@@ -22,7 +22,7 @@ $(function(){
 			url: "/ajax/basket.php",
 			data: data,
 			success: function(msg){
-				var newVal;//newVal
+				var newVal;
 				if (act == 'plus'){
 					newVal = +e.find('input').val() + packaging;
 					$('#basket_basket').html(+$('#basket_basket').unmask() + packaging * summand);

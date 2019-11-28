@@ -1,0 +1,20 @@
+#need_similar a.red{
+	color: red;
+}
+label.item_translate{
+	display: block;
+	margin-top: 10px;	
+}
+label.item_translate a{
+	display: inline-block;
+}
+label.item_translate input{
+	width: 270px !important;
+}
+label.item_translate span.translate_title{
+	width: 200px;
+	display: inline-block;
+}
+span.icon-cross.translate_delete{
+	color: red;
+}

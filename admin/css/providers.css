@@ -1,0 +1,27 @@
+#total{
+	 margin-top: 10px;
+}
+tr.store{
+	cursor: pointer;
+}
+form input[type=submit]{
+	margin: 0 auto;
+}
+.hidden{
+	display: none;
+}
+#load_price{
+	    display: block !important;
+    width: 100%;
+    text-align: left
+}
+#load_price ~ form{
+	margin: 10px 0;
+}
+#load_price ~ form label{
+	display: inline-block;
+    margin: 5px;
+}
+#load_price ~ form input[type=submit]{
+	margin-top: 0;
+}

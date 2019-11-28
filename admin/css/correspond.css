@@ -1,0 +1,16 @@
+#fotos li{
+	display: inline-block;
+	height: 100px;
+}
+#fotos li img{width: 200px}
+.attachment{
+	display: flex;
+}
+.attachment .img-wrap {
+  height: 200px;
+  width: 200px;
+  overflow: hidden;
+}
+.attachment .img-wrap img{
+	width: 100%;
+}

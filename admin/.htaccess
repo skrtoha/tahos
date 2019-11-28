@@ -1,0 +1,32 @@
+AddDefaultCharset utf8
+
+RewriteEngine on
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^admin/(.*)$ admin/$1 [L]
+RewriteRule ^logs/(.*)$ logs/$1 [L]
+RewriteRule ^new/([0-9]+)$ index.php?view=new&id=$1 [L]
+RewriteRule ^category/([a-z0-9-]+)$ index.php?view=category&href=$1 [L]
+RewriteRule ^category/([a-z0-9-]+)/([a-z0-9-]+)$ index.php?view=category&href=$1&sub=$2 [L]
+RewriteRule ^providers/([0-9]+)$ index.php?view=providers&item_id=$1 [L]
+RewriteRule ^search/(article|barcode)/(.*)/yes$ index.php?view=search&type=$1&search=$2&save=true [L]
+RewriteRule ^search/(article|barcode)/(.*)$ index.php?view=search&type=$1&search=$2 [L]
+RewriteRule ^article/([0-9]+)(-([^/]+)?)?$ index.php?view=article&item_id=$1
+RewriteRule ^registration$ index.php?view=registration [L]
+RewriteRule ^authorization$ index.php?view=authorization [L]
+RewriteRule ^favorites$ index.php?view=favorites [L]
+RewriteRule ^settings$ index.php?view=settings [L]
+RewriteRule ^sending$ index.php?view=sending [L]
+RewriteRule ^messages$ index.php?view=messages [L]
+RewriteRule ^basket$ index.php?view=basket [L]
+RewriteRule ^basket/(\w+)$ index.php?view=basket&act=$1 [L]
+RewriteRule ^orders$ index.php?view=orders [L]
+RewriteRule ^account$ index.php?view=account [L]
+RewriteRule ^payment$ index.php?view=payment [L]
+RewriteRule ^received$ index.php?view=received [L]
+RewriteRule ^to_order$ index.php?view=to_order [L]
+RewriteRule ^new_message$ index.php?view=new_message [L]
+RewriteRule ^correspond/([0-9]+)$ index.php?view=correspond&id=$1 [L]
+RewriteRule ^correspond/([0-9]+)/([0-9]+)/([0-9]+)$ index.php?view=correspond&order_id=$1&provider_id=$2&item_id=$3 [L]
+RewriteRule ^exit$ index.php?view=exit [L]
+RewriteRule ^/$ index.php?view=index [L]

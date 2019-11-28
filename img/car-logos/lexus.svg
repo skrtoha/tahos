@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="12.536686mm"
+   height="5.6030154mm"
+   viewBox="0 0 44.421331 19.853204"
+   id="svg38115"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="lexus.svg">
+  <defs
+     id="defs38117" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="22.210663"
+     inkscape:cy="9.9266015"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="751"
+     inkscape:window-height="405"
+     inkscape:window-x="608"
+     inkscape:window-y="268"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata38120">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-335.81477,-519.31065)">
+    <g
+       transform="translate(-365.96601,272.15984)"
+       id="g39570">
+      <g
+         transform="matrix(1.3333333,0,0,-1.3333333,720.63025,253.33614)"
+         id="g4160">
+        <path
+           inkscape:connector-curvature="0"
+           d="M 0,0 C -0.424,-0.668 -0.463,-0.991 -0.474,-1.208 -0.487,-1.42 -0.487,-1.801 -0.143,-2.112 0.438,-2.627 1.251,-2.544 1.97,-2.544 l 5.935,0 c 0.254,0 0.328,0.074 0.466,0.257 0.474,0.723 0.688,1.506 0.688,2.208 0,1.503 -0.981,3.394 -3.457,4.249 L 5.322,3.772 C 7.288,2.843 8.102,1.626 8.102,-0.076 8.111,-0.532 7.993,-1.025 7.691,-1.481 l -5.772,0 c -0.345,0 -0.394,0.39 -0.27,0.609 0.512,0.905 1.039,1.705 1.654,2.528 0.585,0.776 1.159,1.501 1.761,2.262 0.164,0.211 0.055,0.414 -0.27,0.481 -0.674,0.142 -1.378,0.24 -2.232,0.24 -4.737,0 -6.467,-2.71 -6.467,-4.719 0,-2.177 1.745,-4.707 6.479,-4.707 2.628,0 4.349,0.844 5.346,1.927 l -1.006,0 c -0.872,-0.801 -2.365,-1.369 -4.34,-1.369 -4.011,0 -5.49,2.245 -5.49,4.179 0.029,1.725 1.618,4.108 5.59,4.187 C 2.826,4.141 2.942,4.004 2.837,3.875 2.158,3.042 0.221,0.348 0,0"
+           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path4158" />
+      </g>
+      <g
+         transform="matrix(1.3333333,0,0,-1.3333333,719.35278,265.87068)"
+         id="g4164">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0,0 -1.882,0 -3.571,0 c 0.016,0.425 0.468,0.852 0.882,0.852 l 2.689,0 0.742,0 0,0.851 -0.742,0 -3.615,0 c -0.049,0.248 0.418,0.738 0.776,0.738 l 2.839,0 1.078,0 0,0.457 2.538,-1.814 z m 18.805,1.623 -3.8,0 c 0.051,0.461 0.449,0.847 0.852,0.847 l 3.845,0 -0.013,0.801 -4.077,0 c -1.29,0 -2.321,-1.067 -2.351,-2.308 -0.005,-0.087 0.054,-0.14 0.152,-0.14 l 4.625,0.016 c 0.237,-0.033 0.421,-0.22 0.421,-0.441 0,-0.248 -0.227,-0.447 -0.502,-0.447 l -5.089,0 0,3.317 -1.498,0 0,-3.326 -2.755,0 c -0.748,0 -0.902,0.453 -0.902,0.868 l 0,2.478 -2.485,0 C 4.982,3.121 4.743,2.939 4.491,2.786 L 3.018,1.881 1.1,3.275 l -2.982,0 -2.815,0 C -5.46,3.275 -6.045,3.077 -6.479,2.736 -7.26,2.122 -7.508,1.474 -7.499,1.184 l 1.016,0 C -6.929,0.852 -7.229,0.453 -7.387,-0.008 l -3.334,0 c -0.598,0 -0.984,0.423 -0.984,0.835 l 0,2.478 -1.474,0 0,-2.574 c 0,-0.925 0.882,-1.565 2.297,-1.565 l 9,0 2.179,0 c 0.232,0.157 0.452,0.323 0.695,0.47 l 1.517,0.916 1.924,-1.368 2.19,0 -2.894,2.17 1.486,0.967 C 5.531,2.529 5.864,2.702 6.19,2.894 l 0,-2.185 c 0,-0.921 0.236,-1.559 2.098,-1.559 l 10.517,0.025 c 0.81,-0.012 1.332,0.548 1.332,1.223 0,0.672 -0.599,1.225 -1.332,1.225"
+           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path4162" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,7 @@
+{
+    "require": {
+        "katzgrau/klogger": "dev-master",
+        "neitanod/forceutf8": "dev-master",
+        "mobiledetect/mobiledetectlib": "^2.8"
+    }
+}

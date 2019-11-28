@@ -1,0 +1,88 @@
+AddDefaultCharset utf8
+
+RewriteEngine on
+
+RewriteCond %{HTTP_USER_AGENT} AhrefsBot
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} MJ12bot
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} Detectify
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} dotbot
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} Riddler
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} SemrushBot
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} LinkpadBot
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} BLEXBot
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} FlipboardProxy
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} aiHitBot
+RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} trovitBot
+RewriteRule (.*) - [F,L]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^admin/(.*)$ admin/$1 [L]
+RewriteRule ^page/(.*)$ index.php?view=page&type=$1 [L]
+RewriteRule ^new/([0-9]+)$ index.php?view=new&id=$1 [L]
+RewriteRule ^category/([a-z0-9-]+)$ index.php?view=category&href=$1 [L]
+RewriteRule ^category/([a-z0-9-]+)/([a-z0-9-]+)$ index.php?view=category&href=$1&sub=$2 [L]
+RewriteRule ^providers/([0-9]+)$ index.php?view=providers&item_id=$1 [L]
+RewriteRule ^search/(article|barcode|vin)/(.*)/yes$ index.php?view=search&type=$1&search=$2&save=true [L]
+RewriteRule ^search/(article|barcode|vin)/(.*)/(.*)$ index.php?view=search&type=$1&search=$2&brend=$3 [L]
+RewriteRule ^search/(article|barcode|vin)/(.*)$ index.php?view=search&type=$1&search=$2 [L]
+RewriteRule ^search/armtek/(.*)$ index.php?view=search&type=armtek&item_id=$1 [L]
+RewriteRule ^garage\/?$ index.php?view=garage [L]
+RewriteRule ^garage/(\d+)?$ index.php?view=garage&modification_id=$1 [L]
+RewriteRule ^garage/select_modification/$ index.php?view=garage&act=select_modification [L]
+#RewriteRule ^article/(\w+)(-([^/]+)?)?$ index.php?view=article&item_id=$1&article=$3 [L]
+RewriteRule ^article/(\w+)-.*$ index.php?view=article&item_id=$1&article=$3 [L]
+RewriteRule ^registration$ index.php?view=registration [L]
+RewriteRule ^authorization$ index.php?view=authorization [L]
+RewriteRule ^favorites$ index.php?view=favorites [L]
+RewriteRule ^settings$ index.php?view=settings [L]
+RewriteRule ^sending$ index.php?view=sending [L]
+RewriteRule ^messages$ index.php?view=messages [L]
+RewriteRule ^basket$ index.php?view=basket [L]
+RewriteRule ^help$ index.php?view=help [L]
+RewriteRule ^help/([\w-]+)$ index.php?view=help&rubric_href=$1 [L]
+RewriteRule ^basket/(\w+)$ index.php?view=basket&act=$1 [L]
+RewriteRule ^orders$ index.php?view=orders [L]
+RewriteRule ^order/(\d+)$ index.php?view=order&id=$1 [L]
+RewriteRule ^order/(\d+)/edit$ index.php?view=order&id=$1&act=edit [L]
+RewriteRule ^sending/(\d+)$ index.php?view=sending&id=$1 [L]
+RewriteRule ^account$ index.php?view=account [L]
+RewriteRule ^payment$ index.php?view=payment [L]
+RewriteRule ^received$ index.php?view=received [L]
+RewriteRule ^to_order$ index.php?view=to_order [L]
+RewriteRule ^new_message$ index.php?view=new_message [L]
+RewriteRule ^correspond/([0-9]+)$ index.php?view=correspond&id=$1 [L]
+RewriteRule ^correspond/([0-9]+)/([0-9]+)/([0-9]+)$ index.php?view=correspond&order_id=$1&store_id=$2&item_id=$3 [L]
+RewriteRule ^exit$ index.php?view=exit [L]
+RewriteRule ^original-catalogs$ index.php?view=original-catalogs [L]
+RewriteRule ^original-catalogs/([\w-]+)$ index.php?view=original-catalogs&vehicle=$1 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)$ index.php?view=original-catalogs&vehicle=$1&brend=$2 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/(\d{4})$ index.php?view=original-catalogs&vehicle=$1&brend=$2&year=$3 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/to_garage$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&to_garage=1 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/(\d{4})$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/(\d{4})/to_garage$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5&to_garage=1 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/(\d{4})/to_garage/(\d+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5&to_garage=1&modification_id=$6 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/to_garage$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5&to_garage=1 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/to_garage/(\d+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&to_garage=1&modification_id=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/to_garage/(\d+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&to_garage=1&modification_id=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\w{17})?$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})?$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&year=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/([\d]+)$ index.php?view=modification&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$5&vin=vin [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\w{17})/([\d]+)$ index.php?view=modification&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&vin=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})/([\d]+)$ index.php?view=modification&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&year=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\w{17})/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&node_id=$7&vin=$5 [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$5&node_id=$6&vin=vin [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&node_id=$7&year=$5 [L]
+#RewriteRule ^/$ index.php?view=index [L]
+#RewriteRule ^/$ index.php [L]

@@ -1,5 +1,9 @@
 <?php
 $act = $_GET['act'];
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH'])){
+	print_r($_POST);
+	exit();
+};
 error_reporting(E_ERROR);
 switch ($act){
 	case 'delete':
@@ -308,7 +312,12 @@ function show_form($act){
 	}
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title"
 	?>
-	<div class="action"><a href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a></div>
+	<div class="action">
+		<a href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
+		<input type="file" multiple="multiple" name="" style="display: none">
+		<input type="hidden" name="brend_id" value="<?=$_GET['id']?>">
+		<a class="upload_files" href="#">Загрузить изображения товаров</a>
+	</div>
 	<div class="t_form">
 		<div class="bg">
 			<form action="?view=brends&id=<?=$id?>&act=<?=$act?>&from_item=<?=$_GET['from_item']?>&from=<?=$_GET['from']?>" method="post" enctype="multipart/form-data">

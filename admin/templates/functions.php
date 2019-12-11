@@ -158,17 +158,17 @@ function getStrFilters($strFilters){
 	else return false;
 }
 function set_image($file, $id){
-	error_reporting(E_ERROR);
 	global $db;
+	error_reporting(E_ERROR | E_PARSE);
 	$array = [];
 	$name = $file['name'];
 	if (!$name) {
 		$array['error'] = '';
 		return $array;
 	}
-	$dir_big = "../images/items/big/$id";
-	$dir_small = "../images/items/small/$id";
-	require_once('../class/class.upload.php');
+	$dir_big = "{$_SERVER['DOCUMENT_ROOT']}/images/items/big/$id";
+	$dir_small = "{$_SERVER['DOCUMENT_ROOT']}/images/items/small/$id";
+	require_once("{$_SERVER['DOCUMENT_ROOT']}/class/class.upload.php");
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);
 	$handle = new upload($file);

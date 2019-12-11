@@ -392,6 +392,14 @@ class DataBase {
 		if ($this->delete($table_name, 'id='.$id)) return true;
 		else return false;
 	}
+	/**
+	 * [getField description]
+	 * @param  [type] $table_name [description]
+	 * @param  [type] $field_out  [description]
+	 * @param  [type] $field_in   [description]
+	 * @param  [type] $value_in   [description]
+	 * @return [type]             [description]
+	 */
 	function getField($table_name, $field_out, $field_in, $value_in){
 		$table_name = $this->db_prefix.$table_name;
 		$query = "SELECT `$field_out` FROM `$table_name` WHERE $field_in = '$value_in'";

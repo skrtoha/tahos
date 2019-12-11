@@ -21,7 +21,7 @@
 					processData: false,
 					contentType: false,
 					success: function(respond, status, jqXHR){
-						// console.log(respond, status, jqXHR);
+						console.log(respond, status, jqXHR);
 					}
 				})
 				console.log(data);

@@ -21,10 +21,10 @@
 					processData: false,
 					contentType: false,
 					success: function(respond, status, jqXHR){
-						console.log(respond, status, jqXHR);
+						show_message('Операция завершена. Подробности в консоли');
+						console.log(respond);
 					}
 				})
-				console.log(data);
 				return false;
 			})
 		},

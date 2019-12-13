@@ -857,6 +857,9 @@ function sortStoreItems(sortType){
 		res.store_items[i].min = min;
 	}
 	if (sortType == 'brend') res.store_items.sort(function(a, b){
+		if (typeof a.min === 'undefined') return 0;
+		if (typeof b.min === 'undefined') return 0;
+		// console.log(typeof b, typeof a);
 		var nameA = a.min.toLowerCase();
 		var nameB = b.min.toLowerCase();
 		if (nameA < nameB) return -1;
@@ -866,7 +869,6 @@ function sortStoreItems(sortType){
 	else res.store_items.sort(function(a, b){
 		return a.min - b.min;
 	});
-	console.log(res);
 }
 $(function(){
 	if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;

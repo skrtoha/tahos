@@ -17,6 +17,7 @@ switch ($act) {
 			header("Location: ?view=providers&act=provider&id={$_GET['id']}");
 		}
 		break;
+	case 'priceEmail': priceEmail(); break;
 	default:
 		view();
 }
@@ -251,5 +252,175 @@ function orders(){
 			<td style="text-align: right" colspan="10">Итого: <b><span class="price_format"><?=$total?></span></b> руб.</td>
 		</tr>
 	</table>
+<?}
+function priceEmail(){
+	global $status, $db, $page_title;
+	$array = array();
+	if (!empty($_POST)){
+		$db->insert(
+			'email_prices',
+			[
+				'store_id' => $_GET['store_id'],
+				'settings' => json_encode($_POST)
+			],
+			['duplicate' =>[
+				'settings' => json_encode($_POST)
+			], 'print_query' => false]
+		);
+		$array = $_POST;
+	}
+	else{
+		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
+		if (!empty($emailPrice)) $array = json_decode($emailPrice['settings'], true);
+	}
+	$store = $db->select_unique("
+		SELECT
+			ps.id AS store_id,
+			ps.title AS store,
+			ps.provider_id,
+			p.title AS provider
+		FROM
+			#provider_stores ps
+		LEFT JOIN
+			#providers p ON p.id = ps.provider_id
+		WHERE
+			ps.id = {$_GET['store_id']}
+	");
+	$store = $store[0];
+	$page_title = "Загрузка с E-mail для {$store['store']}";
+	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> >";
+	$status .= "<a href='/admin/?view=providers&act=stores&id={$store['provider_id']}'>{$store['provider']}</a> > $page_title";
+	?>
+	<div class="actions"></div>
+	<div class="t_form">
+		<div class="bg">
+			<form method="post" enctype="multipart/form-data">
+				<div class="field">
+					<div class="title">Наименование для лога</div>
+					<div class="value"><input type="text" name="title" value="<?=$array['title']?>"></div>
+				</div>
+				<div class="field">
+					<div class="title">E-mail</div>
+					<div class="value"><input type="text" name="from" value="<?=$array['from']?>"></div>
+				</div>
+				<div class="field">
+					<div class="title">Наименование файла</div>
+					<div class="value"><input type="text" name="name" value="<?=$array['name']?>"></div>
+				</div>
+				<div class="field">
+					<div class="title">Является архивом</div>
+					<div class="value">
+						<label>
+							<input type="radio" <?=$array['isArchive'] ? "checked" : ""?> name="isArchive" value="1">
+							Да
+						</label>
+						<label>
+							<input type="radio" <?=!$array['isArchive'] ? "checked" : ""?> name="isArchive" value="0">
+							Нет
+						</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Наименование файла в архиве</div>
+					<div class="value">
+						<input type="text" name="nameInArchive" value="<?=$array['nameInArchive']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Тип файла</div>
+					<div class="value">
+						<label>
+							<input type="radio" <?=$array['fileType'] == 'csv' ? 'checked' : ''?> name="fileType" value="csv" checked>
+							CSV
+						</label>
+						<label>
+							<input type="radio" <?=$array['fileType'] == 'excel' ? 'checked' : ''?>  name="fileType" value="excel">
+							Excel
+						</label>
+					</div>
+				<div class="field">
+					<div class="title">Очищать прайс</div>
+					<div class="value">
+						<label>
+							<input type="radio" <?=$array['fileType'] == 'onlyStore' ? 'ckecked' : ''?> name="clearPrice" value="onlyStore" checked>
+							Только этого склада
+						</label>
+						<label>
+							<input type="radio" <?=$array['fileType'] == 'provider' ? 'ckecked' : ''?> name="clearPrice" value="provider">
+							Полностью поставщика
+						</label>
+						<label>
+							<input type="radio" <?=$array['fileType'] == 'noClear' ? 'ckecked' : ''?>  name="clearPrice" value="noClear">
+							Не очищать
+						</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Добавлять отсутствующие бренды</div>
+					<div class="value">
+						<label>
+							<input <?=$array['isAddBrend'] == '1' ? 'ckecked' : ''?> type="radio" name="isAddBrend" value="1">
+							Да
+						</label>
+						<label>
+							<input <?=$array['isAddBrend'] == '0' ? 'ckecked' : ''?> type="radio" name="isAddBrend" value="0" checked>
+							Нет
+						</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Добавлять отсутствующую номенклатуру</div>
+					<div class="value">
+						<label>
+							<input type="radio" <?=$array['isAddItem'] == '1' ? 'ckecked' : ''?> name="isAddItem" value="1">
+							Да
+						</label>
+						<label>
+							<input type="radio" <?=$array['isAddItem'] == '0' ? 'ckecked' : ''?> name="isAddItem" value="0" checked>
+							Нет
+						</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Наименование полей</div>
+					<div class="value">
+						<div>
+							<span>Бренд</span>
+							<input type="text" name="fields[brend]" value="<?=$array['fields']['brend']?>">
+						</div>
+						<div>
+							<span>Артикул</span>
+							<input type="text" name="fields[article]" value="<?=$array['fields']['article']?>">
+						</div>
+						<div>
+							<span>Артикул по каталогу</span>
+							<input type="text" name="fields[article_cat]" value="<?=$array['fields']['article_cat']?>">
+						</div>
+						<div>
+							<span>Наименование</span>
+							<input type="text" name="fields[title]" value="<?=$array['fields']['title']?>">
+						</div>
+						<div>
+							<span>В наличии</span>
+							<input type="text" name="fields[inStock]" value="<?=$array['fields']['inStock']?>">
+						</div>
+						<div>
+							<span>Упаковка</span>
+							<input type="text" name="fields[packaging]" value="<?=$array['fields']['packaging']?>">
+						</div>
+						<div>
+							<span>Прайс</span>
+							<input type="text" name="fields[price]" value="<?=$array['fields']['price']?>">
+						</div>
+					</div>
+					<div class="field">
+						<div class="title"></div>
+						<div class="value"><input type="submit" value="Сохранить"></div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
 <?}
 ?>

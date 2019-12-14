@@ -1,0 +1,7 @@
+CREATE TABLE `tahos_email_prices` (
+  `store_id` int(10) UNSIGNED NOT NULL,
+  `settings` json NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ALTER TABLE `tahos_email_prices`
+  ADD PRIMARY KEY (`store_id`);
+COMMIT;

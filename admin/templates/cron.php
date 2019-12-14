@@ -672,6 +672,76 @@ switch($_GET['act']){
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
+	case 'emailPrice':
+		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
+		$emailPrice = json_decode($emailPrice['settings'], true);
+		$store = $db->select_unique("
+			SELECT
+				ps.id AS store_id,
+				ps.title AS store,
+				ps.provider_id,
+				p.title AS provider
+			FROM
+				#provider_stores ps
+			LEFT JOIN
+				#providers p ON p.id = ps.provider_id
+			WHERE
+				ps.id = {$_GET['store_id']}
+		");
+		$store = $store[0];
+		
+		echo "<h2>Прайс {$emailPrice['title']}</h2>";
+
+		switch($emailPrice['clearPrice']){
+			case 'onlyStore': $db->delete('store_items', "`store_id`={$_GET['store_id']}"); break;
+			case 'provider': $db->query("
+				DELETE si FROM
+					#store_items si
+				LEFT JOIN
+					#provider_stores ps ON ps.id=si.store_id
+				WHERE 
+					ps.provider_id = {$store['provider_id']}
+			", '');
+		}
+
+		$price = new core\Price($db, $emailPrice['title']);
+		if ($emailPrice['isAddItem']) $price->isInsertItem = true;
+		if ($emailPrice['isAddBrend']) $price->isInsertBrend = true;
+
+		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$fileImap = $imap->getLastMailFrom([
+			'from' => $emailPrice['from'],
+			'name' => $emailPrice['name']
+		]);
+		if (!$fileImap){
+			echo ("<br>Не удалось получить {$emailPrice['name']} из почты.");
+			break;
+		} 
+
+		switch($emailPrice['fileType']){
+			case 'excel':
+				$xls = PHPExcel_IOFactory::load($fileImap);
+				$xls->setActiveSheetIndex(0);
+				$sheet = $xls->getActiveSheet();
+				$rowIterator = $sheet->getRowIterator();
+				/**
+				 * [$stringNumber counter for string in file]
+				 * @var integer
+				 */
+				$stringNumber = 0;
+				foreach ($rowIterator as $row) {
+					$cellIterator = $row->getCellIterator();
+					$row = array();
+					foreach($cellIterator as $cell){
+						$row[] = $cell->getCalculatedValue();
+					} 
+					$stringNumber++;
+					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+				}
+
+		debug($emailPrice, 'emailPrice');
+		debug($store, 'store');
+		break;
 }
 $endProcess = time();
 echo "<br>Окончание: <b>".date("d.m.Y H:i:s")."</b>";

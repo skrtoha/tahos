@@ -181,4 +181,45 @@ function provider_save(){
 		if (!$_GET['id']) header("Location: /admin/?view=providers&id=".$db->last_id());
 	}
 }
+/**
+ * Парсит массив с данными
+ * @param  [type] $row  Массив из файла]
+ * @param  [type] $fields Номера полей 
+ * @param  [type] $price Класс
+ * @param  [type] $stringNumber Номер строки файла
+ * @return Никакие переменные не возвращаются
+ */
+function parse_row($row, $fields, core\Price $price, $stringNumber){
+	$fieldBrend = $fields['brend'] - 1;
+	$fieldPrice = $fields['price'] - 1;
+	$fieldTitle = $fields['title'] - 1;
+	$fieldArticle = $fields['article'] - 1;
+	$filedArticle_cat = $fields['article_cat'] - 1;
+	$fieldInStock = $fields['inStock'] - 1;
+	$fieldPackaging = $fields['packaging'] - 1;
+
+
+	if (!$row[$filedArticle_cat] || !$row[$fieldBrend]){
+		$price->log->error("В строке $stringNumber произошла ошибка.");
+		continue;
+	}
+	$brend_id = $price->getBrendId($row[$fieldBrend]);
+	if (!$brend_id) continue;
+	$item_id = $price->getItemId([
+		'brend_id' => $brend_id,
+		'brend' => $row[$fieldBrend],
+		'article' => article_clear($row[$filedArticle_cat]),
+		'title' => $row[$fieldTitle],
+		'row' => $stringNumber
+	]);
+	if (!$item_id) continue;
+	$price->insertStoreItem([
+		'store_id' => $_GET['store_id'],
+		'item_id' => $item_id,
+		'price' => $row[$fieldPrice],
+		'in_stock' => $row[$fieldInStock],
+		'packaging' => $row[$fieldPackaging],
+		'row' => $stringNumber
+	]);
+}
 ?>

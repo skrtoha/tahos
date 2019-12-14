@@ -311,8 +311,14 @@ class DataBase {
 		$query .= ")";
 		if (isset($insert_params['duplicate'])){
 			$query .= " ON DUPLICATE KEY UPDATE ";
-			foreach($insert_params['duplicate'] as $key => $value) $query .= "`$key` = $value, ";
-			$query = substr($query, 0, -2);
+			foreach($insert_params['duplicate'] as $key => $value){
+				$query .= "`$key` = ";
+				if ($value == '') $query .= 'DEFAULT,';
+				elseif (!is_numeric($value)) $query .= "'".$this->mysqli->real_escape_string($value) ."',";
+				else $query .= "'".$value."',";
+				// $query .= "`$key` = $value, ";
+			} 
+			$query = substr($query, 0, -1);
 		}
 		if ($insert_params['print_query']){
 			echo "<pre>$query</pre>";

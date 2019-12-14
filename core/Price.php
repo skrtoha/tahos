@@ -10,7 +10,7 @@ class Price{
 	public $insertedStoreItems = 0;
 	public $nameFileLog;
 	/**
-	 * [$isInsertBrend insert brend if it's is no found]
+	 * [$isInsertBrend insert brend if not found]
 	 * @var boolean
 	 */
 	public $isInsertBrend = false;

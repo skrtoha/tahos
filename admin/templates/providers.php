@@ -297,15 +297,15 @@ function priceEmail(){
 			<form method="post" enctype="multipart/form-data">
 				<div class="field">
 					<div class="title">Наименование для лога</div>
-					<div class="value"><input type="text" name="title" value="<?=$array['title']?>"></div>
+					<div class="value"><input required type="text" name="title" value="<?=$array['title']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">E-mail</div>
-					<div class="value"><input type="text" name="from" value="<?=$array['from']?>"></div>
+					<div class="value"><input required type="text" name="from" value="<?=$array['from']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Наименование файла</div>
-					<div class="value"><input type="text" name="name" value="<?=$array['name']?>"></div>
+					<div class="value"><input required type="text" name="name" value="<?=$array['name']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Является архивом</div>
@@ -342,15 +342,15 @@ function priceEmail(){
 					<div class="title">Очищать прайс</div>
 					<div class="value">
 						<label>
-							<input type="radio" <?=$array['fileType'] == 'onlyStore' ? 'ckecked' : ''?> name="clearPrice" value="onlyStore" checked>
+							<input type="radio" <?=$array['clearPrice'] == 'onlyStore' ? 'checked' : ''?> name="clearPrice" value="onlyStore" checked>
 							Только этого склада
 						</label>
 						<label>
-							<input type="radio" <?=$array['fileType'] == 'provider' ? 'ckecked' : ''?> name="clearPrice" value="provider">
+							<input type="radio" <?=$array['clearPrice'] == 'provider' ? 'checked' : ''?> name="clearPrice" value="provider">
 							Полностью поставщика
 						</label>
 						<label>
-							<input type="radio" <?=$array['fileType'] == 'noClear' ? 'ckecked' : ''?>  name="clearPrice" value="noClear">
+							<input type="radio" <?=$array['clearPrice'] == 'noClear' ? 'checked' : ''?>  name="clearPrice" value="noClear">
 							Не очищать
 						</label>
 					</div>
@@ -359,11 +359,11 @@ function priceEmail(){
 					<div class="title">Добавлять отсутствующие бренды</div>
 					<div class="value">
 						<label>
-							<input <?=$array['isAddBrend'] == '1' ? 'ckecked' : ''?> type="radio" name="isAddBrend" value="1">
+							<input <?=$array['isAddBrend'] == 1 ? 'checked' : ''?> type="radio" name="isAddBrend" value="1">
 							Да
 						</label>
 						<label>
-							<input <?=$array['isAddBrend'] == '0' ? 'ckecked' : ''?> type="radio" name="isAddBrend" value="0" checked>
+							<input <?=$array['isAddBrend'] == 0 ? 'checked' : ''?> type="radio" name="isAddBrend" value="0">
 							Нет
 						</label>
 					</div>
@@ -372,11 +372,11 @@ function priceEmail(){
 					<div class="title">Добавлять отсутствующую номенклатуру</div>
 					<div class="value">
 						<label>
-							<input type="radio" <?=$array['isAddItem'] == '1' ? 'ckecked' : ''?> name="isAddItem" value="1">
+							<input type="radio" <?=$array['isAddItem'] == '1' ? 'checked' : ''?> name="isAddItem" value="1">
 							Да
 						</label>
 						<label>
-							<input type="radio" <?=$array['isAddItem'] == '0' ? 'ckecked' : ''?> name="isAddItem" value="0" checked>
+							<input type="radio" <?=$array['isAddItem'] == '0' ? 'checked' : ''?> name="isAddItem" value="0">
 							Нет
 						</label>
 					</div>
@@ -386,15 +386,15 @@ function priceEmail(){
 					<div class="value">
 						<div>
 							<span>Бренд</span>
-							<input type="text" name="fields[brend]" value="<?=$array['fields']['brend']?>">
+							<input required type="text" name="fields[brend]" value="<?=$array['fields']['brend']?>">
 						</div>
 						<div>
 							<span>Артикул</span>
-							<input type="text" name="fields[article]" value="<?=$array['fields']['article']?>">
+							<input required type="text" name="fields[article]" value="<?=$array['fields']['article']?>">
 						</div>
 						<div>
 							<span>Артикул по каталогу</span>
-							<input type="text" name="fields[article_cat]" value="<?=$array['fields']['article_cat']?>">
+							<input required type="text" name="fields[article_cat]" value="<?=$array['fields']['article_cat']?>">
 						</div>
 						<div>
 							<span>Наименование</span>
@@ -410,7 +410,13 @@ function priceEmail(){
 						</div>
 						<div>
 							<span>Прайс</span>
-							<input type="text" name="fields[price]" value="<?=$array['fields']['price']?>">
+							<input required type="text" name="fields[price]" value="<?=$array['fields']['price']?>">
+						</div>
+					</div>
+					<div class="field">
+						<div class="title">Ссылка для крон</div>
+						<div class="value">
+							<input type="text" value="<?=$_SERVER['HTTP_HOST']?>/admin/?view=cron&act=emailPrice&store_id=<?=$_GET['store_id']?>">
 						</div>
 					</div>
 					<div class="field">

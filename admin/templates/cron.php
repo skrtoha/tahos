@@ -1,5 +1,6 @@
 <?php
 set_time_limit(0);
+error_reporting(E_PARSE | E_ERROR);
 $startProcess = time();
 echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
 switch($_GET['act']){
@@ -673,8 +674,10 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 	case 'emailPrice':
+		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
+		// debug($emailPrice); //exit();
 		$store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
@@ -702,6 +705,7 @@ switch($_GET['act']){
 				WHERE 
 					ps.provider_id = {$store['provider_id']}
 			", '');
+			break;
 		}
 
 		$price = new core\Price($db, $emailPrice['title']);
@@ -717,18 +721,38 @@ switch($_GET['act']){
 			echo ("<br>Не удалось получить {$emailPrice['name']} из почты.");
 			break;
 		} 
+		
+		$fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
 
+		if ($emailPrice['isArchive']){
+			$zipArchive = new ZipArchive();
+			$res = $zipArchive->open($fileImap);
+			if (!$res){
+				echo "<br>Ошибка чтения файла {$emailPrice['']}";
+				break;
+			};
+			$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$emailPrice['nameInArchive']]);
+			if (!$res){
+				echo "<br>Ошибка извлечения файла {$emailPrice['nameInArchive']}: $res";
+				break;
+			};
+			if ($emailPrice['fileType'] == 'excel') $workingFile = $emailPrice['nameInArchive'];
+			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
+		}
+		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
+
+		/**
+		 * [$stringNumber counter for strings in file]
+		 * @var integer
+		 */
+		$stringNumber = 0;
 		switch($emailPrice['fileType']){
 			case 'excel':
-				$xls = PHPExcel_IOFactory::load($fileImap);
+				require_once ($_SERVER['DOCUMENT_ROOT'].'/class/PHPExcel/IOFactory.php');
+				$xls = PHPExcel_IOFactory::load($workingFile);
 				$xls->setActiveSheetIndex(0);
 				$sheet = $xls->getActiveSheet();
 				$rowIterator = $sheet->getRowIterator();
-				/**
-				 * [$stringNumber counter for string in file]
-				 * @var integer
-				 */
-				$stringNumber = 0;
 				foreach ($rowIterator as $row) {
 					$cellIterator = $row->getCellIterator();
 					$row = array();
@@ -737,10 +761,36 @@ switch($_GET['act']){
 					} 
 					$stringNumber++;
 					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+					
+					// debug($row);
+					// if ($stringNumber > 100) break;
+					// echo "<hr>";
 				}
+				break;
+			case 'csv':
+				while ($data = fgetcsv($workingFile, 1000, "\n")) {
+					$row = iconv('windows-1251', 'utf-8', $data[0]);
+					$row = explode(';', str_replace('"', '', $row));
+					$stringNumber++;
+					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 
-		debug($emailPrice, 'emailPrice');
-		debug($store, 'store');
+					// debug($row);
+					// if ($stringNumber > 100) break;
+					// echo "<hr>";
+				}
+				break;
+		}
+
+		$price->log->alert("Обработано $stringNumber строк");
+		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
+		$price->log->alert("Вставлено: $price->insertedBrends брендов");
+		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+		
+		echo "<br>Обработано <b>$stringNumber</b> строк";
+		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
+		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
+		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
+		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 }
 $endProcess = time();

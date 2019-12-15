@@ -56,7 +56,8 @@ function get_str_form(){
 			'<label for="parse_2"><input type="radio" id="parse_2" name="parse" value="particulary"> Частично </label><br>' +
 			'<input type="submit" value="Загрузить">' +
 		'</form>' +
-		'<a href="?view=prices&act=items&id=' + store.id + '">Прайс склада</a>';
+		'<a href="?view=prices&act=items&id=' + store.id + '">Прайс склада</a>' +
+		'<a target="" href="?view=providers&act=priceEmail&store_id=' + store.id + '">Прайс с Email</a>';
 	}; 
 	str +=
 		'<form name="store_change">' +

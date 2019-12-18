@@ -2,7 +2,6 @@
 var hidable_form = true;
 var res;
 function getFullItem(i){
-	console.log(typeof i.min);
 	var s = '',
 		b = false,
 		del = false;
@@ -135,6 +134,7 @@ function set_tabs(){
 					success: function(msg){
 						if (msg){
 							res = JSON.parse(msg);
+							console.log(res);
 							sortStoreItems('brend');
 							var si = store_items(res.store_items, res.user, search_type);
 							if (Object.keys(res.prices).length){
@@ -239,12 +239,15 @@ function store_items(store_items, user, search_type = null){
 			mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
 			full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
 		};
-		if (parseInt(si.is_desc)){
+		if (+si.is_desc || typeof si.foto != null){
+			var stringClass = '';
+			if (si.is_desc) stringClass = 'fa-cog';
+			if (si.foto != null) stringClass = 'fa-camera';
 			mobile +=
-				'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="fa fa-camera product-popup-link" aria-hidden="true"></i></a>';
+				'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
 			full +=
 					'<a title="Информация о товаре" href="#">' +
-						'<i item_id="' + si.item_id + '" class="fa fa-camera product-popup-link" aria-hidden="true"></i>' +
+						'<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +
 					'</a>';
 		} 
 		mobile += 

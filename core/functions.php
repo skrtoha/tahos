@@ -676,6 +676,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			si.packaging,
 			b.title as brend,
 			i.brend_id as brend_id,
+			i.foto,
 			ps.cipher,
 			ps.provider_id,
 			ps.id as store_id,
@@ -772,6 +773,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$p['brend'] = $v['brend'];
 		$p['brend_id'] = $v['brend_id'];
 		$p['is_desc'] = $v['is_desc'];
+		$p['foto'] = $v['foto'];
 		$p['item_id'] = $v['item_id'];
 		$list['store_id'] = $v['store_id'];
 		$list['in_stock'] = (int) $v['in_stock'] ? $v['in_stock'] : 'Под заказ';

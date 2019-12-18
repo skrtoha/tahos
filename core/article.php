@@ -1,3 +1,4 @@
+<?//debug($store_items);?>
 <?if ($device == 'tablet' || $device == 'desktop'){?>
 	<table class="articul-table">
 		<tr class="shown">
@@ -30,9 +31,11 @@
 					</td>
 					<!-- наименование с фотоаппаратом -->
 					<td class="name-col" style="padding-top: 20px;text-align:left">
-						<?if($si['is_desc']){?>
+						<?if($si['is_desc']) $class ='fa-cog';
+						if ($si['foto']) $class = 'fa-camera';
+						if($si['is_desc'] || $si['foto']){?>
 							<a href="#">
-								<i item_id="<?=$si['item_id']?>" class="fa fa-camera product-popup-link" aria-hidden="true"></i>
+								<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
 							</a>
 						<?}?>
 						<?=$si['title_full']?>

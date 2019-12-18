@@ -1439,6 +1439,7 @@ img.mfp-img {
 
 .fa-gear:before,
 .fa-cog:before {
+	font-size: 19px;
 	content: "\f013"; }
 
 .fa-trash-o:before {

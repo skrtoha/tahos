@@ -239,10 +239,10 @@ function store_items(store_items, user, search_type = null){
 			mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
 			full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
 		};
-		if (+si.is_desc || typeof si.foto != null){
+		if (+si.is_desc || typeof si.foto){
 			var stringClass = '';
 			if (si.is_desc) stringClass = 'fa-cog';
-			if (si.foto != null) stringClass = 'fa-camera';
+			if (si.foto) stringClass = 'fa-camera';
 			mobile +=
 				'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
 			full +=

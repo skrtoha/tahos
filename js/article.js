@@ -134,7 +134,6 @@ function set_tabs(){
 					success: function(msg){
 						if (msg){
 							res = JSON.parse(msg);
-							console.log(res);
 							sortStoreItems('brend');
 							var si = store_items(res.store_items, res.user, search_type);
 							if (Object.keys(res.prices).length){
@@ -239,12 +238,12 @@ function store_items(store_items, user, search_type = null){
 			mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
 			full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
 		};
-		if (+si.is_desc || typeof si.foto){
+		if (+si.is_desc || si.foto){
 			var stringClass = '';
 			if (si.is_desc) stringClass = 'fa-cog';
 			if (si.foto) stringClass = 'fa-camera';
 			mobile +=
-				'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
+				'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
 			full +=
 					'<a title="Информация о товаре" href="#">' +
 						'<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +
@@ -590,7 +589,7 @@ function store_items(store_items, user, search_type = null){
 				if (si.is_desc) stringClass = 'fa-cog';
 				if (si.foto) stringClass = 'fa-camera';
 				mobile +=
-					'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
+					'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
 				full +=
 						'<a title="Информация о товаре" href="#">' +
 							'<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +

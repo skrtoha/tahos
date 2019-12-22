@@ -585,11 +585,16 @@ function store_items(store_items, user, search_type = null){
 					'</a>' +
 				'</td>' +
 				'<td class="name-col" style="padding-top: 20px;text-align:left">';
-			if (parseInt(si.is_desc)){
+			if (+si.is_desc || typeof si.foto){
+				var stringClass = '';
+				if (si.is_desc) stringClass = 'fa-cog';
+				if (si.foto) stringClass = 'fa-camera';
+				mobile +=
+					'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
 				full +=
-					'<a href="#">' +
-						'<i item_id="' + si.item_id + '" class="fa fa-camera product-popup-link" aria-hidden="true"></i>' +
-					'</a>';
+						'<a title="Информация о товаре" href="#">' +
+							'<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +
+						'</a>';
 			}
 			full +=
 					si.title_full + 

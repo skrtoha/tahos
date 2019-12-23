@@ -242,8 +242,6 @@ function store_items(store_items, user, search_type = null){
 			var stringClass = '';
 			if (si.is_desc) stringClass = 'fa-cog';
 			if (si.foto) stringClass = 'fa-camera';
-			mobile +=
-				'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
 			full +=
 					'<a title="Информация о товаре" href="#">' +
 						'<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +

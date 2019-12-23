@@ -344,10 +344,14 @@ else{?>
 					<a href="<?=getHrefArticle($si['article'])?>" class="articul"><?=$si['article']?></a>
 				</p>
 				<p><?=$si['title_full']?></p>
-				<?if ($si['is_desc']){?>
-					<a href="#"><i item_id="<?=$si['item_id']?>" class="fa fa-camera product-popup-link" aria-hidden="true"></i></a>
-				<?}?>
 			</div>
+			<?if ($si['is_desc'] || $si['foto']){
+				$stringClass = '';
+				if ($si['is_desc']) $stringClass = 'fa-cog';
+				if ($si['foto']) $stringClass = 'fa-camera';
+				?>
+				<a href="#"><i item_id="<?=$si['item_id']?>" class="fa <?=$stringClass?> product-popup-link" aria-hidden="true"></i></a>
+			<?}?>
 			<table class="small-view">
 				<?if ($csi > 0  || !empty($si['prevails'])){?>
 					<tr class="first-mobile shown">

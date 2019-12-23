@@ -6034,10 +6034,9 @@ span.delete-btn {
 	display: none; }
 
 .search-result .mobile-layout .goods-header {
+	float: left;
+    width: calc(100% - 50px);
 	position: relative; }
-	.search-result .mobile-layout .goods-header p {
-		width: -webkit-calc(100% - 80px);
-		width: calc(100% - 80px); }
 		.search-result .mobile-layout .goods-header p:first-child {
 			padding-bottom: 0; }
 	.search-result .mobile-layout .goods-header .fa-camera {
@@ -7510,6 +7509,11 @@ span.delete-btn {
 
 /* Extra Small Devices, Phones */
 @media screen and (max-width: 550px) {
+	.fa-gear:before, .fa-cog:before, .fa-camera:before{
+		position: relative;
+    font-size: 30px;
+    top: 5px;
+	}
 	#actions_slider .prev, #actions_slider .next {
 		width: 68px;
 		height: 68px; }

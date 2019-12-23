@@ -54,7 +54,11 @@ class Armtek{
 			$this->keyzak[$object->KEYZAK] = $array['id'];
 			if ($array['delivery'] == 1){
 				$delivery = $object->WRNTDT ? $object->WRNTDT : $object->DLVDT;
-				$this->db->update('provider_stores', ['delivery' => self::getDaysDelivery($delivery)], "`id`={$array['id']}");
+				$days = self::getDaysDelivery($delivery);
+				//добавлено условие из-за того, что для ARMC количество дней доставки было равно нулю
+				if ($days){
+					$this->db->update('provider_stores', ['delivery' => $days], "`id`={$array['id']}");
+				}
 			} 
 			return $array['id'];
 		} 

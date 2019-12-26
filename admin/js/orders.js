@@ -229,7 +229,7 @@ $(function(){
 			data: data,
 			success: function(response){
 				// console.log(response); return false;
-				// document.location.reload();
+				document.location.reload();
 			}
 		})
 	})

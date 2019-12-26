@@ -205,9 +205,67 @@ $(function(){
 	$('a.allInWork').on('click', function(){
 		if (!confirm('Вы уверены?')) return false;
 	})
+	$(document).on('submit', '#askForQuanAndPrice', function(e){
+		e.preventDefault();
+		var array = $(this).serializeArray();
+		var store_id = array[0].value;
+		var item_id = array[1].value;
+		var form = $('tr[store_id=' + store_id + '][item_id=' + item_id + '] td.change_status form');
+		var data = {
+			status_id: 2,
+			new_returned: array[2].value,
+			returned: form.find('input[name=returned]').val(),
+			ordered: form.find('input[name=ordered]').val(),
+			store_id: store_id,
+			item_id: item_id,
+			price: array[3].value,
+			bill: form.find('input[name=bill]').val(),
+			order_id: form.find('input[name=order_id]').val(),
+			user_id: form.find('input[name=user_id]').val(),
+		}
+		$.ajax({
+			type: 'post',
+			url: ajax_url,
+			data: data,
+			success: function(response){
+				// console.log(response); return false;
+				// document.location.reload();
+			}
+		})
+	})
 	$('select.change_status').on('change', function(){
 		var th = $(this);
 		var status_id = + th.val();
+		if (status_id != 2) return false;
+		var form = th.closest('form');
+		var issued = form.find('input[name=issued]').val();
+		var returned = form.find('input[name=returned]').val();
+		var tr = form.closest('tr');
+		modal_show(
+			'<form id="askForQuanAndPrice">' +
+				'<input type="hidden" name="store_id" value="' + tr.attr('store_id') + '">' +
+				'<input type="hidden" name="item_id" value="' + tr.attr('item_id') + '">' +
+				'<table>' +
+					'<tr>' +
+						'<td>Количество:</td>' +
+						'<td><input type="text" name="quan" value="' + (issued - returned) + '"></td>' +
+					'</tr>' +
+					'<tr>' +
+						'<td>Цена:</td>' +
+						'<td><input type="text" name="price" value="' + form.find('input[name=price]').val() + '"></td>' +
+					'</tr>' +
+					'<tr>' +
+						'<td colspan="2"><input type="submit" value="Отправить"></td>' +
+					'</tr>' +
+				'</table>' +
+			'</form>'
+		);
+	})
+	$('select.change_status').on('change', function(){
+		var th = $(this);
+		var status_id = + th.val();
+		//добавлено, т.к. обработка идет в другом месте
+		if (status_id == 2) return false;
 		th = th.closest('form');
 		var order_id = + th.find('input[name=order_id]').val();
 		var store_id = + th.find('input[name=store_id]').val();
@@ -222,16 +280,8 @@ $(function(){
 				var arrived = + th.find('input[name=arrived]').val() - th.find('input[name=issued]').val();
 				data += '&arrived=' + arrived;
 				break;
-			case 2:
-				var issued = th.find('input[name=issued]').val();
-				var returned = th.find('input[name=returned]').val();
-				var new_returned = prompt('Укажите количество:', issued - returned);
-				if (!check_value(th, new_returned, issued - returned)) return false;
-				data += '&returned=' + returned;
-				data += '&new_returned=' + new_returned;
-				data += '&issued=' + issued;
-				data += '&ordered=' + th.find('input[name=ordered]').val();
-				break;
+			//выделено в отдельную функцию
+			case 2:break;
 			case 3:
 				var ordered = + th.find('input[name=ordered]').val();
 				var arrived = prompt('Укажите количество:', ordered);

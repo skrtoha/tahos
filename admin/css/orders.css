@@ -57,3 +57,6 @@ table input[name=price]{
 #to_basket{
 	float: right;
 }
+#askForQuanAndPrice input{
+	width: 100%;
+}

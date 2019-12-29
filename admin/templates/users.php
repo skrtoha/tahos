@@ -122,9 +122,9 @@ function view(){
 		<?if (count($users)){
 			foreach($users as $user){?>
 				<tr class="users_box" user_id="<?=$user['id']?>">
-					<td><?=$user['name']?></td>
-					<td><?=$user['telefon']?></td>
-					<td><?=$user['email']?></td>
+					<td label="ФИО"><?=$user['name']?></td>
+					<td label="Телефон"><?=$user['telefon']?></td>
+					<td label="E-mail"><?=$user['email']?></td>
 				</tr>
 			<?}
 		}
@@ -417,7 +417,7 @@ function funds(){
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$funds = $db->select('funds', '*', $where, 'id', false, "$start,$perPage", true);?>
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
-	<div class="actions">
+	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>
 		<?$bill = $user[0]['bill'] ? '<span class="price_format">'.$user[0]['bill'].'</span> руб.' : 'пусто';?>
 		<span>На счету: <b><?=$bill?></b></span>
@@ -425,7 +425,7 @@ function funds(){
 		<span>Зарезервировано: <b><?=$reserved_funds?></b></span>
 		<?$value = $user[0]['bill'] - $user[0]['reserved_funds'];
 		$available =  $value ? '<span class="price_format">'.$value.'</span> руб.' : 'пусто';?>
-		<span style="margin-left: 10px">Доступно: <b><?=$available?></b></span>
+		<span>Доступно: <b><?=$available?></b></span>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -438,11 +438,11 @@ function funds(){
 		<?if (count($funds)){
 			foreach($funds as $id => $fund){?>
 				<tr>
-					<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
-					<td><?=$operations_types[$fund['type_operation']]?></td>
-					<td class="price_format"><?=$fund['sum']?> руб.</td>
-					<td class="price_format"><?=$fund['remainder']?></td>
-					<td><?=stripslashes($fund['comment'])?></td>
+					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
+					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
+					<td label="Сумма" class="price_format"><?=$fund['sum']?> руб.</td>
+					<td label="Остаток" class="price_format"><?=$fund['remainder']?></td>
+					<td label="Комментарий"><?=stripslashes($fund['comment'])?></td>
 				</tr>
 			<?}
 		}
@@ -480,8 +480,8 @@ function user_order_add(){
 				</div>
 				<form class="added_items" method="post">
 					<p><strong>Добавленные товары:</strong></p>
-					<table>
-						<tr>
+					<table class="t_table">
+						<tr class="head">
 							<th>Поставщик</th>
 							<th>Бренд</th>
 							<th>Артикул</th>

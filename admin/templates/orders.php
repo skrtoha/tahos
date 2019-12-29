@@ -236,10 +236,10 @@ function view(){
 				$is_new = $order['is_new'] ? 'is_new' : '';
 				?>
 				<tr class="orders_box <?=$is_new?>" href="?view=orders&id=<?=$order['id']?>&act=change">
-					<td><?=$order['id']?></td>
-					<td><?=$order['date']?></td>
-					<td><?=$order['status']?></td>
-					<td class="price_format">
+					<td label="Номер"><?=$order['id']?></td>
+					<td label="Дата заказа"><?=$order['date']?></td>
+					<td label="Статус"><?=$order['status']?></td>
+					<td label="Сумма" class="price_format">
 						<?=get_summ([
 							'price' => $order['prices'],
 							'quan' => $order['quans'],
@@ -249,7 +249,7 @@ function view(){
 							'returned' => $order['returned']
 						])?>
 					</td>
-					<td><a href="?view=orders&act=user_orders&id=<?=$order['user_id']?>"><?=$order['fio']?></a></td>
+					<td label="Пользователь"><a href="?view=orders&act=user_orders&id=<?=$order['user_id']?>"><?=$order['fio']?></a></td>
 				</tr>
 			<?}
 		}
@@ -290,14 +290,14 @@ function show_form($act){
 			<td>Дата заказа</td>
 		</tr>
 		<tr>
-			<td><?=$order['id']?></td>
-			<td>
+			<td label="Номер"><?=$order['id']?></td>
+			<td label="Пользователь">
 				<a href="?view=users&act=funds&id=<?=$order['user_id']?>">
 					<?=$order['fio']?>
 				</a> 
 				(<b class="price_format"><?=$order['bill'] - $order['reserved_funds']?></b> руб.)
 			</td>
-			<td class="price_format total"><?=get_summ([
+			<td label="Сумма" class="price_format total"><?=get_summ([
 				'statuses' => $order['statuses'],
 				'price' => $order['prices'],
 				'quan' => $order['quans'],
@@ -306,8 +306,8 @@ function show_form($act){
 				'issued' => $order['issued'],
 				'returned' => $order['returned']
 			])?></td>
-			<td><?=$order['is_draft'] ? 'Черновик' : get_status($order['statuses'])?></td>
-			<td><?=$order['date']?></td>
+			<td label="Статус"><?=$order['is_draft'] ? 'Черновик' : get_status($order['statuses'])?></td>
+			<td label="Дата заказа"><?=$order['date']?></td>
 		</tr>
 	</table>
 	<h3 style="margin-top: 10px">Товары в заказе</h3>
@@ -355,7 +355,7 @@ function show_form($act){
 					</tr>
 				<?}?>
 				<tr <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
-					<td>
+					<td label="Поставщик">
 						<a class="store" store_id="<?=$ov['store_id']?>"><?=$ov['cipher']?></a>
 						<?if ($mparts->param['provider_id'] == $ov['provider_id']){
 							if (!$mparts->isInBasket($ov['brend'], $ov['article'])){?>
@@ -405,10 +405,10 @@ function show_form($act){
 						}
 						?>
 					</td>
-					<td><?=$ov['brend']?></td>
-					<td><a href="/admin/?view=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>
-					<td><?=$ov['title_full']?></td>
-					<td class="price_format">
+					<td label="Бренд"><?=$ov['brend']?></td>
+					<td label="Артикул"><a href="/admin/?view=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>
+					<td label="Наименование"><?=$ov['title_full']?></td>
+					<td label="Цена" class="price_format">
 						<?if (!$order['is_draft']){?>
 							<?=$ov['price']?>
 						<?}
@@ -416,7 +416,7 @@ function show_form($act){
 							<input <?=$ov['store_id'] ? 'readonly' : ''?> type="text" name="price" value="<?=$ov['price']?>">
 						<?}?>
 					</td>
-					<td>
+					<td label="Кол-во">
 						<?if (!$order['is_draft']){?>
 							Заказ - <?=$ov['quan']?> шт.
 						<?}
@@ -480,7 +480,7 @@ function show_form($act){
 							<br>Отказ - <?=$declined?> шт.
 						<?}?>
 					</td>
-					<td class="price_format sum">
+					<td label="Сумма" class="price_format sum">
 						<?if (!$order['is_draft']){?>
 							<?=$summ?>
 						<?}
@@ -488,7 +488,7 @@ function show_form($act){
 							<?=$ov['sum']?>
 						<?}?>
 					</td>
-					<td>
+					<td label="Комментарий">
 						<?if ($order['is_draft']){?>
 							<input type="text" name="comment" value="<?=$ov['comment']?>">
 						<?}
@@ -497,7 +497,7 @@ function show_form($act){
 						<?}?>
 					</td>
 					<?if (!$order['is_draft']){?>
-						<td class="change_status">
+						<td label="Статус" class="change_status">
 							<form method="post">
 								<input type="hidden" name="user_id" value="<?=$ov['user_id']?>">
 								<input type="hidden" name="order_id" value="<?=$ov['order_id']?>">

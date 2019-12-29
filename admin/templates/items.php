@@ -27,13 +27,12 @@ function view(){
 	$page_title = "Номенклатура";
 	$status = "<a href='/admin'>Главная</a> > $page_title"?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
-	<div class="actions" style="">
+	<div class="actions items" class="" style="">
 		<form action="?view=items&act=search" method="post">
 			<input style="width: 264px;" type="text" name="search" value="" placeholder="Поиск по артикулу, vid и названию" required>
 			<input type="submit" value="Искать">
 		</form>
 		<a href="?view=item&act=add">Добавить</a>
-		<a href="?view=items&act=logDiff">Лог аналогов и замен</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -107,11 +106,11 @@ function search(){
 		<?if (count($items)){
 			foreach($items as $item){?>
 			<tr class="items_box" item_id="<?=$item['id']?>">
-				<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-				<td><?=$item['article']?></td>
-				<td><?=$item['title_full']?></td>
-				<td><?=$item['barcode']?></td>
-				<td>
+				<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
+				<td label="Артикул"><?=$item['article']?></td>
+				<td label="Название"><?=$item['title_full']?></td>
+				<td label="Штрих-код"><?=$item['barcode']?></td>
+				<td label="Категории">
 					<?$categories_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
 					if (count($categories_items)){
 						foreach ($categories_items as $category_item) {?>

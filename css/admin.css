@@ -2099,12 +2099,49 @@ span#square{
 }
 span.icon-menu{
 	display: none;
+	float: left;
+	margin-right: 10px;
 }
 @media screen and (max-width: 550px){
+	textarea[name^=comment]{
+		min-height: 50px;
+	}
+	#user_order_add > div > form > label{
+		    display: block;
+    margin-top: 5px;
+	}
+	.actions.users{
+		display: flex;
+		flex-wrap: wrap;
+	}
+	.ionTabs__item{
+		padding: 0 !important;
+	}
+	#goToItemCard{
+		margin-top: 10px;
+	}
+	td[label=Поставщик] br{
+		display: none;
+	}
+	#relatedActs > form > input[type=submit]:nth-child(4){
+		display: block;
+		margin-top: 10px;
+	}
+	#relatedActs > form > input[type=text]:nth-child(1){
+		display: block;
+		margin-bottom: 10px;
+	}
+	#contents{
+		margin-top: 10px;
+	}
+	#itemHistory{
+		margin-top: 10px;
+	}
 	#left_menu{
 		display: none;
 		position: absolute;
-		border: 1px solid
+		border: 1px solid;
+		z-index: 3;
 	}
 	#main_field{
 		width: 100%;

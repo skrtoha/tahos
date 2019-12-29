@@ -109,14 +109,14 @@
 			var i = this.items[item_id];
 			str =
 				'<tr class="item" item_id="' + item_id + '">' +
-					'<td>' + this.getHtmlStores(item_id) +  '</td>' +
-					'<td>' + i.brend + '</td>' +
-					'<td>' + i.article + '</td>' +
-					'<td>' + i.title_full + '</td>' +
-					'<td><input value="0" type="text" name="price[' + item_id + ']"</td>' +
-					'<td><input value="1" type="text" name="quan[' + item_id + ']"</td>' +
-					'<td><span value="0" class="summ">0</span></td>' +
-					'<td><textarea name="comment[' + item_id + ']"></textarea></td>' +
+					'<td label="Поставищик">' + this.getHtmlStores(item_id) +  '</td>' +
+					'<td label="Бренд">' + i.brend + '</td>' +
+					'<td label="Артикул">' + i.article + '</td>' +
+					'<td label="Наименование">' + i.title_full + '</td>' +
+					'<td label="Цена"><input value="0" type="text" name="price[' + item_id + ']"</td>' +
+					'<td label="Количество"><input value="1" type="text" name="quan[' + item_id + ']"</td>' +
+					'<td label="Сумма"><span value="0" class="summ">0</span></td>' +
+					'<td label="Комментарий"><textarea name="comment[' + item_id + ']"></textarea></td>' +
 					'<td><a href="#" class="delete">Удалить</a></td>' +
 				'</tr>';
 			return str;

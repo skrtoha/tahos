@@ -2069,3 +2069,17 @@ span#square{
 	position: relative;
 	top: 2px;
 }
+@media screen and (max-width: 550px){
+	#left_menu{
+		display: none;
+	}
+	#main_field{
+		margin-left: 0; 
+	}
+	#main_field > div.t_form{
+		margin-left: 10px !important;
+	}
+	#contents > div.actions > a:nth-child(2){
+		display: block;
+	}
+}

@@ -626,19 +626,19 @@ function user_orders(){
 			else{
 				while ($v = $res_orders_values->fetch_assoc()){?>
 					<tr class="status_<?=$v['class']?>">
-						<td><?=$v['cipher']?></td>
-						<td><?=$v['brend']?></td>
-						<td><?=$v['article']?></td>
-						<td><?=$v['title_full']?></td>
-						<td><span class="price_format"><?=$v['price']?></span></td>
-						<td><?=$v['quan']?></td>
-						<td><span class="price_format"><?=$v['price'] * $v['quan']?></span></td>
-						<td><?=$v['comment']?></td>
-						<td><a href="?view=orders&id=<?=$v['order_id']?>&act=change"><?=$v['order_id']?></a></td>
-						<td><?=$v['created']?></td>
-						<td class="change_status"><?=$v['status']?></td>
+						<td label="Поставщик"><?=$v['cipher']?></td>
+						<td label="Бренд"><?=$v['brend']?></td>
+						<td label="Артикул"><?=$v['article']?></td>
+						<td label="Наименование"><?=$v['title_full']?></td>
+						<td label="Цена"><span class="price_format"><?=$v['price']?></span></td>
+						<td label="Кол-во"><?=$v['quan']?></td>
+						<td label="Сумма"><span class="price_format"><?=$v['price'] * $v['quan']?></span></td>
+						<td label="Комментарий"><?=$v['comment']?></td>
+						<td label="№ заказа"><a href="?view=orders&id=<?=$v['order_id']?>&act=change"><?=$v['order_id']?></a></td>
+						<td label="Дата"><?=$v['created']?></td>
+						<td label="Статус" class="change_status"><?=$v['status']?></td>
 						<?if (isset($_GET['income'])){?>
-							<td><input type="checkbox" name="income[]" value="<?=$v['order_id']?>:<?=$v['item_id']?>"></td>
+							<td label=""><input type="checkbox" name="income[]" value="<?=$v['order_id']?>:<?=$v['item_id']?>"></td>
 						<?}?>
 					</tr>
 				<?}

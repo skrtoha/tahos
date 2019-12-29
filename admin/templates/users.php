@@ -158,7 +158,7 @@ function show_form($act){
 		<a href="?view=correspond&user_id=<?=$id?>">Написать сообщение</a>
 		<a href="?view=order_issues&user_id=<?=$id?>">На выдачу</a>
 		<a href="?view=order_issues&user_id=<?=$id?>&issued=1">Выданные</a>
-		<a style="float: right" href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
+		<a href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
 		<div style="width: 100%; height: 10px"></div>
 	<?}?>
 	<div class="t_form">

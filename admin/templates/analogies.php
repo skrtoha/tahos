@@ -64,11 +64,11 @@ function view(){
 				$item = $db->select('items', 'id,article,title_full,barcode,brend_id', "`id`=".$analogy['item_id']);
 				$item = $item[0]?>
 				<tr>
-					<td><?=$item['article']?></td>
-					<td><?=$item['title_full']?></td>
-					<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-					<td><?=$item['barcode']?></td>
-					<td>
+					<td label="Артикул"><?=$item['article']?></td>
+					<td label="Название"><?=$item['title_full']?></td>
+					<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
+					<td label="Штрих-код"><?=$item['barcode']?></td>
+					<td label="Категории">
 						<?$categories_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
 						if (count($categories_items)){
 							foreach ($categories_items as $category_item) {?>
@@ -76,7 +76,7 @@ function view(){
 							<?}
 						}?>
 					</td>
-					<td>
+					<td label="">
 						<?$count = $db->getCount('analogies', "`item_id`=".$analogy['item_id']);?>
 						<a href="?view=analogies&act=item&item_id=<?=$analogy['item_id']?>">Аналоги(<?=$count?>)</a>
 					</td>

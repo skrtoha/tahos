@@ -8,6 +8,9 @@
   font-weight: normal;
   font-style: normal;
 }
+*{
+	box-sizing: border-box;
+}
 span[class^=icon]{
 	cursor: pointer;
 }
@@ -25,7 +28,13 @@ span[class^=icon]{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.icon-cross1:before {
+  content: "\ea0f";
+}
+.icon-menu:before {
+  content: "\e9bd";
+  font-size: 25px;
+}
 .icon-plus:before {
   content: "\ea0a";
 }
@@ -50,7 +59,10 @@ span[class^=icon]{
 .icon-checkmark2:before {
   content: "\ea11";
 }
-
+#closeLeftMenu{
+	display: none;
+	position: absolute;
+}
 	* {padding: 0px;margin: 0px;}
 
 	html {height:auto;min-height:100%;}
@@ -73,7 +85,12 @@ input[readonly]{
 
 	body {margin:0;padding:0;height:auto;min-height:100%;background-repeat: repeat-y;/*min-width:1229px*/;}
 
-	div {font: 14px Arial;height:auto;}
+	div {
+  font: 14px Arial;
+  height: auto;}
+	*{
+		box-sizing: border-box;
+	}
 
 	a {color:#007f8e;}
 	a:hover {color:#f40507;}
@@ -88,23 +105,28 @@ input[readonly]{
 
 	#container {width: 100%;height:auto;}
 
-	#left_menu {float: left;width: 155px;overflow:hidden;}
+	#left_menu {float: left;width: 155px;overflow:hidden;margin-right: 10px;}
 
 	#left_menu div.block {padding: 20px 0px 10px 0px;background: #f7f7f7;}
 
 	#left_menu div.block .title {background: #f0f0f0;padding:5px 5px 5px 15px;font-weight:bold;}
-	#main_field {margin-left: 140px;position: relative;}
+	#main_field {
+  width: calc(100% - 165px);
+  float: right;
+  padding-right: 10px;}
 
-	#header {padding: 10px 20px 0 20px;}
+	#header {}
 	#header h1 {font-weight:normal;font-size:22px;}
+	#status{
 
-	#contents {overflow:hidden;box-sizing:border-box;padding:0 10px 20px 9px;}
+	}
+	#contents {overflow:hidden;box-sizing:border-box;}
 
 	.t_form {width:inherit;overflow:hidden;border:solid 1px #606060;padding:1px;}
 	.t_form .delimiter {font-weight:bold;padding:10px;background:#e8e7e7;}
 	.t_form .field {overflow:hidden;}
 	.t_form .title {width:170px;float: left;padding:10px;font-weight:bold;display:block;overflow:hidden;line-height:0.9;}
-	.t_form .value {background:#ffffff;padding:10px;margin:1px 1px 0 0;display:block;overflow:hidden;align-items:center;}
+	.t_form .value {background:#ffffff;padding:10px;display:block;width:calc(100% - 170px);margin:1px 1px 0 0;overflow:hidden;align-items:center;}
 
 .t_form .value input[type=text], .t_form .value input[type=password]{width: 100%;
 }
@@ -136,7 +158,7 @@ input[readonly]{
 	#filters{ margin: 10px 0px 0px 0px; clear: both;}
 	#filters input{height: auto;}
 
-	#status {padding: 10px 10px 10px 10px; margin: 10px 20px 10px 20px; font-size:10px; background:#f0f0f0;}
+	#status { font-size:10px; background:#f0f0f0; padding:5px 0 5px 10px;}
 
 	#stats {padding:5px 0 0 15px;}
 	#stats div {padding:5px 0 0 0;}
@@ -321,7 +343,7 @@ input[readonly]{
 	background: #a5bed1;
 }
 #need_similar{
-	margin-bottom: 10px;
+  margin: 10px 0;
 }
 #need_similar a:nth-child(n + 2){
 	margin-left: 10px;
@@ -2069,17 +2091,73 @@ span#square{
 	position: relative;
 	top: 2px;
 }
+#main_field > div.t_form{
+  width: 100%;
+}
+#left_menu.show{
+	display: block; !important
+}
+span.icon-menu{
+	display: none;
+}
 @media screen and (max-width: 550px){
 	#left_menu{
 		display: none;
+		position: absolute;
+		border: 1px solid
 	}
 	#main_field{
-		margin-left: 0; 
+		width: 100%;
+		padding-left: 10px;
 	}
-	#main_field > div.t_form{
-		margin-left: 10px !important;
+	.icon-menu{
+		display: block !important;
 	}
 	#contents > div.actions > a:nth-child(2){
 		display: block;
+	}
+	#need_similar{
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+	}
+	#need_similar a{
+		margin: 0 10px 0 0;
+	}
+	#closeLeftMenu{
+		display: block;
+		top: 5px;
+		right: 10px
+	}
+	.t_form .title{
+		width: 100%;
+		padding: 5px 0 5px 5px;
+	}
+	.t_form .value{
+		width: 100%;
+		padding: 10px;
+	}
+	.t_table tr{
+		display: block;
+		border-bottom: 1px solid;
+	}
+	.t_table tr:last-child{
+		border-bottom: none;
+	}
+	.t_table tr td{
+		display: block;
+		min-height: 26px;
+	}
+	.t_table tr.head{
+		display: none;
+	}
+	table.t_table td:before {
+		content: attr(label);
+		float: left;
+		text-transform: uppercase;
+		font-weight: bold;
+		display: block;
+		padding: 0 8px;
+		background: #eee;
 	}
 }

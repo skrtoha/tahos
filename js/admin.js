@@ -717,7 +717,12 @@ $(document).ready(function(e){
 			}
 		})
 	})
-
+	$('.icon-menu').on('click', function(){
+		$('#left_menu').addClass('show');
+	})
+	$('#closeLeftMenu').on('click', function(){
+		$('#left_menu').removeClass('show');
+	})
 })
 function modal_show(content){
 	$('#modal-container')

@@ -1097,11 +1097,11 @@ function analogies_substitutes($type){
 		<?if (!empty($items)){
 			foreach($items as $id => $item){?>
 				<tr>
-					<td><?=$item['brend']?></td>
-					<td><a href="?view=item&id=<?=$id?>"><?=$item['article']?></a></td>
-					<td><?=$item['title_full']?></td>
-					<td><?=$item['barcode']?></td>
-					<td>
+					<td label="Бренд"><?=$item['brend']?></td>
+					<td label="Артикул"><a href="?view=item&id=<?=$id?>"><?=$item['article']?></a></td>
+					<td label="Название"><?=$item['title_full']?></td>
+					<td label="Штрих-код"><?=$item['barcode']?></td>
+					<td label="Категории">
 						<?if (!empty($item['categories'])){
 							foreach ($item['categories'] as $key => $value) {?>
 								<a href="/admin/?view=category&id=<?=$key?>"><?=$value?></a>
@@ -1109,9 +1109,9 @@ function analogies_substitutes($type){
 						}?>
 					</td>
 					<?if ($type == 'analogies'){?>
-						<td><input <?=$item['hidden'] ? 'checked' : ''?> name="hidden" type="checkbox" value="<?=$id?>"></td>
+						<td label="Скрыть"><input <?=$item['hidden'] ? 'checked' : ''?> name="hidden" type="checkbox" value="<?=$id?>"></td>
 					<?}?>
-					<td><a class="<?=$type?>_delete delete_item" href="?view=item&act=<?=$type?>_delete&item_id=<?=$item_id?>&delete_item=<?=$id?>">Удалить</a></td>
+					<td label=""><a class="<?=$type?>_delete delete_item" href="?view=item&act=<?=$type?>_delete&item_id=<?=$item_id?>&delete_item=<?=$id?>">Удалить</a></td>
 				</tr>
 			<?}	
 		}

@@ -47,6 +47,7 @@
 <div id="popup" style="display: none"><img src="/images/preload.gif" alt=""></div>
 <div id="container">
 	<div id="left_menu">
+		<span id="closeLeftMenu" class="icon-cross1"></span>
 		<div class="block">
 			<div class="title">Главное меню</div>
 			<ul>
@@ -84,8 +85,11 @@
 		</div>
 	</div>
 	<div id="main_field">
-		<div id="header"><h1><?=$page_title?></h1></div>
-		<div class="t_form" style="margin: 10px 10px 10px 23px;"><div class="bg" style="padding:5px 10px 5px 10px;"><?=$status?></div></div>
+		<div id="header">
+			<span class="icon-menu"></span>
+			<h1><?=$page_title?></h1>
+		</div>
+		<div id="status" class="t_form" style=""><div class="bg"><?=$status?></div></div>
 		<div id="contents"><?=$content?></div>
 	</div>
 </div>

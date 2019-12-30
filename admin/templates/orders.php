@@ -235,7 +235,7 @@ function view(){
 			foreach($orders as $order){
 				$is_new = $order['is_new'] ? 'is_new' : '';
 				?>
-				<tr class="orders_box <?=$is_new?>" href="?view=orders&id=<?=$order['id']?>&act=change">
+				<tr class="orders_box <?=$is_new?> <?=get_status_color($order['status'])?>" href="?view=orders&id=<?=$order['id']?>&act=change">
 					<td label="Номер"><?=$order['id']?></td>
 					<td label="Дата заказа"><?=$order['date']?></td>
 					<td label="Статус"><?=$order['status']?></td>

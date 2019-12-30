@@ -265,4 +265,16 @@ function getUser($user_id){
 	$user = $user[0];
 	return $user;
 }
+/**
+ * [Возвращает имя класса для для подсвечивания в списке заказов]
+ * @param  [string] $status В работе|Завершен|Ожидает
+ * @return [stirng]         имя класса
+ */
+function get_status_color($status){
+	switch($status){
+		case 'Завершен': return 'status_1'; break;
+		case 'Ожидает': return 'status_5'; break;
+		case 'В работе': return 'status_7'; break;
+	}
+}
 ?>

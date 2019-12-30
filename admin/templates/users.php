@@ -90,7 +90,7 @@ function view(){
 			u.id,
 			IF(
 				u.organization_name <> '',
-				CONCAT_WS (' ', ot.title, u.organization_name),
+				CONCAT_WS (' ', u.organization_name, ot.title),
 				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
 			) AS name,
 			u.telefon,
@@ -100,7 +100,7 @@ function view(){
 		LEFT JOIN 
 			#organizations_types ot ON ot.id=u.organization_type
 		ORDER BY
-			u.id DESC
+			name
 		LIMIT
 			$start, $perPage
 	", '');

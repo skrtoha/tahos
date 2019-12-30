@@ -2197,4 +2197,7 @@ span.icon-menu{
 		padding: 0 8px;
 		background: #eee;
 	}
+	#left_menu div.block{
+		padding-top: 0;
+	}
 }

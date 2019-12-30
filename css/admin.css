@@ -154,7 +154,7 @@ input[readonly]{
 
 	#total {float: right;line-height: 25px;}
 
-	div.actions {padding: 5px 0 5px 0;;}
+	div.actions {padding: 5px 0 5px 0;margin-top: 10px;;}
 	#filters{ margin: 10px 0px 0px 0px; clear: both;}
 	#filters input{height: auto;}
 
@@ -2199,5 +2199,8 @@ span.icon-menu{
 	}
 	#left_menu div.block{
 		padding-top: 0;
+	}
+	div.actions{
+		margin-top: 0px;
 	}
 }

@@ -69,9 +69,9 @@ switch ($act) {
 function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');
-	if ($_POST['search']){
-		$search = $_POST['search'];
-		$where = "`name_1` LIKE '%$search%' OR `name_2` LIKE '%$search%' OR `name_3` LIKE '%$search%'";
+	$having = '';
+	if (isset($_GET['search']) && $_GET['search']){
+		$having = "HAVING `name` LIKE '%{$_GET['search']}%'";
 		$page_title = 'Поиск по пользователям';
 		$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > $page_title";
 	}
@@ -79,14 +79,8 @@ function view(){
 		$page_title = "Пользователи";
 		$status = "<a href='/admin'>Главная</a> > $page_title";
 	}
-	$all = $db->getCount('users', $where);
-	$perPage = 30;
-	$linkLimit = 10;
-	$page = $_GET['page'] ? $_GET['page'] : 1;
-	$chank = getChank($all, $perPage, $linkLimit, $page);
-	$start = $chank[$page] ? $chank[$page] : 0;
-	$users = $db->query("
-		SELECT
+	$query = "
+		SELECT SQL_CALC_FOUND_ROWS
 			u.id,
 			IF(
 				u.organization_name <> '',
@@ -99,16 +93,30 @@ function view(){
 			#users u
 		LEFT JOIN 
 			#organizations_types ot ON ot.id=u.organization_type
+		$having
+	";
+	$db->query($query);
+	$all = $db->found_rows();
+	$perPage = 30;
+	$linkLimit = 10;
+	$page = $_GET['page'] ? $_GET['page'] : 1;
+	$chank = getChank($all, $perPage, $linkLimit, $page);
+	$start = $chank[$page] ? $chank[$page] : 0;
+	$query = "
+		$query
 		ORDER BY
 			name
 		LIMIT
 			$start, $perPage
-	", '');
+	";
+	$query = str_replace('SQL_CALC_FOUND_ROWS', '', $query);
+	$users = $db->query($query, '');
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=users&act=search" method="post">
-			<input style="width: 264px;"  required type="text" name="search" value="<?=$search?>" placeholder="Поиск по пользователям">
+		<form style="margin-top: -3px;float: left;margin-bottom: 10px;">
+			<input type="hidden" name="view" value="users">
+			<input style="width: 264px;"  required type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по пользователям">
 			<input type="submit" value="Искать">
 		</form>
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=add">Добавить</a>

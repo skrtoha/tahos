@@ -56,18 +56,20 @@ class Issues{
 		return '<a href="/admin/?view=item&id='.$item_id.'">'.$item['brend'].' - '.$item['article'].' - '.$item['title_full'].'</a>';
 	}
 	protected function getOrderValue($order_id, $item_id){
-		return $this->db->select_one('orders_values', '*', "`order_id`={$order_id} AND `item_id`={$item_id}");
+		$res = get_order_values('', '', ['order_id' => $order_id, 'item_id' => $item_id]);
+		return $res->fetch_assoc();
 	}
 	function setIncome(){
-		// debug($_POST); exit();
 		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id], ['print_query' => false]);
 		if ($insert_order_issue !== true) die("Ошибка: $this->last_query | $insert_order_issue");
 		$issue_id = $this->db->last_id();
+		$orderValuesForEmail = array();
 		foreach($_POST['income'] as $key => $issued){
 			$a = explode(':', $key);
 			$user = $this->getUser();
 			$title = $this->getTitleForFund($a[1]);
 			$ov = $this->getOrderValue($a[0], $a[1]);
+			$orderValuesForEmail[] = $ov;
 			$insert_order_issue_values = $this->db->insert(
 				'order_issue_values',
 				[
@@ -134,6 +136,12 @@ class Issues{
 			exit();
 		}
 		message('Успешно сохранено');
+		$res = core\Mailer::send([
+			'email' => $this->db->getFieldOnID('users', $_GET['user_id'], 'email'),
+			'subject' => 'Отгрузка товаров',
+			'body' => getTableOrder($orderValuesForEmail)
+		]);
+		if ($res !== true) die($res);
 		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
 	}
 	protected function getOrderIssues(){

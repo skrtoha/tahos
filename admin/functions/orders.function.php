@@ -37,8 +37,11 @@ function get_order($flag = ''){
 	$order = $db->select_unique($query, $flag);
 	return $order[0];
 }
-function get_order_values($flag = ''){
+function get_order_values($flag = '', $order_id = null, $ov = null){
 	global $db;
+	if (!$order_id) $order_id = $_GET['id'];
+	if (!empty($ov)) $where = "ov.order_id = {$ov['order_id']} AND ov.item_id = {$ov['item_id']}";
+	else $where = "ov.order_id={$order_id}";
 	return $db->query("
 		SELECT
 			ps.cipher,
@@ -102,8 +105,7 @@ function get_order_values($flag = ''){
 			c.order_id=ov.order_id AND
 			c.store_id=ov.store_id AND
 			c.item_id=ov.item_id
-		WHERE
-			ov.order_id={$_GET['id']}
+		WHERE $where
 	", $flag);
 }
 function order_print($order, $res_orders_values){
@@ -126,38 +128,7 @@ function order_print($order, $res_orders_values){
 		<p><?=$issue['adres']?></p>
 		<p><?=$issue['title']?> (в дальнейшем ПОСТАВЩИК) с одной стороны и <?=$order['organization']?> (именуемый в дальнейшем ЗАКАЗЧИК), заключили настоящий договор о нижеследующем:</p>
 		<p><b>ПОСТАВЩИК</b> обязуется поставить товары:</p>
-		<table cellspacing="">
-			<tr>
-				<th>№</th>
-				<th>Бренд</th>
-				<th>Артикул</th>
-				<th>Наименование</th>
-				<th>Цена</th>
-				<th>Кол-во</th>
-				<th>Сумма</th>
-				<th>Комментарий</th>
-			</tr>
-			<? $i = 1;
-			$max = 0;
-			while($row = $res_orders_values->fetch_assoc()){?>
-				<tr>
-					<td class="td_center"><?=$i?></td>
-					<td><?=$row['brend']?></td>
-					<td><?=$row['article']?></td>
-					<td><?=$row['title_full']?></td>
-					<td class="td_center"><?=$row['price']?></td>
-					<td class="td_center"><?=$row['quan']?></td>
-					<td class="td_center"><?=$row['sum']?></td>
-					<td><?=$row['comment']?></td>
-				</tr>
-			<?$i++;
-			$total += $row['sum'];
-			if ($row['delivery'] > $max) $max = $row['delivery'];
-			}?>
-			<tr>
-				<td style="text-align: right" colspan="8">Итого: <?=$total?> руб.</td>
-			</tr>
-		</table>
+		<?=getTableOrder($res_orders_values)?>
 		<p style="white-space: nowrap">
 			<span>Поставщик  ______________</span>
 			<span><strong>Клиент: <span id="square"></span></strong></span>
@@ -277,4 +248,62 @@ function get_status_color($status){
 		case 'В работе': return 'status_7'; break;
 	}
 }
+/**
+ * [orderReady Проверяет готовность заказа]
+ * @param  [integer]  $order_id Номер заказа
+ * @return [boolean] true - заказ готов, false - заказ не готов
+ */
+function isOrderReady($order_id){
+	$orderValues = get_order_values('', $order_id);
+	foreach($orderValues as $value){
+		if (in_array($value['status'], ['Возврат', 'Нет в наличии', 'Отменен'])) continue;
+		if (in_array($value['status'], ['Заказано', 'В работе', 'Приостановлено'])) return false;
+
+	}
+	return true;
+}
+/**
+ * [getTableOrder Получение html-таблицы товаров в заказе]
+ * @param  [array] $orderValues Список товаров
+ * @return [string] html-код таблицы
+ */
+function getTableOrder($orderValues){
+	ob_start();?>
+	<table border="1">
+			<tr>
+				<th>№</th>
+				<th>Бренд</th>
+				<th>Артикул</th>
+				<th>Наименование</th>
+				<th>Цена</th>
+				<th>Кол-во</th>
+				<th>Сумма</th>
+				<th>Комментарий</th>
+			</tr>
+			<? $i = 1;
+			$max = 0;
+			foreach($orderValues as $row){
+				if (in_array($row['status'], ['Возврат', 'Нет в наличии', 'Отменен'])) continue;?>
+				<tr>
+					<td class="td_center"><?=$i?></td>
+					<td><?=$row['brend']?></td>
+					<td><?=$row['article']?></td>
+					<td><?=$row['title_full']?></td>
+					<td class="td_center"><?=$row['price']?></td>
+					<td class="td_center"><?=$row['quan']?></td>
+					<td class="td_center"><?=$row['sum']?></td>
+					<td><?=$row['comment']?></td>
+				</tr>
+			<?$i++;
+			$total += $row['sum'];
+			if ($row['delivery'] > $max) $max = $row['delivery'];
+			}?>
+			<tr>
+				<td style="text-align: right" colspan="8">Итого: <?=$total?> руб.</td>
+			</tr>
+		</table>
+		<?
+		return ob_get_clean();
+	}
+
 ?>

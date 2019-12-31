@@ -143,6 +143,8 @@ $(function() {
 		else data += '&get_news=0';
 		if ($('#hide_analogies').is(':checked')) data += '&show_all_analogies=1';
 		else data += '&show_all_analogies=0';
+		if ($('#get_notifications').is(':checked')) data += '&get_notifications=1';
+		else data += '&get_notifications=0';
 		if ($('#bonus_program').is(':checked')) data += '&bonus_program=1';
 		else data += '&bonus_program=0';
 		data += '&email=' + $('#email').val();

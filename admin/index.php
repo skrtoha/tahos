@@ -15,12 +15,12 @@ $settings = $db->select('settings', '*'); $settings = $settings[0];
 $db->setProfiling();
 
 // debug($_SERVER);
-if (!$_SESSION['auth'] && $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest' && $view != 'cron') $view = 'authorization';
 if ($view == 'orders' && $_GET['act'] == 'print'){
 	require_once('functions/orders.function.php');
 	require_once 'templates/orders.php';
 	exit();
 }
+if (!$_SESSION['auth'] && $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest' && $view != 'cron') $view = 'authorization';
 if (file_exists("functions/$view.function.php")) require_once("functions/$view.function.php");
 ob_start();
 require_once ("templates/$view.php");	

@@ -740,7 +740,6 @@ switch($_GET['act']){
 			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
 		}
 		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
-		echo "$workingFile"; exit();
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer

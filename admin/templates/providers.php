@@ -255,7 +255,6 @@ function orders(){
 <?}
 function priceEmail(){
 	global $status, $db, $page_title;
-	debug($_SERVER);
 	$array = array();
 	if (!empty($_POST)){
 		$db->insert(

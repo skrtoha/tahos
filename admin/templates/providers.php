@@ -416,7 +416,7 @@ function priceEmail(){
 					<div class="field">
 						<div class="title">Ссылка для крон</div>
 						<div class="value">
-							<input type="text" value="<?=$_SERVER['REQUEST_SCHEME']?>://<?=$_SERVER['HTTP_HOST']?>/admin/?view=cron&act=emailPrice&store_id=<?=$_GET['store_id']?>">
+							<input type="text" value="http://<?=$_SERVER['HTTP_HOST']?>/admin/?view=cron&act=emailPrice&store_id=<?=$_GET['store_id']?>">
 						</div>
 					</div>
 					<div class="field">

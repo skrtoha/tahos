@@ -255,6 +255,7 @@ function orders(){
 <?}
 function priceEmail(){
 	global $status, $db, $page_title;
+	debug($_SERVER);
 	$array = array();
 	if (!empty($_POST)){
 		$db->insert(
@@ -416,7 +417,7 @@ function priceEmail(){
 					<div class="field">
 						<div class="title">Ссылка для крон</div>
 						<div class="value">
-							<input type="text" value="<?=$_SERVER['HTTP_HOST']?>/admin/?view=cron&act=emailPrice&store_id=<?=$_GET['store_id']?>">
+							<input type="text" value="<?=$_SERVER['REQUEST_SCHEME']?>://<?=$_SERVER['HTTP_HOST']?>/admin/?view=cron&act=emailPrice&store_id=<?=$_GET['store_id']?>">
 						</div>
 					</div>
 					<div class="field">

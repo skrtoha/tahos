@@ -677,7 +677,7 @@ switch($_GET['act']){
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
-		// debug($emailPrice); //exit();
+		debug($emailPrice); //exit();
 		$store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
@@ -736,11 +736,11 @@ switch($_GET['act']){
 				echo "<br>Ошибка извлечения файла {$emailPrice['nameInArchive']}: $res";
 				break;
 			};
-			if ($emailPrice['fileType'] == 'excel') $workingFile = $emailPrice['nameInArchive'];
+			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}";
 			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
 		}
 		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
-
+		echo "$workingFile"; exit();
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer

@@ -1,6 +1,6 @@
 <?php
-require_once ("../class/database_class.php");
-require_once ("../templates/functions.php");
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/class/database_class.php");
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/functions.php");
 
 $db = new DataBase();
 $connection = new core\Connection($db);
@@ -469,8 +469,4 @@ function modification_get_filters(){
 	}
 	return $filters;
 }
-function article_clear($article){
-	return preg_replace('/[\W_]+/', '', $article);
-}
-// if ($res) echo true;
 ?>

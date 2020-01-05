@@ -14,8 +14,8 @@ switch ($act) {
 	case 'allInWork':
 		$res_order_values = get_order_values('');
 		while($ov = $res_order_values->fetch_assoc()){
-			// debug($ov); continue;
 			if (!in_array($ov['status_id'], [5])) continue;
+			//debug($ov); //continue;
 			$isRendered = false;
 			if ($ov['provider_id'] == 15){
 				$armtek->toOrder([
@@ -45,7 +45,7 @@ switch ($act) {
 				$itemInfo = $orderAbcp->getItemInfoByArticleAndBrend($ov);
 				if (!$itemInfo){
 					echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
-					break;
+					exit();
 				} 
 				$params = array_merge(
 					$itemInfo, 

@@ -53,9 +53,9 @@ class OrderAbcp extends Abcp{
 		$article = Armtek::getComparableString($array['article']);
 		$supplierCode = str_replace($this->param['title'].'-', '', $array['providerStore']);
 		$url =  "{$this->param['url']}/search/articles/?userlogin={$this->param['userlogin']}&userpsw=".md5($this->param['userpsw'])."&useOnlineStocks=1&number={$article}&brand={$array['brend']}";
+		$url = str_replace(' ', '%20', $url);
 		$response = file_get_contents($url);
 		$items = json_decode($response, true);
-		// debug($items); exit();
 		if (empty($items)) return false;
 		foreach($items as $value){
 			if (

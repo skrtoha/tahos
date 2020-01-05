@@ -39,7 +39,7 @@ switch($_POST['status_id']){
 			UPDATE 
 				#orders_values 
 			SET 
-				`issued` = {$_POST['arrived']},
+				`issued` = `issued` + {$_POST['arrived']},
 				`status_id` = 1
 			WHERE $where
 		", '');

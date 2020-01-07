@@ -267,6 +267,7 @@ function priceEmail(){
 				'settings' => json_encode($_POST)
 			], 'print_query' => false]
 		);
+		message("Успешно сохранено!");
 		$array = $_POST;
 	}
 	else{

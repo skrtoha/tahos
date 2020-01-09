@@ -36,7 +36,10 @@ if($_GET['act'] == 'unbind'){
 	header('Location: /settings');
 }
 $path = "templates/$view.php";
+
 $user = cat_get_user();
+$basket = get_basket();
+
 if (file_exists($path)){
 	ob_start();
 	require_once($path);

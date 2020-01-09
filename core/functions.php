@@ -636,6 +636,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 }
 function get_basket(){
 	global $db;
+	if (!$_SESSION['user']) return false;
 	$basket = $db->select_unique("
 		SELECT 
 			b.*,
@@ -794,5 +795,10 @@ function isInBasketExists($store_items_list){
 		}
 	}
 	return false;
+}
+function getInBasket($basket){
+	$output = array();
+	foreach($basket as $b) $output[$b['store_id'].':'.$b['item_id']] = $b['quan'];
+	return $output;
 }
 ?>

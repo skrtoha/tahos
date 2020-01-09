@@ -286,6 +286,7 @@ $(function() {
 		});
 		$('.quan li').empty();
 		$('.quan').addClass('hidden');
+		inBasket = {};
 	})
 	$(document).on('click', '.cart-popup button', function(){
 		document.location.href = "/basket";

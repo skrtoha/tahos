@@ -1,10 +1,6 @@
-<?debug($store_items);
+<?//debug($basket);
 $hidden = isInBasketExists($store_items) ? '' : 'hidden';
-/**
- * For counting common amount in basket
- * @var array
- */
-$countStoreItems = getCountStoreItems($store_items);
+$inBasket = json_encode(getInBasket($basket));
 ?>
 <?if ($device == 'tablet' || $device == 'desktop'){?>
 	<table class="articul-table">
@@ -15,7 +11,7 @@ $countStoreItems = getCountStoreItems($store_items);
 			<th>В наличии</th>
 			<th>Срок</th>
 			<th class="price">Цена</th>
-			<th class="quan <?=$hidden?>">Количество</th>
+			<th class="quan <?=$hidden?>">К заказу</th>
 			<th><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></th>
 		</tr>
 		<?foreach($store_items as $value){
@@ -735,5 +731,5 @@ else{?>
 <?}?>
 <script type="text/javascript">
 	var isInBasket = <?=$isInBasket ? 'true' : 'false'?>;
-
+	var inBasket = JSON.parse('<?=$inBasket?>');
 </script>

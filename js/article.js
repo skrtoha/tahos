@@ -202,21 +202,53 @@ function isInBasket(store_items_list){
  * @param {[type]} obj object with parameters (value, store_id, item_id)
  */
 function setNewValueCurrentItem(obj){
-	var currentToStockButton = $('i[store_id=' + obj.store_id + '][item_id=' + obj.item_id + ']');
-	currentToStockButton.find('i.goods-counter').html(obj.value);
-	$('td.quan li[store_id=' + obj.store_id + '][item_id=' + obj.item_id + '] input').val(obj.value);
+	$('li[store_id=' + obj.store_id + '][item_id=' + obj.item_id + '] input').val(obj.quan);
+	$('i.to-stock-btn[store_id=' + obj.store_id + '][item_id=' + obj.item_id + ']').html('<i class="goods-counter">' + obj.quan + '</i>');
 }
+/**
+ * sets in value inBasket amount of item
+ * @param {[type]} store_id [description]
+ * @param {[type]} item_id  [description]
+ * @param {[type]} amount   [addable value]
+ * @param {[isReplace]} if value is replacing
+ */
+function setAmountInBasket(store_id, item_id, amount, isReplace = false){
+	if (typeof inBasket[store_id + ':' + item_id] == 'undefined') return inBasket[store_id + ':' + item_id] = amount;
+	if (isReplace) return inBasket[store_id + ':' + item_id] = parseInt(amount);
+	inBasket[store_id + ':' + item_id] = parseInt(inBasket[store_id + ':' + item_id]);
+	return inBasket[store_id + ':' + item_id] += amount;
+}
+/**
+ * [setNewValueCartIcon sets common amount in basket icon]
+ */
 function setNewValueCartIcon(){
 	var summ = 0;
-	$('.second-full td.quan li[store_id][item_id] input').each(function(){
-		summ += + $(this).val();
+	$('.cart span').remove();
+	for(var k in inBasket){
+		inBasket[k] = parseInt(inBasket[k]);
+		summ += inBasket[k];
+	} 
+	return $('.cart').append('<span>' + summ + '</span>');
+}
+function setNewValueAjax(obj){
+	$.ajax({
+		type: "POST",
+		url: "/ajax/to_basket.php",
+		data: obj,
+		success: function(msg){
+			get_basket(JSON.parse(msg));
+			show_popup_basket();
+			setTimeout(function(){
+				if (!$('.cart-popup').is(':hover')) $('.overlay').click();
+			}, 2500);
+		} 
 	});
-	$('.cart span').html(summ);
 }
 function setNewValue(obj){
+	obj.quan = inBasket[obj.store_id + ':' + obj.item_id];
 	setNewValueCurrentItem(obj);
-	setNewValueCartIcon(obj);
-	// setNewValueAjax(obj);
+	setNewValueCartIcon();
+	setNewValueAjax(obj);
 }
 function store_items(store_items, user, search_type = null){
 	console.log(store_items);
@@ -247,7 +279,7 @@ function store_items(store_items, user, search_type = null){
 			'<th><a class="sortable in_stock" href="">В наличии</a></th>' +
 			'<th><a class="sortable delivery" href="">Срок</a></th>' +
 			'<th><a class="sortable price" href="">Цена</a></th>' +
-			'<th class="quan ' + hidden + '">Количество</th>' +
+			'<th class="quan ' + hidden + '">К заказу</th>' +
 			'<th><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></th>' +
 		'</tr>';
 	var mobile = '';
@@ -716,7 +748,12 @@ function store_items(store_items, user, search_type = null){
 					'</a>' +
 				'</td>' +
 				'<td class="name-col" style="padding-top: 20px;text-align:left">';
-			if (+si.is_desc || typeof si.foto){
+			if (search_type == 'analogies' && typeof user.id !== 'undefined'){
+				var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
+				mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
+				full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
+			};
+			if (+si.is_desc || si.foto){
 				var stringClass = '';
 				if (si.is_desc) stringClass = 'fa-cog';
 				if (si.foto) stringClass = 'fa-camera';
@@ -1218,6 +1255,7 @@ $(function(){
 		var price = +e.attr('price');
 		var packaging = +e.attr('packaging');
 		var item_id = e.attr('item_id');
+
 		if ($('.login_btn span').html() == 'Войти'){
 			$('.login_btn').click();
 			show_message('Для добавления товара в корзину необходимо авторизоваться!', 'error');
@@ -1225,37 +1263,21 @@ $(function(){
 		}
 		$('.quan.hidden').removeClass('hidden');
 		$('button[type=full]').closest('td').attr('colspan', 8);
-		$.ajax({
-			type: "POST",
-			url: "/ajax/to_basket.php",
-			data: "store_id=" + store_id + '&price=' + price + '&packaging=' + packaging + '&item_id=' + item_id,
-			success: function(msg){
-				// console.log(msg);
-				// return;
-
-				//quan at the top in the header
-				if (!$('.cart span').text()) $('.cart').html('<div class="arrow_up"></div><span>' + packaging + '</span>');
-				else $('.cart span').html(parseInt($('.cart span').text()) + parseInt(packaging));
-
-				if (e.find('.goods-counter').length) packaging += +e.find('.goods-counter').html();
-				$('i[store_id=' + store_id + '][item_id=' + item_id + ']').html('<i class="goods-counter">' + packaging + '</i>');
-
-				$('.quan.hidden').removeClass('hidden');
-				$('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']').html('<input value="' + packaging + '">');
-
-				get_basket(JSON.parse(msg));
-				show_popup_basket();
-				setTimeout(function(){
-					 if (!$('.cart-popup').is(':hover')) $('.overlay').click();
-				}, 2500);
-			} 
+		$('.quan.hidden').removeClass('hidden');
+		$('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']').html('<input value="' + packaging + '">');
+		
+		setAmountInBasket(store_id, item_id, packaging);
+		setNewValue({
+			store_id: store_id,
+			item_id: item_id,
+			price: + $('i.to-stock-btn[store_id= ' + store_id + '][item_id=' + item_id + ']').attr('price')
 		});
 	});
 	$(document).on('blur', '.quan li[store_id][item_id] input', function(){
 		var isValidated = true;
 		var th = $(this);
 		var val = + th.val();
-		var packaging = th.closest('li').attr('packaging');
+		var packaging = + th.closest('li').attr('packaging');
 		var message = 'Количество должно быть кратно ' + packaging + '!';
 		if(val % packaging){
 			isValidated = false;
@@ -1266,10 +1288,19 @@ $(function(){
 			show_message(message, 'error');
 		}
 		if (!isValidated) return th.focus();
+		
+		var store_id = + th.closest('li').attr('store_id');
+		var item_id = + th.closest('li').attr('item_id');
+		setAmountInBasket(
+			+ store_id, 
+			+ item_id,
+			+ val, 
+			true
+		);
 		setNewValue({
-			value: val,
-			store_id: +th.closest('li').attr('store_id'),
-			item_id: +th.closest('li').attr('item_id')
+			store_id: store_id,
+			item_id: item_id,
+			price: + $('i.to-stock-btn[store_id= ' + store_id + '][item_id=' + item_id + ']').attr('price'),
 		});
 	})
 	$(document).on('click', '.product-popup-link', function(e){

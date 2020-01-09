@@ -1,5 +1,10 @@
-<?//debug($store_items);
+<?debug($store_items);
 $hidden = isInBasketExists($store_items) ? '' : 'hidden';
+/**
+ * For counting common amount in basket
+ * @var array
+ */
+$countStoreItems = getCountStoreItems($store_items);
 ?>
 <?if ($device == 'tablet' || $device == 'desktop'){?>
 	<table class="articul-table">
@@ -730,4 +735,5 @@ else{?>
 <?}?>
 <script type="text/javascript">
 	var isInBasket = <?=$isInBasket ? 'true' : 'false'?>;
+
 </script>

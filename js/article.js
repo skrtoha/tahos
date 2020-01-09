@@ -209,7 +209,6 @@ function setNewValueCurrentItem(obj){
 function setNewValueCartIcon(){
 	var summ = 0;
 	$('.second-full td.quan li[store_id][item_id] input').each(function(){
-		console.log(+ $(this).val(), $(this));
 		summ += + $(this).val();
 	});
 	$('.cart span').html(summ);

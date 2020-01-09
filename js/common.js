@@ -252,12 +252,15 @@ $(function() {
 				if ($('.cart-popup-table tr').length == 2){
 					$('.cart-popup-table').html('<tr><td colspan="4">Корзина пуста</td>').next().remove();
 					$('.cart span').remove();
+					$('.quan li').empty();
+					$('.quan').addClass('hidden');
 				}
-				$('.articul-table ' + selector).empty();
+				$(selector).empty();
 				$('.cart span').html(+$('.cart span').text() - quan);
 				$('.basket-table ' + selector).closest('tr').remove();
 				$('.basket .mobile-view ' + selector).closest('.good').remove();
 				$('#basket_basket').html(+$('#basket_basket').unmask() - (quan * division));
+				$('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']').empty();
 				price_format();
 			}
 		});
@@ -281,6 +284,8 @@ $(function() {
 				$('.to-stock-btn').html('');
 			} 
 		});
+		$('.quan li').empty();
+		$('.quan').addClass('hidden');
 	})
 	$(document).on('click', '.cart-popup button', function(){
 		document.location.href = "/basket";

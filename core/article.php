@@ -1,4 +1,6 @@
-<?//debug($store_items);?>
+<?//debug($store_items);
+$hidden = isInBasketExists($store_items) ? '' : 'hidden';
+?>
 <?if ($device == 'tablet' || $device == 'desktop'){?>
 	<table class="articul-table">
 		<tr class="shown">
@@ -7,7 +9,8 @@
 			<th>Поставщик</th>
 			<th>В наличии</th>
 			<th>Срок</th>
-			<th>Цена</th>
+			<th class="price">Цена</th>
+			<th class="quan <?=$hidden?>">Количество</th>
 			<th><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></th>
 		</tr>
 		<?foreach($store_items as $value){
@@ -104,7 +107,7 @@
 						<?}?>
 					</td>
 					<!-- цена -->
-					<td>
+					<td class="price">
 						<?if (!empty($si['prevails'])){?>
 							<ul class="prevail">
 								<?foreach($si['prevails'] as $value){?>
@@ -126,6 +129,36 @@
 										<?=get_user_price($si_delivery['price'], $user)?>
 										<?=$user['designation']?>
 									</li>
+								<?}?>
+							</ul>
+						<?}?>
+					</td>
+					<!-- количество -->
+					<td class="quan <?=$hidden?>">
+						<?if (!empty($si['prevails'])){?>
+							<ul class="prevail">
+								<?foreach($si['prevails'] as $value){?>
+									<li packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+										<?if ($value['in_basket']){?>
+											<input value="<?=$value['in_basket']?>">
+										<?}?>
+									</li>
+								<?}?>
+							</ul>
+						<?}?>
+						<?if (!empty($si_price)){?>
+							<ul>
+								<li packaging="<?=$si_price['packaging']?>" store_id="<?=$si_price['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+									<?if ($si_price['in_basket']){?>
+										<input value="<?=$si_price['in_basket']?>">
+									<?}?>
+								</li>
+								<?if (!empty($si_delivery)){?>
+										<li packaging="<?=$si_delivery['packaging']?>" store_id="<?=$si_delivery['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+											<?if ($si_delivery['in_basket']){?>
+												<input value="<?=$si_delivery['in_basket']?>">
+											<?}?>
+										</li>
 								<?}?>
 							</ul>
 						<?}?>
@@ -250,7 +283,7 @@
 							</ul>
 						</td>
 						<!-- цена -->
-						<td>
+						<td class="price">
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
@@ -266,6 +299,29 @@
 									<li>
 										<?=get_user_price($value['price'], $user)?>
 										<?=$user['designation']?>
+									</li>
+								<?}?>
+							</ul>
+						</td>
+						<!-- количество -->
+						<td class="quan <?=$hidden?>">
+							<?if (!empty($si['prevails'])){?>
+								<ul class="prevail">
+									<?foreach($si['prevails'] as $value){?>
+											<li prevail="1" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+												<?if ($value['in_basket']){?>
+													<input value="<?=$value['in_basket']?>">
+												<?}?>
+											</li>
+									<?}?>
+								</ul>
+							<?}?>
+							<ul>
+								<?foreach($si['list'] as $key => $value){?>
+									<li packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+										<?if ($value['in_basket']){?>
+											<input value="<?=$value['in_basket']?>">
+										<?}?>
 									</li>
 								<?}?>
 							</ul>
@@ -307,7 +363,7 @@
 						</td>
 					</tr>
 					<tr class="button-row active shown">
-						<td colspan="7" style="padding-top: 0px !important; text-align: center">
+						<td colspan="<?=$hidden ? 7 : 8?>" style="padding-top: 0px !important; text-align: center">
 							<button type="full"></button>
 						</td>
 					</tr>
@@ -417,7 +473,7 @@ else{?>
 								</ul>
 							<?}?>
 						</td>
-						<td>
+						<td class="price">
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
@@ -438,6 +494,36 @@ else{?>
 										<li>
 											<?=get_user_price($si_delivery['price'], $user)?>
 											<?=$user['designation']?>
+										</li>
+									<?}?>
+								</ul>
+							<?}?>
+						</td>
+						<!-- количество -->
+						<td class="quan <?=$hidden?>">
+							<?if (!empty($si['prevails'])){?>
+								<ul class="prevail">
+									<?foreach($si['prevails'] as $value){?>
+										<li prevail="1" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+											<?if ($value['in_basket']){?>
+												<input value="<?=$value['in_basket']?>">
+											<?}?>
+										</li>
+									<?}?>
+								</ul>
+							<?}?>
+							<?if (!empty($si_price)){?>
+								<ul>
+									<li packaging="<?=$si_price['packaging']?>" store_id="<?=$si_price['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+										<?if ($si_price['in_basket']){?>
+											<input value="<?=$si_price['in_basket']?>">
+										<?}?>
+									</li>
+									<?if (!empty($si_delivery)){?>
+										<li packaging="<?=$si_delivery['packaging']?>" store_id="<?=$si_delivery['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+											<?if ($si_delivery['in_basket']){?>
+												<input value="<?=$si_delivery['in_basket']?>">
+											<?}?>
 										</li>
 									<?}?>
 								</ul>
@@ -537,7 +623,7 @@ else{?>
 								<?}?>
 							</ul>
 						</td>
-						<td>
+						<td class="price">
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
@@ -557,6 +643,29 @@ else{?>
 										</li>
 									<?}?>
 								</ul>
+							</ul>
+						</td>
+						<!-- количество -->
+						<td class="quan <?=$hidden?>">
+							<?if (!empty($si['prevails'])){?>
+								<ul class="prevail">
+									<?foreach($si['prevails'] as $value){?>
+										<li prevail="1" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+											<?if ($value['in_basket']){?>
+												<input value="<?=$value['in_basket']?>">
+											<?}?>
+										</li>
+									<?}?>
+								</ul>
+							<?}?>
+							<ul>
+								<?foreach($si['list'] as $key => $value){?>
+									<li packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>"class="count-block">
+										<?if ($value['in_basket']){?>
+											<input value="<?=$value['in_basket']?>">
+										<?}?>
+									</li>
+								<?}?>
 							</ul>
 						</td>
 						<td>
@@ -596,7 +705,7 @@ else{?>
 					</tr>
 					<?if ($csi > 2){?>
 						<tr class="button-row active shown">
-							<td colspan="7" style="padding-top: 0px !important;">
+							<td colspan="<?=$isInBasket ? 8 : 7?>" style="padding-top: 0px !important;">
 								<button></button>
 							</td>
 						</tr>
@@ -611,5 +720,6 @@ else{?>
 		<?}?>
 	</div>
 <?}?>
-	
-	
+<script type="text/javascript">
+	var isInBasket = <?=$isInBasket ? 'true' : 'false'?>;
+</script>

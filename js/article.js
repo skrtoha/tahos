@@ -1130,9 +1130,6 @@ function sortStoreItems(sortType){
 $(function(){
 	if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;
 	set_tabs();	
-	$(document).on('click', '.product-popup-wrap', function(){
-		set_tabs();
-	})
 	$('#offers-filter-form button').on('click', function(e){
 		e.preventDefault();
 		var elem = $(this);

@@ -76,7 +76,7 @@ if ($_GET['type'] == 'vin'){
 else{
 	get_items_impex();
 	$items = search_items('');
-	if (!empty($items) && $_SESSION['user'] && $_GET['save']){
+	if (!empty($items) && $_SESSION['user']){
 		foreach($items as $id => $item) break;
 		save_search($item['title_full']);
 	} 

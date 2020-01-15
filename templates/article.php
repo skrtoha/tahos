@@ -3,12 +3,13 @@ $abcp = new core\Abcp($_GET['item_id'], $db);
 $abcp->render([13]);
 $abcp->render([6]);
 
-// $mikado = new core\Mikado($db);
-// $mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
+
+$mikado = new core\Mikado($db);
+$mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
 // exit();
 
-// $armtek = new core\Armtek($db);
-// $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
+$armtek = new core\Armtek($db);
+$armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
 // $rossko = new core\Rossko($db, "{$abcp->item['article']} {$abcp->item['brand']}");
 // $rossko->execute();
@@ -16,6 +17,7 @@ $abcp->render([6]);
 $title = "Список предложений";
 
 $array = article_store_items($_GET['item_id'], [], 'articles');
+// debug($array);
 $store_items = array();
 foreach($array['store_items'] as $key => $value){
 	$store_items[] = [
@@ -72,7 +74,15 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 			if ($substitutes) $substitutes = "<span>$substitutes</span>";
 			else $substitutes = '';
 			// debug($user);
-			$complects = $db->getCount('complects', "`item_id`={$_GET['item_id']} AND `hidden`=0");
+			$res = $db->query("
+				SELECT SQL_CALC_FOUND_ROWS
+					COUNT(c.item_diff) 
+				FROM `tahos_complects` c 
+				LEFT JOIN tahos_store_items si ON si.item_id=c.item_diff 
+				WHERE 
+					c.item_id={$_GET['item_id']} AND si.store_id IS NOT null AND si.price>0 GROUP BY c.item_diff
+				");
+			$complects = $db->found_rows();
 			if ($complects) $complects = "<span>$complects</span>";
 			else $complects = '';
 			if (!$user['show_all_analogies']) $where_hide_analogies = "

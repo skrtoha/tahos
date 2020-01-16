@@ -970,16 +970,17 @@ function complect_search(){
 			i.barcode,
 			i.brend_id,
 			i.article,
-			b.title AS brend
+			b.title AS brend,
+			cm.item_diff
 		FROM
 			#items i
 		LEFT JOIN #brends b ON i.brend_id=b.id
 		LEFT JOIN #categories_items ci ON ci.item_id=i.id
 		LEFT JOIN #categories c ON c.id=ci.category_id
+		LEFT JOIN #complects cm ON cm.item_diff = i.id
 		WHERE 
-			i.article='$search' OR
-			i.id='$search' AND 
-			i.id<>$item_id
+			(i.article='$search' OR i.id='$search') AND 
+			i.id<>$item_id AND cm.item_diff IS NULL
 	";
 	$res_items = $db->query($q_items, '');
 	if ($res_items->num_rows > 100){

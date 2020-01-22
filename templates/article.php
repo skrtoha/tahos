@@ -11,6 +11,9 @@ $mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
 $armtek = new core\Armtek($db);
 $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
+$favorite = new core\FavoriteParts($db);
+debug($favorite->getItem($abcp->item['brand'], $abcp->item['article']));
+
 // $rossko = new core\Rossko($db, "{$abcp->item['article']} {$abcp->item['brand']}");
 // $rossko->execute();
 

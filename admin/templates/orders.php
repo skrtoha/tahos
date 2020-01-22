@@ -60,9 +60,14 @@ switch ($act) {
 				);
 				$orderAbcp->addToBasket($params);
 			}
+			//Favorit Avto
+			if ($ov['provider_id'] == 19){
+				$isRendered = true;
+				core\FavoriteParts::addToBasket($ov);
+			}
 			if (!$isRendered) $db->update('orders_values', ['status_id' => 7], "`order_id`={$_GET['id']} AND `status_id` = 5");
 		}
-		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
+		// header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
 		$order = get_order('');
@@ -333,7 +338,7 @@ function show_form($act){
 		<?}
 		else{
 			while ($ov = $res_order_values->fetch_assoc()){
-				// debug($ov);
+				debug($ov);
 				$selector = "store_id='{$ov['store_id']}' item_id='{$ov['item_id']}'";?>
 				<?if (!$order['is_draft']){?>
 					<tr <?=$selector?>>
@@ -402,8 +407,7 @@ function show_form($act){
 							<?if ($response != 'OK'){?>
 								<br><b style="color: red"><?=$response?></b>
 							<?}
-						}
-						?>
+						}?>
 					</td>
 					<td label="Бренд"><?=$ov['brend']?></td>
 					<td label="Артикул"><a href="/admin/?view=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>

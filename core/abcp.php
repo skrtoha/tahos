@@ -107,7 +107,7 @@ class Abcp{
 			'number' => $this->item['article'],
 			'brand' => $value['title']
 		];
-		$res = static::getPostData(
+		$res = static::getUrlData(
 			self::$params[$provider_id]['url'].'/search/batch',
 			[
 				'userlogin' => self::$params[$provider_id]['userlogin'],
@@ -280,16 +280,31 @@ class Abcp{
 		];
 		return $brands;
 	}
-	public static function getPostData($url, $data){
-		// return debug($data, $url);
-		// if (!self::isSiteAvailable($url)) return false;
-		$context = stream_context_create([
-			'http' => [
-				'method' => 'POST',
-				'content' => http_build_query($data)
-			]
-		]);
-		return file_get_contents($url, null, $context);
+	/**
+	 * gets response from remote server by url
+	 * @param  [string] $url remote url server
+	 * @param  [array] $data if is null then method is get 
+	 * @param  [string] $method is POST by default
+	 * @return [string] response from server
+	 */
+	public static function getUrlData($url, $data = array()){
+		$context = null;
+		if (empty($data)){
+			$context = stream_context_create([
+				'ssl' => [
+					'verify_peer' => false
+				]
+			]);
+		}
+		else{
+			$context = stream_context_create([
+				'http' => [
+					'method' => 'POST',
+					'content' => http_build_query($data)
+				]
+			]);
+		}
+		return file_get_contents($url, false, $context);
 	}
 	public static function isDomainAvailible($url) {
 		// Проверка правильности URL

@@ -33,6 +33,8 @@ if (in_array($_POST['status_id'], [1, 'issued_new', 2])){
 				<a href="/search/article/'.$item['article'].'" class="articul">'.
 					$item['article'].'</a> '.$item['title_full'];
 }
+$post = $_POST;
+$orderValue = new core\OrderValue($db);
 switch($_POST['status_id']){
 	case 1://выдано
 		$res_1 = $db->query("
@@ -193,31 +195,8 @@ switch($_POST['status_id']){
 		", '');
 		break;
 	case 11://заказано
-		$db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`status_id`=11,
-				`ordered` = {$_POST['ordered']}
-			WHERE $where
-		", '');
-		$db->query("
-			UPDATE
-				#users
-			SET
-				`reserved_funds`=`reserved_funds` + {$_POST['price']} * {$_POST['ordered']}
-			WHERE
-				`id`={$_POST['user_id']}
-		", '');
-		$db->query("
-			UPDATE
-				#store_items 
-			SET
-				in_stock = in_stock - {$_POST['ordered']}
-			WHERE
-				store_id = {$_POST['store_id']} AND
-				item_id = {$_POST['item_id']}
-		", '');
+		$post['quan'] = $_POST['ordered'];
+		$orderValue->changeStatus(11, $_POST);
 		break;
 	case 'arrived_new':
 		// print_r($_POST);
@@ -332,13 +311,7 @@ switch($_POST['status_id']){
 		$db->update('orders_values', ['status_id' => 5], "`order_id`={$_POST['order_id']}");
 		break;
 	default:
-		$db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`status_id`= {$_POST['status_id']}
-			WHERE $where
-		", '');
+		$orderValue->changeStatus($_POST['status_id'], $_POST);
 }
 
 ?>

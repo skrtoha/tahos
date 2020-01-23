@@ -51,7 +51,7 @@ class OrderAbcp extends Abcp{
 	}
 	public function getItemInfoByArticleAndBrend($array){
 		$article = Armtek::getComparableString($array['article']);
-		$supplierCode = str_replace($this->param['title'].'-', '', $array['providerStore']);
+		$distributorId = str_replace($this->param['title'].'-', '', $array['providerStore']);
 		$url =  "{$this->param['url']}/search/articles/?userlogin={$this->param['userlogin']}&userpsw=".md5($this->param['userpsw'])."&useOnlineStocks=1&number={$article}&brand={$array['brend']}";
 		$response = file_get_contents($url);
 		$items = json_decode($response, true);
@@ -60,7 +60,7 @@ class OrderAbcp extends Abcp{
 		foreach($items as $value){
 			if (
 				Armtek::getComparableString($value['numberFix']) == Armtek::getComparableString($article) 
-				&& $value['supplierCode'] == $supplierCode
+				&& $value['distributorId'] == $distributorId
 				// && Armtek::getComparableString($value['brand']) == Armtek::getComparableString($brend)
 			) {
 				return[
@@ -111,24 +111,71 @@ class OrderAbcp extends Abcp{
 		$res = json_decode($response, true);
 		return $res[1]['date'];
 	}
+	/**
+	 * gets order value by brend and article
+	 * @param  [array] $params article, brend - is required, provider_id, status_id - optional
+	 * @return [array]  row from orders_values
+	 */
+	public function getOrderValueByBrendAndArticle($params){
+		$article = article_clear($params['article']);
+		$where = '';
+		if (isset($params['provider_id'])) {
+			$where .= " AND ps.provider_id = {$params['provider_id']}";
+		}
+		if (isset($params['status_id'])) {
+			$where .= " AND ov.status_id = {$params['status_id']}";
+		}
+		$query = "
+			SELECT
+				ov.*
+			FROM
+				#orders_values ov
+			LEFT JOIN
+				#items i ON i.id = ov.item_id
+			LEFT JOIN
+				#brends b ON b.id = i.brend_id
+			LEFT JOIN 
+				#provider_stores ps ON ps.id = ov.store_id
+			WHERE
+				i.article = '$article' AND b.title LIKE '%{$params['brend']}%'
+				$where
+		";
+		$res = $this->db->query($query, '');
+		return $res->fetch_assoc();
+
+	}
 	public function basketOrder(){
 		// exit();
-		$shipmentDate = $this->getShipmentDate();
-		$res = parent::getPostData(
-			"{$this->param['url']}/basket/order",
-			[
-				'userlogin' => $this->param['userlogin'],
-				'userpsw' => md5($this->param['userpsw']),
-				'paymentMethod' => $this->param['paymentMethod'],
-				'shipmentAddress' => $this->param['shipmentAddress'],
-				'shipmentOffice' => isset($this->param['shipmentOffice']) ? $this->param['shipmentOffice'] : '',
-				'shipmentMethod' => isset($this->param['shipmentMethod']) ? $this->param['shipmentMethod'] : '',
-				'shipmentDate' => $shipmentDate
-			]
-		);
-		echo $res;
+		// $shipmentDate = $this->getShipmentDate();
+		// $res = parent::getPostData(
+		// 	"{$this->param['url']}/basket/order",
+		// 	[
+		// 		'userlogin' => $this->param['userlogin'],
+		// 		'userpsw' => md5($this->param['userpsw']),
+		// 		'paymentMethod' => $this->param['paymentMethod'],
+		// 		'shipmentAddress' => $this->param['shipmentAddress'],
+		// 		'shipmentOffice' => isset($this->param['shipmentOffice']) ? $this->param['shipmentOffice'] : '',
+		// 		'shipmentMethod' => isset($this->param['shipmentMethod']) ? $this->param['shipmentMethod'] : '',
+		// 		'shipmentDate' => $shipmentDate
+		// 	]
+		// );
+		$res = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/core/test.rossko.txt');
+
+		if (!$res) die("Ошибка отправления заказка");
 		$array = json_decode($res, true);
-		debug($array);
+
+		foreach($array['orders'] as $key => $order){
+			$orderValue = new OrderValue($this->db);
+			foreach($order['positions'] as $pos){
+				$ov = $this->getOrderValueByBrendAndArticle([
+					'brend' => $pos['brend'],
+					'article' => $pos['numberFix'],
+					'provider_id' => $this->param['provider_id'],
+					'status_id' => 7
+				]);
+				$orderValue->changeStatus(11, $ov);
+			}
+		}
 	}
 }
 

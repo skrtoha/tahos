@@ -347,7 +347,8 @@ class DataBase {
 		$table_name = $this->db_prefix.$table_name;
 		$query = "UPDATE `$table_name` SET ";
 		if (!$iconv) foreach ($upd_fields as $field => $value){
-			if (!$value && $value != '0') $query .= "`$field` = DEFAULT,";
+			if (strpos($value, $field) !== false) $query .= "`$field` = $value,";
+			elseif (!$value && $value != '0') $query .= "`$field` = DEFAULT,";
 			else $query .= "`$field` = '".$this->mysqli->real_escape_string($value)."',";
 		} 
 		else foreach ($upd_fields as $field => $value) $query .= "`$field` = '".iconv("UTF-8", "WINDOWS-1251", $value)."',";
@@ -363,7 +364,8 @@ class DataBase {
 		$table_name = $this->db_prefix.$table_name;
 		$query = "UPDATE `$table_name` SET ";
 		if (!$iconv) foreach ($upd_fields as $field => $value){
-			if (!$value && $value != '0') $query .= "`$field` = DEFAULT,";
+			if (strpos($value, $field) !== false) $query .= "`$field` = $value,";
+			elseif (!$value && $value != '0') $query .= "`$field` = DEFAULT,";
 			else $query .= "`$field` = '".$this->mysqli->real_escape_string($value)."',";
 		} 
 		else foreach ($upd_fields as $field => $value) $query .= "`$field` = '".iconv("UTF-8", "WINDOWS-1251", $value)."',";

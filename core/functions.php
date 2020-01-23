@@ -65,186 +65,6 @@ function message($text, $type = true){
 	setcookie('message', $text, 0, '/');
 	setcookie('message_type', $type_message, 0, '/');
 }
-function get_status_filters($is_filters, $value){
-	if ($is_filters){
-		if ($value == 1) return "checked";
-		else return "";
-	}
-	else return "checked";
-}
-function get_date($time){
-	$time_array = explode('.', $time);
-	$day = $time_array[0];
-	$mounth = $time_array[1];
-	$year = $time_array[2];
-	// return date("d.m.Y H:i", mktime(0,0,0, $mounth, $day, $year));
-	return mktime(0,0,0, $mounth, $day, $year);
-}
-function begin_day($time){
-	$date = getdate($time);
-	return mktime(0,0,0, $date['mon'], $date['mday'], $date['year']);
-}
-function end_day($time){
-	$time_array = explode('.', $time);
-	$day = $time_array[0];
-	$mounth = $time_array[1];
-	$year = $time_array[2];
-	return mktime(23, 59, 59, $mounth, $day, $year);
-}
-function get_items_search($text){
-	global $db;
-	if (!$text) return false;
-	switch ($_COOKIE['search_type']) {
-		case 'articles':
-		case '':
-			$array = $db->select('items', 'id', "`article`='$text' AND `type`=1");
-			break;
-		case 'subtitutes':
-			$items = $db->select('items', 'id', "`article`='$text' AND `type`=1");
-			$where = "";
-			foreach ($items as $item) $where .= "`item_type`=".$item['id']." OR ";
-			$where = substr($where, 0, -4);
-			$where = "($where) AND `type`=2";
-			$array = $db->select('items', 'id', $where);
-			break;
-		case 'analogies':
-			$items = $db->select('items', 'id', "`article`='$text' AND `type`=1");
-			$where = "";
-			foreach ($items as $item) $where .= "`item_type`=".$item['id']." OR ";
-			$where = substr($where, 0, -4);
-			$where = "($where) AND `type`=3";
-			$array = $db->select('items', 'id', $where);
-			break;
-	}
-	if (count($array)) return $array;
-	else return false;
-}
-function get_items($kol_elem = 0, $cat_id = 0){
-	global $db;
-	$settings = $db->select('settings', "*");
-	$per_page = $settings[0]['per_page'];
-	$sort_type = $_COOKIE['sort_type'] ? $_COOKIE['sort_type'] : "title";
-	$sort_direct = $_COOKIE['sort_direct'];
-	$category_id = $cat_id ? $cat_id : $_GET['category_id'];
-	$cookie_filters = get_cookie_flilters($category_id);
-	// echo count($cookie_filters);
-	// print_r($cookie_filters);
-	if ($cookie_filters){
-		$str = "";
-		$where = "`category_id`=$category_id";
-		if ($cookie_filters['brend']) $where .= " AND `brend_id`=".$cookie_filters['brend'];
-		// echo "$where";
-		$count_values = 0;
-		foreach ($cookie_filters as $key => $value) {
-			if ($key != "brend"){
-	$str .= "`value_id`=$value OR ";
-	$count_values++;
-			} 
-		}
-		$str = substr($str, 0, -3);
-		if ($count_values){
-			$temp = $db->select('items_values', "item_id", "$str ORDER BY `item_id`");
-			$count = count($temp);
-			// echo "$count";
-			// if ($count == 1) 
-			if ($count == $count_values) return false;
-			// echo "$count";
-			for ($i = 0; $i < $count - $count_values; $i++) {
-	$bool = true;
-	for ($j = $i; $j < $i + $count_values; $j++){
-		if ($temp[$i]['item_id'] != $temp[$j]['item_id']) $bool = false;
-	}
-	if ($bool) $items[] = $temp[$i]['item_id'];
-			}
-			if (count($items)){
-	$str = "";
-	foreach ($items as $value)  $str .= "`id`=$value OR ";
-	$str = substr($str, 0, -3);
-	$where .= " AND ($str)";
-			} 
-			else return false;
-			foreach ($_POST as $key => $value) {
-	# code...
-			}
-			$where .=  " ORDER BY `$sort_type` $sort_direct";
-		}
-	}
-	else $where = "`category_id`=$category_id ORDER BY `$sort_type` $sort_direct";
-	$array = $db->select('items', "*", "$where", '', '', "$kol_elem,$per_page");
-	return count($array) ? $array : false;
-}
-function array_id($array){
-	foreach ($array as $key => $value){
-		foreach ($value as $k => $v)if ($k != "id") $new[$value['id']][$k] = $v;
-	}
-	return $new;
-}
-function print_array($array){
-	foreach ($array as $key => $value) {
-		echo "$key : ";
-		print_r($value);
-		echo "<br>";
-	}
-}
-function p_arr($array, $table = true){
-	if ($table){
-		foreach ($array as $key => $value){
-			foreach ($value as $k => $val) $names[] = $k;
-			break;
-		}?>
-		<table style="width: auto">
-			<tr>
-				<?foreach ($names as $value){?>
-					<td style="padding: 10px 10px;vertical-align: middle;text-align: center;border-bottom:1px solid grey"><?=$value?></td>
-				<?}?>
-			</tr>
-			<?foreach ($array as $key => $value) {?>
-				<tr>
-					<?foreach ($value as $val){?>
-						<td style="padding: 10px 10px;vertical-align: middle;text-align: center;border-bottom:1px solid grey"><?=$val?></td>
-					<?}?>
-				</tr>
-			<?}?>
-		</table>
-	<?}
-}
-function get_values_item($array){
-	global $db;
-	$where = "";
-	foreach ($array as $value) $where .= "`id`=".$value['value_id']." OR ";
-	$where = substr($where, 0, -4);
-	$filters_values = $db->select('filters_values', "*", "$where GROUP BY `filter_id`");
-	if (!count($filters_values)) return false;
-	$where = "";
-	foreach ($filters_values as $value) $where .= "`id`=".$value['filter_id']." OR ";
-	$where = substr($where, 0, -4);
-	$temp = $db->select('filters', "title,id", $where, 'position');
-	if (!count($temp)) return false;
-	foreach($temp as $key => $value) $filters[$value['id']] = $value['title'];
-	foreach($filters_values as $value)$new[$filters[$value['filter_id']]] = $value['title'];
-	return $new;
-}
-function get_sort(){
-	$sort_type = $_COOKIE['sort_type'] ? $_COOKIE['sort_type'] : 'title';
-	$sort_direct = $_COOKIE['sort_direct'];
-	switch($sort_type){
-		case 'title':?>
-			<a sort_type="title" sort_direct="<?=$sort_direct?>" class="active <?=$sort_direct?>" href="#">Наименование</a>
-			<a sort_type="price" class="" href="#">Цена</a>
-			<a sort_type="rating" class="" href="#">Рейтинг</a>
-			<?break;
-		case 'price':?>
-			<a sort_type="title" href="#">Наименование</a>
-			<a sort_type="price" sort_direct="<?=$sort_direct?>" class="active <?=$sort_direct?>" href="#">Цена</a>
-			<a sort_type="rating" class="" href="#">Рейтинг</a>
-			<?break;
-		case 'rating':?>
-			<a sort_type="title" href="#">Наименование</a>
-			<a sort_type="price" class="" href="#">Цена</a>
-			<a sort_type="rating" sort_direct="<?=$sort_direct?>" class="active <?=$sort_direct?>" class="" href="#">Рейтинг</a>
-			<?break;
-	}
-}
 function get_cookie_flilters($cat_id = 0){
 	if ($_COOKIE['filters']){
 		$temp = json_decode($_COOKIE['filters'], true);
@@ -260,19 +80,6 @@ function get_cookie_flilters($cat_id = 0){
 		return $cookie_filters;
 	}
 	else return false;
-}
-//перевод в валюту пользователя при отображении результатов
-function price_article($provider_item, $show_currency = true){
-	global $currencies, $user, $providers;
-	//если пользователь не авторизован, то просто возращаем цену в рублях
-	if (!$user) return $provider_item['price'];
-	$rubls = $provider_item['price'];
-	$user_rate = $currencies[$user['currency_id']]['rate'];
-	// echo $provider_item['price']." $provider_currency $provider_percent $provider_rate $rubls $user_rate";
-	// return;
-	if ($user['currency_id'] != 1) $rubls = round($rubls / $user_rate, 2);
-	if ($show_currency) return $rubls.$currencies[$user['currency_id']]['designation'];
-	else return $rubls;
 }
 function get_bill(){
 	global $db;
@@ -339,29 +146,7 @@ function get_user_price($price, $user){
 	return '<span class="price_format">'.$value.'</span>';
 }
 //для перевода в рубли из формы фильтра при поиске артикля
-function get_rubls_form($price){
-	global $currencies, $user;
-	if (!$price) return false;
-	if (!$user) return $price;
-	return round($price * $currencies[$user['currency_id']]['rate']);
-}
 //для отображения если нету поставщиков
-function no_providers(){
-	global $article, $item, $brend;?>
-	<tr class="button-row active">
-		<td style="padding: 20px 0 0 0;text-align:left" class="button_padding">
-			<b class="brend_info" brend_id="<?=$item['brend_id']?>"><?=$brend?></b>
-			<a href="<?=getHrefArticle($article)?>" class="articul"><?=$article?></a></td>
-		<td class="name-col" style="padding: 20px 0 0 0;text-align:left">
-		<?$i = $item;
-		if ($i['applicability'] or $i['characteristics'] or $i['foto'] or $i['full_desc']){?>
-			<a href="#"><i item_id="<?=$item['id']?>" class="fa fa-camera product-popup-link" aria-hidden="true"></i></a>
-		<?}?>
-		<?=$item['title_full']?>
-		</td>
-		<td colspan="5" style="padding-top: 20px">Поставщиков не найдено</td>
-	</tr>
-<?}
 function getHrefArticle($article){
 	return "/search/article/$article";
 }
@@ -387,13 +172,6 @@ function getStrTemplate($template){
 		}
 	}
 	return substr($str, 0, -2);
-}
-function set_cache($array = array()){
-	$file = 'cache/category.chc';
-	if (empty($array)) return file_put_contents($file, '');
-	$str = file_get_contents($file);
-	$str .= json_encode($array).'\n';
-	return file_put_contents($file, $str);
 }
 function get_rating($rate, $ratings){
 	if ($rate <= $ratings[1]) return 0;
@@ -447,9 +225,6 @@ function get_filters($category_id){
 		} 
 	}
 	return $t_filters;
-}
-function console($str){
-	echo "<script>console.log('$str')</script>";
 }
 function cat_get_chunks_items($query){
 	global $db, $settings, $res;

@@ -2,16 +2,17 @@
 namespace core;
 class FavoriteParts{
 	private static $key = 'F4289750-BAFA-434C-8C2D-09AC06D6E6C2';
+	
 	private static $provider_id = 19;
 	private static $stores = [
+		'22664' => [
+			'code' => 'МС2',
+			'id' => 'E8C31C27-031C-11E7-80CF-0050568E1762',
+			'cipher' => 'FAVO'
+		],
 		'22663' => [
 			'code' => 'МЦС',
 			'id' => '23F7657D-FA9D-11E7-812E-0050568E1762',
-			'cipher' => 'FAJA'
-		],
-		'22664' => [
-			'code' => 'МС2',
-			'id' => ''
 			'cipher' => 'FAVO'
 		]
 	];
@@ -42,17 +43,27 @@ class FavoriteParts{
 
 	public static function getItem($brend, $article){
 		$response = Abcp::getUrlData(
-			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend
+			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues='
 		);
-		return json_decode($response, true);
+		$array = json_decode($response, true);
+		return $array['goods'][0];
 	}
 
 	public static function addToBasket($ov){
+		debug($ov, 'ov');
 		$item = self::getItem($ov['brend'], $ov['article']);
+		debug($item, 'item');
 		$url = "https://api.favorit-parts.ru/ws/v1/cart/add/";
 		$url .= "?key=".self::$key;
 		$url .= "&goods={$item['goodsID']}";
-		&goods=1854BF5C-5100-11DE-BF60-000E0CE9B9AA&warehouseGroup=23F7657D-FA9D-11E7-812E-0050568E1762&count=1&comment="
-		debug($item);
+		$url .= "&warehouseGroup=".self::$stores[$ov['store_id']]['id'];
+		$url .= "&count={$ov['quan']}";
+		debug($url, 'url');
+		// $response = Abcp::getUrlData($url);
+		$response = file_get_contents($url);
+		debug($response);
+		debug(json_decode($response, true));
+
+		// count=1&comment="
 	}
 }

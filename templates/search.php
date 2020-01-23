@@ -3,14 +3,14 @@
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$coincidences = array();
 
-	// $mikado = new core\Mikado($db);
-	// setCoincidences($mikado->getCoincidences($_GET['search']));
+	$mikado = new core\Mikado($db);
+	setCoincidences($mikado->getCoincidences($_GET['search']));
 
-	// $armtek = new core\Armtek($db);
-	// setCoincidences($armtek->getSearch($_GET['search']));
+	$armtek = new core\Armtek($db);
+	setCoincidences($armtek->getSearch($_GET['search']));
 
-	// $abcp = new core\Abcp(NULL, $db);
-	// setCoincidences($abcp->getSearch($_GET['search']));
+	$abcp = new core\Abcp(NULL, $db);
+	setCoincidences($abcp->getSearch($_GET['search']));
 
 	setCoincidences(core\FavoriteParts::getSearch($_GET['search']));
 

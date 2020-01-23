@@ -31,14 +31,15 @@
 					</td>
 					<!-- наименование с фотоаппаратом -->
 					<td class="name-col" style="padding-top: 20px;text-align:left">
-						<?if($si['is_desc']) $class ='fa-cog';
-						if ($si['foto']) $class = 'fa-camera';
-						if($si['is_desc'] || $si['foto']){?>
-							<a href="#">
-								<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
-							</a>
-						<?}?>
-						<?=$si['title_full']?>
+						<?$class = '';
+							if($si['is_desc'] || $si['foto']){
+								if($si['is_desc']) $class ='fa-cog';
+								if ($si['foto']) $class = 'fa-camera';?>
+								<a href="#">
+									<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
+								</a>
+							<?}?>
+							<?=$si['title_full']?>
 					</td>
 					<!-- шифр поставщика -->
 					<td>
@@ -189,14 +190,15 @@
 						</td>
 						<!-- наименование с фотоаппаратом -->
 						<td class="name-col" style="padding-top: 20px;text-align:left">
-							<?if($si['is_desc']) $class ='fa-cog';
-								if ($si['foto']) $class = 'fa-camera';
-								if($si['is_desc'] || $si['foto']){?>
-									<a href="#">
-										<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
-									</a>
-								<?}?>
-								<?=$si['title_full']?>
+							<?$class = '';
+							if($si['is_desc'] || $si['foto']){
+								if($si['is_desc']) $class ='fa-cog';
+								if ($si['foto']) $class = 'fa-camera';?>
+								<a href="#">
+									<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
+								</a>
+							<?}?>
+							<?=$si['title_full']?>
 						</td>
 						<!-- шифр поставщика -->
 						<td>
@@ -321,10 +323,15 @@
 						<input type="hidden" id="item_id" value="<?=$si['item_id']?>">
 					</td>
 					<td class="name-col">
-					<?if ($si['is_desc']){?>
-						<a href="#"><i item_id="<?=$si['item_id']?>" class="fa fa-camera product-popup-link" aria-hidden="true"></i></a>
-					<?}?>
-					<?=$si['title_full']?>
+					<?$class = '';
+						if($si['is_desc'] || $si['foto']){
+							if($si['is_desc']) $class ='fa-cog';
+							if ($si['foto']) $class = 'fa-camera';?>
+							<a href="#">
+								<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
+							</a>
+						<?}?>
+						<?=$si['title_full']?>
 					</td>
 					<td colspan="5" style="">Поставщиков не найдено</td>
 				</tr>
@@ -347,12 +354,13 @@ else{?>
 				</p>
 				<p><?=$si['title_full']?></p>
 			</div>
-			<?if ($si['is_desc'] || $si['foto']){
-				$stringClass = '';
-				if ($si['is_desc']) $stringClass = 'fa-cog';
-				if ($si['foto']) $stringClass = 'fa-camera';
-				?>
-				<a href="#"><i item_id="<?=$si['item_id']?>" class="fa <?=$stringClass?> product-popup-link" aria-hidden="true"></i></a>
+			<?$class = '';
+			if($si['is_desc'] || $si['foto']){
+				if($si['is_desc']) $class ='fa-cog';
+				if ($si['foto']) $class = 'fa-camera';?>
+				<a href="#">
+					<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
+				</a>
 			<?}?>
 			<table class="small-view">
 				<?if ($csi > 0  || !empty($si['prevails'])){?>

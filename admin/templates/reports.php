@@ -64,9 +64,9 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			<?if ($items->num_rows){
 				foreach($items as $item){?>
 					<tr>
-						<td><?=$item['text']?></td>
-						<td><?=$item['type']?></td>
-						<td><?=$item['from']?></td>
+						<td label="Вид"><?=$item['text']?></td>
+						<td label="Таблица"><?=$item['type']?></td>
+						<td label="Источник"><?=$item['from']?></td>
 						<td>
 							<?if ($_POST['tab'] == 'nomenclature'){?>
 								<?if (!$item['is_processed']){?>

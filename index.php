@@ -7,22 +7,6 @@ require_once('class/database_class.php');
 require_once('core/functions.php');
 require_once('admin/vendor/autoload.php');
 
-// $db = new mysqli(
-// 	's21.hostia.name',
-// 	'skrtoha_main',
-// 	'Imgr6AtE',
-// 	'skrtoha_main'
-// );
-// debug($db); exit();
-
-// $db = new mysqli(
-// 	'tahos.ru',
-// 	'tahos',
-// 	'',
-// 	'tahos'
-// );
-// debug($db); exit();
-
 $db = new DataBase();
 session_start();
 $connection = new core\Connection($db);
@@ -52,7 +36,10 @@ if($_GET['act'] == 'unbind'){
 	header('Location: /settings');
 }
 $path = "templates/$view.php";
+
 $user = cat_get_user();
+$basket = get_basket();
+
 if (file_exists($path)){
 	ob_start();
 	require_once($path);

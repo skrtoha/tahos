@@ -291,7 +291,7 @@ class Abcp{
 		]);
 		return file_get_contents($url, null, $context);
 	}
-	public static function isSiteAvailable($url) {
+	public static function isDomainAvailible($url) {
 		// Проверка правильности URL
 		if(!filter_var($url, FILTER_VALIDATE_URL)){
 				return false;
@@ -307,7 +307,8 @@ class Abcp{
 		$response = curl_exec($curlInit);
 		// закрываем CURL
 		curl_close($curlInit);
-		return preg_match('/200 OK/', $response) ? true : false;
+		if ($response) return true;
+		return false;
 	}
 }
 ?>

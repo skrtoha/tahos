@@ -109,6 +109,15 @@ $res_user_socials = $db->query("
 				</label>
 			</div>
 			<div class="input-wrap">
+				<label for="get_notifications">
+					Получать дополнительные оповещения
+				</label>
+				<label style="position: relative;top: 5px" class="switch">
+					<input id="get_notifications" type="checkbox" <?=$user['get_notifications'] ? 'checked' : ''?>>
+					<div class="slider round"></div>
+				</label>
+			</div>
+			<div class="input-wrap">
 				<label for="additional-functions">
 					Включить дополнительные функции
 				</label>

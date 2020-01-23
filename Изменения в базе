@@ -5,3 +5,4 @@ CREATE TABLE `tahos_email_prices` (
 ALTER TABLE `tahos_email_prices`
   ADD PRIMARY KEY (`store_id`);
 COMMIT;
+ALTER TABLE `tahos_users`  ADD `get_notifications` BOOLEAN NULL DEFAULT NULL  AFTER `get_news`;

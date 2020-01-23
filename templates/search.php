@@ -76,7 +76,7 @@ if ($_GET['type'] == 'vin'){
 else{
 	get_items_impex();
 	$items = search_items('');
-	if (!empty($items) && $_SESSION['user'] && $_GET['save']){
+	if (!empty($items) && $_SESSION['user']){
 		foreach($items as $id => $item) break;
 		save_search($item['title_full']);
 	} 
@@ -143,34 +143,29 @@ function save_search($title){
 		`type`=$search_type AND
 		`text`='{$_GET['search']}'
 	", '');
-	// debug($db->get_myslqi());
-	// exit();
 	if (!$db->rows_affected()){
-		$count = $db->getCount(
-			'search', 
-			"`user_id`={$_SESSION['user']} AND `type`=$search_type"
+		$userSearch = $db->select(
+			'search',
+			'*',
+			"`user_id` = {$_SESSION['user']} AND `type` = $search_type",
+			'date',
+			true,
+			"0, $search_count_user"
 		);
-		if ($count == $search_count_user){
-			$date_max = $db->getMax(
-				'search', 
-				'date',
-				"
-					`user_id`={$_SESSION['user']} AND
-					`type`=$search_type
-				"
-			);
+		if (count($userSearch) == $search_count_user){
 			$db->query("
 				UPDATE
 					#search
 				SET
 					`text`='{$_GET['search']}',
-					`title`='$title'
+					`title`='$title',
+					`date` = CURRENT_TIMESTAMP
 				WHERE
 					`user_id`={$_SESSION['user']} AND
-					`type`=$search_type AND
-					`date`='$date_max'
+					`type`= $search_type AND
+					`text` = '{$userSearch[0]['text']}'
 			", '');
-		} 
+		}
 		else $db->insert(
 			'search',
 			[

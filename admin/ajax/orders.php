@@ -1,4 +1,7 @@
-<?require_once('../../class/database_class.php');
+<?php
+require_once('../../class/database_class.php');
+require_once("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
+
 
 $db = new DataBase();
 $connection = new core\Connection($db);
@@ -15,31 +18,29 @@ $settings = $db->select_one('settings', '*', '`id`=1');
 // print_r($settings);
 // print_r($_POST);
 // exit();
-if (in_array($_POST['status_id'], [1, 'issued_new', 2])){
-	$item = $db->select_unique("
-		SELECT
-			i.article,
-			i.title,
-			b.title as brend
-		FROM
-			#items i
-		LEFT JOIN
-			#brends b ON b.id=i.brend_id
-		WHERE
-			i.id={$_POST['item_id']}
-	", '');
-	$item = $item[0];
-	$title = '<b style="font-weight: 700">'.$item['brend'].'</b> 
-				<a href="/search/article/'.$item['article'].'" class="articul">'.
-					$item['article'].'</a> '.$item['title_full'];
-}
+$item = $db->select_unique("
+	SELECT
+		i.article,
+		i.title,
+		b.title as brend
+	FROM
+		#items i
+	LEFT JOIN
+		#brends b ON b.id=i.brend_id
+	WHERE
+		i.id={$_POST['item_id']}
+", '');
+$item = $item[0];
+$title = '<b style="font-weight: 700">'.$item['brend'].'</b> 
+			<a href="'.$_SERVER['HTTP_HOST'].'/search/article/'.$item['article'].'" class="articul">'.
+				$item['article'].'</a> '.$item['title_full'];
 switch($_POST['status_id']){
 	case 1://выдано
 		$res_1 = $db->query("
 			UPDATE 
 				#orders_values 
 			SET 
-				`issued` = {$_POST['arrived']},
+				`issued` = `issued` + {$_POST['arrived']},
 				`status_id` = 1
 			WHERE $where
 		", '');
@@ -145,6 +146,12 @@ switch($_POST['status_id']){
 			WHERE
 				`id`={$_POST['user_id']}
 		", '');
+		$res = core\Mailer::send([
+			'email' => $db->getFieldOnID('users', $_POST['user_id'], 'email'),
+			'subject' => 'Возврат средств',
+			'body' => "У вас возврат средств ".$_POST['price'] * $_POST['new_returned']." руб. за $title"
+		]);
+		if ($res !== true) die($res);
 		break;
 	case 3://пришло
 		$db->query("
@@ -155,6 +162,13 @@ switch($_POST['status_id']){
 				`status_id`= 3
 			WHERE $where
 		", '');
+		if (isOrderReady($_POST['order_id'])){
+			$res = core\Mailer::send([
+				'email' => $db->getFieldOnID('users', $_POST['user_id'], 'email'),
+				'subject' => 'Ваш заказ готов к отгрузке',
+				'body' => file_get_contents("http://{$_SERVER['HTTP_HOST']}/admin/?view=orders&act=print&id={$_POST['order_id']}")
+			]);
+		}
 		break;
 	case 6://нет в наличии
 		$db->query("
@@ -165,6 +179,11 @@ switch($_POST['status_id']){
 			WHERE $where
 		", '');
 		$db->delete('store_items', "store_id = {$_POST['store_id']} AND item_id = {$_POST['item_id']}");
+		$res = core\Mailer::send([
+			'email' => $db->getFieldOnID('users', $_POST['user_id'], 'email'),
+			'subject' => 'Товара нет в наличии',
+			'body' => "Сообщаем вам, что в заказазе №{$_POST['order_id']} товара $title нет в наличии"
+		]);
 		break;
 	case 8://отменен
 		$db->query("

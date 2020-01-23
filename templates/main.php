@@ -79,7 +79,6 @@
 				<div class="arrow_up"></div>
 				<?if ($_SESSION['user']){
 					$count_basket = 0;
-					$basket = get_basket();
 					if (!empty($basket)) foreach ($basket as $val) $count_basket += $val['quan'];
 				} 
 				if ($count_basket){?>

@@ -1,0 +1,8 @@
+div.search_items.gif::before{
+	content: '';
+	background: url(/img/gif.gif) no-repeat;
+	height: 67px;
+	width: 67px;
+	margin: 0 auto;
+	display: block !important;;
+}

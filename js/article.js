@@ -1,4 +1,7 @@
-//для скрытие формы в артикле, если нет поставщиков
+/**
+ * hide form if no providers
+ * @type {Boolean}
+ */
 var hidable_form = true;
 var res;
 function getFullItem(i){
@@ -175,8 +178,86 @@ function set_tabs(){
 		}
 	});
 }
+/**
+ * checks is there any item in basket
+ * @param  {[object]}  store_items_list [description]
+ * @return {Boolean} 
+ */
+function isInBasket(store_items_list){
+	for(var key in store_items_list){
+		var store_item = store_items_list[key].store_item;
+		for(var k in store_item.list){
+			if (store_item.list[k].in_basket) return true;
+		}
+		if(typeof store_item.prevails != 'undefined'){
+			for(var k in store_item.prevails){
+				if (store_item.prevails[k].in_basket) return true;
+			}
+		}
+	}
+	return false;
+}
+/**
+ * Sets a new value in current to-stock-button
+ * @param {[type]} obj object with parameters (value, store_id, item_id)
+ */
+function setNewValueCurrentItem(obj){
+	$('li[store_id=' + obj.store_id + '][item_id=' + obj.item_id + '] input').val(obj.quan);
+	$('i.to-stock-btn[store_id=' + obj.store_id + '][item_id=' + obj.item_id + ']').html('<i class="goods-counter">' + obj.quan + '</i>');
+}
+/**
+ * sets in value inBasket amount of item
+ * @param {[type]} store_id [description]
+ * @param {[type]} item_id  [description]
+ * @param {[type]} amount   [addable value]
+ * @param {[isReplace]} if value is replacing
+ */
+function setAmountInBasket(store_id, item_id, amount, isReplace = false){
+	if (typeof inBasket[store_id + ':' + item_id] == 'undefined') return inBasket[store_id + ':' + item_id] = amount;
+	if (isReplace) return inBasket[store_id + ':' + item_id] = parseInt(amount);
+	inBasket[store_id + ':' + item_id] = parseInt(inBasket[store_id + ':' + item_id]);
+	return inBasket[store_id + ':' + item_id] += amount;
+}
+/**
+ * [setNewValueCartIcon sets common amount in basket icon]
+ */
+function setNewValueCartIcon(){
+	var summ = 0;
+	$('.cart span').remove();
+	for(var k in inBasket){
+		inBasket[k] = parseInt(inBasket[k]);
+		summ += inBasket[k];
+	} 
+	return $('.cart').append('<span>' + summ + '</span>');
+}
+function setNewValueAjax(obj){
+	$.ajax({
+		type: "POST",
+		url: "/ajax/to_basket.php",
+		data: obj,
+		success: function(msg){
+			get_basket(JSON.parse(msg));
+			show_popup_basket();
+			setTimeout(function(){
+				if (!$('.cart-popup').is(':hover')) $('.overlay').click();
+			}, 2500);
+		} 
+	});
+}
+function setNewValue(obj){
+	obj.quan = inBasket[obj.store_id + ':' + obj.item_id];
+	setNewValueCurrentItem(obj);
+	setNewValueCartIcon();
+	setNewValueAjax(obj);
+}
 function store_items(store_items, user, search_type = null){
-	// console.log(store_items);
+	console.log(store_items);
+	var isInBasket = window.isInBasket(store_items);
+	/**
+	 * adds to class if no items exists in basket
+	 * @type {[string]}
+	 */
+	var hidden = isInBasket ? '' : 'hidden';
 	var c_si = Object.keys(store_items).length;
 	if (!c_si) return '<div>Ничего не найдено</div>';
 	// console.log(Object.keys(si.list).length);
@@ -198,6 +279,7 @@ function store_items(store_items, user, search_type = null){
 			'<th><a class="sortable in_stock" href="">В наличии</a></th>' +
 			'<th><a class="sortable delivery" href="">Срок</a></th>' +
 			'<th><a class="sortable price" href="">Цена</a></th>' +
+			'<th class="quan ' + hidden + '">К заказу</th>' +
 			'<th><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></th>' +
 		'</tr>';
 	var mobile = '';
@@ -205,11 +287,22 @@ function store_items(store_items, user, search_type = null){
 	for (i = 0; i < length; i++){
 		var id = store_items[i].item_id;
 		var si = store_items[i].store_item;
+		/**
+		 * counts amount of items in list
+		 */
 		var csi;
 		// console.log('item_id=' + si.item_id, typeof si.list);
 		if (typeof si.list !== null && typeof si.list !== 'undefined') csi = Object.keys(si.list).length;
 		else csi = false;
-		count_prevails = typeof si.prevails !== 'undefined' ? Object.keys(si.prevails).length : false;
+		/**
+		 * shows is there any prevail in item list
+		 * @type {[string]}
+		 */
+		var count_prevails = typeof si.prevails !== 'undefined' ? Object.keys(si.prevails).length : false;
+		/**
+		 * for displaying additional items if csi > 2
+		 * @type {[string]}
+		 */
 		var button_row = (csi <= 2) ? 'button-row' : '';
 		var empty = !csi ? 'empty' : '';
 		var si_price = si.min_price;
@@ -461,7 +554,80 @@ function store_items(store_items, user, search_type = null){
 		mobile +=
 				'</td>';
 		//price end
-
+		
+		//quan start
+		full +=
+				'<td class="quan ' + hidden + '">';
+		mobile +=
+				'<td class="quan ' + hidden + '">';
+		if (count_prevails){
+			full += 
+					'<ul class="prevail">';
+			mobile += 
+					'<ul class="prevail">';
+			for (var p in si.prevails){
+				full +=
+						'<li packaging="' + si.prevails[p].packaging + '" store_id="' + si.prevails[p].store_id + '" item_id="' + id + '" class="count-block">';
+				mobile +=
+						'<li packaging="' + si.prevails[p].packaging + '" store_id="' + si.prevails[p].store_id + '" item_id="' + id + '" class="count-block">';
+				if (si.prevails[p].in_basket){
+					full +=
+							'<input value="' + si.prevails[p].in_basket + '">';
+					mobile +=
+							'<input value="' + si.prevails[p].in_basket + '">';
+				}
+				full +=
+						'</li>';
+				mobile +=
+						'</li>';
+			}
+			full +=
+					'</ul>';
+			mobile +=
+					'</ul>';
+		}
+		if (csi){
+			full +=
+					'<ul>' + 
+						'<li packaging="' + si_price.packaging + '" store_id="' + si_price.store_id + '" item_id="' + si.item_id + '" class="count-block">';
+			mobile +=
+					'<ul>' + 
+						'<li packaging="' + si_price.packaging + '" store_id="' + si_price.store_id + '" item_id="' + si.item_id + '" class="count-block">';
+			if (si_price.in_basket){
+				full +=
+							'<input value="' + si_price.in_basket + '">';
+				mobile +=
+							'<input value="' + si_price.in_basket + '">';
+			}
+			full +=
+						'</li>';
+			mobile +=
+						'</li>';
+			if (si_delivery){
+				full +=
+						'<li packaging="' + si_delivery.packaging + '" store_id="' + si_delivery.store_id + '" item_id="' + si.item_id + '" class="count-block">';
+				if (si_delivery.in_basket){
+					full +=
+							'<input value="' + si_delivery.in_basket + '">';
+					mobile +=
+							'<input value="' + si_delivery.in_basket + '">';
+				}
+				full +=
+						'</li>';
+				mobile +=
+						'</li>';
+			}
+			full +=
+					'</ul>';
+			mobile +=
+					'</ul>';
+		}
+		full += 
+				'</td>';
+		mobile +=
+				'</td>';
+		//quan end
+		
 		//stock start
 		full +=
 				'<td>';
@@ -582,7 +748,12 @@ function store_items(store_items, user, search_type = null){
 					'</a>' +
 				'</td>' +
 				'<td class="name-col" style="padding-top: 20px;text-align:left">';
-			if (+si.is_desc || typeof si.foto){
+			if (search_type == 'analogies' && typeof user.id !== 'undefined'){
+				var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
+				mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
+				full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
+			};
+			if (+si.is_desc || si.foto){
 				var stringClass = '';
 				if (si.is_desc) stringClass = 'fa-cog';
 				if (si.foto) stringClass = 'fa-camera';
@@ -596,7 +767,8 @@ function store_items(store_items, user, search_type = null){
 			full +=
 					si.title_full + 
 				'</td>' +
-			//cipher
+
+			//cipher start
 				'<td>';
 			if (count_prevails){
 				full += 
@@ -629,11 +801,15 @@ function store_items(store_items, user, search_type = null){
 			} 
 			full +=
 					'</ul>' +
-				'</td>' +
-				'<td>';
+				'</td>';
 			mobile += 
 						'</ul>' +
-					'</td>' +
+					'</td>';
+
+			//in_stock start
+			full +=
+					'<td>';
+			mobile +=
 					'<td>';
 			if (count_prevails){
 				full +=
@@ -675,11 +851,16 @@ function store_items(store_items, user, search_type = null){
 			} 
 			full +=
 					'</ul>' +
-				'</td>' +
-				'<td>';
+				'</td>';
 			mobile +=
 					'</ul>' +
-				'</td>' +
+				'</td>';
+			//in_stock end
+
+			//delivery start
+			full +=
+				'<td>';
+			mobile +=
 				'<td>';
 			if (count_prevails){
 				full += 
@@ -709,11 +890,16 @@ function store_items(store_items, user, search_type = null){
 			} 
 			full +=
 					'</ul>' +
-				'</td>' +
-				'<td>';
+				'</td>';
 			mobile +=
 					'</ul>' +
-				'</td>' +
+				'</td>';
+			//delivery end
+			
+			//price start
+			full +=
+				'<td>';
+			mobile +=
 				'<td>';
 			if (count_prevails){
 				full +=
@@ -743,11 +929,77 @@ function store_items(store_items, user, search_type = null){
 			} 
 			full +=
 					'</ul>' +
-				'</td>' +
-				'<td>';
+				'</td>';
 			mobile +=
 					'</ul>' +
-				'</td>' +
+				'</td>';
+			//price end
+
+			//quan start
+			full +=
+				'<td class="quan ' + hidden + '">';
+			mobile +=
+				'<td class="quan ' + hidden + '">';		
+			if (count_prevails){
+				full +=
+					'<ul class="prevail">';
+				mobile +=
+					'<ul class="prevail">';
+				for (var p in si.prevails){
+					full +=
+						'<li packaging="' + si.prevails[p].packaging + '" store_id="' + si.prevails[p].store_id + '" item_id="' + si.item_id + '" class="count-block">';
+					mobile +=
+						'<li packaging="' + si.prevails[p].packaging + '" store_id="' + si.prevails[p].store_id + '" item_id="' + si.item_id + '" class="count-block">';
+					if (si.prevails[p].in_basket){
+						full +=
+							'<input value="' + si.prevails[p].in_basket + '">';
+						mobile +=
+							'<input value="' + si.prevails[p].in_basket + '">';
+					}
+					full +=
+						'</li>';
+					mobile +=
+						'</li>';
+				}
+				full +=
+					'</ul>';
+				mobile +=
+					'</ul>';
+			}
+			full +=
+					'<ul>';
+			mobile +=
+					'<ul>';
+			for(var k in si.list){
+				full +=
+					'<li packaging="' + si.list[k].packaging + '" store_id="' + si.list[k].store_id + '" item_id="' + si.item_id + '" class="count-block">';
+				mobile +=
+					'<li packaging="' + si.list[k].packaging + '" store_id="' + si.list[k].store_id + '" item_id="' + si.item_id + '" class="count-block">';
+				if (si.list[k].in_basket){
+					full +=
+						'<input value="' + si.list[k].in_basket + '">';
+					mobile +=
+						'<input value="' + si.list[k].in_basket + '">';
+				}
+				full +=
+					'</li>';
+				mobile +=
+					'</li>';
+			}
+			full +=
+					'</ul>';
+			mobile +=
+					'</ul>';
+			full +=
+					'</ul>';
+			mobile +=
+					'</ul>';
+			//quan end
+			
+			//to_stock start
+			full +=
+				'<td>';
+			mobile += 
 				'<td>';
 			if (count_prevails){
 				full +=
@@ -877,70 +1129,7 @@ function sortStoreItems(sortType){
 }
 $(function(){
 	if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;
-	// console.log(hidable_form);
 	set_tabs();	
-	// $('li[data-target=Tab_3]').click();
-	// if (!+$('input[name=isCheckedFromAbcp]').val()){
-	// 	show_message('Начата проверка других складов...');
-	// 	$.ajax({
-	// 		type: 'get',
-	// 		url: document.location.href,
-	// 		success: function(response){
-	// 			// return;
-	// 			if (response != 'ok') return show_message('Произошла ошибка проверки других складов', 'error');
-	// 			$.ajax({
-	// 				type: "POST",
-	// 				url: "/ajax/article_filter.php",
-	// 				data: "item_id=" + $('#item_id').val() + "&search_type=analogies",
-	// 				success: function(msg){
-	// 					if (msg){
-	// 						// console.log(msg); return;
-	// 						var res = JSON.parse(msg);
-	// 						var si = store_items(res.store_items, res.user, 'analogies');
-	// 						$('#search-result-tabs li[data-target=Tab_3]').remove();
-	// 						$('#search-result-tabs div[data-name=Tab_3]').remove();
-	// 						$('#search-result-tabs > ul.ionTabs__head').append(
-	// 							'<li class="ionTabs__tab" search_type="analogies" data-target="Tab_3" id="Button__search-result-tabs__Tab_3">' +
-	// 								'<span>Аналоги</span>' +
-	// 								'<span>' + Object.keys(res.store_items).length + '</span>' +				
-	// 							'</li>'
-	// 						);
-	// 						$('#search-result-tabs > div.ionTabs__body').append(
-	// 							'<div class="ionTabs__item is_others ionTabs__item_state_active" data-name="Tab_3" id="Tab__search-result-tabs__Tab_3">' +
-	// 							'<table class="articul-table"></table>' +
-	// 							'<div class="mobile-layout"></div>'
-	// 						);
-	// 						// console.log(pi);
-	// 						// console.log(Math.min.apply(null, res.prices));
-	// 						if (Object.keys(res.prices).length){
-	// 							$('#offers-filter-form').removeClass('hidden');
-	// 							$('#price-from').val(Math.min.apply(null, res.prices));
-	// 							$('#price-to').val(Math.max.apply(null, res.prices));
-	// 							$('#time-from').val(Math.min.apply(null, res.deliveries));
-	// 							$('#time-to').val(Math.max.apply(null, res.deliveries));
-	// 						}
-	// 						else $('#offers-filter-form').addClass('hidden');
-	// 					}
-	// 					else{
-	// 						si = {
-	// 							full: '<div>Ничего не найдено.</div>',
-	// 							mobile: '<div>Ничего не найдено.</div>'
-	// 						}
-	// 						$('#offers-filter-form').addClass('hidden');
-	// 					} 
-	// 					$('#Tab__search-result-tabs__Tab_3 .articul-table').html(si.full); 
-	// 					$('#Tab__search-result-tabs__Tab_3 .mobile-layout').html(si.mobile); 
-	// 					price_format();
-	// 					set_tabs();
-	// 					show_message('Поиск с других складов завершен!');
-	// 				} 
-	// 			})
-	// 		}
-	// 	})
-	// }
-	$(document).on('click', '.product-popup-wrap', function(){
-		set_tabs();
-	})
 	$('#offers-filter-form button').on('click', function(e){
 		e.preventDefault();
 		var elem = $(this);
@@ -1063,31 +1252,54 @@ $(function(){
 		var price = +e.attr('price');
 		var packaging = +e.attr('packaging');
 		var item_id = e.attr('item_id');
+
 		if ($('.login_btn span').html() == 'Войти'){
 			$('.login_btn').click();
 			show_message('Для добавления товара в корзину необходимо авторизоваться!', 'error');
 			return false;
 		}
-		$.ajax({
-			type: "POST",
-			url: "/ajax/to_basket.php",
-			data: "store_id=" + store_id + '&price=' + price + '&packaging=' + packaging + '&item_id=' + item_id,
-			success: function(msg){
-				// console.log(msg);
-				// return;
-				if (!$('.cart span').text()) $('.cart').html('<div class="arrow_up"></div><span>' + packaging + '</span>');
-				else $('.cart span').html(parseInt($('.cart span').text()) + parseInt(packaging));
-				if (e.find('.goods-counter').length) packaging += +e.find('.goods-counter').html();
-				$('i[store_id=' + store_id + '][item_id=' + item_id + ']').
-					html('<i class="goods-counter">' + packaging + '</i>');
-				get_basket(JSON.parse(msg));
-				show_popup_basket();
-				setTimeout(function(){
-					 if (!$('.cart-popup').is(':hover')) $('.overlay').click();
-				}, 2500);
-			} 
+		$('.quan.hidden').removeClass('hidden');
+		$('button[type=full]').closest('td').attr('colspan', 8);
+		$('.quan.hidden').removeClass('hidden');
+		$('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']').html('<input value="' + packaging + '">');
+		
+		setAmountInBasket(store_id, item_id, packaging);
+		setNewValue({
+			store_id: store_id,
+			item_id: item_id,
+			price: + $('i.to-stock-btn[store_id= ' + store_id + '][item_id=' + item_id + ']').attr('price')
 		});
 	});
+	$(document).on('blur', '.quan li[store_id][item_id] input', function(){
+		var isValidated = true;
+		var th = $(this);
+		var val = + th.val();
+		var packaging = + th.closest('li').attr('packaging');
+		var message = 'Количество должно быть кратно ' + packaging + '!';
+		if(val % packaging){
+			isValidated = false;
+			show_message(message, 'error');
+		}
+		if (!val){
+			isValidated = false;
+			show_message(message, 'error');
+		}
+		if (!isValidated) return th.focus();
+		
+		var store_id = + th.closest('li').attr('store_id');
+		var item_id = + th.closest('li').attr('item_id');
+		setAmountInBasket(
+			+ store_id, 
+			+ item_id,
+			+ val, 
+			true
+		);
+		setNewValue({
+			store_id: store_id,
+			item_id: item_id,
+			price: + $('i.to-stock-btn[store_id= ' + store_id + '][item_id=' + item_id + ']').attr('price'),
+		});
+	})
 	$(document).on('click', '.product-popup-link', function(e){
 		e.preventDefault();
 		if (e.target.className == 'brend_info') return false;

@@ -1,6 +1,6 @@
 <?php
 // debug($_GET);
-// require_once('../functions/order_issues.function.php');
+require_once("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
 $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
 $issues = new Issues($user_id, $db);
 // debug($issues);
@@ -9,7 +9,6 @@ if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
 $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
 	// print_r($_SERVER);
-	// debug($_POST); exit();
 	if (!empty($_POST['income'])) $issues->setIncome();
 	$user = $issues->getUser();
 	$page_title = "Выдача товара";

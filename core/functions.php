@@ -38,19 +38,6 @@ function translite($var){
 	$var = strtr($var,$alpha);
 	return $var;
 }
-function shot_str($str, $len){
-	$len -= 3;
-	if (mb_strlen($str, "UTF-8") < $len) return $str;
-	$text_cut = mb_substr($str, 0, $len, "UTF-8");
-	$text_explode = explode(" ", $text_cut);
-	unset($text_explode[count($text_explode) - 1]);
-	return implode(" ", $text_explode).'...';
-}
-function toStringKey($array, $key){
-	$str = '';
-	foreach ($array as $k => $v) $str .= $v[$key].',';
-	return substr($str, 0, -1);
-}
 function debug($obj, $name = ''){?>
 	<div style="clear: both"></div>
 	<?if ($name){?>
@@ -64,60 +51,6 @@ function message($text, $type = true){
 	// echo "$text $type_message";
 	setcookie('message', $text, 0, '/');
 	setcookie('message_type', $type_message, 0, '/');
-}
-function get_status_filters($is_filters, $value){
-	if ($is_filters){
-		if ($value == 1) return "checked";
-		else return "";
-	}
-	else return "checked";
-}
-function get_date($time){
-	$time_array = explode('.', $time);
-	$day = $time_array[0];
-	$mounth = $time_array[1];
-	$year = $time_array[2];
-	// return date("d.m.Y H:i", mktime(0,0,0, $mounth, $day, $year));
-	return mktime(0,0,0, $mounth, $day, $year);
-}
-function begin_day($time){
-	$date = getdate($time);
-	return mktime(0,0,0, $date['mon'], $date['mday'], $date['year']);
-}
-function end_day($time){
-	$time_array = explode('.', $time);
-	$day = $time_array[0];
-	$mounth = $time_array[1];
-	$year = $time_array[2];
-	return mktime(23, 59, 59, $mounth, $day, $year);
-}
-function get_items_search($text){
-	global $db;
-	if (!$text) return false;
-	switch ($_COOKIE['search_type']) {
-		case 'articles':
-		case '':
-			$array = $db->select('items', 'id', "`article`='$text' AND `type`=1");
-			break;
-		case 'subtitutes':
-			$items = $db->select('items', 'id', "`article`='$text' AND `type`=1");
-			$where = "";
-			foreach ($items as $item) $where .= "`item_type`=".$item['id']." OR ";
-			$where = substr($where, 0, -4);
-			$where = "($where) AND `type`=2";
-			$array = $db->select('items', 'id', $where);
-			break;
-		case 'analogies':
-			$items = $db->select('items', 'id', "`article`='$text' AND `type`=1");
-			$where = "";
-			foreach ($items as $item) $where .= "`item_type`=".$item['id']." OR ";
-			$where = substr($where, 0, -4);
-			$where = "($where) AND `type`=3";
-			$array = $db->select('items', 'id', $where);
-			break;
-	}
-	if (count($array)) return $array;
-	else return false;
 }
 function get_items($kol_elem = 0, $cat_id = 0){
 	global $db;
@@ -173,78 +106,6 @@ function get_items($kol_elem = 0, $cat_id = 0){
 	$array = $db->select('items', "*", "$where", '', '', "$kol_elem,$per_page");
 	return count($array) ? $array : false;
 }
-function array_id($array){
-	foreach ($array as $key => $value){
-		foreach ($value as $k => $v)if ($k != "id") $new[$value['id']][$k] = $v;
-	}
-	return $new;
-}
-function print_array($array){
-	foreach ($array as $key => $value) {
-		echo "$key : ";
-		print_r($value);
-		echo "<br>";
-	}
-}
-function p_arr($array, $table = true){
-	if ($table){
-		foreach ($array as $key => $value){
-			foreach ($value as $k => $val) $names[] = $k;
-			break;
-		}?>
-		<table style="width: auto">
-			<tr>
-				<?foreach ($names as $value){?>
-					<td style="padding: 10px 10px;vertical-align: middle;text-align: center;border-bottom:1px solid grey"><?=$value?></td>
-				<?}?>
-			</tr>
-			<?foreach ($array as $key => $value) {?>
-				<tr>
-					<?foreach ($value as $val){?>
-						<td style="padding: 10px 10px;vertical-align: middle;text-align: center;border-bottom:1px solid grey"><?=$val?></td>
-					<?}?>
-				</tr>
-			<?}?>
-		</table>
-	<?}
-}
-function get_values_item($array){
-	global $db;
-	$where = "";
-	foreach ($array as $value) $where .= "`id`=".$value['value_id']." OR ";
-	$where = substr($where, 0, -4);
-	$filters_values = $db->select('filters_values', "*", "$where GROUP BY `filter_id`");
-	if (!count($filters_values)) return false;
-	$where = "";
-	foreach ($filters_values as $value) $where .= "`id`=".$value['filter_id']." OR ";
-	$where = substr($where, 0, -4);
-	$temp = $db->select('filters', "title,id", $where, 'position');
-	if (!count($temp)) return false;
-	foreach($temp as $key => $value) $filters[$value['id']] = $value['title'];
-	foreach($filters_values as $value)$new[$filters[$value['filter_id']]] = $value['title'];
-	return $new;
-}
-function get_sort(){
-	$sort_type = $_COOKIE['sort_type'] ? $_COOKIE['sort_type'] : 'title';
-	$sort_direct = $_COOKIE['sort_direct'];
-	switch($sort_type){
-		case 'title':?>
-			<a sort_type="title" sort_direct="<?=$sort_direct?>" class="active <?=$sort_direct?>" href="#">Наименование</a>
-			<a sort_type="price" class="" href="#">Цена</a>
-			<a sort_type="rating" class="" href="#">Рейтинг</a>
-			<?break;
-		case 'price':?>
-			<a sort_type="title" href="#">Наименование</a>
-			<a sort_type="price" sort_direct="<?=$sort_direct?>" class="active <?=$sort_direct?>" href="#">Цена</a>
-			<a sort_type="rating" class="" href="#">Рейтинг</a>
-			<?break;
-		case 'rating':?>
-			<a sort_type="title" href="#">Наименование</a>
-			<a sort_type="price" class="" href="#">Цена</a>
-			<a sort_type="rating" sort_direct="<?=$sort_direct?>" class="active <?=$sort_direct?>" class="" href="#">Рейтинг</a>
-			<?break;
-	}
-}
 function get_cookie_flilters($cat_id = 0){
 	if ($_COOKIE['filters']){
 		$temp = json_decode($_COOKIE['filters'], true);
@@ -260,19 +121,6 @@ function get_cookie_flilters($cat_id = 0){
 		return $cookie_filters;
 	}
 	else return false;
-}
-//перевод в валюту пользователя при отображении результатов
-function price_article($provider_item, $show_currency = true){
-	global $currencies, $user, $providers;
-	//если пользователь не авторизован, то просто возращаем цену в рублях
-	if (!$user) return $provider_item['price'];
-	$rubls = $provider_item['price'];
-	$user_rate = $currencies[$user['currency_id']]['rate'];
-	// echo $provider_item['price']." $provider_currency $provider_percent $provider_rate $rubls $user_rate";
-	// return;
-	if ($user['currency_id'] != 1) $rubls = round($rubls / $user_rate, 2);
-	if ($show_currency) return $rubls.$currencies[$user['currency_id']]['designation'];
-	else return $rubls;
 }
 function get_bill(){
 	global $db;
@@ -308,12 +156,6 @@ function payment_funds($type, $user, $difference = false){
 			return "<span class='price_format_2'>$result</span>";
 	}
 }
-function begin_date(){
-	return date('d.m.Y', time() - 60 * 60 * 24 * 30);
-}
-function end_date(){
-	return date('d.m.Y', time());
-}
 function get_price($provider_item){
 	global $db;
 	$provider = $db->select('providers', 'id,currency_id,percent', '`id`='.$provider_item['provider_id']);
@@ -338,30 +180,6 @@ function get_user_price($price, $user){
 	}
 	return '<span class="price_format">'.$value.'</span>';
 }
-//для перевода в рубли из формы фильтра при поиске артикля
-function get_rubls_form($price){
-	global $currencies, $user;
-	if (!$price) return false;
-	if (!$user) return $price;
-	return round($price * $currencies[$user['currency_id']]['rate']);
-}
-//для отображения если нету поставщиков
-function no_providers(){
-	global $article, $item, $brend;?>
-	<tr class="button-row active">
-		<td style="padding: 20px 0 0 0;text-align:left" class="button_padding">
-			<b class="brend_info" brend_id="<?=$item['brend_id']?>"><?=$brend?></b>
-			<a href="<?=getHrefArticle($article)?>" class="articul"><?=$article?></a></td>
-		<td class="name-col" style="padding: 20px 0 0 0;text-align:left">
-		<?$i = $item;
-		if ($i['applicability'] or $i['characteristics'] or $i['foto'] or $i['full_desc']){?>
-			<a href="#"><i item_id="<?=$item['id']?>" class="fa fa-camera product-popup-link" aria-hidden="true"></i></a>
-		<?}?>
-		<?=$item['title_full']?>
-		</td>
-		<td colspan="5" style="padding-top: 20px">Поставщиков не найдено</td>
-	</tr>
-<?}
 function getHrefArticle($article){
 	return "/search/article/$article";
 }
@@ -387,13 +205,6 @@ function getStrTemplate($template){
 		}
 	}
 	return substr($str, 0, -2);
-}
-function set_cache($array = array()){
-	$file = 'cache/category.chc';
-	if (empty($array)) return file_put_contents($file, '');
-	$str = file_get_contents($file);
-	$str .= json_encode($array).'\n';
-	return file_put_contents($file, $str);
 }
 function get_rating($rate, $ratings){
 	if ($rate <= $ratings[1]) return 0;
@@ -447,9 +258,6 @@ function get_filters($category_id){
 		} 
 	}
 	return $t_filters;
-}
-function console($str){
-	echo "<script>console.log('$str')</script>";
 }
 function cat_get_chunks_items($query){
 	global $db, $settings, $res;
@@ -828,6 +636,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 }
 function get_basket(){
 	global $db;
+	if (!$_SESSION['user']) return false;
 	$basket = $db->select_unique("
 		SELECT 
 			b.*,
@@ -970,5 +779,26 @@ function get_order_group($params, $flag = ''){
 	}
 	$query .= ' ORDER BY o.created DESC';
 	return $db->query($query, $flag);
+}
+/**
+ * cheking is there even one in basket
+ * @param  [type]  $store_items_list array of store_items
+ * @return boolean true if exists
+ */
+function isInBasketExists($store_items_list){
+	foreach($store_items_list as $store_item){
+		foreach($store_item['store_item']['list'] as $value){
+			if ($value['in_basket']) return true;
+		}
+		foreach($store_item['store_item']['prevails'] as $value){
+			if ($value['in_basket']) return true;
+		}
+	}
+	return false;
+}
+function getInBasket($basket){
+	$output = array();
+	foreach($basket as $b) $output[$b['store_id'].':'.$b['item_id']] = $b['quan'];
+	return $output;
 }
 ?>

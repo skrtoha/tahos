@@ -77,13 +77,14 @@ function stores(){
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
 	$res_stores = $db->query("
 		SELECT
-			s.id,
-			s.title,
-			s.cipher
+			ps.id,
+			ps.title,
+			ps.cipher,
+			DATE_FORMAT(ps.price_updated, '%d.%m.%Y %H:%i:%s') AS price_updated
 		FROM
-			#provider_stores s
+			#provider_stores ps
 		WHERE
-			s.provider_id={$_GET['id']}
+			ps.provider_id={$_GET['id']}
 	", '');?>
 	<div id="total">Всего: <?=$res_stores->num_rows?></div>
 	<div class="actions">
@@ -94,12 +95,14 @@ function stores(){
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Название</td>
+			<td>Обновлено</td>
 			<td>Шифр</td>
 		</tr>
 		<?if ($res_stores->num_rows){
 			while($row = $res_stores->fetch_assoc()){?>
 				<tr class="store" store_id="<?=$row['id']?>">
 					<td><?=$row['title']?></td>
+					<td><?=$row['price_updated']?></td>
 					<td><?=$row['cipher']?></td>
 				</tr>
 			<?}
@@ -267,6 +270,7 @@ function priceEmail(){
 				'settings' => json_encode($_POST)
 			], 'print_query' => false]
 		);
+		message("Успешно сохранено!");
 		$array = $_POST;
 	}
 	else{
@@ -416,7 +420,7 @@ function priceEmail(){
 					<div class="field">
 						<div class="title">Ссылка для крон</div>
 						<div class="value">
-							<input type="text" value="<?=$_SERVER['HTTP_HOST']?>/admin/?view=cron&act=emailPrice&store_id=<?=$_GET['store_id']?>">
+							<input type="text" value="http://<?=$_SERVER['HTTP_HOST']?>/admin/?view=cron&act=emailPrice&store_id=<?=$_GET['store_id']?>">
 						</div>
 					</div>
 					<div class="field">

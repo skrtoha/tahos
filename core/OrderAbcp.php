@@ -9,7 +9,7 @@ class OrderAbcp extends Abcp{
 	}
 	public function addToBasket($params){
 		// debug($params); exit();
-		$res = parent::getPostData(
+		$res = parent::getUrlData(
 			"{$this->param['url']}/basket/add",
 			[
 				'userlogin' => $this->param['userlogin'],
@@ -114,7 +114,7 @@ class OrderAbcp extends Abcp{
 	public function basketOrder(){
 		// exit();
 		$shipmentDate = $this->getShipmentDate();
-		$res = parent::getPostData(
+		$res = parent::getUrlData(
 			"{$this->param['url']}/basket/order",
 			[
 				'userlogin' => $this->param['userlogin'],

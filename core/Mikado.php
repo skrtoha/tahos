@@ -18,7 +18,7 @@ class Mikado{
 		$this->armtek = new Armtek($this->db);
 	}
 	public function getCoincidences($text){
-		$xml = Abcp::getPostData(
+		$xml = Abcp::getUrlData(
 			'http://mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
 				'Search_Code' => $text,
@@ -72,7 +72,7 @@ class Mikado{
 		return true;
 	}
 	public function setArticle($brend, $article, $getZakazCode = false){
-		$xml = Abcp::getPostData(
+		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
 				'Search_Code' => $article,
@@ -177,7 +177,7 @@ class Mikado{
 		return false;
 	}
 	private function getCodeInfo($ZakazCode){
-		$xml = Abcp::getPostData(
+		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Info',
 			[
 				'ZakazCode' => $ZakazCode,
@@ -198,7 +198,7 @@ class Mikado{
 			// exit();
 		} 
 		// debug($ov, $ZakazCode);
-		$xml = Abcp::getPostData(
+		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Add',
 			[
 				'ZakazCode' => $ZakazCode,
@@ -240,7 +240,7 @@ class Mikado{
 	}
 	public function deleteFromOrder($ov){
 		$array = $this->db->select_one('mikado_basket', '*', Armtek::getWhere($ov));
-		$xml = Abcp::getPostData(
+		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Delete',
 			[
 				'ItemID' => $array['ItemID'],

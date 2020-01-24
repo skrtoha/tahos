@@ -12,6 +12,8 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$abcp = new core\Abcp(NULL, $db);
 	setCoincidences($abcp->getSearch($_GET['search']));
 
+	setCoincidences(core\FavoriteParts::getSearch($_GET['search']));
+
 	// $rossko = new core\Rossko($db);
 	// setCoincidences($rossko->getSearch($_GET['search']));
 

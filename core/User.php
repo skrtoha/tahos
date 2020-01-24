@@ -42,8 +42,8 @@ class User{
 			LEFT JOIN #issues i ON i.id=u.issue_id
 			WHERE u.id=$user_id
 		";
-		$user = $db->select_unique($q_user, 'result');
-		return $user[0];
+		$res = $db->query($q_user, '');
+		return $res->fetch_assoc();
 	}
 
 	/**

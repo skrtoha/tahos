@@ -3,6 +3,7 @@
 // require_once('functions/')
 $act = $_GET['act'];
 $id = $_GET['id'];
+
 $status_id = $_POST['status_id'];
 $armtek = new core\Armtek($db);
 $rossko = new core\Rossko($db);

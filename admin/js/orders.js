@@ -228,8 +228,8 @@ $(function(){
 			url: ajax_url,
 			data: data,
 			success: function(response){
-				console.log(response); return false;
-				// document.location.reload();
+				// console.log(response); return false;
+				document.location.reload();
 			}
 		})
 	})
@@ -277,8 +277,6 @@ $(function(){
 		data += '&reserved_funds=' + th.find('input[name=reserved_funds]').val();
 		switch(status_id){
 			case 1:
-				var arrived = + th.find('input[name=arrived]').val();
-				data += '&arrived=' + arrived;
 				break;
 			//выделено в отдельную функцию
 			case 2:break;

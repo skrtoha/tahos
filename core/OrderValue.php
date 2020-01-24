@@ -7,7 +7,7 @@ class OrderValue{
 	 * @param  [integer] $status_id 1, 2, 3, 10, 11
 	 * @param  [array] $params 
 	 *         order_id, store_id, item_id - required for all statuses
-	 *         status = 1|2|3|10|11  - price, quan, user_id
+	 *         status = 2|3|10|11  - price, quan, user_id
 	 * @return [boolean] true if changed successfully
 	 */
 	public function changeStatus($status_id, $params){
@@ -16,28 +16,30 @@ class OrderValue{
 		switch ($status_id){
 			//выдано
 			case 1:
-				$values['issued'] = $params['quan'];
+				$ov = $GLOBALS['db']->select_one('orders_values', '*', Armtek::getWhere($params));
+				$quan = $ov['arrived'] - $ov['issued'];
+				$values['issued'] = "`issued` + $quan";
 				$this->updateOrderValue($values, $params);
 				$user = User::get($params['user_id']);
 				$title = $this->getTitleComment($params['item_id']);
 				Fund::insert(2, [
-					'sum' => $params['price'] * $params['quan'],
-					'remainder' => $user['bill'] + $params['price'] * $params['quan'],
+					'sum' => $params['price'] * $quan,
+					'remainder' => $user['bill'] - $params['price'] * $quan,
 					'user_id' => $params['user_id'],
 					'comment' => addslashes('Списание средств на оплату "'.$title.'"')
 				]);
-				User::setBonusProgram($params['user_id'], $params['item_id'], $params['quan'] * $params['price']);
+				User::setBonusProgram($params['user_id'], $params['item_id'], $quan * $params['price']);
 				User::update(
 					$params['user_id'],
 					[
-						'reserved_funds' => "`reserved_funds` - ".$params['price'] * $params['quan'],
-						'bill' => "`bill` - ".$params['price'] * $params['quan']
+						'reserved_funds' => "`reserved_funds` - ".$params['price'] * $quan,
+						'bill' => "`bill` - ".$params['price'] * $quan
 					]
 				);
 				break;
 			//возврат
 			case 2:
-				$ov = $GLOBALS['db']->select('orders_values', '*', Armtek::getWhere($params));
+				$ov = $GLOBALS['db']->select_one('orders_values', '*', Armtek::getWhere($params));
 				if ($ov['returned'] + $params['quan'] < $ov['issued']) $values['status_id'] = 1;
 				$values['returned'] = "`returned` + {$params['quan']}";
 				$this->updateOrderValue($values, $params);
@@ -50,6 +52,11 @@ class OrderValue{
 					'user_id' => $params['user_id'],
 					'comment' => addslashes('Возврат средств за "'.$title.'"')
 				]);
+				User::update(
+					$params['user_id'],
+					['bill' => "`bill` + ".$params['quan'] * $params['price']]
+				);
+				break;
 			//пришло
 			case 3:
 				$values['arrived'] = $params['quan'];
@@ -79,9 +86,7 @@ class OrderValue{
 	 */
 	public static function getTitleComment($item_id){
 		$item = self::getItem($item_id);
-		return '<b style="font-weight: 700">'.$item['brend'].'</b> 
-				<a href="/search/article/'.$item['article'].'" class="articul">'.
-					$item['article'].'</a> '.$item['title_full'];
+		return '<b style="font-weight: 700">'.$item['brend'].'</b> <a href="/search/article/'.$item['article'].'" class="articul">'.$item['article'].'</a> '.$item['title_full'];
 	}
 
 	/**
@@ -90,11 +95,11 @@ class OrderValue{
 	 * @return [array] brend_id, article, title_full, brend
 	 */
 	public static function getItem($item_id){
-		$item = $GLOBALS['db']->select_unique("
+		$item = $GLOBALS['db']->query("
 			SELECT
 				i.brend_id,
 				i.article,
-				i.article_full,
+				i.article_cat,
 				i.title_full,
 				b.title as brend
 			FROM
@@ -104,7 +109,7 @@ class OrderValue{
 			WHERE
 				i.id = $item_id
 		", '');
-		return $item[0];
+		return $item->fetch_assoc();
 	}	
 
 	/**

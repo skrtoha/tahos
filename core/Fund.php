@@ -17,6 +17,6 @@ class Fund{
 				'user_id' => $fields['user_id'],
 				'comment' => $fields['comment']
 			]
-		);
+		, '');
 	}
 }

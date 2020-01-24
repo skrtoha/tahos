@@ -10,7 +10,7 @@ $db->setProfiling();
 
 $id = $_POST['id'];
 if ($_SESSION['user']){
-	$user = cat_get_user();
+	$user = core\User::get();
 	$where_basket = "LEFT JOIN #basket ba  ON ba.item_id=i.id AND ba.store_id=ps.id AND ba.user_id={$_SESSION['user']}";
 	$where_basket .= " LEFT JOIN #items_ratings ir ON ir.item_id=i.id AND ir.user_id={$_SESSION['user']}";
 	$clause = ",ir.rate AS rating, ba.quan as in_basket";
@@ -87,7 +87,7 @@ if (isset($fotos) && count($fotos)){
 	foreach($fotos as $key => $value) $item['fotos'][] = $value['title'];
 } 
 else $item['fotos'] = array();
-$user = cat_get_user();
+$user = core\User::get();
 $item['user_id'] = $_SESSION['user'];
 $item['designation'] = $user['designation'];
 if (isset($item['providers_items']) && !count($item['providers_items'])) {

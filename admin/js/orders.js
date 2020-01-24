@@ -228,8 +228,8 @@ $(function(){
 			url: ajax_url,
 			data: data,
 			success: function(response){
-				// console.log(response); return false;
-				document.location.reload();
+				console.log(response); return false;
+				// document.location.reload();
 			}
 		})
 	})

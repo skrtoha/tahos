@@ -52,7 +52,8 @@ if($_GET['act'] == 'unbind'){
 	header('Location: /settings');
 }
 $path = "templates/$view.php";
-$user = cat_get_user();
+
+$user = core\User::get();
 if (file_exists($path)){
 	ob_start();
 	require_once($path);

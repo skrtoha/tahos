@@ -17,7 +17,7 @@ if ($_POST['filters_on']) $filters = [
 	'in_stock' => $_POST['in_stock']
 ];
 else $filters = [];
-$user = cat_get_user();
+$user = core\User::get();
 $array = article_store_items($_POST['item_id'], $filters, $_POST['search_type']);
 $store_items = & $array['store_items'];
 foreach ($store_items as $k => $v){

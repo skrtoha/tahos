@@ -267,45 +267,6 @@ function cat_get_items_values($items){
 	} 
 	return $items_values;
 }
-function cat_get_user(){
-	global $db;
-	if ($_SESSION['user']){
-		$q_user = "
-			SELECT 
-				u.*,
-				c.designation, 
-				c.rate, 
-				u.delivery_type,
-				u.bonus_count,
-				i.title AS issue_title,
-				i.desc AS issue_desc,
-				i.adres AS issue_adres,
-				i.telephone AS issue_telephone,
-				i.email AS issue_email,
-				i.twitter AS issue_twitter,
-				i.vk AS issue_vk,
-				i.facebook AS issue_facebook,
-				i.google AS issue_google,
-				i.ok AS issue_ok,
-				i.coords AS issue_coords,
-				c.id as currency_id
-			FROM #users u
-			LEFT JOIN #currencies c ON c.id=u.currency_id
-			LEFT JOIN #issues i ON i.id=u.issue_id
-			WHERE u.id={$_SESSION['user']}
-		";
-		$user = $db->select_unique($q_user, '');
-		$user = $user[0];
-	} 
-	else{
-		$user['markup'] = 0;
-		$user['designation'] = '<i class="fa fa-rub" aria-hidden="true"></i>';
-		$user['currency_id'] = 1;
-		$user['rate'] = 1;
-		$user['show_all_analogies'] = 0;
-	}
-	return $user;
-}
 function category_items_without_filters($sub_id, $sort = ['type' => 'title_full', 'desc' => '']){
 	$time_start = microtime();
 	global $db, $settings, $res, $user;
@@ -341,7 +302,7 @@ function category_items_without_filters($sub_id, $sort = ['type' => 'title_full'
 	$_SESSION['items_chunks'] = cat_get_chunks_items($q_items);
 	$items = $_SESSION['items_chunks'][0];
 	$items_values = cat_get_items_values($items);
-	$user = cat_get_user();
+	$user = core\User::get();
 	$ratings = json_decode($settings['ratings'], true);
 	if (empty($items)) return false;
 	foreach ($items as $key => $item){
@@ -407,7 +368,7 @@ function category_items_with_filters($sub_id, $sort = ['type' => 'title_full', '
 	$_SESSION['items_chunks'] = $items_chunks;
 	$items = $_SESSION['items_chunks'][0];
 	$items_values = cat_get_items_values($items);
-	$user = cat_get_user();
+	$user = core\User::get();
 	$ratings = json_decode($settings['ratings'], true);
 	foreach ($items as $key => $item){
 		$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];

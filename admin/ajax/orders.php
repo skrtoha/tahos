@@ -13,79 +13,25 @@ $where = "
 $user = $db->select_one('users', 'id,bonus_program,bonus_count', "`id`={$_POST['user_id']}");
 $settings = $db->select_one('settings', '*', '`id`=1');
 // print_r($settings);
-// print_r($_POST);
+print_r($_POST);
 // exit();
-if (in_array($_POST['status_id'], [1, 'issued_new', 2])){
-	$item = $db->select_unique("
-		SELECT
-			i.article,
-			i.title,
-			b.title as brend
-		FROM
-			#items i
-		LEFT JOIN
-			#brends b ON b.id=i.brend_id
-		WHERE
-			i.id={$_POST['item_id']}
-	", '');
-	$item = $item[0];
-	$title = '<b style="font-weight: 700">'.$item['brend'].'</b> 
-				<a href="/search/article/'.$item['article'].'" class="articul">'.
-					$item['article'].'</a> '.$item['title_full'];
-}
+
 $post = $_POST;
 $orderValue = new core\OrderValue($db);
 switch($_POST['status_id']){
 	case 1://выдано
-		$res_1 = $db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`issued` = {$_POST['arrived']},
-				`status_id` = 1
-			WHERE $where
-		", '');
-		$res_2 = $db->insert(
-			'funds',
-			[
-				'type_operation' => 2,
-				'sum' => $_POST['price'] * $_POST['arrived'],
-				'remainder' => $_POST['bill'] - $_POST['price'] * $_POST['arrived'],
-				'user_id' => $_POST['user_id'],
-				'comment' => addslashes('Списание средств на оплату "'.$title.'"')
-			],
-			['print_query' => false]
-		);
-		if ($user['bonus_program']){
-			$bonus_size = $db->getField('settings', 'bonus_size', 'id', 1);
-			$bonus_count = floor($_POST['price'] * $_POST['arrived'] * $bonus_size / 100);
-			$res_4 = $db->insert(
-				'funds',
-				[
-					'type_operation' => 3,
-					'sum' => $bonus_count,
-					'remainder' => $user['bonus_count'] + $bonus_count,
-					'user_id' => $_POST['user_id'],
-					'comment' => addslashes('Начисление бонусов за заказ "'.$title.'"'),
-				],
-				['print_query' => false]
-			);
-			// exit();
-		}
-		$res_3 = $db->query("
-			UPDATE
-				#users
-			SET
-				`reserved_funds`=`reserved_funds` - {$_POST['price']} * {$_POST['arrived']},
-				`bill`=`bill` - {$_POST['price']} * {$_POST['arrived']}
-			WHERE
-				`id`={$_POST['user_id']}
-		", '');
+		$post['quan'] = $_POST['arrived'];
+		$orderValue->changeStatus(1, $post);
 		break;
 	case 2://возврат
 		// print_r($_POST); exit();
+		$post['quan'] = $_POST['new_returned'];
+		$orderValue->changeStatus(2, $post);
+		break;
 		if ($_POST['new_returned'] + $_POST['returned'] < $_POST['issued']) $status_id = 1;
 		else $status_id = 2;
+		// $orderValue->changeStatus($status_id, $post);
+
 		$db->query("
 			UPDATE 
 				#orders_values 
@@ -149,14 +95,8 @@ switch($_POST['status_id']){
 		", '');
 		break;
 	case 3://пришло
-		$db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`arrived` = {$_POST['arrived']},
-				`status_id`= 3
-			WHERE $where
-		", '');
+		$post['quan'] = $_POST['arrived'];
+		$orderValue->changeStatus(3, $post);
 		break;
 	case 6://нет в наличии
 		$db->query("
@@ -196,7 +136,7 @@ switch($_POST['status_id']){
 		break;
 	case 11://заказано
 		$post['quan'] = $_POST['ordered'];
-		$orderValue->changeStatus(11, $_POST);
+		$orderValue->changeStatus(11, $post);
 		break;
 	case 'arrived_new':
 		// print_r($_POST);

@@ -10,6 +10,7 @@ class ComposerStaticInit32177a424f59751f8425db67467ac785
         'P' => 
         array (
             'Psr\\Log\\' => 8,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'K' => 
         array (
@@ -21,6 +22,10 @@ class ComposerStaticInit32177a424f59751f8425db67467ac785
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'Katzgrau\\KLogger\\' => 
         array (

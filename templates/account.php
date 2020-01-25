@@ -1,28 +1,42 @@
 <?$title = 'Счет';
-$period = $_POST['period'];
-if ($period){
-	switch ($period){
-		case 'all': $where_date = ''; break;
+/**
+ * Параметры запроса
+ * @var array
+ */
+$params = array();
+
+/**
+ * Формирование условия в поиске
+ * @var string
+ */
+$where = '';
+
+$uri = parse_url($_SERVER['REQUEST_URI']);
+parse_str($uri['query'], $params);
+
+if (isset($params['period'])){
+	switch ($params['period']){
+		case 'all': $where = ''; break;
 		case 'selected':
-			$begin = get_date_account($_POST['begin']);
-			$end = get_date_account($_POST['end']);
-			$where_date = "`created` >= '{$begin['year']}-{$begin['month']}-{$begin['day']} 0:0:0' AND ";
-			$where_date .= "`created` <= '{$end['year']}-{$end['month']}-{$end['day']} 23:59:59' AND ";
+			$begin = date('Y-m-d', strtotime($params['begin']));
+			$end = date('Y-m-d', strtotime($params['end']));
+			$where .= "`created` BETWEEN '$begin' AND '$end 23:59:59' AND";
 			break;
 	}
 }
 else{
-	$a = getdate(time() - 60 * 60 * 24 * 30);
-	// $begin = mktime(0,0,0, $array['mon'], $array['mday'], $array['year']);
-	$begin = "{$a['year']}-{$a['mon']}-{$a['mday']} 0:0:0";
-	$a = getdate(time());
-	$end = "{$a['year']}-{$a['mon']}-{$a['mday']} 23:59:59";
-	$where_date = "`created`>='$begin' AND `created`<='$end' AND ";
+	$params['end'] = date('d.m.Y', time());
+	$date = new DateTime($params['end']);
+	$end = $date->format('Y-m-d');
+	$date->sub(new DateInterval('P30D'));
+	$begin = $date->format('Y-m-d');
+	$params['begin'] = $date->format('d.m.Y');
+	$where = "`created` BETWEEN '$begin' AND '$end 23:59:59' AND";
 }
 
 if (!$_SESSION['user']) header("Location: /");
 $designation = $user['designation'];
-$funds = $db->select('funds', '*', "`type_operation` IN (1,2) AND $where_date `user_id`=".$_SESSION['user'], 'created', false);
+$funds = $db->select('funds', '*', "`type_operation` IN (1,2) AND $where `user_id`=".$_SESSION['user'], 'created', false);
 $operations_types = array(
 	1 => 'Пополнение счета', 
 	2 => 'Списание средств',
@@ -58,23 +72,21 @@ $res_bonuses = $db->query("
 		</div>
 		<div class="account-history-block">
 			<h1>История счета</h1>
-			<form method="post">
+			<form>
 				<div class="checkbox-wrap">
-					<input type="radio" name="period" id="order-filter-period-all" value="all" <?=$period == 'all' ? 'checked' : ''?>>
+					<input type="radio" name="period" id="order-filter-period-all" value="all" <?=$params['period'] == 'all' ? 'checked' : ''?>>
 					<label for="order-filter-period-all">за все время</label>
 					<br><br>
-					<input type="radio" name="period" id="order-filter-period-selected" value="selected" <?=($period == 'selected' or !$period) ? 'checked' : ''?>>
+					<input type="radio" name="period" id="order-filter-period-selected" value="selected" <?=$params['period'] == 'selected' || !isset($params['period']) ? 'checked' : ''?>>
 					<label for="order-filter-period-selected">за период </label>
 				</div>
 				<div class="date-wrap">
-					<?$value = $_POST['begin'] ? $_POST['begin'] : begin_date()?>
-					<input type="text" name="begin" id="data-pic-beg" <?=$period == 'all' ? 'disabled' : ''?> value="<?=$value?>">
+					<input type="text" name="begin" id="data-pic-beg" <?=$params['period'] == 'all' ? 'disabled' : ''?> value="<?=$params['begin']?>">
 					<div class="calendar-icon"></div>
 				</div>
 				<span> - </span>
 				<div class="date-wrap">
-					<?$value = $_POST['end'] ? $_POST['end'] : end_date()?>
-					<input type="text" name="end" id="data-pic-end" <?=$period == 'all' ? 'disabled' : ''?>  value="<?=$value?>">
+					<input type="text" name="end" id="data-pic-end" <?=$params['period'] == 'all' ? 'disabled' : ''?>  value="<?=$params['end']?>">
 					<div class="calendar-icon"></div>
 				</div>
 				<button>Применить</button>

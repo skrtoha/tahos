@@ -154,6 +154,7 @@ function items_submit(){
 			`store_id` != 22
 	");
 	if ($profiling) $db->isProfiling = true;
+	$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_POST['store_id']}", '');
 	exit();
 }
 function provider_save(){

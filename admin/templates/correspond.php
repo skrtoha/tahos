@@ -148,15 +148,15 @@ if ($order_id){
 			while ($ov = $res_order_values->fetch_assoc()){
 				$selector = "store_id='{$ov['store_id']}' item_id='{$ov['item_id']}'";?>
 				<tr <?=$selector?> class="status_<?=$ov['status_id']?>">
-					<td><?=$ov['cipher']?></td>
-					<td><?=$ov['brend']?></td>
-					<td><?=$ov['article']?></td>
-					<td><?=$ov['title_full']?></td>
-					<td class="price_format"><?=$ov['price']?> руб.</td>
-					<td><?=$ov['quan']?></td>
-					<td class="price_format"><?=$ov['sum']?></td>
-					<td><?=$ov['comment']?></td>
-					<td class="change_status">
+					<td label="Поставщик"><?=$ov['cipher']?></td>
+					<td label="Бренд"><?=$ov['brend']?></td>
+					<td label="Артикул"><?=$ov['article']?></td>
+					<td label="Наименование"><?=$ov['title_full']?></td>
+					<td label="Цена" class="price_format"><?=$ov['price']?> руб.</td>
+					<td label="Кол-во"><?=$ov['quan']?></td>
+					<td label="Сумма" class="price_format"><?=$ov['sum']?></td>
+					<td label="Комментарий"><?=$ov['comment']?></td>
+					<td label="Статус" class="change_status">
 						<b><?=$ov['status']?></b>
 					</td>
 				</tr>

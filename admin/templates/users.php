@@ -69,9 +69,9 @@ switch ($act) {
 function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');
-	if ($_POST['search']){
-		$search = $_POST['search'];
-		$where = "`name_1` LIKE '%$search%' OR `name_2` LIKE '%$search%' OR `name_3` LIKE '%$search%'";
+	$having = '';
+	if (isset($_GET['search']) && $_GET['search']){
+		$having = "HAVING `name` LIKE '%{$_GET['search']}%'";
 		$page_title = 'Поиск по пользователям';
 		$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > $page_title";
 	}
@@ -79,18 +79,12 @@ function view(){
 		$page_title = "Пользователи";
 		$status = "<a href='/admin'>Главная</a> > $page_title";
 	}
-	$all = $db->getCount('users', $where);
-	$perPage = 30;
-	$linkLimit = 10;
-	$page = $_GET['page'] ? $_GET['page'] : 1;
-	$chank = getChank($all, $perPage, $linkLimit, $page);
-	$start = $chank[$page] ? $chank[$page] : 0;
-	$users = $db->query("
-		SELECT
+	$query = "
+		SELECT SQL_CALC_FOUND_ROWS
 			u.id,
 			IF(
 				u.organization_name <> '',
-				CONCAT_WS (' ', ot.title, u.organization_name),
+				CONCAT_WS (' ', u.organization_name, ot.title),
 				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
 			) AS name,
 			u.telefon,
@@ -99,16 +93,30 @@ function view(){
 			#users u
 		LEFT JOIN 
 			#organizations_types ot ON ot.id=u.organization_type
+		$having
+	";
+	$db->query($query);
+	$all = $db->found_rows();
+	$perPage = 30;
+	$linkLimit = 10;
+	$page = $_GET['page'] ? $_GET['page'] : 1;
+	$chank = getChank($all, $perPage, $linkLimit, $page);
+	$start = $chank[$page] ? $chank[$page] : 0;
+	$query = "
+		$query
 		ORDER BY
-			u.id DESC
+			name
 		LIMIT
 			$start, $perPage
-	", '');
+	";
+	$query = str_replace('SQL_CALC_FOUND_ROWS', '', $query);
+	$users = $db->query($query, '');
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=users&act=search" method="post">
-			<input style="width: 264px;"  required type="text" name="search" value="<?=$search?>" placeholder="Поиск по пользователям">
+		<form style="margin-top: -3px;float: left;margin-bottom: 10px;">
+			<input type="hidden" name="view" value="users">
+			<input style="width: 264px;"  required type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по пользователям">
 			<input type="submit" value="Искать">
 		</form>
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=add">Добавить</a>
@@ -122,9 +130,9 @@ function view(){
 		<?if (count($users)){
 			foreach($users as $user){?>
 				<tr class="users_box" user_id="<?=$user['id']?>">
-					<td><?=$user['name']?></td>
-					<td><?=$user['telefon']?></td>
-					<td><?=$user['email']?></td>
+					<td label="ФИО"><?=$user['name']?></td>
+					<td label="Телефон"><?=$user['telefon']?></td>
+					<td label="E-mail"><?=$user['email']?></td>
 				</tr>
 			<?}
 		}
@@ -158,7 +166,7 @@ function show_form($act){
 		<a href="?view=correspond&user_id=<?=$id?>">Написать сообщение</a>
 		<a href="?view=order_issues&user_id=<?=$id?>">На выдачу</a>
 		<a href="?view=order_issues&user_id=<?=$id?>&issued=1">Выданные</a>
-		<a style="float: right" href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
+		<a href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
 		<div style="width: 100%; height: 10px"></div>
 	<?}?>
 	<div class="t_form">
@@ -417,7 +425,7 @@ function funds(){
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$funds = $db->select('funds', '*', $where, 'id', false, "$start,$perPage", true);?>
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
-	<div class="actions">
+	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>
 		<?$bill = $user[0]['bill'] ? '<span class="price_format">'.$user[0]['bill'].'</span> руб.' : 'пусто';?>
 		<span>На счету: <b><?=$bill?></b></span>
@@ -425,7 +433,7 @@ function funds(){
 		<span>Зарезервировано: <b><?=$reserved_funds?></b></span>
 		<?$value = $user[0]['bill'] - $user[0]['reserved_funds'];
 		$available =  $value ? '<span class="price_format">'.$value.'</span> руб.' : 'пусто';?>
-		<span style="margin-left: 10px">Доступно: <b><?=$available?></b></span>
+		<span>Доступно: <b><?=$available?></b></span>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -438,11 +446,11 @@ function funds(){
 		<?if (count($funds)){
 			foreach($funds as $id => $fund){?>
 				<tr>
-					<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
-					<td><?=$operations_types[$fund['type_operation']]?></td>
-					<td class="price_format"><?=$fund['sum']?> руб.</td>
-					<td class="price_format"><?=$fund['remainder']?></td>
-					<td><?=stripslashes($fund['comment'])?></td>
+					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
+					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
+					<td label="Сумма" class="price_format"><?=$fund['sum']?> руб.</td>
+					<td label="Остаток" class="price_format"><?=$fund['remainder']?></td>
+					<td label="Комментарий"><?=stripslashes($fund['comment'])?></td>
 				</tr>
 			<?}
 		}
@@ -480,8 +488,8 @@ function user_order_add(){
 				</div>
 				<form class="added_items" method="post">
 					<p><strong>Добавленные товары:</strong></p>
-					<table>
-						<tr>
+					<table class="t_table">
+						<tr class="head">
 							<th>Поставщик</th>
 							<th>Бренд</th>
 							<th>Артикул</th>

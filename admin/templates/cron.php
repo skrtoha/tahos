@@ -226,11 +226,11 @@ switch($_GET['act']){
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		}
+		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`={$rossko->provider_id}", '');
 		break;
 	case 'priceVoshod':
 		echo "<h2>Прайс Восход</h2>";
 		$price = new core\Price($db, 'priceVoshod');
-		
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$filename = $imap->getLastMailFrom(['from' => 'price@voshod-avto.ru', 'name' => 'Voshod.zip']);
@@ -283,6 +283,7 @@ switch($_GET['act']){
 		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`=8", '');
 		break;
 	case 'priceMikado':
 		$mikado = new core\Mikado($db);
@@ -351,6 +352,8 @@ switch($_GET['act']){
 			echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+
+			$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$mikado->stocks[$value]}", '');
 		}
 		break;
 	case 'priceSportAvto':
@@ -400,6 +403,8 @@ switch($_GET['act']){
 			]);
 		}
 
+		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`=7", '');		
+
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
 		$price->log->alert("Вставлено: $price->insertedBrends брендов");
@@ -415,12 +420,12 @@ switch($_GET['act']){
 		require_once ('../class/PHPExcel/IOFactory.php');
 		echo "<h2>Прайс Армтек</h2>";
 		$fileNames = [
-			'Armtek_msk_40068974' => 3,
-			'Armtek_CRS_40068974' => 4
+			'Armtek_msk_40068974' => 3
+			// ,'Armtek_CRS_40068974' => 4
 		];
 		$ciphers = [
-			3 => 'ARMC',
-			4 => 'ARMK'
+			3 => 'ARMC'
+			// ,4 => 'ARMK'
 		];
 		$armtek = new core\Armtek($db);
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
@@ -496,6 +501,8 @@ switch($_GET['act']){
 					'row' => $i
 				]);
 			}
+
+			$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`= $store_id", '');
 
 			$price->log->alert("Обработано $i строк");
 			$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
@@ -575,6 +582,8 @@ switch($_GET['act']){
 				'row' => $i
 			]);
 		}
+
+		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`= 13", '');
 
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
@@ -662,6 +671,8 @@ switch($_GET['act']){
 			]);
 		}
 
+		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`= 17", '');
+
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
 		$price->log->alert("Вставлено: $price->insertedBrends брендов");
@@ -677,7 +688,7 @@ switch($_GET['act']){
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
-		// debug($emailPrice); //exit();
+		//debug($emailPrice); //exit();
 		$store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
@@ -736,11 +747,10 @@ switch($_GET['act']){
 				echo "<br>Ошибка извлечения файла {$emailPrice['nameInArchive']}: $res";
 				break;
 			};
-			if ($emailPrice['fileType'] == 'excel') $workingFile = $emailPrice['nameInArchive'];
+			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}";
 			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
 		}
 		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
-
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer
@@ -780,6 +790,8 @@ switch($_GET['act']){
 				}
 				break;
 		}
+
+		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_GET['store_id']}", '');
 
 		$price->log->alert("Обработано $stringNumber строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");

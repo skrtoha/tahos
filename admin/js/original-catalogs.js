@@ -952,8 +952,12 @@ $(function(){
 			method: 'post',
 			url: '/ajax/original-catalogs.php',
 			data: 'act=search_items&article=' + title,
+			beforeSend: function(){
+				$('div.search_items').addClass('gif');
+			},
 			success: function(res){
 				// console.log(res);
+				$('div.search_items').removeClass('gif');
 				if (parseInt(res)) return show_message('Результат содержит ' + res + ' совпадений. Уточните поиск', false);
 				var str = '';
 				if (!res) str = '<p>Ничего не найдено</p>';

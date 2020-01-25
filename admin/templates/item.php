@@ -532,20 +532,20 @@ function history(){
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=items'>Номенклатура</a> > ";
 	$status .= "<a href='/admin/?view=item&id={$_GET['item_id']}'>{$item['brend']} - {$item['article']}</a> > $page_title";
 	?>
-	<table class="t_table" cellspacing="1">
+	<table id="itemHistory" class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Дата</td>
 			<td>Действие</td>
 		</tr>
 		<tr>
-			<td><?=$item['date']?></td>
-			<td>Добавлен <?=$item['source'] ? "c {$item['source']}" : ''?></td>
+			<td label="Дата"><?=$item['date']?></td>
+			<td label="Действие">Добавлен <?=$item['source'] ? "c {$item['source']}" : ''?></td>
 		</tr>
 		<?if ($resOrderValues->num_rows){
 			while($row = $resOrderValues->fetch_assoc()){?>
 				<tr>
-					<td><?=$row['date']?></td>
-					<td>
+					<td label="Дата"><?=$row['date']?></td>
+					<td label="Действие">
 						Заказал <a target="_blank" href="/admin/?view=users&act=change&id=<?=$row['user_id']?>"><?=$row['name']?></a> c <?=$row['cipher']?> по цене <?=$row['price']?> руб. <a href="/admin/?view=orders&id=<?=$row['order_id']?>&act=change">Перейти в заказ</a>
 					</td>
 				</tr>
@@ -595,14 +595,14 @@ function prices(){
 		<?if ($res_store_items->num_rows){
 			while($row = $res_store_items->fetch_assoc()){?>
 				<tr>
-					<td>
+					<td label="Шифр">
 						<a class="store" store_id="<?=$row['store_id']?>"><?=$row['cipher']?></a>
 					</td>
-					<td><?=$row['provider']?></td>
-					<td><?=$row['price']?></td>
-					<td><?=$row['currency']?></td>
-					<td><?=$row['in_stock']?></td>
-					<td><?=$row['packaging']?></td>
+					<td label="Поставщик"><?=$row['provider']?></td>
+					<td label="Цена"><?=$row['price']?></td>
+					<td label="Валюта"><?=$row['currency']?></td>
+					<td label="В наличии"><?=$row['in_stock']?></td>
+					<td label="Мин. заказ"><?=$row['packaging']?></td>
 				</tr>
 		<?}
 		}
@@ -662,14 +662,14 @@ function related(){
 			<td>Штрих-код</td>
 		</tr>
 		<tr>
-			<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-			<td><a href="?items&id=<?=$item['id']?>&act=change"><?=$item['article']?></a></td>
-			<td><?=$item['title_full']?></td>
-			<td><?=$item['barcode']?></td>
+			<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
+			<td label="Артикул"><a href="?items&id=<?=$item['id']?>&act=change"><?=$item['article']?></a></td>
+			<td label="Название"><?=$item['title_full']?></td>
+			<td label="Штрих-код"><?=$item['barcode']?></td>
 		</tr>
 	</table>
 	<!-- <div id="total" style="margin-top: 20px">Всего: <?=$res_items->num_rows?></div> -->
-	<div style="margin-top: 5px" class="actions">
+	<div id="relatedActs" style="margin-top: 5px" class="actions">
 		<form action="/admin/?view=item&act=related_search&id=<?=$item_id?>" method="post">
 			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск для добавления">
 			<label>
@@ -694,11 +694,11 @@ function related(){
 		<?if (count($items)){
 			foreach($items as $value){?>
 				<tr>
-					<td><?=$value['brend']?></td>
-					<td><a href="?view=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
-					<td><?=$value['title_full']?></td>
-					<td><?=$value['barcode']?></td>
-					<td><a class="delete_item" href="?view=item&act=delete_related&item_id=<?=$_GET['id']?>&item_diff=<?=$value['id']?>">Удалить</a></td>
+					<td label="Бренд"><?=$value['brend']?></td>
+					<td label="Артикул"><a href="?view=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
+					<td label="Название"><?=$value['title_full']?></td>
+					<td label="Штрих-код"><?=$value['barcode']?></td>
+					<td label=""><a class="delete_item" href="?view=item&act=delete_related&item_id=<?=$_GET['id']?>&item_diff=<?=$value['id']?>">Удалить</a></td>
 				</tr>
 			<?}	
 		}
@@ -919,11 +919,11 @@ function complect(){
 			<td>Категории</td>
 		</tr>
 		<tr>
-			<td><?=$item['brend']?></td>
-			<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-			<td><?=$item['title_full']?></td>
-			<td><?=$item['barcode']?></td>
-			<td><?=get_href_categories($item['categories_ids'], $item['categories_titles'])?></td>
+			<td label="Бренд"><?=$item['brend']?></td>
+			<td label="Артикул"><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+			<td label="Название"><?=$item['title_full']?></td>
+			<td label="Штрих-код"><?=$item['barcode']?></td>
+			<td label="Категории"><?=get_href_categories($item['categories_ids'], $item['categories_titles'])?></td>
 		</tr>
 	</table>
 	<div id="total" style="margin-top: 20px">Всего: <?=count($items)?></div>
@@ -945,12 +945,12 @@ function complect(){
 		<?if (count($items)){
 			foreach($items as $value){?>
 				<tr>
-					<td><?=$value['brend']?></td>
-					<td><a href="?view=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
-					<td><?=$value['title_full']?></td>
-					<td><?=$value['barcode']?></td>
-					<td><?=get_href_categories($value['categories_ids'], $value['categories_titles'])?></td>
-					<td><a class="delete_item" href="?view=item&act=delete_complect&item_id=<?=$_GET['id']?>&item_diff=<?=$value['id']?>">Удалить</a></td>
+					<td label="Бренд"><?=$value['brend']?></td>
+					<td label="Артикул"><a href="?view=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
+					<td label="Название"><?=$value['title_full']?></td>
+					<td label="Штрих-код"><?=$value['barcode']?></td>
+					<td label="Категории"><?=get_href_categories($value['categories_ids'], $value['categories_titles'])?></td>
+					<td label=""><a class="delete_item" href="?view=item&act=delete_complect&item_id=<?=$_GET['id']?>&item_diff=<?=$value['id']?>">Удалить</a></td>
 				</tr>
 			<?}	
 		}
@@ -970,16 +970,17 @@ function complect_search(){
 			i.barcode,
 			i.brend_id,
 			i.article,
-			b.title AS brend
+			b.title AS brend,
+			cm.item_diff
 		FROM
 			#items i
 		LEFT JOIN #brends b ON i.brend_id=b.id
 		LEFT JOIN #categories_items ci ON ci.item_id=i.id
 		LEFT JOIN #categories c ON c.id=ci.category_id
+		LEFT JOIN #complects cm ON cm.item_diff = i.id
 		WHERE 
-			i.article='$search' OR
-			i.id='$search' AND 
-			i.id<>$item_id
+			(i.article='$search' OR i.id='$search') AND 
+			i.id<>$item_id AND cm.item_diff IS NULL
 	";
 	$res_items = $db->query($q_items, '');
 	if ($res_items->num_rows > 100){
@@ -1002,16 +1003,15 @@ function complect_search(){
 			<td>Артикул</td>
 			<td>Название</td>
 			<td>Штрих-код</td>
-			<td>Категории</td>
 			<td></td>
 		</tr>
 		<?if ($res_items->num_rows){
 			while($value = $res_items->fetch_assoc()){?>
 				<tr>
-					<td><?=$value['brend']?></td>
-					<td><a href="?view=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
-					<td><?=$value['title_full']?></td>
-					<td><?=$value['barcode']?></td>
+					<td label="Бренд"><?=$value['brend']?></td>
+					<td label="Артикул"><a href="?view=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
+					<td label="Название"><?=$value['title_full']?></td>
+					<td label="Штрих-код"><?=$value['barcode']?></td>
 					<td><a href="?view=item&act=complect_add&item_related=<?=$value['id']?>&item_id=<?=$item_id?>">Добавить</a></td>
 				</tr>
 			<?}	
@@ -1071,7 +1071,7 @@ function analogies_substitutes($type){
 		// debug($items);
 	}
 	?>
-	<a href="?view=item&id=<?=$item_id?>&act=change" style="margin-bottom: 10px;display: block">Карточка товара</a>
+	<a id="goToItemCard" href="?view=item&id=<?=$item_id?>&act=change" style="margin-bottom: 10px;display: block">Карточка товара</a>
 	<?=$item_temp['html']?>
 	<b style="display: block; margin: 10px 0"><?=$page_title?>:</b>
 	<div id="total" style="margin-top: 20px">Всего: <?=count($items)?></div>
@@ -1097,11 +1097,11 @@ function analogies_substitutes($type){
 		<?if (!empty($items)){
 			foreach($items as $id => $item){?>
 				<tr>
-					<td><?=$item['brend']?></td>
-					<td><a href="?view=item&id=<?=$id?>"><?=$item['article']?></a></td>
-					<td><?=$item['title_full']?></td>
-					<td><?=$item['barcode']?></td>
-					<td>
+					<td label="Бренд"><?=$item['brend']?></td>
+					<td label="Артикул"><a href="?view=item&id=<?=$id?>"><?=$item['article']?></a></td>
+					<td label="Название"><?=$item['title_full']?></td>
+					<td label="Штрих-код"><?=$item['barcode']?></td>
+					<td label="Категории">
 						<?if (!empty($item['categories'])){
 							foreach ($item['categories'] as $key => $value) {?>
 								<a href="/admin/?view=category&id=<?=$key?>"><?=$value?></a>
@@ -1109,9 +1109,9 @@ function analogies_substitutes($type){
 						}?>
 					</td>
 					<?if ($type == 'analogies'){?>
-						<td><input <?=$item['hidden'] ? 'checked' : ''?> name="hidden" type="checkbox" value="<?=$id?>"></td>
+						<td label="Скрыть"><input <?=$item['hidden'] ? 'checked' : ''?> name="hidden" type="checkbox" value="<?=$id?>"></td>
 					<?}?>
-					<td><a class="<?=$type?>_delete delete_item" href="?view=item&act=<?=$type?>_delete&item_id=<?=$item_id?>&delete_item=<?=$id?>">Удалить</a></td>
+					<td label=""><a class="<?=$type?>_delete delete_item" href="?view=item&act=<?=$type?>_delete&item_id=<?=$item_id?>&delete_item=<?=$id?>">Удалить</a></td>
 				</tr>
 			<?}	
 		}
@@ -1194,11 +1194,11 @@ function analogies_substitutes_search($type){
 		<?if (count($items)){
 			foreach($items as $id => $item){?>
 				<tr>
-					<td><?=$item['brend']?></td>
-					<td><a href="?view=item&id=<?=$id?>"><?=$item['article']?></a></td>
-					<td><?=$item['title_full']?></td>
-					<td><?=$item['barcode']?></td>
-					<td>
+					<td label="Бренд"><?=$item['brend']?></td>
+					<td label="Артикул"><a href="?view=item&id=<?=$id?>"><?=$item['article']?></a></td>
+					<td label="Название"><?=$item['title_full']?></td>
+					<td label="Штрих-код"><?=$item['barcode']?></td>
+					<td label="Категории">
 						<?if (!empty($item['categories'])){
 							foreach ($item['categories'] as $key => $value) {?>
 								<a href="/admin/?view=category&id=<?=$key?>"><?=$value?></a> 
@@ -1292,11 +1292,11 @@ function get_item(){
 			<td>Категории</td>
 		</tr>
 		<tr>
-			<td><?=$item['brend']?></td>
-			<td><a href="/admin/?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-			<td><?=$item['title_full']?></td>
-			<td><?=$item['barcode']?></td>
-			<td>
+			<td label="Бренд"><?=$item['brend']?></td>
+			<td label="Артикул"><a href="/admin/?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+			<td label="Название"><?=$item['title_full']?></td>
+			<td label="Штрих-код"><?=$item['barcode']?></td>
+			<td label="Категории">
 				<?if (!empty($item['categories'])){
 					foreach($item['categories'] as $key => $value){?>
 						<a href="?view=category&act=items&id=<?=$key?>"><?=$value?></a> 

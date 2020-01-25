@@ -77,7 +77,7 @@ $orders = get_order_group($params, '');
 					<div class="search-icon"></div>
 				</div>
 				<div class="checkbox-wrap">
-					<input type="radio" <?=$params['period'] == 'all' ? 'checked' : ''?> name="period_group" id="order-filter-period-all" value="all">
+					<input type="radio" <?=$params['period'] == 'all' ? 'checked' : ''?> name="period" id="order-filter-period-all" value="all">
 					<label for="order-filter-period-all">за все время</label>
 					<input type="radio" name="period" id="order-filter-period-selected" <?=$params['period'] != 'all' ? 'checked' : ''?> value="custom">
 					<label for="order-filter-period-selected">за период: </label>

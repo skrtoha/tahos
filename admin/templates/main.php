@@ -9,6 +9,7 @@
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-touch-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link rel="stylesheet" href="/css/magnific-popup.css">
 	<script src="/js/tinymce/tinymce.min.js"></script>
 	<script type="text/javascript">
@@ -46,6 +47,7 @@
 <div id="popup" style="display: none"><img src="/images/preload.gif" alt=""></div>
 <div id="container">
 	<div id="left_menu">
+		<span id="closeLeftMenu" class="icon-cross1"></span>
 		<div class="block">
 			<div class="title">Главное меню</div>
 			<ul>
@@ -83,8 +85,11 @@
 		</div>
 	</div>
 	<div id="main_field">
-		<div id="header"><h1><?=$page_title?></h1></div>
-		<div class="t_form" style="margin: 10px 10px 10px 23px;"><div class="bg" style="padding:5px 10px 5px 10px;"><?=$status?></div></div>
+		<div id="header">
+			<span class="icon-menu"></span>
+			<h1><?=$page_title?></h1>
+		</div>
+		<div id="status" class="t_form" style=""><div class="bg"><?=$status?></div></div>
 		<div id="contents"><?=$content?></div>
 	</div>
 </div>

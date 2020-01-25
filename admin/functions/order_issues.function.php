@@ -21,6 +21,7 @@ class Issues{
 				ov.ordered,
 				ov.arrived,
 				ov.comment,
+				ov.store_id,
 				o.id AS order_id,
 				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') as created,
 				os.title AS status,
@@ -56,92 +57,41 @@ class Issues{
 		return '<a href="/admin/?view=item&id='.$item_id.'">'.$item['brend'].' - '.$item['article'].' - '.$item['title_full'].'</a>';
 	}
 	protected function getOrderValue($order_id, $item_id){
-		$res = get_order_values('', '', ['order_id' => $order_id, 'item_id' => $item_id]);
-		return $res->fetch_assoc();
+		return $this->db->select_one('orders_values', '*', "`order_id`={$order_id} AND `item_id`={$item_id}");
 	}
 	function setIncome(){
+		//debug($_POST); //exit();
 		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id], ['print_query' => false]);
 		if ($insert_order_issue !== true) die("Ошибка: $this->last_query | $insert_order_issue");
 		$issue_id = $this->db->last_id();
-		$orderValuesForEmail = array();
 		foreach($_POST['income'] as $key => $issued){
 			$a = explode(':', $key);
-			$user = $this->getUser();
-			$title = $this->getTitleForFund($a[1]);
-			$ov = $this->getOrderValue($a[0], $a[1]);
-			$orderValuesForEmail[] = $ov;
 			$insert_order_issue_values = $this->db->insert(
 				'order_issue_values',
 				[
 					'issue_id' => $issue_id,
 					'order_id' => $a[0],
+					'store_id' => $a[2],
 					'item_id' => $a[1],
 					'issued' => $issued,
 					'comment' => $_POST['comment'][$key]
-				]
-			);
-			if ($insert_order_issue_values !== true) die("Ошибка: $this->db->$last_query | $insert_order_issue_values");
-			//debug($title); debug($ov); //continue;
-			$status_id = ($ov['issued'] + $issued < $ov['arrived']) ? 3 : 1;
-			$res_1 = $this->db->query("
-				UPDATE 
-					#orders_values 
-				SET 
-					`issued` = `issued` + {$issued},
-					`status_id` = $status_id
-				WHERE 
-					`order_id`={$a[0]} AND
-					`item_id`={$a[1]}
-			", '');
-			// exit();
-			$remainder = $user['bill'] - $ov['price'] * $ov['arrived'];
-			$res_2 = $this->db->insert(
-				'funds',
-				[
-					'type_operation' => 2,
-					'sum' => $ov['price'] * $ov['arrived'],
-					'remainder' => $remainder,
-					'user_id' => $this->user_id,
-					'comment' => addslashes('Списание средств на оплату "'.$title.'"')
 				],
-				['print_query' => false]
-			);
-			if ($user['bonus_program']){
-				$bonus_size = $this->db->getField('settings', 'bonus_size', 'id', 1);
-				$bonus_count = floor($ov['price'] * $ov['arrived'] * $bonus_size / 100);
-				$res_4 = $this->db->insert(
-					'funds',
-					[
-						'type_operation' => 3,
-						'sum' => $bonus_count,
-						'remainder' => $user['bonus_count'] + $bonus_count,
-						'user_id' => $this->user_id,
-						'comment' => addslashes('Начисление бонусов за "'.$title.'"'),
-					],
-					['print_query' => false]
-				);
+			'');
+			if ($insert_order_issue_values === true){
+				$orderValue = new core\OrderValue();
+				$orderValue->changeStatus(1, [
+					'order_id' => $a[0],
+					'store_id' => $a[2],
+					'item_id' => $a[1]
+				]);
 			}
-			$res_3 = $this->db->query("
-				UPDATE
-					#users
-				SET
-					`reserved_funds`=`reserved_funds` - {$ov['price']} * {$ov['arrived']},
-					`bill`= `bill` - {$ov['price']} * {$ov['arrived']}
-				WHERE
-					`id`={$this->user_id}
-			", '');
+			else die("Ошибка: $this->db->$last_query | $insert_order_issue_values");
 		}
 		if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			echo $issue_id;
 			exit();
 		}
 		message('Успешно сохранено');
-		$res = core\Mailer::send([
-			'email' => $this->db->getFieldOnID('users', $_GET['user_id'], 'email'),
-			'subject' => 'Отгрузка товаров',
-			'body' => getTableOrder($orderValuesForEmail)
-		]);
-		if ($res !== true) die($res);
 		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
 	}
 	protected function getOrderIssues(){
@@ -231,7 +181,7 @@ class Issues{
 			LEFT JOIN
 				#order_issues oi ON oi.id = oiv.issue_id
 			LEFT JOIN
-				#orders_values ov ON ov.order_id=oiv.order_id AND ov.item_id=oiv.item_id
+				#orders_values ov ON ov.order_id=oiv.order_id AND ov.item_id=oiv.item_id AND ov.store_id=oiv.store_id
 			LEFT JOIN
 				#items i ON i.id=oiv.item_id
 			LEFT JOIN

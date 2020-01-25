@@ -3,6 +3,7 @@
 // require_once('functions/')
 $act = $_GET['act'];
 $id = $_GET['id'];
+
 $status_id = $_POST['status_id'];
 $armtek = new core\Armtek($db);
 $rossko = new core\Rossko($db);
@@ -99,9 +100,9 @@ switch ($act) {
 		break;
 	case 'toBasketVoshodAvto':
 	case 'fromBasketVoshodAvto':
-		// debug($_GET); exit();
+		//debug($_GET); //exit();
 		$orderAbcp = new core\OrderAbcp($db, 6);
-		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET['brend'], $_GET['article']);
+		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
 		if (!$itemInfo){
 			echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
 			break;

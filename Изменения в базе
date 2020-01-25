@@ -5,4 +5,7 @@ CREATE TABLE `tahos_email_prices` (
 ALTER TABLE `tahos_email_prices`
   ADD PRIMARY KEY (`store_id`);
 COMMIT;
-ALTER TABLE `tahos_users`  ADD `get_notifications` BOOLEAN NULL DEFAULT NULL  AFTER `get_news`;
+
+ALTER TABLE `tahos_order_issue_values` ADD `store_id` INT(10) UNSIGNED NOT NULL AFTER `order_id`;
+ALTER TABLE `tahos`.`tahos_order_issue_values` DROP PRIMARY KEY, ADD PRIMARY KEY (`issue_id`, `order_id`, `store_id`, `item_id`) USING BTREE;
+

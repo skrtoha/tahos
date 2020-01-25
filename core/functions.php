@@ -38,6 +38,19 @@ function translite($var){
 	$var = strtr($var,$alpha);
 	return $var;
 }
+function shot_str($str, $len){
+	$len -= 3;
+	if (mb_strlen($str, "UTF-8") < $len) return $str;
+	$text_cut = mb_substr($str, 0, $len, "UTF-8");
+	$text_explode = explode(" ", $text_cut);
+	unset($text_explode[count($text_explode) - 1]);
+	return implode(" ", $text_explode).'...';
+}
+function toStringKey($array, $key){
+	$str = '';
+	foreach ($array as $k => $v) $str .= $v[$key].',';
+	return substr($str, 0, -1);
+}
 function debug($obj, $name = ''){?>
 	<div style="clear: both"></div>
 	<?if ($name){?>
@@ -51,60 +64,6 @@ function message($text, $type = true){
 	// echo "$text $type_message";
 	setcookie('message', $text, 0, '/');
 	setcookie('message_type', $type_message, 0, '/');
-}
-function get_items($kol_elem = 0, $cat_id = 0){
-	global $db;
-	$settings = $db->select('settings', "*");
-	$per_page = $settings[0]['per_page'];
-	$sort_type = $_COOKIE['sort_type'] ? $_COOKIE['sort_type'] : "title";
-	$sort_direct = $_COOKIE['sort_direct'];
-	$category_id = $cat_id ? $cat_id : $_GET['category_id'];
-	$cookie_filters = get_cookie_flilters($category_id);
-	// echo count($cookie_filters);
-	// print_r($cookie_filters);
-	if ($cookie_filters){
-		$str = "";
-		$where = "`category_id`=$category_id";
-		if ($cookie_filters['brend']) $where .= " AND `brend_id`=".$cookie_filters['brend'];
-		// echo "$where";
-		$count_values = 0;
-		foreach ($cookie_filters as $key => $value) {
-			if ($key != "brend"){
-	$str .= "`value_id`=$value OR ";
-	$count_values++;
-			} 
-		}
-		$str = substr($str, 0, -3);
-		if ($count_values){
-			$temp = $db->select('items_values', "item_id", "$str ORDER BY `item_id`");
-			$count = count($temp);
-			// echo "$count";
-			// if ($count == 1) 
-			if ($count == $count_values) return false;
-			// echo "$count";
-			for ($i = 0; $i < $count - $count_values; $i++) {
-	$bool = true;
-	for ($j = $i; $j < $i + $count_values; $j++){
-		if ($temp[$i]['item_id'] != $temp[$j]['item_id']) $bool = false;
-	}
-	if ($bool) $items[] = $temp[$i]['item_id'];
-			}
-			if (count($items)){
-	$str = "";
-	foreach ($items as $value)  $str .= "`id`=$value OR ";
-	$str = substr($str, 0, -3);
-	$where .= " AND ($str)";
-			} 
-			else return false;
-			foreach ($_POST as $key => $value) {
-	# code...
-			}
-			$where .=  " ORDER BY `$sort_type` $sort_direct";
-		}
-	}
-	else $where = "`category_id`=$category_id ORDER BY `$sort_type` $sort_direct";
-	$array = $db->select('items', "*", "$where", '', '', "$kol_elem,$per_page");
-	return count($array) ? $array : false;
 }
 function get_cookie_flilters($cat_id = 0){
 	if ($_COOKIE['filters']){
@@ -156,6 +115,12 @@ function payment_funds($type, $user, $difference = false){
 			return "<span class='price_format_2'>$result</span>";
 	}
 }
+function begin_date(){
+	return date('d.m.Y', time() - 60 * 60 * 24 * 30);
+}
+function end_date(){
+	return date('d.m.Y', time());
+}
 function get_price($provider_item){
 	global $db;
 	$provider = $db->select('providers', 'id,currency_id,percent', '`id`='.$provider_item['provider_id']);
@@ -180,6 +145,8 @@ function get_user_price($price, $user){
 	}
 	return '<span class="price_format">'.$value.'</span>';
 }
+//для перевода в рубли из формы фильтра при поиске артикля
+//для отображения если нету поставщиков
 function getHrefArticle($article){
 	return "/search/article/$article";
 }
@@ -300,45 +267,6 @@ function cat_get_items_values($items){
 	} 
 	return $items_values;
 }
-function cat_get_user(){
-	global $db;
-	if ($_SESSION['user']){
-		$q_user = "
-			SELECT 
-				u.*,
-				c.designation, 
-				c.rate, 
-				u.delivery_type,
-				u.bonus_count,
-				i.title AS issue_title,
-				i.desc AS issue_desc,
-				i.adres AS issue_adres,
-				i.telephone AS issue_telephone,
-				i.email AS issue_email,
-				i.twitter AS issue_twitter,
-				i.vk AS issue_vk,
-				i.facebook AS issue_facebook,
-				i.google AS issue_google,
-				i.ok AS issue_ok,
-				i.coords AS issue_coords,
-				c.id as currency_id
-			FROM #users u
-			LEFT JOIN #currencies c ON c.id=u.currency_id
-			LEFT JOIN #issues i ON i.id=u.issue_id
-			WHERE u.id={$_SESSION['user']}
-		";
-		$user = $db->select_unique($q_user, '');
-		$user = $user[0];
-	} 
-	else{
-		$user['markup'] = 0;
-		$user['designation'] = '<i class="fa fa-rub" aria-hidden="true"></i>';
-		$user['currency_id'] = 1;
-		$user['rate'] = 1;
-		$user['show_all_analogies'] = 0;
-	}
-	return $user;
-}
 function category_items_without_filters($sub_id, $sort = ['type' => 'title_full', 'desc' => '']){
 	$time_start = microtime();
 	global $db, $settings, $res, $user;
@@ -374,7 +302,7 @@ function category_items_without_filters($sub_id, $sort = ['type' => 'title_full'
 	$_SESSION['items_chunks'] = cat_get_chunks_items($q_items);
 	$items = $_SESSION['items_chunks'][0];
 	$items_values = cat_get_items_values($items);
-	$user = cat_get_user();
+	$user = core\User::get();
 	$ratings = json_decode($settings['ratings'], true);
 	if (empty($items)) return false;
 	foreach ($items as $key => $item){
@@ -440,7 +368,7 @@ function category_items_with_filters($sub_id, $sort = ['type' => 'title_full', '
 	$_SESSION['items_chunks'] = $items_chunks;
 	$items = $_SESSION['items_chunks'][0];
 	$items_values = cat_get_items_values($items);
-	$user = cat_get_user();
+	$user = core\User::get();
 	$ratings = json_decode($settings['ratings'], true);
 	foreach ($items as $key => $item){
 		$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];
@@ -636,7 +564,6 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 }
 function get_basket(){
 	global $db;
-	if (!$_SESSION['user']) return false;
 	$basket = $db->select_unique("
 		SELECT 
 			b.*,
@@ -779,26 +706,5 @@ function get_order_group($params, $flag = ''){
 	}
 	$query .= ' ORDER BY o.created DESC';
 	return $db->query($query, $flag);
-}
-/**
- * cheking is there even one in basket
- * @param  [type]  $store_items_list array of store_items
- * @return boolean true if exists
- */
-function isInBasketExists($store_items_list){
-	foreach($store_items_list as $store_item){
-		foreach($store_item['store_item']['list'] as $value){
-			if ($value['in_basket']) return true;
-		}
-		foreach($store_item['store_item']['prevails'] as $value){
-			if ($value['in_basket']) return true;
-		}
-	}
-	return false;
-}
-function getInBasket($basket){
-	$output = array();
-	foreach($basket as $b) $output[$b['store_id'].':'.$b['item_id']] = $b['quan'];
-	return $output;
 }
 ?>

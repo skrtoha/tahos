@@ -17,7 +17,7 @@ if (!$_POST['filters_on']){
 		$items = $_SESSION['items_chunks'][$chunk];
 		if (!count($items)) exit();
 		$items_values = cat_get_items_values($items);
-		$user = cat_get_user();
+		$user = core\User::get();
 		$ratings = json_decode($settings['ratings'], true);
 		foreach ($items as $key => $item){
 			$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];
@@ -45,7 +45,7 @@ else{
 	if ($chunk < $settings['cat_countChunk'] && $chunk > 0){
 		$items = $_SESSION['items_chunks'][$chunk];
 		$items_values = cat_get_items_values($items);
-		$user = cat_get_user();
+		$user = core\User::get();
 		$ratings = json_decode($settings['ratings'], true);
 		foreach ($items as $key => $item){
 			$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];

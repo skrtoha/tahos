@@ -9,7 +9,7 @@ class OrderAbcp extends Abcp{
 	}
 	public function addToBasket($params){
 		// debug($params); exit();
-		$res = parent::getUrlData(
+		$res = parent::getPostData(
 			"{$this->param['url']}/basket/add",
 			[
 				'userlogin' => $this->param['userlogin'],
@@ -51,16 +51,16 @@ class OrderAbcp extends Abcp{
 	}
 	public function getItemInfoByArticleAndBrend($array){
 		$article = Armtek::getComparableString($array['article']);
-		$supplierCode = str_replace($this->param['title'].'-', '', $array['providerStore']);
+		$distributorId = str_replace($this->param['title'].'-', '', $array['providerStore']);
 		$url =  "{$this->param['url']}/search/articles/?userlogin={$this->param['userlogin']}&userpsw=".md5($this->param['userpsw'])."&useOnlineStocks=1&number={$article}&brand={$array['brend']}";
-		$url = str_replace(' ', '%20', $url);
 		$response = file_get_contents($url);
 		$items = json_decode($response, true);
+		// debug($items); exit();
 		if (empty($items)) return false;
 		foreach($items as $value){
 			if (
 				Armtek::getComparableString($value['numberFix']) == Armtek::getComparableString($article) 
-				&& $value['supplierCode'] == $supplierCode
+				&& $value['distributorId'] == $distributorId
 				// && Armtek::getComparableString($value['brand']) == Armtek::getComparableString($brend)
 			) {
 				return[
@@ -112,23 +112,38 @@ class OrderAbcp extends Abcp{
 		return $res[1]['date'];
 	}
 	public function basketOrder(){
-		// exit();
-		$shipmentDate = $this->getShipmentDate();
-		$res = parent::getUrlData(
-			"{$this->param['url']}/basket/order",
-			[
-				'userlogin' => $this->param['userlogin'],
-				'userpsw' => md5($this->param['userpsw']),
-				'paymentMethod' => $this->param['paymentMethod'],
-				'shipmentAddress' => $this->param['shipmentAddress'],
-				'shipmentOffice' => isset($this->param['shipmentOffice']) ? $this->param['shipmentOffice'] : '',
-				'shipmentMethod' => isset($this->param['shipmentMethod']) ? $this->param['shipmentMethod'] : '',
-				'shipmentDate' => $shipmentDate
-			]
-		);
-		echo $res;
+		// $shipmentDate = $this->getShipmentDate();
+		// $res = parent::getUrlData(
+		// 	"{$this->param['url']}/basket/order",
+		// 	[
+		// 		'userlogin' => $this->param['userlogin'],
+		// 		'userpsw' => md5($this->param['userpsw']),
+		// 		'paymentMethod' => $this->param['paymentMethod'],
+		// 		'shipmentAddress' => $this->param['shipmentAddress'],
+		// 		'shipmentOffice' => isset($this->param['shipmentOffice']) ? $this->param['shipmentOffice'] : '',
+		// 		'shipmentMethod' => isset($this->param['shipmentMethod']) ? $this->param['shipmentMethod'] : '',
+		// 		'shipmentDate' => $shipmentDate
+		// 	]
+		// );
+		$res = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/core/test.rossko.txt');
+
+		if (!$res) die("Ошибка отправления заказка");
 		$array = json_decode($res, true);
-		debug($array);
+
+		debug($array); exit();
+
+		foreach($array['orders'] as $key => $order){
+			$orderValue = new OrderValue();
+			foreach($order['positions'] as $pos){
+				$ov = OrderValue::getOrderValueByBrendAndArticle([
+					'brend' => $pos['brend'],
+					'article' => $pos['numberFix'],
+					'provider_id' => $this->param['provider_id'],
+					'status_id' => 7
+				]);
+				$orderValue->changeStatus(11, $ov);
+			}
+		}
 	}
 }
 

@@ -142,4 +142,37 @@ class OrderValue{
 		);
 	}
 
+	/**
+	 * gets order value by brend and article
+	 * @param  [array] $params article, brend - is required, provider_id, status_id - optional
+	 * @return [array]  row from orders_values
+	 */
+	public static function getOrderValueByBrendAndArticle($params){
+		$article = article_clear($params['article']);
+		$where = '';
+		if (isset($params['provider_id'])) {
+			$where .= " AND ps.provider_id = {$params['provider_id']}";
+		}
+		if (isset($params['status_id'])) {
+			$where .= " AND ov.status_id = {$params['status_id']}";
+		}
+		$query = "
+			SELECT
+				ov.*
+			FROM
+				#orders_values ov
+			LEFT JOIN
+				#items i ON i.id = ov.item_id
+			LEFT JOIN
+				#brends b ON b.id = i.brend_id
+			LEFT JOIN 
+				#provider_stores ps ON ps.id = ov.store_id
+			WHERE
+				i.article = '$article' AND b.title LIKE '%{$params['brend']}%'
+				$where
+		";
+		$res = $GLOBALS['db']->query($query, '');
+		return $res->fetch_assoc();
+
+	}
 }

@@ -707,4 +707,25 @@ function get_order_group($params, $flag = ''){
 	$query .= ' ORDER BY o.created DESC';
 	return $db->query($query, $flag);
 }
+/**
+ * cheking is there even one in basket
+ * @param  [type]  $store_items_list array of store_items
+ * @return boolean true if exists
+ */
+function isInBasketExists($store_items_list){
+	foreach($store_items_list as $store_item){
+		foreach($store_item['store_item']['list'] as $value){
+			if ($value['in_basket']) return true;
+		}
+		foreach($store_item['store_item']['prevails'] as $value){
+			if ($value['in_basket']) return true;
+		}
+	}
+	return false;
+}
+function getInBasket($basket){
+	$output = array();
+	foreach($basket as $b) $output[$b['store_id'].':'.$b['item_id']] = $b['quan'];
+	return $output;
+}
 ?>

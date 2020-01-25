@@ -284,7 +284,6 @@ class Abcp{
 	 * gets response from remote server by url
 	 * @param  [string] $url remote url server
 	 * @param  [array] $data if is null then method is get 
-	 * @param  [string] $method is POST by default
 	 * @return [string] response from server
 	 */
 	public static function getUrlData($url, $data = array()){

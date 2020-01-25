@@ -20,20 +20,20 @@ class OrderValue{
 				$quan = $ov['arrived'] - $ov['issued'];
 				$values['issued'] = "`issued` + $quan";
 				$this->updateOrderValue($values, $params);
-				$user = User::get($params['user_id']);
+				$user = User::get($ov['user_id']);
 				$title = $this->getTitleComment($params['item_id']);
 				Fund::insert(2, [
-					'sum' => $params['price'] * $quan,
-					'remainder' => $user['bill'] - $params['price'] * $quan,
-					'user_id' => $params['user_id'],
+					'sum' => $ov['price'] * $quan,
+					'remainder' => $user['bill'] - $ov['price'] * $quan,
+					'user_id' => $ov['user_id'],
 					'comment' => addslashes('Списание средств на оплату "'.$title.'"')
 				]);
-				User::setBonusProgram($params['user_id'], $params['item_id'], $quan * $params['price']);
+				User::setBonusProgram($ov['user_id'], $params['item_id'], $quan * $ov['price']);
 				User::update(
-					$params['user_id'],
+					$ov['user_id'],
 					[
-						'reserved_funds' => "`reserved_funds` - ".$params['price'] * $quan,
-						'bill' => "`bill` - ".$params['price'] * $quan
+						'reserved_funds' => "`reserved_funds` - ".$ov['price'] * $quan,
+						'bill' => "`bill` - ".$ov['price'] * $quan
 					]
 				);
 				break;
@@ -66,7 +66,7 @@ class OrderValue{
 			case 10:
 				$this->updateOrderValue($values, $params);
 				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'minus');
-				$this->changeInStockStoreItem($params['quan'], $params, '+');
+				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
 			//заказано
 			case 11:
 				$values['ordered'] = "`ordered` + {$params['quan']}";

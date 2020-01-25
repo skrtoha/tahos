@@ -82,7 +82,7 @@ else{
 						<td><?=$v['created']?></td>
 						<td>
 							<input type="hidden" value="<?=$v['arrived'] - $v['issued']?>">
-							<input type="checkbox" name="income[<?=$v['order_id']?>:<?=$v['item_id']?>]" value="<?=$v['arrived'] - $v['issued']?>">
+							<input type="checkbox" name="income[<?=$v['order_id']?>:<?=$v['item_id']?>:<?=$v['store_id']?>]" value="<?=$v['arrived'] - $v['issued']?>">
 						</td>
 					</tr>
 				<?}

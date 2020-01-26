@@ -305,6 +305,31 @@ class Abcp{
 		}
 		return file_get_contents($url, false, $context);
 	}
+	/**
+	 * outdated, use getUrlData
+	 * @param  [type] $url  [description]
+	 * @param  array  $data [description]
+	 * @return [type]       [description]
+	 */
+	public static function getPostData($url, $data = array()){
+		$context = null;
+		if (empty($data)){
+			$context = stream_context_create([
+				'ssl' => [
+					'verify_peer' => false
+				]
+			]);
+		}
+		else{
+			$context = stream_context_create([
+				'http' => [
+					'method' => 'POST',
+					'content' => http_build_query($data)
+				]
+			]);
+		}
+		return file_get_contents($url, false, $context);
+	}
 	public static function isDomainAvailible($url) {
 		// Проверка правильности URL
 		if(!filter_var($url, FILTER_VALIDATE_URL)){

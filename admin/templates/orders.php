@@ -64,7 +64,8 @@ switch ($act) {
 			//Favorit Avto
 			if ($ov['provider_id'] == 19){
 				$isRendered = true;
-				core\FavoriteParts::addToBasket($ov);
+				$res = core\FavoriteParts::addToBasket($ov);
+				if (!$res) "<p><b>Ошибка добавления {$ov['brend']} - {$ov['article']} в Фаворит</b></p>";
 			}
 			if (!$isRendered) $db->update('orders_values', ['status_id' => 7], "`order_id`={$_GET['id']} AND `status_id` = 5");
 		}
@@ -141,6 +142,10 @@ switch ($act) {
 		$armtek->toOrder($_GET, 'rossko');
 		if ($_GET['store_id'] == 24) $rossko->sendOrder(24);
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
+		break;
+	case 'deleteFromFavoriteAuto':
+		core\FavoriteParts::addToBasket($_GET);
+		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	default:
 		view();
@@ -339,6 +344,8 @@ function show_form($act){
 		<?}
 		else{
 			while ($ov = $res_order_values->fetch_assoc()){
+				// debug($ov);
+
 				$selector = "store_id='{$ov['store_id']}' item_id='{$ov['item_id']}'";?>
 				<?if (!$order['is_draft']){?>
 					<tr <?=$selector?>>
@@ -407,7 +414,11 @@ function show_form($act){
 							<?if ($response != 'OK'){?>
 								<br><b style="color: red"><?=$response?></b>
 							<?}
-						}?>
+						}
+						$basketFavoriteParts = core\FavoriteParts::isInBasket($ov);
+						if (!empty($basketFavoriteParts)){?>
+							<br><a href="?view=orders&act=deleteFromFavoriteAuto&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>&goodsID=<?=$basketFavoriteParts['goodsID']?>&warehouseGroup=<?=$basketFavoriteParts['warehouseGroup']?>&quan=0">Удалить из Фаворит</a>
+						<?}?>
 					</td>
 					<td label="Бренд"><?=$ov['brend']?></td>
 					<td label="Артикул"><a href="/admin/?view=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>

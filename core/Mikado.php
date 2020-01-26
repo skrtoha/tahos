@@ -190,7 +190,7 @@ class Mikado{
 		// debug($result);
 	}
 	public function Basket_Add($ov){
-		// debug($ov);
+		// debug($ov); exit();
 		$ZakazCode = $this->db->getField('mikado_zakazcode', 'ZakazCode', 'item_id', $ov['item_id']);
 		if (!$ZakazCode){
 			$ZakazCode = $this->setArticle($ov['brend'], $ov['article'], true);
@@ -226,11 +226,9 @@ class Mikado{
 			]
 		);
 		if ($result->Message == 'OK'){
-			$this->db->update(
-				'orders_values',
-				['status_id' => 11, 'ordered' => $result->OrderedQTY],
-				Armtek::getWhere($ov)
-			);
+			$ov['quan'] = $result->OrderedQTY;
+			$orderValue = new OrderValue();
+			$orderValue->changeStatus(11, $ov);
 		}
 	}
 	public function isOrdered($ov){
@@ -239,6 +237,8 @@ class Mikado{
 		return $array['Message'];
 	}
 	public function deleteFromOrder($ov){
+		$res = OrderValue::get($ov);
+		$ov = $res->fetch_assoc();
 		$array = $this->db->select_one('mikado_basket', '*', Armtek::getWhere($ov));
 		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Delete',
@@ -251,10 +251,8 @@ class Mikado{
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
 		$this->db->delete('mikado_basket', Armtek::getWhere($ov));
-		$this->db->update(
-			'orders_values',
-			['status_id' => 5, 'ordered' => 0],
-			Armtek::getWhere($ov)
-		);
+
+		OrderValue::update(['status_id' => 5, 'ordered' => 0], $ov);
+		User::updateReservedFunds($ov['user_id'], $ov['price'], 'minus');
 	}
 }

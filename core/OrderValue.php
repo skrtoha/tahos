@@ -4,10 +4,10 @@ class OrderValue{
 
 	/**
 	 * changes status
-	 * @param  [integer] $status_id 1, 2, 3, 10, 11
+	 * @param  [integer] $status_id 1, 2, 3, 6, 10, 11
 	 * @param  [array] $params 
 	 *         order_id, store_id, item_id - required for all statuses
-	 *         status = 2|3|10|11  - price, quan, user_id
+	 *         status = 2|3|8|10|11  - price, quan, user_id
 	 * @return [boolean] true if changed successfully
 	 */
 	public function changeStatus($status_id, $params){
@@ -19,7 +19,7 @@ class OrderValue{
 				$ov = $GLOBALS['db']->select_one('orders_values', '*', Armtek::getWhere($params));
 				$quan = $ov['arrived'] - $ov['issued'];
 				$values['issued'] = "`issued` + $quan";
-				$this->updateOrderValue($values, $params);
+				self::update($values, $params);
 				$user = User::get($ov['user_id']);
 				$title = $this->getTitleComment($params['item_id']);
 				Fund::insert(2, [
@@ -42,7 +42,7 @@ class OrderValue{
 				$ov = $GLOBALS['db']->select_one('orders_values', '*', Armtek::getWhere($params));
 				if ($ov['returned'] + $params['quan'] < $ov['issued']) $values['status_id'] = 1;
 				$values['returned'] = "`returned` + {$params['quan']}";
-				$this->updateOrderValue($values, $params);
+				self::update($values, $params);
 				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
 				$user = User::get($params['user_id']);
 				$title = $this->getTitleComment($params['item_id']);
@@ -60,22 +60,27 @@ class OrderValue{
 			//пришло
 			case 3:
 				$values['arrived'] = $params['quan'];
-				$this->updateOrderValue($values, $params);
+				self::update($values, $params);
 				break;
 			//отменен
 			case 10:
-				$this->updateOrderValue($values, $params);
+				self::update($values, $params);
 				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'minus');
 				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
 			//заказано
 			case 11:
 				$values['ordered'] = "`ordered` + {$params['quan']}";
-				$this->updateOrderValue($values, $params);
+				self::update($values, $params);
 				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price']);
 				$this->changeInStockStoreItem($params['quan'], $params);
 				break;
+			//отменен
+			case 8:
+				User::updateReservedFunds($params['user_id'], $params['price'], 'minus');
+				self::update($values, $params);
+				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
 			default:
-				$this->updateOrderValue($values, $params);
+				self::update($values, $params);
 		}
 	}
 
@@ -118,7 +123,7 @@ class OrderValue{
 	 * @param  [type] $params for condition (order_id, store_id, item_id)
 	 * @return [boolean] true if updated successfully else error of update
 	 */
-	private function updateOrderValue($values, $params){
+	public static function update($values, $params){
 		return $GLOBALS['db']->update('orders_values', $values, Armtek::getWhere([
 			'order_id' => $params['order_id'],
 			'store_id' => $params['store_id'],
@@ -147,7 +152,7 @@ class OrderValue{
 	 * @param  [array] $params article, brend - is required, provider_id, status_id - optional
 	 * @return [array]  row from orders_values
 	 */
-	public static function getOrderValueByBrendAndArticle($params){
+	public static function getByBrendAndArticle($params){
 		$article = article_clear($params['article']);
 		$where = '';
 		if (isset($params['provider_id'])) {
@@ -173,6 +178,52 @@ class OrderValue{
 		";
 		$res = $GLOBALS['db']->query($query, '');
 		return $res->fetch_assoc();
+	}
 
+	/**
+	 * gets common information of order value
+	 * @param  array  $fields user_id|status_id
+	 * @return object mysqli object
+	 */
+	public static function get($fields = array()){
+		$where = '';
+		if (isset($fields['user_id'])) $where .= "o.user_id = {$fields['user_id']} AND ";
+		if (isset($fields['status_id'])) $where .= "ov.status_id = {$fields['status_id']} AND ";
+		if (isset($fields['order_id'])) $where .= "ov.order_id = {$fields['order_id']} AND ";
+		if (isset($fields['store_id'])) $where .= "ov.store_id = {$fields['store_id']} AND ";
+		if (isset($fields['item_id'])) $where .= "ov.item_id = {$fields['item_id']} AND ";
+		if ($where){
+			$where = substr($where, 0, -4);
+			$where = "WHERE $where";
+		}
+		$query = "
+			SELECT
+				ps.cipher,
+				b.title AS brend,
+				i.article,
+				i.id AS item_id,
+				IF (i.title_full<>'', i.title_full, i.title) AS title_full,
+				ov.user_id,
+				ov.issued,
+				ov.price,
+				ov.ordered,
+				ov.arrived,
+				ov.comment,
+				ov.store_id,
+				o.id AS order_id,
+				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') as created,
+				os.title AS status,
+				os.class AS class
+			FROM
+				#orders_values ov
+			LEFT JOIN #orders o ON o.id=ov.order_id
+			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
+			LEFT JOIN #items i ON i.id=ov.item_id
+			LEFT JOIN #brends b ON i.brend_id=b.id
+			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
+			$where
+			ORDER BY o.created DESC
+		";
+		return $GLOBALS['db']->query($query, '');
 	}
 }

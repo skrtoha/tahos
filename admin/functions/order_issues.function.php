@@ -5,41 +5,6 @@ class Issues{
 		if ($user_id) $this->user_id = $user_id;
 		$this->db = $db;
 	}
-	function getUser(){
-		return $this->db->select_one('users', ['name_1', 'name_2', 'name_3', 'reserved_funds', 'bill'], "`id`=$this->user_id");
-	}
-	function getOrderValues(){
-		$query = "
-			SELECT
-				ps.cipher,
-				b.title AS brend,
-				i.article,
-				i.id AS item_id,
-				IF (i.title_full<>'', i.title_full, i.title) AS title_full,
-				ov.issued,
-				ov.price,
-				ov.ordered,
-				ov.arrived,
-				ov.comment,
-				ov.store_id,
-				o.id AS order_id,
-				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') as created,
-				os.title AS status,
-				os.class AS class
-			FROM
-				#orders_values ov
-			LEFT JOIN #orders o ON o.id=ov.order_id
-			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
-			LEFT JOIN #items i ON i.id=ov.item_id
-			LEFT JOIN #brends b ON i.brend_id=b.id
-			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
-			WHERE
-				o.user_id=$this->user_id AND
-				ov.status_id=3
-			ORDER BY o.created DESC
-		";
-		return $this->db->query($query, '');
-	}
 	protected function getTitleForFund($item_id){
 		$item = $this->db->select_unique("
 			SELECT

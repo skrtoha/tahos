@@ -54,6 +54,7 @@ if($_GET['act'] == 'unbind'){
 $path = "templates/$view.php";
 
 $user = core\User::get();
+$basket = get_basket();
 if (file_exists($path)){
 	ob_start();
 	require_once($path);

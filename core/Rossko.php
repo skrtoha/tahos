@@ -270,28 +270,15 @@ class Rossko{
 				Armtek::getComparableString($itemResponse->brand) == Armtek::getComparableString($value['brand'])
 			){
 				$array = explode('-', $value['osi']);
-				$this->db->update(
-					'orders_values',
-					['status_id' => 11, 'ordered' => $value['count']],
-					$this->armtek->getWhere([
-						'order_id' => $array[0],
-						'store_id' => $array[1],
-						'item_id' => $array[2]
-					])
-				);
-				$this->db->query("
-					UPDATE
-						#users
-					SET
-						`reserved_funds`=`reserved_funds` + {$value['price']} * {$value['count']}
-					WHERE
-						`id`={$value['user_id']}
-				", '');
-				$this->db->update(
-					'store_items',
-					['in_stock' => $value['count']],
-					"`store_id`={$array[1]} AND `item_id`={$array[2]}"
-				);
+				$orderValue = new OrderValue();
+				$orderValue->changeStatus(11, [
+					'order_id' => $array[0],
+					'store_id' => $array[1],
+					'item_id' => $array[2],
+					'price' => $value['price'],
+					'quan' => $value['count'],
+					'user_id' => $value['user_id']
+				]);
 				$this->db->update(
 					'other_orders',
 					['response' => 'OK'],
@@ -302,7 +289,6 @@ class Rossko{
 					])
 				);
 			}
-			echo "<hr>";
 		}
 	}
 	private function parseItemErrorList($itemResponse, $itemsParts){

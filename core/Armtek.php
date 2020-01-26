@@ -426,24 +426,9 @@ class Armtek{
 						echo("<br>В заказе №{$item['order_id']}: {$value->BRAND} - {$value->PIN} на хватило остатка {$value->REMAIN}");
 						$this->db->update('other_orders', ['response' => "Не хватило остатка $value->REMAIN"], self::getWhere($arrayQuery)); 
 					} 
-					$this->db->update(
-						'orders_values',
-						['status_id' => 11, 'ordered' => $value->RESULT[0]->KWMENG],
-						self::getWhere($arrayQuery)
-					);
-					$this->db->update(
-						'store_items',
-						['in_stock' => $value->RESULT[0]->KWMENG],
-						"`store_id`={$item['store_id']} AND `item_id`={$item['item_id']}"
-					);
-					$this->db->query("
-						UPDATE
-							#users
-						SET
-							`reserved_funds`=`reserved_funds` + {$item['price']} * {$value->RESULT[0]->KWMENG}
-						WHERE
-							`id`={$item['user_id']}
-					", '');
+					$orderValue = new OrderValue();
+					$item['quan'] = $value->RESULT[0]->KWMENG;
+					$orderValue->changeStatus(11, $item);
 					$this->db->update('other_orders', ['response' => 'OK'], self::getWhere($arrayQuery)); 
 				}
 			}

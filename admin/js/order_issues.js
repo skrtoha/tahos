@@ -14,23 +14,23 @@
 			if ($('#common_list').size()) this.common_list();
 			if ($('#user_issue_values').size()) this.user_issue_values();
 			
-			// $('#user_order_issues input[type=checkbox]').on('change', function(){
-			// 	var th = $(this);
-			// 	if (th.attr('name') == 'all') return oi.checkAll(th);
-			// 	if (th.is(':checked')){
-			// 		if (th.val() > 1){
-			// 			var new_value = prompt('Введите значение для выдачи', th.val());
-			// 			if (new_value === null){
-			// 				th.prop('checked', false);
-			// 				return false;
-			// 			}
-			// 			th.val(new_value);
-			// 		}
-			// 	}
-			// 	else{
-			// 		th.val(th.prev().val());
-			// 	} 
-			// })
+			$('#user_order_issues input[type=checkbox]').on('change', function(){
+				var th = $(this);
+				if (th.attr('name') == 'all') return oi.checkAll(th);
+				// if (th.is(':checked')){
+				// 	if (th.val() > 1){
+				// 		var new_value = prompt('Введите значение для выдачи', th.val());
+				// 		if (new_value === null){
+				// 			th.prop('checked', false);
+				// 			return false;
+				// 		}
+				// 		th.val(new_value);
+				// 	}
+				// }
+				// else{
+				// 	th.val(th.prev().val());
+				// } 
+			})
 			$(document).on('click', 'tr[issue_id]', function(){
 				document.location.href = '/admin/?view=order_issues&issue_id=' + $(this).attr('issue_id') + 
 					'&page=' + oi.paginationContainer.pagination('getSelectedPageNum');

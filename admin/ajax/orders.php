@@ -12,9 +12,6 @@ $where = "
 ";
 $user = $db->select_one('users', 'id,bonus_program,bonus_count', "`id`={$_POST['user_id']}");
 $settings = $db->select_one('settings', '*', '`id`=1');
-// print_r($settings);
-// print_r($_POST);
-// exit();
 
 $post = $_POST;
 $orderValue = new core\OrderValue($db);
@@ -33,40 +30,11 @@ switch($_POST['status_id']){
 		$orderValue->changeStatus(3, $post);
 		break;
 	case 6://нет в наличии
-		$db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`status_id`= 6
-			WHERE $where
-		", '');
-		$db->delete('store_items', "store_id = {$_POST['store_id']} AND item_id = {$_POST['item_id']}");
+		$orderValue->changeStatus(6, $post);
 		break;
 	case 8://отменен
-		$db->query("
-			UPDATE
-				#users
-			SET
-				`reserved_funds`=`reserved_funds` - {$_POST['price']} * {$_POST['ordered']}
-			WHERE
-				`id`={$_POST['user_id']}
-		", '');
-		$db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`status_id`= 8
-			WHERE $where
-		", '');
-		$db->query("
-			UPDATE
-				#store_items 
-			SET
-				in_stock = in_stock + {$_POST['ordered']}
-			WHERE
-				store_id = {$_POST['store_id']} AND
-				item_id = {$_POST['item_id']}
-		", '');
+		$post['quan'] = $_POST['ordered'];
+		$orderValue->changeStatus(8, $post);
 		break;
 	case 11://заказано
 		$post['quan'] = $_POST['ordered'];

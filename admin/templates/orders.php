@@ -68,7 +68,7 @@ switch ($act) {
 			}
 			if (!$isRendered) $db->update('orders_values', ['status_id' => 7], "`order_id`={$_GET['id']} AND `status_id` = 5");
 		}
-		// header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
+		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
 		$order = get_order('');

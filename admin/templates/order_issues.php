@@ -10,9 +10,9 @@ $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
 	// print_r($_SERVER);
 	if (!empty($_POST['income'])) $issues->setIncome();
-	$user = $issues->getUser();
+	$user = core\User::get($issues->user_id);
 	$page_title = "Выдача товара";
-	$res_orders_values = $issues->getOrderValues();
+	$res_orders_values = core\OrderValue::get(['user_id' => $issues->user_id, 'status_id' => 3]);
 	$status .= "
 		<a href='?view=users'>Пользователи</a> >
 		<a href='?view=users&act=change&id={$_GET['user_id']}'>

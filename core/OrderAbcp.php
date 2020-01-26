@@ -9,7 +9,7 @@ class OrderAbcp extends Abcp{
 	}
 	public function addToBasket($params){
 		// debug($params); exit();
-		$res = parent::getPostData(
+		$res = parent::getUrlData(
 			"{$this->param['url']}/basket/add",
 			[
 				'userlogin' => $this->param['userlogin'],
@@ -112,31 +112,29 @@ class OrderAbcp extends Abcp{
 		return $res[1]['date'];
 	}
 	public function basketOrder(){
-		// $shipmentDate = $this->getShipmentDate();
-		// $res = parent::getUrlData(
-		// 	"{$this->param['url']}/basket/order",
-		// 	[
-		// 		'userlogin' => $this->param['userlogin'],
-		// 		'userpsw' => md5($this->param['userpsw']),
-		// 		'paymentMethod' => $this->param['paymentMethod'],
-		// 		'shipmentAddress' => $this->param['shipmentAddress'],
-		// 		'shipmentOffice' => isset($this->param['shipmentOffice']) ? $this->param['shipmentOffice'] : '',
-		// 		'shipmentMethod' => isset($this->param['shipmentMethod']) ? $this->param['shipmentMethod'] : '',
-		// 		'shipmentDate' => $shipmentDate
-		// 	]
-		// );
-		$res = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/core/test.rossko.txt');
+		$shipmentDate = $this->getShipmentDate();
+		$res = parent::getUrlData(
+			"{$this->param['url']}/basket/order",
+			[
+				'userlogin' => $this->param['userlogin'],
+				'userpsw' => md5($this->param['userpsw']),
+				'paymentMethod' => $this->param['paymentMethod'],
+				'shipmentAddress' => $this->param['shipmentAddress'],
+				'shipmentOffice' => isset($this->param['shipmentOffice']) ? $this->param['shipmentOffice'] : '',
+				'shipmentMethod' => isset($this->param['shipmentMethod']) ? $this->param['shipmentMethod'] : '',
+				'shipmentDate' => $shipmentDate
+			]
+		);
+		// $res = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/core/test.rossko.txt');
 
 		if (!$res) die("Ошибка отправления заказка");
 		$array = json_decode($res, true);
 
-		debug($array); exit();
-
 		foreach($array['orders'] as $key => $order){
 			$orderValue = new OrderValue();
 			foreach($order['positions'] as $pos){
-				$ov = OrderValue::getOrderValueByBrendAndArticle([
-					'brend' => $pos['brend'],
+				$ov = OrderValue::getByBrendAndArticle([
+					'brend' => $pos['brand'],
 					'article' => $pos['numberFix'],
 					'provider_id' => $this->param['provider_id'],
 					'status_id' => 7

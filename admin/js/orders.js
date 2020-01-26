@@ -292,7 +292,8 @@ $(function(){
 				break;
 			case 11:
 				var quan = + th.find('input[name=quan]').val();
-				var ordered = prompt('Укажите количество:', quan);
+				if (quan > 1) var ordered = prompt('Укажите количество:', quan);
+				else ordered = quan;
 				if (!check_value(th, ordered, quan)) return false;
 				data += '&ordered=' + ordered;
 				break;

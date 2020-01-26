@@ -302,11 +302,8 @@ class Armtek{
 			],
 			['print_query' => false]
 		);
-		$this->db->update(
-			'orders_values',
-			['status_id' => 7],
-			self::getWhere($value)
-		);
+		$orderValue = new OrderValue();
+		$orderValue->changeStatus(7, $value);
 	}
 	private function getKeyzakByStoreId($store_id){
 		if ($temp = array_search($store_id, $this->keyzak)) return $temp;
@@ -328,11 +325,7 @@ class Armtek{
 	public function deleteFromOrder($value, $type = 'armtek'){
 		$where = self::getWhere($value);
 		$this->db->delete('other_orders', "$where AND `type`='$type'");
-		$this->db->update(
-			'orders_values',
-			['status_id' => 5],
-			$where
-		);
+		OrderValue::changeStatus(5, $value);
 	}
 	public function getItems($type = 'armtek'){
 		$items = array();

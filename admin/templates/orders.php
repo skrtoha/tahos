@@ -16,7 +16,7 @@ switch ($act) {
 		$res_order_values = get_order_values('');
 		while($ov = $res_order_values->fetch_assoc()){
 			if (!in_array($ov['status_id'], [5])) continue;
-			debug($ov); //continue;
+			//debug($ov); //continue;
 			$isRendered = false;
 			if ($ov['provider_id'] == 15){
 				$armtek->toOrder([

@@ -28,32 +28,14 @@ class OrderAbcp extends Abcp{
 		$array = json_decode($res, true);
 		if ($array['positions'][0]['errorMessage']) die ("Произошла ошибка: {$array['positions'][0]['errorMessage']} <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>");
 		$status_id = $params['quantity'] ? 7 : 5;
-		$this->db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`status_id`= $status_id,
-				`ordered` = {$params['quantity']}
-			WHERE 
-				`order_id`={$params['order_id']} AND
-				`store_id`={$params['store_id']} AND
-				`item_id`={$params['item_id']}
-		", '');
-		$act = $params['quantity'] ? '+' : '-';
-		$this->db->query("
-			UPDATE
-				#users
-			SET
-				`reserved_funds`=`reserved_funds` $act {$params['price']} * {$params['quantity']}
-			WHERE
-				`id`={$params['user_id']}
-		", '');
+		$orderValue = new OrderValue();
+		$orderValue->changeStatus($status_id, $params);
 	}
 	public function getItemInfoByArticleAndBrend($array){
 		$article = Armtek::getComparableString($array['article']);
 		$distributorId = str_replace($this->param['title'].'-', '', $array['providerStore']);
 		$url =  "{$this->param['url']}/search/articles/?userlogin={$this->param['userlogin']}&userpsw=".md5($this->param['userpsw'])."&useOnlineStocks=1&number={$article}&brand={$array['brend']}";
-		$response = file_get_contents($url);
+		$response = self::getUrlData($url);
 		$items = json_decode($response, true);
 		// debug($items); exit();
 		if (empty($items)) return false;

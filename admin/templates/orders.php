@@ -416,6 +416,7 @@ function show_form($act){
 							<?}
 						}
 						$basketFavoriteParts = core\FavoriteParts::isInBasket($ov);
+						// debug($basketFavoriteParts, 'basketFavoriteParts');
 						if (!empty($basketFavoriteParts)){?>
 							<br><a href="?view=orders&act=deleteFromFavoriteAuto&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>&goodsID=<?=$basketFavoriteParts['goodsID']?>&warehouseGroup=<?=$basketFavoriteParts['warehouseGroup']?>&quan=0">Удалить из Фаворит</a>
 						<?}?>

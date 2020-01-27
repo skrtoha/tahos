@@ -286,24 +286,18 @@ class Abcp{
 	 * @param  [array] $data if is null then method is get 
 	 * @return [string] response from server
 	 */
-	public static function getUrlData($url, $data = array()){
-		$context = null;
-		if (empty($data)){
-			$context = stream_context_create([
-				'ssl' => [
-					'verify_peer' => false
-				]
-			]);
-		}
+	public static function getUrlData($url, $data = array(), $header = null){
+		$context = array();
+		if ($header) $array['http']['header'] = $header;
+		if (empty($data)) $array['ssl']['verify_peer'] = false;
 		else{
-			$context = stream_context_create([
-				'http' => [
-					'method' => 'POST',
-					'content' => http_build_query($data)
-				]
-			]);
+			$array['http']['method'] = 'POST';
+			$array['http']['content'] = http_build_query($data);
 		}
-		return file_get_contents($url, false, $context);
+		$context = stream_context_create($array);
+		$res = file_get_contents($url, false, $context);
+		$GLOBALS['response_header'] = $http_response_header;
+		return $res;
 	}
 	/**
 	 * outdated, use getUrlData
@@ -311,8 +305,9 @@ class Abcp{
 	 * @param  array  $data [description]
 	 * @return [type]       [description]
 	 */
-	public static function getPostData($url, $data = array()){
+	public static function getPostData($url, $data = array(), $header = null){
 		$context = null;
+		debug($data);
 		if (empty($data)){
 			$context = stream_context_create([
 				'ssl' => [

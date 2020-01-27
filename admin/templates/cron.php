@@ -74,6 +74,11 @@ switch($_GET['act']){
 		$mparts = new core\OrderAbcp($db, 13);
 		$res = $mparts->basketOrder();
 		break;
+	case 'toOrderFavoriteParts':
+		echo "<h2>Отправка заказа</h2>";
+		core\FavoriteParts::toOrder();
+		// debug($GLOBALS['response_header']);
+		break;
 	case 'getItemsVoshod':
 		$abcp = new core\Abcp(NULL, $db);
 		

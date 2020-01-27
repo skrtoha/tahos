@@ -75,13 +75,13 @@ switch($_GET['act']){
 		$res = $mparts->basketOrder();
 		break;
 	case 'toOrderFavoriteParts':
-		echo "<h2>Отправка заказа</h2>";
-		core\FavoriteParts::toOrder();
-		// debug($GLOBALS['response_header']);
+		echo "<h2>Отправка заказа Фаворит</h2>";
+		$res = core\FavoriteParts::toOrder();
+		if ($res === false) echo "<p>Нет товаров для отправки</p>";
+		else echo "<p>$res</p>";
 		break;
 	case 'getItemsVoshod':
 		$abcp = new core\Abcp(NULL, $db);
-		
 		$countTransaction = 50;
 		$seconds = 21600;
 		// $seconds = 20;

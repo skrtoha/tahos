@@ -127,9 +127,13 @@ class FavoriteParts{
 	}
 	/**
 	 * sends goods in favorite basket to order
+	 * @return mixed false - no goods for order, true - successfully sent, string - error
 	 */
 	public static function toOrder(){
 		$basket = self::getBasket();
+		$GoodsList = self::getGoodsForBasket($basket);
+		if (empty($GoodsList)) return false;
+		$user = self::getUser();
 		$array = [
 			'WarehouseShipping' => self::getWarehouseShipping($basket),
 			'ShippingDate' => self::getShippingDate($basket['cart']),
@@ -138,7 +142,7 @@ class FavoriteParts{
 			'DeliveryType' => $user['deliveryType'],
 			'TransportType' => $user['transportType'],
 			'Comment' => '',
-			'GoodsList' => self::getGoodsForBasket($basket)
+			'GoodsList' => $GoodsList 
 		];
 		$curl = curl_init('http://api.favorit-parts.ru/ws/v1/order/');
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -152,6 +156,7 @@ class FavoriteParts{
 		$result = curl_exec($curl);
 		curl_close($curl);
 		self::setStatusOrdered();
+		if (gettype($result) == 'string') return $result;
 	}
 	/**
 	 * sets status "ordered" after successfully sended order favorite parts

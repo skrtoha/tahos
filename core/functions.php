@@ -568,16 +568,16 @@ function get_basket(){
 		SELECT 
 			b.*,
 			IF (
-					i.article_cat != '', 
-					i.article_cat, 
-					IF (
-						i.article !='',
-						i.article,
-						i.barcode
-					)
+				i.article_cat != '', 
+				i.article_cat, 
+				IF (
+					i.article !='',
+					i.article,
+					i.barcode
+				)
 			) as article,
 			br.title as brend,
-			IF (i.title_full, i.title_full, i.title) as title
+			IF (i.title_full != '', i.title_full, i.title) as title
 			FROM
 				#basket b
 			JOIN #items i ON i.id=b.item_id

@@ -42,7 +42,8 @@ class FavoriteParts{
 	/**
 	 * adds item in basket
 	 * @param array $ov order value (order_id, store_id, item_id, quan)
-	 * @return boolean true if successfully added, false if faled
+	 			if quan = 0 then deletes from basket
+	 * @return boolean true if successfully added, false if failed
 	 */
 	public static function addToBasket($ov){
 		if ($ov['quan']) $item = self::getItem($ov['brend'], $ov['article']);

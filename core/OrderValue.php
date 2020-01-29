@@ -79,6 +79,15 @@ class OrderValue{
 				User::updateReservedFunds($params['user_id'], $params['price'], 'minus');
 				self::update($values, $params);
 				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
+			//отменен
+			case 5:
+				$values ['ordered'] = 0;
+				$values['arrived'] = 0;
+				$values['issued'] = 0;
+				$values['declined'] = 0;
+				$values['returned'] = 0;
+				self::update($values, $params);
+				break;
 			default:
 				self::update($values, $params);
 		}

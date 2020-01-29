@@ -87,6 +87,10 @@ class Armtek{
 	}
 	public function getBrendId($brand, $from = 'armtek'){
 		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
+		// $brend = Brend::get([
+		// 	'title' => $brand, 
+		// 	'provider_id' => $this->provider_id
+		// ], ['provider_id']); exit();
 		if (empty($brend)) {
 			$this->db->insert(
 				'log_diff',
@@ -106,6 +110,7 @@ class Armtek{
 	public function getItemId($object, $from = NULL){
 		if (!$from) $brend_id = $this->getBrendId($object->BRAND);
 		else $brend_id = $this->getBrendId($object->BRAND, $from);
+		var_dump($brend_id);
 		if (!$brend_id) return false;
 		$article = preg_replace('/[\W_]+/', '', $object->PIN);
 		$item = $this->db->select('items', 'id', "`article`='{$article}' AND `brend_id`= $brend_id");

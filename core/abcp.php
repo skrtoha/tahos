@@ -176,6 +176,10 @@ class Abcp{
 	}
 	public function getBrandId($provider_id, $brand){
 		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
+		$brend = Brend::get([
+			'title' => $brand,
+			'provider_id' => $provider_id
+		], ['provider_id']);
 		if (empty($brend)) {
 			$this->setLog($provider_id, 'warning', "Бренд $brand отсутствует в базе");
 			$this->db->insert(

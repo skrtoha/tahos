@@ -110,7 +110,6 @@ class Armtek{
 	public function getItemId($object, $from = NULL){
 		if (!$from) $brend_id = $this->getBrendId($object->BRAND);
 		else $brend_id = $this->getBrendId($object->BRAND, $from);
-		var_dump($brend_id);
 		if (!$brend_id) return false;
 		$article = preg_replace('/[\W_]+/', '', $object->PIN);
 		$item = $this->db->select('items', 'id', "`article`='{$article}' AND `brend_id`= $brend_id");
@@ -343,7 +342,8 @@ class Armtek{
 				ov.item_id,
 				ov.price,
 				i.article,
-				b.title AS brend,
+				IF(pb.provider_id IS NOT NULL, pb.title, b.title) AS brend,
+				pb.provider_id,
 				ov.quan AS count
 			FROM
 				#other_orders ao
@@ -355,6 +355,8 @@ class Armtek{
 				#items i ON i.id=ov.item_id
 			LEFT JOIN
 				#brends b ON b.id=i.brend_id
+			LEFT JOIN
+				#provider_brends pb ON pb.brend_id = b.id AND pb.provider_id = ps.provider_id
 			WHERE ao.type = '$type' && ao.response IS NULL
 		", '');
 		return $res_items;

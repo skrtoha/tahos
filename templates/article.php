@@ -1,6 +1,7 @@
 <?
 $abcp = new core\Abcp($_GET['item_id'], $db);
-$abcp->render([13]);
+// debug($abcp);
+$abcp->render([13]); 
 $abcp->render([6]);
 
 
@@ -14,8 +15,8 @@ $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 $favorite = new core\FavoriteParts($db);
 $favorite->getItem($abcp->item['brand'], $abcp->item['article']);
 
-// $rossko = new core\Rossko($db, "{$abcp->item['article']} {$abcp->item['brand']}");
-// $rossko->execute();
+$rossko = new core\Rossko($db, "{$abcp->item['article']} {$abcp->item['brand']}");
+$rossko->execute();
 
 $title = "Список предложений";
 

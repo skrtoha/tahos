@@ -2,14 +2,30 @@
 namespace core;
 class Brend{
 	private static $defaultFields = ['id', 'title', 'parent_id'];
-	public static function get($conditions = array(), $additionalFields = array()){
-		$fields = array_merge(self::$defaultFields, $additionalFields);
+	private static $additionalFields = array();
+	/**
+	 * gets brends by coditions
+	 * @param  array  $conditions 
+	 *         provider_id - adds table provider_brends and search through it
+	 * @param  array  $additionalFields fields that have to be added to output results
+	 * @param string for debugging (result, print)
+	 * @return mixed false in no results, else mysli object
+	 */
+	public static function get($conditions = array(), $additionalFields = array(), $flag = ''){
+		self::$additionalFields = $additionalFields;
+		if (isset($conditions['provider_id'])) self::$additionalFields[] = 'provider_id';
+		$fields = array_merge(self::$defaultFields, self::$additionalFields);
 		$where = '';
 		$joins = array();
 		if (!empty($conditions)){
 			foreach ($conditions as $field => $value){
 				switch($field){
-					case 'id': $where .= "b.id = {$value} AND "; break;
+					case 'id': 
+						if (isset($conditions['provider_id'])){
+							$where .= "(b.id = {$value} OR (pb.brend_id = $value AND pb.provider_id = {$conditions['provider_id']})) AND ";
+						}
+						else  $where .= "b.id = {$value} AND "; 
+					break;
 					case 'title': 
 						if (isset($conditions['provider_id'])) $where .= "(b.title = '$value' OR (pb.title = '$value' AND pb.provider_id = {$conditions['provider_id']})) AND ";
 						else $where .= "b.title = '$value' AND ";
@@ -24,28 +40,45 @@ class Brend{
 			$where = substr($where, 0, -4);
 			$where = "WHERE $where";
 		} 
-		$brendsList = $GLOBALS['db']->query("
+		$res = $GLOBALS['db']->query("
 			SELECT
 				".self::getFields($fields)."
 			FROM
 				#brends b
 			".implode(' ', $joins)."
 			$where
-		", '');
-		if (isset($additionalFields['provider_id'])){
-			foreach($brendsList as $value) {
-				if ($value['provider_id']) return $value;
-			}
-		}
-
+		", $flag);
+		if ($res->num_rows) return $res;
+		else return false;
 	}
-	private static function getFields($fields){
+	/**
+	 * gets brend_id
+	 * @param mixed $brendsList  array or mysqli_result
+	 * @return int brend_id
+	 */
+	public static function getBrendIdFromList($brendsList){
+		$brendFirst = array();
+		foreach($brendsList as $brend){
+			if (empty($brendFirst)) $brendFirst = $brend;
+			if ($brend['provider_id']) return $brend['id'];
+		}
+		foreach($brendsList as $brend){
+			if ($brend['parent_id']) return $brend['parent_id'];
+		}
+		return $brendFirst['id'];
+	}
+	/**
+	 * gets string of fields for additing to condition
+	 * @param  array  $fields array of fields
+	 * @return string output string
+	 */
+	private static function getFields(array $fields){
 		$output = '';
 		foreach($fields as $field){
 			switch($field){
 				case 'provider_id': $output .= "pb.provider_id,"; break;
 				case 'title':
-					if (in_array('provider_id', $fields)) $output .= "IF(pb.provider_id IS NOT NULL, pb.title, b.title) AS title,";
+					if (in_array('provider_id', self::$additionalFields)) $output .= "IF(pb.provider_id IS NOT NULL, pb.title, b.title) AS title,";
 					else $output .= "b.title,";
 					break;
 				default:

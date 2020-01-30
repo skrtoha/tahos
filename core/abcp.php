@@ -143,6 +143,7 @@ class Abcp{
 
 			$items = $this->getItems($provider_id);
 			if (!$items) continue;
+			
 			// debug($this->item);
 			// debug($items); exit();
 
@@ -175,7 +176,7 @@ class Abcp{
 		return self::$params[$store_id]['log']->$logLevel("$text");
 	}
 	public function getBrandId($provider_id, $brand){
-		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
+		// $brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
 		$brend = Brend::get([
 			'title' => $brand,
 			'provider_id' => $provider_id

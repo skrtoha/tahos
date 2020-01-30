@@ -5,7 +5,6 @@ $db = new DataBase();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
-
 switch($_POST['act']){
 	case 'get_store':
 		$store = $db->select_one('provider_stores', '*', "`id`={$_POST['store_id']}");
@@ -42,5 +41,23 @@ switch($_POST['act']){
 	case 'get_currencies':
 		$currencies = $db->select('currencies', 'id,title');
 		echo json_encode($currencies);
+		break;
+	case 'getAllProviders':
+		echo json_encode(core\Provider::get());
+		break;
+	case 'setProviderBrend':
+		$res = $db->insert(
+			'provider_brends',
+			[
+				'brend_id' => $_POST['brend_id'],
+				'provider_id' => $_POST['data'][0]['value'],
+				'title' => $_POST['data'][1]['value']
+			],
+		'');
+		if ($res !== false) echo "$res";
+		else echo true;
+		break;
+	case 'providerBrendDelete':
+		$db->delete('provider_brends', "`brend_id`={$_POST['brend_id']} AND `provider_id`= {$_POST['provider_id']}");
 		break;
 }

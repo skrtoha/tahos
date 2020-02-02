@@ -57,6 +57,22 @@ switch ($act) {
 	case 'funds': funds(); break;
 	case 'user_order_add': user_order_add(); break;
 	case 'form_operations': form_operations('add'); break;
+	case 'checkOrderedWithReserved':
+		$res = $db->query("
+			SELECT
+				SUM(ov.price * ov.quan) AS sum
+			FROM
+				#orders_values ov
+			WHERE
+				ov.user_id = {$_GET['user_id']} AND ov.status_id = 11
+		", '');
+		$array = $res->fetch_assoc();
+		if (core\User::update($_GET['user_id'], ['reserved_funds' => $array['sum']]) === true){
+			message("В варезервировано установлено {$array['sum']}");
+			header("Location: /admin/?view=users&act=change&id={$array['sum']}");
+		}
+		else die("Произошла ошибка");
+		break;
 	case 'delete':
 		if ($db->delete('users', "`id`=".$_GET['id'])){
 			message('Пользователь успешно удален!');
@@ -166,6 +182,7 @@ function show_form($act){
 		<a href="?view=correspond&user_id=<?=$id?>">Написать сообщение</a>
 		<a href="?view=order_issues&user_id=<?=$id?>">На выдачу</a>
 		<a href="?view=order_issues&user_id=<?=$id?>&issued=1">Выданные</a>
+		<a href="?view=users&act=checkOrderedWithReserved&user_id=<?=$id?>">Сверить "заказано"</a>
 		<a href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
 		<div style="width: 100%; height: 10px"></div>
 	<?}?>

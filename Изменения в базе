@@ -21,3 +21,5 @@ ALTER TABLE `tahos_provider_brends`
   ALTER TABLE `tahos_provider_brends`
   ADD CONSTRAINT `tahos_provider_brends_ibfk_1` FOREIGN KEY (`brend_id`) REFERENCES `tahos_brends` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `tahos_provider_brends_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `tahos_providers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `tahos_items` ADD `isBlocked` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `source`;

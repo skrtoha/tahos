@@ -66,7 +66,8 @@ switch ($act) {
 			WHERE
 				ov.user_id = {$_GET['user_id']} AND ov.status_id = 11
 		", '');
-		$array = $res->fetch_assoc();
+		if ($res->nom_rows) $array = $res->fetch_assoc();
+		else $array['sum'] = 0;
 		if (core\User::update($_GET['user_id'], ['reserved_funds' => $array['sum']]) === true){
 			message("В варезервировано установлено {$array['sum']}");
 			header("Location: /admin/?view=users&act=change&id={$array['sum']}");

@@ -191,13 +191,6 @@ class Rossko{
 		$items = array();
 		while ($item = $res_items->fetch_assoc()){
 			if ($store_id && $item['store_id'] != $store_id) continue;
-			// $result = $query->GetSearch([
-			// 	'KEY1' => $this->param['KEY1'],
-			// 	'KEY2' => $this->param['KEY2'],
-			// 	'TEXT' => "{$item['article']} {$item['brend']}"
-			// ]);
-			// debug($result);
-			// $part = & $result->SearchResult->PartsList->Part;
 			$items[] = [
 				// 'partnumber' => is_array($part) ? $part[0]->partnumber : $part->partnumber,
 				// 'brand' => is_array($part) ? $part[0]->brand : $part->brand,

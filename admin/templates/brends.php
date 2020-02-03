@@ -362,6 +362,34 @@ function show_form($act){
 					</div>
 					<?}?>
 				</div>
+				<?if ($id){?>
+					<div class="field">
+						<div class="title">Поставщики</div>
+						<div class="value subbrends">
+							<a href="#" id="addProviderBrend">Добавить</a>
+							<?$providerBrends = $db->query("
+								SELECT
+									pb.provider_id,
+									p.title AS provider,
+									pb.title
+								FROM
+									#provider_brends pb
+								LEFT JOIN
+									#providers p ON p.id = pb.provider_id
+								WHERE
+									 pb.brend_id = {$_GET['id']}
+							", '');
+							if ($providerBrends->num_rows){
+								foreach($providerBrends as $value){?>
+									<span class="subbrend" provider_id=<?=$value['provider_id']?>>
+										<b><?=$value['provider']?>:</b> <?=$value['title']?>
+										<span class="providerBrendDelete"></span>
+									</span>
+								<?}
+							}?>
+						</div>
+					</div>
+				<?}?>
 				<div class="field">
 					<div class="title">Сайт</div>
 					<div class="value"><input type=text name="site" value="<?=$brend['site']?>"></div>

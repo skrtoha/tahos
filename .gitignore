@@ -1,3 +1,7 @@
 images/
 tmp/
-admin/logs
+admin/logs/
+phpAdmin/
+*.jpg
+*.txt
+*.txt

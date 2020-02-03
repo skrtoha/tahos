@@ -87,6 +87,10 @@ class Armtek{
 	}
 	public function getBrendId($brand, $from = 'armtek'){
 		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
+		// $brend = Brend::get([
+		// 	'title' => $brand, 
+		// 	'provider_id' => $this->provider_id
+		// ], ['provider_id']); exit();
 		if (empty($brend)) {
 			$this->db->insert(
 				'log_diff',
@@ -338,7 +342,8 @@ class Armtek{
 				ov.item_id,
 				ov.price,
 				i.article,
-				b.title AS brend,
+				IF(pb.provider_id IS NOT NULL, pb.title, b.title) AS brend,
+				pb.provider_id,
 				ov.quan AS count
 			FROM
 				#other_orders ao
@@ -350,6 +355,8 @@ class Armtek{
 				#items i ON i.id=ov.item_id
 			LEFT JOIN
 				#brends b ON b.id=i.brend_id
+			LEFT JOIN
+				#provider_brends pb ON pb.brend_id = b.id AND pb.provider_id = ps.provider_id
 			WHERE ao.type = '$type' && ao.response IS NULL
 		", '');
 		return $res_items;

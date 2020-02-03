@@ -287,13 +287,18 @@ class DataBase {
 		}
 		return $data;
 	}
-	//return_query - return the query;
-	//print_query - print the query;
-	//deincrement_duplicate - reduces the autoincrement into 1 after failed query 
-	/*duplicate => [
-		'field' => 'value'
-	]*/
-	//ifNullSetDefault - if the string is empty then will be inserted the default value
+	/**
+	 * inserts row into database
+	 * @param  string $table_name table name
+	 * @param  array $new_values insert values
+	 * @param  array  $insert_params params
+	 		print - print the query;
+	 		deincrement_duplicate - reduces the autoincrement into 1 after failed query 
+	 		duplicate => [
+				'field' => 'value'
+			]
+	 * @return mixed true if query is successful, else error
+	 */
 	function insert($table_name, $new_values, $insert_params = array()){
 		$table_name = $this->db_prefix.$table_name;
 		$query = "INSERT INTO `$table_name` (";
@@ -309,7 +314,7 @@ class DataBase {
 		} 
 		$query = substr($query, 0, -1);
 		$query .= ")";
-		if (isset($insert_params['duplicate'])){
+		if ($insert_params == 'duplicate'){
 			$query .= " ON DUPLICATE KEY UPDATE ";
 			foreach($insert_params['duplicate'] as $key => $value){
 				$query .= "`$key` = ";
@@ -320,14 +325,14 @@ class DataBase {
 			} 
 			$query = substr($query, 0, -1);
 		}
-		if ($insert_params['print_query']){
+		if ($insert_params == 'print'){
 			echo "<pre>$query</pre>";
 			return false;
 		}
 		$this->last_query = $query;
-		if ($insert_params['return_query']) return $query;
+		if ($insert_params == 'print') return $query;
 		$res = $this->query($query, '');
-		if ($insert_params['deincrement_duplicate'] && $res === false){
+		if ($insert_params == 'deincrement_duplicate' && $res === false){
 			$error = $this->error();
 			$res_dd = $this->query("
 				SELECT auto_increment FROM information_schema.tables WHERE table_name='$table_name';

@@ -101,24 +101,26 @@ class Abcp{
 		} 
 	}
 	private function getItems($provider_id){
-		$brends = $this->db->select('brends', 'id,title', "`id`={$this->item['brend_id']} OR `parent_id`={$this->item['brend_id']}");
-		if (empty($brends)) return false;
-		foreach($brends as $value) $search[] = [
-			'number' => $this->item['article'],
-			'brand' => $value['title']
-		];
-		$res = static::getUrlData(
-			self::$params[$provider_id]['url'].'/search/batch',
-			[
-				'userlogin' => self::$params[$provider_id]['userlogin'],
-				'userpsw' => md5(self::$params[$provider_id]['userpsw']),
-				'search' => $search
-			]
-		);
-		$res = json_decode($res, true);
-		if (!self::$params[$provider_id]['getAnalogies']) return $res;
+		// $brends = $this->db->select('brends', 'id,title', "`id`={$this->item['brend_id']} OR `parent_id`={$this->item['brend_id']}");
+		// if (empty($brends)) return false;
+		// foreach($brends as $value) $search[] = [
+		// 	'number' => $this->item['article'],
+		// 	'brand' => $value['title']
+		// ];
+		// $res = static::getUrlData(
+		// 	self::$params[$provider_id]['url'].'/search/batch',
+		// 	[
+		// 		'userlogin' => self::$params[$provider_id]['userlogin'],
+		// 		'userpsw' => md5(self::$params[$provider_id]['userpsw']),
+		// 		'search' => $search
+		// 	]
+		// );
+		// $res = json_decode($res, true);
+		// if (!self::$params[$provider_id]['getAnalogies']) return $res;
+		$brends = Brend::get(['id' => $this->item['brend_id'], 'provider_id' => $provider_id]);
+		$brend = $brends->fetch_assoc();
 		$p = self::$params[$provider_id];
-		$res = file_get_contents("{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$res[0]['number']}&brand={$res[0]['brand']}");
+		$res = file_get_contents("{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$this->item['article']}&brand={$brend['title']}");
 		return json_decode($res, true);
 	}
 	public function getSearch($search){
@@ -143,6 +145,7 @@ class Abcp{
 
 			$items = $this->getItems($provider_id);
 			if (!$items) continue;
+			
 			// debug($this->item);
 			// debug($items); exit();
 
@@ -175,8 +178,12 @@ class Abcp{
 		return self::$params[$store_id]['log']->$logLevel("$text");
 	}
 	public function getBrandId($provider_id, $brand){
-		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
-		if (empty($brend)) {
+		// $brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
+		$brendsList = Brend::get([
+			'title' => $brand,
+			'provider_id' => $provider_id
+		], [], '');
+		if (!$brendsList->num_rows) {
 			$this->setLog($provider_id, 'warning', "Бренд $brand отсутствует в базе");
 			$this->db->insert(
 				'log_diff',
@@ -190,8 +197,7 @@ class Abcp{
 			);
 			return false;
 		}
-		if ($brend['parent_id']) return $brend['parent_id'];
-		else return $brend['id'];
+		return Brend::getBrendIdFromList($brendsList);
 	}
 	public static function isDuplicate($str){
 		if (preg_match('/Duplicate/', $str)) return true;
@@ -301,9 +307,6 @@ class Abcp{
 	}
 	/**
 	 * outdated, use getUrlData
-	 * @param  [type] $url  [description]
-	 * @param  array  $data [description]
-	 * @return [type]       [description]
 	 */
 	public static function getPostData($url, $data = array(), $header = null){
 		$context = null;

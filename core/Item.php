@@ -21,6 +21,6 @@ class Item{
 		$conditions = '';
 		foreach($where as $key => $value) $conditions .= "`{$key}` = '{$value}' AND ";
 		$conditions = substr($conditions, 0, -5);
-		return $GLOBALS['db']->update_query('items', $fields, $conditions);
+		return $GLOBALS['db']->update('items', $fields, $conditions);
 	}
 }

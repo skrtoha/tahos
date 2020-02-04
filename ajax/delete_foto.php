@@ -12,7 +12,7 @@ print_r($_POST);
 switch ($table) {
 	case 'items':
 		$foto = $db->getFieldOnID('items', $id, 'foto');
-		if ($db->update('items', array('foto' => ''), "`id` = $id") and unlink("../images/items/$id/$foto")) echo true;
+		if (core\Item::update(['foto' => ''], ['id' => $id]) and unlink("../images/items/$id/$foto")) echo true;
 		else echo false;
 		break;
 	case 'foto':

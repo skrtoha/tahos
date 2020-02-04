@@ -1,0 +1,23 @@
+CREATE TABLE `tahos_email_prices` (
+  `store_id` int(10) UNSIGNED NOT NULL,
+  `settings` json NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ALTER TABLE `tahos_email_prices`
+  ADD PRIMARY KEY (`store_id`);
+COMMIT;
+
+ALTER TABLE `tahos_order_issue_values` ADD `store_id` INT(10) UNSIGNED NOT NULL AFTER `order_id`;
+ALTER TABLE `tahos`.`tahos_order_issue_values` DROP PRIMARY KEY, ADD PRIMARY KEY (`issue_id`, `order_id`, `store_id`, `item_id`) USING BTREE;
+
+CREATE TABLE `tahos_provider_brends` (
+  `brend_id` int(10) UNSIGNED NOT NULL,
+  `provider_id` int(10) UNSIGNED NOT NULL,
+  `title` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `tahos_provider_brends`
+  ADD PRIMARY KEY (`brend_id`,`provider_id`),
+  ADD KEY `provider_id` (`provider_id`);
+  ALTER TABLE `tahos_provider_brends`
+  ADD CONSTRAINT `tahos_provider_brends_ibfk_1` FOREIGN KEY (`brend_id`) REFERENCES `tahos_brends` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tahos_provider_brends_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `tahos_providers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;

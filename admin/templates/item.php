@@ -1,6 +1,4 @@
 <?//error_reporting( E_ERROR );
-echo "{$_SERVER['REQUEST_URI']}"; echo '/admin/?view=item&id=';
-var_dump(strpos($_SERVER['REQUEST_URI'], '/admin/?view=item&id='));
 if ($_POST['item_image_submit']){
 	$item_id = $_POST['item_id'];
 	$image = set_image($_FILES['image'], $item_id);
@@ -22,6 +20,8 @@ if ($_POST['item_image_submit']){
 }
 $act = $_GET['act'];
 if ($_POST['form_submit']){
+	debug($_FILES);
+	debug($_POST);
 	foreach($_POST as $key => $value){
 		if ($key == 'form_submit') continue;
 		if ($key == 'is_stay') continue;
@@ -34,8 +34,7 @@ if ($_POST['form_submit']){
 	if (!$array['isBlocked']) $array['isBlocked'] = 0;
 	if (isset($_GET['id'])){
 		$db->delete('items_titles', "`item_id`={$_GET['id']}");
-		core\Item::update($array, ['id' => $_GET['id']]);
-		// $res = $db->update('items', $array, "`id`={$_GET['id']}");
+		$res = core\Item::update($array, ['id' => $_GET['id']]);
 		$last_id = $_GET['id'];
 	} 
 	else{
@@ -57,7 +56,6 @@ if ($_POST['form_submit']){
 		if (!empty($_FILES['foto'])){
 			$res_image = set_image($_FILES['foto'], $last_id);
 			core\Item::update(['foto' => $res_image['name']], ['id' => $last_id]);
-			// $db->update('items', ['foto' => $res_image['name']], "`id`=$last_id");
 		} 
 		if (!empty($_POST['translate'])){
 			$i = 0;
@@ -75,8 +73,8 @@ if ($_POST['form_submit']){
 			}
 		}
 		message('Успешно сохранено!');
-		// if ($_POST['is_stay']) header("Location: /admin/?view=item&id=$last_id");
-		// else header("Location: /admin/?view=items");
+		if ($_POST['is_stay']) header("Location: /admin/?view=item&id=$last_id");
+		else header("Location: /admin/?view=items");
 	}
 	else message($res, false);
 }
@@ -109,7 +107,7 @@ switch ($act) {
 		break;
 	case 'delete_foto':
 		$id = $_GET['id'];
-		$db->update('items', ['foto' => ''], "`id`=$id");
+		core\Item::update(['foto' => ''], ['id' => $id]);
 		unlink("../images/items/big/$id/{$_GET['title']}");
 		unlink("../images/items/small/$id/{$_GET['title']}");
 		message('Фото успешно удалено');

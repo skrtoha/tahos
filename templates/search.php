@@ -225,7 +225,8 @@ function get_items_impex(){
 					"`article`='{$item['part_no_raw']}' AND `brend_id`=$brend_id"
 				);
 				if ($array['title_full'] == 'Деталь') 
-					$db->update('items', ['title_full' => $title_full, 'title' => $title_full], "`id`={$array['id']}");
+					// $db->update('items', ['title_full' => $title_full, 'title' => $title_full], "`id`={$array['id']}");
+					core\Items::update(['title_full' => $title_full, 'title' => $title_full], ['id' => $array['id']]);
 				$item_last_id = $array['id'];
 				$articles[] = $item_last_id;
 			} 

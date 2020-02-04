@@ -95,8 +95,7 @@ if ($_POST['items_submit']){
 			} 
 		}
 		else{
-			$res_update = $db->update(
-				'items',
+			$res_update = core\Item::update(
 				[
 					'article_cat' => $value[2],
 					'barcode' => $value[3],
@@ -108,9 +107,7 @@ if ($_POST['items_submit']){
 					'characteristics' => $value[8],
 					'applicability' => $value[9]
 				],
-				"					
-					`brend_id`=$brend_id AND `article`='$article'
-				"
+				['brend_id' => $brend_id, 'article' => $article]
 			);
 			// echo ($db->last_query);
 			$rows_affected = $db->rows_affected();

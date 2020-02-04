@@ -8,7 +8,7 @@ class Config {
 
 	var $host = "127.0.0.1";
 	var $db = "tahos";
-	var $user = "root";
-	var $password = "";
+	var $user = "Anton";
+	var $password = "Anton10317";
 }
 ?>

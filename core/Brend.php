@@ -12,7 +12,7 @@ class Brend{
 	 * @return mixed false in no results, else mysli object
 	 */
 	public static function get($conditions = array(), $additionalFields = array(), $flag = ''){
-		self::$additionalFields = $additionalFields;
+		if ($additionalFields) self::$additionalFields = $additionalFields;
 		if (isset($conditions['provider_id'])) self::$additionalFields[] = 'provider_id';
 		$fields = array_merge(self::$defaultFields, self::$additionalFields);
 		$where = '';

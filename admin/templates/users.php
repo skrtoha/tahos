@@ -58,19 +58,20 @@ switch ($act) {
 	case 'user_order_add': user_order_add(); break;
 	case 'form_operations': form_operations('add'); break;
 	case 'checkOrderedWithReserved':
+		debug($_GET);
 		$res = $db->query("
 			SELECT
-				SUM(ov.price * ov.quan) AS sum
+				SUM(ov.price * ov.ordered) AS sum
 			FROM
 				#orders_values ov
 			WHERE
 				ov.user_id = {$_GET['user_id']} AND ov.status_id = 11
 		", '');
-		if ($res->nom_rows) $array = $res->fetch_assoc();
+		if ($res->num_rows) $array = $res->fetch_assoc();
 		else $array['sum'] = 0;
 		if (core\User::update($_GET['user_id'], ['reserved_funds' => $array['sum']]) === true){
 			message("В зарезервировано установлено {$array['sum']}");
-			header("Location: /admin/?view=users&act=change&id={$array['sum']}");
+			header("Location: /admin/?view=users&act=change&id={$_GET['user_id']}");
 		}
 		else die("Произошла ошибка");
 		break;

@@ -246,6 +246,8 @@ switch($_GET['act']){
 		$res = $zipArchive->open($filename);
 		$file = $zipArchive->getStream('Voshod.csv');
 
+		if (!$file) die("Ошибка скачивания файла Voshod.zip с почты.");
+
 		$db->delete('store_items', "`store_id`=8");
 		$i = 0;
 		while ($data = fgetcsv($file, 1000, "\n")) {
@@ -436,14 +438,6 @@ switch($_GET['act']){
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$zipArchive = new ZipArchive();
 
-		$db->query("
-			DELETE si FROM
-				#store_items si
-			LEFT JOIN
-				#provider_stores ps ON ps.id=si.store_id
-			WHERE 
-				ps.provider_id = $armtek->provider_id
-		", '');
 
 		foreach($fileNames as $fileName => $store_id){
 			$price = new core\Price($db, 'price_'.$ciphers[$store_id]);
@@ -451,7 +445,14 @@ switch($_GET['act']){
 			if (!$fileImap){
 				echo ("<br>Не удалось получить $fileName из почты.");
 				continue;
-			} 
+			}
+
+			$db->query("
+				DELETE si FROM
+					#store_items si
+				WHERE 
+					si.store_id = $store_id
+			", '');
 			
 			// $res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$fileName}.zip");
 			$res = $zipArchive->open($fileImap);
@@ -527,14 +528,6 @@ switch($_GET['act']){
 		echo "<h2>Прайс МПартс</h2>";
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 
-		$db->query("
-			DELETE si FROM
-				#store_items si
-			LEFT JOIN
-				#provider_stores ps ON ps.id=si.store_id
-			WHERE 
-				ps.provider_id = 13
-		", '');
 
 		$price = new core\Price($db, 'priceMparts');
 		// $price->isInsertBrend = true;
@@ -544,7 +537,16 @@ switch($_GET['act']){
 		if (!$fileImap){
 			echo ("<br>Не удалось получить MPartsPrice.xlsx из почты.");
 			break;
-		} 
+		}
+
+		$db->query("
+			DELETE si FROM
+				#store_items si
+			LEFT JOIN
+				#provider_stores ps ON ps.id=si.store_id
+			WHERE 
+				ps.provider_id = 13
+		", '');
 
 		$xls = PHPExcel_IOFactory::load($fileImap);
 		$xls->setActiveSheetIndex(0);
@@ -711,18 +713,6 @@ switch($_GET['act']){
 		
 		echo "<h2>Прайс {$emailPrice['title']}</h2>";
 
-		switch($emailPrice['clearPrice']){
-			case 'onlyStore': $db->delete('store_items', "`store_id`={$_GET['store_id']}"); break;
-			case 'provider': $db->query("
-				DELETE si FROM
-					#store_items si
-				LEFT JOIN
-					#provider_stores ps ON ps.id=si.store_id
-				WHERE 
-					ps.provider_id = {$store['provider_id']}
-			", '');
-			break;
-		}
 
 		$price = new core\Price($db, $emailPrice['title']);
 		if ($emailPrice['isAddItem']) $price->isInsertItem = true;
@@ -736,7 +726,20 @@ switch($_GET['act']){
 		if (!$fileImap){
 			echo ("<br>Не удалось получить {$emailPrice['name']} из почты.");
 			break;
-		} 
+		}
+		 
+		switch($emailPrice['clearPrice']){
+			case 'onlyStore': $db->delete('store_items', "`store_id`={$_GET['store_id']}"); break;
+			case 'provider': $db->query("
+				DELETE si FROM
+					#store_items si
+				LEFT JOIN
+					#provider_stores ps ON ps.id=si.store_id
+				WHERE 
+					ps.provider_id = {$store['provider_id']}
+			", '');
+			break;
+		}
 		
 		$fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
 

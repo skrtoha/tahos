@@ -314,7 +314,7 @@ class DataBase {
 		} 
 		$query = substr($query, 0, -1);
 		$query .= ")";
-		if ($insert_params == 'duplicate'){
+		if (isset($insert_params['duplicate'])){
 			$query .= " ON DUPLICATE KEY UPDATE ";
 			foreach($insert_params['duplicate'] as $key => $value){
 				$query .= "`$key` = ";
@@ -325,14 +325,14 @@ class DataBase {
 			} 
 			$query = substr($query, 0, -1);
 		}
-		if ($insert_params == 'print'){
+		if (isset($insert_params['print'])){
 			echo "<pre>$query</pre>";
 			return false;
 		}
 		$this->last_query = $query;
-		if ($insert_params == 'print') return $query;
+		if (isset($insert_params['get'])) return $query;
 		$res = $this->query($query, '');
-		if ($insert_params == 'deincrement_duplicate' && $res === false){
+		if (isset($insert_params['deincrement_duplicate']) && $res === false){
 			$error = $this->error();
 			$res_dd = $this->query("
 				SELECT auto_increment FROM information_schema.tables WHERE table_name='$table_name';

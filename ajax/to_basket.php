@@ -18,7 +18,7 @@ $db->insert(
 		'price' => $_POST['price'],
 	],
 	['duplicate' => [
-		'quan' => $_POST['quan']
+		'quan' => "{$_POST['quan']}"
 	]]
 );
 echo (json_encode(get_basket()));

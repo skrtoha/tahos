@@ -237,6 +237,7 @@ $(function(){
 		var th = $(this);
 		var status_id = + th.val();
 		if (status_id != 2) return false;
+		if (!confirm('Подтверждаете действие?')) return false;
 		var form = th.closest('form');
 		var issued = form.find('input[name=issued]').val();
 		var returned = form.find('input[name=returned]').val();
@@ -266,6 +267,9 @@ $(function(){
 		var status_id = + th.val();
 		//добавлено, т.к. обработка идет в другом месте
 		if (status_id == 2) return false;
+		if (status_id == 6 || status_id == 8){
+			if (!confirm('Вы подтверждаете действие?')) return false;
+		}
 		th = th.closest('form');
 		var order_id = + th.find('input[name=order_id]').val();
 		var store_id = + th.find('input[name=store_id]').val();

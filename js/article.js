@@ -231,6 +231,7 @@ function setNewValueCartIcon(){
 	return $('.cart').append('<span>' + summ + '</span>');
 }
 function setNewValueAjax(obj){
+	console.log(obj);
 	$.ajax({
 		type: "POST",
 		url: "/ajax/to_basket.php",

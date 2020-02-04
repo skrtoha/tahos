@@ -42,7 +42,8 @@ if (isset($_GET['brend_id'])){
 		$image['item_id'] = $array['id'];
 		$imagesList[] = $image;
 		if ($image['error']) continue;
-		$db->update('items', ['foto' => $res['name']], "`id`={$array['id']}");
+		// $db->update('items', ['foto' => $res['name']], "`id`={$array['id']}");
+		core\Item::update(['foto' => $res['name']], ['id' => $array['id']]);
 	};
 	echo json_encode($imagesList);
 }

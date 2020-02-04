@@ -76,9 +76,10 @@ function update_price_min(){
 			'provider_id' => $value['provider_id'],
 			'pi_id' => $value['pi_id']
 		];
-		$db->update('items', $array, "`id`=$key");
+		core\Item::update($array, ['id' => $key]);
+		// $db->update('items', $array, "`id`=$key");
 	}
-	$db->update('items', ['price' => 0], '`id` NOT IN ('.implode(',', $in_array).')');
+	// $db->update('items', ['price' => 0], '`id` NOT IN ('.implode(',', $in_array).')');
 	message('Успешно обновлено!');
 	// debug($currencies);
 

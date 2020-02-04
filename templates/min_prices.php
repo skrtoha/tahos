@@ -78,7 +78,8 @@ function update_price_min(){
 			'provider_id' => $value['provider_id'],
 			'pi_id' => $value['pi_id']
 		];
-		$db->update('items', $array, "`id`=$key");
+		// $db->update('items', $array, "`id`=$key");
+		core\Item::update($array, ['id' => $key]);
 	}
 	message('Успешно обновлено!');
 	// debug($currencies);

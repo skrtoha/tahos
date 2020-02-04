@@ -297,7 +297,8 @@ foreach($brend_paths as $brend_path){
 									$log->error("Ошибка обновления наименования Деталь у номенклатуры $article, $brend_name: $res | {$db->last_query}");
 								}
 							}
-							$res2 = $db->update('items', ['article_cat' => $r[2]], "`id`=$item_id");
+							// $res2 = $db->update('items', ['article_cat' => $r[2]], "`id`=$item_id");
+							$res2 = core\Item::update(['article_cat' => $r[2]], ['id' => $item_id]);
 							if ($res2 === true && $db->rows_affected() > 0){
 								$bl_affected_2 = true;
 								$log->info("Каталожный номер у {$item['article']}, $brend_name изменен с {$item['article_cat']} на {$r[2]}");

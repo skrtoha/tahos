@@ -2,3 +2,4 @@ images/
 tmp/
 admin/logs
 phpAdmin/
+*.config

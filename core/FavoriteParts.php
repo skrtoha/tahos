@@ -35,6 +35,7 @@ class FavoriteParts{
 		$response = Abcp::getUrlData(
 			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues='
 		);
+		$GLOBALS['response_header'];
 		$array = json_decode($response, true);
 		return $array['goods'][0];
 	}
@@ -51,7 +52,13 @@ class FavoriteParts{
 			'goodsID' => $ov['goodsID'],
 			'warehouseGroup' => $ov['warehouseGroup']
 		];
+		// debug($item); exit();
 		$warehouseGroup = self::getWarehouseGroup($ov, $item);
+		if (!$warehouseGroup){
+			debug($ov); 
+			debug($item);
+			die("Ошибка получения warehouseGroup");
+		}
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/add/";
 		$url .= "?key=".self::$key;
 		$url .= '&developerKey='.self::$developerKey;

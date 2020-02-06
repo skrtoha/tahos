@@ -294,8 +294,12 @@ class Abcp{
 	 */
 	public static function getUrlData($url, $data = array(), $header = null){
 		$context = array();
+		$url = str_replace(' ', '%20', $url);
 		if ($header) $array['http']['header'] = $header;
-		if (empty($data)) $array['ssl']['verify_peer'] = false;
+		if (empty($data)){
+			$array['ssl']['verify_peer'] = false;
+			$array['http']['method'] = 'GET';
+		} 
 		else{
 			$array['http']['method'] = 'POST';
 			$array['http']['content'] = http_build_query($data);

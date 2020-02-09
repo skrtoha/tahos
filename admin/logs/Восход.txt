@@ -1,0 +1,1 @@
+[16:41:05] [error] INSERT INTO `tahos_analogies` (`item_id`,`item_diff`) VALUES ('8732661','8727657') | 1

@@ -144,7 +144,7 @@ $res_bonuses = $db->query("
 							?>
 							<tr>
 								<td class="name-col"><?=stripslashes($fund['comment'])?></td>
-								<td><?=date('d.m.Y H:i', $fund['date'])?></td>
+								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 								<td>
 									<?$color = $fund['type_operation'] == 1 ? 'positive-color' : 'negative-color';
 									$minus_plus = $fund['type_operation'] == 1 ? '+' : '-';?>

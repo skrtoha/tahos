@@ -129,6 +129,10 @@ switch ($act) {
 	case 'substitutes_add': analogies_substitutes_add('substitutes'); break;
 	case 'substitutes_delete': analogies_substitutes_delete('substitutes'); break;
 	case 'analogies_delete': analogies_substitutes_delete('analogies'); break;
+	case 'clearAnalogies':
+		core\Item::clearAnalogies($_GET['id']);
+		message('Список аналогов успешно очищен');
+		header("Location: /admin/?view=item&act=analogies&item_id={$_GET['id']}");
 	default:
 		show_form('s_change');
 		break;
@@ -1080,7 +1084,10 @@ function analogies_substitutes($type){
 		// debug($items);
 	}
 	?>
-	<a id="goToItemCard" href="?view=item&id=<?=$item_id?>&act=change" style="margin-bottom: 10px;display: block">Карточка товара</a>
+	<a id="goToItemCard" href="?view=item&id=<?=$item_id?>&act=change">Карточка товара</a>
+	<?if($_GET['act'] == 'analogies'){?>
+		<a class="clearAnalogies" href="?view=item&id=<?=$item_id?>&act=clearAnalogies">Очистить аналоги</a>
+	<?}?>
 	<?=$item_temp['html']?>
 	<b style="display: block; margin: 10px 0"><?=$page_title?>:</b>
 	<div id="total" style="margin-top: 20px">Всего: <?=count($items)?></div>

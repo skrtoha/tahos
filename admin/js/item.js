@@ -236,4 +236,7 @@ $(function(){
 			}
 		})
 	})
+	$('a.clearAnalogies').on('click', function(e){
+		if (!confirm('Вы действительно хотите очистить список аналогов')) e.preventDefault();
+	})
 })

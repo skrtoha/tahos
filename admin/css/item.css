@@ -18,3 +18,10 @@ label.item_translate span.translate_title{
 span.icon-cross.translate_delete{
 	color: red;
 }
+#goToItemCard{
+	display: inline-block;
+	margin: 10px 0;
+}
+.clearAnalogies{
+	display: inline-block;
+}

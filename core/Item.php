@@ -23,4 +23,7 @@ class Item{
 		$conditions = substr($conditions, 0, -5);
 		return $GLOBALS['db']->update('items', $fields, $conditions);
 	}
+	public static function clearAnalogies($item_id){
+		return $GLOBALS['db']->delete('analogies', "`item_id` = $item_id OR `item_diff` = $item_id");
+	}
 }

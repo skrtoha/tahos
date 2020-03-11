@@ -14,8 +14,8 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 
 	setCoincidences(core\FavoriteParts::getSearch($_GET['search']));
 
-	// $rossko = new core\Rossko($db);
-	// setCoincidences($rossko->getSearch($_GET['search']));
+	$rossko = new core\Rossko($db);
+	setCoincidences($rossko->getSearch($_GET['search']));
 
 	if (empty($coincidences)) exit();
 	echo json_encode($coincidences);

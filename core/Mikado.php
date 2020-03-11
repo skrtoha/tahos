@@ -1,10 +1,11 @@
 <?php
 namespace core;
 
-class Mikado{
+class Mikado extends Provider{
 	private $db;
 	public $ClientID = 33773;
 	public $Password = 'tahos2bz';
+	public static $provider_id = 8;
 	private $armtek;
 	private $brends;
 	// StockID => store_id
@@ -18,6 +19,7 @@ class Mikado{
 		$this->armtek = new Armtek($this->db);
 	}
 	public function getCoincidences($text){
+		if (parent::getIsDisabled(self::$provider_id)) return false;
 		$xml = Abcp::getUrlData(
 			'http://mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
@@ -72,6 +74,7 @@ class Mikado{
 		return true;
 	}
 	public function setArticle($brend, $article, $getZakazCode = false){
+		if (parent::getIsDisabled(self::$provider_id)) return false;
 		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[

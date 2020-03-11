@@ -15,8 +15,8 @@ $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 $favorite = new core\FavoriteParts($db);
 $favorite->getItem($abcp->item['brand'], $abcp->item['article']);
 
-// $rossko = new core\Rossko($db, "{$abcp->item['article']} {$abcp->item['brand']}");
-// $rossko->execute();
+$rossko = new core\Rossko($db, "{$abcp->item['article']} {$abcp->item['brand']}");
+$rossko->execute();
 
 $title = "Список предложений";
 

@@ -169,6 +169,7 @@ function provider_save(){
 			default: if ($key != 'is_legal') $array[$key] = $value;
 		}
 	} 
+	if (!isset($_POST['is_disabled'])) $array['is_disabled'] = 0;
 	if ($_POST['is_legal']){
 		$array['fact_index'] = $array['legal_index'];
 		$array['fact_region'] = $array['legal_region'];

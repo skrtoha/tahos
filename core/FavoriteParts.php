@@ -1,6 +1,6 @@
 <?php
 namespace core;
-class FavoriteParts{
+class FavoriteParts extends Provider{
 	private static $key = 'F4289750-BAFA-434C-8C2D-09AC06D6E6C2';
 	private static $developerKey = '156C7176-B22F-4617-94B0-94C1B530FA75';
 	
@@ -32,6 +32,7 @@ class FavoriteParts{
 	 * @return array array of items
 	 */
 	public static function getItem($brend, $article){
+		if (parent::getIsDisabled(self::$provider_id)) return false;
 		$response = Abcp::getUrlData(
 			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues='
 		);

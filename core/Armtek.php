@@ -6,7 +6,7 @@ use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
 require_once $_SERVER['DOCUMENT_ROOT'].'/admin/vendor/Armtek/autoloader.php';
 require_once ($_SERVER['DOCUMENT_ROOT'].'/admin/vendor/autoload.php');
 
-class Armtek{
+class Armtek extends Provider{
 	public $provider_id = 2;
 	private $config = [
 		'user_login' => 'TAHOS@TAHOS.RU',
@@ -165,6 +165,7 @@ class Armtek{
 		}
 	}
 	public function setArticle($brand, $article){
+		if (parent::getIsDisabled($this->provider_id)) return false;
 		$this->params['PIN'] = $article;
 		$this->params['BRAND']	= $brand;
 		$this->params['QUERY_TYPE']	= 1;
@@ -178,6 +179,7 @@ class Armtek{
 		$this->render($data->RESP);
 	}
 	public function getSearch($search){
+		if (parent::getIsDisabled($this->provider_id)) return false;
 		$this->params['PIN'] = $search;
 		$request_params = [
 			'url' => 'search/search',

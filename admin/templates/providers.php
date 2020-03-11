@@ -194,6 +194,12 @@ function provider(){
 					</div>
 				</div>
 				<div class="field">
+					<div class="title">Отключить API</div>
+					<div class="value">
+						<input type="checkbox" name="is_disabled" <?=$array['is_disabled'] ? 'checked' : ''?> value="1">
+					</div>
+				</div>
+				<div class="field">
 					<div class="title"></div>
 					<div class="value"><input type="submit" class="button" value="Сохранить"></div>
 				</div>

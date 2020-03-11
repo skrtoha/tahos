@@ -1,6 +1,6 @@
 <?php
 namespace core;
-class Rossko{
+class Rossko extends Provider{
 	private $db, $result;
 	private $connect = array(
 		'wsdl' => 'http://api.rossko.ru/service/GetSearch',
@@ -304,6 +304,7 @@ class Rossko{
 		}
 	}
 	public function getSearch($search){
+		if (parent::getIsDisabled($this->provider_id)) return false;
 		$result = $this->getResult($search);
 		// debug($result); exit();
 		if (!$result) return false;
@@ -322,6 +323,7 @@ class Rossko{
 		return $coincidences;
 	}
 	public function execute(){
+		if (parent::getIsDisabled($this->provider_id)) return false;
 		if (!$this->text) return false;
 		$result = $this->getResult();
 		if (!$result) return false;

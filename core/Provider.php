@@ -6,6 +6,12 @@ class Provider{
 		return $res;
 	}
 	public static function getIsDisabled($provider_id){
-		return $GLOBALS['db']->getFieldOnID('providers', $provider_id, 'is_disabled');
+		if (self::isAdminArea()) return 0;
+		$db = isset($GLOBALS['db']) ? $GLOBALS['db'] : new DataBase();
+		return $db->getFieldOnID('providers', $provider_id, 'is_disabled');
+	}
+	protected static function isAdminArea(){
+		if (preg_match('/^\/admin/', $_SERVER['REQUEST_URI'])) return true;
+		else return false;
 	}
 }

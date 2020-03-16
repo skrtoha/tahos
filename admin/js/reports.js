@@ -77,7 +77,7 @@ $(function(){
 				return false;
 			})
 			$(document).on('click', '.icon-cross1', function(){
-				if (!confirm('Подтвердить удаление? Внимание! Номенклатура будет удалена окончательно!')) return false;
+				if (!confirm('Подтвердить удаление?')) return false;
 				var th = $(this);
 				var user_id = th.closest('tr').attr('user_id');
 				var item_id = th.closest('tr').attr('item_id');

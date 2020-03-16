@@ -64,7 +64,6 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$db->update('user_request_delete_item', ['is_processed' => 1], "`is_processed`=0");
 			break;
 		case 'delete_item':
-			$db->delete('items', "`id`={$_POST['item_id']}");
 			$db->delete('user_request_delete_item', "`item_id`={$_POST['item_id']} AND `user_id`={$_POST['user_id']}");
 			break;
 	}

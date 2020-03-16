@@ -1,0 +1,14 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "require": {
+        "katzgrau/klogger": "dev-master",
+        "phpoffice/phpspreadsheet": "^1.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "core\\": "core"
+        }
+    }
+}

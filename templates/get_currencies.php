@@ -1,8 +1,6 @@
 <?php
-  if ($view) require_once ("../class/database_class.php");
-  else  require_once ("/home/skrichev/skrichevsky.in.ua/tahos/class/database_class.php");
-  require_once('functions.php');
-  $db = new DataBase();
+  require_once ("../core/DataBase.php");
+  $db = new core\DataBase();
   $date = date("d/m/Y"); // Сегодняшняя дата в необходимом формате
   $link = "http://www.cbr.ru/scripts/XML_daily.asp?date_req=$date"; // Ссылка на XML-файл с курсами валют
   $content = file_get_contents($link); // Скачиваем содержимое страницы

@@ -19,7 +19,7 @@ class Mikado extends Provider{
 		$this->armtek = new Armtek($this->db);
 	}
 	public function getCoincidences($text){
-		if (parent::getIsDisabled(self::$provider_id)) return false;
+		if (parent::getIsDisabledApiSearch(self::$provider_id)) return false;
 		$xml = Abcp::getUrlData(
 			'http://mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
@@ -74,7 +74,7 @@ class Mikado extends Provider{
 		return true;
 	}
 	public function setArticle($brend, $article, $getZakazCode = false){
-		if (parent::getIsDisabled(self::$provider_id)) return false;
+		if (parent::getIsDisabledApiSearch(self::$provider_id)) return false;
 		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[

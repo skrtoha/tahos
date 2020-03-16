@@ -1,4 +1,4 @@
-<?class Reports extends Database{
+<?class Reports{
 	private $tab;
 	public function __construct($tab, $db){
 		$this->db = $db;

@@ -3,12 +3,12 @@ ini_set('error_reporting', E_PARSE | E_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-require_once('../class/database_class.php');
+require_once('../core/DataBase.php');
 require_once('templates/functions.php');
 session_start();
 $view = $_GET['view'] ? $_GET['view'] : 'items';
 
-$db = new DataBase();
+$db = new core\DataBase();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $settings = $db->select('settings', '*'); $settings = $settings[0];

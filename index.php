@@ -3,27 +3,11 @@ ini_set('error_reporting', E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-require_once('class/database_class.php');
+require_once('core/DataBase.php');
 require_once('core/functions.php');
-require_once('admin/vendor/autoload.php');
+require_once('vendor/autoload.php');
 
-// $db = new mysqli(
-// 	's21.hostia.name',
-// 	'skrtoha_main',
-// 	'Imgr6AtE',
-// 	'skrtoha_main'
-// );
-// debug($db); exit();
-
-// $db = new mysqli(
-// 	'tahos.ru',
-// 	'tahos',
-// 	'',
-// 	'tahos'
-// );
-// debug($db); exit();
-
-$db = new DataBase();
+$db = new core\DataBase();
 session_start();
 $connection = new core\Connection($db);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');
@@ -63,4 +47,5 @@ if (file_exists($path)){
 }
 // debug($user);
 require_once('templates/main.php');
+
 ?>

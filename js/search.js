@@ -98,7 +98,8 @@ $(function(){
 			} 
 		})
 	});
-	$(document).on('click', '.hit-list-table tr:not(.notFound):not(.searchFromOtherProviders):nth-child(n + 2)', function(){
+	$(document).on('click', '.hit-list-table tr:not(.notFound):not(.searchFromOtherProviders):nth-child(n + 2)', function(e){
+		if (e.target.className == 'icon-bin') return false;
 		var item_id = $(this).attr('item_id');
 		var article = $(this).attr('article');
 		var href = "/article/" + item_id + "-" + article;
@@ -152,6 +153,21 @@ $(function(){
 			},
 			success: function(response){
 				document.location.href = '/article/' + response + '-' + $('input[name=search]').val();
+			}
+		})
+	})
+	$('span.icon-bin').on('click', function(){
+		if (!confirm('Отправить запрос на удаление?')) return false;
+		$.ajax({
+			url: '/ajax/garage.php',
+			type: 'post',
+			data: {
+				"act": "request_delete_item",
+				"item_id": $(this).closest('tr').attr('item_id'),
+				"user_id": $('input[name=user_id]').val()
+			},
+			success: function(response){
+				return show_message('Запрос успешно отправлен!');
 			}
 		})
 	})

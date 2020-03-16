@@ -3,7 +3,7 @@ function items_submit(){
 	global $db;
 	$profiling = $db->isProfiling;
 	$db->isProfiling = false;
-	require_once ('vendor/autoload.php');
+	require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 	$catalog_name = 'prices_'.date('d.m.Y_H-i-s').'.txt';
 	// debug($_POST); debug($_FILES); exit();
 	$log = new Katzgrau\KLogger\Logger('logs', Psr\Log\LogLevel::WARNING, array(
@@ -169,7 +169,8 @@ function provider_save(){
 			default: if ($key != 'is_legal') $array[$key] = $value;
 		}
 	} 
-	if (!isset($_POST['is_disabled'])) $array['is_disabled'] = 0;
+	if (!isset($_POST['is_disabled_api_search'])) $array['is_disabled_api_search'] = 0;
+	if (!isset($_POST['is_disabled_api_order'])) $array['is_disabled_api_order'] = 0;
 	if ($_POST['is_legal']){
 		$array['fact_index'] = $array['legal_index'];
 		$array['fact_region'] = $array['legal_region'];

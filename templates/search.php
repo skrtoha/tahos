@@ -1,5 +1,4 @@
 <?
-
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$coincidences = array();
 
@@ -20,23 +19,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	if (empty($coincidences)) exit();
 	echo json_encode($coincidences);
 	exit();
-	if (!$items) exit();
-	foreach($items as $id => $item){?>
-		<tr is_armtek="<?=$item['is_armtek']?>" item_id="<?=$id?>" article="<?=$item['article']?>">
-			<td><?=$item['brend']?></td>
-			<td><a class="articul" href="/article/<?=$id?>-<?=$item['article']?>"><?=$item['article']?></a></td>
-			<td style="text-align: left"><?=$item['title_full']?></td>
-			<td>
-				<?=$item['price'] ? 'от '.get_user_price($item['price'], $user).$user['designation'] : 'Нет данных'?>
-			</td>
-			<td>
-				<?=$item['delivery'] ? 'от '.$item['delivery'].' дн.' : 'Нет данных'?>
-			</td>
-		</tr>
-	<?}
-	exit();
 }
-
 if ($connection->denyAccess) die('Доступ запрещен!');
 if ($_GET['type'] == 'armtek') get_items_armtek($_GET['item_id']);
 // debug($_GET); exit();
@@ -76,7 +59,7 @@ if ($_GET['type'] == 'vin'){
 	<?}
 }
 else{
-	get_items_impex();
+	core\Impex::setSearch($_GET);
 	$items = search_items('');
 	if (!empty($items) && $_SESSION['user']){
 		foreach($items as $id => $item) break;
@@ -89,6 +72,7 @@ else{
 		else header("Location: /article/$id-{$item['article']}");
 	}?>
 	<input type="hidden" name="search" value="<?=$_GET['search']?>">
+	<input type="hidden" name="user_id" value="<?=$user['id']?>">
 	<div class="hit-list">
 		<h1>Список совпадений</h1>
 		<table class="hit-list-table">
@@ -98,6 +82,9 @@ else{
 				<th>Наименование</th>
 				<th>Цена</th>
 				<th>Срок</th>
+				<?if ($user['allow_request_delete_item']){?>
+					<th></th>
+				<?}?>
 			</tr>
 			<?if ($items){
 					foreach($items as $id => $item){?>
@@ -111,6 +98,9 @@ else{
 							<td>
 								<?=$item['delivery'] ? 'от '.$item['delivery'].' дн.' : 'Нет данных'?>
 							</td>
+							<?if ($user['allow_request_delete_item']){?>
+								<td><span title="Запрос на удаление" class="icon-bin"></span></td>
+							<?}?>
 						</tr>
 					<?}
 				}
@@ -177,124 +167,6 @@ function save_search($title){
 				'title' => $title,
 			]
 		);
-	}
-}
-function get_items_impex(){
-	global $db;
-	if ($_GET['brend']){
-		require_once("core/impex_marks.php");
-		$mark_id= $impex_marks[strtoupper($_GET['brend'])];
-		if ($mark_id) $mark = "&mark_id=$mark_id";
-	}
-	$for_search = article_clear($_GET['search']);
-	$sites = [
-		'IMPX' => @json_decode(
-			file_get_contents(
-				"https://www.impex-jp.com/api/parts/search.html?part_no=$for_search&key=00LAXmDj-igrFACAWeZG$mark"
-			),
-		true)
-	];
-	$is_empty_original_parts = empty($sites['IMPX']['original_parts']); 
-	$is_empty_replacement_parts = empty($sites['IMPX']['replacement_parts']);
-	if (!$is_empty_original_parts){
-		$store_id = $db->getField('provider_stores', 'id', 'cipher', 'impx');
-		foreach($sites['IMPX']['original_parts'] as $item){
-			if (!$item['price_yen']) continue;
-			$title_full = $item['name_rus'] ? $item['name_rus'] : $item['name'];
-			$brend_id = get_brend($item['mark']);
-			$res = $db->insert(
-				'items',
-				[
-					'title_full' => $title_full,
-					'title' => $title_full,
-					'brend_id' => $brend_id,
-					'article' => $item['part_no_raw'],
-					'article_cat' => $item['part'],
-					'weight' => $item['weight'] * 1000
-				],
-				['deincrement_dublicate' => 1]
-			);
-			if ($res === true){
-				$item_last_id = $db->last_id();
-				$articles[] = $item_last_id;
-			} 
-			else{
-				$array = $db->select_one(
-					'items', 
-					'id,title,title_full', 
-					"`article`='{$item['part_no_raw']}' AND `brend_id`=$brend_id"
-				);
-				if ($array['title_full'] == 'Деталь') 
-					// $db->update('items', ['title_full' => $title_full, 'title' => $title_full], "`id`={$array['id']}");
-					core\Items::update(['title_full' => $title_full, 'title' => $title_full], ['id' => $array['id']]);
-				$item_last_id = $array['id'];
-				$articles[] = $item_last_id;
-			} 
-			if ($store_id) $db->insert(
-				'store_items', 
-				[
-					'item_id' =>$item_last_id,
-					'store_id' => $store_id,
-					'price' => $item['price_yen'],
-					'in_stock' => 0,
-					'packaging' => 1
-				]
-				// ,['print_query' => 1]
-			); 
-			if (!$is_empty_replacement_parts){
-				foreach($sites['IMPX']['replacement_parts'] as $item){
-					if (!$item['price_yen']) continue;
-					$brend_id = get_brend($item['mark']);
-					$res = $db->insert(
-						'items',
-						[
-							'title_full' => $item['name_rus'] ? $item['name_rus'] : $item['name'],
-							'title' => $item['name_rus'] ? $item['name_rus'] : $item['name'],
-							'brend_id' => $brend_id,
-							'article' => $item['part_no_raw'],
-							'article_cat' => $item['part'],
-							'weight' => $item['weight'] * 1000
-						]
-					);
-					if ($res === true) $last_sub = $db->last_id();
-					else{
-						$array = $db->select_one(
-							'items', 
-							'id', 
-							"`article`='{$item['part_no_raw']}' AND `brend_id`=$brend_id"
-						);
-						$last_sub = $array['id'];
-					} 
-					$db->insert('articles', ['item_id' => $last_sub, 'item_diff' => $last_sub]);
-					$db->insert('analogies',['item_id' => $item_last_id, 'item_diff' => $last_sub]);
-					$db->insert('analogies',['item_id' => $last_sub, 'item_diff' => $item_last_id]);
-					if ($store_id && $item['price_yen']) $db->insert(
-						'store_items', 
-						[
-							'item_id' =>$last_sub,
-							'store_id' => $store_id,
-							'price' => $item['price_yen'],
-							'in_stock' => 0,
-							'packaging' => 1
-						]
-					);
-				}
-			}
-		}
-		// debug($articles); exit();
-		if (!empty($articles)){
-			foreach($articles as $value){
-				$current = $value;
-				foreach($articles as $val) $db->insert(
-					'articles',
-					[
-						'item_id' => $current,
-						'item_diff' => $val
-					]
-					// ['print_query' => 1]
-				);
-			}
-		}
 	}
 }
 function get_brend($title){

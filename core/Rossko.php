@@ -304,7 +304,7 @@ class Rossko extends Provider{
 		}
 	}
 	public function getSearch($search){
-		if (parent::getIsDisabled($this->provider_id)) return false;
+		if (parent::getIsDisabledApiSearch($this->provider_id)) return false;
 		$result = $this->getResult($search);
 		// debug($result); exit();
 		if (!$result) return false;
@@ -323,7 +323,7 @@ class Rossko extends Provider{
 		return $coincidences;
 	}
 	public function execute(){
-		if (parent::getIsDisabled($this->provider_id)) return false;
+		if (parent::getIsDisabledApiOrder($this->provider_id)) return false;
 		if (!$this->text) return false;
 		$result = $this->getResult();
 		if (!$result) return false;

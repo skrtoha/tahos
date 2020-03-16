@@ -25,8 +25,7 @@ function accStr($length = 8){
   return $string;
 }
 function getCountLeftMenu($table, $where = 1){
-	require_once('../class/database_class.php');
-	$db = new DataBase();
+	global $db;
 	$count = $db->getCount($table, $where);
 	if ($count){?>
 		<span><?=$count?></span>
@@ -168,7 +167,7 @@ function set_image($file, $id){
 	}
 	$dir_big = "{$_SERVER['DOCUMENT_ROOT']}/images/items/big/$id";
 	$dir_small = "{$_SERVER['DOCUMENT_ROOT']}/images/items/small/$id";
-	require_once("{$_SERVER['DOCUMENT_ROOT']}/class/class.upload.php");
+	require_once("{$_SERVER['DOCUMENT_ROOT']}/vendor/class.upload.php");
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);
 	$handle = new upload($file);

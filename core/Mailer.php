@@ -1,6 +1,6 @@
 <?php
 namespace core;
-require_once($_SERVER['DOCUMENT_ROOT'].'/admin/vendor/autoload.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;

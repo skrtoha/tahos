@@ -1,5 +1,4 @@
 <?php 
-require_once('class/database_class.php');
 require_once('core/functions.php');
 if ($_POST['token']){
 	$s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);

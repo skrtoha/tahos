@@ -1,6 +1,4 @@
 <?php 
-require_once('class/database_class.php');
-require_once('core/functions.php');
 // print_r($_POST);
 $login = $_POST['login'];
 $password = md5($_POST['password']);

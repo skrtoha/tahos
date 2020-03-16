@@ -1,7 +1,7 @@
-<?require_once ("../class/database_class.php");
+<?require_once ("../core/DataBase.php");
 session_start();
 
-$db = new DataBase();
+$db = new core\DataBase();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
@@ -147,6 +147,9 @@ switch($_POST['act']){
 	case 'from_modification_to_garage':
 		$db->delete('garage', "`user_id`={$_POST['user_id']} AND `modification_id`={$_POST['modification_id']}");
 		$db->insert('garage', ['user_id' => $_POST['user_id'], 'modification_id' => $_POST['modification_id']]);
+		break;
+	case 'request_delete_item':
+		$db->insert('user_request_delete_item', ['user_id' => $_POST['user_id'], 'item_id' => $_POST['item_id']]);
 		break;
 }
 function get_modifications(){

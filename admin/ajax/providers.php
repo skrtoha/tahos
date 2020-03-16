@@ -1,7 +1,7 @@
-<?require_once ("{$_SERVER['DOCUMENT_ROOT']}/class/database_class.php");
+<?require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 
-$db = new DataBase();
+$db = new core\DataBase();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();

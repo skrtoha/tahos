@@ -1,9 +1,9 @@
 <?
 set_time_limit(0);
-require_once('../class/database_class.php');
+require_once('../core/DataBase.php');
 require_once('templates/functions.php');
-require_once ('vendor/autoload.php');
-$db = new DataBase();
+require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
+$db = new core\DataBase();
 
 file_put_contents('logs/dubles.txt', '');
 

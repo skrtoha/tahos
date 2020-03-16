@@ -478,7 +478,7 @@ function brend_set_image($file, $id = 0){
 		return $array;
 	}
 	$dir = "../images/brends/";
-	require_once('../class/class.upload.php');
+	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir)) mkdir($dir);
 	$handle = new upload($file);
 	if (!$handle->file_is_image){

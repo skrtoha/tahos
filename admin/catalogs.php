@@ -1,9 +1,10 @@
 <?
 set_time_limit(0);
-require_once('../class/database_class.php');
+require_once('../core/DataBase.php');
 require_once('templates/functions.php');
-require_once ('vendor/autoload.php');
-$db = new DataBase();
+require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
+
+$db = new core\DataBase();
 
 // $db->query("SET foreign_key_checks = 0");
 // $db->delete('nodes', "`id`=1174291");
@@ -393,7 +394,7 @@ function image_catalog($file){
 	}
 	$dir_big = "../images/nodes/big/$brend_name";
 	$dir_small = "../images/nodes/small/$brend_name";
-	require_once('../class/class.upload.php');
+	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);
 	$handle = new upload($file);

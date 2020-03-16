@@ -1,13 +1,10 @@
 <?
 $abcp = new core\Abcp($_GET['item_id'], $db);
-// debug($abcp);
 $abcp->render([13]); 
 $abcp->render([6]);
 
-
 $mikado = new core\Mikado($db);
 $mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
-// exit();
 
 $armtek = new core\Armtek($db);
 $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
@@ -35,8 +32,6 @@ foreach ($store_items as $key => $value){
 	if (!empty($value['list'])) $hide_form = false;
 	break;
 }
-// debug($_GET);
-// debug($providers_items);
 if (!empty($array['prices']) && !empty($array['deliveries'])){
 	$price_from = min($array['prices']);	
 	$price_to = max($array['prices']);

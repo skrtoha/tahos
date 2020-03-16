@@ -120,6 +120,7 @@ function provider(){
 		$array = $_POST;
 		$page_title = 'Добавление поставщика';
 	} 
+	// debug($array);
 	$page_title = $array['title'];
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
 	if ($_GET['id']){?>
@@ -193,12 +194,20 @@ function provider(){
 						<input type=text <?=$disabled?> name="fact_adres" value="<?=$array['fact_adres']?>">
 					</div>
 				</div>
-				<div class="field">
-					<div class="title">Отключить API</div>
-					<div class="value">
-						<input type="checkbox" name="is_disabled" <?=$array['is_disabled'] ? 'checked' : ''?> value="1">
+				<?if ($array['api_title'] && file_exists($_SERVER['DOCUMENT_ROOT']."/core/{$array['api_title']}.php")){?>
+					<div class="field">
+						<div class="title">Отключить API поиска</div>
+						<div class="value">
+							<input type="checkbox" name="is_disabled_api_search" <?=$array['is_disabled_api_search'] ? 'checked' : ''?> value="1">
+						</div>
 					</div>
-				</div>
+					<div class="field">
+						<div class="title">Отключить API заказов</div>
+						<div class="value">
+							<input type="checkbox" name="is_disabled_api_order" <?=$array['is_disabled_api_order'] ? 'checked' : ''?> value="1">
+						</div>
+					</div>
+				<?}?>
 				<div class="field">
 					<div class="title"></div>
 					<div class="value"><input type="submit" class="button" value="Сохранить"></div>

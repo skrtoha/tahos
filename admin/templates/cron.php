@@ -424,7 +424,7 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 	case 'priceArmtek':
-		require_once ('../class/PHPExcel/IOFactory.php');
+		require_once ('../vendor/PHPExcel/IOFactory.php');
 		echo "<h2>Прайс Армтек</h2>";
 		$fileNames = [
 			'Armtek_msk_40068974' => 3
@@ -524,14 +524,9 @@ switch($_GET['act']){
 		}
 		break;
 	case 'priceMparts':
-		require_once ('../class/PHPExcel/IOFactory.php');
 		echo "<h2>Прайс МПартс</h2>";
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
-
-
 		$price = new core\Price($db, 'priceMparts');
-		// $price->isInsertBrend = true;
-		// $price->isInsertItem = true;
 
 		$fileImap = $imap->getLastMailFrom(['from' => 'price@v01.ru', 'name' => 'MPartsPrice.XLSX']);
 		if (!$fileImap){
@@ -548,7 +543,7 @@ switch($_GET['act']){
 				ps.provider_id = 13
 		", '');
 
-		$xls = PHPExcel_IOFactory::load($fileImap);
+		$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($fileImap);
 		$xls->setActiveSheetIndex(0);
 		$sheet = $xls->getActiveSheet();
 		$rowIterator = $sheet->getRowIterator();
@@ -605,7 +600,7 @@ switch($_GET['act']){
 		break;
 	case 'priceForumAuto':
 		echo "<h2>Прайс Forum-Auto</h2>";
-		require_once ('../class/PHPExcel/IOFactory.php');
+		require_once ('../vendor/PHPExcel/IOFactory.php');
 		$price = new core\Price($db, 'priceForumAuto');
 		$price->isInsertItem = true;
 		$price->isInsertBrend = true;
@@ -766,7 +761,7 @@ switch($_GET['act']){
 		$stringNumber = 0;
 		switch($emailPrice['fileType']){
 			case 'excel':
-				require_once ($_SERVER['DOCUMENT_ROOT'].'/class/PHPExcel/IOFactory.php');
+				require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/PHPExcel/IOFactory.php');
 				$xls = PHPExcel_IOFactory::load($workingFile);
 				$xls->setActiveSheetIndex(0);
 				$sheet = $xls->getActiveSheet();

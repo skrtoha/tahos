@@ -3,8 +3,14 @@ namespace core;
 use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException; 
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
-require_once $_SERVER['DOCUMENT_ROOT'].'/admin/vendor/Armtek/autoloader.php';
-require_once ($_SERVER['DOCUMENT_ROOT'].'/admin/vendor/autoload.php');
+
+//добавлен в связи с тем, что не работало в тестах для Росско
+if ($_SERVER['DOCUMENT_ROOT']) $path = $_SERVER['DOCUMENT_ROOT'].'/';
+else $path = '';
+
+require_once $path.'vendor/Armtek/autoloader.php';
+require_once $path.'vendor/autoload.php';
+
 
 class Armtek extends Provider{
 	public $provider_id = 2;
@@ -165,7 +171,7 @@ class Armtek extends Provider{
 		}
 	}
 	public function setArticle($brand, $article){
-		if (parent::getIsDisabled($this->provider_id)) return false;
+		if (parent::getIsDisabledApiSearch($this->provider_id)) return false;
 		$this->params['PIN'] = $article;
 		$this->params['BRAND']	= $brand;
 		$this->params['QUERY_TYPE']	= 1;
@@ -179,7 +185,7 @@ class Armtek extends Provider{
 		$this->render($data->RESP);
 	}
 	public function getSearch($search){
-		if (parent::getIsDisabled($this->provider_id)) return false;
+		if (parent::getIsDisabledApiSearch($this->provider_id)) return false;
 		$this->params['PIN'] = $search;
 		$request_params = [
 			'url' => 'search/search',

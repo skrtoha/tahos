@@ -1,6 +1,6 @@
 <?
 set_time_limit(0);
-require_once ('vendor/autoload.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 
 // $log_name = 'items.txt';
 // file_put_contents('logs/items.txt', '');
@@ -18,7 +18,7 @@ if ($isUseProfiling) $db->isProfiling = true;
 
 if ($_POST['items_submit']){
 	$db->isProfiling = false;
-	require_once ('../class/PHPExcel/IOFactory.php');
+	require_once ('../vendor/PHPExcel/IOFactory.php');
 	$xls = PHPExcel_IOFactory::load($_FILES['items']['tmp_name']);
 	$xls->setActiveSheetIndex(0);
 	$sheet = $xls->getActiveSheet();
@@ -133,7 +133,7 @@ function to_file($str){
 	fwrite($f, $str.PHP_EOL);
 }
 if ($_POST['items_analogies']){
-	require_once ('../class/PHPExcel/IOFactory.php');
+	require_once ('../vendor/PHPExcel/IOFactory.php');
 	$xls = PHPExcel_IOFactory::load($_FILES['items']['tmp_name']);
 	$xls->setActiveSheetIndex(0);
 	$sheet = $xls->getActiveSheet();

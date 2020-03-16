@@ -48,7 +48,7 @@ if ($res_rubrics->num_rows){
 		<?}?>
 	</div>
 	<div class="answer-block">
-		<?=file_get_contents('admin/vendor/help_main.txt')?>
+		<?=file_get_contents('vendor/help_main.txt')?>
 	</div>
 	<div class="clearfix"></div>
 </div>

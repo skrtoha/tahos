@@ -23,3 +23,32 @@ ALTER TABLE `tahos_provider_brends`
   ADD CONSTRAINT `tahos_provider_brends_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `tahos_providers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `tahos_providers` ADD `is_disabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `fact_adres`
+
+ALTER TABLE `tahos_items` ADD `is_blocked` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `updated`;
+
+ALTER TABLE `tahos_users` ADD `allow_request_delete_item` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `isAutomaticOrder`;
+CREATE TABLE `tahos`.`tahos_user_request_delete_item` ( `user_id` INT(10) UNSIGNED NOT NULL , `item_id` INT(10) UNSIGNED NOT NULL ) ENGINE = InnoDB;
+ALTER TABLE `tahos_user_request_delete_item` ADD PRIMARY KEY( `user_id`, `item_id`);
+ALTER TABLE `tahos_user_request_delete_item` ADD `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `item_id`;
+ALTER TABLE `tahos_user_request_delete_item` ADD `is_processed` INT(1) NOT NULL DEFAULT '0' AFTER `item_id`;
+
+ALTER TABLE `tahos_providers` CHANGE `is_disabled` `is_disabled_api_search` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `tahos_providers` ADD `is_disabled_api_order` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `is_disabled_api_search`;
+ALTER TABLE `tahos_providers` ADD `api_title` VARCHAR(255) NULL DEFAULT NULL AFTER `fact_adres`;
+
+UPDATE `tahos_providers` SET `api_title` = 'Armtek' WHERE `tahos_providers`.`id` = 2;
+UPDATE `tahos_providers` SET `api_title` = 'FavoriteParts' WHERE `tahos_providers`.`id` = 19;
+UPDATE `tahos_providers` SET `api_title` = 'Mikado' WHERE `tahos_providers`.`id` = 8;
+UPDATE `tahos_providers` SET `api_title` = 'Abcp' WHERE `tahos_providers`.`id` = 6;
+UPDATE `tahos_providers` SET `api_title` = 'Abcp' WHERE `tahos_providers`.`id` = 13;
+UPDATE `tahos_providers` SET `api_title` = 'Rossko' WHERE `tahos_providers`.`id` = 15;
+
+
+
+
+
+
+
+
+
+

@@ -101,8 +101,8 @@
 		{"src" : "/js/admin.js", "async" : false},
 		{"src" : "/js/jquery.form.js", "async" : false},
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
-		{"src" : "/admin/vendor/accordion.js", "async" : false},
-		{"src" : "/admin/vendor/paginationjs/pagination.min.js", "async" : false},
+		{"src" : "/vendor/accordion.js", "async" : false},
+		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
 		<?if (file_exists("js/$view.js")){
 			echo '{"src" : "/admin/js/'.$view.'.js", "async" : false},';
 		}?>

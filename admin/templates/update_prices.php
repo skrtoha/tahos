@@ -1,5 +1,5 @@
 <?
-require_once('../../class/database_class.php');
+require_once('../../core/database_class.php');
 require_once('functions.php');
 require_once ('../vendor/autoload.php');
 $prices_name = 'prices_'.date('d.m.Y_H-i-s').'.txt';
@@ -8,7 +8,7 @@ $log = new Katzgrau\KLogger\Logger('../logs', Psr\Log\LogLevel::WARNING, array(
 	'dateFormat' => 'G:i:s'
 ));
 set_time_limit(0);
-$db = new DataBase();
+$db = new core\DataBase();
 $start = 0;
 $step = 500;
 $db->query('TRUNCATE TABLE `tahos_prices`');

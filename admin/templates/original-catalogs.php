@@ -493,7 +493,7 @@ function node_set_image($file, $id){
 	$brend = $db->getFieldOnID('brends', $_GET['brend_id'], 'title');
 	$dir_big = "../images/nodes/big/$brend";
 	$dir_small = "../images/nodes/small/$brend";
-	require_once('../class/class.upload.php');
+	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);
 	$handle = new upload($file);
@@ -548,7 +548,7 @@ function model_set_image($file, $id){
 		return $array;
 	}
 	$dir = "../images/models/";
-	require_once('../class/class.upload.php');
+	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir)) mkdir($dir);
 	$handle = new upload($file);
 	if (!$handle->file_is_image){
@@ -595,7 +595,7 @@ function vehicle_set_image($file, $id){
 		return $array;
 	}
 	$dir = "../images/vehicles/";
-	require_once('../class/class.upload.php');
+	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir)) mkdir($dir);
 	$handle = new upload($file);
 	if (!$handle->file_is_image){

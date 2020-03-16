@@ -1,8 +1,10 @@
 <?
 namespace core;
-require_once ($_SERVER['DOCUMENT_ROOT'].'/admin/vendor/autoload.php');
+if ($_SERVER['DOCUMENT_ROOT']) $path = $_SERVER['DOCUMENT_ROOT'].'/';
+else $path = '';
+require_once $path.'vendor/autoload.php';
 
-class Abcp{
+class Abcp extends Provider{
 	public static $params = [
 		6 => [
 			'title' => 'Восход',
@@ -126,6 +128,7 @@ class Abcp{
 	public function getSearch($search){
 		$coincidences = array();
 		foreach(self::$params as $store_id => $param){
+			if (parent::getIsDisabledApiSearch($param->provider_id)) return false;
 			$c = array();
 			$url = "{$param['url']}/search/brands?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw'])."&number=$search";
 			$response = @file_get_contents($url);

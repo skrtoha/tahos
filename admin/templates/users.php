@@ -29,8 +29,9 @@ if ($_POST['form_submit']){
 				if ($key != 'pass' and $key != 'form_submit') $array[$key] = $value;
 		}
 	}
-	if (!$array['show_all_analogies']) $array['show_all_analogies'] = 0;
-	if (!$array['bonus_program']) $array['bonus_program'] = 0;
+	if (!isset($array['show_all_analogies'])) $array['show_all_analogies'] = 0;
+	if (!isset($array['bonus_program'])) $array['bonus_program'] = 0;
+	if (!isset($array['allow_request_delete_item'])) $array['allow_request_delete_item'] = 0;
 	// debug($array, 'array'); //exit();
 	if ($array['user_type'] == 'entity' and !$array['organization_name']){
 		message('Введите название организации!', false);
@@ -42,12 +43,12 @@ if ($_POST['form_submit']){
 	}
 	if ($saveble) {
 		if ($_POST['form_submit'] == 1){
-			if ($db->update('users', $array, "`id`=".$id)) message ('Изменения успешно сохранены!');
-			// header("Location: ?view=users&id=$id&act=change");
+			if (core\User::update($id, $array)) message('Изменения успешно сохранены!');
+			header("Location: ?view=users&id=$id&act=change");
 		}
 		else{
 			if ($db->insert('users', $array)) message('Пользователь успешно добавлен!');
-			// header("Location: ?view=users&id={$db->last_id()}&act=change");
+			header("Location: ?view=users&id={$db->last_id()}&act=change");
 		}
 	}
 }
@@ -330,6 +331,14 @@ function show_form($act){
 						<?if ($_POST['show_all_analogies']) $checked = $_POST['show_all_analogies'] ? 'checked' : '';
 						else $checked = $user['show_all_analogies'] ? 'checked' : '';?>
 						<input type="checkbox" name="show_all_analogies" <?=$checked?> value="1">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Разрешить отправлять запрос на удаление товара</div>
+					<div class="value">
+						<?if ($_POST['allow_request_delete_item']) $checked = $_POST['allow_request_delete_item'] ? 'checked' : '';
+						else $checked = $user['allow_request_delete_item'] ? 'checked' : '';?>
+						<input type="checkbox" name="allow_request_delete_item" <?=$checked?> value="1">
 					</div>
 				</div>
 				<div class="field">

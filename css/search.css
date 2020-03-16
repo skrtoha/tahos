@@ -1,4 +1,7 @@
 @charset "UTF-8";
+.icon-bin:before {
+  content: "\e9ac";
+}
 /*
  * CSS Styles that are needed by jScrollPane for it to operate correctly.
  *

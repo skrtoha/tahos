@@ -1,14 +1,14 @@
 <?
 set_time_limit(0);
 require_once('vendor/simple_html_dom.php');
-require_once('../class/database_class.php');
-require_once ('vendor/autoload.php');
+require_once('../core/DataBase.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 file_put_contents('logs/psndemo.txt', '');
 $log = new Katzgrau\KLogger\Logger(__DIR__.'/logs', Psr\Log\LogLevel::INFO, array(
 	'filename' => 'psndemo',
 	'extension' => 'txt'
 ));
-$db = new DataBase();
+$db = new core\DataBase();
 
 $db->query("SET foreign_key_checks = 0");
 $db->query("TRUNCATE tahos_models");
@@ -403,7 +403,7 @@ function image_catalog($file){
 	$dir_big = "../images/nodes/big/$brend_title";
 	$dir_small = "../images/nodes/small/$brend_title";
 	// echo "$dir_big $dir_small";
-	require_once('../class/class.upload.php');
+	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);
 	$handle = new upload($file);

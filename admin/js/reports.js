@@ -62,6 +62,39 @@ $(function(){
 					}
 				})
 			})
+			$(document).on('click', '.clear_request_delete_item', function(e){
+				if (!confirm('Уверены, что хотите очистить список?')) return false;
+				$.ajax({
+					url: reports.ajaxUrl,
+					type: 'post',
+					data: {
+						tab: 'clear_request_delete_item'
+					},
+					success: function(){
+						document.location.reload();
+					}
+				})
+				return false;
+			})
+			$(document).on('click', '.icon-cross1', function(){
+				if (!confirm('Подтвердить удаление? Внимание! Номенклатура будет удалена окончательно!')) return false;
+				var th = $(this);
+				var user_id = th.closest('tr').attr('user_id');
+				var item_id = th.closest('tr').attr('item_id');
+				$.ajax({
+					url:reports.ajaxUrl,
+					type: 'post',
+					data: {
+						tab: 'delete_item',
+						user_id: user_id,
+						item_id: item_id
+					},
+					success: function(){
+						th.closest('tr').remove();
+						show_message('Успешно удалено!');
+					}
+				})
+			})
 		},
 		setTabs: function(){
 			$.ionTabs("#tabs_1",{

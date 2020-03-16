@@ -1,10 +1,10 @@
 <?php
 namespace core;
 class FavoriteParts extends Provider{
-	private static $key = 'F4289750-BAFA-434C-8C2D-09AC06D6E6C2';
-	private static $developerKey = '156C7176-B22F-4617-94B0-94C1B530FA75';
+	public static $key = 'F4289750-BAFA-434C-8C2D-09AC06D6E6C2';
+	public static $developerKey = '156C7176-B22F-4617-94B0-94C1B530FA75';
 	
-	private static $provider_id = 19;
+	public static $provider_id = 19;
 
 	/**
 	 * gets items by article
@@ -12,6 +12,7 @@ class FavoriteParts extends Provider{
 	 * @return [array] array like [brend => title]
 	 */
 	public static function getSearch($search){
+		if (parent::getIsDisabledApiSearch(self::$provider_id)) return false;
 		$coincidences = array();
 		$response = Abcp::getUrlData(
 			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$search
@@ -32,12 +33,13 @@ class FavoriteParts extends Provider{
 	 * @return array array of items
 	 */
 	public static function getItem($brend, $article){
-		if (parent::getIsDisabled(self::$provider_id)) return false;
+		if (parent::getIsDisabledApiSearch(self::$provider_id)) return false;
 		$response = Abcp::getUrlData(
 			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues='
 		);
 		$GLOBALS['response_header'];
 		$array = json_decode($response, true);
+		debug($array);
 		return $array['goods'][0];
 	}
 
@@ -53,7 +55,7 @@ class FavoriteParts extends Provider{
 			'goodsID' => $ov['goodsID'],
 			'warehouseGroup' => $ov['warehouseGroup']
 		];
-		// debug($item); exit();
+		debug($item); exit();
 		$warehouseGroup = self::getWarehouseGroup($ov, $item);
 		if (!$warehouseGroup){
 			debug($ov); 

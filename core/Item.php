@@ -13,8 +13,8 @@ class Item{
 		if (strpos($_SERVER['REQUEST_URI'], '/admin/?view=item&id=') !== false) return self::processUpdate($fields, $where);
 		if (isset($where['id'])) $conditions = "`id`={$where['id']}";
 		elseif (isset($where['article']) && isset($where['brend_id'])) $conditions = "`article`='{$where['article']}' AND `brend_id`='{$where['brend_id']}'";
-		$item = $GLOBALS['db']->select('items', "isBlocked", $conditions);
-		if ($item['isBlocked'] || empty($item)) return false;
+		$item = $GLOBALS['db']->select('items', "is_blocked", $conditions);
+		if ($item['is_blocked'] || empty($item)) return false;
 		return self::processUpdate($fields, $where);
 	}
 	private function processUpdate($fields, $where){

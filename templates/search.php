@@ -98,8 +98,11 @@ else{
 							<td>
 								<?=$item['delivery'] ? 'от '.$item['delivery'].' дн.' : 'Нет данных'?>
 							</td>
-							<?if ($user['allow_request_delete_item']){?>
-								<td><span title="Запрос на удаление" class="icon-bin"></span></td>
+							<?if ($user['allow_request_delete_item']){
+								if (!$item['is_blocked']){?>
+									<td><span title="Запрос на удаление" class="icon-bin"></span></td>
+								<?}
+								?>
 							<?}?>
 						</tr>
 					<?}
@@ -221,6 +224,7 @@ function search_items($flag = ''){
 			si.store_id,
 			IF (si.in_stock, ps.delivery, ps.under_order) AS delivery,
 			ps.cipher AS cipher,
+			i.is_blocked,
 			IF (
 				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.foto != '',
 				1,
@@ -242,6 +246,7 @@ function search_items($flag = ''){
 		$i['brend_id'] = $item['brend_id'];
 		$i['article'] = $item['article'];
 		$i['title_full'] = $item['title_full'];
+		$i['is_blocked'] = $item['is_blocked'];
 		//for displaying coincided items
 		if (in_array($item['provider_id'], [11, 12, 18, 20, 21])) $i['is_armtek'] = 1;
 		if (isset($i['price'])){

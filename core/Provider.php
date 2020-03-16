@@ -12,18 +12,18 @@ class Provider{
 			$output = array();
 			$res = $db->query("
 				SELECT
-					id, is_disabled_api_order
+					id, is_disabled_api_search
 				FROM
 					#providers
 				WHERE
-					is_disabled_api_search= 1
+					is_disabled_api_search = 1
 			", '');
 			if (!$res->num_rows) return false;
 			foreach($res as $value) $output[] = $value['id'];
 			$disabledArrayApiSearch = $output;
 		}	
 		if (in_array($provider_id, $disabledArrayApiSearch)) return true;
-		else return true;
+		else return false;
 	}
 	public static function isAdminArea(){
 		if (preg_match('/^\/admin/', $_SERVER['REQUEST_URI'])) return true;

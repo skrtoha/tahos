@@ -43,6 +43,10 @@ UPDATE `tahos_providers` SET `api_title` = 'Abcp' WHERE `tahos_providers`.`id` =
 UPDATE `tahos_providers` SET `api_title` = 'Abcp' WHERE `tahos_providers`.`id` = 13;
 UPDATE `tahos_providers` SET `api_title` = 'Rossko' WHERE `tahos_providers`.`id` = 15;
 
+ALTER TABLE `tahos_settings` CHANGE `id` `id` INT(1) NOT NULL AUTO_INCREMENT, CHANGE `ratings` `ratings` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `cat_perPage` `cat_perPage` INT(2) NOT NULL DEFAULT '30', CHANGE `cat_countChunk` `cat_countChunk` INT(2) NOT NULL DEFAULT '10', CHANGE `news_perPage` `news_perPage` INT(3) NOT NULL DEFAULT '10', CHANGE `news_linksLimit` `news_linksLimit` INT(3) NOT NULL DEFAULT '10', CHANGE `currencies_update` `currencies_update` INT(10) NULL DEFAULT NULL, CHANGE `help_main` `help_main` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `agreement` `agreement` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `discount` `discount` DOUBLE NULL DEFAULT '0', CHANGE `for_providers` `for_providers` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, CHANGE `for_wholesellers` `for_wholesellers` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, CHANGE `about_company` `about_company` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, CHANGE `partner_programs` `partner_programs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, CHANGE `bonus_size` `bonus_size` FLOAT NULL DEFAULT NULL, CHANGE `days_for_return` `days_for_return` INT(2) NOT NULL DEFAULT '14' COMMENT 'количество дней на возврат товара', CHANGE `countItems` `countItems` INT(10) UNSIGNED NOT NULL DEFAULT '0';
+INSERT INTO `tahos_settings` (`id`, `ratings`, `cat_perPage`, `cat_countChunk`, `news_perPage`, `news_linksLimit`, `currencies_update`, `help_main`, `agreement`, `discount`, `for_providers`, `for_wholesellers`, `about_company`, `partner_programs`, `bonus_size`, `days_for_return`, `countItems`) VALUES (NULL, NULL, '30', '10', '10', '10', NULL, NULL, NULL, '0', '', '', '', '', NULL, '14', '0');
+
+
 
 
 

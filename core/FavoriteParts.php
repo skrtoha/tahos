@@ -39,7 +39,6 @@ class FavoriteParts extends Provider{
 		);
 		$GLOBALS['response_header'];
 		$array = json_decode($response, true);
-		debug($array);
 		return $array['goods'][0];
 	}
 

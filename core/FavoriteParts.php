@@ -54,7 +54,7 @@ class FavoriteParts extends Provider{
 			'goodsID' => $ov['goodsID'],
 			'warehouseGroup' => $ov['warehouseGroup']
 		];
-		debug($item); exit();
+		// debug($item); exit();
 		$warehouseGroup = self::getWarehouseGroup($ov, $item);
 		if (!$warehouseGroup){
 			debug($ov); 

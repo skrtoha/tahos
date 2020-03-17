@@ -199,6 +199,10 @@ function items(){
 	$perPage = 30;
 	$linkLimit = 10;
 	$where = "i.brend_id = {$_GET['id']}";
+	if (isset($_GET['type_list'])){
+		if ($_GET['type_list'] == 'blocked') $where .= " AND i.is_blocked = 1"; 
+		if ($_GET['type_list'] == 'non_blocked') $where .= " AND i.is_blocked = 0"; 
+	}
 	if (isset($_GET['search']) && $_GET['search']) $where .= " AND i.article = '{$_GET['search']}'";
 	$db->query("
 		SELECT SQL_CALC_FOUND_ROWS
@@ -246,6 +250,20 @@ function items(){
 			<input type="hidden" name="view" value="brends">
 			<input type="hidden" name="act" value="items">
 			<input type="hidden" name="id" value="<?=$_GET['id']?>">
+			<div class="radio">
+				<label>
+					<input <?=$_GET['type_list'] == 'all' || !isset($_GET['type_list']) ? 'checked' : ''?> type="radio" name="type_list" value="all">
+					все
+				</label>
+				<label>
+					<input <?=$_GET['type_list'] == 'blocked' ? 'checked' : ''?> type="radio" name="type_list" value="blocked">
+					заблокированные
+				</label>
+				<label>
+					<input <?=$_GET['type_list'] == 'non_blocked' ? 'checked' : ''?> type="radio" name="type_list" value="non_blocked">
+					незаблокированные
+				</label>
+			</div>
 			<input style="width: 264px;" type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по артикулу, vid и названию">
 			<input type="submit" value="Искать">
 		</form>

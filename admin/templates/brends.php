@@ -195,23 +195,58 @@ function subbrends(){
 }
 function items(){
 	global $status, $db, $page_title;
-	$id = $_GET['id'];
-	$where = "`brend_id`=$id";
 	require_once('templates/pagination.php');
 	$perPage = 30;
 	$linkLimit = 10;
-	$all = $db->getCount('items', $where);
+	$where = "i.brend_id = {$_GET['id']}";
+	if (isset($_GET['search']) && $_GET['search']) $where .= " AND i.article = '{$_GET['search']}'";
+	$db->query("
+		SELECT SQL_CALC_FOUND_ROWS
+			i.id
+		FROM
+			#items i
+		WHERE
+			$where
+	");
+	$all = $db->found_rows();
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
-	$items = $db->select('items', 'title_full,id,article,article_cat,barcode,brend_id', $where, '', '', "$start,$perPage");
-	$categories = $db->select('categories', '*', '', '', '', '', true);
+	$res_items = $db->query("
+		SELECT
+			i.id,
+			i.brend_id,
+			b.title AS brend,
+			i.article,
+			i.article_cat,
+			i.title_full,
+			i.barcode,
+			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories,
+			i.is_blocked
+		FROM
+			#items i
+		LEFT JOIN
+			#brends b ON b.id = i.brend_id
+		LEFT JOIN
+			#categories_items ci ON ci.item_id = i.id
+		LEFT JOIN
+			#categories c ON c.id = ci.category_id
+		WHERE
+			$where
+		GROUP BY
+			i.id
+		LIMIT
+			$start, $perPage
+	", '');
 	$page_title = "Товары бренда <b>".$db->getFieldOnID('brends', $id, 'title')."</b>";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";?>
 	<div id="total" style="margin: 0">Всего: <?=$all?></div>
 	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=brends&act=items_search&id=<?=$id?>" method="post">
-			<input style="width: 264px;" required type="text" name="search" value="" placeholder="Поиск по артикулу, vid и названию">
+		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" method="get">
+			<input type="hidden" name="view" value="brends">
+			<input type="hidden" name="act" value="items">
+			<input type="hidden" name="id" value="<?=$_GET['id']?>">
+			<input style="width: 264px;" type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по артикулу, vid и названию">
 			<input type="submit" value="Искать">
 		</form>
 	</div>
@@ -222,80 +257,26 @@ function items(){
 			<td>Каталожный номер</td>
 			<td>Название</td>
 			<td>Штрих-код</td>
+			<td>Категории</td>
 		</tr>
-		<?if (count($items)){
-			foreach($items as $item){?>
-				<tr class="clickable_1" value_id="<?=$item['id']?>">
-					<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article_cat']?></a></td>
+		<?if ($res_items->num_rows){
+			foreach($res_items as $item){?>
+				<tr class="clickable_1 <?=$item['is_blocked'] ? 'is_blocked' : ''?>" value_id="<?=$item['id']?>">
+					<td><?=$item['brend']?></td>
+					<td><a target="_blank" href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+					<td><a target="_blank" href="?view=item&id=<?=$item['id']?>"><?=$item['article_cat']?></a></td>
 					<td><?=$item['title_full']?></td>
 					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['barcode']?></a></td>
+					<td><?=$item['categories']?></td>
 				</tr>
 			<?}
 		}
 		else{?>
-			<tr><td colspan="5">Товаров данного бренда не найдено</td></tr>
+			<tr><td colspan="6">Товаров данного бренда не найдено</td></tr>
 		<?}?>
 	</table>
-	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=brends&act=items&id=$id&page=");
+	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=brends&act=items&id={$_GET['id']}&page=");
 }
-function items_search(){
-	global $status, $db;
-	$id = $_GET['id'];
-	$search = $_POST['search'];
-	$category_items = $db->select('categories_items', 'item_id', "`category_id`=$id");
-	require_once('templates/pagination.php');
-	$where = "(`article`='$search') AND `brend_id`=$id";
-	$all = $db->getCount('items', $where);
-	$items = $db->select('items', 'title_full,id,article,barcode,brend_id', $where);
-	$categories = $db->select('categories', '*', '', '', '', '', true);
-	$page_title = "Поск товаров бренда <b>".$db->getFieldOnID('brends', $id, 'title')."</b>";
-	$category = $db->select('categories', '*', "`id`=$id");
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";?>
-	<div id="total" style="margin: 0">Всего: <?=$all?></div>
-	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=brends&id=<?=$id?>&act=items_search" method="post">
-			<input style="width: 264px;" required type="text" name="search" value="<?=$search?>" placeholder="Поиск по артикулу, vid и названию">
-			<input type="submit" value="Искать">
-		</form>
-	</div>
-	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-			<td></td>
-		</tr>
-		<?if (count($items)){
-			foreach($items as $item){?>
-			<tr>
-				<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-				<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-				<td><?=$item['title_full']?></td>
-				<td><?=$item['barcode']?></td>
-				<td>
-					<?$categories_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
-					if (count($categories_items)){
-						foreach ($categories_items as $category_item) {?>
-							<a href="/admin/?view=category&id=<?=$category_item['category_id']?>"><?=$categories[$category_item['category_id']]['title']?></a>
-						<?}
-					}?>
-				</td>
-				<td>
-					<a href="?view=item&id=<?=$item['id']?>&act=change">Изменить</a>
-					<a href="?view=items&id=<?=$item['id']?>&act=delete" class="delete_item" item_id="<?=$item['id']?>">Удалить</a>
-				</td>
-			</tr>
-		<?}
-		}
-		else{?>
-			<tr><td colspan="5">Товаров не найдено</td></tr>
-		<?}?>
-	</table>
-<?}
 function show_form($act){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];

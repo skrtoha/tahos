@@ -238,7 +238,7 @@ function items(){
 		LIMIT
 			$start, $perPage
 	", '');
-	$page_title = "Товары бренда <b>".$db->getFieldOnID('brends', $id, 'title')."</b>";
+	$page_title = "Товары бренда ".$db->getFieldOnID('brends', $id, 'title')."";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";?>
 	<div id="total" style="margin: 0">Всего: <?=$all?></div>
 	<div class="actions">

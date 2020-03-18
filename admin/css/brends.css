@@ -1,7 +1,6 @@
 tr.is_blocked{
 	background: #e4e4e4;
-   color: #949494;
 }
-tr.is_blocked a{
-	color: #a2a2a2;
+tr.is_blocked td:first-child{
+	color: #c72a2a;
 }

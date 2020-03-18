@@ -119,7 +119,7 @@ class Abcp extends Provider{
 		// );
 		// $res = json_decode($res, true);
 		// if (!self::$params[$provider_id]['getAnalogies']) return $res;
-		$brends = Brend::get(['id' => $this->item['brend_id'], 'provider_id' => $provider_id]);
+		$brends = Brend::get(['id' => $this->item['brend_id'], 'provider_id' => $provider_id], [], '');
 		$brend = $brends->fetch_assoc();
 		$p = self::$params[$provider_id];
 		$res = file_get_contents("{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$this->item['article']}&brand={$brend['title']}");

@@ -327,7 +327,7 @@ function store_items(store_items, user, search_type = null){
 					'<a href="' + si.href_article + '" class="articul">' + si.article + '</a>' +
 				'</p>' +
 				'<p>' + si.title_full + '</p>';
-		if (search_type == 'analogies' && typeof user.id !== 'undefined'){
+		if (search_type == 'analogies' && typeof user.id !== 'undefined' && user.allow_request_delete_item == '1'){
 			var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
 			mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
 			full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
@@ -749,7 +749,7 @@ function store_items(store_items, user, search_type = null){
 					'</a>' +
 				'</td>' +
 				'<td class="name-col" style="padding-top: 20px;text-align:left">';
-			if (search_type == 'analogies' && typeof user.id !== 'undefined'){
+			if (search_type == 'analogies' && typeof user.id !== 'undefined' && user.allow_request_delete_item == '1'){
 				var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
 				mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
 				full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
@@ -1192,7 +1192,7 @@ $(function(){
 		if (th.hasClass('in_stock')) sortType = 'in_stock';
 		if (th.hasClass('brend')) sortType = 'brend';
 		sortStoreItems(sortType);
-		var si = store_items(res.store_items, res.user);
+		var si = store_items(res.store_items, res.user, 'analogies');
 		ionTab.find('.articul-table').html(si.full); 
 		ionTab.find('.mobile-layout').html(si.mobile); 
 		ionTab.find('a.sortable.' + sortType).addClass('asc');

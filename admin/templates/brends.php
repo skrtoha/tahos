@@ -239,6 +239,8 @@ function items(){
 			$where
 		GROUP BY
 			i.id
+		ORDER BY
+			i.article
 		LIMIT
 			$start, $perPage
 	", '');

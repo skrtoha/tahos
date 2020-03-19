@@ -71,6 +71,7 @@ function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');
 	$search = $_GET['search'] ? $_GET['search'] : $_POST['search'];
+	$search = str_replace("'", "\'", $search);
 	$select = "
 		SELECT b.id, b.title
 		FROM #brends b 
@@ -139,6 +140,7 @@ function subbrends(){
 	require_once('templates/pagination.php');
 	$where = '`parent_id`!=0';
 	$search = $_GET['search'] ? $_GET['search'] : $_POST['search'];
+	$search = str_replace("'", "\'", $search);
 	if ($search) $where .= " AND `title` LIKE '%$search%'";
 	$all = $db->getCount('brends', $where);
 	$perPage = 30;

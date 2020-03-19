@@ -11,6 +11,11 @@ switch ($act) {
 		}
 		break;
 	case 'search': search(); break;
+	case 'block_item': 
+		core\Timer::start();
+		core\Item::blockItem(); 
+		echo "Обработка заняла ".core\Timer::end()." секунд";
+		break;
 	default:
 		view();
 }
@@ -33,6 +38,7 @@ function view(){
 			<input type="submit" value="Искать">
 		</form>
 		<a href="?view=item&act=add">Добавить</a>
+		<a href="?view=items&act=block_item">Заблокировать товар</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

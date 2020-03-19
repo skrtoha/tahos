@@ -26,4 +26,22 @@ class Item{
 	public static function clearAnalogies($item_id){
 		return $GLOBALS['db']->delete('analogies', "`item_id` = $item_id OR `item_diff` = $item_id");
 	}
+	/**
+	 * blocks items where there are photos, prices and exists barcode
+	 * @return true is succesfully processed
+	 */
+	public static function blockItem(){
+		return $GLOBALS['db']->query("
+			UPDATE
+				#items
+			SET
+				is_blocked = 1
+			WHERE
+				foto != '' OR
+				barcode != '' OR
+				id IN (
+					SELECT item_id FROM #store_items GROUP BY item_id
+				)
+		", '');
+	}
 }

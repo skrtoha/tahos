@@ -20,8 +20,6 @@ if ($_POST['item_image_submit']){
 }
 $act = $_GET['act'];
 if ($_POST['form_submit']){
-	debug($_FILES);
-	debug($_POST);
 	foreach($_POST as $key => $value){
 		if ($key == 'form_submit') continue;
 		if ($key == 'is_stay') continue;
@@ -1070,6 +1068,8 @@ function analogies_substitutes($type){
 		LEFT JOIN #categories c ON c.id=ci.category_id
 		WHERE
 			diff.item_id=$item_id
+		ORDER BY
+			b.title
 	", '');
 	if ($res_items->num_rows){
 		while($r = $res_items->fetch_assoc()){

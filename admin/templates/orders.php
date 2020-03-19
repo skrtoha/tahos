@@ -35,7 +35,7 @@ switch ($act) {
 				$isRendered = true;
 			} 
 			if ($armtek->isKeyzak($ov['store_id'])){
-				if (Provider::$getIsDisabledApiOrder($ov['provider_id'])) continue;
+				if (Provider::getIsDisabledApiOrder($ov['provider_id'])) continue;
 				$armtek->toOrder(
 					[
 						'order_id' => $ov['order_id'],
@@ -46,7 +46,7 @@ switch ($act) {
 				$isRendered = true;
 			} 
 			if ($ov['provider_id'] == 6 || $ov['provider_id'] == 13){
-				if (Provider::$getIsDisabledApiOrder($ov['provider_id'])) continue;
+				if (Provider::getIsDisabledApiOrder($ov['provider_id'])) continue;
 				$orderAbcp = new core\OrderAbcp($db, $ov['provider_id']);
 				$itemInfo = $orderAbcp->getItemInfoByArticleAndBrend($ov);
 				if (!$itemInfo){
@@ -108,7 +108,7 @@ switch ($act) {
 		break;
 	case 'toBasketVoshodAvto':
 	case 'fromBasketVoshodAvto':
-		//debug($_GET); //exit();
+		debug($_GET); //exit();
 		if (Provider::getIsDisabledApiOrder(6)) Provider::showErrorDisabledApiOrder();
 		$orderAbcp = new core\OrderAbcp($db, 6);
 		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
@@ -141,12 +141,12 @@ switch ($act) {
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;
 	case 'deleteFromMikado':
-		if (Provider::$disabledArrayApiOrder(8)) Provider::showErrorDisabledApiOrder();
+		if (Provider::getIsDisabledApiOrder(8)) Provider::showErrorDisabledApiOrder();
 		$mikado->deleteFromOrder($_GET);
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;
 	case 'toOrderArmtek':
-		if (Provider::$disabledArrayApiOrder(2)) Provider::showErrorDisabledApiOrder();
+		if (Provider::getIsDisabledApiOrder(2)) Provider::showErrorDisabledApiOrder();
 		$armtek->toOrder($_GET, 'armtek');
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;

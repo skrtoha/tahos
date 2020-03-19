@@ -1,5 +1,5 @@
 <?php  
-require_once ("../core/database_class.php");
+require_once ("../core/DataBase.php");
 session_start();
 
 $db = new core\DataBase();
@@ -8,7 +8,6 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
 $where = "`user_id`={$_SESSION['user']}";
-print_r($_POST);
 if (!$_POST['filds']) $where .= " AND `item_id`= {$_POST['item_id']} AND `store_id`={$_POST['store_id']}";
 $db->update('basket', ['comment' => $_POST['comment']], $where);
 echo true;

@@ -98,6 +98,12 @@ else{
 							<td>
 								<?=$item['delivery'] ? 'от '.$item['delivery'].' дн.' : 'Нет данных'?>
 							</td>
+							<?if ($user['allow_request_delete_item']){
+								if (!$item['is_blocked']){?>
+									<td><span title="Запрос на удаление" class="icon-bin"></span></td>
+								<?}
+								?>
+							<?}?>
 						</tr>
 					<?}
 				}

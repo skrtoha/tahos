@@ -46,7 +46,7 @@ class OrderValue{
 				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
 				$user = User::get($params['user_id']);
 				$title = $this->getTitleComment($params['item_id']);
-				Fund::insert(2, [
+				Fund::insert(1, [
 					'sum' => $params['quan'] * $params['price'],
 					'remainder' => $user['bill'] + $params['quan'] * $params['price'],
 					'user_id' => $params['user_id'],

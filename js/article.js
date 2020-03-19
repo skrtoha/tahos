@@ -137,6 +137,7 @@ function set_tabs(){
 					success: function(msg){
 						if (msg){
 							res = JSON.parse(msg);
+							console.log(res);
 							sortStoreItems('brend');
 							var si = store_items(res.store_items, res.user, search_type);
 							if (Object.keys(res.prices).length){

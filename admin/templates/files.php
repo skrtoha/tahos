@@ -18,8 +18,7 @@ if ($isUseProfiling) $db->isProfiling = true;
 
 if ($_POST['items_submit']){
 	$db->isProfiling = false;
-	require_once ('../vendor/PHPExcel/IOFactory.php');
-	$xls = PHPExcel_IOFactory::load($_FILES['items']['tmp_name']);
+	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['items']['tmp_name']);
 	$xls->setActiveSheetIndex(0);
 	$sheet = $xls->getActiveSheet();
 	$rowIterator = $sheet->getRowIterator();
@@ -133,8 +132,7 @@ function to_file($str){
 	fwrite($f, $str.PHP_EOL);
 }
 if ($_POST['items_analogies']){
-	require_once ('../vendor/PHPExcel/IOFactory.php');
-	$xls = PHPExcel_IOFactory::load($_FILES['items']['tmp_name']);
+	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['items']['tmp_name']);
 	$xls->setActiveSheetIndex(0);
 	$sheet = $xls->getActiveSheet();
 	$rowIterator = $sheet->getRowIterator();

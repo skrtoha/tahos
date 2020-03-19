@@ -42,7 +42,7 @@ if ($_POST['form_submit']){
 			[
 				'print_query' => false, 
 				'duplicate' => [
-					'weight' => 'weight + 10', 
+					'weight' => '`weight`+ 10', 
 				]
 			]); 
 		if ($res === true){

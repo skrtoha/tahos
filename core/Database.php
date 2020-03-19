@@ -352,7 +352,7 @@ class DataBase {
 		$table_name = $this->db_prefix.$table_name;
 		$query = "UPDATE `$table_name` SET ";
 		if (!$iconv) foreach ($upd_fields as $field => $value){
-			if (strpos($value, $field) !== false) $query .= "`$field` = $value,";
+			if (preg_match("/`$field`/", $value)) $query .= "`$field` = $value,";
 			elseif (!$value && $value != '0') $query .= "`$field` = DEFAULT,";
 			else $query .= "`$field` = '".$this->mysqli->real_escape_string($value)."',";
 		} 
@@ -369,7 +369,7 @@ class DataBase {
 		$table_name = $this->db_prefix.$table_name;
 		$query = "UPDATE `$table_name` SET ";
 		if (!$iconv) foreach ($upd_fields as $field => $value){
-			if (strpos("`$value`", $field) !== false) $query .= "`$field` = $value,";
+			if (preg_match("/`$field`/", $value)) $query .= "`$field` = $value,";
 			elseif (!$value && $value != '0') $query .= "`$field` = DEFAULT,";
 			else $query .= "`$field` = '".$this->mysqli->real_escape_string($value)."',";
 		} 

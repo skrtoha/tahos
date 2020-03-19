@@ -279,8 +279,6 @@
 		else message($res, false);
 	}
 	function settings($field, $title = ''){
-		// debug($_POST, $field);
-		// debug($_GET);
 		if (!empty($_POST) && $_GET['tab'] == $field){
 			$this->db->update('settings', [$field => $_POST['text']], "`id`=1");
 			message('Успешно сохранено');

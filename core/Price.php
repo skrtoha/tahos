@@ -23,14 +23,13 @@ class Price{
 	public function __construct($db, $type){
 		$this->db = $db;
 		$this->type = $type;
-		$this->source = $source;
 		$this->nameFileLog = $this->type.'_'.date('d.m.Y_H-i-s').'.txt';
 		$this->log = new \Katzgrau\KLogger\Logger('logs', \Psr\Log\LogLevel::WARNING, array(
 			'filename' => $this->nameFileLog,
 			'dateFormat' => 'G:i:s'
 		));
 	}
-	public function getBrendId($brendTitle){
+	public function getBrendId($brendTitle, $row = null){
 		if (!$this->brends[$brendTitle]) {
 			$brend = $this->db->select_one('brends', ['id', 'title', 'parent_id'], "`title`='{$brendTitle}'");
 			$brend_id = $brend['parent_id'] ? $brend['parent_id'] : $brend['id'];
@@ -39,7 +38,7 @@ class Price{
 		else $brend_id = $this->brends[$brendTitle];
 		if (!$brend_id && !$this->isInsertBrend){
 			if (!in_array($brendTitle, $this->brendErrors)){
-				$this->log->error("Бренд $brendTitle не найден");
+				$this->log->error("Бренд $brendTitle в $row не найден");
 				$this->brendErrors[] = $brendTitle;
 			}
 			return false;

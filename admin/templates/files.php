@@ -2,14 +2,6 @@
 set_time_limit(0);
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 
-// $log_name = 'items.txt';
-// file_put_contents('logs/items.txt', '');
-
-$log_name = 'items_'.date('d.m.Y_H-i-s').'.txt';
-$log = new Katzgrau\KLogger\Logger('logs', Psr\Log\LogLevel::WARNING, array(
-	'filename' => $log_name,
-	'dateFormat' => 'G:i:s'
-));
 //Закоментировать для включения лога запросов
 $isUseProfiling = false;
 
@@ -17,6 +9,11 @@ $profiling = $db->isProfiling;
 if ($isUseProfiling) $db->isProfiling = true;
 
 if ($_POST['items_submit']){
+	$log_name = 'items_'.date('d.m.Y_H-i-s').'.txt';
+	$log = new Katzgrau\KLogger\Logger('logs', Psr\Log\LogLevel::WARNING, array(
+		'filename' => $log_name,
+		'dateFormat' => 'G:i:s'
+	));
 	$db->isProfiling = false;
 	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['items']['tmp_name']);
 	$xls->setActiveSheetIndex(0);
@@ -122,135 +119,93 @@ if ($_POST['items_submit']){
 	$log->alert("Всего вставлено: $inserted");
 	$log->alert("Всего обновлено: $updated");
 }
-function to_file($str){
-	global $f, $name;
-	if (!$f){
-		$name = date('d.m.Y_H-i-s').'.log';
-		$path = dirname(__DIR__).'\\logs\\'.$name;
-		$f = fopen($path, 'w');
-	}
-	fwrite($f, $str.PHP_EOL);
-}
 if ($_POST['items_analogies']){
+	$insertedItems = 0;
+	$insertedAnalogies = 0;
+
+	core\Timer::start();
 	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['items']['tmp_name']);
+	$price = new core\Price($db, 'items_analogies');
+
 	$xls->setActiveSheetIndex(0);
 	$sheet = $xls->getActiveSheet();
 	$rowIterator = $sheet->getRowIterator();
 	$r = 0;
-	$errors = array();
-	$inserted = 0;
-	$analogies = 0;
+
 	foreach ($rowIterator as $row) {
 		$cellIterator = $row->getCellIterator();
 		$value = array();
 		foreach($cellIterator as $cell) $value[] = $cell->getCalculatedValue();
 		$r++;//счетчик строк в файле
-		// debug($value, $r);
+		// if ($r > 100) die("Обработка прервана");
 		if (
 				!$value[0] || 											//основной бренд пуст
 				(!$value[1] && !$value[2]) ||		//артикул и каталожный номер пусты
 				!$value[4] ||											//бренд аналога пуст
 				(!$value[5] && !$value[6])			//артикул и каталожный номер аналога пусты
 			){
-			to_file("В стоке $r ошибочные данные.");
-			// echo "<p>Проверка не пройдена!</p>";
+			$price->log->error("В стоке $r ошибочные данные.");
 			continue;
 		}
-		$brend = $db->select_one('brends', ['id', 'parent_id'], "`title`='{$value[0]}' ");
-		if (empty($brend)){
-			to_file("В строке $r бренд {$value[0]} отсутствует.");
-			continue;
-		}
-		$brend_main_id = $brend['parent_id'] ? $brend['parent_id'] : $brend['id'];
-		$brend = $db->select_one('brends', ['id', 'parent_id'], "`title`='{$value[4]}' ");
-		if (empty($brend)){
-			to_file("В строке $r бренд {$value[4]} отсутствует.");
-			continue;
-		}
-		$brend_other_id = $brend['parent_id'] ? $brend['parent_id'] : $brend['id'];
-		if (!$value[1]){
-			$article_main = article_clear($value[2]);
-			$where_main = "`brend_id`=$brend_main_id AND `article`='$article_main'";
+
+
+		$brendMain = $price->getBrendId($value[0]);
+		$brendAnalogy = $price->getBrendId($value[4]);
+		if (!$brendMain || !$brendAnalogy) continue;
+
+		$articleMain = article_clear($value[1] ? $value[1] : $value[2]);
+		$articleAnalogy = article_clear($value[5] ? $value[5] : $value[6]);
+
+		$resMain = $db->insert('items', [
+			'brend_id' => $brendMain,
+			'article' => $articleMain,
+			'article_cat' => $value[2],
+			'title_full' => $value[3]
+		]);
+		if ($resMain === true){
+			$insertedItems++;
+			$item_main_id = $db->last_id();
+			$db->insert('articles', ['item_id' => $item_main_id, 'item_diff' => $item_main_id]);
 		} 
 		else{
-			$article_main = article_clear($value[1]);
-			$where_main = "`brend_id`=$brend_main_id AND `article`='$article_main'";
-		} 
-		if (!$value[6]){
-			$article_other = article_clear($value[5]);
-			$where_other = "`brend_id`=$brend_other_id AND `article`='$article_other'";
-		} 
-		else{
-			$article_other = article_clear($value[6]);
-			$where_other = "`brend_id`=$brend_other_id AND `article`='$article_other'";
-		} 
-		$main = $db->select_one('items', 'id', $where_main);
-		// debug($main, 'main');
-		$other = $db->select_one('items', 'id', $where_other);
-		// debug($other, 'other');
-		if (empty($main)){
-			$res = $db->insert(
-				'items',
-				[
-					'brend_id' => $brend_main_id,
-					'article' => $article_main,
-					'article_cat' => $value[2],
-					'title_full' => $value[3]
-				]
-			);
-			if ($res === true){
-				$inserted++;
-				$last_main = $db->last_id();
-				$db->insert('articles', ['item_id' => $last_main, 'item_diff' => $last_main]);
-			} 
-			else to_file("В строке $r ошибка вставки данных: ".$db->error());
-		} 
-		else $last_main = $main['id'];
-		if (empty($other)){
-			$res = $db->insert(
-				'items',
-				[
-					'brend_id' => $brend_other_id,
-					'article' => $article_other,
-					'article_cat' => $value[7],
-					'title_full' => $value[3]
-				]
-			);
-			if ($res === true){
-				$inserted++;
-				$last_other = $db->last_id();
-				$db->insert('articles', ['item_id' => $last_other, 'item_diff' => $last_other]);
-			} 
-			else to_file("В строке $r ошибка вставки данных: ".$db->error());
-		} 
-		else $last_other = $other['id'];
-		if ($last_other && $last_main){
-			$res = $db->query("
-				INSERT INTO #analogies 
-					(`item_id`, `item_diff`) 
-				VALUES 
-					($last_main, $last_other),
-					($last_other, $last_main)
-			", '');
-			if ($res === true) $analogies++;
-			else to_file("В строке $r ошибка вставки аналога: ".$db->error());
+			$itemMain = $db->select_one('items', 'id', "`article` = '{$articleMain}' AND `brend_id` = $brendMain");
+			$item_main_id = $itemMain['id'];
 		}
-		// if ($count_main && $count_other){
-		// 	$res = $db->insert(
-		// 		'articles',
-		// 		['i']
-		// 	);
-		// }
-		// echo "<hr>";
+
+		if ($_POST['create_analogies']){
+			$resAnalogy = $db->insert('items', [
+				'brend_id' => $brendAnalogy,
+				'article' => $articleAnalogy,
+				'article_cat' => $value[6],
+				'title_full' => $value[3]
+			]);
+			if ($resAnalogy === true){
+				$item_analogy_id = $db->last_id();
+				$db->insert('articles', ['item_id' => $item_analogy_id, 'item_diff' => $item_analogy_id]);
+			} 
+		}
+
+		if (!$item_analogy_id){
+			$itemAnalogy = $db->select_one('items', 'id', "`article`='{$articleAnalogy}' AND `brend_id` = $brendAnalogy");
+			if (empty($itemAnalogy)){
+				$price->log->warning("В строке $r не найдено {$value[4]} - $articleAnalogy");
+				continue;
+			}
+			else $item_analogy_id = $itemAnalogy['id'];
+		}
+
+		if ($item_analogy_id && $item_main_id){
+			$db->insert('analogies', ['item_id' => $item_analogy_id, 'item_diff' => $item_main_id]);
+			$db->insert('analogies', ['item_id' => $item_main_id, 'item_diff' => $item_analogy_id]);
+			$insertedAnalogies++;
+		}
 	}
 	echo "
-		<p>Вставлено строк номенклатуры: <b>$inserted</b>.</p>
-		<p>Вставлено аналогов: <b>$analogies</b>.</p>
+		<p>Время обработки: ".core\Timer::end()." секунд.</p>
+		<p>Вставлено строк номенклатуры: <b>$insertedItems</b>.</p>
+		<p>Вставлено аналогов: <b>$insertedAnalogies</b>.</p>
+		<a target='_blank' href='/admin/logs/{$price->nameFileLog}.txt'>Лог ошибок</a>
 	";
-	if ($f){
-		echo "<a target='_blank' href='/admin/logs/$name'>Лог ошибок</a>";
-		fclose($f);
-	}
 }
 $act = $_GET['act'];
 switch ($act){
@@ -288,6 +243,10 @@ function view(){
 					<form method="post" enctype="multipart/form-data">
 						<input type="hidden" name="items_analogies" value="1"> 
 						<input type="file" name="items">
+						<label>
+							<input type="checkbox" name="create_analogies" value="1">
+							<span>создавать аналоги</span>
+						</label>
 						<input type="submit" value="Загрузить">
 					</form>
 				</div>

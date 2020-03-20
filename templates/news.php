@@ -13,7 +13,7 @@ switch ($_GET['act']){
 		}
 		break;
 	case 's_change':
-		if ($db->update('news', array('new' => addslashes($_POST['new']), 'date' => time()), "`id`=".$_GET['id'])){
+		if ($db->update('news', array('new' => $_POST['new'], 'date' => time()), "`id`=".$_GET['id'])){
 			message('Новость успешно сохранена!');
 			header('Location: /admin/?view=news');
 		}

@@ -23,7 +23,7 @@ if ($_POST['bonus_current']){
 				'sum' => $_POST['bonus_count'],
 				'remainder' => $user['bonus_count'] - $_POST['bonus_count'],
 				'user_id' => $_SESSION['user'],
-				'comment' => addslashes('Списание бонусов')
+				'comment' => 'Списание бонусов'
 			],
 			['print_query' => false]
 		);

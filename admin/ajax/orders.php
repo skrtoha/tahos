@@ -84,7 +84,7 @@ switch($_POST['status_id']){
 				'sum' => $_POST['price'] * $_POST['issued_new'],
 				'remainder' => $_POST['bill'] - $_POST['price'] * $_POST['issued_new'],
 				'user_id' => $_POST['user_id'],
-				'comment' => addslashes('Списание средств на оплату "'.$title.'"')
+				'comment' => 'Списание средств на оплату "'.$title.'"'
 			],
 			['print_query' => false]
 		);

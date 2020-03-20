@@ -25,7 +25,7 @@ switch ($act){
 		header("Location: /admin/?view=brends&id={$_GET['id']}&act=change");
 		break;
 	case 's_change':
-		foreach ($_POST as $key => $value) $_POST[$key] = addslashes($value);
+		foreach ($_POST as $key => $value) $_POST[$key] = $value;
 		if (!empty($_FILES['image'])){
 			$f = $_FILES['image'];
 			if ($f['type'] == 'image/svg+xml'){
@@ -42,7 +42,7 @@ switch ($act){
 		}
 		break;
 	case 's_add':
-		foreach ($_POST as $key => $value) $_POST[$key] = addslashes($value);
+		foreach ($_POST as $key => $value) $_POST[$key] = $value;
 		// print_r($_GET);
 		// exit();
 		$brend_title = $_POST['title'];

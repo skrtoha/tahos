@@ -48,6 +48,7 @@ INSERT INTO `tahos_settings` (`id`, `ratings`, `cat_perPage`, `cat_countChunk`, 
 
 ALTER TABLE `tahos_items` CHANGE `isBlocked` `is_blocked` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0';
 
+ALTER TABLE `tahos_funds` CHANGE `sum` `sum` INT(7) NULL DEFAULT NULL;
 
 
 

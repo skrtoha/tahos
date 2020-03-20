@@ -18,14 +18,14 @@ switch ($act){
 	case 'change': show_form('s_change');break;
 	case 'add': show_form('s_add');break;
 	case 's_change':
-		foreach ($_POST as $key => $value) $_POST[$key] = addslashes($value);
+		foreach ($_POST as $key => $value) $_POST[$key] = $value;
 		if ($db->update('brends', $_POST, "`id`=".$_GET['id'])){
 			message('Бренд успешно изменен!');
 			header("Location: ?view=brends");
 		}
 		break;
 	case 's_add':
-		foreach ($_POST as $key => $value) $_POST[$key] = addslashes($value);
+		foreach ($_POST as $key => $value) $_POST[$key] = $value;
 		// print_r($_GET);
 		// exit();
 		$brend_title = $_POST['title'];

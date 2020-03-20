@@ -56,7 +56,7 @@ class User{
 		$sign = $act == 'plus' ? '+' : '-';
 		return self::update(
 			$user_id,
-			['reserved_funds' => "reserved_funds $sign {$price}"]
+			['reserved_funds' => "`reserved_funds` $sign {$price}"]
 		);
 	}
 
@@ -77,7 +77,7 @@ class User{
 			'sum' => $current_bonus_count,
 			'remainder' => $user['bonus_count'] + $current_bonus_count,
 			'user_id' => $user_id,
-			'comment' => addslashes('Начисление бонусов за заказ "'.$title.'"')
+			'comment' => 'Начисление бонусов за заказ "'.$title.'"'
 		]);
 		return true;
 	}

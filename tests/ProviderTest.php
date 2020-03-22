@@ -29,7 +29,7 @@ class ProviderTest extends \PHPUnit\Framework\TestCase{
         $response = Abcp::getUrlData(
             'http://api.favorit-parts.ru/hs/hsprice/?key='.FavoriteParts::$key.'&number=53610-SNR-A01'
         );
-        $this->assertNotEmpty($response, 'не работает api');
+        $this->assertNotNull($response, 'Ошибка api, возможено отключен vpn');
         $item = FavoriteParts::getItem('Honda', '53610SNRA01');
     }
 }

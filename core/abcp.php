@@ -308,7 +308,10 @@ class Abcp extends Provider{
 			$array['http']['content'] = http_build_query($data);
 		}
 		$context = stream_context_create($array);
-		$res = file_get_contents($url, false, $context);
+		try{
+			$res = file_get_contents($url, false, $context);
+			if ($res === false) return false;
+		} catch(\Exception $e){}
 		$GLOBALS['response_header'] = $http_response_header;
 		return $res;
 	}

@@ -171,7 +171,7 @@ class Armtek extends Provider{
 		}
 	}
 	public function setArticle($brand, $article){
-		if (parent::getIsDisabledApiSearch($this->provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch($this->provider_id)) return false;
 		$this->params['PIN'] = $article;
 		$this->params['BRAND']	= $brand;
 		$this->params['QUERY_TYPE']	= 1;
@@ -185,7 +185,7 @@ class Armtek extends Provider{
 		$this->render($data->RESP);
 	}
 	public function getSearch($search){
-		if (parent::getIsDisabledApiSearch($this->provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch($this->provider_id)) return false;
 		$this->params['PIN'] = $search;
 		$request_params = [
 			'url' => 'search/search',

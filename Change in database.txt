@@ -50,6 +50,7 @@ ALTER TABLE `tahos_items` CHANGE `isBlocked` `is_blocked` TINYINT(1) UNSIGNED NO
 
 ALTER TABLE `tahos_funds` CHANGE `sum` `sum` INT(7) NULL DEFAULT NULL;
 
+ALTER TABLE `tahos_providers` CHANGE `is_disabled_api_search` `is_enabled_api_search` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', CHANGE `is_disabled_api_order` `is_enabled_api_order` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0';
 
 
 

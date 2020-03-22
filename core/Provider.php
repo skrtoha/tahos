@@ -5,24 +5,24 @@ class Provider{
 		$res = $GLOBALS['db']->select('providers', 'id,title', '', 'title');
 		return $res;
 	}
-	public static function getIsDisabledApiSearch($provider_id){
-		static $disabledArrayApiSearch;
-		if (!$disabledArrayApiSearch){
+	public static function getIsEnabledApiSearch($provider_id){
+		static $enabledArrayApiSearch;
+		if (!$enabledArrayApiSearch){
 			$db = isset($GLOBALS['db']) ? $GLOBALS['db'] : new DataBase();
 			$output = array();
 			$res = $db->query("
 				SELECT
-					id, is_disabled_api_search
+					id, is_enabled_api_search
 				FROM
 					#providers
 				WHERE
-					is_disabled_api_search = 1
+					is_enabled_api_search = 1
 			", '');
 			if (!$res->num_rows) return false;
 			foreach($res as $value) $output[] = $value['id'];
-			$disabledArrayApiSearch = $output;
+			$enabledArrayApiSearch = $output;
 		}	
-		if (in_array($provider_id, $disabledArrayApiSearch)) return true;
+		if (in_array($provider_id, $enabledArrayApiSearch)) return true;
 		else return false;
 	}
 	public static function isAdminArea(){
@@ -33,24 +33,24 @@ class Provider{
 	 * gets list with is_disabled_api_order =1
 	 * @return array array with is_disabled_api_order
 	 */
-	public static function getIsDisabledApiOrder($provider_id){
-		static $disabledArrayApiOrder;
-		if (!$disabledArrayApiOrder){
+	public static function getIsEnabledApiOrder($provider_id){
+		static $enabledArrayApiOrder;
+		if (!$enabledArrayApiOrder){
 			$db = isset($GLOBALS['db']) ? $GLOBALS['db'] : new DataBase();
 			$output = array();
 			$res = $db->query("
 				SELECT
-					id, is_disabled_api_order
+					id, is_enabled_api_order
 				FROM
 					#providers
 				WHERE
-					is_disabled_api_order = 1
+					is_enabled_api_order = 1
 			", '');
 			if (!$res->num_rows) return false;
 			foreach($res as $value) $output[] = $value['id'];
-			$disabledArrayApiOrder = $output;
+			$enabledArrayApiOrder = $output;
 		}	
-		if (in_array($provider_id, $disabledArrayApiOrder)) return true;
+		if (in_array($provider_id, $enabledArrayApiOrder)) return true;
 		else return false;
 	}
 	public static function showErrorDisabledApiOrder(){

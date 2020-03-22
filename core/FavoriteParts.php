@@ -12,7 +12,7 @@ class FavoriteParts extends Provider{
 	 * @return [array] array like [brend => title]
 	 */
 	public static function getSearch($search){
-		if (parent::getIsDisabledApiSearch(self::$provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$coincidences = array();
 		$response = Abcp::getUrlData(
 			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$search
@@ -33,7 +33,7 @@ class FavoriteParts extends Provider{
 	 * @return array array of items
 	 */
 	public static function getItem($brend, $article){
-		if (parent::getIsDisabledApiSearch(self::$provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$response = Abcp::getUrlData(
 			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues='
 		);

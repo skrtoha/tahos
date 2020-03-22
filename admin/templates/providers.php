@@ -196,15 +196,15 @@ function provider(){
 				</div>
 				<?if ($array['api_title'] && file_exists($_SERVER['DOCUMENT_ROOT']."/core/{$array['api_title']}.php")){?>
 					<div class="field">
-						<div class="title">Отключить API поиска</div>
+						<div class="title">Включить API поиска</div>
 						<div class="value">
-							<input type="checkbox" name="is_disabled_api_search" <?=$array['is_disabled_api_search'] ? 'checked' : ''?> value="1">
+							<input type="checkbox" name="is_enabled_api_search" <?=$array['is_enabled_api_search'] ? 'checked' : ''?> value="1">
 						</div>
 					</div>
 					<div class="field">
-						<div class="title">Отключить API заказов</div>
+						<div class="title">Включить API заказов</div>
 						<div class="value">
-							<input type="checkbox" name="is_disabled_api_order" <?=$array['is_disabled_api_order'] ? 'checked' : ''?> value="1">
+							<input type="checkbox" name="is_enabled_api_order" <?=$array['is_enabled_api_order'] ? 'checked' : ''?> value="1">
 						</div>
 					</div>
 				<?}?>

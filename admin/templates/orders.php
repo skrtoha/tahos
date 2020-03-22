@@ -20,7 +20,7 @@ switch ($act) {
 			//debug($ov); //continue;
 			$isRendered = false;
 			if ($ov['provider_id'] == 15){
-				if (Provider::getIsDisabledApiOrder(15)) continue;
+				if (!Provider::getIsEnabledApiOrder(15)) continue;
 				$armtek->toOrder([
 					'order_id' => $ov['order_id'],
 					'store_id' => $ov['store_id'],
@@ -30,12 +30,12 @@ switch ($act) {
 				$isRendered = true;
 			}
 			if ($mikado->isStoreMikado($ov['store_id'])){
-				if (Provider::getIsDisabledApiOrder($ov['provider_id'])) continue;
+				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])) continue;
 				$mikado->Basket_Add($ov);
 				$isRendered = true;
 			} 
 			if ($armtek->isKeyzak($ov['store_id'])){
-				if (Provider::getIsDisabledApiOrder($ov['provider_id'])) continue;
+				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])) continue;
 				$armtek->toOrder(
 					[
 						'order_id' => $ov['order_id'],
@@ -46,7 +46,7 @@ switch ($act) {
 				$isRendered = true;
 			} 
 			if ($ov['provider_id'] == 6 || $ov['provider_id'] == 13){
-				if (Provider::getIsDisabledApiOrder($ov['provider_id'])) continue;
+				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])) continue;
 				$orderAbcp = new core\OrderAbcp($db, $ov['provider_id']);
 				$itemInfo = $orderAbcp->getItemInfoByArticleAndBrend($ov);
 				if (!$itemInfo){
@@ -68,7 +68,7 @@ switch ($act) {
 			}
 			//Favorit Avto
 			if ($ov['provider_id'] == 19){
-				if (Provider::getIsDisabledApiOrder(19)) continue;
+				if (!Provider::getIsEnabledApiOrder(19)) continue;
 				$isRendered = true;
 				$res = core\FavoriteParts::addToBasket($ov);
 				if (!$res) "<p><b>Ошибка добавления {$ov['brend']} - {$ov['article']} в Фаворит</b></p>";
@@ -85,7 +85,7 @@ switch ($act) {
 	case 'toBasketMparts':
 	case 'fromBasketMparts':
 		// debug($_GET); exit();
-		if (Provider::getIsDisabledApiOrder(13)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(13)) Provider::showErrorDisabledApiOrder();
 		$orderAbcp = new core\OrderAbcp($db, 13);
 		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
 		if (!$itemInfo){
@@ -109,7 +109,7 @@ switch ($act) {
 	case 'toBasketVoshodAvto':
 	case 'fromBasketVoshodAvto':
 		debug($_GET); //exit();
-		if (Provider::getIsDisabledApiOrder(6)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(6)) Provider::showErrorDisabledApiOrder();
 		$orderAbcp = new core\OrderAbcp($db, 6);
 		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
 		if (!$itemInfo){
@@ -131,33 +131,33 @@ switch ($act) {
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'deleteFromOrderArmtek':
-		if (Provider::getIsDisabledApiOrder(2)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(2)) Provider::showErrorDisabledApiOrder();
 		$armtek->deleteFromOrder($_GET, 'armtek');
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;
 	case 'deleteFromOrderRossko':
-		if (Provider::getIsDisabledApiOrder(15)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(15)) Provider::showErrorDisabledApiOrder();
 		$armtek->deleteFromOrder($_GET, 'rossko');
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;
 	case 'deleteFromMikado':
-		if (Provider::getIsDisabledApiOrder(8)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(8)) Provider::showErrorDisabledApiOrder();
 		$mikado->deleteFromOrder($_GET);
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;
 	case 'toOrderArmtek':
-		if (Provider::getIsDisabledApiOrder(2)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(2)) Provider::showErrorDisabledApiOrder();
 		$armtek->toOrder($_GET, 'armtek');
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;
 	case 'toOrderRossko':
-		if (Provider::getIsDisabledApiOrder(15)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(15)) Provider::showErrorDisabledApiOrder();
 		$armtek->toOrder($_GET, 'rossko');
 		if ($_GET['store_id'] == 24) $rossko->sendOrder(24);
 		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 		break;
 	case 'deleteFromFavoriteAuto':
-		if (Provider::getIsDisabledApiOrder(19)) Provider::showErrorDisabledApiOrder();
+		if (!Provider::getIsEnabledApiOrder(19)) Provider::showErrorDisabledApiOrder();
 		core\FavoriteParts::addToBasket($_GET);
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;

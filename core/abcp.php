@@ -128,7 +128,7 @@ class Abcp extends Provider{
 	public function getSearch($search){
 		$coincidences = array();
 		foreach(self::$params as $store_id => $param){
-			if (parent::getIsDisabledApiSearch($param->provider_id)) return false;
+			if (!parent::getIsEnabledApiSearch($param->provider_id)) return false;
 			$c = array();
 			$url = "{$param['url']}/search/brands?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw'])."&number=$search";
 			$response = @file_get_contents($url);

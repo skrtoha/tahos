@@ -1,8 +1,15 @@
 <?php 
 use core\Log;
-ini_set('error_reporting', E_PARSE | E_ERROR);
+
+set_exception_handler('error_handler');
+function error_handler(Exception $e){
+	Log::insertThroughException($e);
+}
+
+// ini_set('error_reporting', E_PARSE | E_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+
 
 require_once('../core/DataBase.php');
 require_once('templates/functions.php');
@@ -23,9 +30,11 @@ if ($view == 'orders' && $_GET['act'] == 'print'){
 }
 if (!$_SESSION['auth'] && $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest' && $view != 'cron') $view = 'authorization';
 if (file_exists("functions/$view.function.php")) require_once("functions/$view.function.php");
+
 ob_start();
 require_once ("templates/$view.php");	
 $content = ob_get_contents();
 ob_clean();
 require_once('templates/main.php');
+
 ?>

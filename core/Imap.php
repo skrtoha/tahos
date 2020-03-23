@@ -3,12 +3,20 @@ namespace core;
 class Imap{
 	private $login = 'price@tahos.ru';
 	private $password = 'Anton12345';
+	public $error;
 
 	public function __construct($imap){
-		$this->connection = imap_open($imap, $this->login, $this->password);
+		try{
+			$this->connection = imap_open($imap, $this->login, $this->password);
+			if (!$this->connection) throw new \Exception('Не удалось подключиться к почте по протоколу Imap');
+		} catch(\Exception $e){
+			$this->error = $e->getMessage();
+			Log::insertThroughException($e);
+		}
 	}
 	public function getLastMailFrom($params){
 		$data = array();
+		if ($this->error) return false;
 		$num = imap_num_msg($this->connection);
 		for($i = $num; $i > $num - 20; $i--){
 			$header = imap_header($this->connection, $i);

@@ -25,16 +25,13 @@ class Item{
 			$res = $GLOBALS['db']->update('items', $fields, $conditions);
 			if ($res !== true) throw new \Exception($res);
 		} catch(\Exception $c){
-			$trace = $c->getTrace();
-			Log::insert([
-				'source' => $_SERVER['REQUEST_URI'],
+			Log::insertThroughException($c, [
 				'query' => $GLOBALS['db']->last_query,
-				'file' => $trace[0]['file'],
-				'line' => $trace[0]['line'],
 				'text' => $res
-			], ['print' => true]);
+			]);
+			return $res;
 		}
-		// return 
+		return true;
 	}
 	public static function clearAnalogies($item_id){
 		return $GLOBALS['db']->delete('analogies', "`item_id` = $item_id OR `item_diff` = $item_id");

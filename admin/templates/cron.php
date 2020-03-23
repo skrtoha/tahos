@@ -1,8 +1,8 @@
 <?php
 set_time_limit(0);
 error_reporting(E_PARSE | E_ERROR);
-$startProcess = time();
-echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
+core\Timer::start();
+// echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
 switch($_GET['act']){
 	case 'bonuses':
 		require_once ('../vendor/autoload.php');
@@ -92,7 +92,11 @@ switch($_GET['act']){
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$filename = $imap->getLastMailFrom(['from' => 'noreply@berg.ru', 'name' => $_GET['act']]);
-		if (!$filename) die("<br>Не удалось получить файл из почты.");
+		if (!$filename){
+			$errorText = "Не удалось получить файл из почты.";
+			echo "<br>$errorText";
+			throw new Exception($errorText);
+		} 
 		$handle = fopen($filename, 'r');
 
 		if ($_GET['act'] == 'BERG_Yar') $store_id = 276;
@@ -154,7 +158,11 @@ switch($_GET['act']){
 		$rossko = new core\Rossko($db);
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$filename = $imap->getLastMailFrom(['from' => 'price@rossko.ru', 'name' => 'rossko_price.zip']);
-		if (!$filename) die("<br>Не удалось получить файл из почты.");
+		if (!$filename){
+			$errorText = "Не удалось получить файл из почты.";
+			echo "<br>$errorText";
+			throw new Exception($errorText);
+		} 
 		
 		$zipArchive = new ZipArchive();
 		// $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/rossko_price.zip");
@@ -162,7 +170,9 @@ switch($_GET['act']){
 
 		$numFiles = $zipArchive->numFiles;
 		if (!$numFiles){
-			echo ("<br>Ошибка скачивания файла с почты");
+			$errorText = "Ошибка скачивания файла с почты";
+			echo "<br>$errorText";
+			throw new Exception($errorText);
 			break;
 		} 
 		$db->query("
@@ -177,7 +187,9 @@ switch($_GET['act']){
 			$zipFile = $zipArchive->statIndex($num);
 			$store_id = $fileNames[$zipFile['name']];
 			if (!$store_id) {
-				echo "<br>Неизвестное имя файла {$zipFile['name']}";
+				$errorText = "Неизвестное имя файла {$zipFile['name']}";
+				echo "<br>$errorText";
+				throw new Exception($errorText);
 				continue;
 			}
 			$price = new core\Price($db, 'price_'.$ciphers[$store_id]);
@@ -246,7 +258,11 @@ switch($_GET['act']){
 		$res = $zipArchive->open($filename);
 		$file = $zipArchive->getStream('Voshod.csv');
 
-		if (!$file) die("Ошибка скачивания файла Voshod.zip с почты.");
+		if (!$file){
+			$errorText = "Ошибка скачивания файла Voshod.zip с почты.";
+			echo "<br>$errorText";
+			throw new Exception($errorText);
+		} 
 
 		$db->delete('store_items', "`store_id`=8");
 		$i = 0;
@@ -300,17 +316,19 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID={$mikado->ClientID}&PSW={$mikado->Password}";
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID={$mikado->ClientID}&PSW={$mikado->Password}111";
+			$file = file_get_contents($url);
+			if (strlen($file) == 18){
+				$errorText = "Не удалось скачать $zipName в $url";
+				echo "<br>$errorText";
+				throw new Exception($errorText);
+			} 
 			$resDownload = (
 				file_put_contents(
 					"{$_SERVER['DOCUMENT_ROOT']}/tmp/{$zipName}.zip", 
-					file_get_contents($url)
+					$file
 				)
 			);
-			if (!$resDownload){
-				echo "<br> Не удалось скачать $zipName";
-				continue;
-			}
 			
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$zipName}.zip");
@@ -370,9 +388,14 @@ switch($_GET['act']){
 		// $price->isInsertItem = true;
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		if ($imap->error) die("Подключение не удалось");
 		$filename = $imap->getLastMailFrom(['from' => 'zakaz@sportavto.com', 'name' => 'price.zip']);
-		if (!$filename) die("<br>Не удалось получить файл из почты.");
-		
+		if (!$filename){
+			$textError = "Не удалось получить файл из почты.";
+			echo "<br>$textError";
+			throw new Exception($textError);
+		} 
+
 		$zipArchive = new ZipArchive();
 		$res = $zipArchive->open($filename);
 		$file = $zipArchive->getStream('price.csv');
@@ -424,7 +447,6 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 	case 'priceArmtek':
-		require_once ('../vendor/PHPExcel/IOFactory.php');
 		echo "<h2>Прайс Армтек</h2>";
 		$fileNames = [
 			'Armtek_msk_40068974' => 3
@@ -436,15 +458,20 @@ switch($_GET['act']){
 		];
 		$armtek = new core\Armtek($db);
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		if (isset($imap->error)) {
+			echo "$imap->error";
+			break;
+		}
 		$zipArchive = new ZipArchive();
-
 
 		foreach($fileNames as $fileName => $store_id){
 			$price = new core\Price($db, 'price_'.$ciphers[$store_id]);
+			
 			$fileImap = $imap->getLastMailFrom(['from' => 'price@armtek.ru', 'name' => $fileName]);
 			if (!$fileImap){
-				echo ("<br>Не удалось получить $fileName из почты.");
-				continue;
+				$textError = "Не удалось скачать $fileName с price@armtek.ru";
+				echo "<br>$textError";
+				throw new Exception($textError);
 			}
 
 			$db->query("
@@ -466,7 +493,7 @@ switch($_GET['act']){
 				continue;
 			};
 
-			$xls = PHPExcel_IOFactory::load("{$_SERVER['DOCUMENT_ROOT']}/tmp/$fileName.xlsx");
+			$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load("{$_SERVER['DOCUMENT_ROOT']}/tmp/$fileName.xlsx");
 			$xls->setActiveSheetIndex(0);
 			$sheet = $xls->getActiveSheet();
 			$rowIterator = $sheet->getRowIterator();
@@ -526,11 +553,17 @@ switch($_GET['act']){
 	case 'priceMparts':
 		echo "<h2>Прайс МПартс</h2>";
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		if (isset($imap->error)){
+			echo "<br>$imap->error";
+			break;
+		}
 		$price = new core\Price($db, 'priceMparts');
 
 		$fileImap = $imap->getLastMailFrom(['from' => 'price@v01.ru', 'name' => 'MPartsPrice.XLSX']);
 		if (!$fileImap){
-			echo ("<br>Не удалось получить MPartsPrice.xlsx из почты.");
+			$textError = "Не удалось получить MPartsPrice.xlsx из почты.";
+			echo "<br>$textError";
+			throw new Exception($textError);
 			break;
 		}
 
@@ -600,15 +633,18 @@ switch($_GET['act']){
 		break;
 	case 'priceForumAuto':
 		echo "<h2>Прайс Forum-Auto</h2>";
-		require_once ('../vendor/PHPExcel/IOFactory.php');
 		$price = new core\Price($db, 'priceForumAuto');
 		$price->isInsertItem = true;
 		$price->isInsertBrend = true;
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
-		if (!$fileImap) die("<br>Не удалось получить файл из почты.");
-		
+		if (!$fileImap){
+			$errorText = "Не удалось получить Forum-Auto_Price.zip из почты";
+			echo "<br>$errorText";
+			throw new \Exception($errorText);
+		} 
+
 		$db->query("
 			DELETE si FROM
 				#store_items si
@@ -616,7 +652,7 @@ switch($_GET['act']){
 				#provider_stores ps ON ps.id=si.store_id
 			WHERE 
 				ps.provider_id = 17
-		", '');
+		", 'debug');
 		
 		$zipArchive = new ZipArchive();
 		$res = $zipArchive->open($fileImap);
@@ -630,7 +666,7 @@ switch($_GET['act']){
 			break;
 		};
 
-		$xls = PHPExcel_IOFactory::load("{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.xlsx");
+		$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load("{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.xlsx");
 		$xls->setActiveSheetIndex(0);
 		$sheet = $xls->getActiveSheet();
 		$rowIterator = $sheet->getRowIterator();
@@ -643,9 +679,9 @@ switch($_GET['act']){
 			} 
 			$i++;
 
-			// debug($row);
-			// if ($i > 20) break;
-			// continue;
+			debug($row);
+			if ($i > 20) break;
+			continue;
 
 			if (!$row[0]) continue;
 			if ($row[0] == 'ГРУППА') continue;
@@ -690,7 +726,6 @@ switch($_GET['act']){
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
-		//debug($emailPrice); //exit();
 		$store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
@@ -708,7 +743,6 @@ switch($_GET['act']){
 		
 		echo "<h2>Прайс {$emailPrice['title']}</h2>";
 
-
 		$price = new core\Price($db, $emailPrice['title']);
 		if ($emailPrice['isAddItem']) $price->isInsertItem = true;
 		if ($emailPrice['isAddBrend']) $price->isInsertBrend = true;
@@ -719,10 +753,11 @@ switch($_GET['act']){
 			'name' => $emailPrice['name']
 		]);
 		if (!$fileImap){
-			echo ("<br>Не удалось получить {$emailPrice['name']} из почты.");
-			break;
-		}
-		 
+			$errorText = "Не удалось скачать {$emailPrice['name']} из почты.";
+			echo "<br>$errorText";
+			throw new Exception($errorText);
+		} 
+
 		switch($emailPrice['clearPrice']){
 			case 'onlyStore': $db->delete('store_items', "`store_id`={$_GET['store_id']}"); break;
 			case 'provider': $db->query("
@@ -742,14 +777,18 @@ switch($_GET['act']){
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open($fileImap);
 			if (!$res){
-				echo "<br>Ошибка чтения файла {$emailPrice['']}";
+				$errorText = "Ошибка чтения файла {$emailPrice['name']}";
+				throw new Exception($errorText);
+				echo "<br>$errorText";
 				break;
-			};
+			} 
 			$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$emailPrice['nameInArchive']]);
 			if (!$res){
-				echo "<br>Ошибка извлечения файла {$emailPrice['nameInArchive']}: $res";
+				$errorText = "Ошибка извлечения файла {$emailPrice['nameInArchive']}: $res";
+				throw new Exception($errorText);
+				echo "<br>$errorText";
 				break;
-			};
+			} 
 			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}";
 			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
 		}
@@ -761,8 +800,7 @@ switch($_GET['act']){
 		$stringNumber = 0;
 		switch($emailPrice['fileType']){
 			case 'excel':
-				require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/PHPExcel/IOFactory.php');
-				$xls = PHPExcel_IOFactory::load($workingFile);
+				$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($fileImap);
 				$xls->setActiveSheetIndex(0);
 				$sheet = $xls->getActiveSheet();
 				$rowIterator = $sheet->getRowIterator();
@@ -774,10 +812,6 @@ switch($_GET['act']){
 					} 
 					$stringNumber++;
 					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
-					
-					// debug($row);
-					// if ($stringNumber > 100) break;
-					// echo "<hr>";
 				}
 				break;
 			case 'csv':
@@ -786,10 +820,6 @@ switch($_GET['act']){
 					$row = explode(';', str_replace('"', '', $row));
 					$stringNumber++;
 					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
-
-					// debug($row);
-					// if ($stringNumber > 100) break;
-					// echo "<hr>";
 				}
 				break;
 		}
@@ -808,6 +838,4 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 }
-$endProcess = time();
-echo "<br>Окончание: <b>".date("d.m.Y H:i:s")."</b>";
-echo "<br>Время обработки: <b>".($endProcess - $startProcess)."</b> секунд";
+echo "<br>Время обработки: <b>".core\Timer::end()."</b> секунд";

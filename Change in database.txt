@@ -52,7 +52,18 @@ ALTER TABLE `tahos_funds` CHANGE `sum` `sum` INT(7) NULL DEFAULT NULL;
 
 ALTER TABLE `tahos_providers` CHANGE `is_disabled_api_search` `is_enabled_api_search` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', CHANGE `is_disabled_api_order` `is_enabled_api_order` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0';
 
-
+CREATE TABLE `tahos_logs` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `query` text,
+  `text` text NOT NULL,
+  `trace` text,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ALTER TABLE `tahos_logs`
+  ADD PRIMARY KEY (`id`);
+ALTER TABLE `tahos_logs`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 
 

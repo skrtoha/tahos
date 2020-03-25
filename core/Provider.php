@@ -56,4 +56,8 @@ class Provider{
 	public static function showErrorDisabledApiOrder(){
 		die("API заказов для этого поставщика отключено. <a href=\"{$_SERVER['HTTP_REFERER']}\">Назад</a>");
 	}
+	public static function getInstanceDataBase(){
+		if (isset($GLOBALS['db'])) return $GLOBALS['db'];
+		else return new DataBase();
+	}
 }

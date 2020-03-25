@@ -339,9 +339,8 @@ class Armtek extends Provider{
 		$this->db->delete('other_orders', "$where AND `type`='$type'");
 		OrderValue::changeStatus(5, $value);
 	}
-	public function getItems($type = 'armtek'){
-		$items = array();
-		$res_items = $this->db->query("
+	public static function getItems($type = 'armtek'){
+		return self::getInstanceDataBase()->query("
 			SELECT
 				ov.user_id,
 				ov.order_id,
@@ -367,7 +366,6 @@ class Armtek extends Provider{
 				#provider_brends pb ON pb.brend_id = b.id AND pb.provider_id = ps.provider_id
 			WHERE ao.type = '$type' && ao.response IS NULL
 		", '');
-		return $res_items;
 	}
 	public static function clearString($str){
 		$str = mb_strtolower($str);
@@ -376,9 +374,13 @@ class Armtek extends Provider{
 	public function sendOrder($settings = array()){
 		$params['VKORG'] = $this->params['VKORG'];
 		$params['KUNRG'] = $this->params['KUNNR_RG'];
-		$res_items = $this->getItems('armtek');
+		$res_items = self::getItems('armtek');
 		if (!$res_items->num_rows){
 			echo "<br>Товаров для отправки не найдено";
+			Log::insert([
+				'url' => $_SERVER['REQUEST_URI'],
+				'text' => 'Армтек: не найдено товаров для отправки'
+			]);
 			return false;
 		} 
 		$items = array();

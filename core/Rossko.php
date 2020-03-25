@@ -17,6 +17,7 @@ class Rossko extends Provider{
 	public $provider_id = 15;
 	private $stopOnError = false;
 	public $isNeedsToCheck;
+	public function getItemsToOrder(int $provider_id){}
 	public function __construct($db, $text = NULL){
 		ini_set('soap.wsdl_cache_enabled',0);
 		ini_set('soap.wsdl_cache_ttl',0);

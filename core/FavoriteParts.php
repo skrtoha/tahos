@@ -25,6 +25,7 @@ class FavoriteParts extends Provider{
 		} 
 		return $coincidences;
 	}
+	public function getItemsToOrder(int $provider_id){}
 
 	/**
 	 * gets item by brend and article

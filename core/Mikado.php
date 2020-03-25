@@ -14,6 +14,7 @@ class Mikado extends Provider{
 		10 => 13,
 		35 => 12
 	];
+	public function getItemsToOrder(int $provider_id){}
 	public function __construct($db){
 		$this->db = $db;	
 		$this->armtek = new Armtek($this->db);

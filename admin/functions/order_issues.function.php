@@ -57,7 +57,7 @@ class Issues{
 			exit();
 		}
 		message('Успешно сохранено');
-		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
+		// header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
 	}
 	protected function getOrderIssues(){
 		if ($_GET['user_id']) $where = "WHERE oi.user_id={$_GET['user_id']}";

@@ -87,7 +87,7 @@ class Impex extends Provider{
 		return json_decode(file_get_contents($url), true);
 	}
 	public static function setSearch($params){
-		if (!Provider::getIsEnabledApiSearch()) return false;
+		if (!Provider::getIsEnabledApiSearch(1)) return false;
 		$db = $GLOBALS['db'];
 		$data = self::getData([
 			'article' => article_clear($params['search']),

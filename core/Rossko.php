@@ -185,7 +185,7 @@ class Rossko extends Provider{
 	}
 	private function getParts($store_id = NULL){
 		$armtek = new Armtek($this->db);
-		$res_items = $armtek->getItems('rossko');
+		$res_items = Amtek::getItems('rossko');
 		if (!$res_items->num_rows) return false;
 		// $query  = new \SoapClient('http://api.rossko.ru/service/GetSearch', $this->connect['options']);
 		$items = array();

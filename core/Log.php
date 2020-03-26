@@ -1,7 +1,16 @@
 <?php
 namespace core;
 class Log{
-	public static function insert($params, $flag = null){
+	/**
+	 * inserts a record to Log
+	 * @param  array $params 
+	 *         	text - required,
+	 *         	url, query, trace - optional
+	 * @param  bool|null $flag   [description]
+	 * @return mixed true - if successfully inserted, string - error
+	 */
+	public static function insert(array $params, boolean $flag = null): bool
+	{
 		return $GLOBALS['db']->insert(
 			'logs',
 			$params,

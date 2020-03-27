@@ -17,6 +17,7 @@ class Rossko extends Provider{
 	public $provider_id = 15;
 	private $stopOnError = false;
 	public $isNeedsToCheck;
+	public function getItemsToOrder(int $provider_id){}
 	public function __construct($db, $text = NULL){
 		ini_set('soap.wsdl_cache_enabled',0);
 		ini_set('soap.wsdl_cache_ttl',0);
@@ -184,8 +185,7 @@ class Rossko extends Provider{
 		return $query->GetCheckoutDetails($this->param);
 	}
 	private function getParts($store_id = NULL){
-		$armtek = new Armtek($this->db);
-		$res_items = Amtek::getItems('rossko');
+		$res_items = Armtek::getItems('rossko');
 		if (!$res_items->num_rows) return false;
 		// $query  = new \SoapClient('http://api.rossko.ru/service/GetSearch', $this->connect['options']);
 		$items = array();

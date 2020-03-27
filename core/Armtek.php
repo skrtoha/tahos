@@ -38,6 +38,7 @@ class Armtek extends Provider{
 			)
 		);
 	}
+	public function getItemsToOrder(int $provider_id){}
 	public static function getDaysDelivery($str){
 		$year = substr($str, 0, 4);
 		$month = substr($str, 4, 2);

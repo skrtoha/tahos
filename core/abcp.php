@@ -32,6 +32,7 @@ class Abcp extends Provider{
 		]
 	];
 	private $providerStores = [];
+	public function getItemsToOrder(int $provider_id){}
 	public function __construct($item_id = NULL, $db){
 		// if (!$_SESSION['user']) return false;
 		$this->db = $db;

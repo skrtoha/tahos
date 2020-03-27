@@ -77,7 +77,7 @@ class Impex extends Provider{
 		'HONDA MARINE' => 10001,
 		'SUZUKI MARINE' => 10002,
 	]; 
-
+	public function getItemsToOrder(int $provider_id){}
 	public static function getData($params){
 		$url = "https://www.impex-jp.com/api/parts/search.html?part_no={$params['article']}&key=EicWfyYXZs5xJeKtrVuQ";
 		if (isset($params['brend']) && $params['brend']){

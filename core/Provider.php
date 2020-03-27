@@ -1,6 +1,7 @@
 <?php
 namespace core;
-class Provider{
+abstract class Provider{
+	protected abstract function getItemsToOrder(int $provider_id);
 	public static function get(){
 		$res = $GLOBALS['db']->select('providers', 'id,title', '', 'title');
 		return $res;

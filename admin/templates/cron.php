@@ -637,13 +637,14 @@ switch($_GET['act']){
 		$price->isInsertItem = true;
 		$price->isInsertBrend = true;
 
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
-		$fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
-		if (!$fileImap){
-			$errorText = "Не удалось получить Forum-Auto_Price.zip из почты";
-			echo "<br>$errorText";
-			throw new \Exception($errorText);
-		} 
+		// $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		// $fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
+		// if (!$fileImap){
+		// 	$errorText = "Не удалось получить Forum-Auto_Price.zip из почты";
+		// 	echo "<br>$errorText";
+		// 	throw new \Exception($errorText);
+		// } 
+		$fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.zip";
 
 		$db->query("
 			DELETE si FROM
@@ -656,14 +657,13 @@ switch($_GET['act']){
 		
 		$zipArchive = new ZipArchive();
 		$res = $zipArchive->open($fileImap);
+		debug($zipArchive);
 		if (!$res){
 			echo "<br>Ошибка чтения файла Forum-Auto_Price.zip";
-			throw new \Exception("Ошибка чтения файла Forum-Auto_Price.zip");
 			break;
 		};
 		$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", ["Forum-Auto_Price.xlsx"]);
 		if (!$res){
-			throw new \Exception("Ошибка извлечения файла Forum-Auto_Price.xlsx");
 			echo "<br>Ошибка извлечения файла Forum-Auto_Price.xlsx";
 			break;
 		};
@@ -677,9 +677,13 @@ switch($_GET['act']){
 			$cellIterator = $row->getCellIterator();
 			$row = array();
 			foreach($cellIterator as $cell){
-				$row[] = $cell->getCalculatedValue();
+				$value = $cell->getCalculatedValue();
+				if (!$value) continue;
+				$row[] = $value;
 			} 
 			$i++;
+			debug($row);
+			if ($i > 100) die("Обработка закончена");
 
 			if (!$row[0]) continue;
 			if ($row[0] == 'ГРУППА') continue;

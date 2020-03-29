@@ -459,8 +459,8 @@ function itemsToOrder(){
 	$items = array();
 	foreach($res_providers as $p){
 		switch($p['title']){
-			case 'ООО "Авторусь"':
-			case 'ООО "М Партс"':
+			case 'Авторусь':
+			case 'М Партс':
 				$orderAbcp = new core\OrderAbcp($db, $p['id']);
 				$output = $orderAbcp->getItemsToOrder($p['id']);
 				break;

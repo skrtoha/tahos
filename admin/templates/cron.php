@@ -723,6 +723,7 @@ switch($_GET['act']){
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
+		debug($emailPrice);
 		$store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
@@ -768,8 +769,6 @@ switch($_GET['act']){
 			break;
 		}
 		
-		$fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
-
 		if ($emailPrice['isArchive']){
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open($fileImap);
@@ -797,18 +796,16 @@ switch($_GET['act']){
 		$stringNumber = 0;
 		switch($emailPrice['fileType']){
 			case 'excel':
-				$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($fileImap);
-				$xls->setActiveSheetIndex(0);
-				$sheet = $xls->getActiveSheet();
-				$rowIterator = $sheet->getRowIterator();
-				foreach ($rowIterator as $row) {
-					$cellIterator = $row->getCellIterator();
-					$row = array();
-					foreach($cellIterator as $cell){
-						$row[] = $cell->getCalculatedValue();
-					} 
-					$stringNumber++;
-					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+				$reader = ReaderEntityFactory::createReaderFromFile($workingFile);
+				$reader->open($workingFile);
+				foreach ($reader->getSheetIterator() as $sheet) {
+				   foreach ($sheet->getRowIterator() as $iterator) {
+						$cells = $iterator->getCells();
+						$row = [];
+						foreach($cells as $value) $row[] = $value->getValue();
+						$stringNumber++;
+						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+					}
 				}
 				break;
 			case 'csv':

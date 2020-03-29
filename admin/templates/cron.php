@@ -1,4 +1,5 @@
 <?php
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 set_time_limit(0);
 error_reporting(E_PARSE | E_ERROR);
 core\Timer::start();
@@ -657,7 +658,6 @@ switch($_GET['act']){
 		
 		$zipArchive = new ZipArchive();
 		$res = $zipArchive->open($fileImap);
-		debug($zipArchive);
 		if (!$res){
 			echo "<br>Ошибка чтения файла Forum-Auto_Price.zip";
 			break;
@@ -668,47 +668,42 @@ switch($_GET['act']){
 			break;
 		};
 
-		$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load("{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.xlsx");
-		$xls->setActiveSheetIndex(0);
-		$sheet = $xls->getActiveSheet();
-		$rowIterator = $sheet->getRowIterator();
-		$i = 0;
-		foreach ($rowIterator as $row) {
-			$cellIterator = $row->getCellIterator();
-			$row = array();
-			foreach($cellIterator as $cell){
-				$value = $cell->getCalculatedValue();
-				if (!$value) continue;
-				$row[] = $value;
-			} 
-			$i++;
-			debug($row);
-			if ($i > 100) die("Обработка закончена");
+		$filePath = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.xlsx";
+		$reader = ReaderEntityFactory::createReaderFromFile($filePath);
+		$reader->open($filePath);
+		foreach ($reader->getSheetIterator() as $sheet) {
+		   foreach ($sheet->getRowIterator() as $iterator) {
+				$cells = $iterator->getCells();
+				$row = [];
+				foreach($cells as $value) $row[] = $value->getValue();
+				$i++;
+				// if ($i > 1000) die("Обработка закончена");
 
-			if (!$row[0]) continue;
-			if ($row[0] == 'ГРУППА') continue;
-			if (!$row[0] || !$row[1]){
-				$price->log->error("В строке $i произошла ошибка.");
-				continue;
+				if (!$row[0]) continue;
+				if ($row[0] == 'ГРУППА') continue;
+				if (!$row[0] || !$row[1]){
+					$price->log->error("В строке $i произошла ошибка.");
+					continue;
+				}
+				$brend_id = $price->getBrendId($row[0]);
+				if (!$brend_id) continue;
+				$item_id = $price->getItemId([
+					'brend_id' => $brend_id,
+					'brend' => $row[0],
+					'article' => $row[1],
+					'title' => $row[2],
+					'row' => $i
+				]);
+				if (!$item_id) continue;
+				$price->insertStoreItem([
+					'store_id' => 22380,
+					'item_id' => $item_id,
+					'price' => $row[4],
+					'in_stock' => $row[5],
+					'packaging' => $row[6],
+					'row' => $i
+				]);
 			}
-			$brend_id = $price->getBrendId($row[0]);
-			if (!$brend_id) continue;
-			$item_id = $price->getItemId([
-				'brend_id' => $brend_id,
-				'brend' => $row[0],
-				'article' => $row[1],
-				'title' => $row[2],
-				'row' => $i
-			]);
-			if (!$item_id) continue;
-			$price->insertStoreItem([
-				'store_id' => 22380,
-				'item_id' => $item_id,
-				'price' => $row[4],
-				'in_stock' => $row[5],
-				'packaging' => $row[6],
-				'row' => $i
-			]);
 		}
 
 		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`= 17", '');

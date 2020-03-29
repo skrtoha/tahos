@@ -4,17 +4,75 @@ namespace core;
 class Mikado extends Provider{
 	private $db;
 	public $ClientID = 33773;
+	// public $ClientID = 28221;
 	public $Password = 'tahos2bz';
+	// public $Password = 'Vadim888';
 	public static $provider_id = 8;
 	private $armtek;
 	private $brends;
-	// StockID => store_id
 	public $stocks = [
 		1 => 14,
 		10 => 13,
 		35 => 12
 	];
-	public function getItemsToOrder(int $provider_id){}
+	public function getItemsToOrder(int $provider_id){
+		$xml = Abcp::getUrlData(
+			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
+			[
+				'ClientID' => 33773,
+				'Password' => 'tahos2bz',
+			]
+		);
+		if (!$xml) return false;
+		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
+		$result = json_decode(json_encode($result));
+		$basketItem = & $result->List->BasketItem;
+		if (is_object($basketItem)) return [
+			0 => self::parseBasketItem($basketItem)
+		];
+		$output = [];
+		foreach($basketItem as $value){
+			$output[] = $this->parseBasketItem($value);
+		}
+		return $output;
+	}
+	/**
+	 * parses BasketItem
+	 * @param  object $BasketItem 
+	 * @return array 
+	 */
+	private static function parseBasketItem($basketItem){
+		$res = Provider::getInstanceDataBase()->query("
+			SELECT
+				mz.item_id,
+				i.brend_id,
+				b.title AS brend,
+				i.article,
+				i.title_full
+			FROM
+				#mikado_zakazcode mz
+			LEFT JOIN
+				#items i ON i.id = mz.item_id
+			LEFT JOIN
+				#brends b ON b.id = i.brend_id
+			WHERE
+				mz.ZakazCode = '{$basketItem->ZakazCode}'
+		", '');
+		$item = $res->fetch_assoc();
+		return [
+			'provider' => 'Mikado',
+			'store' => self::getCipher($basketItem->Notes),
+			'brend' => $item['brend'],
+			'article' => $item['article'],
+			'title_full' => $item['title_full'],
+			'price' => $basketItem->Price,
+			'count' => $basketItem->QTY
+		];
+	}
+	public function getCipher($str){
+		$array = explode('-', $str);
+		return Provider::getInstanceDataBase()->getField('provider_stores', 'cipher', 'id', $array[1]);
+	}
 	public function __construct($db){
 		$this->db = $db;	
 		$this->armtek = new Armtek($this->db);
@@ -22,7 +80,7 @@ class Mikado extends Provider{
 	public function getCoincidences($text){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$xml = Abcp::getUrlData(
-			'http://mikado-parts.ru/ws1/service.asmx/Code_Search',
+			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
 				'Search_Code' => $text,
 				'ClientID' => $this->ClientID,
@@ -180,7 +238,14 @@ class Mikado extends Provider{
 		if (array_search($store_id, $this->stocks)) return true;
 		return false;
 	}
-	private function getCodeInfo($ZakazCode){
+	protected function getStockId($store_id){
+		foreach($this->stocks as $key => $value){
+			if ($value == $store_id) return $key;
+		}
+		throw new \Exception("Не удалось получить StockID по store_id = $store_id");
+		return false;
+	}
+	public function getDeliveryType($ZakazCode, $store_id){
 		$xml = Abcp::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Info',
 			[
@@ -191,33 +256,63 @@ class Mikado extends Provider{
 		);
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
-		// debug($result);
+		$StokID = $this->getStockId($store_id);
+		foreach($result->Prices->Code_PriceInfo as $value){
+			if (empty($value->OnStocks)) continue;
+			if (is_object($value->OnStocks->StockLine)){
+				if ($value->OnStocks->StockLine->StokID == $StokID) return $value->DeliveryType;
+			}
+			else{
+				foreach($value->OnStocks->StockLine as $v){
+					if ($v->StokID == $StockID) return $value->DeliveryType;
+				}
+			}
+		}
+		return false;
 	}
 	public function Basket_Add($ov){
 		// debug($ov); exit();
+		/**
+		 * Можно обойтись и без записи в базу данных ZakazCode, но это крайне необходимо, когда нужно
+		 * получить по нету item_id и brend_id
+		 * @var string
+		 */
 		$ZakazCode = $this->db->getField('mikado_zakazcode', 'ZakazCode', 'item_id', $ov['item_id']);
 		if (!$ZakazCode){
 			$ZakazCode = $this->setArticle($ov['brend'], $ov['article'], true);
 			$this->db->insert('mikado_zakazcode', ['item_id' => $ov['item_id'], 'ZakazCode' => $ZakazCode], ['print_query' => false]); 
 			// exit();
 		} 
-		// debug($ov, $ZakazCode);
-		$xml = Abcp::getUrlData(
-			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Add',
-			[
-				'ZakazCode' => $ZakazCode,
-				'QTY' => $ov['quan'],
-				'DeliveryType' => 0,
-				'Notes' => '',
-				'ClientID' => $this->ClientID,
-				'Password' => $this->Password,
-				'ExpressID' => 0,
-				'StockID' => array_search($ov['store_id'], $this->stocks)
-			]
-		);
+		if (preg_match('/^g/', $ZakazCode)){
+			try{
+				$DeliveryType = $this->getDeliveryType($ZakazCode, $ov['store_id']);
+				if (!$DeliveryType) throw new \Exception("Ошибка получения DeliveryType");
+			} catch(\Exception $e){
+				Log::insertThroughException($e);
+			}
+		} 
+		else $DeliveryType = 0;
+		try{
+			$xml = Abcp::getUrlData(
+				'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Add',
+				[
+					'ZakazCode' => $ZakazCode,
+					'QTY' => $ov['quan'],
+					'DeliveryType' => $DeliveryType,
+					'Notes' => "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}",
+					'ClientID' => $this->ClientID,
+					'Password' => $this->Password,
+					'ExpressID' => 0,
+					'StockID' => $this->getStockId($ov['store_id'])
+				]
+			);
+			if (!$xml) throw new \Exception("Ошибка получения данных Микадо в заказе {$ov['order_id']} {$ov['brend']}-{$ov['article']}!");
+		} catch(\Exception $e){
+			Log::insertThroughException($e);
+			return false;
+		}
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
-		// debug($result); exit();
 		$this->db->insert(
 			'mikado_basket',
 			[

@@ -17,7 +17,18 @@ class Rossko extends Provider{
 	public $provider_id = 15;
 	private $stopOnError = false;
 	public $isNeedsToCheck;
-	public function getItemsToOrder(int $provider_id){}
+	/**
+	 * [getItemsToOrder description]
+	 * @param  int $provider_id provider_id
+	 * @return array user_id, order_id, store_id, store, item_id, price, article, brend, provider_id, provider, count
+	 */
+	public function getItemsToOrder(int $provider_id){
+		$output = [];
+		$res_items = Armtek::getItems('rossko');
+		if (!$res_items->num_rows) return false;
+		foreach($res_items as $value) $output[] = $value;
+		return $output;
+	}
 	public function __construct($db, $text = NULL){
 		ini_set('soap.wsdl_cache_enabled',0);
 		ini_set('soap.wsdl_cache_ttl',0);
@@ -172,22 +183,33 @@ class Rossko extends Provider{
 			else $this->renderStock($item_id, $value->stocks->stock);
 		}
 	}
+	private function getSoap(){
+		try{
+			$soap = new \SoapClient($this->connect['wsdl'], $this->connect['options']);
+			if (!$soap) throw new \Exception("Не удается подключиться к Росско.");
+		}	catch(\Exception $e){
+			Log::insertThroughException($e);
+			return false;
+		}
+		return $soap;
+	}
 	private function getResult($text = NULL){
 		if ($text) $this->param['TEXT'] = $text;
 		else $this->param['TEXT'] = $this->text;
-		$query  = new \SoapClient($this->connect['wsdl'], $this->connect['options']);
+		$query = $this->getSoap();
+		if (!$query) return false;
 		$result = $query->GetSearch($this->param);
 		return $result;
 	}
 	public function getCheckoutDetails(){
 		$this->connect['wsdl'] = 'http://api.rossko.ru/service/GetCheckoutDetails';
-		$query  = new \SoapClient($this->connect['wsdl'], $this->connect['options']);
+		$query  = $this->getSoap();
+		if (!$query) return false;
 		return $query->GetCheckoutDetails($this->param);
 	}
 	private function getParts($store_id = NULL){
 		$res_items = Armtek::getItems('rossko');
 		if (!$res_items->num_rows) return false;
-		// $query  = new \SoapClient('http://api.rossko.ru/service/GetSearch', $this->connect['options']);
 		$items = array();
 		while ($item = $res_items->fetch_assoc()){
 			if ($store_id && $item['store_id'] != $store_id) continue;
@@ -234,7 +256,8 @@ class Rossko extends Provider{
 		echo json_encode($param);
 		debug($param, 'param');
 
-		$query  = new \SoapClient($this->connect['wsdl'], $this->connect['options']);
+		$query  = $this->getSoap();
+		if (!$query) return false;
 		$result = $query->GetCheckout($param);
 
 		echo json_encode($result);

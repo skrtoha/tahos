@@ -25,3 +25,6 @@ form input[type=submit]{
 #load_price ~ form input[type=submit]{
 	margin-top: 0;
 }
+div.actions a{
+	margin-left: 5px;
+}

@@ -38,7 +38,13 @@ class Armtek extends Provider{
 			)
 		);
 	}
-	public function getItemsToOrder(int $provider_id){}
+	public function getItemsToOrder(int $provider_id){
+		$output = [];
+		$res_items = Armtek::getItems('armtek');
+		if (!$res_items->num_rows) return false;
+		foreach($res_items as $value) $output[] = $value;
+		return $output;
+	}
 	public static function getDaysDelivery($str){
 		$year = substr($str, 0, 4);
 		$month = substr($str, 4, 2);
@@ -350,8 +356,10 @@ class Armtek extends Provider{
 				ov.item_id,
 				ov.price,
 				i.article,
+				i.title_full,
 				IF(pb.provider_id IS NOT NULL, pb.title, b.title) AS brend,
-				pb.provider_id,
+				IF(pb.provider_id IS NOT NULL, pb.provider_id, ps.provider_id) AS provider_id,
+				p.title AS provider,
 				ov.quan AS count
 			FROM
 				#other_orders ao
@@ -359,6 +367,8 @@ class Armtek extends Provider{
 				#orders_values ov ON ov.order_id = ao.order_id AND ov.store_id = ao.store_id AND ov.item_id = ao.item_id
 			LEFT JOIN
 				#provider_stores ps ON ps.id=ov.store_id
+			LEFT JOIN
+				#providers p ON p.id = ps.provider_id
 			LEFT JOIN
 				#items i ON i.id=ov.item_id
 			LEFT JOIN

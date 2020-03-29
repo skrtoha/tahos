@@ -3,9 +3,9 @@ namespace core;
 class OrderAbcp extends Abcp{
 	public $param;
 	private $basketContent;
-	public function __construct($db, $store_id){
+	public function __construct($db, $provider_id){
 		parent::__construct(NULL, $db);
-		$this->param = parent::$params[$store_id];
+		$this->param = parent::$params[$provider_id];
 	}
 	public function addToBasket($params){
 		// debug($params); exit();
@@ -55,10 +55,34 @@ class OrderAbcp extends Abcp{
 		}
 		return false;
 	}
-	private function setBasketContent(){
+	public function getItemsToOrder(int $provider_id){
+		$output = array();
+		$basketContent = $this->getBasketContent();
+		if (!$basketContent) return false;
+		foreach($basketContent as $value) $output[] = [
+			'provider' => $this->param['title'],
+			'store' => $this->param['title'] . '-' . $value['supplierCode'],
+			'brend' => $value['brand'],
+			'article' => $value['numberFix'],
+			'title_full' => $value['description'],
+			'price' => $value['price'],
+			'count' => $value['quantity']
+		];
+		return $output;
+	}
+	private function getBasketContent(){
 		$url =  "{$this->param['url']}/basket/content/?userlogin={$this->param['userlogin']}&userpsw=".md5($this->param['userpsw']);
-		$response = file_get_contents($url);
-		return $this->basketContent = json_decode($response, true);
+		try{
+			$response = file_get_contents($url);
+			if (!$response) throw new \Exception("Ошибка получение данных корзины {$this->param['title']}");
+			$output = json_decode($response, true);
+			if (isset($output['error']) && $output['error']) throw new \Exception("Ошибка {$this->param['title']}: {$output['error']}");
+			
+		} catch(\Exception $e){
+			Log::insertThroughException($e);
+			return false;
+		}
+		return $output;
 	}
 	public static function getGetString($param){
 		return "
@@ -76,7 +100,7 @@ class OrderAbcp extends Abcp{
 		";
 	}
 	public function isInBasket($brend, $article){
-		if (!$this->basketContent) $this->setBasketContent();
+		if (!$this->basketContent) $this->basketContent = $this->getBasketContent();
 		if (!$this->basketContent) return false;
 		foreach($this->basketContent as $value){
 			if (

@@ -1,8 +1,9 @@
 <?php 
 use core\Log;
 
-set_exception_handler('error_handler');
-function error_handler(Exception $e){
+set_exception_handler('error_handler',);
+function error_handler(Throwable $e){
+	if (get_class($e) == 'ParseError') return debug($e);
 	Log::insertThroughException($e);
 }
 

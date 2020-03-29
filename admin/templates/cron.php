@@ -652,16 +652,18 @@ switch($_GET['act']){
 				#provider_stores ps ON ps.id=si.store_id
 			WHERE 
 				ps.provider_id = 17
-		", 'debug');
+		", '');
 		
 		$zipArchive = new ZipArchive();
 		$res = $zipArchive->open($fileImap);
 		if (!$res){
 			echo "<br>Ошибка чтения файла Forum-Auto_Price.zip";
+			throw new \Exception("Ошибка чтения файла Forum-Auto_Price.zip");
 			break;
 		};
 		$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", ["Forum-Auto_Price.xlsx"]);
 		if (!$res){
+			throw new \Exception("Ошибка извлечения файла Forum-Auto_Price.xlsx");
 			echo "<br>Ошибка извлечения файла Forum-Auto_Price.xlsx";
 			break;
 		};
@@ -678,10 +680,6 @@ switch($_GET['act']){
 				$row[] = $cell->getCalculatedValue();
 			} 
 			$i++;
-
-			debug($row);
-			if ($i > 20) break;
-			continue;
 
 			if (!$row[0]) continue;
 			if ($row[0] == 'ГРУППА') continue;

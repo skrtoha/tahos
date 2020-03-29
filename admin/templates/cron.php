@@ -638,14 +638,14 @@ switch($_GET['act']){
 		$price->isInsertItem = true;
 		$price->isInsertBrend = true;
 
-		// $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
-		// $fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
-		// if (!$fileImap){
-		// 	$errorText = "Не удалось получить Forum-Auto_Price.zip из почты";
-		// 	echo "<br>$errorText";
-		// 	throw new \Exception($errorText);
-		// } 
-		$fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.zip";
+		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
+		if (!$fileImap){
+			$errorText = "Не удалось получить Forum-Auto_Price.zip из почты";
+			echo "<br>$errorText";
+			throw new \Exception($errorText);
+		} 
+		// $fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.zip";
 
 		$db->query("
 			DELETE si FROM
@@ -677,7 +677,7 @@ switch($_GET['act']){
 				$row = [];
 				foreach($cells as $value) $row[] = $value->getValue();
 				$i++;
-				// if ($i > 1000) die("Обработка закончена");
+				// if ($i > 223801000) die("Обработка закончена");
 
 				if (!$row[0]) continue;
 				if ($row[0] == 'ГРУППА') continue;

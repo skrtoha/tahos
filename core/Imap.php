@@ -50,21 +50,21 @@ class Imap{
 				$body = $this->convert_to_utf8($recursive_data["charset"], $msg_body);
 			}
 			$d['body'] = base64_encode($body);
-			// debug($msg_structure->parts); exit();
+			// debug($msg_structure->parts); //exit();
 			if(isset($msg_structure->parts)){
 				for($j = 1, $f = 2; $j < count($msg_structure->parts); $j++, $f++){
 					$type = $msg_structure->parts[$j]->subtype;
 					$d["attachs"][$j]["type"] = $type;
 					$d["attachs"][$j]["size"] = $msg_structure->parts[$j]->bytes;
 					$d["attachs"][$j]["name"] = $this->getNameFromParameters($msg_structure->parts[$j]->parameters);
-					if (!preg_match('/'.$params['name'].'/u', $d["attachs"][$j]["name"])) continue;
+					if (!preg_match('/'.quotemeta($params['name']).'/u', $d["attachs"][$j]["name"])) continue;
 					$d["attachs"][$j]["file"] = $this->structure_encoding(
 						$msg_structure->parts[$j]->encoding,
 						imap_fetchbody($this->connection, $i, $f)
 					);
 					file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$d["attachs"][$j]["name"]}", $d["attachs"][$j]["file"]);
 					return $_SERVER['DOCUMENT_ROOT']."/tmp/{$d["attachs"][$j]["name"]}";
-					// debug($d); exit();
+					debug($d); exit();
 				}
 			}
 		}

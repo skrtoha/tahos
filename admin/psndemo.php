@@ -400,8 +400,8 @@ function image_catalog($file){
 	global $brend_title, $node_id, $log;
 	if (!$file) return $log->error("Изображение не найдено");
 	$array = [];
-	$dir_big = "../images/nodes/big/$brend_title";
-	$dir_small = "../images/nodes/small/$brend_title";
+	$dir_big = core\Config::getImgPath() . "/nodes/big/$brend_title";
+	$dir_small = core\Config::getImgPath() . "/nodes/small/$brend_title";
 	// echo "$dir_big $dir_small";
 	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir_big)) mkdir($dir_big);

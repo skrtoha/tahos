@@ -107,6 +107,9 @@ function cp_init(){
 	};
 	price_format();
 }
+function getImgUrl(){
+	return $('input[name=imgUrl]').val()
+}
 $(function() {
 	cp_init();
 	price_format();

@@ -165,8 +165,8 @@ function set_image($file, $id){
 		$array['error'] = '';
 		return $array;
 	}
-	$dir_big = "{$_SERVER['DOCUMENT_ROOT']}/images/items/big/$id";
-	$dir_small = "{$_SERVER['DOCUMENT_ROOT']}/images/items/small/$id";
+	$dir_big = core\Config::getImgPath() . "/items/big/$id";
+	$dir_small = core\Config::getImgPath() . "/items/small/$id";
 	require_once("{$_SERVER['DOCUMENT_ROOT']}/vendor/class.upload.php");
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);

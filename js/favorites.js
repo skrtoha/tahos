@@ -19,8 +19,8 @@ function getFullItem(i){
 	var c_fotos = Object.keys(i.fotos).length;
 	// console.log(c_fotos);
 	if (is_foto){
-		var src_small = '/images/items/small/' + item.id + '/' + item.foto;
-		var src_big = '/images/items/big/' + item.id + '/' + item.foto;
+		var src_small = getImgUrl() + '/items/small/' + item.id + '/' + item.foto;
+		var src_big = getImgUrl() + '/items/big/' + item.id + '/' + item.foto;
 		str += '' +
 				'<div id="main-pic">' + 
 					'<img src="'+ src_small + '" data-zoom-image="' + src_big + '">' + 
@@ -28,8 +28,8 @@ function getFullItem(i){
 		if (c_fotos){
 			str += '<div id="gallery">';
 			for (var k in i.fotos){
-				var src_small = '/images/items/small/' + item.id + '/' + i.fotos[k];
-				var src_big = '/images/items/big/' + item.id + '/' + i.fotos[k];
+				var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.fotos[k];
+				var src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.fotos[k];
 				str += '<img src="' + src_small + '" data-big-img="' + src_big + '">';
 			}
 			str += '</div>';

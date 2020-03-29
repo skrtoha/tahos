@@ -3,7 +3,7 @@ if ($_FILES['model_image']){
 	error_reporting(E_ERROR);
 	$res = model_set_image($_FILES['model_image'], $_POST['model_id']);
 	if ($res){?>
-		<img src="/images/models/<?=$_POST['model_id']?>.jpg">
+		<img src="<?=core\Config::$imgUrl?>/models/<?=$_POST['model_id']?>.jpg">
 		<a href="#" class="model_image_delete" model_id="<?=$_POST['model_id']?>">Удалить</a>
 	<?}
 	exit();
@@ -15,7 +15,7 @@ if ($_FILES['vehicle_image']){
 	// exit();
 	$res = vehicle_set_image($_FILES['vehicle_image'], $_POST['vehicle_id']);
 	if ($res){?>
-		<img src="/images/vehicles/<?=$_POST['vehicle_id']?>.jpg">
+		<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$_POST['vehicle_id']?>.jpg">
 		<a href="#" class="vehicle_image_delete" vehicle_id="<?=$_POST['model_id']?>">Удалить</a>
 	<?}
 	exit();
@@ -26,7 +26,6 @@ if ($_GET['brend_id'] && $_GET['vehicle_id'] && !$_GET['model_id']) $act = 'mode
 if ($_GET['brend_id'] && $_GET['vehicle_id'] && $_GET['model_id']) $act = 'modifications';
 if ($_GET['brend_id'] && $_GET['vehicle_id'] && $_GET['model_id'] && $_GET['modification_id']) $act = 'nodes';
 if ($_GET['node_id'] && $_GET['act'] != 'node_image') $act = 'node';
-// debug($_GET);
 switch ($act) {
 	case 'vehicle_brends': vehicle_brends(); break;
 	case 'models': models(); break;
@@ -143,7 +142,7 @@ function vehicles(){
 					<td>
 						<a href="#" class="vehicle_change not_clickable">Изменить</a>
 						<a href="#" class="vehicle_remove not_clickable">Удалить</a>
-						<?$is_image = file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/vehicles/{$value['id']}.jpg") ? 1 : 0?>
+						<?$is_image = file_exists(core\Config::getImgPath() . "/vehicles/{$value['id']}.jpg") ? 1 : 0?>
 						<input type="hidden" name="is_image" value="<?=$is_image?>">
 					</td>
 				</tr>
@@ -235,8 +234,8 @@ function models(){
 					</td>
 					<td><?=$value['vin']?></td>
 					<td>
-						<?$img_path = "/images/models/{$value['id']}.jpg";
-						$model_image_exists = file_exists($_SERVER['DOCUMENT_ROOT'].$img_path) ? 1 : 0;?>
+						<?$img_path = core\Config::getImgPath() . "/models/{$value['id']}.jpg";
+						$model_image_exists = file_exists($img_path) ? 1 : 0;?>
 						<input type="hidden" name="model_image_exists" value="<?=$model_image_exists?>">
 						<a class="model_change not_clickable" href="">Изменить</a>
 						<a href="#" class="model_remove not_clickable">Удалить</a>
@@ -442,10 +441,10 @@ function node(){
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=$res_node_items->num_rows?></span></div>
 	<?$img = "$brend_title/{$_GET['node_id']}.jpg";
-	$img_path = "/images/nodes/big/$img";
-	$src = array_shift(glob("../images/nodes/big/$brend_title/{$_GET['node_id']}.*"));
+	$img_path = core\Config::getImgPath() . "/nodes/big/$img";
+	$src = array_shift(glob(core\Config::$imgUrl . "/nodes/big/$brend_title/{$_GET['node_id']}.*"));
 	if ($src){?>
-		<img class="zoom" src="/<?=$src?>" alt="<?=$page_title?>" data-zoom-image="/<?=$src?>">
+		<img class="zoom" src="<?=$src?>" alt="<?=$page_title?>" data-zoom-image="<?=$src?>">
 		<a class="delete_item" href="?view=original-catalogs&act=image_delete&src=<?=$src?>">Удалить изображение</a>
 	<?}
 	else{?>
@@ -483,6 +482,7 @@ function node(){
 	</table>
 <?}
 function node_set_image($file, $id){
+	debug($file, $id);
 	global $db;
 	$array = [];
 	$name = $file['name'];
@@ -491,11 +491,12 @@ function node_set_image($file, $id){
 		return $array;
 	}
 	$brend = $db->getFieldOnID('brends', $_GET['brend_id'], 'title');
-	$dir_big = "../images/nodes/big/$brend";
-	$dir_small = "../images/nodes/small/$brend";
-	require_once('../vendor/class.upload.php');
+	$dir_big = core\Config::getImgPath()."/nodes/big/$brend";
+	$dir_small = core\Config::getImgPath()."/nodes/small/$brend";
+	require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/class.upload.php');
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);
+	// echo "$dir_big, $dir_small"; exit();
 	$handle = new upload($file);
 	$handle_big = new upload($file);
 	if (!$handle->file_is_image){
@@ -547,7 +548,7 @@ function model_set_image($file, $id){
 		$array['error'] = '';
 		return $array;
 	}
-	$dir = "../images/models/";
+	$dir = core\Config::getImgPath() . "/models/";
 	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir)) mkdir($dir);
 	$handle = new upload($file);
@@ -594,7 +595,7 @@ function vehicle_set_image($file, $id){
 		$array['error'] = '';
 		return $array;
 	}
-	$dir = "../images/vehicles/";
+	$dir = core\Config::getImgPath() . "/vehicles/";
 	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir)) mkdir($dir);
 	$handle = new upload($file);

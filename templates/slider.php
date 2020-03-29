@@ -9,7 +9,7 @@ switch ($act) {
 			// header("Location: ".$_SERVER['HTTP_REFERER']);
 		}
 		else{
-			move_uploaded_file($_FILES['foto']['tmp_name'], "../images/slider/$name");
+			move_uploaded_file($_FILES['foto']['tmp_name'], core\Config::getImgPath() . "/slider/$name");
 			$array = array('foto' => $name);
 			if ($db->insert('slider', $array)){
 				setcookie('message', "Фото успешно сохранено!");
@@ -58,7 +58,7 @@ function show_form(){
 			<div class="field">
 				<div class="title">Фото <?=$i + 1?></div>
 				<div class="value">
-					<img width="400" src="/images/slider/<?=$fotos[$i]['foto']?>" alt="">
+					<img width="400" src="<?=core\Config::$imgUrl?>/slider/<?=$fotos[$i]['foto']?>" alt="">
 					<a class="foto_delete" href="?view=slider&act=delete&id=<?=$fotos[$i]['id']?>">Удалить</a>
 				</div>
 			</div>

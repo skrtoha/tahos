@@ -179,7 +179,7 @@ $(function(){
 		mosaic_str += '</select>';
 		var vehicle_image = '<div class="vehicle_image">';
 		if (parseInt(elem.find('input[name=is_image]').val())) vehicle_image +=
-			'<img src="/images/vehicles/' + elem.attr('vehicle_id') + '.jpg">' +
+			'<img src="' + getImgUrl() + '/vehicles/' + elem.attr('vehicle_id') + '.jpg">' +
 			'<a vehicle_id="' + elem.attr('vehicle_id') + '" href="#" class="vehicle_image_delete">Удалить</a>';
 		else vehicle_image +=
 			'<a class="vehicle_image_add" vehicle_id="' + elem.attr('vehicle_id') + '">Добавить изображение</a>';
@@ -557,7 +557,7 @@ $(function(){
 			'<div model_id="' + model_id + '" class="model_image">';
 		if (parseInt(elem.find('input[name=model_image_exists]').val())){
 			img += 
-				'<img src="/images/models/' + model_id + '.jpg">' +
+				'<img src="' + getImgUrl() + '/models/' + model_id + '.jpg">' +
 				'<a href="#" class="model_image_delete" model_id="' + model_id + '">Удалить</a>'
 		}	
 		else img +=

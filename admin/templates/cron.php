@@ -317,7 +317,7 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID={$mikado->ClientID}&PSW={$mikado->Password}111";
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID={$mikado->ClientID}&PSW={$mikado->Password}";
 			$file = file_get_contents($url);
 			if (strlen($file) == 18){
 				$errorText = "Не удалось скачать $zipName в $url";

@@ -348,6 +348,12 @@ function priceEmail(){
 					</div>
 				</div>
 				<div class="field">
+					<div class="title">Индекс файла в архиве</div>
+					<div class="value">
+						<input type="text" name="indexInArchive" value="<?=$array['indexInArchive']?>">
+					</div>
+				</div>
+				<div class="field">
 					<div class="title">Тип файла</div>
 					<div class="value">
 						<label>

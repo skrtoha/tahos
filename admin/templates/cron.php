@@ -778,17 +778,29 @@ switch($_GET['act']){
 				echo "<br>$errorText";
 				break;
 			} 
-			$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$emailPrice['nameInArchive']]);
-			if (!$res){
-				$errorText = "Ошибка извлечения файла {$emailPrice['nameInArchive']}: $res";
-				throw new Exception($errorText);
-				echo "<br>$errorText";
-				break;
-			} 
+			try{
+				$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$emailPrice['nameInArchive']]);
+				if (!$res) throw new Exception ("Ошибка извлечения файла {$emailPrice['nameInArchive']}. Попытка использовать альтернативный способ.");
+			} catch(Exception $e){
+				echo "<br>" . $e->getMessage();
+				if ($emailPrice['indexInArchive'] !== false){
+					$bites = file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
+					if (!$bites) throw new Exception("Возникла ошибка. Ни один из способов извлечь архив не сработали");
+				}
+				else{
+					$zip_count = $zipArchive->count();
+					if (!$zip_count) throw new Exception("Альтернативный способ не сработал - ошибка получения количества файлов в архиве");
+					for ($i = 0; $i < $zip_count; $i++) { 
+						echo "<br>" . "Индекс $i: ". $zipArchive->getNameIndex($i);
+					};
+					echo "<br>Укажите настройках в поле \"Индекс файла в архиве\" необходимый индекс.";
+				}
+			}
 			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}";
 			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
 		}
 		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
+
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer

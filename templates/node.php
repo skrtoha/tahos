@@ -46,9 +46,9 @@ $res_items = $db->query("
 ?>
 <div class="catalogue-original catalogue-original-unit">
 	<div class="item-info-block">
-		<?if (file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/models/{$_GET['model_id']}.jpg")){?>
+		<?if (file_exists(core\Config::getImgPath() . "/models/{$_GET['model_id']}.jpg")){?>
 			<div class="img">
-				<img src="/images/models/<?=$_GET['model_id']?>.jpg" alt="<?=$model['title']?>">
+				<img src="<?=core\Config::$imgUrl?>/models/<?=$_GET['model_id']?>.jpg" alt="<?=$model['title']?>">
 			</div>
 		<?}?>
 		<?if (!empty($model['filter_values']) || ($_GET['vin'] != 'vin' && $_GET['vin'])){?>
@@ -77,7 +77,7 @@ $res_items = $db->query("
 			</a>
 			<span><?=$title?></span>
 		</div>
-		<?$src = array_shift(glob("images/nodes/big/{$model['brend']}/{$_GET['node_id']}.*"));
+		<?$src = array_shift(glob(core\Config::$imgPath . "/nodes/big/{$model['brend']}/{$_GET['node_id']}.*"));
 		if ($src){?>
 			<div class="unit-pic">
 				<a href="/<?=$src?>">

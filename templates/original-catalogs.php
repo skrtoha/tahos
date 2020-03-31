@@ -252,7 +252,7 @@ if ($_GET['vehicle'] && $_GET['brend']){
 							<a href="/original-catalogs/<?=$value['href']?>"></a>
 							<div class="img-wrap">
 								<?$src = file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/vehicles/$key.jpg") ? "$key.jpg" : 'no_image.jpg';?>
-								<img src="/images/vehicles/<?=$src?>" alt="<?=$value['title']?>">
+								<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$src?>" alt="<?=$value['title']?>">
 							</div>
 							<a href="/original-catalogs/<?=$value['href']?>"><?=$value['title']?></a>
 						</div>
@@ -264,7 +264,7 @@ if ($_GET['vehicle'] && $_GET['brend']){
 						<?if (!empty($brend_titles)) foreach($brend_titles as $key => $row) {?>
 							<div class="item">
 								<a href="/original-catalogs/<?=strtolower($_GET['vehicle'])?>/<?=$row['href']?>"></a>
-								<?$src = array_shift(glob("images/brends/{$row['brend_id']}.*"));
+								<?$src = array_shift(glob(core\Config::getImgPath() . "/brends/{$row['brend_id']}.*"));
 								if ($src){?>
 									<div class="img-wrap">
 										<img src="/<?=$src?>" alt="<?=$row['title']?>">

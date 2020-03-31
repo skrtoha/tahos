@@ -25,7 +25,27 @@ class FavoriteParts extends Provider{
 		} 
 		return $coincidences;
 	}
-	public function getItemsToOrder(int $provider_id){}
+
+	private static function getStoreByWarehouseGroup($basket, $warehouseGroup){
+		$code = $basket['warehouseGroup'][$warehouseGroup]['code'];
+		return self::getCipherByCode($code);
+	}
+
+	public function getItemsToOrder(int $provider_id){
+		$basket = self::getBasket();
+		if (!$basket) return false;
+		$output = [];
+		foreach($basket['cart'] as $c) $output[] = [
+			'provider' => 'FavoriteParts',
+			'store' => self::getStoreByWarehouseGroup($basket, $c['warehouseGroup']),
+			'brend' => $basket['goods'][$c['goods']]['Brand'],
+			'article' => $basket['goods'][$c['goods']]['Number'],
+			'title_full' => $basket['goods'][$c['goods']]['Name'],
+			'price' => $c['price'],
+			'count' => $c['count']
+		];
+		return $output;
+	}
 
 	/**
 	 * gets item by brend and article
@@ -35,9 +55,8 @@ class FavoriteParts extends Provider{
 	 */
 	public static function getItem($brend, $article){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
-		$response = Abcp::getUrlData(
-			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues='
-		);
+		$url = 'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues=';
+		$response = Abcp::getUrlData($url);
 		$GLOBALS['response_header'];
 		$array = json_decode($response, true);
 		return $array['goods'][0];

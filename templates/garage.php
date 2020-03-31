@@ -147,14 +147,14 @@ function garage(){
 								<div class="item" modification_id="<?=$value['modification_id']?>">
 									<a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
 									<div class="clearfix"></div>
-									<?if (file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/models/{$value['model_id']}.jpg")){?>
+									<?if (file_exists(core\Config::getImgPath() . "/models/{$value['model_id']}.jpg")){?>
 										<div class="img">
-											<img src="/images/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
+											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}
 									else{?>
 										<div class="img">
-											<img src="/images/vehicles/<?=$value['vehicle_id']?>.jpg" alt="<?=$value['title']?>">
+											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$value['vehicle_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}?>
 									<div class="description">
@@ -180,14 +180,14 @@ function garage(){
 								<div class="item" modification_id="<?=$value['modification_id']?>">
 									<a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
 									<div class="clearfix"></div>
-									<?if (file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/models/{$value['model_id']}.jpg")){?>
+									<?if (file_exists(core\Config::getImgPath() . "/models/{$value['model_id']}.jpg")){?>
 										<div class="img">
-											<img src="/images/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
+											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}
 									else{?>
 										<div class="img">
-											<img src="/images/vehicles/<?=$value['vehicle_id']?>.jpg" alt="<?=$value['title']?>">
+											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$value['vehicle_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}?>
 									<div class="description">
@@ -396,11 +396,11 @@ function modification(){
 			<h1><?=$m['brend']?> <?=$m['model_title']?> (<?=$m['modification_title']?>)</h1>
 			<div class="img-and-name">
 				<div class="img-wrap">
-					<?if (file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/models/{$m['model_id']}.jpg")){?>
-						<img src="/images/models/<?=$m['model_id']?>.jpg" alt="<?=$m['modification_title']?>">
+					<?if (file_exists(core\Config::getImgPath() . "/models/{$m['model_id']}.jpg")){?>
+						<img src="<?=core\Config::$imgUrl?>/models/<?=$m['model_id']?>.jpg" alt="<?=$m['modification_title']?>">
 					<?}
 					else{?>
-						<img src="/images/vehicles/<?=$m['vehicle_id']?>.jpg" alt="<?=$m['modification_title']?>">
+						<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$m['vehicle_id']?>.jpg" alt="<?=$m['modification_title']?>">
 					<?}?>
 				</div>
 				<label for="ts-name">Имя: <input type="text" name="modification_title" value="<?=$m['garage_title']?>"></label>

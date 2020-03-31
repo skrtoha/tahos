@@ -18,6 +18,7 @@ switch ($act) {
 		}
 		break;
 	case 'priceEmail': priceEmail(); break;
+	case 'itemsToOrder': itemsToOrder(); break;
 	default:
 		view();
 }
@@ -47,7 +48,8 @@ function view(){
 			<input style="width: 264px;" required type="text" name="search" value="<?=$search?>" placeholder="Поиск по поставщикам">
 			<input type="submit" value="Искать">
 		</form>
-		<a style="position: relative;left: 14px;top: 5px;" href="?view=providers&act=provider">Добавить</a>
+		<a href="?view=providers&act=provider">Добавить</a>
+		<a href="?view=providers&act=itemsToOrder">Товары, ожидающие отправку в заказ</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -346,6 +348,12 @@ function priceEmail(){
 					</div>
 				</div>
 				<div class="field">
+					<div class="title">Индекс файла в архиве</div>
+					<div class="value">
+						<input type="text" name="indexInArchive" value="<?=$array['indexInArchive']?>">
+					</div>
+				</div>
+				<div class="field">
 					<div class="title">Тип файла</div>
 					<div class="value">
 						<label>
@@ -446,6 +454,56 @@ function priceEmail(){
 			</form>
 		</div>
 	</div>
-
+<?}
+function itemsToOrder(){
+	global $status, $page_title, $db;
+	$page_title = "Товары, ожидающие отправку в заказы";
+	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
+	$res_providers = $db->query("
+		SELECT id, title, api_title FROM #providers WHERE api_title IS NOT NULL
+	", '');
+	$items = array();
+	foreach($res_providers as $p){
+		switch($p['title']){
+			case 'Авторусь':
+			case 'М Партс':
+				$orderAbcp = new core\OrderAbcp($db, $p['id']);
+				$output = $orderAbcp->getItemsToOrder($p['id']);
+				break;
+			default:
+				eval("\$output = core\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
+		}
+		if (!count($output)) continue;
+		foreach($output as $value) $items[] = $value;
+	}?>
+	<div id="total" style="margin-top: 10px;">Всего: <?=count($items)?></div>
+	<table class="t_table" cellspacing="1">
+		<tr class="head">
+			<td>Поставщик</td>
+			<td>Склад</td>
+			<td>Бренд</td>
+			<td>Артикул</td>
+			<td>Название</td>
+			<td>Цена</td>
+			<td>Количество</td>
+		</tr>
+		<?if (count($items)){
+			foreach($items as $i){?>
+				<tr>
+					<td><?=$i['provider']?></td>
+					<td><?=$i['store']?></td>
+					<td><?=$i['brend']?></td>
+					<td><?=$i['article']?></td>
+					<td><?=$i['title_full']?></td>
+					<td><?=$i['price']?></td>
+					<td><?=$i['count']?></td>
+				</tr>
+			<?}
+		}
+		else{?>
+			<tr><td colspan="7">Товаров не найдено</td></tr>
+		<?}?>
+	</table>
+	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
 <?}
 ?>

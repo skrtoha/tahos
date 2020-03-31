@@ -1,4 +1,5 @@
 <?php
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 set_time_limit(0);
 error_reporting(E_PARSE | E_ERROR);
 core\Timer::start();
@@ -316,7 +317,7 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID={$mikado->ClientID}&PSW={$mikado->Password}111";
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID={$mikado->ClientID}&PSW={$mikado->Password}";
 			$file = file_get_contents($url);
 			if (strlen($file) == 18){
 				$errorText = "Не удалось скачать $zipName в $url";
@@ -644,6 +645,7 @@ switch($_GET['act']){
 			echo "<br>$errorText";
 			throw new \Exception($errorText);
 		} 
+		// $fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.zip";
 
 		$db->query("
 			DELETE si FROM
@@ -652,7 +654,7 @@ switch($_GET['act']){
 				#provider_stores ps ON ps.id=si.store_id
 			WHERE 
 				ps.provider_id = 17
-		", 'debug');
+		", '');
 		
 		$zipArchive = new ZipArchive();
 		$res = $zipArchive->open($fileImap);
@@ -666,47 +668,42 @@ switch($_GET['act']){
 			break;
 		};
 
-		$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load("{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.xlsx");
-		$xls->setActiveSheetIndex(0);
-		$sheet = $xls->getActiveSheet();
-		$rowIterator = $sheet->getRowIterator();
-		$i = 0;
-		foreach ($rowIterator as $row) {
-			$cellIterator = $row->getCellIterator();
-			$row = array();
-			foreach($cellIterator as $cell){
-				$row[] = $cell->getCalculatedValue();
-			} 
-			$i++;
+		$filePath = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.xlsx";
+		$reader = ReaderEntityFactory::createReaderFromFile($filePath);
+		$reader->open($filePath);
+		foreach ($reader->getSheetIterator() as $sheet) {
+		   foreach ($sheet->getRowIterator() as $iterator) {
+				$cells = $iterator->getCells();
+				$row = [];
+				foreach($cells as $value) $row[] = $value->getValue();
+				$i++;
+				// if ($i > 223801000) die("Обработка закончена");
 
-			debug($row);
-			if ($i > 20) break;
-			continue;
-
-			if (!$row[0]) continue;
-			if ($row[0] == 'ГРУППА') continue;
-			if (!$row[0] || !$row[1]){
-				$price->log->error("В строке $i произошла ошибка.");
-				continue;
+				if (!$row[0]) continue;
+				if ($row[0] == 'ГРУППА') continue;
+				if (!$row[0] || !$row[1]){
+					$price->log->error("В строке $i произошла ошибка.");
+					continue;
+				}
+				$brend_id = $price->getBrendId($row[0]);
+				if (!$brend_id) continue;
+				$item_id = $price->getItemId([
+					'brend_id' => $brend_id,
+					'brend' => $row[0],
+					'article' => $row[1],
+					'title' => $row[2],
+					'row' => $i
+				]);
+				if (!$item_id) continue;
+				$price->insertStoreItem([
+					'store_id' => 22380,
+					'item_id' => $item_id,
+					'price' => $row[4],
+					'in_stock' => $row[5],
+					'packaging' => $row[6],
+					'row' => $i
+				]);
 			}
-			$brend_id = $price->getBrendId($row[0]);
-			if (!$brend_id) continue;
-			$item_id = $price->getItemId([
-				'brend_id' => $brend_id,
-				'brend' => $row[0],
-				'article' => $row[1],
-				'title' => $row[2],
-				'row' => $i
-			]);
-			if (!$item_id) continue;
-			$price->insertStoreItem([
-				'store_id' => 22380,
-				'item_id' => $item_id,
-				'price' => $row[4],
-				'in_stock' => $row[5],
-				'packaging' => $row[6],
-				'row' => $i
-			]);
 		}
 
 		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`= 17", '');
@@ -771,8 +768,6 @@ switch($_GET['act']){
 			break;
 		}
 		
-		$fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
-
 		if ($emailPrice['isArchive']){
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open($fileImap);
@@ -782,17 +777,30 @@ switch($_GET['act']){
 				echo "<br>$errorText";
 				break;
 			} 
-			$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$emailPrice['nameInArchive']]);
-			if (!$res){
-				$errorText = "Ошибка извлечения файла {$emailPrice['nameInArchive']}: $res";
-				throw new Exception($errorText);
-				echo "<br>$errorText";
-				break;
-			} 
+			try{
+				$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$emailPrice['nameInArchive']]);
+				if (!$res) throw new Exception ("Ошибка извлечения файла {$emailPrice['nameInArchive']}. Попытка использовать альтернативный способ.");
+			} catch(Exception $e){
+				echo "<br>" . $e->getMessage();
+				if ($emailPrice['indexInArchive'] !== false){
+					$bites = file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
+					if (!$bites) throw new Exception("Возникла ошибка. Ни один из способов извлечь архив не сработали");
+				}
+				else{
+					$zip_count = $zipArchive->count();
+					if (!$zip_count) throw new Exception("Альтернативный способ не сработал - ошибка получения количества файлов в архиве");
+					for ($i = 0; $i < $zip_count; $i++) { 
+						echo "<br>" . "Индекс $i: ". $zipArchive->getNameIndex($i);
+					};
+					echo "<br>Укажите настройках в поле \"Индекс файла в архиве\" необходимый индекс.";
+				}
+			}
 			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}";
 			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
 		}
 		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
+
+		// $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Armtek_CRS_40068974.xlsx";
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer
@@ -800,18 +808,43 @@ switch($_GET['act']){
 		$stringNumber = 0;
 		switch($emailPrice['fileType']){
 			case 'excel':
-				$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($fileImap);
-				$xls->setActiveSheetIndex(0);
-				$sheet = $xls->getActiveSheet();
-				$rowIterator = $sheet->getRowIterator();
-				foreach ($rowIterator as $row) {
-					$cellIterator = $row->getCellIterator();
-					$row = array();
-					foreach($cellIterator as $cell){
-						$row[] = $cell->getCalculatedValue();
-					} 
-					$stringNumber++;
-					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+				$reader = ReaderEntityFactory::createReaderFromFile($workingFile);
+				try{
+					$reader->open($workingFile);
+				} catch(\Box\Spout\Common\Exception\IOException $e){
+					echo "<br>Ошибка: <b>" . $e->getMessage() . "</b>";
+					echo "<br>Попытка обработки файла другим способом....";
+					
+					$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
+					$xls->setActiveSheetIndex(0);
+					$sheet = $xls->getActiveSheet();
+					$rowIterator = $sheet->getRowIterator();
+					foreach ($rowIterator as $iterator) {
+						$row = array();
+						$cellIterator = $iterator->getCellIterator();
+						foreach($cellIterator as $cell){
+							$row[] = $cell->getCalculatedValue();
+						} 
+						$stringNumber++;
+
+						// debug($row);
+						// if ($stringNumber > 100) die("Обработка прошла");
+
+						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+					}
+				}
+				foreach ($reader->getSheetIterator() as $sheet) {
+				   foreach ($sheet->getRowIterator() as $iterator) {
+						$cells = $iterator->getCells();
+						$row = [];
+						foreach($cells as $value) $row[] = $value->getValue();
+						$stringNumber++;
+
+						// debug($row);
+						// if ($stringNumber > 100) die("Обработка прошла");
+
+						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+					}
 				}
 				break;
 			case 'csv':

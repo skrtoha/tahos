@@ -10,7 +10,7 @@ switch ($act){
 		$res = $db->delete('brends', "`id`=".$_GET['id']);
 		if ($res === true){
 			$db->delete('brends', '`parent_id`='.$_GET['id']);
-			array_map('unlink', glob("{$_SERVER['DOCUMENT_ROOT']}/images/brends/{$_GET['id']}.*"));
+			array_map('unlink', glob(core\Config::getImgPath() . "/brends/{$_GET['id']}.*"));
 			message('Бренд успешно удален!');
 		}
 		else message('Данный бренд привязан к номенклатуре!', false);
@@ -21,7 +21,7 @@ switch ($act){
 	case 'change': show_form('s_change');break;
 	case 'add': show_form('s_add');break;
 	case 'image_delete':
-		array_map('unlink', glob("../images/brends/{$_GET['id']}.*"));
+		array_map('unlink', glob(core\Config::getImgPath() . "/brends/{$_GET['id']}.*"));
 		header("Location: /admin/?view=brends&id={$_GET['id']}&act=change");
 		break;
 	case 's_change':
@@ -29,7 +29,7 @@ switch ($act){
 		if (!empty($_FILES['image'])){
 			$f = $_FILES['image'];
 			if ($f['type'] == 'image/svg+xml'){
-				move_uploaded_file($f['tmp_name'], "../images/brends/{$_GET['id']}.svg");
+				move_uploaded_file($f['tmp_name'], core\Config::getImgPath() . "/brends/{$_GET['id']}.svg");
 			} 
 			else brend_set_image($f);
 		}
@@ -331,7 +331,7 @@ function show_form($act){
 				<div class="field">
 					<div class="title">Фото</div>
 					<div class="value">
-						<?if ($brend['id']) $src = array_shift(glob("../images/brends/{$brend['id']}.*"));?>
+						<?if ($brend['id']) $src = array_shift(glob(core\Config::getImgPath() . "/brends/{$brend['id']}.*"));?>
 						<?if ($src){?>
 							<img style="height: 150px" src="/<?=$src?>" alt=""><br>
 							<a href="?view=<?=$_GET['view']?>&id=<?=$brend['id']?>&act=image_delete">Удалить</a>
@@ -480,7 +480,7 @@ function brend_set_image($file, $id = 0){
 		$array['error'] = '';
 		return $array;
 	}
-	$dir = "../images/brends/";
+	$dir = core\Config::getImgPath() . "/brends/";
 	require_once('../vendor/class.upload.php');
 	if (!file_exists($dir)) mkdir($dir);
 	$handle = new upload($file);

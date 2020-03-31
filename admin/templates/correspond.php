@@ -8,7 +8,7 @@
 		$bool = false;
 	}
 	if ($bool){
-		$target_dir = "../images/temp/";
+		$target_dir = core\Config::getImgPath() . "/temp/";
 		$image_name = microtime().".jpg";
 		if (move_uploaded_file($tmp_name, $target_dir.$image_name)){
 			message('Фото успешно загружено!');?>
@@ -183,7 +183,7 @@ if (!empty($messages)){
 				if (count($msg_fotos)){?>
 					<div class="attachment">
 					<?foreach ($msg_fotos as $msg_foto){?>
-						<div class="img-wrap"><a href="/images/temp/<?=$msg_foto['title']?>"><img style="width: 200px" src="/images/temp/<?=$msg_foto['title']?>" alt=""></a></div>
+						<div class="img-wrap"><a href="<?=core\Config::$imgUrl?>/temp/<?=$msg_foto['title']?>"><img style="width: 200px" src="/images/temp/<?=$msg_foto['title']?>" alt=""></a></div>
 					<?}?>
 					</div>
 				<?}?>

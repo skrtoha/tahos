@@ -147,7 +147,7 @@ else{
 								<div class="pic-and-description">
 									<div class="img-wrap">
 										<?if ($item['foto']){?>
-											<img src="/images/items/small/<?=$item['id']?>/<?=$item['foto']?>">
+											<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$item['foto']?>">
 										<?}
 										else{?>
 											<img src="/images/no_foto.png" alt="Фото отсутствует">

@@ -8,7 +8,7 @@
 		$bool = false;
 	}
 	if ($bool){
-		$target_dir = "images/temp/";
+		$target_dir = core\Config::getImgPath() . "/temp/";
 		$image_name = microtime().".jpg";
 		if (move_uploaded_file($tmp_name, $target_dir.$image_name)){
 			message('Фото успешно загружено!');?>
@@ -27,31 +27,6 @@ $messages = $db->select('messages', '*', "`order_id`=$order_id AND `hidden`=0", 
 	else{?>
 	<h1>Отправить сообщение</h1>
 	<?}?>
-	<!-- <?if (count($messages)){
-		$user = $db->select('users', 'name_1,name_2,name_3', "`id`=".$_SESSION['user']);
-		$user = $user[0];
-		$user = $user['name_1']." ".$user['name_2']." ".$user['name_3'];?>
-		<div class="dialog" style="margin-top: 20px">
-			<div class="dialog-box">
-			<?foreach ($messages as $message) {?>
-				<div class="message-box">
-					<span class="sender"><?=$message['user_sender'] ? $user : 'Администрация'?></span>
-					<span class="send-time"><?=date('d.m.Y H:i', $message['date'])?></span>
-					<p class="message"><?=$message['message']?></p>
-					<?$msg_fotos = $db->select('msg_fotos', 'title', "`message_id`=".$message['id']);
-					if (count($msg_fotos)){?>
-						<div class="attachment">
-						<?foreach ($msg_fotos as $msg_foto){?>
-							<div class="img-wrap"><a href="/images/temp/<?=$msg_foto['title']?>"><img src="/images/temp/<?=$msg_foto['title']?>" alt=""></a></div>
-						<?}?>
-						</div>
-					<?}?>
-				</div>
-			<?}?>
-			</div>
-			<hr>
-		</div>
-	<?}?> -->
 	<form action="/core/send_message.php" id="send-message" method="post">
 	<input type="hidden" name="message_send" value="1">
 		<input type="hidden" name="json_fotos">

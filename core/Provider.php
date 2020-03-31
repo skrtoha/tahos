@@ -3,15 +3,14 @@ namespace core;
 abstract class Provider{
 	protected abstract function getItemsToOrder(int $provider_id);
 	public static function get(){
-		$res = $GLOBALS['db']->select('providers', 'id,title', '', 'title');
+		$res = self::getInstanceDataBase()->select('providers', 'id,title', '', 'title');
 		return $res;
 	}
 	public static function getIsEnabledApiSearch($provider_id){
 		static $enabledArrayApiSearch;
 		if (!$enabledArrayApiSearch){
-			$db = isset($GLOBALS['db']) ? $GLOBALS['db'] : new DataBase();
 			$output = array();
-			$res = $db->query("
+			$res = self::getInstanceDataBase()->query("
 				SELECT
 					id, is_enabled_api_search
 				FROM
@@ -37,9 +36,8 @@ abstract class Provider{
 	public static function getIsEnabledApiOrder($provider_id){
 		static $enabledArrayApiOrder;
 		if (!$enabledArrayApiOrder){
-			$db = isset($GLOBALS['db']) ? $GLOBALS['db'] : new DataBase();
 			$output = array();
-			$res = $db->query("
+			$res = self::getInstanceDataBase()->query("
 				SELECT
 					id, is_enabled_api_order
 				FROM

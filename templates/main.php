@@ -22,6 +22,7 @@
 </head>
 <body>
 	<input type="hidden" name="device" value="<?=$device?>">
+	<input type="hidden" name="imgUrl" value="<?=core\Config::$imgUrl?>">
 	<div id="popup" style="display: none"><img src="/images/preload.gif" alt=""></div>
 	<div id="message">
 		<div><div></div></div>

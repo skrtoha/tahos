@@ -45,7 +45,7 @@ function getHtmlItems(items){
 	var list = '';
 	for (var key in items){
 		var item = items[key];
-		if (item.foto) var foto = '<img src="/images/items/small/' + item.id + '/' + item.foto + '" alt="' + item.title + '">';
+		if (item.foto) var foto = '<img src="' + getImgUrl() + '/items/small/' + item.id + '/' + item.foto + '" alt="' + item.title + '">';
 		else foto = '<img src="/images/no_foto.png" alt="Фото отсутствует">';
 		var values_mosaic = '';
 		var values_list = '';
@@ -242,8 +242,8 @@ function getFullItem(i){
 	var c_fotos = Object.keys(i.fotos).length;
 	// console.log(c_fotos);
 	if (is_foto){
-		var src_small = '/images/items/small/' + item.id + '/' + item.foto;
-		var src_big = '/images/items/big/' + item.id + '/' + item.foto;
+		var src_small = getImgUrl() + '/items/small/' + item.id + '/' + item.foto;
+		var src_big = getImgUrl() + '/items/big/' + item.id + '/' + item.foto;
 		str += '' +
 				'<div id="main-pic">' + 
 					'<img src="'+ src_small + '" data-zoom-image="' + src_big + '">' + 
@@ -251,8 +251,8 @@ function getFullItem(i){
 		if (c_fotos){
 			str += '<div id="gallery">';
 			for (var k in i.fotos){
-				var src_small = '/images/items/small/' + item.id + '/' + i.fotos[k];
-				var src_big = '/images/items/big/' + item.id + '/' + i.fotos[k];
+				var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.fotos[k];
+				var src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.fotos[k];
 				str += '<img src="' + src_small + '" data-big-img="' + src_big + '">';
 			}
 			str += '</div>';

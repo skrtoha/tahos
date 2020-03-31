@@ -65,7 +65,7 @@ ALTER TABLE `tahos_logs`
 ALTER TABLE `tahos_logs`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
-
+ALTER TABLE `tahos_mikado_zakazcode` ADD INDEX(`ZakazCode`);
 
 
 

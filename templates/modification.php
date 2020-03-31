@@ -68,14 +68,14 @@ if ($res_nodes->num_rows){
 <div class="catalogue-original">
 	<div class="clearfix"></div>
 	<div class="item-info-block">
-		<?if (file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/models/{$_GET['model_id']}.jpg")){?>
+		<?if (file_exists(core\Config::getImgPath() . "/models/{$_GET['model_id']}.jpg")){?>
 			<div class="img">
-				<img src="/images/models/<?=$_GET['model_id']?>.jpg" alt="<?=$modification['title']?>">
+				<img src="<?=core\Config::$imgUrl?>/models/<?=$_GET['model_id']?>.jpg" alt="<?=$modification['title']?>">
 			</div>
 			<?}
 		if (file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/vehicles/{$modification['vehicle_id']}.jpg")){?>
 			<div class="img">
-				<img src="/images/vehicles/<?=$modification['vehicle_id']?>.jpg" alt="<?=$modification['title']?>">
+				<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$modification['vehicle_id']?>.jpg" alt="<?=$modification['title']?>">
 			</div>
 		<?}
 		if (!empty($modification['filter_values']) || ($_GET['vin'] != 'vin' && $_GET['vin'])){?>
@@ -139,7 +139,7 @@ if ($res_nodes->num_rows){
 	<div class="item">
 		<a href="<?=$_SERVER['REQUEST_URI']?>/<?=$k?>"></a>
 		<p><?=$v?></p>
-		<?$src = array_shift(glob("images/nodes/small/{$_GET['brend']}/$k.*"));
+		<?$src = array_shift(glob(core\Config::$imgPath . "/nodes/small/{$_GET['brend']}/$k.*"));
 		if ($src){?>
 			<div class="img">
 				<img src="/<?=$src?>" alt="<?=$v?>">

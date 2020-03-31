@@ -9,7 +9,7 @@ if ($_POST['image_submit']){
 		$bool = false;
 	}
 	if ($bool){
-		$target_dir = "images/temp/";
+		$target_dir = core\Config::getImgPath() . "/temp/";
 		$image_name = microtime().".jpg";
 		if (move_uploaded_file($tmp_name, $target_dir.$image_name)){
 			message('Фото успешно загружено!');?>

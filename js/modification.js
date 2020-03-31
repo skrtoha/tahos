@@ -56,7 +56,7 @@ $(function(){
 							'<p>' + n.title + '</p>';
 						if (n.is_img) str += 
 							'<div class="img">' + 
-								'<img src="/images/nodes/small/' + brend + '/' + n.id + '.jpg" alt="' + n.title + '">' +
+								'<img src="' + getImgUrl() + '/nodes/small/' + brend + '/' + n.id + '.jpg" alt="' + n.title + '">' +
 							'</div>';
 						str +=
 						'</div>';

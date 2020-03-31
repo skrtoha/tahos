@@ -12,7 +12,7 @@ if ($_POST['item_image_submit']){
 				<a class="loop" href="#">Увеличить</a>
 				<a table="fotos" class="delete_foto" href="#">Удалить</a>
 			</div>
-			<img src="/images/items/small/<?=$item_id?>/<?=$title?>" alt="">
+			<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item_id?>/<?=$title?>" alt="">
 		</li>
 	<?}
 	else message($image['error'], false);
@@ -106,8 +106,8 @@ switch ($act) {
 	case 'delete_foto':
 		$id = $_GET['id'];
 		core\Item::update(['foto' => ''], ['id' => $id]);
-		unlink("../images/items/big/$id/{$_GET['title']}");
-		unlink("../images/items/small/$id/{$_GET['title']}");
+		unlink(core\Config::getImgPath() . "/items/big/$id/{$_GET['title']}");
+		unlink(core\Config::getImgPath() . "/items/small/$id/{$_GET['title']}");
 		message('Фото успешно удалено');
 		header("Location: ?view=item&id={$_GET['id']}");
 		break;
@@ -309,7 +309,7 @@ function show_form($act){
 											<a class="loop" href="#">Увеличить</a>
 											<a class="delete_item" href="?view=item&id=<?=$item['id']?>&act=delete_foto&title=<?=$item['foto']?>">Удалить</a>
 										</div>
-										<img src="/images/items/small/<?=$item['id']?>/<?=$item['foto']?>" alt="">
+										<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$item['foto']?>" alt="">
 									</li>
 								</ul>
 							<?}
@@ -331,7 +331,7 @@ function show_form($act){
 													<a class="loop" href="#">Увеличить</a>
 													<a table="fotos" class="delete_foto" href="#">Удалить</a>
 												</div>
-												<img src="/images/items/small/<?=$foto['item_id']?>/<?=$foto['title']?>" alt="">
+												<img src="<?=core\Config::$imgUrl?>/items/small/<?=$foto['item_id']?>/<?=$foto['title']?>" alt="">
 											</li>
 										<?}
 									}?>

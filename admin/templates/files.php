@@ -134,6 +134,8 @@ if ($_POST['items_analogies']){
 
 	foreach ($rowIterator as $row) {
 		$cellIterator = $row->getCellIterator();
+		$item_analogy_id = false;
+		$item_main_id = false;
 		$value = array();
 		foreach($cellIterator as $cell) $value[] = $cell->getCalculatedValue();
 		$r++;//счетчик строк в файле
@@ -193,7 +195,7 @@ if ($_POST['items_analogies']){
 			} 
 		}
 
-		if (!$item_analogy_id && $_POST['create_analogies']){
+		if (!$item_analogy_id){
 			$itemAnalogy = $db->select_one('items', 'id', "`article`='{$articleAnalogy}' AND `brend_id` = $brendAnalogy");
 			if (empty($itemAnalogy)){
 				$price->log->warning("В строке $r не найдено {$value[4]} - $articleAnalogy");

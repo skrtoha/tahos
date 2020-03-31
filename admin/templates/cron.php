@@ -832,6 +832,8 @@ switch($_GET['act']){
 
 						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 					}
+					endSuccessfullyProccessing();
+					echo "<br>Время обработки: <b>".core\Timer::end()."</b> секунд";
 				}
 				foreach ($reader->getSheetIterator() as $sheet) {
 				   foreach ($sheet->getRowIterator() as $iterator) {
@@ -857,18 +859,7 @@ switch($_GET['act']){
 				break;
 		}
 
-		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_GET['store_id']}", '');
-
-		$price->log->alert("Обработано $stringNumber строк");
-		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->log->alert("Вставлено: $price->insertedBrends брендов");
-		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
-		
-		echo "<br>Обработано <b>$stringNumber</b> строк";
-		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
-		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
-		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		endSuccessfullyProccessing();
 		break;
 }
 echo "<br>Время обработки: <b>".core\Timer::end()."</b> секунд";

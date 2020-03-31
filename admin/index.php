@@ -2,7 +2,7 @@
 use core\Log;
 
 set_exception_handler('error_handler',);
-function error_handler(Throwable $e){
+function error_handler($e){
 	if (get_class($e) == 'ParseError') return debug($e);
 	Log::insertThroughException($e);
 }

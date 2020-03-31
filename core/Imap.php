@@ -18,7 +18,7 @@ class Imap{
 		$data = array();
 		if ($this->error) return false;
 		$num = imap_num_msg($this->connection);
-		for($i = $num; $i > $num - 20; $i--){
+		for($i = $num; $i > 0; $i--){
 			$header = imap_header($this->connection, $i);
 			$from = $header->from[0]->mailbox.'@'.$header->from[0]->host;
 			if ($from != $params['from']) continue;

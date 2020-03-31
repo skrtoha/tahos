@@ -723,7 +723,6 @@ switch($_GET['act']){
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
-		debug($emailPrice);
 		$store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
@@ -801,6 +800,7 @@ switch($_GET['act']){
 		}
 		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
 
+		// $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Armtek_CRS_40068974.xlsx";
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer
@@ -809,13 +809,40 @@ switch($_GET['act']){
 		switch($emailPrice['fileType']){
 			case 'excel':
 				$reader = ReaderEntityFactory::createReaderFromFile($workingFile);
-				$reader->open($workingFile);
+				try{
+					$reader->open($workingFile);
+				} catch(\Box\Spout\Common\Exception\IOException $e){
+					echo "<br>Ошибка: <b>" . $e->getMessage() . "</b>";
+					echo "<br>Попытка обработки файла другим способом....";
+					
+					$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
+					$xls->setActiveSheetIndex(0);
+					$sheet = $xls->getActiveSheet();
+					$rowIterator = $sheet->getRowIterator();
+					foreach ($rowIterator as $iterator) {
+						$row = array();
+						$cellIterator = $iterator->getCellIterator();
+						foreach($cellIterator as $cell){
+							$row[] = $cell->getCalculatedValue();
+						} 
+						$stringNumber++;
+
+						// debug($row);
+						// if ($stringNumber > 100) die("Обработка прошла");
+
+						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+					}
+				}
 				foreach ($reader->getSheetIterator() as $sheet) {
 				   foreach ($sheet->getRowIterator() as $iterator) {
 						$cells = $iterator->getCells();
 						$row = [];
 						foreach($cells as $value) $row[] = $value->getValue();
 						$stringNumber++;
+
+						// debug($row);
+						// if ($stringNumber > 100) die("Обработка прошла");
+
 						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 					}
 				}

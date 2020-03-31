@@ -137,7 +137,11 @@ if ($_POST['items_analogies']){
 		$value = array();
 		foreach($cellIterator as $cell) $value[] = $cell->getCalculatedValue();
 		$r++;//счетчик строк в файле
-		// if ($r > 100) die("Обработка прервана");
+
+		// if ($r > 100) break;
+		//debug($value); //echo "<hr>"; continue;
+
+
 		if (
 				!$value[0] || 											//основной бренд пуст
 				(!$value[1] && !$value[2]) ||		//артикул и каталожный номер пусты
@@ -152,7 +156,7 @@ if ($_POST['items_analogies']){
 		$brendMain = $price->getBrendId($value[0]);
 		$brendAnalogy = $price->getBrendId($value[4]);
 		if (!$brendMain || !$brendAnalogy) continue;
-
+		// debug($value);
 		$articleMain = article_clear($value[1] ? $value[1] : $value[2]);
 		$articleAnalogy = article_clear($value[5] ? $value[5] : $value[6]);
 
@@ -171,6 +175,10 @@ if ($_POST['items_analogies']){
 			$itemMain = $db->select_one('items', 'id', "`article` = '{$articleMain}' AND `brend_id` = $brendMain");
 			$item_main_id = $itemMain['id'];
 		}
+		if (!$item_main_id){
+			$price->log->error("Ошибка получения основного id номенклатуры в $r.");
+			continue;
+		}
 
 		if ($_POST['create_analogies']){
 			$resAnalogy = $db->insert('items', [
@@ -185,7 +193,7 @@ if ($_POST['items_analogies']){
 			} 
 		}
 
-		if (!$item_analogy_id){
+		if (!$item_analogy_id && $_POST['create_analogies']){
 			$itemAnalogy = $db->select_one('items', 'id', "`article`='{$articleAnalogy}' AND `brend_id` = $brendAnalogy");
 			if (empty($itemAnalogy)){
 				$price->log->warning("В строке $r не найдено {$value[4]} - $articleAnalogy");
@@ -204,7 +212,7 @@ if ($_POST['items_analogies']){
 		<p>Время обработки: ".core\Timer::end()." секунд.</p>
 		<p>Вставлено строк номенклатуры: <b>$insertedItems</b>.</p>
 		<p>Вставлено аналогов: <b>$insertedAnalogies</b>.</p>
-		<a target='_blank' href='/admin/logs/{$price->nameFileLog}.txt'>Лог ошибок</a>
+		<a target='_blank' href='/admin/logs/{$price->nameFileLog}'>Лог ошибок</a>
 	";
 }
 $act = $_GET['act'];

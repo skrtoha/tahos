@@ -205,9 +205,9 @@ if ($_POST['items_analogies']){
 		}
 
 		if ($item_analogy_id && $item_main_id){
-			$db->insert('analogies', ['item_id' => $item_analogy_id, 'item_diff' => $item_main_id]);
-			$db->insert('analogies', ['item_id' => $item_main_id, 'item_diff' => $item_analogy_id]);
-			$insertedAnalogies++;
+			$res1 = $db->insert('analogies', ['item_id' => $item_analogy_id, 'item_diff' => $item_main_id]);
+			$res2 = $db->insert('analogies', ['item_id' => $item_main_id, 'item_diff' => $item_analogy_id]);
+			if ($res1 && $res2) $insertedAnalogies++;
 		}
 	}
 	echo "

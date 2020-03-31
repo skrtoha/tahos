@@ -67,6 +67,7 @@ ALTER TABLE `tahos_logs`
 
 ALTER TABLE `tahos_mikado_zakazcode` ADD INDEX(`ZakazCode`);
 
+CREATE TRIGGER `decreaseCountItems` AFTER DELETE ON `tahos_items` FOR EACH ROW BEGIN UPDATE tahos_settings SET countItems = countItems - 1 WHERE id=1; END
 
 
 

@@ -196,7 +196,7 @@ function provider(){
 						<input type=text <?=$disabled?> name="fact_adres" value="<?=$array['fact_adres']?>">
 					</div>
 				</div>
-				<?if ($array['api_title'] && file_exists($_SERVER['DOCUMENT_ROOT']."/core/{$array['api_title']}.php")){?>
+				<?if ($array['api_title'] && file_exists($_SERVER['DOCUMENT_ROOT']."/core/Provider/{$array['api_title']}.php")){?>
 					<div class="field">
 						<div class="title">Включить API поиска</div>
 						<div class="value">

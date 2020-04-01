@@ -88,7 +88,7 @@ class Abcp extends Provider{
 			'provider_stores',
 			[
 				'title' => $p['title'].'-'.$item['distributorId'],
-				'cipher' => strtoupper(static::getRandomString(4)),
+				'cipher' => strtoupper(self::getRandomString(4)),
 				'percent' => 10,
 				'currency_id' => 1,
 				'provider_id' => $provider_id,
@@ -107,22 +107,6 @@ class Abcp extends Provider{
 		} 
 	}
 	private function getItems($provider_id){
-		// $brends = $this->db->select('brends', 'id,title', "`id`={$this->item['brend_id']} OR `parent_id`={$this->item['brend_id']}");
-		// if (empty($brends)) return false;
-		// foreach($brends as $value) $search[] = [
-		// 	'number' => $this->item['article'],
-		// 	'brand' => $value['title']
-		// ];
-		// $res = static::getUrlData(
-		// 	self::$params[$provider_id]['url'].'/search/batch',
-		// 	[
-		// 		'userlogin' => self::$params[$provider_id]['userlogin'],
-		// 		'userpsw' => md5(self::$params[$provider_id]['userpsw']),
-		// 		'search' => $search
-		// 	]
-		// );
-		// $res = json_decode($res, true);
-		// if (!self::$params[$provider_id]['getAnalogies']) return $res;
 		$brends = Brend::get(['id' => $this->item['brend_id'], 'provider_id' => $provider_id], [], '');
 		$brend = $brends->fetch_assoc();
 		$p = self::$params[$provider_id];
@@ -140,7 +124,7 @@ class Abcp extends Provider{
 			// debug($items);
 			if (empty($items)) continue;
 			foreach($items as $value){
-				if (!Armtek::getComparableString($value['description'])) continue;
+				if (!self::getComparableString($value['description'])) continue;
 				$coincidences[$value['brand']] = $value['description'];
 			} 
 		}
@@ -171,7 +155,7 @@ class Abcp extends Provider{
 					'weight' => $item['weight'] ? $item['weight'] * 1000 : null
 				]);
 				if (!$item_id) return false;
-				if (Armtek::getComparableString($this->item['article']) != Armtek::getComparableString($item['numberFix'])){
+				if (self::getComparableString($this->item['article']) != self::getComparableString($item['numberFix'])){
 					$this->insertAnalogies($provider_id, $item_id, $item);
 				}
 				$store_id = $this->insertProviderStore($provider_id, $item);
@@ -206,10 +190,6 @@ class Abcp extends Provider{
 		}
 		return Brend::getBrendIdFromList($brendsList);
 	}
-	public static function isDuplicate($str){
-		if (preg_match('/Duplicate/', $str)) return true;
-		else return false;
-	}
 	public function insertItem($provider_id, $array, & $insertedItems = NULL){
 		$array['source'] = self::$params[$provider_id]['title'];
 		$res = $this->db->insert('items', $array, ['print_query' => false]);
@@ -226,7 +206,7 @@ class Abcp extends Provider{
 			} 
 			return $last_id;
 		} 
-		if (static::isDuplicate($res)){
+		if (self::isDuplicate($res)){
 			$item = $this->db->select('items', 'id', "`article`='{$array['article']}' AND `brend_id`={$array['brend_id']}");
 			$item_id = $item[0]['id'];
 			$this->setLog($provider_id, 'info', "Duplicate item {$array['article']} с id=$item_id");
@@ -253,17 +233,10 @@ class Abcp extends Provider{
 				'param2' => $item_id,
 			]
 		);
-		if (static::isDuplicate($res1)) $this->setLog($provider_id, 'info', "duplicate analogies item_id=$this->item_id, item_diff=$item_id");
+		if (self::isDuplicate($res1)) $this->setLog($provider_id, 'info', "duplicate analogies item_id=$this->item_id, item_diff=$item_id");
 		else $this->setLog($provider_id, 'error', "$last_query1 | $res1");
-		if (static::isDuplicate($res2)) $this->setLog($provider_id, 'info', "duplicate analogies item_id=$item_id, item_diff=$this->item_id");
+		if (self::isDuplicate($res2)) $this->setLog($provider_id, 'info', "duplicate analogies item_id=$item_id, item_diff=$this->item_id");
 		else $this->setLog($provider_id, 'error', "$last_query2 | $res2");
-	}
-	static public function getRandomString($str_length = 4){
-		$str_characters = array (0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-		$characters_length = count($str_characters) - 1;
-		$string = '';
-		for($i = $str_length; $i > 0; $i--) $string .= $str_characters[mt_rand(0, $characters_length)];
-		return $string;
 	}
 	private function insertStoreItems($store_id, $item_id, $item){
 		$res = $this->db->insert('store_items', 
@@ -292,74 +265,6 @@ class Abcp extends Provider{
 			'brand' => $value['brand']
 		];
 		return $brands;
-	}
-	/**
-	 * gets response from remote server by url
-	 * @param  [string] $url remote url server
-	 * @param  [array] $data if is null then method is get 
-	 * @return [string] response from server
-	 */
-	public static function getUrlData($url, $data = array(), $header = null){
-		$context = array();
-		$url = str_replace(' ', '%20', $url);
-		if ($header) $array['http']['header'] = $header;
-		if (empty($data)){
-			$array['ssl']['verify_peer'] = false;
-			$array['http']['method'] = 'GET';
-		} 
-		else{
-			$array['http']['method'] = 'POST';
-			$array['http']['content'] = http_build_query($data);
-		}
-		$context = stream_context_create($array);
-		try{
-			$res = file_get_contents($url, false, $context);
-			if ($res === false) return false;
-		} catch(\Exception $e){}
-		$GLOBALS['response_header'] = $http_response_header;
-		return $res;
-	}
-	/**
-	 * outdated, use getUrlData
-	 */
-	public static function getPostData($url, $data = array(), $header = null){
-		$context = null;
-		debug($data);
-		if (empty($data)){
-			$context = stream_context_create([
-				'ssl' => [
-					'verify_peer' => false
-				]
-			]);
-		}
-		else{
-			$context = stream_context_create([
-				'http' => [
-					'method' => 'POST',
-					'content' => http_build_query($data)
-				]
-			]);
-		}
-		return file_get_contents($url, false, $context);
-	}
-	public static function isDomainAvailible($url) {
-		// Проверка правильности URL
-		if(!filter_var($url, FILTER_VALIDATE_URL)){
-				return false;
-		}
-		// Инициализация cURL
-		$curlInit = curl_init($url);
-		// Установка параметров запроса
-		curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT, 10);
-		curl_setopt($curlInit,CURLOPT_HEADER, true);
-		curl_setopt($curlInit,CURLOPT_NOBODY, true);
-		curl_setopt($curlInit,CURLOPT_RETURNTRANSFER, true);
-		// Получение ответа
-		$response = curl_exec($curlInit);
-		// закрываем CURL
-		curl_close($curlInit);
-		if ($response) return true;
-		return false;
 	}
 }
 ?>

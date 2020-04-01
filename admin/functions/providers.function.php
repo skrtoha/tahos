@@ -1,5 +1,5 @@
 <?php
-use core\Provider\Abcp;
+use core\Provider;
 function items_submit(){
 	global $db;
 	$profiling = $db->isProfiling;
@@ -79,7 +79,7 @@ function items_submit(){
 					'packaging' => $row[5] ? $row[5] : 1
 				]
 			);
-			if (Abcp::isDuplicate($res)){
+			if (Provider::isDuplicate($res)){
 				$log->warning("В строке $i дублирующие данные: $res | {$db->last_query}");
 				continue;
 			} 

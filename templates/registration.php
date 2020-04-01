@@ -171,7 +171,7 @@ $res_issues = $db->query("
 		</div>
 		<?if ($res_issues->num_rows){?>
 			<div id="div_issue" class="input_box issue_div clearfix" style="">
-				<p>Пункт доставки</p>
+				<p>Пункт выдачи</p>
 				<div class="input">
 					<div class="select">
 						<select name="issue_id">

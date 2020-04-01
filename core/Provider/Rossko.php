@@ -1,5 +1,7 @@
 <?php
-namespace core;
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 class Rossko extends Provider{
 	private $db, $result;
 	private $connect = array(

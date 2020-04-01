@@ -1,4 +1,4 @@
 <?php
-namespace core\Exceptions;
+namespace core\Exception;
 class DataBaseNoConnectException extends \Exception{
 }

@@ -467,11 +467,11 @@ function itemsToOrder(){
 		switch($p['title']){
 			case 'Авторусь':
 			case 'М Партс':
-				$orderAbcp = new core\OrderAbcp($db, $p['id']);
+				$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, $p['id']);
 				$output = $orderAbcp->getItemsToOrder($p['id']);
 				break;
 			default:
-				eval("\$output = core\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
+				eval("\$output = core\\Provider\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
 		}
 		if (!count($output)) continue;
 		foreach($output as $value) $items[] = $value;

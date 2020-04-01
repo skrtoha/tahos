@@ -1,5 +1,7 @@
 <?php
-namespace core;
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 class FavoriteParts extends Provider{
 	public static $key = 'F4289750-BAFA-434C-8C2D-09AC06D6E6C2';
 	public static $developerKey = '156C7176-B22F-4617-94B0-94C1B530FA75';

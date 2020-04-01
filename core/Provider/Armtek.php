@@ -1,5 +1,7 @@
 <?php
-namespace core;
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException; 
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
@@ -100,10 +102,6 @@ class Armtek extends Provider{
 	}
 	public function getBrendId($brand, $from = 'armtek'){
 		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
-		// $brend = Brend::get([
-		// 	'title' => $brand, 
-		// 	'provider_id' => $this->provider_id
-		// ], ['provider_id']); exit();
 		if (empty($brend)) {
 			$this->db->insert(
 				'log_diff',
@@ -388,7 +386,7 @@ class Armtek extends Provider{
 		$res_items = self::getItems('armtek');
 		if (!$res_items->num_rows){
 			echo "<br>Товаров для отправки не найдено";
-			Log::insert([
+			\core\Log::insert([
 				'url' => $_SERVER['REQUEST_URI'],
 				'text' => 'Армтек: не найдено товаров для отправки'
 			]);

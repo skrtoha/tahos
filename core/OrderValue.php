@@ -133,7 +133,7 @@ class OrderValue{
 	 * @return [boolean] true if updated successfully else error of update
 	 */
 	public static function update($values, $params){
-		return $GLOBALS['db']->update('orders_values', $values, Armtek::getWhere([
+		return $GLOBALS['db']->update('orders_values', $values, Provider\Armtek::getWhere([
 			'order_id' => $params['order_id'],
 			'store_id' => $params['store_id'],
 			'item_id' => $params['item_id']

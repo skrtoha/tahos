@@ -1,6 +1,7 @@
 <?php
-namespace core;
-
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 class Mikado extends Provider{
 	private $db;
 	public $ClientID = 33773;

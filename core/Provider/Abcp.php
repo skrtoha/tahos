@@ -1,5 +1,8 @@
 <?
-namespace core;
+namespace core\Provider;
+use core\Provider;
+use core\Brend;
+
 if ($_SERVER['DOCUMENT_ROOT']) $path = $_SERVER['DOCUMENT_ROOT'].'/';
 else $path = '';
 require_once $path.'vendor/autoload.php';

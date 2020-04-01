@@ -1,5 +1,8 @@
 <?
-namespace core;
+namespace core\Provider\Abcp;
+use core\Provider\Abcp;
+use core\OrderValue;
+
 class OrderAbcp extends Abcp{
 	public $param;
 	private $basketContent;
@@ -79,7 +82,7 @@ class OrderAbcp extends Abcp{
 			if (isset($output['error']) && $output['error']) throw new \Exception("Ошибка {$this->param['title']}: {$output['error']}");
 			
 		} catch(\Exception $e){
-			Log::insertThroughException($e);
+			\core\Log::insertThroughException($e);
 			return false;
 		}
 		return $output;

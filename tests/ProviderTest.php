@@ -1,9 +1,9 @@
 <?php
-use core\FavoriteParts;
-use core\Impex;
-use core\Rossko;
+use core\Provider\FavoriteParts;
+use core\Provider\Impex;
+use core\Provider\Rossko;
 use core\DataBase;
-use core\Abcp;
+use core\Provider\Abcp;
 use core\Provider;
 
 class ProviderTest extends \PHPUnit\Framework\TestCase{

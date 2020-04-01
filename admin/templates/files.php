@@ -133,16 +133,16 @@ if ($_POST['items_analogies']){
 	$r = 0;
 
 	foreach ($rowIterator as $row) {
-		$cellIterator = $row->getCellIterator();
 		$item_analogy_id = false;
 		$item_main_id = false;
+
+		$cellIterator = $row->getCellIterator();
 		$value = array();
 		foreach($cellIterator as $cell) $value[] = $cell->getCalculatedValue();
 		$r++;//счетчик строк в файле
 
 		// if ($r > 100) break;
 		//debug($value); //echo "<hr>"; continue;
-
 
 		if (
 				!$value[0] || 											//основной бренд пуст
@@ -153,7 +153,6 @@ if ($_POST['items_analogies']){
 			$price->log->error("В стоке $r ошибочные данные.");
 			continue;
 		}
-
 
 		$brendMain = $price->getBrendId($value[0]);
 		$brendAnalogy = $price->getBrendId($value[4]);
@@ -207,7 +206,7 @@ if ($_POST['items_analogies']){
 		if ($item_analogy_id && $item_main_id){
 			$res1 = $db->insert('analogies', ['item_id' => $item_analogy_id, 'item_diff' => $item_main_id]);
 			$res2 = $db->insert('analogies', ['item_id' => $item_main_id, 'item_diff' => $item_analogy_id]);
-			if ($res1 && $res2) $insertedAnalogies++;
+			if ($res1 === true && $res2 === true) $insertedAnalogies++;
 		}
 	}
 	echo "

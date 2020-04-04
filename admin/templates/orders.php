@@ -6,9 +6,9 @@ $act = $_GET['act'];
 $id = $_GET['id'];
 
 $status_id = $_POST['status_id'];
-$armtek = new core\Armtek($db);
-$rossko = new core\Rossko($db);
-$mikado = new core\Mikado($db);
+$armtek = new core\Provider\Armtek($db);
+$rossko = new core\Provider\Rossko($db);
+$mikado = new core\Provider\Mikado($db);
 // debug($armtek); exit();
 switch ($act) {
 	case 'user_orders': user_orders(); break;
@@ -69,13 +69,13 @@ switch ($act) {
 			if ($ov['provider_id'] == 6 || $ov['provider_id'] == 13){
 				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])){
 					try{
-						throw new Exception("API заказов ".core\Abcp::$params[$ov['provider_id']]['title']." отключено");
+						throw new Exception("API заказов ".core\Provider\Abcp::$params[$ov['provider_id']]['title']." отключено");
 					} catch(Exception $e){
 						core\Log::insertThroughException($e);
 						continue;
 					}
 				};
-				$orderAbcp = new core\OrderAbcp($db, $ov['provider_id']);
+				$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, $ov['provider_id']);
 				$itemInfo = $orderAbcp->getItemInfoByArticleAndBrend($ov);
 				if (!$itemInfo){
 					echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
@@ -105,7 +105,7 @@ switch ($act) {
 					}
 				};
 				$isRendered = true;
-				$res = core\FavoriteParts::addToBasket($ov);
+				$res = core\Provider\FavoriteParts::addToBasket($ov);
 				if (!$res) "<p><b>Ошибка добавления {$ov['brend']} - {$ov['article']} в Фаворит</b></p>";
 			}
 			if (!$isRendered) $db->update('orders_values', ['status_id' => 7], "`order_id`={$_GET['id']} AND `status_id` = 5");
@@ -129,7 +129,7 @@ switch ($act) {
 				continue;
 			}
 		} 
-		$orderAbcp = new core\OrderAbcp($db, 13);
+		$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, 13);
 		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
 		if (!$itemInfo){
 			echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
@@ -161,7 +161,7 @@ switch ($act) {
 				continue;
 			}
 		} 
-		$orderAbcp = new core\OrderAbcp($db, 6);
+		$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, 6);
 		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
 		if (!$itemInfo){
 			echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
@@ -257,7 +257,7 @@ switch ($act) {
 				continue;
 			}
 		};
-		core\FavoriteParts::addToBasket($_GET);
+		core\Provider\FavoriteParts::addToBasket($_GET);
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	default:
@@ -385,8 +385,8 @@ function view(){
 }
 function show_form($act){
 	global $status, $db, $page_title, $armtek, $rossko, $mikado;
-	$mparts = new core\OrderAbcp($db, 13);
-	$voshodAvto = new core\OrderAbcp($db, 6);
+	$mparts = new core\Provider\Abcp\OrderAbcp($db, 13);
+	$voshodAvto = new core\Provider\Abcp\OrderAbcp($db, 6);
 	$id = $_GET['id'];
 	$db->update('orders', array('is_new' => 0), "`id`=$id");
 	switch($act){
@@ -528,7 +528,7 @@ function show_form($act){
 								<br><b style="color: red"><?=$response?></b>
 							<?}
 						}
-						$basketFavoriteParts = core\FavoriteParts::isInBasket($ov);
+						$basketFavoriteParts = core\Provider\FavoriteParts::isInBasket($ov);
 						// debug($basketFavoriteParts, 'basketFavoriteParts');
 						if (!empty($basketFavoriteParts)){?>
 							<br><a href="?view=orders&act=deleteFromFavoriteAuto&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>&goodsID=<?=$basketFavoriteParts['goodsID']?>&warehouseGroup=<?=$basketFavoriteParts['warehouseGroup']?>&quan=0">Удалить из Фаворит</a>

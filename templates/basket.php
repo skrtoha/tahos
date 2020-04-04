@@ -36,7 +36,7 @@ if ($_GET['act'] == 'to_offer'){
 	 	);
 		if ($res !== true) die("$res | $last_query");
 		if ($user['isAutomaticOrder']){
-			$armtek = new core\Armtek($db);
+			$armtek = new core\Provider\Armtek($db);
 			if ($armtek->isKeyzak($value['store_id'])){
 				$value['order_id'] = $order_id;
 				$armtek->toOrder($value);

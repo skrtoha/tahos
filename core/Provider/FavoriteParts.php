@@ -1,5 +1,7 @@
 <?php
-namespace core;
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 class FavoriteParts extends Provider{
 	public static $key = 'F4289750-BAFA-434C-8C2D-09AC06D6E6C2';
 	public static $developerKey = '156C7176-B22F-4617-94B0-94C1B530FA75';
@@ -14,7 +16,7 @@ class FavoriteParts extends Provider{
 	public static function getSearch($search){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$coincidences = array();
-		$response = Abcp::getUrlData(
+		$response = self::getUrlData(
 			'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$search
 		);
 		$items = json_decode($response, true);
@@ -56,7 +58,7 @@ class FavoriteParts extends Provider{
 	public static function getItem($brend, $article){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$url = 'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues=';
-		$response = Abcp::getUrlData($url);
+		$response = self::getUrlData($url);
 		$GLOBALS['response_header'];
 		$array = json_decode($response, true);
 		return $array['goods'][0];
@@ -87,7 +89,7 @@ class FavoriteParts extends Provider{
 		$url .= "&goods={$item['goodsID']}";
 		$url .= "&warehouseGroup=$warehouseGroup";
 		$url .= "&count={$ov['quan']}";
-		Abcp::getUrlData($url); 
+		self::getUrlData($url); 
 		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK') return false;
 		$orderValue = new OrderValue();
 		$status_id = $ov['quan'] > 0 ? 7 : 5;
@@ -127,8 +129,8 @@ class FavoriteParts extends Provider{
 		foreach($basket['cart'] as $b){
 			$code = $basket['warehouseGroup'][$b['warehouseGroup']]['code'];
 			if (
-				Armtek::getComparableString($basket['goods'][$b['goods']]['Brand']) == Armtek::getComparableString($ov['brend']) &&
-				Armtek::getComparableString($basket['goods'][$b['goods']]['Number']) == Armtek::getComparableString($ov['article']) &&
+				self::getComparableString($basket['goods'][$b['goods']]['Brand']) == self::getComparableString($ov['brend']) &&
+				self::getComparableString($basket['goods'][$b['goods']]['Number']) == self::getComparableString($ov['article']) &&
 				$ov['cipher'] == self::getCipherByCode($code)
 			) return [
 				'goodsID' => $b['goods'],
@@ -149,7 +151,7 @@ class FavoriteParts extends Provider{
 	 */
 	private static function getBasket(){
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/";
-		$res = Abcp::getUrlData($url, null, [
+		$res = self::getUrlData($url, null, [
 			"X-Favorit-DeveloperKey: ".self::$developerKey,
 			'X-Favorit-ClientKey: '.self::$key
 		]);
@@ -254,7 +256,7 @@ class FavoriteParts extends Provider{
 	 */
 	private static function getUser(){
 		$url = "http://api.favorit-parts.ru//ws/v1/references/profile/";
-		$res = Abcp::getUrlData($url, null, [
+		$res = self::getUrlData($url, null, [
 			"X-Favorit-DeveloperKey: ".self::$developerKey,
 			'X-Favorit-ClientKey: '.self::$key
 		]);

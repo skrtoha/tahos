@@ -1,6 +1,7 @@
 <?php
-namespace core;
-
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 class Mikado extends Provider{
 	private $db;
 	public $ClientID = 33773;
@@ -16,7 +17,7 @@ class Mikado extends Provider{
 		35 => 12
 	];
 	public function getItemsToOrder(int $provider_id){
-		$xml = Abcp::getUrlData(
+		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
 			[
 				'ClientID' => 33773,
@@ -79,7 +80,7 @@ class Mikado extends Provider{
 	}
 	public function getCoincidences($text){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
-		$xml = Abcp::getUrlData(
+		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
 				'Search_Code' => $text,
@@ -134,7 +135,7 @@ class Mikado extends Provider{
 	}
 	public function setArticle($brend, $article, $getZakazCode = false){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
-		$xml = Abcp::getUrlData(
+		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
 				'Search_Code' => $article,
@@ -166,7 +167,7 @@ class Mikado extends Provider{
 	}
 	private function compareBrends($b1, $b2){
 		// echo "запрос для $b1 и $b2<br>";
-		if (Armtek::getComparableString($b1) == Armtek::getComparableString($b2)) return true;
+		if (self::getComparableString($b1) == self::getComparableString($b2)) return true;
 		$in = '';
 		if (!isset($this->brends[$b1])) $in .= "'$b1',";
 		if (!isset($this->brends[$b2])) $in .= "'$b2',";
@@ -246,7 +247,7 @@ class Mikado extends Provider{
 		return false;
 	}
 	public function getDeliveryType($ZakazCode, $store_id){
-		$xml = Abcp::getUrlData(
+		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Info',
 			[
 				'ZakazCode' => $ZakazCode,
@@ -293,7 +294,7 @@ class Mikado extends Provider{
 		} 
 		else $DeliveryType = 0;
 		try{
-			$xml = Abcp::getUrlData(
+			$xml = self::getUrlData(
 				'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Add',
 				[
 					'ZakazCode' => $ZakazCode,
@@ -331,15 +332,15 @@ class Mikado extends Provider{
 		}
 	}
 	public function isOrdered($ov){
-		$array = $this->db->select_one('mikado_basket', '*', Armtek::getWhere($ov));
+		$array = $this->db->select_one('mikado_basket', '*', self::getWhere($ov));
 		if (empty($array)) return false;
 		return $array['Message'];
 	}
 	public function deleteFromOrder($ov){
 		$res = OrderValue::get($ov);
 		$ov = $res->fetch_assoc();
-		$array = $this->db->select_one('mikado_basket', '*', Armtek::getWhere($ov));
-		$xml = Abcp::getUrlData(
+		$array = $this->db->select_one('mikado_basket', '*', self::getWhere($ov));
+		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Delete',
 			[
 				'ItemID' => $array['ItemID'],
@@ -349,7 +350,7 @@ class Mikado extends Provider{
 		);
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
-		$this->db->delete('mikado_basket', Armtek::getWhere($ov));
+		$this->db->delete('mikado_basket', self::getWhere($ov));
 
 		OrderValue::update(['status_id' => 5, 'ordered' => 0], $ov);
 		User::updateReservedFunds($ov['user_id'], $ov['price'], 'minus');

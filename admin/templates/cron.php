@@ -52,14 +52,14 @@ switch($_GET['act']){
 		break;
 	case 'orderArmtek':
 		echo "<h2>Отправка заказа в Армтек</h2>";
-		$armtek = new core\Armtek($db);
+		$armtek = new core\Provider\Armtek($db);
 		$armtek->sendOrder();
 		echo "<br>Обработка завершена.";
 		break;
 	case 'orderRossko':
 		// debug($_GET); exit();
 		echo "<h2>Отправка заказа в Росско</h2>";
-		$rossko = new core\Rossko($db);
+		$rossko = new core\Provider\Rossko($db);
 		$rossko->sendOrder($_GET['store_id'] ? $_GET['store_id'] : NULL);
 		if ($_GET['order_id']){
 			header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
@@ -68,21 +68,21 @@ switch($_GET['act']){
 		echo "<br>Обработка завершена.";
 		break;
 	case 'orderVoshodAvto':
-		$voshodAvto = new core\OrderAbcp($db, 6);
+		$voshodAvto = new core\Provider\Abcp\OrderAbcp($db, 6);
 		$res = $voshodAvto->basketOrder();
 		break;
 	case 'orderMparts':
-		$mparts = new core\OrderAbcp($db, 13);
+		$mparts = new core\Provider\Abcp\OrderAbcp($db, 13);
 		$res = $mparts->basketOrder();
 		break;
 	case 'toOrderFavoriteParts':
 		echo "<h2>Отправка заказа Фаворит</h2>";
-		$res = core\FavoriteParts::toOrder();
+		$res = core\Provider\FavoriteParts::toOrder();
 		if ($res === false) echo "<p>Нет товаров для отправки</p>";
 		else echo "<p>$res</p>";
 		break;
 	case 'getItemsVoshod':
-		$abcp = new core\Abcp(NULL, $db);
+		$abcp = new core\Provider\Abcp(NULL, $db);
 		$countTransaction = 50;
 		$seconds = 21600;
 		// $seconds = 20;
@@ -156,7 +156,7 @@ switch($_GET['act']){
 			24 => 'ROSV',
 			25 => 'ROSM'
 		];
-		$rossko = new core\Rossko($db);
+		$rossko = new core\Provider\Rossko($db);
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$filename = $imap->getLastMailFrom(['from' => 'price@rossko.ru', 'name' => 'rossko_price.zip']);
 		if (!$filename){
@@ -310,7 +310,7 @@ switch($_GET['act']){
 		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`=8", '');
 		break;
 	case 'priceMikado':
-		$mikado = new core\Mikado($db);
+		$mikado = new core\Provider\Mikado($db);
 		$files = [
 			'MikadoStock' => 1,
 			'MikadoStockReg' => 35
@@ -457,7 +457,7 @@ switch($_GET['act']){
 			3 => 'ARMC'
 			// ,4 => 'ARMK'
 		];
-		$armtek = new core\Armtek($db);
+		$armtek = new core\Provider\Armtek($db);
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		if (isset($imap->error)) {
 			echo "$imap->error";

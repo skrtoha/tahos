@@ -1,8 +1,9 @@
 <?php  
 namespace core;
+use core\Exception\DataBaseNoConnectException;
 class DataBase {
 	public $config;
-	private $mysqli;
+	public $mysqli;
 	public $last_query;
 	public $isProfiling = false;
 	private $profiling;
@@ -18,6 +19,7 @@ class DataBase {
 			$this->config->password,
 			$this->config->db
 		);
+		if ($this->mysqli->connect_error) throw new DataBaseNoConnectException($this->mysqli->connect_error);
 		$this->mysqli->query("SET NAMES utf8");
 	}
 	public function setProfiling(){

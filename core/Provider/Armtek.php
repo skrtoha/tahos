@@ -1,5 +1,7 @@
 <?php
-namespace core;
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException; 
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
@@ -59,7 +61,7 @@ class Armtek extends Provider{
 			* @param $object
 			* @return bool|mixed
 			*/
-		private function getStoreId($object){
+	private function getStoreId($object){
 		if (!$object->KEYZAK) return false;
 		if (array_key_exists($object->KEYZAK, $this->keyzak)) return $this->keyzak[$object->KEYZAK];
 		$array = $this->db->select_one('provider_stores', 'id,delivery', "`provider_id`={$this->provider_id} AND `title`='{$object->KEYZAK}'");
@@ -79,7 +81,7 @@ class Armtek extends Provider{
 			$res = $this->db->insert('provider_stores',[
 				'provider_id' => $this->provider_id,
 				'title' => $object->KEYZAK,
-				'cipher' => strtoupper(Abcp::getRandomString(4)),
+				'cipher' => strtoupper(self::getRandomString(4)),
 				'percent' => 11,
 				'currency_id' => 1,
 				'delivery' => 1,
@@ -100,10 +102,6 @@ class Armtek extends Provider{
 	}
 	public function getBrendId($brand, $from = 'armtek'){
 		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
-		// $brend = Brend::get([
-		// 	'title' => $brand, 
-		// 	'provider_id' => $this->provider_id
-		// ], ['provider_id']); exit();
 		if (empty($brend)) {
 			$this->db->insert(
 				'log_diff',
@@ -331,9 +329,6 @@ class Armtek extends Provider{
 		$this->keyzak[$array['title']] = $array['id'];
 		return $array['title'];
 	}
-	public static function getWhere($array){
-		return "`order_id`={$array['order_id']} AND `store_id`={$array['store_id']} AND `item_id`={$array['item_id']}";
-	}
 	public function isOrdered($value, $type = 'armtek'){
 		$where = self::getWhere($value);
 		$where .= " AND `type`='$type'";
@@ -388,7 +383,7 @@ class Armtek extends Provider{
 		$res_items = self::getItems('armtek');
 		if (!$res_items->num_rows){
 			echo "<br>Товаров для отправки не найдено";
-			Log::insert([
+			\core\Log::insert([
 				'url' => $_SERVER['REQUEST_URI'],
 				'text' => 'Армтек: не найдено товаров для отправки'
 			]);
@@ -455,10 +450,5 @@ class Armtek extends Provider{
 			}
 		}
 		// debug($json_responce_data->RESP->ITEMS, 'json_responce_data');
-	}
-	public static function getComparableString($str){
-		if (!$str) return false;
-		$str = preg_replace('/[^\wа-яA-Z]/i', '', $str);
-		return mb_strtolower($str);
 	}
 }

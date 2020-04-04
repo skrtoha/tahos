@@ -1,5 +1,7 @@
 <?php
-namespace core;
+namespace core\Provider;
+use core\Provider;
+use core\OrderValue;
 class Rossko extends Provider{
 	private $db, $result;
 	private $connect = array(
@@ -105,7 +107,7 @@ class Rossko extends Provider{
 			[
 				'title' => $stock->id,
 				'provider_id' => $this->provider_id,
-				'cipher' => strtoupper(Abcp::getRandomString(4)),
+				'cipher' => strtoupper(self::getRandomString(4)),
 				'currency_id' => 1,
 				'delivery' => $stock->delivery,
 				'percent' => 10
@@ -115,7 +117,7 @@ class Rossko extends Provider{
 				'deincrement_duplicate' => true,
 			]
 		);
-		if (Abcp::isDuplicate($res)){
+		if (self::isDuplicate($res)){
 			$where = "`title`='{$stock->id}' AND `provider_id`={$this->provider_id}";
 			$this->db->update('provider_stores', ['delivery' => $stock->delivery], $where);
 			$array = $this->db->select_one('provider_stores', 'id', $where);
@@ -282,8 +284,8 @@ class Rossko extends Provider{
 		// debug($itemsParts, 'itemsParts');
 		foreach($itemsParts as $value){
 			if (
-				Armtek::getComparableString($itemResponse->partnumber) == Armtek::getComparableString($value['partnumber']) &&
-				Armtek::getComparableString($itemResponse->brand) == Armtek::getComparableString($value['brand'])
+				self::getComparableString($itemResponse->partnumber) == self::getComparableString($value['partnumber']) &&
+				self::getComparableString($itemResponse->brand) == self::getComparableString($value['brand'])
 			){
 				$array = explode('-', $value['osi']);
 				$orderValue = new OrderValue();
@@ -298,7 +300,7 @@ class Rossko extends Provider{
 				$this->db->update(
 					'other_orders',
 					['response' => 'OK'],
-					$this->armtek->getWhere([
+					self::getWhere([
 						'order_id' => $array[0],
 						'store_id' => $array[1],
 						'item_id' => $array[2]
@@ -310,14 +312,14 @@ class Rossko extends Provider{
 	private function parseItemErrorList($itemResponse, $itemsParts){
 		foreach($itemsParts as $value){
 			if (
-				Armtek::getComparableString($itemResponse->partnumber) == Armtek::getComparableString($value['partnumber']) &&
-				Armtek::getComparableString($itemResponse->brand) == Armtek::getComparableString($itemResponse->brand == $value['brand'])
+				self::getComparableString($itemResponse->partnumber) == self::getComparableString($value['partnumber']) &&
+				self::getComparableString($itemResponse->brand) == self::getComparableString($itemResponse->brand == $value['brand'])
 			){
 				$array = explode('-', $value['osi']);
 				$this->db->update(
 					'other_orders',
 					['response' => $itemResponse->message],
-					$this->armtek->getWhere([
+					self::getWhere([
 						'order_id' => $array[0],
 						'store_id' => $array[1],
 						'item_id' => $array[2]
@@ -336,12 +338,12 @@ class Rossko extends Provider{
 		$Part = & $result->SearchResult->PartsList->Part;
 		if (is_array($Part)){
 			foreach($Part as $value) {
-				if (!Armtek::getComparableString($value->name)) continue;
+				if (!self::getComparableString($value->name)) continue;
 				$coincidences[$value->brand] = $value->name;
 			}
 		}
 		else{
-			if (Armtek::getComparableString($Part->name)) $coincidences[$Part->brand] = $Part->name;
+			if (self::getComparableString($Part->name)) $coincidences[$Part->brand] = $Part->name;
 		} 
 		return $coincidences;
 	}

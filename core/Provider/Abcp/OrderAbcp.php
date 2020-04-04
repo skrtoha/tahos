@@ -1,5 +1,9 @@
 <?
-namespace core;
+namespace core\Provider\Abcp;
+use core\Provider\Abcp;
+use core\OrderValue;
+use core\Provider;
+
 class OrderAbcp extends Abcp{
 	public $param;
 	private $basketContent;
@@ -32,7 +36,7 @@ class OrderAbcp extends Abcp{
 		$orderValue->changeStatus($status_id, $params);
 	}
 	public function getItemInfoByArticleAndBrend($array){
-		$article = Armtek::getComparableString($array['article']);
+		$article = self::getComparableString($array['article']);
 		$distributorId = str_replace($this->param['title'].'-', '', $array['providerStore']);
 		$url =  "{$this->param['url']}/search/articles/?userlogin={$this->param['userlogin']}&userpsw=".md5($this->param['userpsw'])."&useOnlineStocks=1&number={$article}&brand={$array['brend']}";
 		$response = self::getUrlData($url);
@@ -41,9 +45,9 @@ class OrderAbcp extends Abcp{
 		if (empty($items)) return false;
 		foreach($items as $value){
 			if (
-				Armtek::getComparableString($value['numberFix']) == Armtek::getComparableString($article) 
+				self::getComparableString($value['numberFix']) == self::getComparableString($article) 
 				&& $value['distributorId'] == $distributorId
-				// && Armtek::getComparableString($value['brand']) == Armtek::getComparableString($brend)
+				// && self::getComparableString($value['brand']) == self::getComparableString($brend)
 			) {
 				return[
 					'brand' => $value['brand'],
@@ -79,7 +83,7 @@ class OrderAbcp extends Abcp{
 			if (isset($output['error']) && $output['error']) throw new \Exception("Ошибка {$this->param['title']}: {$output['error']}");
 			
 		} catch(\Exception $e){
-			Log::insertThroughException($e);
+			\core\Log::insertThroughException($e);
 			return false;
 		}
 		return $output;
@@ -104,8 +108,8 @@ class OrderAbcp extends Abcp{
 		if (!$this->basketContent) return false;
 		foreach($this->basketContent as $value){
 			if (
-				Armtek::getComparableString($value['numberFix']) == Armtek::getComparableString($article) 
-				// && Armtek::getComparableString($value['brand']) == Armtek::getComparableString($brend)
+				self::getComparableString($value['numberFix']) == self::getComparableString($article) 
+				// && self::getComparableString($value['brand']) == self::getComparableString($brend)
 			) return true;
 		}
 		return false;
@@ -119,7 +123,7 @@ class OrderAbcp extends Abcp{
 	}
 	public function basketOrder(){
 		$shipmentDate = $this->getShipmentDate();
-		$res = parent::getUrlData(
+		$res = self::getUrlData(
 			"{$this->param['url']}/basket/order",
 			[
 				'userlogin' => $this->param['userlogin'],

@@ -16,7 +16,7 @@ class OrderValue{
 		switch ($status_id){
 			//выдано
 			case 1:
-				$ov = $GLOBALS['db']->select_one('orders_values', '*', Armtek::getWhere($params));
+				$ov = $GLOBALS['db']->select_one('orders_values', '*', Provider::getWhere($params));
 				$quan = $ov['arrived'] - $ov['issued'];
 				$values['issued'] = "`issued` + $quan";
 				self::update($values, $params);
@@ -39,7 +39,7 @@ class OrderValue{
 				break;
 			//возврат
 			case 2:
-				$ov = $GLOBALS['db']->select_one('orders_values', '*', Armtek::getWhere($params));
+				$ov = $GLOBALS['db']->select_one('orders_values', '*', Provider::getWhere($params));
 				if ($ov['returned'] + $params['quan'] < $ov['issued']) $values['status_id'] = 1;
 				$values['returned'] = "`returned` + {$params['quan']}";
 				self::update($values, $params);
@@ -133,7 +133,7 @@ class OrderValue{
 	 * @return [boolean] true if updated successfully else error of update
 	 */
 	public static function update($values, $params){
-		return $GLOBALS['db']->update('orders_values', $values, Armtek::getWhere([
+		return $GLOBALS['db']->update('orders_values', $values, Provider\Armtek::getWhere([
 			'order_id' => $params['order_id'],
 			'store_id' => $params['store_id'],
 			'item_id' => $params['item_id']

@@ -1,9 +1,9 @@
 <?php
-use core\FavoriteParts;
-use core\Impex;
-use core\Rossko;
+use core\Provider\FavoriteParts;
+use core\Provider\Impex;
+use core\Provider\Rossko;
 use core\DataBase;
-use core\Abcp;
+use core\Provider\Abcp;
 use core\Provider;
 
 class ProviderTest extends \PHPUnit\Framework\TestCase{
@@ -26,7 +26,7 @@ class ProviderTest extends \PHPUnit\Framework\TestCase{
     public function testFavoriteParts(){
         $this->assertTrue(Provider::getIsEnabledApiSearch(FavoriteParts::$provider_id), 'api поиска отключено');
         $this->assertTrue(Provider::getIsEnabledApiSearch(FavoriteParts::$provider_id), 'api заказов отключено');
-        $response = Abcp::getUrlData(
+        $response = self::getUrlData(
             'http://api.favorit-parts.ru/hs/hsprice/?key='.FavoriteParts::$key.'&number=53610-SNR-A01'
         );
         $this->assertNotNull($response, 'Ошибка api, возможено отключен vpn');

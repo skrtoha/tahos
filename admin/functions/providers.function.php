@@ -1,4 +1,5 @@
-<?use core\Abcp;
+<?php
+use core\Provider;
 function items_submit(){
 	global $db;
 	$profiling = $db->isProfiling;
@@ -14,8 +15,8 @@ function items_submit(){
 	$i = 0;
 	$inserted = 0;
 	if ($_POST['parse'] == 'full'){
-		$armtek = new core\Armtek($db);
-		$rossko = new core\Rossko($db);
+		$armtek = new core\Provider\Armtek($db);
+		$rossko = new core\Provider\Rossko($db);
 		if ($armtek->isKeyzak($_POST['store_id']) || $_POST['store_id'] == 4 || $_POST['store_id'] == 3){
 			$query = "
 				DELETE si FROM
@@ -78,7 +79,7 @@ function items_submit(){
 					'packaging' => $row[5] ? $row[5] : 1
 				]
 			);
-			if (Abcp::isDuplicate($res)){
+			if (Provider::isDuplicate($res)){
 				$log->warning("В строке $i дублирующие данные: $res | {$db->last_query}");
 				continue;
 			} 

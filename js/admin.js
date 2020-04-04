@@ -678,7 +678,7 @@ $(document).ready(function(e){
 		elems.each(function(){
 			var title = $(this).attr('foto_name');
 			if (title == curr) child = i;
-			var href = getImgUrl() + '/items/big/' + item_id + '/' + title;
+			var href = '/images/items/big/' + item_id + '/' + title;
 			str += '<a href="' + href +'" rel="alternate">' +
 								'<img src="' + href + '" alt="" />' +
 							'</a>';

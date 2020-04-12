@@ -6,7 +6,9 @@ function update_price_min(){
 	$res = $db->query("
 		SELECT
 			ci.item_id,
-			MIN(si.price) AS price,
+			MIN(
+				FLOOR (si.price + si.price * ps.percent / 100)
+			) AS price,
 			MIN(ps.delivery) AS delivery
 		FROM
 			#categories_items ci

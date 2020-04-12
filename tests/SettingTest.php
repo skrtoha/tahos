@@ -9,7 +9,11 @@ class SettingTest extends \PHPUnit\Framework\TestCase{
 	 */
     public function testSetting($settings){
         $this->assertNotEmpty($settings);
-        foreach($settings as $key => $value) return $value;
+        $db = $this->createMock(core\DataBase::class);
+        $db->method('select')->willReturn(true);
+        // $settings = $db->select('settings', '*', "`id` = 1");
+        // print_r($settings);
+        // foreach($settings as $key => $value) return $value;
     }
     /**
      * @depends testSetting
@@ -18,6 +22,7 @@ class SettingTest extends \PHPUnit\Framework\TestCase{
     	$this->assertNotEquals(1, $id);
     }
     public function getSettings(){
+
     	$db = new core\DataBase();
     	$settings = $db->select('settings', '*', "`id` = 1");
     	$output = [];

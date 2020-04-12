@@ -6784,6 +6784,7 @@ span.delete-btn:hover {
     padding: 20px;
     margin-top: 10px;
     border: 1px dashed #c3c3c3;
+    overflow: hidden;
 }
 .items .content .item_1:hover{
     border: 1px solid #c3c3c3;

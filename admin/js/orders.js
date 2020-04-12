@@ -182,6 +182,10 @@ function setTotalSumm(){
 	$('td.total').html(total);
 }
 $(function(){
+	$('a.show_stringLog').on('click', function(e){
+		e.preventDefault();
+		$(this).next().toggleClass('active');
+	});
 	$.ajax({
 		type: 'post',
 		url: '/admin/ajax/providers.php',

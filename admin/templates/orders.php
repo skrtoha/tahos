@@ -6,109 +6,45 @@ $act = $_GET['act'];
 $id = $_GET['id'];
 
 $status_id = $_POST['status_id'];
-$armtek = new core\Provider\Armtek($db);
-$rossko = new core\Provider\Rossko($db);
-$mikado = new core\Provider\Mikado($db);
-// debug($armtek); exit();
 switch ($act) {
 	case 'user_orders': user_orders(); break;
 	case 'change': show_form('s_change'); break;
+	case 'removeFromBasket':
+		Provider::removeFromBasket($_GET);
+		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
+		break;
 	case 'allInWork':
 		$res_order_values = get_order_values('');
 		while($ov = $res_order_values->fetch_assoc()){
 			if (!in_array($ov['status_id'], [5])) continue;
-			//debug($ov); //continue;
-			$isRendered = false;
-			if ($ov['provider_id'] == 15){
-				if (!Provider::getIsEnabledApiOrder(15)){
-					try{
-						throw new Exception("API заказов Rossko отключено");
-					} catch(Exception $e){
-						core\Log::insertThroughException($e);
-						continue;
-					}
-				};
-				$armtek->toOrder([
-					'order_id' => $ov['order_id'],
-					'store_id' => $ov['store_id'],
-					'item_id' => $ov['item_id']
-				], 'rossko');
-				if ($ov['store_id'] == 24) $rossko->sendOrder($ov['store_id']);
-				$isRendered = true;
+			if (!Provider::getIsEnabledApiOrder($ov['provider_id'])){
+				try{
+					throw new Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");
+				} catch(Exception $e){
+					core\Log::insertThroughException($e, "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}");
+					continue;
+				}
+			} 
+
+			switch($ov['provider_id']){
+				case 8: //Микадо
+					$mikado = new core\Provider\Mikado($db);
+					$mikado->Basket_Add($ov);
+					break;
+				case 2: //Армтек
+				case 6: //Восход
+				case 13: //МПартс
+				case 15: //Росско
+					Provider::addToProviderBasket($ov);
+					if ($ov['store_id'] == 24) Provider\Rossko::sendOrder($ov['store_id']);
+					break;
+				case 19://Favorit
+					core\Provider\FavoriteParts::addToBasket($ov);
+					break;
+				default:
+					core\OrderValue::changeStatus(7, $ov);
 			}
-			if ($mikado->isStoreMikado($ov['store_id'])){
-				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])){
-					try{
-						throw new Exception("API заказов Микадо отключено");
-					} catch(Exception $e){
-						core\Log::insertThroughException($e);
-						continue;
-					}
-				};
-				$mikado->Basket_Add($ov);
-				$isRendered = true;
-			} 
-			if ($armtek->isKeyzak($ov['store_id'])){
-				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])){
-					try{
-						throw new Exception("API заказов Армтек отключено");
-					} catch(Exception $e){
-						core\Log::insertThroughException($e);
-						continue;
-					}
-				};
-				$armtek->toOrder(
-					[
-						'order_id' => $ov['order_id'],
-						'store_id' => $ov['store_id'],
-						'item_id' => $ov['item_id'],
-					]
-				);
-				$isRendered = true;
-			} 
-			if ($ov['provider_id'] == 6 || $ov['provider_id'] == 13){
-				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])){
-					try{
-						throw new Exception("API заказов ".core\Provider\Abcp::$params[$ov['provider_id']]['title']." отключено");
-					} catch(Exception $e){
-						core\Log::insertThroughException($e);
-						continue;
-					}
-				};
-				$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, $ov['provider_id']);
-				$itemInfo = $orderAbcp->getItemInfoByArticleAndBrend($ov);
-				if (!$itemInfo){
-					echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
-					exit();
-				} 
-				$params = array_merge(
-					$itemInfo, 
-					[
-						'quantity' => $ov['quan'],
-						'order_id' => $order_id['id'],
-						'store_id' => $order_id['store_id'],
-						'item_id' => $order_id['item_id'],
-						'price' => $order_id['price'],
-						'user_id' => $order_id['user_id']
-					]
-				);
-				$orderAbcp->addToBasket($params);
-			} 
-			//Favorit Avto
-			if ($ov['provider_id'] == 19){
-				if (!Provider::getIsEnabledApiOrder($ov['provider_id'])){
-					try{
-						throw new Exception("API заказов Favorit Avto отключено");
-					} catch(Exception $e){
-						core\Log::insertThroughException($e);
-						continue;
-					}
-				};
-				$isRendered = true;
-				$res = core\Provider\FavoriteParts::addToBasket($ov);
-				if (!$res) "<p><b>Ошибка добавления {$ov['brend']} - {$ov['article']} в Фаворит</b></p>";
-			}
-			if (!$isRendered) $db->update('orders_values', ['status_id' => 7], "`order_id`={$_GET['id']} AND `status_id` = 5");
+			
 		}
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
@@ -116,149 +52,6 @@ switch ($act) {
 		$order = get_order('');
 		$res_order_values = get_order_values('');
 		order_print($order, $res_order_values);
-		break;
-	case 'toBasketMparts':
-	case 'fromBasketMparts':
-		// debug($_GET); exit();
-		if (!Provider::getIsEnabledApiOrder(13)){
-			try{
-				throw new Exception("API заказов МПартс отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		} 
-		$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, 13);
-		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
-		if (!$itemInfo){
-			echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
-			break;
-		} 
-		$params = array_merge(
-			$itemInfo, 
-			[
-				'quantity' => $act == 'toBasketMparts' ? $_GET['quan'] : 0,
-				'order_id' => $_GET['id'],
-				'store_id' => $_GET['store_id'],
-				'item_id' => $_GET['item_id'],
-				'price' => $_GET['price'],
-				'user_id' => $_GET['user_id']
-			]
-		);
-		$orderAbcp->addToBasket($params);
-		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
-		break;
-	case 'toBasketVoshodAvto':
-	case 'fromBasketVoshodAvto':
-		debug($_GET); //exit();
-		if (!Provider::getIsEnabledApiOrder(6)){
-			try{
-				throw new Exception("API заказов Voshod Auto отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		} 
-		$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, 6);
-		$itemInfo =  $orderAbcp->getItemInfoByArticleAndBrend($_GET);
-		if (!$itemInfo){
-			echo "<br>Ошибка получения itemInfo <a href='{$_SERVER['HTTP_REFERER']}'>Назад</a>";
-			break;
-		} 
-		$params = array_merge(
-			$itemInfo, 
-			[
-				'quantity' => $act == 'toBasketVoshodAvto' ? $_GET['quan'] : 0,
-				'order_id' => $_GET['id'],
-				'store_id' => $_GET['store_id'],
-				'item_id' => $_GET['item_id'],
-				'price' => $_GET['price'],
-				'user_id' => $_GET['user_id']
-			]
-		);
-		$orderAbcp->addToBasket($params);
-		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
-		break;
-	case 'deleteFromOrderArmtek':
-		if (!Provider::getIsEnabledApiOrder(2)){
-			try{
-				throw new Exception("API заказов Армтек отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		};
-		$armtek->deleteFromOrder($_GET, 'armtek');
-		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
-		break;
-	case 'deleteFromOrderRossko':
-		if (!Provider::getIsEnabledApiOrder(15)){
-			try{
-				throw new Exception("API заказов Rossko отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		}
-		$armtek->deleteFromOrder($_GET, 'rossko');
-		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
-		break;
-	case 'deleteFromMikado':
-		if (!Provider::getIsEnabledApiOrder(8)){
-			try{
-				throw new Exception("API заказов Микадо отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		} 
-		$mikado->deleteFromOrder($_GET);
-		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
-		break;
-	case 'toOrderArmtek':
-		if (!Provider::getIsEnabledApiOrder(2)){
-			try{
-				throw new Exception("API заказов Армтек отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		};
-		$armtek->toOrder($_GET, 'armtek');
-		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
-		break;
-	case 'toOrderRossko':
-		if (!Provider::getIsEnabledApiOrder(15)){
-			try{
-				throw new Exception("API заказов Росско отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		};
-		$armtek->toOrder($_GET, 'rossko');
-		if ($_GET['store_id'] == 24) $rossko->sendOrder(24);
-		header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
-		break;
-	case 'deleteFromFavoriteAuto':
-		if (!Provider::getIsEnabledApiOrder(19)){
-			try{
-				throw new Exception("API заказов Favorit Avto отключено");
-			} catch(Exception $e){
-				core\Log::insertThroughException($e);
-				Provider::showErrorDisabledApiOrder();
-				continue;
-			}
-		};
-		core\Provider\FavoriteParts::addToBasket($_GET);
-		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	default:
 		view();
@@ -384,9 +177,7 @@ function view(){
 	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=orders&status={$_GET['status']}&search={$_GET['search']}&page=");
 }
 function show_form($act){
-	global $status, $db, $page_title, $armtek, $rossko, $mikado;
-	$mparts = new core\Provider\Abcp\OrderAbcp($db, 13);
-	$voshodAvto = new core\Provider\Abcp\OrderAbcp($db, 6);
+	global $status, $db, $page_title;
 	$id = $_GET['id'];
 	$db->update('orders', array('is_new' => 0), "`id`=$id");
 	switch($act){
@@ -457,8 +248,7 @@ function show_form($act){
 		<?}
 		else{
 			while ($ov = $res_order_values->fetch_assoc()){
-				// debug($ov);
-
+				$res_stringLog = core\Provider::getStringLog($ov);
 				$selector = "store_id='{$ov['store_id']}' item_id='{$ov['item_id']}'";?>
 				<?if (!$order['is_draft']){?>
 					<tr <?=$selector?>>
@@ -482,56 +272,21 @@ function show_form($act){
 				<tr <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
 					<td label="Поставщик">
 						<a class="store" store_id="<?=$ov['store_id']?>"><?=$ov['cipher']?></a>
-						<?if ($mparts->param['provider_id'] == $ov['provider_id']){
-							if (!$mparts->isInBasket($ov['brend'], $ov['article'])){?>
-								<br><a href="<?=$mparts->getGetString($ov)?>&act=toBasketMparts" class="mparts">В корзину МПартс</a>
-							<?}
-							else{?>
-								<br><a href="<?=$mparts->getGetString($ov)?>&act=fromBasketMparts" class="mparts">Удалить из МПартс</a>
-							<?}
-						}
-						if ($voshodAvto->param['provider_id'] == $ov['provider_id']){
-							if (!$voshodAvto->isInBasket($ov['brend'], $ov['article'])){?>
-								<br><a href="<?=$voshodAvto->getGetString($ov)?>&act=toBasketVoshodAvto" class="mparts">В корзину Восход</a>
-							<?}
-							else{?>
-								<br><a href="<?=$voshodAvto->getGetString($ov)?>&act=fromBasketVoshodAvto" class="mparts">Удалить из Восход</a>
-							<?}
-						}
-						if ($armtek->isKeyzak($ov['store_id'])){
-							if (!$armtek->isOrdered($ov) && in_array($ov['status_id'], [7, 5])){?>
-								<br><a href="?view=orders&act=toOrderArmtek&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>">В корзину Армтек</a>
-							<?}
-							if ($armtek->isOrdered($ov) && in_array($ov['status_id'], [7, 5])){?>
-								<br><a href="?view=orders&act=deleteFromOrderArmtek&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>">Удалить из Армтек</a>
-							<?}
-						}
-						if ($rossko->isRossko($ov['store_id'])){
-							$isOrdered = $armtek->isOrdered($ov, 'rossko');
-							// debug($ov, 'ov');
-							// debug($isOrdered, 'isOrdered');
-							if (in_array($ov['status_id'], [7, 5])){
-								if (empty($isOrdered)){?>
-									<br><a href="?view=orders&act=toOrderRossko&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>">В заказ Росско</a>
-								<?}
-								else{?>
-									<br><a href="?view=orders&act=deleteFromOrderRossko&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>">Удалить из Росско</a>
-								<?}
-							}
-							if ($isOrdered['response'] && $isOrdered['response'] != 'OK'){?>
-								<br><b style="color: red"><?=$isOrdered['response']?></b>
-							<?}
-						}
-						if ($response = $mikado->isOrdered($ov)){?>
-							<br><a href="?view=orders&act=deleteFromMikado&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>">Удалить из Микадо</a>
-							<?if ($response != 'OK'){?>
-								<br><b style="color: red"><?=$response?></b>
-							<?}
-						}
-						$basketFavoriteParts = core\Provider\FavoriteParts::isInBasket($ov);
-						// debug($basketFavoriteParts, 'basketFavoriteParts');
-						if (!empty($basketFavoriteParts)){?>
-							<br><a href="?view=orders&act=deleteFromFavoriteAuto&order_id=<?=$_GET['id']?>&store_id=<?=$ov['store_id']?>&item_id=<?=$ov['item_id']?>&goodsID=<?=$basketFavoriteParts['goodsID']?>&warehouseGroup=<?=$basketFavoriteParts['warehouseGroup']?>&quan=0">Удалить из Фаворит</a>
+						<?if ($ov['provider_id'] && core\Provider::isInBasket($ov)){?>
+							<a class="removeFromBasket" href="?view=orders&act=removeFromBasket&<?=http_build_query($ov)?>">
+								Удалить из корзины
+							</a>
+						<?}?>
+						<?if ($res_stringLog->num_rows){?>
+							<a href="#" class="show_stringLog">Показать лог</a>
+							<table class="stringLog">
+								<?foreach($res_stringLog as $value){?>
+									<tr>
+										<td><?=$value['date']?></td>
+										<td><?=$value['text']?></td>
+									</tr>
+								<?}?>
+							</table>
 						<?}?>
 					</td>
 					<td label="Бренд"><?=$ov['brend']?></td>

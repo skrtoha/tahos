@@ -7,6 +7,6 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
 $name = $_POST['name'];
-if (unlink(core\Config::getImgPath() . "/temp/$name")) echo true;
+if (unlink(core\Config::$imgPath . "/temp/$name")) echo true;
 else echo false;
 ?>

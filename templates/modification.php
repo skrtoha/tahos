@@ -1,6 +1,4 @@
 <?
-// debug($_GET);
-error_reporting(E_ERROR);
 $query = "
 	SELECT
 		mf.id,
@@ -68,7 +66,7 @@ if ($res_nodes->num_rows){
 <div class="catalogue-original">
 	<div class="clearfix"></div>
 	<div class="item-info-block">
-		<?if (file_exists(core\Config::getImgPath() . "/models/{$_GET['model_id']}.jpg")){?>
+		<?if (file_exists(core\Config::$imgPath . "/models/{$_GET['model_id']}.jpg")){?>
 			<div class="img">
 				<img src="<?=core\Config::$imgUrl?>/models/<?=$_GET['model_id']?>.jpg" alt="<?=$modification['title']?>">
 			</div>
@@ -139,10 +137,12 @@ if ($res_nodes->num_rows){
 	<div class="item">
 		<a href="<?=$_SERVER['REQUEST_URI']?>/<?=$k?>"></a>
 		<p><?=$v?></p>
-		<?$src = array_shift(glob(core\Config::$imgPath . "/nodes/small/{$_GET['brend']}/$k.*"));
+		<?$imgPath = array_shift(glob(core\Config::$imgPath . "/nodes/small/{$_GET['brend']}/$k.*"));
+		$pathinfo = pathinfo($imgPath);
+		$src = core\Config::$imgUrl . "/nodes/small/{$_GET['brend']}/{$pathinfo['basename']}";
 		if ($src){?>
 			<div class="img">
-				<img src="/<?=$src?>" alt="<?=$v?>">
+				<img src="<?=$src?>" alt="<?=$v?>">
 			</div>
 		<?}?>
 	</div>

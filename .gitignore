@@ -7,3 +7,4 @@ phpAdmin/
 *.txt
 *.txt
 class/config_class.php
+core/Config.php

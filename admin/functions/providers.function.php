@@ -240,4 +240,25 @@ function endSuccessfullyProccessing(){
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 }
+function parseWithPhpOffice($workingFile){
+	global $emailPrice, $price, $stringNumber;
+	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
+	$xls->setActiveSheetIndex(0);
+	$sheet = $xls->getActiveSheet();
+	$rowIterator = $sheet->getRowIterator();
+	foreach ($rowIterator as $iterator) {
+		$row = array();
+		$cellIterator = $iterator->getCellIterator();
+		foreach($cellIterator as $cell){
+			$row[] = $cell->getCalculatedValue();
+		} 
+		$stringNumber++;
+
+		// debug($row);
+		// if ($stringNumber > 100) die("Обработка прошла");
+
+		parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+	}
+	echo "<br>Обрабока с помощью PhpOffice закончена";
+}
 ?>

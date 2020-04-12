@@ -130,7 +130,6 @@ if ($_GET['vehicle'] && $_GET['brend']){
 		ORDER BY
 			title_2 DESC
 	", '');
-	// debug($models);
 }
 ?>
 <div class="auto-types">
@@ -251,7 +250,7 @@ if ($_GET['vehicle'] && $_GET['brend']){
 						<div class="item">
 							<a href="/original-catalogs/<?=$value['href']?>"></a>
 							<div class="img-wrap">
-								<?$src = file_exists("{$_SERVER['DOCUMENT_ROOT']}/images/vehicles/$key.jpg") ? "$key.jpg" : 'no_image.jpg';?>
+								<?$src = file_exists(core\Config::$imgPath . "/vehicles/$key.jpg") ? "$key.jpg" : 'no_image.jpg';?>
 								<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$src?>" alt="<?=$value['title']?>">
 							</div>
 							<a href="/original-catalogs/<?=$value['href']?>"><?=$value['title']?></a>
@@ -264,10 +263,12 @@ if ($_GET['vehicle'] && $_GET['brend']){
 						<?if (!empty($brend_titles)) foreach($brend_titles as $key => $row) {?>
 							<div class="item">
 								<a href="/original-catalogs/<?=strtolower($_GET['vehicle'])?>/<?=$row['href']?>"></a>
-								<?$src = array_shift(glob(core\Config::getImgPath() . "/brends/{$row['brend_id']}.*"));
+								<?$filePath = array_shift(glob(core\Config::$imgPath . "/brends/{$row['brend_id']}.*"));
+								$pathinfo = pathinfo($filePath);
+								$src = core\Config::$imgUrl . "/brends/{$pathinfo['basename']}";
 								if ($src){?>
 									<div class="img-wrap">
-										<img src="/<?=$src?>" alt="<?=$row['title']?>">
+										<img src="<?=$src?>" alt="<?=$row['title']?>">
 									</div>
 								<?}?>
 								<p><?=$row['title']?></p>

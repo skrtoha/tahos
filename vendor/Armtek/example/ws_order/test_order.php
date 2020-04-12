@@ -19,8 +19,8 @@ try {
 
 
     $params = [
-        'VKORG'         => ''       
-        ,'KUNNR_RG'     => ''
+        'VKORG'         => '5000'       
+        ,'KUNNR_RG'     => '43232305'
         ,'KUNNR_WE'     => ''
         ,'KUNNR_ZA'     => ''
         ,'INCOTERMS'    => ''

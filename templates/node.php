@@ -1,6 +1,4 @@
 <?
-// debug($_GET);
-error_reporting(E_ERROR);
 $res_model = $db->query("
 	SELECT
 		m.id,
@@ -46,7 +44,7 @@ $res_items = $db->query("
 ?>
 <div class="catalogue-original catalogue-original-unit">
 	<div class="item-info-block">
-		<?if (file_exists(core\Config::getImgPath() . "/models/{$_GET['model_id']}.jpg")){?>
+		<?if (file_exists(core\Config::$imgPath . "/models/{$_GET['model_id']}.jpg")){?>
 			<div class="img">
 				<img src="<?=core\Config::$imgUrl?>/models/<?=$_GET['model_id']?>.jpg" alt="<?=$model['title']?>">
 			</div>
@@ -77,11 +75,13 @@ $res_items = $db->query("
 			</a>
 			<span><?=$title?></span>
 		</div>
-		<?$src = array_shift(glob(core\Config::$imgPath . "/nodes/big/{$model['brend']}/{$_GET['node_id']}.*"));
+		<?$filePath = array_shift(glob(core\Config::$imgPath . "/nodes/big/{$model['brend']}/{$_GET['node_id']}.*"));
+		$pathinfo = pathinfo($filePath);
+		$src = core\Config::$imgUrl . "/nodes/big/{$model['brend']}/{$pathinfo['basename']}";
 		if ($src){?>
 			<div class="unit-pic">
-				<a href="/<?=$src?>">
-					<img src="/<?=$src?>" data-zoom-image="/<?=$src?>" alt="<?=$title?>">
+				<a href="<?=$src?>">
+					<img src="<?=$src?>" data-zoom-image="<?=$src?>" alt="<?=$title?>">
 				</a>
 			</div>
 		<?}?>

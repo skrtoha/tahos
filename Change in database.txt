@@ -71,6 +71,34 @@ CREATE TRIGGER `decreaseCountItems` AFTER DELETE ON `tahos_items` FOR EACH ROW B
 
 ALTER TABLE `tahos_analogies` ADD `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `hidden`;
 
+----tahos_provider_basket start
 
 
+CREATE TABLE `tahos_provider_basket` (
+  `order_id` int(10) UNSIGNED NOT NULL,
+  `store_id` int(10) UNSIGNED NOT NULL,
+  `item_id` int(10) UNSIGNED NOT NULL,
+  `quan` int(10) UNSIGNED DEFAULT NULL,
+  `params` json DEFAULT NULL,
+  `response` varchar(255) DEFAULT NULL,
+  `updated` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+ALTER TABLE `tahos_provider_basket`
+  ADD PRIMARY KEY (`order_id`,`store_id`,`item_id`),
+  ADD KEY `item_id` (`item_id`),
+  ADD KEY `store_id` (`store_id`);
+ALTER TABLE `tahos_provider_basket`
+  ADD CONSTRAINT `tahos_provider_basket_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `tahos_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tahos_provider_basket_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `tahos_orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tahos_provider_basket_ibfk_3` FOREIGN KEY (`store_id`) REFERENCES `tahos_provider_stores` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ALTER TABLE `tahos_provider_basket` ADD `successful` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `response`;
+ALTER TABLE `tahos_logs` ADD `additional` TEXT NULL DEFAULT NULL AFTER `trace`;
+ALTER TABLE `tahos_logs` CHANGE `additional` `additional` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+ALTER TABLE `tahos_logs` ADD INDEX( `additional`);
+ALTER TABLE `tahos_provider_basket` DROP `quan`, DROP `params`;
+
+
+
+----tahos_provider_basket end
 

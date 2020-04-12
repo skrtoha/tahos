@@ -9,7 +9,7 @@ switch ($act) {
 			// header("Location: ".$_SERVER['HTTP_REFERER']);
 		}
 		else{
-			move_uploaded_file($_FILES['foto']['tmp_name'], core\Config::getImgPath() . "/slider/$name");
+			move_uploaded_file($_FILES['foto']['tmp_name'], core\Config::$imgPath . "/slider/$name");
 			$array = array('foto' => $name);
 			if ($db->insert('slider', $array)){
 				setcookie('message', "Фото успешно сохранено!");

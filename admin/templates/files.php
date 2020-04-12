@@ -122,6 +122,7 @@ if ($_POST['items_submit']){
 if ($_POST['items_analogies']){
 	$insertedItems = 0;
 	$insertedAnalogies = 0;
+	if ($_FILES['items']['error']) die("Ошибка загрузки файла. Код ошибки: {$_FILES['items']['error']}");
 
 	core\Timer::start();
 	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['items']['tmp_name']);

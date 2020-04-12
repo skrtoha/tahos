@@ -147,7 +147,7 @@ function garage(){
 								<div class="item" modification_id="<?=$value['modification_id']?>">
 									<a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
 									<div class="clearfix"></div>
-									<?if (file_exists(core\Config::getImgPath() . "/models/{$value['model_id']}.jpg")){?>
+									<?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
 										<div class="img">
 											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
@@ -180,7 +180,7 @@ function garage(){
 								<div class="item" modification_id="<?=$value['modification_id']?>">
 									<a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
 									<div class="clearfix"></div>
-									<?if (file_exists(core\Config::getImgPath() . "/models/{$value['model_id']}.jpg")){?>
+									<?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
 										<div class="img">
 											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
@@ -396,7 +396,7 @@ function modification(){
 			<h1><?=$m['brend']?> <?=$m['model_title']?> (<?=$m['modification_title']?>)</h1>
 			<div class="img-and-name">
 				<div class="img-wrap">
-					<?if (file_exists(core\Config::getImgPath() . "/models/{$m['model_id']}.jpg")){?>
+					<?if (file_exists(core\Config::$imgPath . "/models/{$m['model_id']}.jpg")){?>
 						<img src="<?=core\Config::$imgUrl?>/models/<?=$m['model_id']?>.jpg" alt="<?=$m['modification_title']?>">
 					<?}
 					else{?>

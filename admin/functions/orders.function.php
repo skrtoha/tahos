@@ -80,6 +80,7 @@ function get_order_values($flag = '', $order_id = null, $ov = null){
 			ps.title AS providerStore,
 			ps.provider_id,
 			mc.code,
+			mzc.ZakazCode,
 			IF (ps.noReturn, 'class=\"noReturn\" title=\"Возврат поставщику невозможен!\"', '') AS noReturn,
 			c.id AS correspond_id,
 			(
@@ -105,6 +106,8 @@ function get_order_values($flag = '', $order_id = null, $ov = null){
 			c.order_id=ov.order_id AND
 			c.store_id=ov.store_id AND
 			c.item_id=ov.item_id
+		LEFT JOIN
+			#mikado_zakazcode mzc ON mzc.item_id = ov.item_id 
 		WHERE $where
 	", $flag);
 }

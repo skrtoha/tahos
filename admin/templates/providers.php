@@ -326,7 +326,7 @@ function priceEmail(){
 				</div>
 				<div class="field">
 					<div class="title">Наименование файла</div>
-					<div class="value"><input required type="text" name="name" value="<?=$array['name']?>"></div>
+					<div class="value"><input type="text" name="name" value="<?=$array['name']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Является архивом</div>
@@ -467,8 +467,9 @@ function itemsToOrder(){
 		switch($p['title']){
 			case 'Авторусь':
 			case 'М Партс':
-				$orderAbcp = new core\Provider\Abcp\OrderAbcp($db, $p['id']);
-				$output = $orderAbcp->getItemsToOrder($p['id']);
+			case 'Авторусь':
+			case 'Rossko':
+				$output = core\Provider\Abcp::getItemsToOrder($p['id']);
 				break;
 			default:
 				eval("\$output = core\\Provider\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");

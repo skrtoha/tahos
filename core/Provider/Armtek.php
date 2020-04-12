@@ -2,6 +2,7 @@
 namespace core\Provider;
 use core\Provider;
 use core\OrderValue;
+use core\Log;
 use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException; 
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
@@ -15,37 +16,41 @@ require_once $path.'vendor/autoload.php';
 
 
 class Armtek extends Provider{
-	public $provider_id = 2;
-	private $config = [
-		'user_login' => 'TAHOS@TAHOS.RU',
-		'user_password' => 'tahos12345'
+	public static $provider_id = 2;
+	private static $config = [
+		'user_login' => 'price@tahos.ru',
+		'user_password' => 'tahos10317'
 	];
-	public $keyzak = array();
+	public static $keyzak = array();
 	private $mainItemId;
-	private $params = [
+	private static $params = [
 		'VKORG' => '5000',
-		'KUNNR_RG' => '43182432',
+		'KUNWE' => '',
+		'KUNZA' => '',
+		'INCOTERMS' => '',
+		'PARNR' => '',
+		'VBELN' => '',
+		'TEXT_ORD' => '',
+		'TEXT_EXP' => '',
+		'DBTYP' => 3,
 		'format' => 'json'
 	];
-	public function __construct($db){
-		$this->db = $db;
-		$armtek_client_config = new ArmtekRestClientConfig($this->config);
-		$this->armtek_client = new ArmtekRestClient($armtek_client_config);
-		$this->log = new \Katzgrau\KLogger\Logger(
-			$_SERVER['DOCUMENT_ROOT'].'/admin/logs', 
-			\Psr\Log\LogLevel::INFO, 
-			array(
-				'filename' => 'armtek_order',
-				'extension' => 'txt'
-			)
-		);
+	private static $KUNNR_RG = [
+		'private' => '43233624',
+		'entity' => '43232305'
+	];
+	public function __construct($db = NULL){
+		if ($db){
+			$this->db = $db;
+			$this->armtek_client = self::getClientArmtek();
+		} 
 	}
-	public function getItemsToOrder(int $provider_id){
-		$output = [];
-		$res_items = Armtek::getItems('armtek');
-		if (!$res_items->num_rows) return false;
-		foreach($res_items as $value) $output[] = $value;
-		return $output;
+	private static function getClientArmtek(){
+		$armtek_client_config = new ArmtekRestClientConfig(self::$config);
+		return new ArmtekRestClient($armtek_client_config);
+	}
+	public static function getItemsToOrder(int $provider_id){
+		return Abcp::getItemsToOrder($provider_id);
 	}
 	public static function getDaysDelivery($str){
 		$year = substr($str, 0, 4);
@@ -56,15 +61,14 @@ class Armtek extends Provider{
 		$endTime = mktime($hour, 0, 0, $month, $day, $year);
 		return bcdiv($endTime - $currentTime, 86400);
 	}
-
 		/**
-			* @param $object
-			* @return bool|mixed
-			*/
+		* @param $object
+		* @return bool|mixed
+		*/
 	private function getStoreId($object){
 		if (!$object->KEYZAK) return false;
 		if (array_key_exists($object->KEYZAK, $this->keyzak)) return $this->keyzak[$object->KEYZAK];
-		$array = $this->db->select_one('provider_stores', 'id,delivery', "`provider_id`={$this->provider_id} AND `title`='{$object->KEYZAK}'");
+		$array = $this->db->select_one('provider_stores', 'id,delivery', "`provider_id`= " . self::$provider_id . " AND `title`='{$object->KEYZAK}'");
 		if (!empty($array)){
 			$this->keyzak[$object->KEYZAK] = $array['id'];
 			if ($array['delivery'] == 1){
@@ -79,7 +83,7 @@ class Armtek extends Provider{
 		} 
 		else{
 			$res = $this->db->insert('provider_stores',[
-				'provider_id' => $this->provider_id,
+				'provider_id' => self::$provider_id,
 				'title' => $object->KEYZAK,
 				'cipher' => strtoupper(self::getRandomString(4)),
 				'percent' => 11,
@@ -95,7 +99,10 @@ class Armtek extends Provider{
 				return $this->db->last_id();
 			} 
 			else{
-				$this->log->error("$res: {$this->db->last_query}");
+				Log::insert([
+					'text' => "Ошибка Армтек: $res",
+					'query' => $this->db->last_query
+				]);
 				return false;
 			}
 		}
@@ -176,29 +183,48 @@ class Armtek extends Provider{
 		}
 	}
 	public function setArticle($brand, $article){
-		if (!parent::getIsEnabledApiSearch($this->provider_id)) return false;
-		$this->params['PIN'] = $article;
-		$this->params['BRAND']	= $brand;
-		$this->params['QUERY_TYPE']	= 1;
-		// debug($this->params);
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$params = self::$params;
+		$params['PIN'] = $article;
+		$params['BRAND']	 = $brand;
+		$params['QUERY_TYPE']	= 1;
+		$params['KUNNR_RG'] = self::$KUNNR_RG['entity'];
 		$request_params = [
 			'url' => 'search/search',
-			'params' => $this->params
+			'params' => $params
 		];
 		$response = $this->armtek_client->post($request_params);
 		$data = $response->json();
 		$this->render($data->RESP);
 	}
+	private function getKUNNR_RG(int $order_id = NULL): string
+	{
+		if (!$order_id) return self::$KUNNR_RG['entity'];
+		$user_type = parent::getUserTypeByOrderID($order_id);
+		return self::$KUNNR_RG[$user_type];
+	}
 	public function getSearch($search){
-		if (!parent::getIsEnabledApiSearch($this->provider_id)) return false;
-		$this->params['PIN'] = $search;
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$params = self::$params;
+		$params['PIN'] = $search;
+		$params['KUNNR_RG'] = self::$KUNNR_RG['entity'];
 		$request_params = [
 			'url' => 'search/search',
-			'params' => $this->params
+			'params' => $params
 		];
 		$response = $this->armtek_client->post($request_params);
 		$data = $response->json();
-		// debug($data); exit;
+		if ($data->RESP->ERROR || $data->RESP->MSG){
+			$text = $data->RESP->ERROR ? $data->RESP->ERROR : $data->RESP->MSG;
+			$errorMessage .= "Артикул: $search";
+			foreach($data->MESSAGES as $msg) $errorMessage .= "{$msg->TEXT}\n";
+			Log::insert([
+				'url' => $_SERVER['REQUEST_URI'],
+				'text' => "Армтек: $text",
+				'additional' => $errorMessage
+			]);
+			return false;
+		}
 		if ($data->RESP->MSG) return false;
 		$coincidences = array();
 		foreach($data->RESP as $value){
@@ -211,7 +237,6 @@ class Armtek extends Provider{
 		// $this->renderRESP($data->RESP);
 	}
 	private function renderRESP($RESP){
-		// debug($RESP, 'resp');
 		foreach($RESP as $key => $value){
 			if (!$this->isKeyzakByTitle($value->KEYZAK)) continue;
 			//артикул
@@ -229,7 +254,6 @@ class Armtek extends Provider{
 			];
 		}
 		if (empty($keyzak)) return false;
-		// debug($keyzak); exit();
 		foreach($keyzak as $key => $value){
 			if (empty($value['KEYZAK'])) continue;
 			$res_brend_insert = $this->db->insert(
@@ -292,17 +316,17 @@ class Armtek extends Provider{
 		}
 	}
 	private function getStoreIdByKeyzak($keyzak){
-		if (array_key_exists($keyzak, $this->keyzak)) return $this->keyzak[$keyzak];
-		$array = $this->db->select_one('provider_stores', 'id', "`title`='$keyzak` AND `provider_id`={$this->provider_id}");
+		if (array_key_exists($keyzak, self::$keyzak)) return self::$keyzak[$keyzak];
+		$array = $this->db->select_one('provider_stores', 'id', "`title`='$keyzak` AND `provider_id`= " . self::$provider_id);
 		if (empty($array)) return false;
-		$this->keyzak[$keyzak] = $array['id'];
+		self::$keyzak[$keyzak] = $array['id'];
 		return $array['id'];
 	}
 	public function isKeyzak($store_id){
 		if ($temp = array_search($store_id, $this->keyzak)) return $temp;
 		$array = $this->db->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
 		if (empty($array)) return false;
-		if ($array['provider_id'] == $this->provider_id){
+		if ($array['provider_id'] == self::$provider_id){
 			$this->keyzak[$array['title']] = $array['id'];
 			return true;
 		} 
@@ -322,11 +346,11 @@ class Armtek extends Provider{
 		$orderValue = new OrderValue();
 		$orderValue->changeStatus(7, $value);
 	}
-	private function getKeyzakByStoreId($store_id){
-		if ($temp = array_search($store_id, $this->keyzak)) return $temp;
-		$array = $this->db->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
+	private static function getKeyzakByStoreId($store_id){
+		if ($temp = array_search($store_id, self::$keyzak)) return $temp;
+		$array = parent::getInstanceDataBase()->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
 		if (empty($array)) return false;
-		$this->keyzak[$array['title']] = $array['id'];
+		self::$keyzak[$array['title']] = $array['id'];
 		return $array['title'];
 	}
 	public function isOrdered($value, $type = 'armtek'){
@@ -341,114 +365,136 @@ class Armtek extends Provider{
 		$this->db->delete('other_orders', "$where AND `type`='$type'");
 		OrderValue::changeStatus(5, $value);
 	}
-	public static function getItems($type = 'armtek'){
-		return self::getInstanceDataBase()->query("
-			SELECT
-				ov.user_id,
-				ov.order_id,
-				ov.store_id,
-				ps.title AS store,
-				ov.item_id,
-				ov.price,
-				i.article,
-				i.title_full,
-				IF(pb.provider_id IS NOT NULL, pb.title, b.title) AS brend,
-				IF(pb.provider_id IS NOT NULL, pb.provider_id, ps.provider_id) AS provider_id,
-				p.title AS provider,
-				ov.quan AS count
-			FROM
-				#other_orders ao
-			LEFT JOIN
-				#orders_values ov ON ov.order_id = ao.order_id AND ov.store_id = ao.store_id AND ov.item_id = ao.item_id
-			LEFT JOIN
-				#provider_stores ps ON ps.id=ov.store_id
-			LEFT JOIN
-				#providers p ON p.id = ps.provider_id
-			LEFT JOIN
-				#items i ON i.id=ov.item_id
-			LEFT JOIN
-				#brends b ON b.id=i.brend_id
-			LEFT JOIN
-				#provider_brends pb ON pb.brend_id = b.id AND pb.provider_id = ps.provider_id
-			WHERE ao.type = '$type' && ao.response IS NULL
-		", '');
-	}
 	public static function clearString($str){
 		$str = mb_strtolower($str);
 		return preg_replace('/[^\wА-Яа-я]+/', '', $str);
 	}
-	public function sendOrder($settings = array()){
-		$params['VKORG'] = $this->params['VKORG'];
-		$params['KUNRG'] = $this->params['KUNNR_RG'];
-		$res_items = self::getItems('armtek');
-		if (!$res_items->num_rows){
-			echo "<br>Товаров для отправки не найдено";
-			\core\Log::insert([
+	/**
+	 * executes a sending to order
+	 * @param  [type] $items     [description]
+	 * @param  [type] $user_type [description]
+	 * @return [type]            [description]
+	 */
+	public static function executeSendOrder($items, $user_type){
+		$params = self::$params;
+		$params['VKORG'] = self::$params['VKORG'];
+		$params['KUNRG'] = self::$KUNNR_RG[$user_type];
+		if (empty($items)){
+			Log::insert([
 				'url' => $_SERVER['REQUEST_URI'],
-				'text' => 'Армтек: не найдено товаров для отправки'
+				'text' => "Армтек: не найдено товаров для отправки для $user_type"
 			]);
-			return false;
+			return 0;
 		} 
-		$items = array();
-		foreach($res_items as $item){
-			$items[] = [
-				'user_id' => $item['user_id'],
-				'order_id' => $item['order_id'],
-				'item_id' => $item['item_id'],
-				'store_id' => $item['store_id'],
-				'price' => $item['price'],
-				'PIN' => $item['article'],
-				'BRAND' => $item['brend'],
-				'KWMENG' => $item['count'],
-				'KEYZAK' => $this->getKeyzakByStoreId($item['store_id'])
+		$itemsForSending = array();
+		foreach($items as $i){
+			$itemsForSending[strtoupper($i['brend']) . ":" . strtoupper($i['article']) . ":" .strtoupper($i['store'])] = [
+				'order_id' => $i['order_id'],
+				'item_id' => $i['item_id'],
+				'store_id' => $i['store_id'],
+				'user_id' => $i['user_id'],
+				'price' => $i['price'],
+				'PIN' => $i['article'],
+				'BRAND' => $i['brend'],
+				'KWMENG' => $i['quan'],
+				'KEYZAK' => $i['store']
 			];
 		}
-		$params['ITEMS'] = $items;
+		$params['ITEMS'] = $itemsForSending;
 		$params['format'] = 'json';
 		$request_params = [
 			'url' => 'order/createOrder',
 			'params' => $params
 		];
-		// debug($request_params, 'request_params'); 
-		$response = $this->armtek_client->post($request_params);
+		$response = self::getClientArmtek()->post($request_params);
 		$json_responce_data = $response->json();
+		return [
+			'itemsForSending' => $itemsForSending,
+			'responseData' => $json_responce_data
+		];
+	}
+	private static function parseOrderResponse($input){
+		$items = $input['itemsForSending'];
+		$response = $input['responseData'];
+		if (!empty($response->MESSAGES)){
+			$errorMessage = "";
+			foreach($response->MESSAGES as $value) $errorMessage .= "{$value->TYPE} - {$value->TEXT}\n";
+			foreach ($items as $i) Log::insert([
+				'text' => $errorMessage,
+				'additional' => "osi: {$i['order_id']}-{$i['store_id']}-{$i['item_id']}"
+			]);
+		}
 
-		// debug($json_responce_data, 'json_responce_data');
-		// exit();
+		if (empty($response->RESP->ITEMS)) return false;
 
-		foreach($json_responce_data->RESP->ITEMS as $value){
-			foreach($params['ITEMS'] as $item){
-				if (
-					$item['PIN'] == $value->PIN && 
-					strcasecmp(self::clearString($value->BRAND), self::clearString($item['BRAND'])) === 0 && 
-					$item['KEYZAK'] == $value->KEYZAK
-				){
-					$arrayQuery = [
-						'order_id' => $item['order_id'],
-						'store_id' => $item['store_id'],
-						'item_id' => $item['item_id']
-					];
-					if ($value->ERROR_MESSAGE){
-						$this->db->update('other_orders', ['response' => $value->ERROR_MESSAGE], self::getWhere($arrayQuery)); 
-						echo ("<br>Ошибка в заказе №{$item['order_id']}: {$value->BRAND} - {$value->PIN} - {$value->ERROR_MESSAGE}");
-						break 2;
-					}
-					if (isset($value->RESULT[0]->ERROR) && $value->RESULT[0]->ERROR){
-						echo("<br>Ошибка в заказе №{$item['order_id']}: {$value['BRAND']} - {$value['PIN']} - {$value->RESULT[0]->ERROR}");
-						$this->db->update('other_orders', ['response' => $value->ERROR_MESSAGE], self::getWhere($arrayQuery)); 
-						break 2;
-					}
-					if ($value->REMAIN){
-						echo("<br>В заказе №{$item['order_id']}: {$value->BRAND} - {$value->PIN} на хватило остатка {$value->REMAIN}");
-						$this->db->update('other_orders', ['response' => "Не хватило остатка $value->REMAIN"], self::getWhere($arrayQuery)); 
-					} 
-					$orderValue = new OrderValue();
-					$item['quan'] = $value->RESULT[0]->KWMENG;
-					$orderValue->changeStatus(11, $item);
-					$this->db->update('other_orders', ['response' => 'OK'], self::getWhere($arrayQuery)); 
+		foreach($response->RESP->ITEMS as $value){
+			$itemKey = strtoupper($value->BRAND) . ":" . strtoupper($value->PIN) . ":" . strtoupper($value->KEYZAK);
+			if (isset($value->ERROR_MESSAGE) && $value->ERROR_MESSAGE){
+				Log::insert([
+					'text' => $value->ERROR_MESSAGE,
+					'additional' => "osi: {$items[$itemKey]['order_id']}-{$items[$itemKey]['store_id']}-{$items[$itemKey]['item_id']}"
+				]);
+			}
+			if (isset($value->RESULT) && !empty($value->RESULT)){
+				if ($value->RESULT[0]->ERROR){
+					Log::insert([
+						'text' => $value->RESULT[0]->ERROR,
+						'additional' => "osi: {$items[$itemKey['order_id']]}-{$items[$itemKey['store_id']]}-{$items[$itemKey['item_id']]}"
+					]);
+					continue;
 				}
+				if ($value->RESULT->REMAIN) Log::insert([
+					'text' => 'Армтек: нехватка остатка для заказа',
+					'additional' => "osi: {$items[$itemKey]['order_id']}-{$items[$itemKey]['store_id']}-{$items[$itemKey]['item_id']}"
+				]);
+				OrderValue::changeStatus(11, [
+					'order_id' => $items[$itemKey]['order_id'],
+					'store_id' => $items[$itemKey]['store_id'],
+					'item_id' => $items[$itemKey]['item_id'],
+					'price' => $items[$itemKey]['price'],
+					'quan' => $value->RESULT[0]->KWMENG,
+					'user_id' => $items[$itemKey]['user_id']
+				]);
+				parent::updateProviderBasket(
+					[
+						'order_id' => $items[$itemKey]['order_id'],
+						'store_id' => $items[$itemKey]['store_id'],
+						'item_id' => $items[$itemKey]['item_id'],
+					],
+					[
+						'response' => 'OK',
+						'successful' => 1
+					]
+				);
 			}
 		}
-		// debug($json_responce_data->RESP->ITEMS, 'json_responce_data');
+	}
+	/**
+	 * prepares data for sending and sends them to order
+	 * @return void
+	 */
+	public static function sendOrder(){
+		$private = [];
+		$entity = [];
+		$output = [];
+		$providerBasket = parent::getProviderBasket(self::$provider_id);
+		if (!$providerBasket->num_rows) return false;
+		foreach($providerBasket as $pb){
+			switch($pb['user_type']){
+				case 'private': $private[] = $pb; break;
+				case 'entity': $entity[] = $pb; break;
+			}
+		}
+		$resultPrivate = self::executeSendOrder($private, 'private');
+		$resParseOrderResponsePrivate = self::parseOrderResponse($resultPrivate);
+
+		$resultEntity = self::executeSendOrder($entity, 'entity');
+		$resParseOrderResponseEntity = self::parseOrderResponse($resultEntity);
+	}
+	public static function isInBasket($ov){
+		return parent::getInstanceDataBase()->getCount('provider_basket', parent::getWhere($ov));
+	}
+	public static function removeFromBasket($ov){
+		return parent::getInstanceDataBase()->delete('provider_basket', parent::getWhere($ov));
 	}
 }

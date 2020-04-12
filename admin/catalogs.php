@@ -392,8 +392,8 @@ function image_catalog($file){
 		$array['error'] = '';
 		return $array;
 	}
-	$dir_big = core\Config::getImgPath()."/nodes/big/$brend_name";
-	$dir_small = core\Config::getImgPath()."/nodes/small/$brend_name";
+	$dir_big = core\Config::$imgPath."/nodes/big/$brend_name";
+	$dir_small = core\Config::$imgPath."/nodes/small/$brend_name";
 	require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/class.upload.php');
 	if (!file_exists($dir_big)) mkdir($dir_big);
 	if (!file_exists($dir_small)) mkdir($dir_small);

@@ -6,8 +6,8 @@
 * @var array
 */
 $user_settings = array(
-    'user_login'         => 'sale@tahos.ru'   // логин 
-    ,'user_password'     => 'tahos12345'  // пароль
+    'user_login'         => 'price@tahos.ru'   // логин 
+    ,'user_password'     => 'tahos10317'  // пароль
 );
 
 
@@ -26,8 +26,8 @@ $user_settings = array(
 */
 $ws_default_settings = array(
     
-    'VKORG'         => ''        
-    ,'KUNNR_RG'     => ''
+    'VKORG'         => '5000'        
+    ,'KUNNR_RG'     => '43233624'
     ,'KUNNR_WE'     => ''
     ,'KUNNR_ZA'     => ''
     ,'INCOTERMS'    => ''

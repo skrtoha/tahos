@@ -45,6 +45,7 @@
 </div>
 <div id="additional" style="display: none"><div></div></div>
 <div id="popup" style="display: none"><img src="/images/preload.gif" alt=""></div>
+<input type="hidden" name="imgUrl" value="<?=core\Config::$imgUrl?>">
 <div id="container">
 	<div id="left_menu">
 		<span id="closeLeftMenu" class="icon-cross1"></span>

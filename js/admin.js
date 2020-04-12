@@ -11,6 +11,9 @@ function show_message(msg, type = 'ok'){
 	$.cookie('message', '', cookieOptions);
 	$.cookie('message_type', '', cookieOptions);
 }
+function getImgUrl(){
+	return $('input[name=imgUrl]').val();
+}
 $(document).ready(function(e){
 	// $('.price_format').priceFormat({
 	// 	allowNegative: true,

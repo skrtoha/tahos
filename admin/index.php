@@ -1,11 +1,11 @@
 <?php 
 use core\Log;
 
-set_exception_handler('error_handler',);
-function error_handler($e){
-	if (get_class($e) == 'ParseError') return debug($e);
-	Log::insertThroughException($e);
-}
+// set_exception_handler('error_handler',);
+// function error_handler($e){
+// 	if (get_class($e) == 'ParseError') return debug($e);
+// 	Log::insertThroughException($e);
+// }
 
 ini_set('error_reporting', E_PARSE | E_ERROR);
 ini_set('display_errors', 1);
@@ -19,9 +19,8 @@ $view = $_GET['view'] ? $_GET['view'] : 'items';
 
 $db = new core\DataBase();
 $connection = new core\Connection($db);
-$db->connection_id = $connection->connection_id;
+$db->setProfiling($connection->connection_id);
 $settings = $db->select('settings', '*'); $settings = $settings[0];
-$db->setProfiling();
 
 // debug($_SERVER);
 if ($view == 'orders' && $_GET['act'] == 'print'){

@@ -1,12 +1,16 @@
 <?php
 namespace core\Provider;
+
 use core\Provider;
 use core\OrderValue;
+use core\Log;
+
 class FavoriteParts extends Provider{
 	public static $key = 'F4289750-BAFA-434C-8C2D-09AC06D6E6C2';
 	public static $developerKey = '156C7176-B22F-4617-94B0-94C1B530FA75';
 	
 	public static $provider_id = 19;
+	public static $error;
 
 	/**
 	 * gets items by article
@@ -33,7 +37,7 @@ class FavoriteParts extends Provider{
 		return self::getCipherByCode($code);
 	}
 
-	public function getItemsToOrder(int $provider_id){
+	public static function getItemsToOrder(int $provider_id){
 		$basket = self::getBasket();
 		if (!$basket) return false;
 		$output = [];
@@ -71,30 +75,49 @@ class FavoriteParts extends Provider{
 	 * @return boolean true if successfully added, false if failed
 	 */
 	public static function addToBasket($ov){
-		if ($ov['quan']) $item = self::getItem($ov['brend'], $ov['article']);
-		else $item = [
-			'goodsID' => $ov['goodsID'],
-			'warehouseGroup' => $ov['warehouseGroup']
-		];
-		// debug($item); exit();
+		if (isset($ov['quan']) && $ov['quan']) $item = self::getItem($ov['brend'], $ov['article']);
+		else{
+			$item = [
+				'goodsID' => $ov['goods'],
+				'warehouseGroup' => $ov['warehouseGroup']
+			];
+			$ov['quan'] = 0;
+		} 
 		$warehouseGroup = self::getWarehouseGroup($ov, $item);
 		if (!$warehouseGroup){
-			debug($ov); 
-			debug($item);
-			die("Ошибка получения warehouseGroup");
+			Log::insert([
+				'text' => "Ошибка получения warehouseGroup для " . self::$error,
+				'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
+			]);
+			return false;
 		}
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/add/";
 		$url .= "?key=".self::$key;
 		$url .= '&developerKey='.self::$developerKey;
 		$url .= "&goods={$item['goodsID']}";
 		$url .= "&warehouseGroup=$warehouseGroup";
+		$url .= "&comment={$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 		$url .= "&count={$ov['quan']}";
-		self::getUrlData($url); 
-		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK') return false;
-		$orderValue = new OrderValue();
-		$status_id = $ov['quan'] > 0 ? 7 : 5;
-		$orderValue->changeStatus($status_id, $ov);
+		parent::getUrlData($url);
+		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK'){
+			Log::insert([
+				'text' => 'Произошла ошибка добавления в корзину. Ответ сервера: ' . $GLOBALS['response_header'][0],
+				'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
+			]);
+			return false;
+		} 
+		$status_id = isset($ov['quan']) && $ov['quan'] ? 7 : 5;
+		OrderValue::changeStatus($status_id, $ov);
 		return true;
+	}
+
+	public static function removeFromBasket($ov){
+		$basket = self::getBasket();
+		// debug($basket);
+		$osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+		foreach($basket['cart'] as $basket){
+			if ($basket['comment'] == $osi) return self::addToBasket($basket);
+		}
 	}
 
 	/**
@@ -115,6 +138,8 @@ class FavoriteParts extends Provider{
 					break;
 			}
 		}
+		self::$error = $item['warehouses'][0]['code'];
+		return false;
 	}
 
 	/**

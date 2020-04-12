@@ -1,7 +1,6 @@
 <?php
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 set_time_limit(0);
-error_reporting(E_PARSE | E_ERROR);
 core\Timer::start();
 // echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
 switch($_GET['act']){
@@ -52,30 +51,26 @@ switch($_GET['act']){
 		break;
 	case 'orderArmtek':
 		echo "<h2>Отправка заказа в Армтек</h2>";
-		$armtek = new core\Provider\Armtek($db);
-		$armtek->sendOrder();
+		core\Provider\Armtek::sendOrder();
 		echo "<br>Обработка завершена.";
 		break;
 	case 'orderRossko':
 		// debug($_GET); exit();
 		echo "<h2>Отправка заказа в Росско</h2>";
-		$rossko = new core\Provider\Rossko($db);
-		$rossko->sendOrder($_GET['store_id'] ? $_GET['store_id'] : NULL);
+		core\Provider\Rossko::sendOrder();
 		if ($_GET['order_id']){
 			header("Location: ?view=orders&act=change&id={$_GET['order_id']}");
 			exit();
 		} 
 		echo "<br>Обработка завершена.";
 		break;
-	case 'orderVoshodAvto':
-		$voshodAvto = new core\Provider\Abcp\OrderAbcp($db, 6);
-		$res = $voshodAvto->basketOrder();
+	case 'orderVoshod':
+		core\Provider\Abcp::sendOrder(6);
 		break;
 	case 'orderMparts':
-		$mparts = new core\Provider\Abcp\OrderAbcp($db, 13);
-		$res = $mparts->basketOrder();
+		core\Provider\Abcp::sendOrder(13);
 		break;
-	case 'toOrderFavoriteParts':
+	case 'orderFavoriteParts':
 		echo "<h2>Отправка заказа Фаворит</h2>";
 		$res = core\Provider\FavoriteParts::toOrder();
 		if ($res === false) echo "<p>Нет товаров для отправки</p>";
@@ -317,7 +312,7 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID={$mikado->ClientID}&PSW={$mikado->Password}";
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . $mikado::$clientData['entity']['ClientID'] . "&PSW=" . $mikado::$clientData['entity']['Password'];
 			$file = file_get_contents($url);
 			if (strlen($file) == 18){
 				$errorText = "Не удалось скачать $zipName в $url";
@@ -333,7 +328,7 @@ switch($_GET['act']){
 			
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$zipName}.zip");
-			$file = $zipArchive->getStream("mikado_price_{$value}_{$mikado->ClientID}.csv");
+			$file = $zipArchive->getStream("mikado_price_{$value}_" . $mikado::$clientData['entity']['ClientID'] . ".csv");
 
 			$db->delete('store_items', "`store_id`={$mikado->stocks[$value]}");
 			$i = 0;
@@ -356,7 +351,7 @@ switch($_GET['act']){
 					'row' => $i
 				]);
 				if (!$item_id) continue;
-				$db->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $row[0]], ['print_query' => false]);
+				// $db->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $row[0]], ['print_query' => false]);
 				$price->insertStoreItem([
 					'store_id' => $mikado->stocks[$value],
 					'item_id' => $item_id,
@@ -635,8 +630,8 @@ switch($_GET['act']){
 	case 'priceForumAuto':
 		echo "<h2>Прайс Forum-Auto</h2>";
 		$price = new core\Price($db, 'priceForumAuto');
-		$price->isInsertItem = true;
-		$price->isInsertBrend = true;
+		$price->isInsertItem = false;
+		$price->isInsertBrend = false;
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
@@ -798,7 +793,7 @@ switch($_GET['act']){
 			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}";
 			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
 		}
-		else $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['name']}";
+		else $workingFile = $fileImap;
 
 		// $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Armtek_CRS_40068974.xlsx";
 		/**
@@ -808,32 +803,22 @@ switch($_GET['act']){
 		$stringNumber = 0;
 		switch($emailPrice['fileType']){
 			case 'excel':
-				$reader = ReaderEntityFactory::createReaderFromFile($workingFile);
+				try{
+					$reader = ReaderEntityFactory::createReaderFromFile($workingFile);
+				}
+				catch(\Box\Spout\Common\Exception\UnsupportedTypeException $e){
+					echo "<br>" . $e->getMessage();
+					echo "<br>Обработка с помощью PhpOffice...";
+					parseWithPhpOffice($workingFile);
+					break;
+				}
 				try{
 					$reader->open($workingFile);
 				} catch(\Box\Spout\Common\Exception\IOException $e){
 					echo "<br>Ошибка: <b>" . $e->getMessage() . "</b>";
 					echo "<br>Попытка обработки файла другим способом....";
-					
-					$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
-					$xls->setActiveSheetIndex(0);
-					$sheet = $xls->getActiveSheet();
-					$rowIterator = $sheet->getRowIterator();
-					foreach ($rowIterator as $iterator) {
-						$row = array();
-						$cellIterator = $iterator->getCellIterator();
-						foreach($cellIterator as $cell){
-							$row[] = $cell->getCalculatedValue();
-						} 
-						$stringNumber++;
-
-						// debug($row);
-						// if ($stringNumber > 100) die("Обработка прошла");
-
-						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
-					}
-					endSuccessfullyProccessing();
-					echo "<br>Время обработки: <b>".core\Timer::end()."</b> секунд";
+					parseWithPhpOffice($workingFile);
+					break;
 				}
 				foreach ($reader->getSheetIterator() as $sheet) {
 				   foreach ($sheet->getRowIterator() as $iterator) {

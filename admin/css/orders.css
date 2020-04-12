@@ -1,3 +1,17 @@
+a.removeFromBasket{
+	display: block;
+}
+.stringLog{
+	display: none;
+	font-size: 13px;
+}
+.stringLog.active{
+	display: block;
+}
+a.show_stringLog{
+	display: block;
+	font-size: 11px;
+}
 #arrived_change > label{
 	display: block;
     text-align: left;

@@ -1,13 +1,13 @@
 <?php
 namespace core\Provider;
+
 use core\Provider;
 use core\OrderValue;
+use core\Log;
+use Exception;
+
 class Mikado extends Provider{
 	private $db;
-	public $ClientID = 33773;
-	// public $ClientID = 28221;
-	public $Password = 'tahos2bz';
-	// public $Password = 'Vadim888';
 	public static $provider_id = 8;
 	private $armtek;
 	private $brends;
@@ -16,13 +16,21 @@ class Mikado extends Provider{
 		10 => 13,
 		35 => 12
 	];
-	public function getItemsToOrder(int $provider_id){
+	public static $clientData  = [
+		'entity' => [
+			'ClientID' => 33773,
+			'Password' =>  'tahos2bz'
+		],
+		'private' => [
+			'ClientID' => 28221, 
+			'Password' => 'Vadim888'
+		]
+	];
+	public static function getItemsToOrder(int $provider_id = null, $order_id = null){
+		$clientData = self::getClientData($order_id);
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
-			[
-				'ClientID' => 33773,
-				'Password' => 'tahos2bz',
-			]
+			$clientData
 		);
 		if (!$xml) return false;
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
@@ -33,7 +41,7 @@ class Mikado extends Provider{
 		];
 		$output = [];
 		foreach($basketItem as $value){
-			$output[] = $this->parseBasketItem($value);
+			$output[] = self::parseBasketItem($value);
 		}
 		return $output;
 	}
@@ -66,6 +74,8 @@ class Mikado extends Provider{
 			'brend' => $item['brend'],
 			'article' => $item['article'],
 			'title_full' => $item['title_full'],
+			'ZakazCode' => $basketItem->ZakazCode,
+			'ID' => $basketItem->ID,
 			'price' => $basketItem->Price,
 			'count' => $basketItem->QTY
 		];
@@ -74,8 +84,8 @@ class Mikado extends Provider{
 		$array = explode('-', $str);
 		return Provider::getInstanceDataBase()->getField('provider_stores', 'cipher', 'id', $array[1]);
 	}
-	public function __construct($db){
-		$this->db = $db;	
+	public function __construct($db = NULL){
+		if ($db) $this->db = $db;	
 		$this->armtek = new Armtek($this->db);
 	}
 	public function getCoincidences($text){
@@ -135,12 +145,13 @@ class Mikado extends Provider{
 	}
 	public function setArticle($brend, $article, $getZakazCode = false){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$clientData = self::getClientData();
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
 				'Search_Code' => $article,
-				'ClientID' => $this->ClientID,
-				'Password' => $this->Password,
+				'ClientID' => $clientData['ClientID'],
+				'Password' => $clientData['Password'],
 				'FromStockOnly' => 'FromStockOnly'  			
 			]
 		);
@@ -247,36 +258,51 @@ class Mikado extends Provider{
 		return false;
 	}
 	public function getDeliveryType($ZakazCode, $store_id){
+		$clientData = $this->getClientData();
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Info',
 			[
 				'ZakazCode' => $ZakazCode,
-				'ClientID' => $this->ClientID,
-				'Password' => $this->Password,
+				'ClientID' => $clientData['ClientID'],
+				'Password' => $clientData['Password'],
 			]
 		);
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
 		$StokID = $this->getStockId($store_id);
+		if (is_object($result->Prices->Code_PriceInfo)){
+			$deliveryType = $this->parseCodePriceInfo($result->Prices->Code_PriceInfo, $StokID);
+			if ($deliveryType) return $deliveryType;
+		} 
 		foreach($result->Prices->Code_PriceInfo as $value){
 			if (empty($value->OnStocks)) continue;
-			if (is_object($value->OnStocks->StockLine)){
-				if ($value->OnStocks->StockLine->StokID == $StokID) return $value->DeliveryType;
-			}
-			else{
-				foreach($value->OnStocks->StockLine as $v){
-					if ($v->StokID == $StockID) return $value->DeliveryType;
-				}
+			$deliveryType = $this->parseCodePriceInfo($value, $StokID);
+			if ($deliveryType) return $deliveryType;
+		}
+		return false;
+	}
+	private function parseCodePriceInfo(object $value, int $StokID){
+		if (is_object($value->OnStocks->StockLine)){
+			if ($value->OnStocks->StockLine->StokID == $StokID) return $value->DeliveryType;
+		}
+		else{
+			foreach($value->OnStocks->StockLine as $v){
+				if ($v->StokID == $StokID) return $value->DeliveryType;
 			}
 		}
 		return false;
+	}
+	private function getClientData(int $order_id = null): array
+	{
+		if (!$order_id) return self::$clientData['entity'];
+		$user_type = parent::getUserTypeByOrderID($order_id);
+		return self::$clientData[$user_type];
 	}
 	public function Basket_Add($ov){
 		// debug($ov); exit();
 		/**
 		 * Можно обойтись и без записи в базу данных ZakazCode, но это крайне необходимо, когда нужно
-		 * получить по нету item_id и brend_id
-		 * @var string
+		 * получить по ZakazCode item_id и brend_id
 		 */
 		$ZakazCode = $this->db->getField('mikado_zakazcode', 'ZakazCode', 'item_id', $ov['item_id']);
 		if (!$ZakazCode){
@@ -287,49 +313,45 @@ class Mikado extends Provider{
 		if (preg_match('/^g/', $ZakazCode)){
 			try{
 				$DeliveryType = $this->getDeliveryType($ZakazCode, $ov['store_id']);
-				if (!$DeliveryType) throw new \Exception("Ошибка получения DeliveryType");
-			} catch(\Exception $e){
-				Log::insertThroughException($e);
+				if (!$DeliveryType) throw new Exception("Ошибка получения DeliveryType по $ZakazCode");
+			} catch(Exception $e){
+				Log::insertThroughException($e, "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}");
+				return fase;
 			}
 		} 
 		else $DeliveryType = 0;
+		$clientData = $this->getClientData($ov['order_id']);
+		$params = [
+			'ZakazCode' => $ZakazCode,
+			'QTY' => $ov['quan'],
+			'DeliveryType' => $DeliveryType,
+			'Notes' => "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}",
+			'ClientID' => $clientData['ClientID'],
+			'Password' => $clientData['Password'],
+			'ExpressID' => 0,
+			'StockID' => $this->getStockId($ov['store_id'])
+		];
 		try{
 			$xml = self::getUrlData(
 				'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Add',
-				[
-					'ZakazCode' => $ZakazCode,
-					'QTY' => $ov['quan'],
-					'DeliveryType' => $DeliveryType,
-					'Notes' => "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}",
-					'ClientID' => $this->ClientID,
-					'Password' => $this->Password,
-					'ExpressID' => 0,
-					'StockID' => $this->getStockId($ov['store_id'])
-				]
+				$params
 			);
-			if (!$xml) throw new \Exception("Ошибка получения данных Микадо в заказе {$ov['order_id']} {$ov['brend']}-{$ov['article']}!");
-		} catch(\Exception $e){
-			Log::insertThroughException($e);
+			if (!$xml) throw new Exception("Ошибка отправки заказа в Микадо");
+		} catch(Exception $e){
+			Log::insertThroughException($e, "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}");
 			return false;
 		}
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
-		$this->db->insert(
-			'mikado_basket',
-			[
-				'order_id' => $ov['order_id'],
-				'store_id' => $ov['store_id'],
-				'item_id' => $ov['item_id'],
-				'ItemID' => $result->ID,
-				'OrderedQTY' => $result->OrderedQTY,
-				'Message' => $result->Message
-			]
-		);
 		if ($result->Message == 'OK'){
 			$ov['quan'] = $result->OrderedQTY;
-			$orderValue = new OrderValue();
-			$orderValue->changeStatus(11, $ov);
+			OrderValue::changeStatus(11, $ov);
 		}
+		else Log::insert([
+			'url' => $_SERVER['REQUEST_URI'],
+			'text' => $result->Message,
+			'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
+		]);
 	}
 	public function isOrdered($ov){
 		$array = $this->db->select_one('mikado_basket', '*', self::getWhere($ov));
@@ -354,5 +376,45 @@ class Mikado extends Provider{
 
 		OrderValue::update(['status_id' => 5, 'ordered' => 0], $ov);
 		User::updateReservedFunds($ov['user_id'], $ov['price'], 'minus');
+	}
+	public static function isInBasket($ov){
+		$items = self::getItemsToOrder(null, $ov['order_id']);
+		foreach($items as $value){
+			if ($value['ZakazCode'] == $ov['ZakazCode']) return true;
+		}
+		return false;
+	}
+	public static function removeFromBasket($ov){
+		$items = self::getItemsToOrder(null, $ov['order_id']);
+		$clientData = self::getClientData($ov['order_id']);
+		$isParsed = false;
+		foreach($items as $value){
+			if ($value['ZakazCode'] == $ov['ZakazCode']){
+				$xml = self::getUrlData(
+					'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Delete',
+					[
+						'ClientID' => $clientData['ClientID'],
+						'Password' => $clientData['Password'],
+						'ItemID' => $value['ID']
+					]
+				);
+				if (!$xml) return false;
+				$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
+				$result = json_decode(json_encode($result), true);
+				debug($result);
+				if ($result[0] != 'OK'){
+					Log::insert([
+						'url' => $_SERVER['REQUEST_URI'],
+						'text' => 'Ошибка удаления из корзины Микадо: ' . $result[0],
+						'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
+					]);
+					return false;
+				}
+				OrderValue::changeStatus(5, $ov);
+				$isParsed = true;
+			}
+		}
+		if ($isParsed) return true;
+		return false;
 	}
 }

@@ -10,7 +10,7 @@ class OrderValue{
 	 *         status = 2|3|8|10|11  - price, quan, user_id
 	 * @return [boolean] true if changed successfully
 	 */
-	public function changeStatus($status_id, $params){
+	public static function changeStatus($status_id, $params){
 		// print_r($params);
 		$values = ['status_id' => $status_id];
 		switch ($status_id){
@@ -21,7 +21,7 @@ class OrderValue{
 				$values['issued'] = "`issued` + $quan";
 				self::update($values, $params);
 				$user = User::get($ov['user_id']);
-				$title = $this->getTitleComment($params['item_id']);
+				$title = self::getTitleComment($params['item_id']);
 				Fund::insert(2, [
 					'sum' => $ov['price'] * $quan,
 					'remainder' => $user['bill'] - $ov['price'] * $quan,
@@ -43,7 +43,7 @@ class OrderValue{
 				if ($ov['returned'] + $params['quan'] < $ov['issued']) $values['status_id'] = 1;
 				$values['returned'] = "`returned` + {$params['quan']}";
 				self::update($values, $params);
-				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
+				self::changeInStockStoreItem($params['quan'], $params, 'plus');
 				$user = User::get($params['user_id']);
 				$title = $this->getTitleComment($params['item_id']);
 				Fund::insert(1, [
@@ -66,19 +66,19 @@ class OrderValue{
 			case 10:
 				self::update($values, $params);
 				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'minus');
-				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
+				self::changeInStockStoreItem($params['quan'], $params, 'plus');
 			//заказано
 			case 11:
 				$values['ordered'] = "`ordered` + {$params['quan']}";
 				self::update($values, $params);
 				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price']);
-				$this->changeInStockStoreItem($params['quan'], $params);
+				self::changeInStockStoreItem($params['quan'], $params);
 				break;
 			//отменен
 			case 8:
 				User::updateReservedFunds($params['user_id'], $params['price'], 'minus');
 				self::update($values, $params);
-				$this->changeInStockStoreItem($params['quan'], $params, 'plus');
+				self::changeInStockStoreItem($params['quan'], $params, 'plus');
 			//отменен
 			case 5:
 				$values ['ordered'] = 0;
@@ -133,7 +133,7 @@ class OrderValue{
 	 * @return [boolean] true if updated successfully else error of update
 	 */
 	public static function update($values, $params){
-		return $GLOBALS['db']->update('orders_values', $values, Provider\Armtek::getWhere([
+		return $GLOBALS['db']->update('orders_values', $values, Provider::getWhere([
 			'order_id' => $params['order_id'],
 			'store_id' => $params['store_id'],
 			'item_id' => $params['item_id']
@@ -147,7 +147,7 @@ class OrderValue{
 	 * @param  string $act plus|minus (+|-) minus as default
 	 * @return none
 	 */
-	private function changeInStockStoreItem($quan, $condition, $act = 'minus'){
+	private static function changeInStockStoreItem($quan, $condition, $act = 'minus'){
 		$sign = $act == 'minus' ? '-' : '+';
 		$GLOBALS['db']->update(
 			'store_items',

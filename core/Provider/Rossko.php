@@ -2,57 +2,35 @@
 namespace core\Provider;
 use core\Provider;
 use core\OrderValue;
+use core\Log;
+
 class Rossko extends Provider{
 	private $db, $result;
-	private $connect = array(
-		'wsdl' => 'http://api.rossko.ru/service/GetSearch',
+	private static $connect = array(
+		'wsdl' => 'http://api.rossko.ru/service',
 		'options' => array(
 			'connection_timeout' => 5,
 			'trace' => true
 		)
 	);
 	private $countDaysOfChecking = 0;
-	private $param = array(
+	private static $param = array(
 		'KEY1' => 'd3a3b2e361276178e60d8da2f9d553b4',
 		'KEY2' => 'd2697480a48aee9f6238818072235929',
 	);
-	public $provider_id = 15;
-	private $stopOnError = false;
-	public $isNeedsToCheck;
+	public static $provider_id = 15;
 	/**
 	 * [getItemsToOrder description]
 	 * @param  int $provider_id provider_id
 	 * @return array user_id, order_id, store_id, store, item_id, price, article, brend, provider_id, provider, count
 	 */
-	public function getItemsToOrder(int $provider_id){
-		$output = [];
-		$res_items = Armtek::getItems('rossko');
-		if (!$res_items->num_rows) return false;
-		foreach($res_items as $value) $output[] = $value;
-		return $output;
+	public static function getItemsToOrder(int $provider_id){
+		return Abcp::getItemsToOrder($provider_id);
 	}
-	public function __construct($db, $text = NULL){
+	public function __construct($db = NULL){
 		ini_set('soap.wsdl_cache_enabled',0);
 		ini_set('soap.wsdl_cache_ttl',0);
-		$this->db = $db;
-		if ($text){
-			$this->text = $text;
-			$rossko_query_query = $this->db->query("
-				SELECT
-					rq.query,
-					rq.created,
-					IF(NOW() >= DATE_ADD(rq.created, Interval {$this->countDaysOfChecking} DAY), 1, 0) AS isNeedsToCheck
-				FROM
-					#rossko_queries rq
-				WHERE
-					rq.query='$this->text'
-			", '');
-			if (!$rossko_query->num_rows) $this->isNeedsToCheck = true;
-			else{
-				$rossko_query = $rossko_query_query->fetch_assoc();
-				$this->isNeedsToCheck = (bool) $rossko_query['isNeedsToCheck'];
-			}
-		}
+		if ($db) $this->db = $db;
 	}
 	public function isRossko($store_id){
 		$array = $this->db->select_one('provider_stores', 'id,provider_id', "`id`=$store_id");
@@ -79,7 +57,6 @@ class Rossko extends Provider{
 	}
 	private function addItem($item, $printQuery = false){
 		$brend_id = $this->getBrandId($item->brand);
-		if ($this->stopOnError && !$brend_id) die("Ошибка получение brend_id $item->brand");
 		if (!$brend_id) return false;
 		$article = article_clear($item->partnumber);
 		$name = $item->name ? $item->name : 'Деталь';
@@ -106,8 +83,8 @@ class Rossko extends Provider{
 			'provider_stores', 
 			[
 				'title' => $stock->id,
-				'provider_id' => $this->provider_id,
-				'cipher' => strtoupper(self::getRandomString(4)),
+				'provider_id' => self::$provider_id,
+				'cipher' => strtoupper(parent::getRandomString(4)),
 				'currency_id' => 1,
 				'delivery' => $stock->delivery,
 				'percent' => 10
@@ -117,8 +94,8 @@ class Rossko extends Provider{
 				'deincrement_duplicate' => true,
 			]
 		);
-		if (self::isDuplicate($res)){
-			$where = "`title`='{$stock->id}' AND `provider_id`={$this->provider_id}";
+		if (parent::isDuplicate($res)){
+			$where = "`title`='{$stock->id}' AND `provider_id` = " . self::$provider_id;
 			$this->db->update('provider_stores', ['delivery' => $stock->delivery], $where);
 			$array = $this->db->select_one('provider_stores', 'id', $where);
 			return $array['id'];
@@ -185,66 +162,110 @@ class Rossko extends Provider{
 			else $this->renderStock($item_id, $value->stocks->stock);
 		}
 	}
-	private function getSoap(){
+	private static function getSoap($method){
 		try{
-			$soap = new \SoapClient($this->connect['wsdl'], $this->connect['options']);
+			$soap = new \SoapClient(self::$connect['wsdl']."/$method", self::$connect['options']);
 			if (!$soap) throw new \Exception("Не удается подключиться к Росско.");
-		}	catch(\Exception $e){
-			Log::insertThroughException($e);
+		}catch(\Exception $e){
 			return false;
 		}
 		return $soap;
 	}
-	private function getResult($text = NULL){
-		if ($text) $this->param['TEXT'] = $text;
-		else $this->param['TEXT'] = $this->text;
-		$query = $this->getSoap();
+	private function getResult($search){
+		$query = self::getSoap('GetSearch');
 		if (!$query) return false;
-		$result = $query->GetSearch($this->param);
+		$param = self::$param;
+		$param['TEXT'] = $search;
+		$result = $query->GetSearch($param);
 		return $result;
 	}
-	public function getCheckoutDetails(){
-		$this->connect['wsdl'] = 'http://api.rossko.ru/service/GetCheckoutDetails';
-		$query  = $this->getSoap();
-		if (!$query) return false;
-		return $query->GetCheckoutDetails($this->param);
+	public static function getCheckoutDetails(){
+		$soap  = self::getSoap('GetCheckoutDetails');
+		if (!$soap) return false;
+		try{
+			$query = $soap->GetCheckoutDetails(self::$param);
+		}catch(\SoapFault $e){
+			Log::insertThroughException($e);
+			return false;
+		}
+		return $query;
 	}
-	private function getParts($store_id = NULL){
-		$res_items = Armtek::getItems('rossko');
-		if (!$res_items->num_rows) return false;
+	private static function getPartsForSending(){
+		$providerBasket = parent::getProviderBasket(self::$provider_id, '');
+		if (!$providerBasket->num_rows) return false;
 		$items = array();
-		while ($item = $res_items->fetch_assoc()){
+		while ($item = $providerBasket->fetch_assoc()){
 			if ($store_id && $item['store_id'] != $store_id) continue;
 			$items[] = [
-				// 'partnumber' => is_array($part) ? $part[0]->partnumber : $part->partnumber,
-				// 'brand' => is_array($part) ? $part[0]->brand : $part->brand,
 				'partnumber' => $item['article'],
 				'brand' => $item['brend'],
 				'stock' => $item['store'],
-				'count' => $item['count'],
-				'osi' => "{$item['order_id']}-{$item['store_id']}-{$item['item_id']}",
+				'count' => $item['quan'],
+				'comment' => "{$item['order_id']}-{$item['store_id']}-{$item['item_id']}",
 				'price' => $item['price'],
-				'user_id' => $item['user_id']
+				'user_id' => $item['user_id'],
+				'user_type' => $item['user_type']
 			];
 		}
 		return $items;
 	}
-	public function sendOrder($store_id = NULL){
-		$checkoutDetails = $this->getCheckoutDetails();
-		$parts = $this->getParts($store_id);
-		if (!$parts){
-			echo "<br>Нет товаров для отправки.";
+	public static function sendOrder($store_id = NULL){
+		if ($store_id) $stock = parent::getInstanceDataBase()->getFieldOnID('provider_stores', $store_id, 'title');
+		$partsList = self::getPartsForSending();
+		$entity = [];
+		$private = [];
+		if (!$partsList){
+			if (!empty($ov)) $additional = "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+			else $additional = NULL;
+			Log::insert([
+				'text' => 'Росско: нет товаров для отправки',
+				'additional' => $additional
+			]);
 			return false;
 		}
-		$this->connect['wsdl'] = 'http://api.rossko.ru/service/GetCheckout';
+		foreach($partsList as $part){
+			if (isset($stock) && $part['stock'] != $stock) continue;
+			if ($part['user_type'] == 'private') $private[] = $part;
+			if ($part['user_type'] == 'entity') $entity[] = $part;
+		}
+
+		$resultEntity = self::executeSendOrder($entity, 'entity');
+		self::parseSendOrderResponse($resultEntity, $entity);
+
+
+		$resultPrivate = self::executeSendOrder($private, 'private');
+		self::parseSendOrderResponse($resultPrivate, $private);
+	}
+	private static function executeSendOrder(array $parts, $user_type){
+		static $checkoutDetails;
+		if (empty($parts)) return false;
+		if (!$checkoutDetails){
+			$checkoutDetails = self::getCheckoutDetails();
+			if (!$checkoutDetails) die("Ошибка получения checkoutDetails. Подробности в логе.");
+		} 
+		$payment_id = $user_type == 'private' ? 2 : 1;
+		
+		$soap  = self::getSoap('GetCheckout');
+		if (!$soap){
+			foreach($parts as $part) Log::insert([
+				'text' => 'Ошибка подключения к Росско',
+				'additional' => "osi: {$part['comment']}"
+			]);
+			return false;
+		}
+
 		$param = array(
-			'KEY1' => $this->param['KEY1'],
-			'KEY2' => $this->param['KEY2'],
+			'KEY1' => self::$param['KEY1'],
+			'KEY2' => self::$param['KEY2'],
 			'delivery' => array(
-				'delivery_id' => '000000001'
+				'delivery_id' => '000000001',
+				'city' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->city,
+				'street' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->street,
+				'house' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->house,
+				'office' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->office
 			),
 			'payment' => array(
-				'payment_id' => '1',
+				'payment_id' => $payment_id,
 				'company_name' => $checkoutDetails->CheckoutDetailsResult->CompanyList->company->name,
 				'company_requisite' => $checkoutDetails->CheckoutDetailsResult->CompanyList->company->requisite
 			),
@@ -255,76 +276,74 @@ class Rossko extends Provider{
 			'delivery_parts' => true,
 			'PARTS' => $parts
 		);
-		echo json_encode($param);
-		debug($param, 'param');
-
-		$query  = $this->getSoap();
-		if (!$query) return false;
-		$result = $query->GetCheckout($param);
-
-		echo json_encode($result);
-		debug($result, 'result');
-
-		$this->armtek = new Armtek($this->db);
+		try{
+			$result = $soap->GetCheckout($param);
+		} catch(\SoapFault $e){
+			return $e;
+		}
+		return $result;
+	}
+	private static function parseSendOrderResponse($result, array $parts){
+		if (empty($parts)) return false;
+		if ($result->CheckoutResult->message && !$result->CheckoutResult->success){
+			foreach($parts as $part) Log::insert([
+				'text' => $result->CheckoutResult->message,
+				'additional' => "osi: {$part['comment']}"
+			]);
+			return false;
+		}
 		if (isset($result->CheckoutResult->ItemsList)){
-			if (is_array($result->CheckoutResult->ItemsList->Item)){
-				foreach($result->CheckoutResult->ItemsList->Item as $value) $this->parseItemList($value, $param['PARTS']);
+			$itemsList = & $result->CheckoutResult->ItemsList->Item;
+			if (is_array($itemsList)){
+				foreach($itemsList as $value) self::parseItemList($value, $parts);
 			}
-			else $this->parseItemList($result->CheckoutResult->ItemsList->Item, $param['PARTS']);
+			else self::parseItemList($itemsList, $parts);
 		}
 		if (isset($result->CheckoutResult->ItemsErrorList)){
-			if (is_array($result->CheckoutResult->ItemsErrorList->ItemError)){
-				foreach($result->CheckoutResult->ItemsErrorList->ItemError as $value) $this->parseItemErrorList($value, $param['PARTS']);
+			$errorList = & $result->CheckoutResult->ItemsErrorList->ItemError;
+			if (is_array($errorList)){
+				foreach($errorList as $value) self::parseItemErrorList($value, $parts);
 			}
-			else $this->parseItemErrorList($result->CheckoutResult->ItemsErrorList->ItemError, $param['PARTS']);
+			else self::parseItemErrorList($errorList, $parts);
 		}
 	}
-	private function parseItemList($itemResponse, $itemsParts){
-		// debug($itemResponse, 'itemResponse');
-		// debug($itemsParts, 'itemsParts');
-		foreach($itemsParts as $value){
+	private static function parseItemList($Item, $parts){
+		foreach($parts as $value){
 			if (
-				self::getComparableString($itemResponse->partnumber) == self::getComparableString($value['partnumber']) &&
-				self::getComparableString($itemResponse->brand) == self::getComparableString($value['brand'])
+				parent::getComparableString($Item->partnumber) == parent::getComparableString($value['partnumber']) &&
+				parent::getComparableString($Item->brand) == parent::getComparableString($value['brand'])
 			){
-				$array = explode('-', $value['osi']);
-				$orderValue = new OrderValue();
-				$orderValue->changeStatus(11, [
-					'order_id' => $array[0],
-					'store_id' => $array[1],
-					'item_id' => $array[2],
+				$osi = explode('-', $value['comment']);
+				OrderValue::changeStatus(11, [
+					'order_id' => $osi[0],
+					'store_id' => $osi[1],
+					'item_id' => $osi[2],
 					'price' => $value['price'],
 					'quan' => $value['count'],
 					'user_id' => $value['user_id']
 				]);
-				$this->db->update(
-					'other_orders',
-					['response' => 'OK'],
-					self::getWhere([
-						'order_id' => $array[0],
-						'store_id' => $array[1],
-						'item_id' => $array[2]
-					])
+				parent::updateProviderBasket(
+					[
+						'order_id' => $osi[0],
+						'store_id' => $osi[1],
+						'item_id' => $osi[2]
+					],
+					['response' => 'OK']
 				);
 			}
 		}
 	}
-	private function parseItemErrorList($itemResponse, $itemsParts){
-		foreach($itemsParts as $value){
+	private static function parseItemErrorList($Item, $parts){
+		foreach($parts as $value){
 			if (
-				self::getComparableString($itemResponse->partnumber) == self::getComparableString($value['partnumber']) &&
-				self::getComparableString($itemResponse->brand) == self::getComparableString($itemResponse->brand == $value['brand'])
+				parent::getComparableString($Item->partnumber) == parent::getComparableString($value['partnumber']) &&
+				parent::getComparableString($Item->brand) == parent::getComparableString($value['brand'])
 			){
-				$array = explode('-', $value['osi']);
-				$this->db->update(
-					'other_orders',
-					['response' => $itemResponse->message],
-					self::getWhere([
-						'order_id' => $array[0],
-						'store_id' => $array[1],
-						'item_id' => $array[2]
-					])
-				);
+				$osi = explode('-', $value['comment']);
+				Log::insert([
+					'text' => $Item->message,
+					'additional' => "osi: {$value['comment']}"
+				]);
 			}
 		}
 	}
@@ -347,16 +366,20 @@ class Rossko extends Provider{
 		} 
 		return $coincidences;
 	}
-	public function execute(){
-		if (!parent::getIsEnabledApiOrder($this->provider_id)) return false;
-		if (!$this->text) return false;
-		$result = $this->getResult();
+	public function execute($search){
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$result = $this->getResult($search);
 		if (!$result) return false;
-		// debug($result); exit();
 		if (!$result->SearchResult->success) return false;
 		if (is_array($result->SearchResult->PartsList->Part)){
 			foreach($result->SearchResult->PartsList->Part as $value) $this->renderPart($value);
 		}
 		else $this->renderPart($result->SearchResult->PartsList->Part);
+	}
+	public static function isInBasket($ov){
+		return Armtek::isInBasket($ov);
+	}
+	static public function removeFromBasket($ov){
+		return Armtek::removeFromBasket($ov);
 	}
 }

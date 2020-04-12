@@ -2,6 +2,8 @@
 namespace core\Provider;
 use core\Provider;
 use core\Brend;
+use core\Log;
+use core\OrderValue;
 
 if ($_SERVER['DOCUMENT_ROOT']) $path = $_SERVER['DOCUMENT_ROOT'].'/';
 else $path = '';
@@ -15,16 +17,25 @@ class Abcp extends Provider{
 			'userlogin' => 'info@tahos.ru',
 			'userpsw' => 'vk640431',
 			'provider_id' => 6,
-			'paymentMethod' => 1062,
+			'paymentMethod' => [
+				'entity' => 1062,
+				'private' => 1061
+			],
 			'shipmentAddress' => 659625,
 			'getAnalogies' => true,
 			'providerStores' => array()
 		],
 		13 => [
-			'title' => 'МПартс',
+			'title' => 'М Партс',
 			'url' => 'http://v01.ru/api/devinsight',
-			'userlogin' => 'info@tahos.ru',
-			'userpsw' => '1031786',
+			'private' => [
+				'userlogin' => 'info@tahos.ru',
+				'userpsw' => '1031786'
+			],
+			// 'entity' => [
+			// 	'userlogin' => 'info@tahos.ru',
+			// 	'userpsw' => '1031786',
+			// ],
 			'provider_id' => 13,
 			'shipmentMethod' => 1,
 			'paymentMethod' => 6,
@@ -35,10 +46,9 @@ class Abcp extends Provider{
 		]
 	];
 	private $providerStores = [];
-	public function getItemsToOrder(int $provider_id){}
-	public function __construct($item_id = NULL, $db){
+	public function __construct($item_id = NULL, $db = NULL){
 		// if (!$_SESSION['user']) return false;
-		$this->db = $db;
+		if ($db) $this->db = $db;
 		if ($item_id){
 			$this->item_id = $item_id;
 			$this->item = $this->db->select_unique("
@@ -56,13 +66,27 @@ class Abcp extends Provider{
 			", '');
 			$this->item = $this->item[0];
 		}
-		foreach(self::$params as $provider_id => $param){
-			self::$params[$provider_id]['log'] = new \Katzgrau\KLogger\Logger($_SERVER['DOCUMENT_ROOT'].'/admin/logs', \Psr\Log\LogLevel::WARNING, array(
-				'filename' => "{$param['title']}.txt",
-				'dateFormat' => 'G:i:s'
-			));
-			$this->setLog($provider_id, 'debug', 'Исходный item: ', $this->item);
-		}
+	}
+	public static function isInBasket($ov){
+		return Armtek::isInBasket($ov);
+	}
+	static public function removeFromBasket($ov){
+		return Armtek::removeFromBasket($ov);
+	}
+	public static function getItemsToOrder(int $provider_id){
+		$basketProvider = parent::getProviderBasket($provider_id, '');
+		if (!$basketProvider->num_rows) return false;
+		$output = array();
+		foreach($basketProvider as $bp) $output[] = [
+			'provider' => $bp['provider'],
+			'store' => $bp['cipher'],
+			'brend' => $bp['brend'],
+			'article' => $bp['article'],
+			'title_full' => $bp['title_full'],
+			'price' => $bp['price'],
+			'count' => $bp['quan']
+		];
+		return $output;
 	}
 	public static function getQueryDeleteByProviderId($item_id, $provider_id){
 		return "
@@ -74,9 +98,22 @@ class Abcp extends Provider{
 				si.item_id = $item_id AND ps.provider_id = $provider_id
 		"; 
 	}
+	private static function getParam(int $provider_id, string $user_type = 'private'){
+		$param = self::$params[$provider_id];
+		switch($provider_id){
+			case 6:
+				$param['paymentMethod'] = $param['paymentMethod'][$user_type];
+				break;
+			case 13:
+				$param['userlogin'] = self::$params[$provider_id][$user_type]['userlogin'];
+				$param['userpsw'] = self::$params[$provider_id][$user_type]['userpsw'];
+				break;
+		}
+		return $param;
+	}
 	private function insertProviderStore($provider_id, $item){
 		if (!$item['distributorId']) return false;
-		$p = & self::$params[$provider_id];
+		$p = & self::getParam($provider_id);
 		$store_id = array_search($item['distributorId'], $p['providerStores']);
 		if ($store_id) return $store_id;
 		$array = $this->db->select_one('provider_stores', 'id', "`title`='{$p['title']}-{$item['distributorId']}' AND provider_id=$provider_id");
@@ -109,64 +146,58 @@ class Abcp extends Provider{
 	private function getItems($provider_id){
 		$brends = Brend::get(['id' => $this->item['brend_id'], 'provider_id' => $provider_id], [], '');
 		$brend = $brends->fetch_assoc();
-		$p = self::$params[$provider_id];
-		$res = file_get_contents("{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$this->item['article']}&brand={$brend['title']}");
+		$p = self::getParam($provider_id);
+		$res = parent::getUrlData(
+			"{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$this->item['article']}&brand={$brend['title']}"
+		);
 		return json_decode($res, true);
 	}
 	public function getSearch($search){
 		$coincidences = array();
-		foreach(self::$params as $store_id => $param){
-			if (!parent::getIsEnabledApiSearch($param->provider_id)) return false;
-			$c = array();
+		foreach(self::$params as $provider_id => $value){
+			if (!parent::getIsEnabledApiSearch($provider_id)) continue;
+			$param = self::getParam($provider_id);
 			$url = "{$param['url']}/search/brands?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw'])."&number=$search";
-			$response = @file_get_contents($url);
+			$response = parent::getUrlData($url);
 			$items = json_decode($response, true);
-			// debug($items);
 			if (empty($items)) continue;
 			foreach($items as $value){
 				if (!self::getComparableString($value['description'])) continue;
+				// print_r($value);
 				$coincidences[$value['brand']] = $value['description'];
 			} 
 		}
 		return $coincidences;
 	}
-	public function render($providerStores = array()){
-		foreach(self::$params as $provider_id => $param){
-			if (!empty($providerStores) && !in_array($provider_id, $providerStores)) continue;
+	public function render($provider_id){
+		//пока не понятно для чего эта строка
+		// if (!empty($providerStores) && !in_array($provider_id, $providerStores)) continue;
 
-			$items = $this->getItems($provider_id);
-			if (!$items) continue;
-			
-			// debug($this->item);
-			// debug($items); exit();
+		$items = $this->getItems($provider_id);
+		if (!$items) return false;
 
-			$count = count($items);
-			// $count = $count <= 5 ? $count : 5; 
-			for($i = 0; $i < $count; $i++){
-				$item = $items[$i];
-				$brend_id = $this->getBrandId($provider_id, $item['brand']);
-				if (!$brend_id) continue;
-				$item_id = $this->insertItem($provider_id, [
-					'brend_id' => $brend_id,
-					'article' => $item['numberFix'],
-					'article_cat' => $item['number'],
-					'title' => $item['description'] ? $item['description'] : 'Деталь',
-					'title_full' => $item['description'] ? $item['description'] : 'Деталь',
-					'weight' => $item['weight'] ? $item['weight'] * 1000 : null
-				]);
-				if (!$item_id) return false;
-				if (self::getComparableString($this->item['article']) != self::getComparableString($item['numberFix'])){
-					$this->insertAnalogies($provider_id, $item_id, $item);
-				}
-				$store_id = $this->insertProviderStore($provider_id, $item);
-				if (!$store_id) continue;
-				$this->insertStoreItems($store_id, $item_id, $item);
+		$count = count($items);
+		$count = $count <= 5 ? $count : 5; 
+		for($i = 0; $i < $count; $i++){
+			$item = $items[$i];
+			$brend_id = $this->getBrandId($provider_id, $item['brand']);
+			if (!$brend_id) continue;
+			$item_id = $this->insertItem($provider_id, [
+				'brend_id' => $brend_id,
+				'article' => $item['numberFix'],
+				'article_cat' => $item['number'],
+				'title' => $item['description'] ? $item['description'] : 'Деталь',
+				'title_full' => $item['description'] ? $item['description'] : 'Деталь',
+				'weight' => $item['weight'] ? $item['weight'] * 1000 : null
+			]);
+			if (!$item_id) return false;
+			if (self::getComparableString($this->item['article']) != self::getComparableString($item['numberFix'])){
+				$this->insertAnalogies($provider_id, $item_id, $item);
 			}
+			$store_id = $this->insertProviderStore($provider_id, $item);
+			if (!$store_id) continue;
+			$this->insertStoreItems($store_id, $item_id, $item);
 		}
-	}
-	private function setLog($store_id, $logLevel, $text, $array = []){
-		if ($logLevel == 'debug' && !empty($array)) return self::$params[$store_id]['log']->debug("$text", $array);
-		return self::$params[$store_id]['log']->$logLevel("$text");
 	}
 	public function getBrandId($provider_id, $brand){
 		// $brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
@@ -175,7 +206,6 @@ class Abcp extends Provider{
 			'provider_id' => $provider_id
 		], [], '');
 		if (!$brendsList->num_rows) {
-			$this->setLog($provider_id, 'warning', "Бренд $brand отсутствует в базе");
 			$this->db->insert(
 				'log_diff',
 				[
@@ -197,9 +227,7 @@ class Abcp extends Provider{
 		$last_res = $res;
 		if ($res === true){
 			$last_id = $this->db->last_id();
-			$this->setLog($provider_id, 'info', "Items success: item_id=$last_id");
 			$res2 = $this->db->insert('articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
-			if ($res2 !== true) $this->setLog($provider_id, 'error', "articles $res2 | {$this->db->last_query}");
 			if ($insertedItems !== NULL){
 				$this->db->insert('rendered_voshod', ['item_id' => $last_id], ['print_query' => false]);
 				$insertedItems++;
@@ -209,10 +237,8 @@ class Abcp extends Provider{
 		if (self::isDuplicate($res)){
 			$item = $this->db->select('items', 'id', "`article`='{$array['article']}' AND `brend_id`={$array['brend_id']}");
 			$item_id = $item[0]['id'];
-			$this->setLog($provider_id, 'info', "Duplicate item {$array['article']} с id=$item_id");
 			return $item_id;
 		} 
-		$this->setLog($provider_id, 'error', "items $last_res | $last_query");
 		return false;
 	}
 	public function insertAnalogies($provider_id, $item_id, $item){
@@ -233,10 +259,6 @@ class Abcp extends Provider{
 				'param2' => $item_id,
 			]
 		);
-		if (self::isDuplicate($res1)) $this->setLog($provider_id, 'info', "duplicate analogies item_id=$this->item_id, item_diff=$item_id");
-		else $this->setLog($provider_id, 'error', "$last_query1 | $res1");
-		if (self::isDuplicate($res2)) $this->setLog($provider_id, 'info', "duplicate analogies item_id=$item_id, item_diff=$this->item_id");
-		else $this->setLog($provider_id, 'error', "$last_query2 | $res2");
 	}
 	private function insertStoreItems($store_id, $item_id, $item){
 		$res = $this->db->insert('store_items', 
@@ -249,7 +271,8 @@ class Abcp extends Provider{
 			],
 			[
 				'duplicate' => [
-					'price' => ceil($item['price'])
+					'price' => ceil($item['price']),
+					'in_stock' => $item['availability']
 				],
 				'print_query' => false
 			]
@@ -265,6 +288,151 @@ class Abcp extends Provider{
 			'brand' => $value['brand']
 		];
 		return $brands;
+	}
+	public static function getItemInfoByArticleAndBrend($ov){
+		// debug($ov);
+		$param = self::getParam($ov['provider_id']);
+		$article = self::getComparableString($ov['article']);
+		$distributorId = str_replace($param['title'].'-', '', $ov['store']);
+		$url =  "{$param['url']}/search/articles/?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw'])."&useOnlineStocks=1&number={$article}&brand={$ov['brend']}";
+		$response = self::getUrlData($url);
+		if (!$response) return false;
+		$items = json_decode($response, true);
+		if (empty($items)) return false;
+		foreach($items as $value){
+			if (
+				self::getComparableString($value['numberFix']) == self::getComparableString($article) 
+				&& $value['distributorId'] == $distributorId
+			) {
+				return[
+					'brand' => $value['brand'],
+					'number' => $value['number'],
+					'supplierCode' => $value['supplierCode'],
+					'itemKey' => $value['itemKey']
+				];
+			}
+		}
+		return false;
+	}
+	/**
+	 * returns payment methods that was added to $params and is not nothere used
+	 * @param  integer $provider_id
+	 * @return array 
+	 */
+	public static function getPaymentMethods($provider_id){
+		$param = self::getParam($provider_id);
+		$url =  "{$param['url']}/basket/paymentMethods/?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw']);
+		$response = self::getUrlData($url);
+		return json_decode($response, true);
+	}
+	public static function sendOrder(int $provider_id){
+		$param = self::getParam($provider_id);
+		$providerBasket = parent::getProviderBasket($provider_id, '');
+		if (!$providerBasket->num_rows) return false;
+		$private = [];
+		$entity = [];
+		foreach($providerBasket as $value){
+			if (!parent::getIsEnabledApiOrder($provider_id)){
+				Log::insert([
+					'text' => "API заказов для {$param['title']} отключено",
+					'additional' => "osi: {$value['order_id']}-{$value['store_id']}-{$value['item_id']}"
+				]);
+				continue;
+			}
+			switch($value['user_type']){
+				case 'entity': $entity["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value; break;
+				case 'private': $private["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value; break;
+			}
+		}
+		if (!empty($private)){
+			$responseAddToBasket = self::addToBasket($private, $provider_id, 'private');
+			self::parseResponseAddToBasket($responseAddToBasket, $private);
+			// self::sendBasketToOrder($provider_id, 'private');
+		}
+		if (!empty($entity)){
+			$responseAddToBasket = self::addToBasket($entity, $provider_id, 'entity');
+			self::parseResponseAddToBasket($responseAddToBasket, $entity);
+		}
+	}
+	private static function addToBasket($items, $provider_id, $user_type = 'private'){
+		$param = self::getParam($provider_id, $user_type);
+		$positions = [];
+		foreach($items as $item){
+			$item['provider_id'] = $provider_id;
+			$itemInfo = self::getItemInfoByArticleAndBrend($item);
+			if (!$itemInfo){
+				Log::insert([
+					'text' => 'Ошибка получения itemInfo',
+					'additional' => "osi: {$item['order_id']}-{$item['store_id']}-{$item['item_id']}"
+				]);
+				continue;
+			}
+			$positions[] = [
+				'brand' => $itemInfo['brand'],
+				'number' => $itemInfo['number'],
+				'supplierCode' => $itemInfo['supplierCode'],
+				'itemKey' => $itemInfo['itemKey'],
+				'quantity' => $item['quan'],
+				'comment' => "{$item['order_id']}-{$item['store_id']}-{$item['item_id']}"
+			];
+		}
+		$response = parent::getUrlData(
+			"{$param['url']}/basket/add",
+			[
+				'userlogin' => $param['userlogin'],
+				'userpsw' => md5($param['userpsw']),
+				'positions' => $positions
+			]
+		);
+		return json_decode($response, true);
+	}
+	private static function parseResponseAddToBasket($response, $items){
+		if ($response['error']){
+			foreach($items as $osi => $item){
+					Log::insert([
+						'text' => $response['error'],
+						'additional' => "osi: $osi"
+					]);
+				}
+			return false;
+		}
+		if (empty($response['positions'])) return false;
+		foreach($response['positions'] as $position){
+			if ($position['status'] == 0){
+				Log::insert([
+					'text' => $position['errorMessage'],
+					'additional' => $position['comment']
+				]);
+				continue;
+			}
+			OrderValue::changeStatus(11, $items[$position['comment']]);
+		}
+	}
+	private static function getShipmentDate($provider_id){
+		if ($provider_id == 13) return '';
+		$param = self::getParam($provider_id, $user_type);
+		$url =  "{$param['url']}/basket/shipmentDates/?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw']);
+		$response = parent::getUrlData($url);
+		$res = json_decode($response, true);
+		return $res[1]['date'];
+	}
+	public static function sendBasketToOrder(int $provider_id, string $user_type): void
+	{
+		$param = self::getParam($provider_id, $user_type);
+		$shipmentDate = self::getShipmentDate($provider_id);
+		$res = self::getUrlData(
+			"{$param['url']}/basket/order",
+			[
+				'userlogin' => $param['userlogin'],
+				'userpsw' => md5($param['userpsw']),
+				'paymentMethod' => $param['paymentMethod'][$user_type],
+				'shipmentAddress' => $param['shipmentAddress'],
+				'shipmentOffice' => isset($param['shipmentOffice']) ? $param['shipmentOffice'] : '',
+				'shipmentMethod' => isset($param['shipmentMethod']) ? $param['shipmentMethod'] : '',
+				'shipmentDate' => $shipmentDate
+			]
+		);
+		var_dump($res);
 	}
 }
 ?>

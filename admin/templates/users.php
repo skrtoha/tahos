@@ -44,11 +44,11 @@ if ($_POST['form_submit']){
 	if ($saveble) {
 		if ($_POST['form_submit'] == 1){
 			if (core\User::update($id, $array)) message('Изменения успешно сохранены!');
-			header("Location: ?view=users&id=$id&act=change");
+			// header("Location: ?view=users&id=$id&act=change");
 		}
 		else{
 			if ($db->insert('users', $array)) message('Пользователь успешно добавлен!');
-			header("Location: ?view=users&id={$db->last_id()}&act=change");
+			// header("Location: ?view=users&id={$db->last_id()}&act=change");
 		}
 	}
 }

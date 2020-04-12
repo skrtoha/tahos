@@ -9,8 +9,9 @@ class Log{
 	 * @param  bool|null $flag   [description]
 	 * @return mixed true - if successfully inserted, string - error
 	 */
-	public static function insert(array $params, boolean $flag = null): bool
+	public static function insert(array $params, array $flag = null): bool
 	{
+		if (!isset($params['url'])) $params['url'] = $_SERVER['REQUEST_URI'];
 		return $GLOBALS['db']->insert(
 			'logs',
 			$params,
@@ -20,14 +21,15 @@ class Log{
 	/**
 	 * insert into log, if there is an Exception
 	 * @param  Exception $e 
-	 * @param  array $params 'text' - requeired, 'query' - optional
+	 * @param  string $additional additional information about log
 	 * @return boolean true if inserted successfully
 	 */
-	public static function insertThroughException($e, $params = []){
+	public static function insertThroughException($e, string $additional = NULL){
 		return self::insert([
 			'url' => $_SERVER['REQUEST_URI'],
 			'query' => isset($params['query']) ? $params['query'] : '',
 			'trace' => $e->getTraceAsString(),
+			'additional' => $additional,
 			'text' => $e->getMessage()
 		]);
 	}

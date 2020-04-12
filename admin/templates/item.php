@@ -106,8 +106,8 @@ switch ($act) {
 	case 'delete_foto':
 		$id = $_GET['id'];
 		core\Item::update(['foto' => ''], ['id' => $id]);
-		unlink(core\Config::getImgPath() . "/items/big/$id/{$_GET['title']}");
-		unlink(core\Config::getImgPath() . "/items/small/$id/{$_GET['title']}");
+		unlink(core\Config::$imgPath . "/items/big/$id/{$_GET['title']}");
+		unlink(core\Config::$imgPath . "/items/small/$id/{$_GET['title']}");
 		message('Фото успешно удалено');
 		header("Location: ?view=item&id={$_GET['id']}");
 		break;

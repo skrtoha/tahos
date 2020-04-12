@@ -1,7 +1,7 @@
 <?
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
-$abcp->render([13]); 
-$abcp->render([6]);
+$abcp->render(13); 
+$abcp->render(6);
 
 $mikado = new core\Provider\Mikado($db);
 $mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
@@ -9,11 +9,11 @@ $mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
 $armtek = new core\Provider\Armtek($db);
 $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
-$favorite = new core\Provider\FavoriteParts($db);
-$favorite->getItem($abcp->item['brand'], $abcp->item['article']);
+// $favorite = new core\Provider\FavoriteParts($db);
+// $favorite->getItem($abcp->item['brand'], $abcp->item['article']);
 
-$rossko = new core\Provider\Rossko($db, "{$abcp->item['article']} {$abcp->item['brand']}");
-$rossko->execute();
+$rossko = new core\Provider\Rossko($db);
+$rossko->execute("{$abcp->item['article']} {$abcp->item['brand']}");
 
 $title = "Список предложений";
 

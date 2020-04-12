@@ -22,9 +22,21 @@ class DataBase {
 		if ($this->mysqli->connect_error) throw new DataBaseNoConnectException($this->mysqli->connect_error);
 		$this->mysqli->query("SET NAMES utf8");
 	}
-	public function setProfiling(){
+	public function setConnectionID($connection_id){
+		if ($connection_id){
+			$this->connection_id = $connection_id;
+			return true;
+		}
+		return false;
+	}
+	public function setProfiling($connection_id = null){
 		if (!$this->isProfiling) return false;
-		$this->profiling = new Profiling($this->config, $this->connection_id);
+		$connection_id = $connection_id ? $connection_id : $this->connection_id;
+		if ($this->setConnectionID($connection_id)){
+			$this->profiling = new Profiling($this->config, $this->connection_id);
+			return true;
+		}
+		return false;
 	}
 	private function getDurationOfLastQuery(){
 		if ($this->mysqli->error) return 'NULL';

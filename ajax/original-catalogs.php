@@ -69,7 +69,7 @@ switch($_POST['act']){
 				n.subgroups_exist!=1
 		", '');
 		while($row = $res_nodes->fetch_assoc()){
-			$path = core\Config::getImgPath() . "/nodes/small/{$_POST['brend']}/{$row['id']}.jpg";
+			$path = core\Config::$imgPath . "/nodes/small/{$_POST['brend']}/{$row['id']}.jpg";
 			$nodes[] = [
 				'id' => $row['id'],
 				'title' => $row['title'],
@@ -381,7 +381,7 @@ switch($_POST['act']){
 		else $db->update('vehicle_filter_values', ['title' => $_POST['title']], "`id`={$_POST['fv_id']}"); 
 		break;
 	case 'model_image_delete':
-		unlink(core\Config::getImgPath() . "/models/{$_POST['model_id']}.jpg");
+		unlink(core\Config::$imgPath . "/models/{$_POST['model_id']}.jpg");
 		break;
 	case 'node_change':
 		// print_r($_POST); exit();

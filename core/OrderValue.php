@@ -7,6 +7,7 @@ class OrderValue{
 	 * @param  [integer] $status_id 1, 2, 3, 6, 10, 11
 	 * @param  [array] $params 
 	 *         order_id, store_id, item_id - required for all statuses
+	 *         status = 1 - issued
 	 *         status = 2|3|8|10|11  - price, quan, user_id
 	 * @return [boolean] true if changed successfully
 	 */
@@ -17,7 +18,7 @@ class OrderValue{
 			//выдано
 			case 1:
 				$ov = $GLOBALS['db']->select_one('orders_values', '*', Provider::getWhere($params));
-				$quan = $ov['arrived'] - $ov['issued'];
+				$quan = $params['issued'];
 				$values['issued'] = "`issued` + $quan";
 				self::update($values, $params);
 				$user = User::get($ov['user_id']);

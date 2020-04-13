@@ -14,31 +14,30 @@ $user = $db->select_one('users', 'id,bonus_program,bonus_count', "`id`={$_POST['
 $settings = $db->select_one('settings', '*', '`id`=1');
 
 $post = $_POST;
-$orderValue = new core\OrderValue($db);
 switch($_POST['status_id']){
 	case 1://выдано
-		$post['quan'] = $_POST['arrived'];
-		$orderValue->changeStatus(1, $post);
+		$post['issued'] = $_POST['arrived'];
+		core\OrderValue::changeStatus(1, $post);
 		break;
 	case 2://возврат
 		// print_r($_POST); exit();
 		$post['quan'] = $_POST['new_returned'];
-		$orderValue->changeStatus(2, $post);
+		core\OrderValue::changeStatus(2, $post);
 		break;
 	case 3://пришло
 		$post['quan'] = $_POST['arrived'];
-		$orderValue->changeStatus(3, $post);
+		core\OrderValue::changeStatus(3, $post);
 		break;
 	case 6://нет в наличии
-		$orderValue->changeStatus(6, $post);
+		core\OrderValue::changeStatus(6, $post);
 		break;
 	case 8://отменен
 		$post['quan'] = $_POST['ordered'];
-		$orderValue->changeStatus(8, $post);
+		core\OrderValue::changeStatus(8, $post);
 		break;
 	case 11://заказано
 		$post['quan'] = $_POST['ordered'];
-		$orderValue->changeStatus(11, $post);
+		core\OrderValue::changeStatus(11, $post);
 		break;
 	case 'arrived_new':
 		// print_r($_POST);

@@ -43,11 +43,11 @@ class Issues{
 				],
 			'');
 			if ($insert_order_issue_values === true){
-				$orderValue = new core\OrderValue();
-				$orderValue->changeStatus(1, [
+				core\OrderValue::changeStatus(1, [
 					'order_id' => $a[0],
 					'store_id' => $a[2],
-					'item_id' => $a[1]
+					'item_id' => $a[1], 
+					'issued' => $issued
 				]);
 			}
 			else die("Ошибка: $this->db->$last_query | $insert_order_issue_values");

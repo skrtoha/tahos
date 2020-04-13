@@ -8,7 +8,6 @@ if (isset($_GET['ajax'])) $issues->getAjax();
 if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
 $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
-	// print_r($_SERVER);
 	if (!empty($_POST['income'])) $issues->setIncome();
 	$user = core\User::get($issues->user_id);
 	$page_title = "Выдача товара";
@@ -75,7 +74,7 @@ else{
 						<td class="amount">
 							<?=$v['arrived'] - $v['issued']?>
 						</td>
-						<td><span class="price_format"><?=$v['price'] * $v['arrived']?></span></td>
+						<td><span class="price_format"><?=$v['price'] * ($v['arrived'] - $v['issued'])?></span></td>
 						<td><?=$v['comment']?></td>
 						<td><a href="?view=orders&id=<?=$v['order_id']?>&act=change"><?=$v['order_id']?></a></td>
 						<td><?=$v['created']?></td>

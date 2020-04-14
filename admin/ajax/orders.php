@@ -152,7 +152,7 @@ switch($_POST['status_id']){
 		$db->update('orders_values', ['status_id' => 5], "`order_id`={$_POST['order_id']}");
 		break;
 	default:
-		$orderValue->changeStatus($_POST['status_id'], $_POST);
+		core\OrderValue::changeStatus($_POST['status_id'], $_POST);
 }
 
 ?>

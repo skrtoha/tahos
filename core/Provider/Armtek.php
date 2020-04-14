@@ -146,10 +146,7 @@ class Armtek extends Provider{
 				if ($from == 'mikado') $this->db->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $object->ZakazCode]);
 				return $item_id;
 			} 
-			else{
-				$this->log->error("$res: {$this->db->last_query}");
-				return false;
-			}
+			else return false;
 		}
 		else{
 			if ($from == 'mikado') $this->db->insert('mikado_zakazcode', ['item_id' => $item[0]['id'], 'ZakazCode' => $object->ZakazCode]);

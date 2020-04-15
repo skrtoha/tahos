@@ -32,10 +32,10 @@ class Abcp extends Provider{
 				'userlogin' => 'info@tahos.ru',
 				'userpsw' => '1031786'
 			],
-			// 'entity' => [
-			// 	'userlogin' => 'info@tahos.ru',
-			// 	'userpsw' => '1031786',
-			// ],
+			'entity' => [
+				'userlogin' => 'info@tahos.ru',
+				'userpsw' => '1031786',
+			],
 			'provider_id' => 13,
 			'shipmentMethod' => 1,
 			'paymentMethod' => 6,
@@ -98,7 +98,7 @@ class Abcp extends Provider{
 				si.item_id = $item_id AND ps.provider_id = $provider_id
 		"; 
 	}
-	private static function getParam(int $provider_id, string $user_type = 'private'){
+	private static function getParam(int $provider_id, $user_type = 'private'){
 		$param = self::$params[$provider_id];
 		switch($provider_id){
 			case 6:
@@ -347,11 +347,12 @@ class Abcp extends Provider{
 		if (!empty($private)){
 			$responseAddToBasket = self::addToBasket($private, $provider_id, 'private');
 			self::parseResponseAddToBasket($responseAddToBasket, $private);
-			// self::sendBasketToOrder($provider_id, 'private');
+			self::sendBasketToOrder($provider_id, 'private');
 		}
 		if (!empty($entity)){
 			$responseAddToBasket = self::addToBasket($entity, $provider_id, 'entity');
 			self::parseResponseAddToBasket($responseAddToBasket, $entity);
+			self::sendBasketToOrder($provider_id, 'entity');
 		}
 	}
 	private static function addToBasket($items, $provider_id, $user_type = 'private'){
@@ -410,7 +411,7 @@ class Abcp extends Provider{
 	}
 	private static function getShipmentDate($provider_id){
 		if ($provider_id == 13) return '';
-		$param = self::getParam($provider_id, $user_type);
+		$param = self::getParam($provider_id);
 		$url =  "{$param['url']}/basket/shipmentDates/?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw']);
 		$response = parent::getUrlData($url);
 		$res = json_decode($response, true);
@@ -425,14 +426,15 @@ class Abcp extends Provider{
 			[
 				'userlogin' => $param['userlogin'],
 				'userpsw' => md5($param['userpsw']),
-				'paymentMethod' => $param['paymentMethod'][$user_type],
+				'paymentMethod' => $param['paymentMethod'],
 				'shipmentAddress' => $param['shipmentAddress'],
 				'shipmentOffice' => isset($param['shipmentOffice']) ? $param['shipmentOffice'] : '',
 				'shipmentMethod' => isset($param['shipmentMethod']) ? $param['shipmentMethod'] : '',
 				'shipmentDate' => $shipmentDate
 			]
 		);
-		var_dump($res);
+		$responseData = json_decode($res, true);
+		debug($responseData);
 	}
 }
 ?>

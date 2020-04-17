@@ -77,12 +77,14 @@ class FavoriteParts extends Provider{
 	public static function addToBasket($ov){
 		if (isset($ov['quan']) && $ov['quan']) $item = self::getItem($ov['brend'], $ov['article']);
 		else{
+			//эта часть кода используется если товар удаляется с корзины
 			$item = [
 				'goodsID' => $ov['goods'],
 				'warehouseGroup' => $ov['warehouseGroup']
 			];
 			$ov['quan'] = 0;
 		} 
+		// debug($ov, 'ov');	debug($item, 'item'); 
 		$warehouseGroup = self::getWarehouseGroup($ov, $item);
 		if (!$warehouseGroup){
 			Log::insert([

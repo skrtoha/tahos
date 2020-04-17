@@ -473,8 +473,10 @@ switch($_GET['act']){
 			$db->query("
 				DELETE si FROM
 					#store_items si
-				WHERE 
-					si.store_id = $store_id
+				LEFT JOIN
+					#provider_stores ps ON ps.id = si.store_id
+				WHERE
+					ps.provider_id = 2 AND si.store_id != 4
 			", '');
 			
 			// $res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$fileName}.zip");
@@ -762,6 +764,17 @@ switch($_GET['act']){
 			", '');
 			break;
 		}
+
+		//добавлено специально для Армтек, чтобы если грузится ARMK, то очищаются 
+		//все склады, кроме ARMC
+		if ($store['id'] == 4) $db->query("
+				DELETE si FROM
+					#store_items si
+				LEFT JOIN
+					#provider_stores ps ON ps.id = si.store_id
+				WHERE
+					ps.provider_id = 2 AND si.store_id != 3
+			", '');
 		
 		if ($emailPrice['isArchive']){
 			$zipArchive = new ZipArchive();

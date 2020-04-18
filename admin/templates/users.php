@@ -593,7 +593,7 @@ function search_history(){
 		WHERE
 			user_id = {$_GET['id']}
 	", '');
-	$user = core\User::get($_SESSION['user']);
+	$user = core\User::get($_GET['id']);
 	$page_title = 'История поиска';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
@@ -623,7 +623,7 @@ function search_history(){
 function basket(){
 	global $db, $status, $page_title;
 	$basket = core\Basket::get($_GET['id']);
-	$user = core\User::get($_SESSION['user']);
+	$user = core\User::get($_GET['id']);
 	$page_title = 'Корзина';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";

@@ -141,7 +141,7 @@ else{
 							<div class="product">
 								<p>
 									<b class="brend_info" brend_id="<?=$item['brend_id']?>"><?=$item['brend']?></b> 
-									<a href="<?=getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
+									<a href="<?=core\Item::getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
 								</p>
 								<p><strong><?=$item['title_full']?></strong></p>
 								<div class="pic-and-description">
@@ -205,7 +205,7 @@ else{
 									<tr class="product-popup-link" item_id="<?=$item['id']?>">
 										<td class="name-col">
 											<b class="brend_info" brend_id="<?=$item['brend_id']?>"><?=$item['brend']?></b> 
-											<a href="<?=getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
+											<a href="<?=core\Item::getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
 											<?=$item['title_full']?>
 										</td>
 										<?if (count($filters)){

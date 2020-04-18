@@ -38,7 +38,7 @@ $status_classes = [
 					<tr order_id="<?=$order['order_id']?>" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" class="<?=$blocked?>">
 						<td class="name-col">
 							<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> 
-							<a href="<?=getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
+							<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
 							<?=$order['title_full']?>
 						</td>
 						<td <?=$order['noReturn']?>><?=$order['cipher']?></td>

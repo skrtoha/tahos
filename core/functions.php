@@ -145,11 +145,6 @@ function get_user_price($price, $user){
 	}
 	return '<span class="price_format">'.$value.'</span>';
 }
-//для перевода в рубли из формы фильтра при поиске артикля
-//для отображения если нету поставщиков
-function getHrefArticle($article){
-	return "/search/article/$article";
-}
 function getStrTemplate($template){
 	global $db, $deliveries;
 	$str = '';
@@ -588,7 +583,7 @@ function get_basket(){
 	foreach($basket as $key => $value){
 		$b = & $basket[$key];
 		unset($b['user_id'], $b['comment']);
-		$b['href'] = getHrefArticle($b['article']);
+		$b['href'] = core\Item::getHrefArticle($b['article']);
 	} 
 	return $basket;
 }

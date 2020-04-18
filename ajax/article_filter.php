@@ -22,7 +22,7 @@ $array = article_store_items($_POST['item_id'], $filters, $_POST['search_type'])
 $store_items = & $array['store_items'];
 foreach ($store_items as $k => $v){
 	$si = & $store_items[$k];
-	$si['href_article'] = getHrefArticle($si['article']);
+	$si['href_article'] = core\Item::getHrefArticle($si['article']);
 	if (!empty($si['list'])){
 		$si['min_price']['user_price'] = get_user_price($si['min_price']['price'], $user).$user['designation'];
 		foreach($si['list'] as $key => $value){

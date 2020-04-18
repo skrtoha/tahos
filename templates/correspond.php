@@ -128,7 +128,7 @@ $title = $messages[0]['theme'];
 		<tr>
 			<td class="name-col">
 				<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> 
-				<a class="articul" href="<?=getHrefArticle($order['article'])?>">
+				<a class="articul" href="<?=core\Item::getHrefArticle($order['article'])?>">
 					<?=$order['article']?>
 				</a>
 				 <?=$order['title']?> 
@@ -149,7 +149,7 @@ $title = $messages[0]['theme'];
 			<td>
 			<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b>
 			<br> 
-			<a class="articul" href="<?=getHrefArticle($order['article'])?>"></a> <br> 
+			<a class="articul" href="<?=core\Item::getHrefArticle($order['article'])?>"></a> <br> 
 			<?=$order['title']?> 
 			<br>
 			<br>

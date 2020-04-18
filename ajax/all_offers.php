@@ -19,7 +19,7 @@ $currencies = $db->select('currencies', 'id,rate,designation', '', '', '', '', t
 if ($_POST['type'] == 'full'){?>
 	<td style="padding: 20px 0 0 0;text-align:left">
 		<b style="font-weight: 700"><?=$_POST['brend']?></b>
-		<a href="<?=getHrefArticle($_POST['article'])?>" class="articul"><?=$_POST['article']?></a>
+		<a href="<?=core\Item::getHrefArticle($_POST['article'])?>" class="articul"><?=$_POST['article']?></a>
 	</td>
 	<!-- наименование с фотоаппаратом -->
 	<td class="name-col" style="padding-top: 20px;text-align:left">

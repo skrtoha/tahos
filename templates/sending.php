@@ -80,7 +80,7 @@ if (!$_GET['id']){
 						<tr>
 							<td class="name-col">
 								<b style="font-weight: 700"><?=$item['brend']?></b> 
-								<a href="<?=getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
+								<a href="<?=core\Item::getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
 								<?=$item['title']?>
 							</td>
 							<td><?=$item['date']?></td>
@@ -115,7 +115,7 @@ if (!$_GET['id']){
 						<tr>
 							<td class="name-col">
 								<b style="font-weight: 700"><?=$item['brend']?></b>  <br>
-								<a href="<?=getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a>  <br>
+								<a href="<?=core\Item::getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a>  <br>
 								<?=$item['title']?> <br> <br>
 								<p>Поступление на склад: <?=$item['date']?></p>
 								<p>Количество: <span class="quan"><?=$item['quan']?></span></p>

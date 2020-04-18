@@ -29,7 +29,7 @@ $inBasket = json_encode(getInBasket($basket));
 						<b class="brend_info" brend_id="<?=$si['brend_id']?>">
 							<?=$si['brend']?>
 						</b>
-						<a href="<?=getHrefArticle($si['article'])?>" class="articul">
+						<a href="<?=core\Item::getHrefArticle($si['article'])?>" class="articul">
 							<?=$si['article']?>
 						</a>
 					</td>
@@ -218,7 +218,7 @@ $inBasket = json_encode(getInBasket($basket));
 							<b class="brend_info" brend_id="<?=$si['brend_id']?>">
 								<?=$si['brend']?>
 							</b>
-							<a href="<?=getHrefArticle($si['article'])?>" class="articul">
+							<a href="<?=core\Item::getHrefArticle($si['article'])?>" class="articul">
 								<?=$si['article']?>
 							</a>
 						</td>
@@ -376,7 +376,7 @@ $inBasket = json_encode(getInBasket($basket));
 				<tr class="shown button-row empty">
 					<td class="button_padding">
 						<b class="brend_info" brend_id="<?=$si['brend_id']?>"><?=$si['brend']?></b>
-						<a href="<?=getHrefArticle($si['article'])?>" class="articul"><?=$si['article']?></a>
+						<a href="<?=core\Item::getHrefArticle($si['article'])?>" class="articul"><?=$si['article']?></a>
 						<input type="hidden" id="item_id" value="<?=$si['item_id']?>">
 					</td>
 					<td class="name-col">
@@ -407,7 +407,7 @@ else{?>
 			<div class="goods-header">
 				<p>
 					<b class="brend_info" brend_id="<?=$si['brend_id']?>"><?=$si['brend']?></b>
-					<a href="<?=getHrefArticle($si['article'])?>" class="articul"><?=$si['article']?></a>
+					<a href="<?=core\Item::getHrefArticle($si['article'])?>" class="articul"><?=$si['article']?></a>
 				</p>
 				<p><?=$si['title_full']?></p>
 			</div>

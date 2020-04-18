@@ -203,7 +203,7 @@ $orders = get_order_group($params, '');
 								<tr order_id="<?=$order['order_id']?>">
 									<td class="name-col">
 										<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> 
-										<a href="<?=getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
+										<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
 										<?=$order['title']?>
 									</td>
 									<td <?=$order['noReturn']?>><?=$order['cipher']?></td>
@@ -371,7 +371,7 @@ $orders = get_order_group($params, '');
 								}?>
 								<tr order_id="<?=$order['order_id']?>">
 									<td>
-										<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> <br> <a href="<?=getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> <br> <?=$order['title']?> <br> <br>
+										<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> <br> <a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> <br> <?=$order['title']?> <br> <br>
 										Поставщик: <strong><?=$order['cipher']?></strong> <br>
 										Дата заказа: <strong><?=$order['date_from']?></strong> <br>
 										Дата доставки: <strong><?=$order['date_to']?></strong> <br>

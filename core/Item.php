@@ -54,4 +54,7 @@ class Item{
 				)
 		", '');
 	}
+	public static function getHrefArticle($article){
+		return "/search/article/$article";
+	}
 }

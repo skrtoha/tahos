@@ -45,7 +45,7 @@ $favorites = $db->select_unique("
 				<tr class="item_id" item_id="<?=$value['item_id']?>">
 					<td>
 						<b class="brend_info" brend_id="<?=$value['brend_id']?>"><?=$value['brend']?></b> 
-						<a href="<?=getHrefArticle($value['article'])?>" class="articul"><?=$value['article']?></a>
+						<a href="<?=core\Item::getHrefArticle($value['article'])?>" class="articul"><?=$value['article']?></a>
 					</td>
 					<td class="name-col">
 						<?if ($value['is_desc']){?>
@@ -72,7 +72,7 @@ $favorites = $db->select_unique("
 					<div class="goods-header">
 						<p>
 							<b class="brend_info" brend_id="<?=$value['brend_id']?>"><?=$value['brend']?></b>  
-							<a href="<?=getHrefArticle($value['article'])?>" class="articul"><?=$value['article']?></a>
+							<a href="<?=core\Item::getHrefArticle($value['article'])?>" class="articul"><?=$value['article']?></a>
 						</p>
 						<p><a href="#"></a><?=$value['title_full']?></p>
 						<i class="fa fa-camera product-popup-link" aria-hidden="true"></i>

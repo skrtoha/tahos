@@ -36,10 +36,17 @@ class User{
 				i.facebook AS issue_facebook,
 				i.google AS issue_google,
 				i.ok AS issue_ok,
-				i.coords AS issue_coords
+				i.coords AS issue_coords,
+				IF(
+					u.organization_name <> '',
+					CONCAT_WS (' ', u.organization_name, ot.title),
+					CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
+				) AS full_name
 			FROM #users u
 			LEFT JOIN #currencies c ON c.id=u.currency_id
 			LEFT JOIN #issues i ON i.id=u.issue_id
+			LEFT JOIN 
+				#organizations_types ot ON ot.id=u.organization_type
 			WHERE u.id=$user_id
 		";
 		$res = $db->query($q_user, '');

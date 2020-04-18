@@ -58,6 +58,8 @@ switch ($act) {
 	case 'funds': funds(); break;
 	case 'user_order_add': user_order_add(); break;
 	case 'form_operations': form_operations('add'); break;
+	case 'search_history': search_history(); break;
+	case 'basket': basket(); break;
 	case 'checkOrderedWithReserved':
 		debug($_GET);
 		$res = $db->query("
@@ -186,6 +188,9 @@ function show_form($act){
 		<a href="?view=order_issues&user_id=<?=$id?>">На выдачу</a>
 		<a href="?view=order_issues&user_id=<?=$id?>&issued=1">Выданные</a>
 		<a href="?view=users&act=checkOrderedWithReserved&user_id=<?=$id?>">Сверить "заказано"</a>
+		<a href="?view=users&act=checkOrderedWithReserved&user_id=<?=$id?>">Сверить "заказано"</a>
+		<a href="?view=users&id=<?=$id?>&act=search_history">История поиска</a>
+		<a href="?view=users&id=<?=$id?>&act=basket">Товары в корзине</a>
 		<a href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
 		<div style="width: 100%; height: 10px"></div>
 	<?}?>
@@ -543,13 +548,6 @@ function user_order_add(){
 		</div>
 	</div>
 <?}
-function item_come(){
-	global $db;
-	$orders_values = $db->query("
-		SELECT
-			ov.id,
-	");
-}
 function setUserOrder(){
 	global $db;
 	// debug($_POST); exit();
@@ -578,4 +576,84 @@ function setUserOrder(){
 	message('Заказ успешно сохранен!');
 	header("Location: /admin/?view=orders&act=change&id=$order_id");
 }
+function search_history(){
+	global $db, $status, $page_title;
+	$res_search = $db->query("
+		SELECT
+			CASE
+				WHEN s.type = 1 THEN \"article\"
+				WHEN s.type = 2 THEN \"barcode\"
+				WHEN s.type = 3 THEN \"VIN\"
+			END as type,
+			s.text,
+			s.title,
+			DATE_FORMAT(`date`, '%d.%m.%Y %H:%i:%s') as date
+		FROM
+			#search s
+		WHERE
+			user_id = {$_GET['id']}
+	", '');
+	$user = core\User::get($_SESSION['user']);
+	$page_title = 'История поиска';
+	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
+	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
+	?>
+	<table class="t_table" cellspacing="1">
+		<tr class="head">
+			<td>Тип</td>
+			<td>Текст</td>
+			<td>Название</td>
+			<td>Дата</td>
+		</tr>
+		<?if ($res_search->num_rows){
+			foreach($res_search as $value){?>
+				<tr>
+					<td><?=$value['type']?></td>
+					<td><?=$value['text']?></td>
+					<td><?=$value['title']?></td>
+					<td><?=$value['date']?></td>
+				</tr>
+			<?}
+		}
+		else{?>
+			<tr><td colspan="4">Историю поиска не найдено</td></tr>
+		<?}?>
+	</table>
+<?}
+function basket(){
+	global $db, $status, $page_title;
+	$basket = core\Basket::get($_GET['id']);
+	$user = core\User::get($_SESSION['user']);
+	$page_title = 'Корзина';
+	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
+	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
+	?>
+	<table class="t_table" cellspacing="1">
+		<tr class="head">
+			<td>Бренд</td>
+			<td>Наименование</td>
+			<td>Поставщик</td>
+			<td>Срок</td>
+			<td>Количество</td>
+			<td>Цена</td>
+			<td>Сумма</td>
+		</tr>
+		<?if (count($basket)){
+			foreach($basket as $value){?>
+				<tr>
+					<td><?=$value['brend']?></td>
+					<td><?=$value['title']?></td>
+					<td><?=$value['cipher']?></td>
+					<td><?=$value['delivery']?></td>
+					<td><?=$value['quan']?></td>
+					<td><?=$value['price']?></td>
+					<td><?=$value['quan'] * $value['price']?></td>
+				</tr>
+			<?}
+		}
+		else{?>
+			<tr><td colspan="4">Историю поиска не найдено</td></tr>
+		<?}?>
+	</table>
+<?}
 ?>

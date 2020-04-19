@@ -159,7 +159,10 @@ function get_summ($order){
 		if (in_array($statuses[$i], [6, 8])) continue;
 		$summ += $prices[$i] * $quans[$i];
 		if ($ordered[$i]) $summ -= ($quans[$i] - $ordered[$i]) * $prices[$i];
-		if ($arrived[$i]) $summ -= ($ordered[$i] - $arrived[$i]) * $prices[$i];
+
+		//закоментировано, т.к. если пришел не весь товар, то сумма уменьшалась
+		// if ($arrived[$i]) $summ -= ($ordered[$i] - $arrived[$i]) * $prices[$i];
+		
 		if ($issued[$i]) $summ -= ($arrived[$i] - $issued[$i]) * $prices[$i];
 		if ($returned[$i]) $summ -= $returned[$i] * $prices[$i];
 	} 

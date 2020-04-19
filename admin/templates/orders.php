@@ -330,7 +330,9 @@ function show_form($act){
 								$summ = 0;
 								break;
 							case 3://пришло
-								$summ = $ov['price'] * ($ov['arrived'] - $ov['issued']);
+								//закоментировано, т.к. если пришел не весь товар, то сумма уменьшалась
+								// $summ = $ov['price'] * ($ov['arrived'] - $ov['issued']);
+								$summ = $ov['price'] * $ov['ordered'];
 								if ($ov['issued'] && $ov['issued'] < $ov['arrived']){?>
 									<br>Пришло - <?=$ov['arrived'] - $ov['issued']?> шт.
 									<br>Выдано - <?=$ov['issued']?> шт.

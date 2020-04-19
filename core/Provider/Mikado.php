@@ -315,7 +315,7 @@ class Mikado extends Provider{
 				$DeliveryType = $this->getDeliveryType($ZakazCode, $ov['store_id']);
 				if (!$DeliveryType) throw new Exception("Ошибка получения DeliveryType по $ZakazCode");
 			} catch(Exception $e){
-				Log::insertThroughException($e, "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}");
+				Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
 				return fase;
 			}
 		} 
@@ -338,7 +338,7 @@ class Mikado extends Provider{
 			);
 			if (!$xml) throw new Exception("Ошибка отправки заказа в Микадо");
 		} catch(Exception $e){
-			Log::insertThroughException($e, "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}");
+			Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
 			return false;
 		}
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);

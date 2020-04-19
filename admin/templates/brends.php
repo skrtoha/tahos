@@ -419,7 +419,7 @@ function chb(){
 	global $status, $db, $page_title;
 	if ($_POST['submit_chb']){
 		$submit = submit_chb();
-		message("Успешно выполнено! Изменено $submit товаров");
+		message("Успешно выполнено! Изменено {$submit['updated']} товаров. Изменено аналогов: {$submit['replacedAnalogies']}");
 	}
 	$page_title = 'Перевод из одного бренда в другой';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";
@@ -455,26 +455,40 @@ function chb(){
 function submit_chb(){
 	global $db;
 	$updated = 0;
+	$replacedAnalogies = 0;
 	if (!$_POST['brend_from'] || !$_POST['brend_to']) return 'Выберите оба бренда!';
-	$res = $db->query("
+	$res_items = $db->query("
 		SELECT
-			id,
-			article
+			i.id,
+			i.brend_id,
+			i.article
 		FROM
-			#items
+			#items i
 		WHERE
-			brend_id={$_POST['brend_from']}
+			i.brend_id = {$_POST['brend_from']}
 	", '');
-	if (!$res->num_rows) return false;
-	while ($row = $res->fetch_assoc()){
-		$r = $db->update(
-			'items',
-			['brend_id' => $_POST['brend_to']],
-			"id={$row['id']}"
-		);
-		if ($r === true) $updated++;
+	if (!$res_items->num_rows) return false;
+	foreach($res_items as $item){
+		$res_update = $db->update('items', ['brend_id' => $_POST['brend_to']], "`id` = {$item['id']}");
+		if ($res_update === true){
+			$uploaded++;
+			continue;
+		}
+		$array = core\Item::get($_POST['brend_to'], $item['article']);
+		$item_id = $array['id'];
+		try{
+			$res = $db->update('analogies', ['item_id' => $item_id], "`item_id` = {$item['id']}");
+			if ($res === true) $replacedAnalogies += $db->rows_affected();
+			else throw new Exception($res);
+		}
+		catch(Exception $e){
+			core\Log::insertThroughException($e);
+		}
 	}
-	return $updated;
+	return [
+		'updated' => $updated,
+		'replacedAnalogies' => $replacedAnalogies
+	];
 }
 function brend_set_image($file, $id = 0){
 	global $db;

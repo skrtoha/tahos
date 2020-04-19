@@ -17,6 +17,9 @@ class Item{
 		if ($item['is_blocked'] || empty($item)) return false;
 		return self::processUpdate($fields, $where);
 	}
+	public static function get($brend_id, $article){
+		return $GLOBALS['db']->select_one('items', '*', "`brend_id` = $brend_id AND `article` = '$article'");
+	}
 	private function processUpdate($fields, $where){
 		$conditions = '';
 		foreach($where as $key => $value) $conditions .= "`{$key}` = '{$value}' AND ";

@@ -21,7 +21,7 @@ switch ($act) {
 				try{
 					throw new Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");
 				} catch(Exception $e){
-					core\Log::insertThroughException($e, "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}");
+					core\Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
 					continue;
 				}
 			} 

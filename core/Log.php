@@ -24,12 +24,12 @@ class Log{
 	 * @param  string $additional additional information about log
 	 * @return boolean true if inserted successfully
 	 */
-	public static function insertThroughException($e, string $additional = NULL){
+	public static function insertThroughException($e, array $params = []){
 		return self::insert([
-			'url' => $_SERVER['REQUEST_URI'],
+			'url' => isset($params['url']) ? $params['url'] : $_SERVER['REQUEST_URI'],
 			'query' => isset($params['query']) ? $params['query'] : '',
 			'trace' => $e->getTraceAsString(),
-			'additional' => $additional,
+			'additional' => isset($params['additional']) ? $params['additional'] : '',
 			'text' => $e->getMessage()
 		]);
 	}

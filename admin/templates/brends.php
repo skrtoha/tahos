@@ -423,7 +423,7 @@ function chb(){
 	}
 	$page_title = 'Перевод из одного бренда в другой';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";
-	$brends = $db->select('brends', 'id,title', '`parent_id`=0');?>
+	$brends = $db->select('brends', 'id,title', '`parent_id`=0', 'title', true);?>
 	<div class="t_form">
 		<div class="bg">
 			<form method="post" enctype="multipart/form-data">

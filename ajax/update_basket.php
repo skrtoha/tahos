@@ -12,22 +12,11 @@ switch($_GET['act']){
 	case 'update_price':
 		$db->update(
 			'basket', 
-			['price' => $_GET['new_price']],
+			['price' => $_GET['price']],
 			"
 				`user_id`={$_SESSION['user']} AND 
 				`item_id`={$_GET['item_id']} AND 
-				`provider_id`={$_GET['provider_id']}
-			"
-		);
-		break;
-	case 'update_quan':
-		$db->update(
-			'basket', 
-			['quan' => $_GET['quan']],
-			"
-				`user_id`={$_SESSION['user']} AND 
-				`item_id`={$_GET['item_id']} AND 
-				`provider_id`={$_GET['provider_id']}
+				`store_id`={$_GET['store_id']}
 			"
 		);
 		break;

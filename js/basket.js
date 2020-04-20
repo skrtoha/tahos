@@ -2,12 +2,22 @@ $(function(){
 	$('input[type=checkbox]').styler();
 	$(".count-block .minus, .count-block .plus").click(function(event) {
 		var e = $(this);
+		var available = + e.closest('tr').find('input[name=available]').val();
+		if (available !== 'undefined'){
+			if (available == -1) return show_message('Данной позиции нет в наличии!', 'error');
+		}
+		if (!e.closest('tr').find('input[name=toOrder]').prop('checked')) return false;
 		var act = e.attr('class');
 		e = $(this).parent();
 		var store_id = e.attr('store_id');
 		var item_id = e.attr('item_id');
-		var packaging = +e.attr('packaging');
-		if (act == 'minus' && +e.find('input').val() - packaging == 0) return false;
+		var packaging = + e.attr('packaging');
+		if (act == 'minus' && + e.find('input').val() - packaging == 0) return false;
+		if (act == 'plus' && + e.find('input').val() + packaging > available) {
+			e.closest('div').nextAll('span.available').addClass('active');
+			return show_message('Превышено доступное количество!', 'error');
+		}
+		else e.closest('div').nextAll('span.available').removeClass('active');
 		var summand = e.attr('summand');
 		var sel = '[store_id=' + store_id + '][item_id=' + item_id + ']';
 		var data = 
@@ -282,6 +292,7 @@ $(function(){
 	})
 	$('input[name=toOrder]').on('change', function(){
 		var e = $(this);
+		if (e.closest('tr').find('input[name=available]').val() == '-1') return show_message('Данной позиции нет в наличии!', 'error');
 		if (e.attr('view_type') == 'mobile') var elem = e.closest('.good').find('.count-block');
 		else var elem = e.closest('tr').find('.count-block');
 		// console.log(elem);
@@ -298,7 +309,7 @@ $(function(){
 				item_id: elem.attr('item_id')
 			},
 			success: function(response){
-				console.log(response); return false;
+				// console.log(response); return false;
 			}
 		})
 	})

@@ -26,7 +26,7 @@ class Abcp extends Provider{
 			'providerStores' => array()
 		],
 		13 => [
-			'title' => 'М Партс',
+			'title' => 'МПартс',
 			'url' => 'http://v01.ru/api/devinsight',
 			'private' => [
 				'userlogin' => 'info@tahos.ru',
@@ -65,6 +65,22 @@ class Abcp extends Provider{
 					i.id=$item_id
 			", '');
 			$this->item = $this->item[0];
+		}
+	}
+	public static function getPrice(array $params)
+	{
+		$p = self::getParam($params['provider_id']);
+		$storeTitle = parent::getInstanceDataBase()->getField('provider_stores', 'title', 'id', $params['store_id']);
+		$distributorId = str_replace("{$p['title']}-", '', $storeTitle);
+		$res = parent::getUrlData(
+			"{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$params['article']}&brand={$params['brend']}"
+		);
+		$result = json_decode($res, true);
+		foreach($result as $value){
+			if ($value['distributorId'] == $distributorId) return [
+				'price' => $value['price'],
+				'available' => $value['availability']
+			];
 		}
 	}
 	public static function isInBasket($ov){
@@ -170,6 +186,7 @@ class Abcp extends Provider{
 		return $coincidences;
 	}
 	public function render($provider_id){
+		if(!parent::getIsEnabledApiSearch($provider_id)) return false;
 		//пока не понятно для чего эта строка
 		// if (!empty($providerStores) && !in_array($provider_id, $providerStores)) continue;
 

@@ -12,6 +12,36 @@ class FavoriteParts extends Provider{
 	public static $provider_id = 19;
 	public static $error;
 
+	public static function getPrice(array $params){
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$url = 'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$params['article'].'&brand='.$params['brend'].'&analogues=';
+		$response = self::getUrlData($url);
+		$array = json_decode($response, true);
+		if (isset($array['error'])) return false;
+		
+		$storeInfo = parent::getStoreInfo($params['store_id']);
+
+		$codes = [];
+		switch($storeInfo['cipher']){
+			case 'FAVO':
+				$codes = ['МС1', 'МС2'];
+				break;
+			case 'FAJA':
+				$codes = ['МЦС'];
+				break;
+		}
+
+		foreach($array['goods'] as $good){
+			if (empty($good['warehouses'])) continue;
+			foreach($good['warehouses'] as $warehouse){
+				if (in_array($warehouse['code'], $codes)) return [
+					'price' => $warehouse['price'],
+					'available' => $warehouse['stock']
+				];
+			}
+		}
+	}
+
 	/**
 	 * gets items by article
 	 * @param  [string] $search search article

@@ -11,7 +11,7 @@ class Mikado extends Provider{
 	public static $provider_id = 8;
 	private $armtek;
 	private $brends;
-	public $stocks = [
+	public static $stocks = [
 		1 => 14,
 		10 => 13,
 		35 => 12
@@ -26,6 +26,72 @@ class Mikado extends Provider{
 			'Password' => 'Vadim888'
 		]
 	];
+	public static function getPrice(array $params){
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$clientData = self::getClientData();
+		$xml = self::getUrlData(
+			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
+			[
+				'Search_Code' => $params['article'],
+				'ClientID' => $clientData['ClientID'],
+				'Password' => $clientData['Password'],
+				'FromStockOnly' => 'FromStockOnly'  			
+			]
+		);
+		if (!$xml) return false;
+		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
+		$result = json_decode(json_encode($result));
+		if (empty($result->List)) return false;
+
+		$ZakazCode = parent::getInstanceDataBase()->getField('mikado_zakazcode', 'ZakazCode', 'item_id', $params['item_id']);
+		$StokID = self::getStockId($params['store_id']);
+
+		$r = & $result->List->Code_List_Row;
+		if (is_array($r)){
+			foreach($r as $row){
+				if ($row->ZakazCode != $ZakazCode) continue;
+				if (empty($row->OnStocks)) return [
+					'price' => $row->PriceRUR,
+					'available' => 0
+				];
+				if (is_array($row->OnStocks->StockLine)){
+					foreach($row->OnStocks->StockLine as $stock){
+						if ($stock->StokID == $StokID) return [
+							'price' => $row->PriceRUR,
+							'available' => $stock->StockQTY
+						];
+					}
+				}
+				else{
+					if ($row->OnStocks->StockLine->StokID == $StokID) return [
+						'price' => $row->PriceRUR,
+						'available' => $row->OnStocks->StockLine->StockQTY
+					];
+				}
+			} 
+		}
+		else{
+			if ($r->ZakazCode != $ZakazCode) return false;
+			if (empty($r->OnStocks)) return [
+				'price' => $r->PriceRUR,
+				'available' => 0
+			];
+			if (is_array($r->OnStocks->StockLine)){
+				foreach($r->OnStocks->StockLine as $stock){
+					if ($stock->StokID == $StokID) return [
+						'price' => $r->PriceRUR,
+						'available' => $stock->StockQTY
+					];
+				}
+			}
+			else{
+				if ($r->OnStocks->StockLine->StokID == $StokID) return [
+					'price' => $r->PriceRUR,
+					'available' => $r->OnStocks->StockLine->StockQTY
+				];
+			}
+		} 
+	}
 	public static function getItemsToOrder(int $provider_id = null, $order_id = null){
 		$clientData = self::getClientData($order_id);
 		$xml = self::getUrlData(
@@ -226,7 +292,7 @@ class Mikado extends Provider{
 		}
 	}
 	private function parseStockLine($stock, $item_id, $row){
-		$store_id = $this->stocks[$stock->StokID];
+		$store_id = self::$stocks[$stock->StokID];
 		// debug($stock, "store_id = $store_id"); return;
 		if (!$store_id) return false;
 		$this->db->insert(
@@ -247,11 +313,11 @@ class Mikado extends Provider{
 		);
 	}
 	public function isStoreMikado($store_id){
-		if (array_search($store_id, $this->stocks)) return true;
+		if (array_search($store_id, self::$stocks)) return true;
 		return false;
 	}
-	protected function getStockId($store_id){
-		foreach($this->stocks as $key => $value){
+	protected static function getStockId($store_id){
+		foreach(self::$stocks as $key => $value){
 			if ($value == $store_id) return $key;
 		}
 		throw new \Exception("Не удалось получить StockID по store_id = $store_id");

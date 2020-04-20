@@ -171,11 +171,75 @@ abstract class Provider{
 				`additional` = 'osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}'
 		", '');
 	}
-	static public function isInBasket($ov){
-		$api_title = self::getProviderAPITitle($ov['provider_id']);
+	public static function getStoreInfo(int $store_id, $flag = ''): array
+	{
+		static $storeInfo;
+		if (isset($storeInfo[$store_id])) return $storeInfo[$store_id];
+		$res = self::getInstanceDataBase()->query("
+			SELECT
+				ps.id, 
+				ps.title,
+				ps.cipher,
+				ps.percent,
+				c.rate
+			FROM
+				#provider_stores ps
+			LEFT JOIN
+				#currencies c ON c.id = ps.currency_id
+			WHERE
+				ps.id = $store_id
+		", $flag);
+		if (!$res->num_rows) return false;
+		$storeInfo[$store_id]  = $res->fetch_assoc();
+		return $storeInfo[$store_id]; 
+	}
+	/**
+	 * increases price taking into account markup of provider and discount of user
+	 * @param  double $price 
+	 * @param  int $store_id
+	 * @param  int $user_id
+	 * @return int
+	 */
+	public static function getPriceWithMarkups($price, int $store_id, int $user_id)
+	{
+		$storeInfo = self::getStoreInfo($store_id, '');
+		$userInfo = User::get($user_id);
+		$price = $price + $price * $storeInfo['percent'] / 100 - $price * $userInfo['discount'] / 100;
+		return ceil($price);
+	}
+	/**
+	 * gets price from provider by article and brend
+	 * @param  array  $params provider_id, store_id, article, brend, user_id
+	 * @return array price, in_stock
+	 */
+	public static function getPrice(array $params){
+		if (!$params['provider_id']) return false;
+		if (!$params['store_id']) throw new Exception\InvalidStoreIDException;
+		$provider = self::getInstanceProvider($params['provider_id']);
+		if (!$provider || !self::getIsEnabledApiOrder($params['provider_id'])) return [
+			'price' => 0,
+			'available' => $params['in_stock']
+		];
+		$price = $provider::getPrice($params);
+		if (!$price) return [
+			'price' => 0,
+			'available' => -1
+		];
+		if (!$price['price']) return false;
+		$price['price'] = self::getPriceWithMarkups($price['price'], $params['store_id'], $params['user_id']);
+		// debug($price, get_class($provider) . " {$params['article']}");
+		return $price;
+	}
+	private static function getInstanceProvider($provider_id){
+		if (!$provider_id) throw new Exception\InvalidProviderIDException;
+		$api_title = self::getProviderAPITitle($provider_id);
 		if (!$api_title) return false;
 		$api_title = 'core\Provider\\'.$api_title;
-		$provider = new $api_title;
+		return new $api_title;
+	}
+	static public function isInBasket($ov){
+		$provider = self::getInstanceProvider($ov['provider_id']);
+		if (!$provider) return false;
 		return $provider::isInBasket($ov);
 	}
 	static public function removeFromBasket($ov){

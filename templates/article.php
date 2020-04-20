@@ -9,9 +9,6 @@ $mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
 $armtek = new core\Provider\Armtek($db);
 $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
-// $favorite = new core\Provider\FavoriteParts($db);
-// $favorite->getItem($abcp->item['brand'], $abcp->item['article']);
-
 $rossko = new core\Provider\Rossko($db);
 $rossko->execute("{$abcp->item['article']} {$abcp->item['brand']}");
 

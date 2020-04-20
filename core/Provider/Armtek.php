@@ -45,6 +45,31 @@ class Armtek extends Provider{
 			$this->armtek_client = self::getClientArmtek();
 		} 
 	}
+	public static function getPrice(array $fields){
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$params = self::$params;
+		$params['PIN'] = $fields['article'];
+		$params['BRAND']	 = $fields['brend'];
+		$params['QUERY_TYPE']	= 1;
+		$params['KUNNR_RG'] = self::$KUNNR_RG['entity'];
+		$request_params = [
+			'url' => 'search/search',
+			'params' => $params
+		];
+		$response = self::getClientArmtek()->post($request_params);
+		$data = $response->json();
+		if ($data->STATUS == '401') return false;
+
+		$storeInfo = parent::getStoreInfo($fields['store_id']);
+
+		foreach($data->RESP as $value){
+			if ($value->KEYZAK == $storeInfo['title']) return [
+				'price' => $value->PRICE,
+				'available' => $value->RVALUE
+			];
+		}
+		return false;
+	}
 	private static function getClientArmtek(){
 		$armtek_client_config = new ArmtekRestClientConfig(self::$config);
 		return new ArmtekRestClient($armtek_client_config);

@@ -13,7 +13,6 @@ class Rossko extends Provider{
 			'trace' => true
 		)
 	);
-	private $countDaysOfChecking = 0;
 	private static $param = array(
 		'KEY1' => 'd3a3b2e361276178e60d8da2f9d553b4',
 		'KEY2' => 'd2697480a48aee9f6238818072235929',
@@ -365,6 +364,57 @@ class Rossko extends Provider{
 			if (self::getComparableString($Part->name)) $coincidences[$Part->brand] = $Part->name;
 		} 
 		return $coincidences;
+	}
+	public static function getPrice(array $params){
+		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		$query = self::getSoap('GetSearch');
+		if (!$query) return false;
+		$storeInfo = parent::getStoreInfo($params['store_id']);
+		
+		$param = self::$param;
+		$param['TEXT'] = "{$params['article']} {$params['brend']}";
+		$result = $query->GetSearch($param);
+		// debug($storeInfo);
+		if (!$result) return false;
+		if (!$result->SearchResult->success) return false;
+		$Part = $result->SearchResult->PartsList->Part;
+		if (is_array($Part)){
+			foreach($Part as $value){
+				if (!isset($value->stocks)) continue;
+				if (is_array($value->stocks->stock)){
+					foreach($value->stocks->stock as $v){
+						if ($v->id == $storeInfo['title']) return [
+							'price' => $v->price,
+							'available' => $v->count
+						];
+					} 
+				}
+				else{
+					if ($value->stocks->stock->id == $storeInfo['title']) return [
+						'price' => $value->stocks->stock->price,
+						'available' => $value->stocks->stock->count
+					];
+				} 
+			}
+		}
+		else{
+			if (!isset($Part->stocks)) return false;
+			if (is_array($Part->stocks->stock)){
+				foreach($Part->stocks->stock as $v){
+					if ($v->id == $storeInfo['title']) return [
+						'price' => $v->price,
+						'available' => $v->count
+					];
+				} 
+			}
+			else{
+				if ($Part->stocks->stock->id == $storeInfo['title']) return [
+					'price' => $Part->stocks->stock->price,
+					'available' => $Part->stocks->stock->count
+				];
+			} 
+		}
+		return false;
 	}
 	public function execute($search){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;

@@ -24,10 +24,10 @@ class FavoriteParts extends Provider{
 		$codes = [];
 		switch($storeInfo['cipher']){
 			case 'FAVO':
-				$codes = ['МС1', 'МС2'];
-				break;
-			case 'FAJA':
 				$codes = ['МЦС'];
+				break;
+			case 'FAMO':
+				$codes = ['МС1', 'МС2', 'Дилер OE', 'МСК'];
 				break;
 		}
 

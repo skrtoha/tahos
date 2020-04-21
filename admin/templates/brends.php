@@ -471,7 +471,7 @@ function submit_chb(){
 	foreach($res_items as $item){
 		$res_update = $db->update('items', ['brend_id' => $_POST['brend_to']], "`id` = {$item['id']}");
 		if ($res_update === true){
-			$uploaded++;
+			$updated++;
 			continue;
 		}
 		$array = core\Item::get($_POST['brend_to'], $item['article']);

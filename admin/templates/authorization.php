@@ -1,6 +1,6 @@
 <?
 $act = $_GET['act'];
-if (isset($_GET['auth']) && $_SERVER['REMOTE_ADDR'] == '91.105.237.20') $_SESSION['user'] = $_GET['auth'];
+if (isset($_GET['auth']) && $_SERVER['REMOTE_ADDR'] == '188.64.169.59') $_SESSION['user'] = $_GET['auth'];
 if ($_POST['name'] || $_GET['auth']){
 	if ($_POST['name'] == 'vadim' && $_POST['password'] == '10317' || isset($_GET['auth'])){
 		message('Вы успешно авторизовались!');

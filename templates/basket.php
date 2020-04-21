@@ -6,7 +6,7 @@ $user_id = $_SESSION['user'];
 if ($_GET['act'] == 'to_offer'){
 	// exit();
 	$res_basket = core\Basket::get($user_id, true);
-	if (!$basket->num_rows){
+	if (!$res_basket->num_rows){
 		message('Нечего отправлять!', false);
 		header('Location: /basket');
 		exit();

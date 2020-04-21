@@ -13,7 +13,6 @@ class FavoriteParts extends Provider{
 	public static $error;
 
 	public static function getPrice(array $params){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$url = 'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$params['article'].'&brand='.$params['brend'].'&analogues=';
 		$response = self::getUrlData($url);
 		$array = json_decode($response, true);

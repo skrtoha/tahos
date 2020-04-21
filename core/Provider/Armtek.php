@@ -46,7 +46,6 @@ class Armtek extends Provider{
 		} 
 	}
 	public static function getPrice(array $fields){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$params = self::$params;
 		$params['PIN'] = $fields['article'];
 		$params['BRAND']	 = $fields['brend'];

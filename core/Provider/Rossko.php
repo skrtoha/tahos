@@ -366,7 +366,6 @@ class Rossko extends Provider{
 		return $coincidences;
 	}
 	public static function getPrice(array $params){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$query = self::getSoap('GetSearch');
 		if (!$query) return false;
 		$storeInfo = parent::getStoreInfo($params['store_id']);

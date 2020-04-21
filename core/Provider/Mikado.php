@@ -27,7 +27,6 @@ class Mikado extends Provider{
 		]
 	];
 	public static function getPrice(array $params){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$clientData = self::getClientData();
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',

@@ -173,13 +173,19 @@ class Abcp extends Provider{
 		foreach(self::$params as $provider_id => $value){
 			if (!parent::getIsEnabledApiSearch($provider_id)) continue;
 			$param = self::getParam($provider_id);
-			$url = "{$param['url']}/search/brands?userlogin={$param['userlogin']}&userpsw=".md5($param['userpsw'])."&number=$search";
+			$url = "{$param['url']}/search/brands?".http_build_query([
+				'userlogin' => $param['userlogin'],
+				'userpsw' => md5($param['userpsw']),
+				'number' => $search
+			]);
 			$response = parent::getUrlData($url);
+			if ($response == 'maintenance' || !$response) return Log::insert([
+				'text' => "Не срабатывает api ".$value['title']." - ответ сервера: $response"
+			]);
 			$items = json_decode($response, true);
 			if (empty($items)) continue;
 			foreach($items as $value){
 				if (!self::getComparableString($value['description'])) continue;
-				// print_r($value);
 				$coincidences[$value['brand']] = $value['description'];
 			} 
 		}

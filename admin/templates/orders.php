@@ -44,8 +44,9 @@ switch ($act) {
 				default:
 					core\OrderValue::changeStatus(7, $ov);
 			}
-			
+			// echo "<hr>";	
 		}
+
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':

@@ -12,6 +12,18 @@ class FavoriteParts extends Provider{
 	public static $provider_id = 19;
 	public static $error;
 
+	private static function getCodesByCipher($cipher): array
+	{
+		switch($cipher){
+			case 'FAVO':
+				return ['МЦС'];
+				break;
+			case 'FAMO':
+				return ['МС1', 'МС2', 'Дилер OE', 'МСК'];
+				break;
+		}
+		return false;
+	}
 	public static function getPrice(array $params){
 		$url = 'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$params['article'].'&brand='.$params['brend'].'&analogues=';
 		$response = self::getUrlData($url);
@@ -20,15 +32,7 @@ class FavoriteParts extends Provider{
 		
 		$storeInfo = parent::getStoreInfo($params['store_id']);
 
-		$codes = [];
-		switch($storeInfo['cipher']){
-			case 'FAVO':
-				$codes = ['МЦС'];
-				break;
-			case 'FAMO':
-				$codes = ['МС1', 'МС2', 'Дилер OE', 'МСК'];
-				break;
-		}
+		$codes = self::getCodesByCipher($storeInfo['cipher']);
 
 		foreach($array['goods'] as $good){
 			if (empty($good['warehouses'])) continue;
@@ -104,24 +108,26 @@ class FavoriteParts extends Provider{
 	 * @return boolean true if successfully added, false if failed
 	 */
 	public static function addToBasket($ov){
-		if (isset($ov['quan']) && $ov['quan']) $item = self::getItem($ov['brend'], $ov['article']);
+		if (isset($ov['quan']) && $ov['quan']){
+			$item = self::getItem($ov['brend'], $ov['article']);
+			$codes = self::getCodesByCipher($ov['cipher']);
+			$warehouseGroup = self::getWarehouseGroupIDByCodes($item, $codes);
+			if (!$warehouseGroup){
+				Log::insert([
+					'text' => "Ошибка получения warehouseGroup для " . self::$error,
+					'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
+				]);
+				return false;
+			}
+		} 
 		else{
 			//эта часть кода используется если товар удаляется с корзины
 			$item = [
-				'goodsID' => $ov['goods'],
-				'warehouseGroup' => $ov['warehouseGroup']
+				'goodsID' => $ov['goods']
 			];
+			$warehouseGroup = $ov['warehouseGroup'];
 			$ov['quan'] = 0;
 		} 
-		// debug($ov, 'ov');	debug($item, 'item'); 
-		$warehouseGroup = self::getWarehouseGroup($ov, $item);
-		if (!$warehouseGroup){
-			Log::insert([
-				'text' => "Ошибка получения warehouseGroup для " . self::$error,
-				'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
-			]);
-			return false;
-		}
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/add/";
 		$url .= "?key=".self::$key;
 		$url .= '&developerKey='.self::$developerKey;
@@ -144,7 +150,6 @@ class FavoriteParts extends Provider{
 
 	public static function removeFromBasket($ov){
 		$basket = self::getBasket();
-		// debug($basket);
 		$osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 		foreach($basket['cart'] as $basket){
 			if ($basket['comment'] == $osi) return self::addToBasket($basket);
@@ -157,17 +162,9 @@ class FavoriteParts extends Provider{
 	 * @param  item $item array with goodsID and warehouseGroup
 	 * @return string id warehouse
 	 */
-	private static function getWarehouseGroup($ov, $item){
-		if ($ov['quan'] == 0) return $ov['warehouseGroup'];
+	private static function getWarehouseGroupIDByCodes($item, $codes){
 		foreach($item['warehouses'] as $value){
-			switch($ov['cipher']){
-				case 'FAVO':
-					if ($value['code'] == 'МС1' || $value['code'] == 'МС2') return $value['id'];
-					break;
-				case 'FAJA':
-					if ($value['code'] == 'МЦС') return $value['id'];
-					break;
-			}
+			if (in_array($value['code'], $codes)) return $value['id'];
 		}
 		self::$error = $item['warehouses'][0]['code'];
 		return false;
@@ -183,12 +180,7 @@ class FavoriteParts extends Provider{
 		// debug($ov, 'ov');
 		// debug($basket, 'basket');
 		foreach($basket['cart'] as $b){
-			$code = $basket['warehouseGroup'][$b['warehouseGroup']]['code'];
-			if (
-				self::getComparableString($basket['goods'][$b['goods']]['Brand']) == self::getComparableString($ov['brend']) &&
-				self::getComparableString($basket['goods'][$b['goods']]['Number']) == self::getComparableString($ov['article']) &&
-				$ov['cipher'] == self::getCipherByCode($code)
-			) return [
+			if ($b['comment'] == "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}") return [
 				'goodsID' => $b['goods'],
 				'warehouseGroup' => $b['warehouseGroup']
 			];

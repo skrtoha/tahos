@@ -93,7 +93,6 @@ class FavoriteParts extends Provider{
 	 * @return array array of items
 	 */
 	public static function getItem($brend, $article){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$url = 'http://api.favorit-parts.ru/hs/hsprice/?key='.self::$key.'&number='.$article.'&brand='.$brend.'&analogues=';
 		$response = self::getUrlData($url);
 		$GLOBALS['response_header'];
@@ -108,6 +107,7 @@ class FavoriteParts extends Provider{
 	 * @return boolean true if successfully added, false if failed
 	 */
 	public static function addToBasket($ov){
+		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
 		if (isset($ov['quan']) && $ov['quan']){
 			$item = self::getItem($ov['brend'], $ov['article']);
 			$codes = self::getCodesByCipher($ov['cipher']);

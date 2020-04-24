@@ -2,11 +2,11 @@ $(function(){
 	$('input[type=checkbox]').styler();
 	$(".count-block .minus, .count-block .plus").click(function(event) {
 		var e = $(this);
-		var available = + e.closest('tr').find('input[name=available]').val();
+		var available = + e.closest('.good').find('input[name=available]').val();
 		if (available !== 'undefined'){
 			if (available == -1) return show_message('Данной позиции нет в наличии!', 'error');
 		}
-		if (!e.closest('tr').find('input[name=toOrder]').prop('checked')) return false;
+		if (!e.closest('.good').find('input[name=toOrder]').prop('checked')) return false;
 		var act = e.attr('class');
 		e = $(this).parent();
 		var store_id = e.attr('store_id');

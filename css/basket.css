@@ -58,7 +58,9 @@ span.not_available{
   height: 16px;
   background: red;
   display: none; }
-
+.mobile-view .good .important{
+  text-align: left;
+}
 .jspVerticalBar *,
 .jspHorizontalBar * {
   margin: 0;
@@ -69,7 +71,7 @@ span.not_available{
 
 .jspHorizontalBar .jspCap {
   float: left; }
-td .available{
+.good .available{
   color: red;
 }
 .jspTrack {

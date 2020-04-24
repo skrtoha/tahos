@@ -84,8 +84,6 @@ $noReturnIsExists = false;
 					'in_stock' => $val['in_stock'],
 					'user_id' => $_SESSION['user'],
 				]);
-				$basket[$key] = $val;
-				$basket[$key]['pp'] = $pp;
 				if ($pp){
 					if (
 						$pp['available'] == -1 ||
@@ -181,12 +179,24 @@ $noReturnIsExists = false;
 		}?>
 	</table>
 	<div class="mobile-view">
-		<?if (empty($basket)){?>
+		<?if (!$res_basket->num_rows){?>
 		<p>Корзина пуста</p>
 		<?}
 		else{
-			foreach ($basket as $val) {
-				$pp = & $val['pp'];
+			$total_basket = 0;
+			$totalToOrder = 0;
+			$bl_check = false;
+			foreach ($res_basket as $key => $val) {
+				$checkbox = '';
+				$pp = core\Provider::getPrice([
+					'provider_id' => $val['provider_id'],
+					'store_id' => $val['store_id'],
+					'item_id' => $val['item_id'],
+					'article' => $val['article'],
+					'brend' => $val['provider_brend'],
+					'in_stock' => $val['in_stock'],
+					'user_id' => $_SESSION['user'],
+				]);
 				if ($pp){
 					if (
 						$pp['available'] == -1 ||
@@ -198,11 +208,12 @@ $noReturnIsExists = false;
 						$db->update('basket', ['isToOrder' => 0], "`store_id` = {$val['store_id']} AND `item_id` = {$val['item_id']}");
 					} 
 				}
+
+				if ($val['noReturn']) $noReturnIsExists = true;
+				$total_basket += $val['price'] * $val['quan'];
+				if ($val['isToOrder']) $totalToOrder += $val['price'] * $val['quan'];
 				?>
 				<div class="good">
-					<?if ($pp){?>
-						<input type="hidden" name="available" value="<?=$pp['available']?>">
-					<?}?>
 					<div class="goods-header">
 						<p>
 							<input view_type="mobile" <?=$val['isToOrder'] == 1 ? 'checked' : ''?> type="checkbox" <?=$checkbox?> name="toOrder" value="<?=$val['store_id']?>-<?=$val['item_id']?>">
@@ -224,16 +235,16 @@ $noReturnIsExists = false;
 					</div>
 					<div class="goods-footer">
 						<div class="price-block">
-							<?if ($val['pp']['price'] > 0 && $val['pp']['price'] > $val['price']){?>
-							<span style="text-align: left; display: block;" class="important" style="margin-bottom: 5px; display: block">Цена изменилась</span>
-							<span class="price_format"><?=$val['price']?></span>
-							<i class="fa fa-rub" aria-hidden="true"></i>
-							 <br> <a class="update-price" href="/ajax/update_basket.php?act=update_price&store_id=<?=$val['store_id']?>&item_id=<?=$val['item_id']?>&price=<?=$val['pp']['price']?>">Обновить цену</a>
-						<?}
-						else{?>
-							<span class="price_format"><?=$val['price']?></span>
-							<i class="fa fa-rub" aria-hidden="true"></i>
-						<?}?>
+							<?if ($pp['price'] > 0 && $pp['price'] > $val['price']){?>
+								<span class="important" style="margin-bottom: 5px; display: block">Цена изменилась</span>
+								<span class="price_format"><?=$val['price']?></span>
+								<i class="fa fa-rub" aria-hidden="true"></i>
+								 <br> <a class="update-price" href="/ajax/update_basket.php?act=update_price&store_id=<?=$val['store_id']?>&item_id=<?=$val['item_id']?>&price=<?=$pp['price']?>">Обновить цену</a>
+							<?}
+							else{?>
+								<span class="price_format"><?=$val['price']?></span>
+								<i class="fa fa-rub" aria-hidden="true"></i>
+							<?}?>
 						</div>
 						<div class="subtotal-block">
 							<span class="label">Сумма:</span>
@@ -252,14 +263,18 @@ $noReturnIsExists = false;
 						packaging="<?=$val['packaging']?>" 
 						class="count-block" 
 						summand="<?=$val['price']?>">
-						<span class="minus">-</span>
-						<input type="number" readonly value="<?=$val['quan']?>">
-						<span class="plus">+</span>
+							<span class="minus">-</span>
+							<input type="number" readonly value="<?=$val['quan']?>">
+							<span class="plus">+</span>
 					</div>
-					<?if ($val['quan'] > $val['in_stock'] and $check){?>
-							<span style="line-height: 25px; display: block" class="important">В наличии <?=$val['in_stock']?> шт.</span>
-							<a href="/ajax/update_basket.php?act=update_quan&provider_id=<?=$val['provider_id']?>&item_id=<?=$val['item_id']?>&quan=<?=$val['in_stock']?>" class="update-quan">Пересчитать</a>	
+					<?if ($pp){?>
+						<input type="hidden" name="available" value="<?=$pp['available']?>">
+						<?$active = $pp['available'] > 0 && $pp['available'] < $val['quan'] ? 'active' : ''?>
+						<span class="available <?=$active?>">В наличии <?=$pp['available']?> шт.</span>
+						<?if($pp['available'] == -1){?>
+							<span class="not_available">Нет в наличии</span>
 						<?}?>
+					<?}?>
 					<?if ($user_id){
 						if ($val['is_favorite']){?>
 							<i item_id="<?=$val['item_id']?>" class="fa fa-star favorites-btn" aria-hidden="true"></i>

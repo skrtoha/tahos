@@ -1,8 +1,11 @@
 <?php
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use core\Provider\Mikado;
+
 set_time_limit(0);
 core\Timer::start();
-// echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
+
+echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
 switch($_GET['act']){
 	case 'bonuses':
 		require_once ('../vendor/autoload.php');
@@ -312,7 +315,7 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . $mikado::$clientData['entity']['ClientID'] . "&PSW=" . $mikado::$clientData['entity']['Password'];
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::$clientData['entity']['ClientID'] . "&PSW=" . Mikado::$clientData['entity']['Password'];
 			$file = file_get_contents($url);
 			if (strlen($file) == 18){
 				$errorText = "Не удалось скачать $zipName в $url";
@@ -328,9 +331,9 @@ switch($_GET['act']){
 			
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$zipName}.zip");
-			$file = $zipArchive->getStream("mikado_price_{$value}_" . $mikado::$clientData['entity']['ClientID'] . ".csv");
+			$file = $zipArchive->getStream("mikado_price_{$value}_" . Mikado::$clientData['entity']['ClientID'] . ".csv");
 
-			$db->delete('store_items', "`store_id`={$mikado->stocks[$value]}");
+			$db->delete('store_items', "`store_id`=" .Mikado::$stocks[$value]);
 			$i = 0;
 			while ($data = fgetcsv($file, 1000, "\n")) {
 				$row = iconv('windows-1251', 'utf-8', $data[0]);
@@ -353,7 +356,7 @@ switch($_GET['act']){
 				if (!$item_id) continue;
 				// $db->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $row[0]], ['print_query' => false]);
 				$price->insertStoreItem([
-					'store_id' => $mikado->stocks[$value],
+					'store_id' => Mikado::$stocks[$value],
 					'item_id' => $item_id,
 					'price' => $row[4],
 					'in_stock' => $row[5],
@@ -374,7 +377,7 @@ switch($_GET['act']){
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 
-			$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$mikado->stocks[$value]}", '');
+			$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`=". Mikado::$stocks[$value], '');
 		}
 		break;
 	case 'priceSportAvto':

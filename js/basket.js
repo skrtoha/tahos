@@ -6,7 +6,7 @@ $(function(){
 		if (available !== 'undefined'){
 			if (available == -1) return show_message('Данной позиции нет в наличии!', 'error');
 		}
-		if (!e.closest('.good').find('input[name=toOrder]').prop('checked')) return false;
+		// if (!e.closest('.good').find('input[name=toOrder]').prop('checked')) return false;
 		var act = e.attr('class');
 		e = $(this).parent();
 		var store_id = e.attr('store_id');
@@ -26,7 +26,6 @@ $(function(){
 			'&item_id=' + item_id + 
 			'&packaging=' + packaging +
 			'&summand=' + summand;
-		// console.log(data);
 		$.ajax({
 			type: "POST",
 			url: "/ajax/basket.php",
@@ -36,13 +35,17 @@ $(function(){
 				if (act == 'plus'){
 					newVal = +e.find('input').val() + packaging;
 					$('#basket_basket').html(+$('#basket_basket').unmask() + packaging * summand);
-					$('#totalToOrder').html(+$('#totalToOrder').html() + packaging * summand);
+					if (e.closest('.good').find('input[name=toOrder]').prop('checked')){
+						$('#totalToOrder').html(+$('#totalToOrder').html() + packaging * summand);
+					}
 					$('.cart span').html(+$('.cart span').html() + packaging);
 				} 
 				if (act == 'minus'){
 					newVal = +e.find('input').val() - packaging;
 					$('#basket_basket').html(+$('#basket_basket').unmask() - packaging * summand);
-					$('#totalToOrder').html(+$('#totalToOrder').html() - packaging * summand);
+					if (e.closest('.good').find('input[name=toOrder]').prop('checked')){
+						$('#totalToOrder').html(+$('#totalToOrder').html() - packaging * summand);
+					}
 					$('.cart span').html(+$('.cart span').html() - packaging);
 				} 
 				e.parent().nextAll('.subtotal').find('span').html(newVal * summand);

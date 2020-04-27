@@ -114,3 +114,12 @@ CREATE TABLE IF NOT EXISTS `tahos_forbidden_pages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+CREATE TABLE `tahos_autoeuro_order_keys` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `item_id` int(10) UNSIGNED NOT NULL,
+  `order_key` text CHARACTER SET utf8 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8_unicode_ci;
+ALTER TABLE `tahos_autoeuro_order_keys`
+  ADD PRIMARY KEY (`id`);
+  ALTER TABLE `tahos_autoeuro_order_keys`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;

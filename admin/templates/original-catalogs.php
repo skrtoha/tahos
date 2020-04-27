@@ -424,6 +424,7 @@ function node(){
 	$res_node_items = $db->query("
 		SELECT
 			ni.pos,
+			CAST(ni.pos AS UNSIGNED) AS pos_2,
 			ni.item_id,
 			b.title AS brend,
 			b.id AS brend_id,
@@ -437,6 +438,8 @@ function node(){
 		LEFT JOIN #brends b ON b.id=i.brend_id
 		WHERE
 			ni.node_id={$_GET['node_id']}
+		ORDER BY
+			pos_2, ni.pos
 	", '');
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=$res_node_items->num_rows?></span></div>
@@ -459,6 +462,7 @@ function node(){
 		<tr class="head">
 			<td>Позиция</td>
 			<td>Название</td>
+			<td>Бренд</td>
 			<td>Артикул</td>
 			<td>Кол-во</td>
 			<td>Комментарий</td>
@@ -468,6 +472,7 @@ function node(){
 				<tr class="node_item" item_id="<?=$row['item_id']?>">
 					<td><?=$row['pos']?></td>
 					<td><?=$row['title_full']?></td>
+					<td><?=$row['brend']?></td>
 					<td><?=$row['article']?></td>
 					<td><?=$row['quan']?></td>
 					<td><?=$row['comment']?></td>

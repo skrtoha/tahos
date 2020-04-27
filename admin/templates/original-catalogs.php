@@ -440,7 +440,7 @@ function node(){
 	", '');
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=$res_node_items->num_rows?></span></div>
-	<?$src = array_shift(glob(core\Config::$imgUrl . "/nodes/big/$brend_title/{$_GET['node_id']}.*"));
+	<?$src = array_shift(glob(core\Config::$imgPath . "/nodes/big/$brend_title/{$_GET['node_id']}.*"));
 	$pathinfo = pathinfo($src);
 	$src = core\Config::$imgUrl . "/nodes/big/$brend_title/{$pathinfo['basename']}";
 	if ($src){?>

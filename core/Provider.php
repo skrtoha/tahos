@@ -143,10 +143,23 @@ abstract class Provider{
 		$context = stream_context_create($array);
 		try{
 			$res = file_get_contents($url, false, $context);
-			if ($res === false) return false;
+			$GLOBALS['response_header'] = $http_response_header;
+			if ($res == false) return self::getCurlUrlData($url, $data, $header);
 		} catch(\Exception $e){}
-		$GLOBALS['response_header'] = $http_response_header;
 		return $res;
+	}
+	public static function getCurlUrlData($url, $data = [], $header = null){
+		// debug($url, 'getCurlUrlData');
+		$curl = curl_init('http://api.favorit-parts.ru/ws/v1/order/');
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, empty($data) ? 'GET' : 'POST');
+		if (!empty($data)) curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		if ($header){
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+		}
+		$result = curl_exec($curl);
+		curl_close($curl);
+		return $result;
 	}
 	public static function isDuplicate($str){
 		if (preg_match('/Duplicate/', $str)) return true;

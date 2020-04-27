@@ -6,6 +6,9 @@
 	<?if(file_exists("css/{$_GET['view']}.css")){?>
 		<link rel="stylesheet" type="text/css" href="css/<?=$_GET['view']?>.css">
 	<?}?>
+	<?if (in_array($_GET['view'], ['connections'])){?>
+		<link rel="stylesheet" type="text/css" href="/vendor/datetimepicker/jquery.datetimepicker.min.css">
+	<?}?>
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-touch-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
@@ -74,6 +77,7 @@
 				<li class="<?=($view == 'providers')  ? "checked" : ""?>"><a href="?view=providers">Поставщики</a>
 				<li class="<?=($view == 'issues')  ? "checked" : ""?>"><a href="?view=issues">Точки выдачи</a>
 				<li class="<?=$view == 'users'  ? "checked" : ""?>"><a href="?view=users">Пользователи</a>
+				<li class="<?=$view == 'connections'  ? "checked" : ""?>"><a href="?view=connections">Соединения</a>
 				<li class="<?=$view == 'original-catalogs'  ? "checked" : ""?>"><a href="?view=original-catalogs">Оригинальные каталоги</a>
 				<li class="<?=$view == 'order_issues'  ? "checked" : ""?>"><a href="?view=order_issues">Выдачи товара</a>
 				<li class="<?=$view == 'help'  ? "checked" : ""?>"><a href="?view=texts&tab=">Тексты</a>
@@ -104,6 +108,9 @@
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/vendor/accordion.js", "async" : false},
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
+		<?if (in_array($view, ['connections'])){?>
+			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
+		<?}?>
 		<?if (file_exists("js/$view.js")){
 			echo '{"src" : "/admin/js/'.$view.'.js", "async" : false},';
 		}?>

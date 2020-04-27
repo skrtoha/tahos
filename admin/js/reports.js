@@ -97,7 +97,7 @@ $(function(){
 			})
 		},
 		setTabs: function(){
-			$.ionTabs("#tabs_1",{
+			$.ionTabs("#tabs_1", {
 				type: "hash",
 				onChange: function(obj){
 					reports.tab = obj.tab;

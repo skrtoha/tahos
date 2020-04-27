@@ -102,3 +102,15 @@ ALTER TABLE `tahos_provider_basket` DROP `quan`, DROP `params`;
 
 ----tahos_provider_basket end
 
+ALTER TABLE `tahos_connections` CHANGE `isDenyAccess` `isDeniedAccess` INT(1) NOT NULL DEFAULT '0';
+
+CREATE TABLE IF NOT EXISTS `tahos_denied_addresses` (
+  `ip` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  PRIMARY KEY (`ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `tahos_forbidden_pages` (
+  `page` varchar(255) NOT NULL,
+  PRIMARY KEY (`page`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

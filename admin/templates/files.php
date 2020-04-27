@@ -190,6 +190,7 @@ if ($_POST['items_analogies']){
 				'title_full' => $value[3]
 			]);
 			if ($resAnalogy === true){
+				$insertedItems++;
 				$item_analogy_id = $db->last_id();
 				$db->insert('articles', ['item_id' => $item_analogy_id, 'item_diff' => $item_analogy_id]);
 			} 

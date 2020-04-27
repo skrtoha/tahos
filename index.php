@@ -11,6 +11,7 @@ require_once('vendor/autoload.php');
 $db = new core\DataBase();
 session_start();
 $connection = new core\Connection($db);
+// debug($connection);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');
 $db->connection_id = $connection->connection_id;
 $settings = $db->select('settings', '*', '`id`=1'); $settings = $settings[0];

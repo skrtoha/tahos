@@ -80,19 +80,19 @@ $res_vehicles = $db->query("
 
 			<a href="#">
 				<img src="img/news/news__news1.jpg" alt="News">
-				<span class="news_date">16.04.2017</span>
+				<span class="news_date">16.04.2020</span>
 				<span class="news_title one_row">Добавлены новые каталогии kia</span>
 			</a>
 
 			<a href="#">
 				<img src="img/news/news__news2.jpg" alt="News">
-				<span class="news_date">12.04.2017</span>
-				<span class="news_title">Стартует новая акции на любые масла купленные до июня 2017</span>
+				<span class="news_date">12.04.2020</span>
+				<span class="news_title">Стартует новая акции на любые масла купленные до июня 2020</span>
 			</a>
 
 			<a href="#">
 				<img src="img/news/news__news3.jpg" alt="News">
-				<span class="news_date">09.04.2017</span>
+				<span class="news_date">09.04.2020</span>
 				<span class="news_title">Горячая растпродажа зимних шин Nokian Купи 4 шины и получишь...</span>
 			</a>
 

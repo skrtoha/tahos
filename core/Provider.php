@@ -285,4 +285,20 @@ abstract class Provider{
 		$user = $res_user->fetch_assoc();
 		return $user['user_type'];
 	}
+	protected static function getProviderBrend($provider_id, $brend): string
+	{
+		$res = self::getInstanceDataBase()->query("
+			SELECT
+				pb.title
+			FROM
+				#provider_brends pb
+			LEFT JOIN
+				#brends b ON b.id = pb.brend_id
+			WHERE
+				b.title = '$brend' AND pb.provider_id = $provider_id
+		", '');
+		if (!$res->num_rows) return false;
+		$array = $res->fetch_assoc();
+		return $array['title'];
+	}
 }

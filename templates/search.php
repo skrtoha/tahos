@@ -16,6 +16,8 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$rossko = new core\Provider\Rossko($db);
 	setCoincidences($rossko->getSearch($_GET['search']));
 
+	setCoincidences(core\Provider\Autoeuro::getSearch($_GET['search']));
+
 	if (empty($coincidences)) exit();
 	echo json_encode($coincidences);
 	exit();

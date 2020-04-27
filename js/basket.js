@@ -192,6 +192,7 @@ $(function(){
 	})
 	$('div.count-block input').on('blur', function(){
 		var count = $(this).val();
+		var available = $(this).closest('.good').find('input[name=available]').val();
 		var th = $(this).closest('div.count-block');
 		var packaging = th.attr('packaging');
 		var reg = /^\d+$/;
@@ -207,6 +208,11 @@ $(function(){
 		}
 		if (count % packaging != 0){
 			show_message('Значение должно нацело делиться на ' + packaging + '!', 'error');
+			$(this).focus();
+			return false;
+		}
+		if (count > available){
+			show_message('Превышено доступное количество', 'error');
 			$(this).focus();
 			return false;
 		}

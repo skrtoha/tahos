@@ -131,10 +131,16 @@ class Armtek extends Provider{
 			}
 		}
 	}
-	public function getBrendId($brand, $from = 'armtek'){
-		$brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
+	public static function getBrendId($brand, $from = 'armtek'){
+		/**
+		 * ['brend' => brend_id]
+		 * @var array
+		 */
+		static $brends;
+		if (isset($brends[$brand])) return $brends[$brand];
+		$brend = parent::getInstanceDataBase()->select_one('brends', 'id,parent_id', "`title`='$brand'");
 		if (empty($brend)) {
-			$this->db->insert(
+			parent::getInstanceDataBase()->insert(
 				'log_diff',
 				[
 					'type' => 'brends',
@@ -146,8 +152,10 @@ class Armtek extends Provider{
 			);
 			return false;
 		}
-		if ($brend['parent_id']) return $brend['parent_id'];
-		else return $brend['id'];
+		if ($brend['parent_id']) $brend_id = $brend['parent_id'];
+		$brend_id = $brend['id'];
+		$brends[$brand] = $brend_id;
+		return $brend_id;
 	}
 	public function getItemId($object, $from = NULL){
 		if (!$from) $brend_id = $this->getBrendId($object->BRAND);

@@ -310,7 +310,8 @@ class DataBase {
 	 		deincrement_duplicate - reduces the autoincrement into 1 after failed query 
 	 		duplicate => [
 				'field' => 'value'
-			]
+			],
+			get - gets query
 	 * @return mixed true if query is successful, else error
 	 */
 	function insert($table_name, $new_values, $insert_params = array()){

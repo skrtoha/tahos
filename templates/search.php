@@ -2,19 +2,19 @@
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$coincidences = array();
 
-	$mikado = new core\Provider\Mikado($db);
-	setCoincidences($mikado->getCoincidences($_GET['search']));
+	// $mikado = new core\Provider\Mikado($db);
+	// setCoincidences($mikado->getCoincidences($_GET['search']));
 
-	$armtek = new core\Provider\Armtek($db);
-	setCoincidences($armtek->getSearch($_GET['search']));
+	// $armtek = new core\Provider\Armtek($db);
+	// setCoincidences($armtek->getSearch($_GET['search']));
 
-	$abcp = new core\Provider\Abcp(NULL, $db);
-	setCoincidences($abcp->getSearch($_GET['search']));
+	// $abcp = new core\Provider\Abcp(NULL, $db);
+	// setCoincidences($abcp->getSearch($_GET['search']));
 
-	setCoincidences(core\Provider\FavoriteParts::getSearch($_GET['search']));
+	// setCoincidences(core\Provider\FavoriteParts::getSearch($_GET['search']));
 
-	$rossko = new core\Provider\Rossko($db);
-	setCoincidences($rossko->getSearch($_GET['search']));
+	// $rossko = new core\Provider\Rossko($db);
+	// setCoincidences($rossko->getSearch($_GET['search']));
 
 	setCoincidences(core\Provider\Autoeuro::getSearch($_GET['search']));
 

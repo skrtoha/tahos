@@ -68,6 +68,7 @@ class Autoeuro extends Provider{
 	}
 	private static function parseObjectData($o, $mainItemID, $isObjectCrosses = false): void
 	{
+		echo "<hr>isObjectCrosses = $isObjectCrosses";
 		if ($isObjectCrosses){
 			$item_id = self::insertItem($o);
 			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
@@ -91,11 +92,23 @@ class Autoeuro extends Provider{
 		$res = parent::getInstanceDataBase()->insert('autoeuro_order_keys', [
 			'cipher' => $cipher,
 			'item_id' => $mainItemID, 
+			'price' => ceil($o->price),
+			'order_term' => $o->order_term,
 			'order_key' => $o->order_key,
 		]
 		// , ['print' => true]
 		);
-		if (parent::isDuplicate($res)){
+		debug($o, parent::getInstanceDataBase()->insert('autoeuro_order_keys', [
+			'cipher' => $cipher,
+			'item_id' => $mainItemID, 
+			'price' => floor($o->price),
+			'order_term' => $o->order_term,
+			'order_key' => $o->order_key,
+		]
+		, ['get' => true]
+		).":<br><br>  " . $res);
+		if (parent::isDuplicate($res)) return;
+		/*if (parent::isDuplicate($res)){
 			$res_aok = parent::getInstanceDataBase()->query("
 				SELECT
 					aok.*
@@ -103,10 +116,10 @@ class Autoeuro extends Provider{
 					#autoeuro_order_keys aok
 				WHERE
 					aok.order_key = '{$o->order_key}'
-			", '');
+			", 'result');
 			$array = $res_aok->fetch_assoc();
 			$cipher = $array['cipher'];
-		}
+		}*/
 		$res_provider_stores = parent::getInstanceDataBase()->insert('provider_stores', [
 			'title' => "АвтоЕвро - $cipher",
 			'cipher' => $cipher,
@@ -117,6 +130,7 @@ class Autoeuro extends Provider{
 			'delivery_max' => $o->order_term,
 			'under_order' => $o->order_term
 		]);
+		echo "$res_provider_stores";
 		if ($res_provider_stores !== true){
 			$provider_store = parent::getInstanceDataBase()->select_one('provider_stores', '*', "`cipher` = '$cipher'");
 			$store_id = $provider_store['id'];

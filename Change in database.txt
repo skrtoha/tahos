@@ -115,18 +115,17 @@ CREATE TABLE IF NOT EXISTS `tahos_forbidden_pages` (
 
 
 CREATE TABLE `tahos_autoeuro_order_keys` (
-  `cipher` varchar(4) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `cipher` varchar(4) CHARACTER SET utf8 NOT NULL,
   `item_id` int(10) UNSIGNED NOT NULL,
-  `order_key` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+  `price` float UNSIGNED DEFAULT NULL,
+  `order_term` int(2) UNSIGNED NOT NULL,
+  `order_key` text CHARACTER SET utf8 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `tahos_autoeuro_order_keys`
---
 ALTER TABLE `tahos_autoeuro_order_keys`
   ADD PRIMARY KEY (`cipher`),
-  ADD UNIQUE KEY `order_key` (`order_key`(1000)) USING BTREE;
+  ADD UNIQUE KEY `order_key` (`order_key`(1000)),
+  ADD UNIQUE KEY `item_id` (`item_id`,`price`,`order_term`);
+ALTER TABLE `tahos_autoeuro_order_keys`
+  ADD CONSTRAINT `tahos_autoeuro_order_keys_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `tahos_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  SELECT si.*, ps.cipher, aok.order_key FROM tahos_store_items si LEFT JOIN tahos_provider_stores ps on ps.id = si.store_id LEFT JOIN tahos_autoeuro_order_keys aok ON aok.cipher = ps.cipher WHERE si.item_id=90 ORDER BY `si`.`price` ASC
+

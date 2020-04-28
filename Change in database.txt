@@ -115,11 +115,18 @@ CREATE TABLE IF NOT EXISTS `tahos_forbidden_pages` (
 
 
 CREATE TABLE `tahos_autoeuro_order_keys` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `cipher` varchar(4) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `item_id` int(10) UNSIGNED NOT NULL,
-  `order_key` text CHARACTER SET utf8 NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8_unicode_ci;
+  `order_key` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `tahos_autoeuro_order_keys`
+--
 ALTER TABLE `tahos_autoeuro_order_keys`
-  ADD PRIMARY KEY (`id`);
-  ALTER TABLE `tahos_autoeuro_order_keys`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  ADD PRIMARY KEY (`cipher`),
+  ADD UNIQUE KEY `order_key` (`order_key`(1000)) USING BTREE;

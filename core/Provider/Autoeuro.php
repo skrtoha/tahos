@@ -28,8 +28,11 @@ class Autoeuro extends Provider{
 		]);
 	}
 	public static function getPrice($params){
-		debug($params);
 		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
+		debug($params);
+		$response = self::getStockItems($params['brend'], $params['article']);
+		$stock_items = json_decode($response);
+		debug($stock_items);
 	}
 	public static function getItemsToOrder($provider_id){
 		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
@@ -68,7 +71,6 @@ class Autoeuro extends Provider{
 	}
 	private static function parseObjectData($o, $mainItemID, $isObjectCrosses = false): void
 	{
-		echo "<hr>isObjectCrosses = $isObjectCrosses";
 		if ($isObjectCrosses){
 			$item_id = self::insertItem($o);
 			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
@@ -98,15 +100,6 @@ class Autoeuro extends Provider{
 		]
 		// , ['print' => true]
 		);
-		debug($o, parent::getInstanceDataBase()->insert('autoeuro_order_keys', [
-			'cipher' => $cipher,
-			'item_id' => $mainItemID, 
-			'price' => floor($o->price),
-			'order_term' => $o->order_term,
-			'order_key' => $o->order_key,
-		]
-		, ['get' => true]
-		).":<br><br>  " . $res);
 		if (parent::isDuplicate($res)) return;
 		/*if (parent::isDuplicate($res)){
 			$res_aok = parent::getInstanceDataBase()->query("
@@ -130,7 +123,6 @@ class Autoeuro extends Provider{
 			'delivery_max' => $o->order_term,
 			'under_order' => $o->order_term
 		]);
-		echo "$res_provider_stores";
 		if ($res_provider_stores !== true){
 			$provider_store = parent::getInstanceDataBase()->select_one('provider_stores', '*', "`cipher` = '$cipher'");
 			$store_id = $provider_store['id'];

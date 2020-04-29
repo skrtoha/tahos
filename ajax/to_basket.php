@@ -1,4 +1,5 @@
 <?php  
+use core\Provider\Autoeuro;
 session_start();
 require_once ("../core/DataBase.php");
 require_once ("../core/functions.php");
@@ -7,6 +8,11 @@ $db = new core\DataBase();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
+
+if (Autoeuro::isAutoeuro($_POST['store_id'])){
+	Autoeuro::putBusket($_POST);
+}
+exit();
 
 $db->insert(
 	'basket',

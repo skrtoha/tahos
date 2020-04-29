@@ -8,6 +8,7 @@ class Autoeuro extends Provider{
 	private static $password = 'VGpS5DxFrslpgx046vVFb8dh';
 	private static $apiKey = 'w84dWVnWf0fahzrMQhALbEVflzGrazSQgmMoSZWHmd5oHarZvJR0ULlLzjjh';
 	private static $url = 'https://api.autoeuro.ru/api/v-1.0/shop/';
+	private static $stores = [];
 
 	public static $provider_id = 18;
 	public static $mainStoreID = 22657;
@@ -27,12 +28,52 @@ class Autoeuro extends Provider{
 			'with_crosses' => $with_crosses
 		]);
 	}
+	public static function getOrderKey($store_id){
+		$resAutoeuroOrderKeys = parent::getInstanceDataBase()->query("
+			SELECT
+				aok.order_key
+			FROM
+				#autoeuro_order_keys aok
+			LEFT JOIN
+				#provider_stores ps ON ps.cipher = aok.cipher
+			WHERE
+				ps.id = $store_id
+		", '');
+		$output = $resAutoeuroOrderKeys->fetch_assoc();
+		return $output['order_key'];
+	}
 	public static function getPrice($params){
+		// echo "<hr>";
+		// debug($params, 'params');
 		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
-		debug($params);
-		$response = self::getStockItems($params['brend'], $params['article']);
+		$response = self::getStockItems($params['brend'], $params['article'], 1);
 		$stock_items = json_decode($response);
 		debug($stock_items);
+		$order_key = self::getOrderKey($params['store_id']);
+		// echo "$order_key<br><br>";
+		if (isset($stock_items->DATA->CODES)){
+			foreach($stock_items->DATA->CODES as $code){
+				if ($code->order_key == $order_key){
+					// debug($code);
+					return [
+						'price' => $code->price,
+						'available' => $code->amount
+					];
+				} 
+			}
+		}
+		if (isset($stock_items->DATA->CROSSES)){
+			foreach($stock_items->DATA->CROSSES as $code){
+				// debug($code);
+				if ($code->order_key == $order_key){
+					return [
+						'price' => $code->price,
+						'available' => $code->amount
+					];
+				} 
+			}
+		}
+		return false;
 	}
 	public static function getItemsToOrder($provider_id){
 		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
@@ -69,6 +110,28 @@ class Autoeuro extends Provider{
 		}
 		return false;
 	}
+	private static function removeItemsAndProviderStores($item_id): void
+	{
+		$resAutoeuroOrderKeys = parent::getInstanceDataBase()->query("
+			SELECT
+				aok.cipher,
+				aok.item_id,
+				b.store_id
+			FROM
+				#autoeuro_order_keys aok
+			LEFT JOIN
+				#provider_stores ps ON ps.cipher = aok.cipher
+			LEFT JOIN
+				#basket b ON b.store_id = ps.id AND b.item_id = aok.item_id
+			WHERE
+				aok.item_id = $item_id AND b.store_id IS NULL
+		", '');
+		if (!$resAutoeuroOrderKeys->num_rows) return;
+		foreach($resAutoeuroOrderKeys as $value){
+			parent::getInstanceDataBase()->delete('provider_stores', "`cipher` = '{$value['cipher']}'");
+			parent::getInstanceDataBase()->delete('autoeuro_order_keys', "`cipher` = '{$value['cipher']}'");
+		}
+	}
 	private static function parseObjectData($o, $mainItemID, $isObjectCrosses = false): void
 	{
 		if ($isObjectCrosses){
@@ -77,6 +140,7 @@ class Autoeuro extends Provider{
 			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
 			$mainItemID = $item_id;
 		}
+		// self::removeItemsAndProviderStores($mainItemID);
 		if ($o->proposal == 'АвтоЕвро'){
 			parent::getInstanceDataBase()->insert('store_items', [
 				'store_id' => self::$mainStoreID,
@@ -144,8 +208,8 @@ class Autoeuro extends Provider{
 			$providerBrend = parent::getProviderBrend(self::$provider_id, $brend);
 			$response = self::getStockItems($providerBrend, $article);
 		}
+		if (!$response) return false;
 		$object = json_decode($response);
-		// debug($object);
 		if (isset($object->DATA->CODES)){
 			foreach($object->DATA->CODES as $o){
 				self::parseObjectData($o, $mainItemID);
@@ -170,5 +234,53 @@ class Autoeuro extends Provider{
 			foreach($itemsList->DATA->CODES as $item) $output[$item->maker] = $item->name;
 		}
 		return $output;
+	}
+	public static function isAutoeuro($store_id){
+		$store = parent::getStoreInfo($store_id);
+		if ($store['provider_id'] == self::$provider_id) return true;
+		else return false;
+	}
+	/**
+	 * [isInBasket description]
+	 * @param  array  $params [description]
+	 * @return mixed basket_item_key if is in basket,  false if not
+	 */
+	public static function isInBasket($params){
+		$basket_items = self::getBasket();
+		if (!isset($basket_items->DATA)) return false;
+		foreach($basket_items->DATA as $data){
+			if ($data->comment == self::getStringBasketComment($params)) return $data->basket_item_key;
+		}
+		return false;
+	}
+	private static function getStringBasketComment($params): string
+	{
+		return "{$params['store_id']}-{$params['item_id']}";
+	}
+	public static function removeBasket($basket_item_key): void
+	{
+		debug(json_decode(parent::getUrlData(self::getUrlString('basket_del'))));
+	}
+	public static function putBusket($params)
+	{
+		$order_key = self::getOrderKey($params['store_id']);
+		if ($basket_item_key = self::isInBasket($params)){
+			self::removeBasket($basket_item_key);
+		}
+		$response = parent::getUrlData(
+			self::getUrlString('basket_put'),
+			[
+				'order_key' => $order_key,
+				'quantity' => $params['quan'],
+				'item_note' => self::getStringBasketComment($params)
+			]
+		);
+		$json = json_decode($response);
+		print_r($GLOBALS['response_header']);
+		print_r($json);
+	}
+	public static function getBasket(){
+		$response = parent::getUrlData(self::getUrlString('basket_items'));
+		return json_decode($response);
 	}
 }

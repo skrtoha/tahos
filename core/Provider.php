@@ -184,7 +184,7 @@ abstract class Provider{
 				`additional` = 'osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}'
 		", '');
 	}
-	public static function getStoreInfo(int $store_id, $flag = ''): array
+	public static function getStoreInfo(int $store_id, $params = ['flag' => '']): array
 	{
 		static $storeInfo;
 		if (isset($storeInfo[$store_id])) return $storeInfo[$store_id];
@@ -194,6 +194,7 @@ abstract class Provider{
 				ps.title,
 				ps.cipher,
 				ps.percent,
+				ps.provider_id,
 				c.rate
 			FROM
 				#provider_stores ps
@@ -201,7 +202,7 @@ abstract class Provider{
 				#currencies c ON c.id = ps.currency_id
 			WHERE
 				ps.id = $store_id
-		", $flag);
+		", $params['flag']);
 		if (!$res->num_rows) return false;
 		$storeInfo[$store_id]  = $res->fetch_assoc();
 		return $storeInfo[$store_id]; 

@@ -53,8 +53,8 @@ switch ($act) {
 		else message($res['error'], false);
 		break;
 	case 'image_delete':
-		unlink($_GET['src']);
-		unlink(str_replace('big', 'small', $_GET['src']));
+		unlink(core\Config::$imgPath . $_GET['src']);
+		unlink(str_replace('big', 'small', core\Config::$imgPath . $_GET['src']));
 		message('Изображение успешно удалено!');
 		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
@@ -443,11 +443,12 @@ function node(){
 	", '');
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=$res_node_items->num_rows?></span></div>
-	<?$src = array_shift(glob(core\Config::$imgPath . "/nodes/big/$brend_title/{$_GET['node_id']}.*"));
-	$pathinfo = pathinfo($src);
-	$src = core\Config::$imgUrl . "/nodes/big/$brend_title/{$pathinfo['basename']}";
-	if ($src){?>
-		<img class="zoom" src="<?=$src?>" alt="<?=$page_title?>" data-zoom-image="<?=$src?>">
+	<?$files = array_shift(glob(core\Config::$imgPath . "/nodes/big/$brend_title/{$_GET['node_id']}.*"));?>
+	<?if ($files){
+		$pathinfo = pathinfo($files);
+		$src = "/nodes/big/$brend_title/{$pathinfo['basename']}";
+		?>
+		<img class="zoom" src="<?=core\Config::$imgUrl . $src?>" alt="<?=$page_title?>" data-zoom-image="<?=core\Config::$imgUrl . $src?>">
 		<a class="delete_item" href="?view=original-catalogs&act=image_delete&src=<?=$src?>">Удалить изображение</a>
 	<?}
 	else{?>

@@ -75,13 +75,13 @@ $res_items = $db->query("
 			</a>
 			<span><?=$title?></span>
 		</div>
-		<?$filePath = array_shift(glob(core\Config::$imgPath . "/nodes/big/{$model['brend']}/{$_GET['node_id']}.*"));
-		$pathinfo = pathinfo($filePath);
-		$src = core\Config::$imgUrl . "/nodes/big/{$model['brend']}/{$pathinfo['basename']}";
-		if ($src){?>
+		<?$files = array_shift(glob(core\Config::$imgPath . "/nodes/big/{$model['brend']}/{$_GET['node_id']}.*"));?>
+		<?if ($files){
+			$pathinfo = pathinfo($files);
+			$src = "/nodes/big/{$model['brend']}/{$pathinfo['basename']}";?>
 			<div class="unit-pic">
-				<a href="<?=$src?>">
-					<img src="<?=$src?>" data-zoom-image="<?=$src?>" alt="<?=$title?>">
+				<a href="<?=core\Config::$imgUrl . $src?>">
+					<img src="<?=core\Config::$imgUrl . $src?>" data-zoom-image="<?=core\Config::$imgUrl . $src?>?>" alt="<?=$title?>">
 				</a>
 			</div>
 		<?}?>

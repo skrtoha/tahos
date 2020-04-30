@@ -9,9 +9,7 @@ $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
-if (Autoeuro::isAutoeuro($_POST['store_id'])){
-	Autoeuro::putBusket($_POST);
-}
+if (Autoeuro::isAutoeuro($_POST['store_id'])) Autoeuro::putBusket($_POST);
 
 $db->insert(
 	'basket',

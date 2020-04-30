@@ -79,6 +79,7 @@ $noReturnIsExists = false;
 					'provider_id' => $val['provider_id'],
 					'store_id' => $val['store_id'],
 					'item_id' => $val['item_id'],
+					'price' => $val['price'],
 					'article' => $val['article'],
 					'brend' => $val['provider_brend'],
 					'in_stock' => $val['in_stock'],
@@ -100,11 +101,11 @@ $noReturnIsExists = false;
 				$total_basket += $val['price'] * $val['quan'];
 				if ($val['isToOrder']) $totalToOrder += $val['price'] * $val['quan'];
 				?>
-				<tr>
+				<!-- <tr>
 					<td colspan="9">
 						<?debug($val, 'basket'); debug($pp, 'providerPrice')?>
 					</td>
-				</tr>
+				</tr> -->
 				<tr class="good">
 					<td class="checkbox">
 						<input <?=$val['isToOrder'] == 1 ? 'checked' : ''?> <?=$checkbox?> type="checkbox" name="toOrder" value="<?=$val['store_id']?>-<?=$val['item_id']?>">

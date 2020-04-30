@@ -421,7 +421,11 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 				)
 			) as article,
 			IF (i.title_full!='', i.title_full, i.title) as title_full,
-			IF (si.in_stock = 0, ps.under_order, ps.delivery) as delivery,
+			CASE
+				WHEN aok.order_term IS NOT NULL THEN aok.order_term
+				ELSE
+					IF (si.in_stock = 0, ps.under_order, ps.delivery) 
+			END AS delivery,
 			ps.prevail,
 			ps.noReturn,
 			CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100 $userDiscount) as price,
@@ -437,6 +441,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 		LEFT JOIN #currencies c ON c.id=ps.currency_id
 		LEFT JOIN #items i ON diff.item_diff=i.id
 		LEFT JOIN #brends b ON b.id=i.brend_id
+		LEFT JOIN #autoeuro_order_keys aok ON aok.item_id = si.item_id AND aok.store_id = si.store_id
 		$join_basket
 		WHERE diff.item_id=$item_id AND diff.hidden=0
 	";

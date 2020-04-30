@@ -1,5 +1,5 @@
 /**
- * hide form if no providers
+ * hide form if there are no providers
  * @type {Boolean}
  */
 var hidable_form = true;
@@ -232,7 +232,6 @@ function setNewValueCartIcon(){
 	return $('.cart').append('<span>' + summ + '</span>');
 }
 function setNewValueAjax(obj){
-	console.log(obj);
 	$.ajax({
 		type: "POST",
 		url: "/ajax/to_basket.php",
@@ -253,7 +252,6 @@ function setNewValue(obj){
 	setNewValueAjax(obj);
 }
 function store_items(store_items, user, search_type = null){
-	console.log(store_items);
 	var isInBasket = window.isInBasket(store_items);
 	/**
 	 * adds to class if no items exists in basket
@@ -1248,6 +1246,7 @@ $(function(){
 		}
 	});
 	$(document).on('click', '.to-stock-btn', function(){
+		console.log(storesAutoeuro);
 		$('.mfp-wrap').click();
 		var e = $(this);
 		var store_id = +e.attr('store_id');

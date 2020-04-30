@@ -21,7 +21,11 @@ class Basket{
 			IF(pb.title IS NOT NULL, pb.title, br.title) AS provider_brend,
 			IF (i.title_full != '', i.title_full, i.title) AS title,
 			IF (f.item_id IS NOT NULL, 1, 0) AS is_favorite,
-			IF (si.in_stock = 0, ps.under_order, ps.delivery) AS delivery,
+			CASE
+				WHEN aok.order_term IS NOT NULL THEN aok.order_term
+				ELSE
+					IF (si.in_stock = 0, ps.under_order, ps.delivery) 
+			END AS delivery,
 			ps.cipher,
 			ps.provider_id,
 			p.api_title,
@@ -39,6 +43,7 @@ class Basket{
 		LEFT JOIN #provider_brends pb ON pb.brend_id = i.brend_id AND pb.provider_id = ps.provider_id
 		LEFT JOIN #currencies c ON c.id=ps.currency_id
 		LEFT JOIN #favorites f ON f.item_id=b.item_id AND f.user_id=$user_id
+		LEFT JOIN #autoeuro_order_keys aok ON aok.item_id = si.item_id AND aok.store_id = si.store_id
 		WHERE b.user_id=$user_id $whereIsToOrder
 		", '');
 	}

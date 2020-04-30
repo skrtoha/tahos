@@ -30,52 +30,23 @@ class Autoeuro extends Provider{
 			'with_crosses' => $with_crosses
 		]);
 	}
-	public static function getOrderKey($store_id){
+	public static function getOrderKey($store_id, $item_id){
 		$resAutoeuroOrderKeys = parent::getInstanceDataBase()->query("
 			SELECT
 				aok.order_key
 			FROM
 				#autoeuro_order_keys aok
-			LEFT JOIN
-				#provider_stores ps ON ps.cipher = aok.cipher
 			WHERE
-				ps.id = $store_id
+				aok.store_id = $store_id AND aok.item_id = $item_id
 		", '');
 		$output = $resAutoeuroOrderKeys->fetch_assoc();
 		return $output['order_key'];
 	}
 	public static function getPrice($params){
-		// echo "<hr>";
-		// debug($params, 'params');
-		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
-		$response = self::getStockItems($params['brend'], $params['article'], 1);
-		$stock_items = json_decode($response);
-		debug($stock_items);
-		$order_key = self::getOrderKey($params['store_id']);
-		// echo "$order_key<br><br>";
-		if (isset($stock_items->DATA->CODES)){
-			foreach($stock_items->DATA->CODES as $code){
-				if ($code->order_key == $order_key){
-					// debug($code);
-					return [
-						'price' => $code->price,
-						'available' => $code->amount
-					];
-				} 
-			}
-		}
-		if (isset($stock_items->DATA->CROSSES)){
-			foreach($stock_items->DATA->CROSSES as $code){
-				// debug($code);
-				if ($code->order_key == $order_key){
-					return [
-						'price' => $code->price,
-						'available' => $code->amount
-					];
-				} 
-			}
-		}
-		return false;
+		return [
+			'price' => $params['price'],
+			'available' => $params['in_stock']
+		];
 	}
 	public static function getItemsToOrder($provider_id){
 		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
@@ -97,7 +68,6 @@ class Autoeuro extends Provider{
 			'title_full' => $o->name,
 			'source' => 'Autoeuro'
 		]);
-		debug($resInsertItem);
 		if ($resInsertItem === true){
 			$item_id = parent::getInstanceDataBase()->last_id();
 			parent::getInstanceDataBase()->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
@@ -148,6 +118,17 @@ class Autoeuro extends Provider{
 			if ($o->price < $output[$key]['price']->price) $output[$key]['price'] = $o;
 			if ($o->order_term < $output[$key]['order_term']->order_term) $output[$key]['order_term'] = $o;
 		}
+
+		//это цикл нужен для того, чтобы удалить order_term если цена и доставка равна price
+		foreach($output as $key => $o){
+			if (
+				$o['price']->price == $o['order_term']->price && 
+				$o['price']->order_term == $o['order_term']->order_term
+			){
+				unset($output[$key]['order_term']);
+			} 
+		}
+
 		return $output;
 		/*if ($isObjectCrosses){
 			$item_id = self::insertItem($o);
@@ -228,116 +209,83 @@ class Autoeuro extends Provider{
 		$codes = [];
 		$crosses = [];
 		// debug($object);
-		if (isset($object->DATA->CODES)){
+		/*if (isset($object->DATA->CODES)){
 			$codes = self::parseObjectData($object->DATA->CODES);
-			foreach($codes as $code){
-
-				$item_id = self::insertItem($code['price']);
-				debug($code, $item_id);
-				if (!$item_id) continue;
-				debug(
-					parent::getInstanceDataBase()->insert(
-						'store_items', 
-						[
-							'store_id' => self::$minPriceStoreID,
-							'item_id' => $item_id,
-							'price' => $code['price']->price,
-							'in_stock' => $code['price']->amount,
-							'packaging' => $code['price']->packing
-						],
-						['duplicate' => [
-							'in_stock' => $code['price']->amount,
-							'price' => $code['price']->price
-						]]
-					)
-				);
-				debug(
-					parent::getInstanceDataBase()->insert(
-						'autoeuro_order_keys',
-						[
-							'store_id' => self::$minPriceStoreID,
-							'item_id' => $item_id,
-							'order_term' => $code['price']->order_term,
-							'order_key' => $code['price']->order_key
-						],
-						['duplicate' => [
-							'order_key' => $code['price']->order_key,
-							'order_term' => $code['price']->order_term,
-						]]
-					)
-				);
-
-				if (!isset($code['order_term'])) continue;
-				debug(
-					parent::getInstanceDataBase()->insert(
-						'store_items', 
-						[
-							'store_id' => self::$minDeliveryStoreID,
-							'item_id' => $item_id,
-							'price' => $code['order_term']->price,
-							'in_stock' => $code['order_term']->amount,
-							'packaging' => $code['order_term']->packing
-						],
-						['duplicate' => [
-							'in_stock' => $code['order_term']->amount,
-							'price' => $code['order_term']->price
-						]]
-					)
-				);
-				debug(
-					parent::getInstanceDataBase()->insert(
-						'autoeuro_order_keys',
-						[
-							'store_id' => self::$minDeliveryStoreID,
-							'item_id' => $item_id,
-							'order_term' => $code['order_term']->order_term,
-							'order_key' => $code['order_term']->order_key
-						],
-						['duplicate' => [
-							'order_key' => $code['order_term']->order_key,
-							'order_term' => $code['order_term']->order_term,
-						]]
-					)
-				);
-			}
-		}
-		debug($codes, 'codes');
-		/*if (isset($object->DATA->CROSSES)){
-			$crosses = self::parseObjectData($object->DATA->CROSSES);
-			foreach($codes as $code){
-				$item_id = self::insertItem($code['price']);
-				debug($code, $item_id);
-				if (!$item_id) continue;
-				parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
-				parent::getInstanceDataBase()->insert('analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
-				parent::getInstanceDataBase()->insert(
-					'store_items', 
-					[
-						'store_id' => self::$minPriceStoreID,
-						'item_id' => $item_id,
-						'price' => $code['price']->price,
-						'in_stock' => $code['price']->amount,
-						'packaging' => $code['price']->packing
-					],
-					['duplicate' => [
-						'in_stock' => $code['price']->amount,
-						'price' => $code['price']->price
-					]]
-				);
-				parent::getInstanceDataBase()->insert(
-					'autoeuro_order_keys',
-					[
-						'store_id' => self::$minPriceStoreID,
-						'item_id' => $item_id,
-						'order_key' => $code['price']->order_key
-					],
-					['duplicate' => [
-						'order_key' => $code['price']->order_key
-					]]
-				);
-			}
+			foreach($codes as $code) self::parseCode($code);
 		}*/
-		debug($crosses, 'crosses');
+		if (isset($object->DATA->CROSSES)){
+			$crosses = self::parseObjectData($object->DATA->CROSSES);
+			// debug($crosses);
+			foreach($crosses as $cross) self::parseCode($cross, $mainItemID);
+		}
+	}
+	private static function parseCode($code, $mainItemID = null){
+		// debug($code, $mainItemID);
+		$item_id = self::insertItem($code['price']);
+		if (!$item_id) return;
+
+		if ($mainItemID){
+			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
+			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
+		}
+
+		//price
+		$resInsertStoreItem = parent::getInstanceDataBase()->insert(
+			'store_items', 
+			[
+				'store_id' => self::$minPriceStoreID,
+				'item_id' => $item_id,
+				'price' => $code['price']->price,
+				'in_stock' => $code['price']->amount,
+				'packaging' => $code['price']->packing
+			],
+			['duplicate' => [
+				'in_stock' => $code['price']->amount,
+				'price' => $code['price']->price
+			]]
+		);
+		$resInsertAutoeuroOrderKeys = parent::getInstanceDataBase()->insert(
+			'autoeuro_order_keys',
+			[
+				'store_id' => self::$minPriceStoreID,
+				'item_id' => $item_id,
+				'order_term' => $code['price']->order_term,
+				'order_key' => $code['price']->order_key
+			],
+			['duplicate' => [
+				'order_key' => $code['price']->order_key,
+				'order_term' => $code['price']->order_term,
+			]]
+		);
+		//order_term
+		if (!isset($code['order_term'])) return;
+		$resInsertStoreItem = parent::getInstanceDataBase()->insert(
+			'store_items', 
+			[
+				'store_id' => self::$minDeliveryStoreID,
+				'item_id' => $item_id,
+				'price' => $code['order_term']->price,
+				'in_stock' => $code['order_term']->amount,
+				'packaging' => $code['order_term']->packing
+			],
+			['duplicate' => [
+				'in_stock' => $code['order_term']->amount,
+				'price' => $code['order_term']->price
+			]]
+		);
+		$resInsertAutoeuroOrderKeys = parent::getInstanceDataBase()->insert(
+			'autoeuro_order_keys',
+			[
+				'store_id' => self::$minDeliveryStoreID,
+				'item_id' => $item_id,
+				'order_term' => $code['order_term']->order_term,
+				'order_key' => $code['order_term']->order_key
+			],
+			['duplicate' => [
+				'order_key' => $code['order_term']->order_key,
+				'order_term' => $code['order_term']->order_term,
+			]]
+		);
 	}
 	public static function getSearch($code){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
@@ -360,7 +308,7 @@ class Autoeuro extends Provider{
 	}
 	/**
 	 * [isInBasket description]
-	 * @param  array  $params [description]
+	 * @param  array  $params store_id, item_id
 	 * @return mixed basket_item_key if is in basket,  false if not
 	 */
 	public static function isInBasket($params){
@@ -381,8 +329,13 @@ class Autoeuro extends Provider{
 			'basket_item_key' => $basket_item_key
 		]));
 	}
+	/**
+	 * [putBusket description]
+	 * @param  array $params store_id, item_id, quan
+	 * @return [type]         [description]
+	 */
 	public static function putBusket($params){
-		$order_key = self::getOrderKey($params['store_id']);
+		$order_key = self::getOrderKey($params['store_id'], $params['item_id']);
 		if ($basket_item_key = self::isInBasket($params)){
 			self::removeBasket($basket_item_key);
 		}
@@ -394,8 +347,8 @@ class Autoeuro extends Provider{
 				'item_note' => self::getStringBasketComment($params)
 			]
 		);
-		$json = json_decode($response);
-		print_r($json);
+		if ($response) return true;
+		else return false;
 	}
 	public static function getBasket(){
 		$response = parent::getUrlData(self::getUrlString('basket_items'));

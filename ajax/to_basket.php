@@ -12,7 +12,6 @@ $db->setProfiling();
 if (Autoeuro::isAutoeuro($_POST['store_id'])){
 	Autoeuro::putBusket($_POST);
 }
-exit();
 
 $db->insert(
 	'basket',

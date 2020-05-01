@@ -145,6 +145,7 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 	case 'priceRossko':
+
 		echo "<h2>Прайс Росско</h2>";
 		$fileNames = [
 			'77769_91489D6DA76B9D7A99061B9F7B18F3CE.csv' => 24,
@@ -180,7 +181,7 @@ switch($_GET['act']){
 			LEFT JOIN
 				#provider_stores ps ON ps.id=si.store_id
 			WHERE 
-				ps.provider_id = $rossko->provider_id
+				ps.provider_id = ".$rossko::$provider_id."
 		", '');
 		for ($num = 0; $num < $numFiles; $num++){
 			$zipFile = $zipArchive->statIndex($num);

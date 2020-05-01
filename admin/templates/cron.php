@@ -79,6 +79,9 @@ switch($_GET['act']){
 		if ($res === false) echo "<p>Нет товаров для отправки</p>";
 		else echo "<p>$res</p>";
 		break;
+	case 'orderAutoeuro':
+		core\Provider\Autoeuro::sendOrder();
+		break;
 	case 'getItemsVoshod':
 		$abcp = new core\Provider\Abcp(NULL, $db);
 		$countTransaction = 50;

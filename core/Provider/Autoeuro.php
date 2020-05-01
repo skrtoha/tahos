@@ -11,6 +11,8 @@ class Autoeuro extends Provider{
 	private static $apiKey = 'w84dWVnWf0fahzrMQhALbEVflzGrazSQgmMoSZWHmd5oHarZvJR0ULlLzjjh';
 	private static $url = 'https://api.autoeuro.ru/api/v-1.0/shop/';
 	private static $stores = [];
+	private static $delivery_key = 'Zid3sPWIUfEZXeXVuy8e46Zr1MwD704huFO0nxypa7DxUyB%2BlF1Vh4dMAnAa3qxhhI272D8npAC0Gl%2FUWNynsfbWxSyjqG9S9fQ%2Bk1GeP1xCjg5J470ZnoZeTHsZICym%2BEUUZ0wYVPCUbjbnHwTR3c227AGXDBbI4gwxzixWriUj2dc%2FC5nUdYyeuRFAg5bQBbnx5eqCyWlfs9lJdoUqRCzT7mJ230xoZrOGKYkb%2Bsak752366%2FSmFCKUy%2F4FtqlHAeLbNkJtNkZF%2F9ra6Rggg%3D%3D';
+	private static $subdivision_key = 'ogeRtaAVTbn%2FgjvNpHEZxi0FXtlvnXv8GaUON7FfMMbY4DF3brfW6H1mxYDjkR7wNHIqYZrxHMMzutXD%2FsOKHGey%2Fz2NAQSA8MudmokeGJKbkysLvH99q7C257zSxsOYnhH2iiGgyeuK2I7X3FcMcUY8DBVv2LhSrviyKC1Sg5UImARZeRFLy2gLnycQa6ooEQs4gviFLLkqoAGEKBj5LupIhMwMI7mzHWVZSzMQFmQshZqiaI5ck%2BA5djEzmSoV53%2B8QSe89ndE9E6BGE87Nclu%2B9kKr2VTPYUDMcCRDYI%3D';
 
 	public static $provider_id = 18;
 	public static $mainStoreID = 22657;
@@ -360,7 +362,7 @@ class Autoeuro extends Provider{
 			]);
 			return;
 		}
-		OrderValue::changeStatus(11, $params);
+		OrderValue::changeStatus(7, $params);
 		// debug(json_decode($response));
 		if ($response) return true;
 		else return false;
@@ -368,5 +370,43 @@ class Autoeuro extends Provider{
 	public static function getBasket(){
 		$response = parent::getUrlData(self::getUrlString('basket_items'));
 		return json_decode($response);
+	}
+	public static function sendOrder(){
+		$basket_items = self::getBasket();
+		if (!isset($basket_items->DATA)) return false;
+		// debug($basket_items);
+		$basket_item_keys = [];
+		foreach($basket_items->DATA as $b){
+			if (!$b->comment) continue;
+			$basket_item_keys[] = $b->basket_item_key;
+		}
+		/*$response = parent::getUrlData(
+			self::getUrlString('order_basket'),
+			[
+				'delivery_key' => self::$delivery_key,
+				'subdivision_key' => self::$subdivision_key,
+				'basket_item_keys' => $basket_item_keys
+			]
+		);
+		$json = json_decode($response);
+		if (!$response){
+			foreach($basket_items->DATA as $b){
+				if (!$b->comment) continue;
+				Log::insert([
+					'text' => 'Ошибка отправления в заказ',
+					'additional' => "osi: {$b->comment}"
+				]);
+			}
+			return false;
+		}*/
+		foreach($basket_items->DATA as $b){
+			if (!$b->comment) continue;
+			$array = explode('-', $b->comment);
+			$orderValue = OrderValue::get([
+				'order_id' => $array[0],
+				'store_id' => $array[1],
+				'item_id' => $array[2]
+			]);
+		}
 	}
 }

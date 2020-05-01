@@ -68,6 +68,7 @@ class OrderValue{
 				self::update($values, $params);
 				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'minus');
 				self::changeInStockStoreItem($params['quan'], $params, 'plus');
+				break;
 			//заказано
 			case 11:
 				$values['ordered'] = "`ordered` + {$params['quan']}";
@@ -80,6 +81,7 @@ class OrderValue{
 				User::updateReservedFunds($params['user_id'], $params['price'], 'minus');
 				self::update($values, $params);
 				self::changeInStockStoreItem($params['quan'], $params, 'plus');
+				break;
 			//отменен
 			case 5:
 				$values ['ordered'] = 0;
@@ -192,7 +194,7 @@ class OrderValue{
 
 	/**
 	 * gets common information of order value
-	 * @param  array  $fields user_id|status_id
+	 * @param  array  $fields user_id|status_id|order_id|store_id|
 	 * @return object mysqli object
 	 */
 	public static function get($fields = array()){
@@ -234,6 +236,6 @@ class OrderValue{
 			$where
 			ORDER BY o.created DESC
 		";
-		return $GLOBALS['db']->query($query, '');
+		return $GLOBALS['db']->query($query, 'result');
 	}
 }

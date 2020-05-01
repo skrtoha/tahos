@@ -38,7 +38,6 @@ function price_format(){
 	// });
 }
 function get_basket(basket){
-	console.log(basket);
 	var total_quan = 0;
 	var total_price = 0;
 	var c_tr = $('.cart-popup-table tr').length;

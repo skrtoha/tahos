@@ -38,6 +38,9 @@ switch ($act) {
 					Provider::addToProviderBasket($ov);
 					if ($ov['store_id'] == 24) Provider\Rossko::sendOrder($ov['store_id']);
 					break;
+				case 18: //Autoeuro
+					core\Provider\Autoeuro::putBusket($ov);
+					break;
 				case 19://Favorit
 					core\Provider\FavoriteParts::addToBasket($ov);
 					break;

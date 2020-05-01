@@ -148,6 +148,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 <script type="text/javascript">
 	var storesAutoeuro = [
 		<?=Autoeuro::$mainStoreID?>,
-		
+		<?=Autoeuro::$minPriceStoreID?>,
+		<?=Autoeuro::$minDeliveryStoreID?>
 	]
 </script>

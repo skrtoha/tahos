@@ -1246,7 +1246,6 @@ $(function(){
 		}
 	});
 	$(document).on('click', '.to-stock-btn', function(){
-		console.log(storesAutoeuro);
 		$('.mfp-wrap').click();
 		var e = $(this);
 		var store_id = +e.attr('store_id');

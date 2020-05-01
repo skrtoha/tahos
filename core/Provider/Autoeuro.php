@@ -1,6 +1,8 @@
 <?php
 namespace core\Provider;
 use core\Provider;
+use core\Log;
+use core\OrderValue;
 
 class Autoeuro extends Provider{
 	
@@ -208,14 +210,12 @@ class Autoeuro extends Provider{
 		$object = json_decode($response);
 		$codes = [];
 		$crosses = [];
-		// debug($object);
-		/*if (isset($object->DATA->CODES)){
+		if (isset($object->DATA->CODES)){
 			$codes = self::parseObjectData($object->DATA->CODES);
 			foreach($codes as $code) self::parseCode($code);
-		}*/
+		}
 		if (isset($object->DATA->CROSSES)){
 			$crosses = self::parseObjectData($object->DATA->CROSSES);
-			// debug($crosses);
 			foreach($crosses as $cross) self::parseCode($cross, $mainItemID);
 		}
 	}
@@ -321,9 +321,14 @@ class Autoeuro extends Provider{
 	}
 	private static function getStringBasketComment($params): string
 	{
-		return "{$params['store_id']}-{$params['item_id']}";
+		return "{$params['order_id']}-{$params['store_id']}-{$params['item_id']}";
 	}
-	public static function removeBasket($basket_item_key): object
+	public static function removeFromBasket($ov){
+		$basket_item_key = self::isInBasket($ov);
+		self::removeBasket($basket_item_key);
+		return true;
+	}
+	public static function removeBasket($basket_item_key)
 	{
 		return json_decode(parent::getUrlData(self::getUrlString('basket_del'), [
 			'basket_item_key' => $basket_item_key
@@ -335,6 +340,7 @@ class Autoeuro extends Provider{
 	 * @return [type]         [description]
 	 */
 	public static function putBusket($params){
+		debug($params);
 		$order_key = self::getOrderKey($params['store_id'], $params['item_id']);
 		if ($basket_item_key = self::isInBasket($params)){
 			self::removeBasket($basket_item_key);
@@ -347,6 +353,15 @@ class Autoeuro extends Provider{
 				'item_note' => self::getStringBasketComment($params)
 			]
 		);
+		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK'){
+			Log::insert([
+				'text' => 'Произошла ошибка добавления в корзину',
+				'additional' => "osi: ".self::getStringBasketComment($params)
+			]);
+			return;
+		}
+		OrderValue::changeStatus(11, $params);
+		// debug(json_decode($response));
 		if ($response) return true;
 		else return false;
 	}

@@ -1,5 +1,4 @@
 <?php  
-use core\Provider\Autoeuro;
 
 require_once ("../core/DataBase.php");
 session_start();
@@ -20,10 +19,6 @@ switch ($_POST['act']){
 			`item_id`=$item_id AND
 			`user_id`=$user_id
 		");
-		if (Autoeuro::isAutoeuro($store_id)){
-			$basket_item_key = Autoeuro::isInBasket(['store_id' => $store_id, 'item_id' => $item_id]);
-			Autoeuro::removeBasket($basket_item_key);
-		} 
 		break;
 	case 'plus':
 	case 'minus':
@@ -38,14 +33,6 @@ switch ($_POST['act']){
 				`item_id` = $item_id AND
 				`user_id`= $user_id
 		");
-		if (Autoeuro::isAutoeuro($store_id)){
-			$array = $db->select_one('basket', 'quan', "`store_id`=$store_id AND `item_id` = $item_id AND `user_id`=$user_id");
-			Autoeuro::putBusket([
-				'item_id' => $item_id,
-				'store_id' => $store_id,
-				'quan' => $array['quan']
-			]);
-		} 
 		break;
 	case 'clear':
 		$res = $db->delete('basket', "`user_id`=$user_id");
@@ -62,14 +49,6 @@ switch ($_POST['act']){
 				`item_id` = $item_id AND
 				`user_id`=$user_id
 		", '');
-		if (Autoeuro::isAutoeuro($store_id)){
-			$array = $db->select_one('basket', 'quan', "`store_id`=$store_id AND `item_id` = $item_id AND `user_id`=$user_id");
-			Autoeuro::putBusket([
-				'item_id' => $item_id,
-				'store_id' => $store_id,
-				'quan' => $array['quan']
-			]);
-		} 
 		break;
 	case 'isToOrder':
 	case 'noToOrder':

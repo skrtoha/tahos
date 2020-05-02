@@ -363,7 +363,6 @@ class Autoeuro extends Provider{
 			return;
 		}
 		OrderValue::changeStatus(7, $params);
-		// debug(json_decode($response));
 		if ($response) return true;
 		else return false;
 	}
@@ -382,17 +381,12 @@ class Autoeuro extends Provider{
 			if (!$b->comment) continue;
 			$basket_item_keys[] = $b->basket_item_key;
 		}
-		debug([
-				'delivery_key' => self::$delivery_key,
-				'subdivision_key' => self::$subdivision_key,
-				'basket_item_keys' => $basket_item_keys
-			]);
-		$response = parent::getUrlData(
+		$response = parent::getCurlUrlData(
 			self::getUrlString('order_basket'),
 			[
 				'delivery_key' => self::$delivery_key,
 				'subdivision_key' => self::$subdivision_key,
-				'basket_item_keys' => $basket_item_keys
+				'basket_item_keys' s=> json_encode($basket_item_keys)
 			]
 		);
 		$json = json_decode($response);

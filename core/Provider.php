@@ -160,10 +160,14 @@ abstract class Provider{
 		return $res;
 	}
 	public static function getCurlUrlData($url, $data = [], $header = null){
-		// debug($url, 'getCurlUrlData');
-		$curl = curl_init('http://api.favorit-parts.ru/ws/v1/order/');
+		debug($data, $url);
+		$curl = curl_init($url);
+		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, empty($data) ? 'GET' : 'POST');
-		if (!empty($data)) curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+		if (!empty($data)){
+			curl_setopt($curl, CURLOPT_POST, true);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+		} 
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		if ($header){
 			curl_setopt($curl, CURLOPT_HTTPHEADER, $header);

@@ -50,46 +50,48 @@
 <div id="popup" style="display: none"><img src="/images/preload.gif" alt=""></div>
 <input type="hidden" name="imgUrl" value="<?=core\Config::$imgUrl?>">
 <div id="container">
-	<div id="left_menu">
-		<span id="closeLeftMenu" class="icon-cross1"></span>
-		<div class="block">
-			<div class="title">Главное меню</div>
-			<ul>
-				<li class="<?=($view == 'items' or $view == 'item' or $view == 'substitutes' or $view == 'analogies')  ? "checked" : ""?>"><a href="?view=items">Номенклатура</a>
-				<li class="<?=($view == 'min_prices') ? "checked" : ""?>"><a href="?view=min_prices">Обновление цен</a>
-				<li class="<?=($view == 'sendings')  ? "checked" : ""?>">
-					<a href="?view=sendings">Доставки</a>
-					<?getCountLeftMenu('sendings', '`is_new`=1')?>
-				<li class="<?=($view == 'orders')  ? "checked" : ""?>">
-					<a href="?view=orders">Заказы</a>
-					<?getCountLeftMenu('orders', '`is_new`=1')?>
-				</li>
-				<li class="<?=($view == 'funds')  ? "checked" : ""?>">
-					<a href="?view=funds">Финансовые операции</a>
-					<?getCountLeftMenu('funds', '`type_operation`=1 AND `is_new`=1')?>
-				<li class="<?=($view == 'categories' or $view =='category') ? "checked" : ""?>"><a href="?view=categories">Категории товаров</a>
-				<li class="<?=($view == 'brends') ? "checked" : ""?>"><a href="?view=brends">Бренды товаров</a>
-				<li class="<?=($view == 'messages' or $view == 'correspond' or $view == 'news')  ? "checked" : ""?>">
-					<a href="?view=messages">Сообщения</a>
-					<?getCountLeftMenu('messages', '`is_read`=0 AND `sender`=1');?>
-				<li class="<?=($view == 'currencies' or $view == 'currencies')  ? "checked" : ""?>"><a href="?view=currencies">Валюта</a>
-				<li class="<?=($view == 'prices')  ? "checked" : ""?>"><a href="?view=prices">Прайсы</a>
-				<li class="<?=($view == 'providers')  ? "checked" : ""?>"><a href="?view=providers">Поставщики</a>
-				<li class="<?=($view == 'issues')  ? "checked" : ""?>"><a href="?view=issues">Точки выдачи</a>
-				<li class="<?=$view == 'users'  ? "checked" : ""?>"><a href="?view=users">Пользователи</a>
-				<li class="<?=$view == 'connections'  ? "checked" : ""?>"><a href="?view=connections">Соединения</a>
-				<li class="<?=$view == 'original-catalogs'  ? "checked" : ""?>"><a href="?view=original-catalogs">Оригинальные каталоги</a>
-				<li class="<?=$view == 'order_issues'  ? "checked" : ""?>"><a href="?view=order_issues">Выдачи товара</a>
-				<li class="<?=$view == 'help'  ? "checked" : ""?>"><a href="?view=texts&tab=">Тексты</a>
-				<li class="<?=$view == 'files'  ? "checked" : ""?>"><a href="?view=files">Файлы</a>
-				<li class="<?=$view == 'reports'  ? "checked" : ""?>"><a href="?view=reports">Отчеты</a>
-				<?if ($_SESSION['auth']){?>
-					<li><a href="?view=authorization&act=regout">Выйти</a></li>
-				<?}?>
-			</ul>
+	<?if ($_SESSION['auth']){?>
+		<div id="left_menu">
+			<span id="closeLeftMenu" class="icon-cross1"></span>
+			<div class="block">
+				<div class="title">Главное меню</div>
+				<ul>
+					<li class="<?=($view == 'items' or $view == 'item' or $view == 'substitutes' or $view == 'analogies')  ? "checked" : ""?>"><a href="?view=items">Номенклатура</a>
+					<li class="<?=($view == 'min_prices') ? "checked" : ""?>"><a href="?view=min_prices">Обновление цен</a>
+					<li class="<?=($view == 'sendings')  ? "checked" : ""?>">
+						<a href="?view=sendings">Доставки</a>
+						<?getCountLeftMenu('sendings', '`is_new`=1')?>
+					<li class="<?=($view == 'orders')  ? "checked" : ""?>">
+						<a href="?view=orders">Заказы</a>
+						<?getCountLeftMenu('orders', '`is_new`=1')?>
+					</li>
+					<li class="<?=($view == 'funds')  ? "checked" : ""?>">
+						<a href="?view=funds">Финансовые операции</a>
+						<?getCountLeftMenu('funds', '`type_operation`=1 AND `is_new`=1')?>
+					<li class="<?=($view == 'categories' or $view =='category') ? "checked" : ""?>"><a href="?view=categories">Категории товаров</a>
+					<li class="<?=($view == 'brends') ? "checked" : ""?>"><a href="?view=brends">Бренды товаров</a>
+					<li class="<?=($view == 'messages' or $view == 'correspond' or $view == 'news')  ? "checked" : ""?>">
+						<a href="?view=messages">Сообщения</a>
+						<?getCountLeftMenu('messages', '`is_read`=0 AND `sender`=1');?>
+					<li class="<?=($view == 'currencies' or $view == 'currencies')  ? "checked" : ""?>"><a href="?view=currencies">Валюта</a>
+					<li class="<?=($view == 'prices')  ? "checked" : ""?>"><a href="?view=prices">Прайсы</a>
+					<li class="<?=($view == 'providers')  ? "checked" : ""?>"><a href="?view=providers">Поставщики</a>
+					<li class="<?=($view == 'issues')  ? "checked" : ""?>"><a href="?view=issues">Точки выдачи</a>
+					<li class="<?=$view == 'users'  ? "checked" : ""?>"><a href="?view=users">Пользователи</a>
+					<li class="<?=$view == 'connections'  ? "checked" : ""?>"><a href="?view=connections">Соединения</a>
+					<li class="<?=$view == 'original-catalogs'  ? "checked" : ""?>"><a href="?view=original-catalogs">Оригинальные каталоги</a>
+					<li class="<?=$view == 'order_issues'  ? "checked" : ""?>"><a href="?view=order_issues">Выдачи товара</a>
+					<li class="<?=$view == 'help'  ? "checked" : ""?>"><a href="?view=texts&tab=">Тексты</a>
+					<li class="<?=$view == 'files'  ? "checked" : ""?>"><a href="?view=files">Файлы</a>
+					<li class="<?=$view == 'reports'  ? "checked" : ""?>"><a href="?view=reports">Отчеты</a>
+					<?if ($_SESSION['auth']){?>
+						<li><a href="?view=authorization&act=regout">Выйти</a></li>
+					<?}?>
+				</ul>
+			</div>
 		</div>
-	</div>
-	<div id="main_field">
+	<?}?>
+	<div id="main_field" class="<?=!$_SESSION['auth'] ? 'nonAuthorizated' : ''?>">
 		<div id="header">
 			<span class="icon-menu"></span>
 			<h1><?=$page_title?></h1>

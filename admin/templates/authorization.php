@@ -11,7 +11,6 @@ if ($_POST['name'] || $_GET['auth']){
 		message('Неверное имя или пароль!', false);
 	}
 }
-if ($_SESSION['auth'] && $_GET['user_id'])  $_SESSION['user'] = $_GET['user_id'];
 switch ($act) {
 	case 'regout':
 		$_SESSION['auth'] = 0;	

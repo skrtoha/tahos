@@ -220,6 +220,10 @@ class OrderValue{
 				ov.price,
 				ov.ordered,
 				ov.arrived,
+				ov.issued,
+				ov.declined,
+				ov.returned,
+				ov.quan,
 				ov.comment,
 				ov.store_id,
 				o.id AS order_id,
@@ -236,6 +240,6 @@ class OrderValue{
 			$where
 			ORDER BY o.created DESC
 		";
-		return $GLOBALS['db']->query($query, 'result');
+		return $GLOBALS['db']->query($query, '');
 	}
 }

@@ -372,6 +372,8 @@ class Autoeuro extends Provider{
 		return json_decode($response);
 	}
 	public static function sendOrder(){
+		// debug(json_decode(parent::getUrlData(self::getUrlString('subdivisions'))));
+		// exit();
 		$basket_items = self::getBasket();
 		if (!isset($basket_items->DATA)) return false;
 		// debug($basket_items);
@@ -380,7 +382,12 @@ class Autoeuro extends Provider{
 			if (!$b->comment) continue;
 			$basket_item_keys[] = $b->basket_item_key;
 		}
-		/*$response = parent::getUrlData(
+		debug([
+				'delivery_key' => self::$delivery_key,
+				'subdivision_key' => self::$subdivision_key,
+				'basket_item_keys' => $basket_item_keys
+			]);
+		$response = parent::getUrlData(
 			self::getUrlString('order_basket'),
 			[
 				'delivery_key' => self::$delivery_key,
@@ -389,6 +396,8 @@ class Autoeuro extends Provider{
 			]
 		);
 		$json = json_decode($response);
+		debug($GLOBALS['response_header']);
+		debug($json);
 		if (!$response){
 			foreach($basket_items->DATA as $b){
 				if (!$b->comment) continue;
@@ -398,14 +407,23 @@ class Autoeuro extends Provider{
 				]);
 			}
 			return false;
-		}*/
+		}
 		foreach($basket_items->DATA as $b){
 			if (!$b->comment) continue;
 			$array = explode('-', $b->comment);
-			$orderValue = OrderValue::get([
+			$resOrderValue = OrderValue::get([
 				'order_id' => $array[0],
 				'store_id' => $array[1],
 				'item_id' => $array[2]
+			]);
+			$orderValue = $resOrderValue->fetch_assoc();
+			OrderValue::changeStatus(11, [
+				'order_id' => $array[0], 
+				'store_id' => $array[1],
+				'item_id' => $array[2],
+				'price' => $orderValue['price'],
+				'quan' => $orderValue['quan'],
+				'user_id' => $orderValue['user_id']
 			]);
 		}
 	}

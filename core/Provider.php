@@ -59,9 +59,9 @@ abstract class Provider{
 	 */
 	public function updatePriceUpdated($params){
 		if (isset($params['store_id'])) return 
-			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE id = {$params['store_id']}", 'result');
+			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE id = {$params['store_id']}", '');
 		if (isset($params['provider_id'])) return 
-			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE provider_id = {$params['provider_id']}", 'result');
+			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE provider_id = {$params['provider_id']}", '');
 	}
 	public function addToProviderBasket($ov){
 		self::getInstanceDataBase()->insert('provider_basket', [

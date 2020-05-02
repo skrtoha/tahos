@@ -1,6 +1,7 @@
 <?php
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use core\Provider\Mikado;
+use core\Provider;
 
 set_time_limit(0);
 core\Timer::start();
@@ -135,7 +136,8 @@ switch($_GET['act']){
 				'row' => $i
 			]);
 		}
-		
+		Provider::updatePriceUpdated(['store_id' => $store_id]);
+
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
 		$price->log->alert("Вставлено: $price->insertedBrends брендов");
@@ -246,7 +248,7 @@ switch($_GET['act']){
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		}
-		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`={$rossko->provider_id}", '');
+		Provider::updatePriceUpdated(['provider_id' => $rossko::$provider_id]);
 		break;
 	case 'priceVoshod':
 		echo "<h2>Прайс Восход</h2>";
@@ -299,6 +301,8 @@ switch($_GET['act']){
 			]);
 		}
 
+		Provider::updatePriceUpdated(['store_id' => 8]);
+
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
 		$price->log->alert("Вставлено: $price->insertedBrends брендов");
@@ -309,7 +313,6 @@ switch($_GET['act']){
 		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
-		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`=8", '');
 		break;
 	case 'priceMikado':
 		$mikado = new core\Provider\Mikado($db);
@@ -369,6 +372,8 @@ switch($_GET['act']){
 				]);
 			}
 
+			Provider::updatePriceUpdated(['store_id' => Mikado::$stocks[$value]]);
+
 			$price->log->alert("Обработано $i строк");
 			$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
 			$price->log->alert("Вставлено: $price->insertedBrends брендов");
@@ -381,7 +386,6 @@ switch($_GET['act']){
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 
-			$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`=". Mikado::$stocks[$value], '');
 		}
 		break;
 	case 'priceSportAvto':
@@ -436,7 +440,7 @@ switch($_GET['act']){
 			]);
 		}
 
-		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`=7", '');		
+		Provider::updatePriceUpdated(['store_id' => 7]);
 
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
@@ -540,7 +544,7 @@ switch($_GET['act']){
 				]);
 			}
 
-			$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`= $store_id", '');
+			Provider::updatePriceUpdated(['store_id' => $store_id]);
 
 			$price->log->alert("Обработано $i строк");
 			$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
@@ -623,7 +627,7 @@ switch($_GET['act']){
 			]);
 		}
 
-		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`= 13", '');
+		Provider::updatePriceUpdated(['provider_id' => 13]);
 
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
@@ -710,7 +714,7 @@ switch($_GET['act']){
 			}
 		}
 
-		$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `provider_id`= 17", '');
+		Provider::updatePriceUpdated(['provider_id' => 17]);
 
 		$price->log->alert("Обработано $i строк");
 		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
@@ -864,7 +868,14 @@ switch($_GET['act']){
 				break;
 		}
 
+		switch($emailPrice['clearPrice']){
+			case 'onlyStore': Provider::updatePriceUpdated(['store_id' => $_GET['store_id']]); break;
+			case 'provider': Provider::updatePriceUpdated(['provider_id' => $_GET['provider_id']]); break;
+			break;
+		}
+
 		endSuccessfullyProccessing();
+
 		break;
 }
 echo "<br>Время обработки: <b>".core\Timer::end()."</b> секунд";

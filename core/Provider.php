@@ -52,6 +52,17 @@ abstract class Provider{
 				p.id = $provider_id AND pb.response IS NULL
 		", $flag);
 	}
+	/**
+	 * updates field price_updated in provider_stores
+	 * @param $params store_id|provider_id
+	 * @return boolean
+	 */
+	public function updatePriceUpdated($params){
+		if (isset($params['store_id'])) return 
+			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE id = {$params['store_id']}", 'result');
+		if (isset($params['provider_id'])) return 
+			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE provider_id = {$params['provider_id']}", 'result');
+	}
 	public function addToProviderBasket($ov){
 		self::getInstanceDataBase()->insert('provider_basket', [
 			'order_id' => $ov['order_id'],

@@ -1,6 +1,7 @@
 <?php
 namespace core;
 abstract class Provider{
+	private static $ignoreProvidersForMarkups = [18];
 	protected abstract static function getItemsToOrder(int $provider_id);
 
 	public static function getProviderTitle($provider_id){
@@ -160,7 +161,6 @@ abstract class Provider{
 		return $res;
 	}
 	public static function getCurlUrlData($url, $data = [], $header = null){
-		debug($data, $url);
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, empty($data) ? 'GET' : 'POST');
@@ -255,7 +255,9 @@ abstract class Provider{
 			'available' => -1
 		];
 		if (!$price['price']) return false;
-		$price['price'] = self::getPriceWithMarkups($price['price'], $params['store_id'], $params['user_id']);
+		if (!in_array($params['provider_id'], self::$ignoreProvidersForMarkups)){
+			$price['price'] = self::getPriceWithMarkups($price['price'], $params['store_id'], $params['user_id']);
+		}
 		// debug($price, get_class($provider) . " {$params['article']}");
 		return $price;
 	}

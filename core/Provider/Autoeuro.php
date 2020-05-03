@@ -16,8 +16,8 @@ class Autoeuro extends Provider{
 
 	public static $provider_id = 18;
 	public static $mainStoreID = 22657;
-	public static $minPriceStoreID = 25275;
-	public static $minDeliveryStoreID = 25276;
+	public static $minPriceStoreID = 23617;
+	public static $minDeliveryStoreID = 23618;
 
 	private static function getUrlString($action){
 		return self::$url . "$action/json/" . self::$apiKey;
@@ -342,7 +342,6 @@ class Autoeuro extends Provider{
 	 * @return [type]         [description]
 	 */
 	public static function putBusket($params){
-		debug($params);
 		$order_key = self::getOrderKey($params['store_id'], $params['item_id']);
 		if ($basket_item_key = self::isInBasket($params)){
 			self::removeBasket($basket_item_key);
@@ -386,7 +385,7 @@ class Autoeuro extends Provider{
 			[
 				'delivery_key' => self::$delivery_key,
 				'subdivision_key' => self::$subdivision_key,
-				'basket_item_keys' s=> json_encode($basket_item_keys)
+				'basket_item_keys' => json_encode($basket_item_keys)
 			]
 		);
 		$json = json_decode($response);

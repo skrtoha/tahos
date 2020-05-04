@@ -13,8 +13,7 @@ switch($_POST['act']){
 		break;
 	case 'addItemFromSearch':
 		// print_r($_POST);
-		$armtek = new core\Provider\Armtek($db);
-		$brend_id = $armtek->getBrendId($_POST['brend'], 'addItemFromSearch');
+		$brend_id = core\Provider\Armtek::getBrendId($_POST['brend'], 'addItemFromSearch');
 		if (!$brend_id){
 			$db->insert(
 				'brends',

@@ -153,7 +153,7 @@ class Armtek extends Provider{
 			return false;
 		}
 		if ($brend['parent_id']) $brend_id = $brend['parent_id'];
-		$brend_id = $brend['id'];
+		else $brend_id = $brend['id'];
 		$brends[$brand] = $brend_id;
 		return $brend_id;
 	}

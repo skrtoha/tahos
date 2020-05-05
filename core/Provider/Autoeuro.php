@@ -34,14 +34,34 @@ class Autoeuro extends Provider{
 			'with_crosses' => $with_crosses
 		]);
 	}
-	public static function getOrderKey($store_id, $item_id){
+	/**
+	 * [getOrderKey description]
+	 * @param array $params store_id, item_id
+	 * @return string order_key
+	 */
+	public static function getOrderKey($params){
+		if ($params['store_id'] == self::$mainStoreID){
+			$response = self::getStockItems(strtoupper($params['brend']), $params['article'], 0);
+			if (!$response || $response == 'Пустой ключ покупателя'){
+				$providerBrend = parent::getProviderBrend(self::$provider_id, $params['brend']);
+				$response = self::getStockItems(strtoupper($providerBrend), $params['article']);
+			}
+			$json = json_decode($response);
+			if (!isset($json->DATA->CODES)) return false;
+			foreach($json->DATA->CODES as $code){
+				if ($code->proposal == 'АвтоЕвро'){
+					return $code->order_key;
+				} 
+			}
+			return false;
+		}
 		$resAutoeuroOrderKeys = parent::getInstanceDataBase()->query("
 			SELECT
 				aok.order_key
 			FROM
 				#autoeuro_order_keys aok
 			WHERE
-				aok.store_id = $store_id AND aok.item_id = $item_id
+				aok.store_id = {$params['store_id']} AND aok.item_id = {$params['item_id']}
 		", '');
 		$output = $resAutoeuroOrderKeys->fetch_assoc();
 		return $output['order_key'];
@@ -132,74 +152,7 @@ class Autoeuro extends Provider{
 				unset($output[$key]['order_term']);
 			} 
 		}
-
 		return $output;
-		/*if ($isObjectCrosses){
-			$item_id = self::insertItem($o);
-			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
-			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
-			$mainItemID = $item_id;
-		}
-		// self::removeItemsAndProviderStores($mainItemID);
-		if ($o->proposal == 'АвтоЕвро'){
-			parent::getInstanceDataBase()->insert('store_items', [
-				'store_id' => self::$mainStoreID,
-				'item_id' => $mainItemID,
-				'price' => $o->price,
-				'in_stock' => $o->amount,
-				'packaging' => $o->packing
-			], ['duplicate' =>[
-				'price' => $o->price,
-				'in_stock' => $o->amount
-			]]);
-			return;
-		};
-		$cipher = strtoupper(parent::getRandomString(4));
-		$res = parent::getInstanceDataBase()->insert('autoeuro_order_keys', [
-			'cipher' => $cipher,
-			'item_id' => $mainItemID, 
-			'price' => ceil($o->price),
-			'order_term' => $o->order_term,
-			'order_key' => $o->order_key,
-		]
-		// , ['print' => true]
-		);
-		if (parent::isDuplicate($res)) return;
-		if (parent::isDuplicate($res)){
-			$res_aok = parent::getInstanceDataBase()->query("
-				SELECT
-					aok.*
-				FROM
-					#autoeuro_order_keys aok
-				WHERE
-					aok.order_key = '{$o->order_key}'
-			", 'result');
-			$array = $res_aok->fetch_assoc();
-			$cipher = $array['cipher'];
-		}
-		$res_provider_stores = parent::getInstanceDataBase()->insert('provider_stores', [
-			'title' => "АвтоЕвро - $cipher",
-			'cipher' => $cipher,
-			'percent' => 10,
-			'currency_id' => 1,
-			'provider_id' => self::$provider_id,
-			'delivery' => $o->order_term,
-			'delivery_max' => $o->order_term,
-			'under_order' => $o->order_term
-		]);
-		if ($res_provider_stores !== true){
-			$provider_store = parent::getInstanceDataBase()->select_one('provider_stores', '*', "`cipher` = '$cipher'");
-			$store_id = $provider_store['id'];
-		}
-		else $store_id = parent::getInstanceDataBase()->last_id();
-		if (!$store_id) die("Ошибка получение store_id");
-		$res = parent::getInstanceDataBase()->insert('store_items', [
-			'store_id' => $store_id,
-			'item_id' => $mainItemID,
-			'price' => $o->price,
-			'in_stock' => $o->amount,
-			'packaging' => $o->packing
-		]);*/
 	}
 	public static function setArticle($brend, $article, $mainItemID){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
@@ -342,7 +295,14 @@ class Autoeuro extends Provider{
 	 * @return [type]         [description]
 	 */
 	public static function putBusket($params){
-		$order_key = self::getOrderKey($params['store_id'], $params['item_id']);
+		$order_key = self::getOrderKey($params);
+		if (!$order_key){
+			Log::insert([
+				'text' => 'АвтоЕвро ошибка получения order_key',
+				'additional' => 'osi: ' . self::getStringBasketComment($params)
+			]);
+			return false;
+		}
 		if ($basket_item_key = self::isInBasket($params)){
 			self::removeBasket($basket_item_key);
 		}
@@ -354,6 +314,7 @@ class Autoeuro extends Provider{
 				'item_note' => self::getStringBasketComment($params)
 			]
 		);
+		debug(json_decode($response));
 		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK'){
 			Log::insert([
 				'text' => 'Произошла ошибка добавления в корзину',

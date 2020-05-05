@@ -4,7 +4,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH
 	print_r($_POST);
 	exit();
 };
-error_reporting(E_ERROR);
 switch ($act){
 	case 'delete':
 		$res = $db->delete('brends', "`id`=".$_GET['id']);

@@ -4,3 +4,6 @@ tr.is_blocked{
 tr.is_blocked td:first-child{
 	color: #c72a2a;
 }
+div.action{
+	margin: 5px 0;
+}

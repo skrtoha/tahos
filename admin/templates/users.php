@@ -188,7 +188,6 @@ function show_form($act){
 		<a href="?view=order_issues&user_id=<?=$id?>">На выдачу</a>
 		<a href="?view=order_issues&user_id=<?=$id?>&issued=1">Выданные</a>
 		<a href="?view=users&act=checkOrderedWithReserved&user_id=<?=$id?>">Сверить "заказано"</a>
-		<a href="?view=users&act=checkOrderedWithReserved&user_id=<?=$id?>">Сверить "заказано"</a>
 		<a href="?view=users&id=<?=$id?>&act=search_history">История поиска</a>
 		<a href="?view=users&id=<?=$id?>&act=basket">Товары в корзине</a>
 		<a href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
@@ -628,9 +627,10 @@ function basket(){
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
 	?>
-	<table class="t_table" cellspacing="1">
+	<table style="margin-top: 10px;" class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Бренд</td>
+			<td>Артикул</td>
 			<td>Наименование</td>
 			<td>Поставщик</td>
 			<td>Срок</td>
@@ -642,6 +642,7 @@ function basket(){
 			foreach($basket as $value){?>
 				<tr>
 					<td><?=$value['brend']?></td>
+					<td><?=$value['article']?></td>
 					<td><?=$value['title']?></td>
 					<td><?=$value['cipher']?></td>
 					<td><?=$value['delivery']?></td>

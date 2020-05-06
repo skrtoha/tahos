@@ -1,7 +1,7 @@
 <?
 use core\Provider\Autoeuro;
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
-/*$abcp->render(13); 
+$abcp->render(13); 
 $abcp->render(6);
 
 $mikado = new core\Provider\Mikado($db);
@@ -11,7 +11,7 @@ $armtek = new core\Provider\Armtek($db);
 $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
 $rossko = new core\Provider\Rossko($db);
-$rossko->execute("{$abcp->item['article']} {$abcp->item['brand']}");*/
+$rossko->execute("{$abcp->item['article']} {$abcp->item['brand']}");
 
 core\Provider\Autoeuro::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 

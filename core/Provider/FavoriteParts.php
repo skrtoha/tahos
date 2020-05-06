@@ -19,7 +19,7 @@ class FavoriteParts extends Provider{
 				return ['МЦС'];
 				break;
 			case 'FAMO':
-				return ['МС1', 'МС2', 'Дилер OE', 'МСК'];
+				return ['МС1', 'МС2', 'Дилер OE', 'МСК', 'ЦС OE'];
 				break;
 		}
 		return false;

@@ -981,6 +981,7 @@ $(function(){
 		e.preventDefault();
 		var elem = $(this);
 		modal_show(
+			'<a target="_blank" href="/admin/?view=items&act=item&id=' + elem.attr('item_id') + '">Карточка товара</a>' +
 			'<form class="item_set">' + 
 				'<input type="hidden" name="item_id" value="' + elem.attr('item_id') + '">' +
 				'<input type="hidden" name="node_id" value="' + elem.attr('node_id') + '">' +
@@ -1059,7 +1060,8 @@ $(function(){
 	$(document).on('click', 'tr.node_item', function(){
 		var elem = $(this);
 		modal_show(
-			'<a href="#" class="item_remove">Удалить</a>' +
+			'<a style="float: left" href="#" class="item_remove">Удалить</a>' +
+			'<a target="_blank" href="/admin/?view=items&act=item&id=' + elem.attr('item_id') + '">Карточка товара</a>' +
 			'<form class="item_change">' + 
 				'<input value="' + $('table.nodes').attr('node_id') + '" name="node_id" type="hidden">' +
 				'<input value="' + elem.attr('item_id') + '" name="item_id" type="hidden">' +

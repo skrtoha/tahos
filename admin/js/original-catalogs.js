@@ -967,7 +967,7 @@ $(function(){
 					var item = items[key];
 					var attributes = 
 						'article="' + item.article + '" item_id="' + item.id + '" title_full="' + 
-						item.title_full + '" node_id="' + $('table.nodes').attr('node_id') + '"';
+						item.title_full + '" node_id="' + $('table.nodes').attr('node_id') + '" brend="' + item.brend + '"';
 					str += 
 						'<a ' + attributes + ' class="item_set" title="Добавить">' +
 							item.brend + ' - ' + item.title_full
@@ -999,6 +999,10 @@ $(function(){
 					 	'<td>Артикул:</td>' +
 					 	'<td><input readonly type="text" value="' + elem.attr('article') + '"></td>' +
 				 	'</tr>' +
+			 		'<tr>' +
+					 	'<td>Бренд:</td>' +
+					 	'<td><input type="text" name="brend" value="' + elem.attr('brend') + '"></td>' +
+				 	'</tr>' +
 				 	'<tr>' +
 					 	'<td>Количество:</td>' +
 					 	'<td><input type="text" name="quan" value="1"></td>' +
@@ -1020,6 +1024,7 @@ $(function(){
 		var pos = elem.find('input[name=pos]').val();
 		var item_id = elem.find('input[name=item_id]').val();
 		var article = elem.find('input[name=article]').val();
+		var brend = elem.find('input[name=brend]').val();
 		var title_full = elem.find('input[name=title_full]').val();
 		var quan = elem.find('input[name=quan]').val();
 		var comment = elem.find('input[name=comment]').val();
@@ -1040,6 +1045,7 @@ $(function(){
 					'<tr class="node_item" item_id="' + item_id + '">' +
 						'<td>' + pos + '</td>' +
 						'<td>' + title_full + '</td>' +
+						'<td>' + brend + '</td>' +
 						'<td>' + article + '</td>' +
 						'<td>' + quan + '</td>' +
 						'<td>' + comment + '</td>' +
@@ -1066,17 +1072,21 @@ $(function(){
 					 	'<td>Название:</td>' +
 					 	'<td><input name="title_full" readonly type="text" value="' + elem.find('td:nth-child(2)').html() + '"></td>' +
 				 	'</tr>' +
+				 	'<tr>' +
+					 	'<td>Бренд:</td>' +
+					 	'<td><input name="brend" readonly type="text" value="' + elem.find('td:nth-child(3)').html() + '"></td>' +
+				 	'</tr>' +
 			 		'<tr>' +
 					 	'<td>Артикул:</td>' +
-					 	'<td><input name="article" readonly type="text" value="' + elem.find('td:nth-child(3)').html() + '"></td>' +
+					 	'<td><input name="article" readonly type="text" value="' + elem.find('td:nth-child(4)').html() + '"></td>' +
 				 	'</tr>' +
 				 	'<tr>' +
 					 	'<td>Количество:</td>' +
-					 	'<td><input type="text" name="quan" value="' + elem.find('td:nth-child(4)').html() + '"></td>' +
+					 	'<td><input type="text" name="quan" value="' + elem.find('td:nth-child(5)').html() + '"></td>' +
 				 	'</tr>' +
 				 	'<tr>' +
 					 	'<td>Комментарий:</td>' +
-					 	'<td><input type="text" name="comment" value="' + elem.find('td:nth-child(5)').html() + '"></td>' +
+					 	'<td><input type="text" name="comment" value="' + elem.find('td:nth-child(6)').html() + '"></td>' +
 				 	'</tr>' +
 			 		'<tr>' +
 					 	'<td colspan="2"><input type="submit" value="Изменить"></td>' +
@@ -1096,6 +1106,7 @@ $(function(){
 				$('tr[item_id=' + $('input[name=item_id]').val() + ']').html(
 					'<td>' + $('input[name=pos]').val() + '</td>' +
 					'<td>' + $('input[name=title_full]').val() + '</td>' +
+					'<td>' + $('input[name=brend]').val() + '</td>' +
 					'<td>' + $('input[name=article]').val() + '</td>' +
 					'<td>' + $('input[name=quan]').val() + '</td>' +
 					'<td>' + $('input[name=comment]').val() + '</td>'

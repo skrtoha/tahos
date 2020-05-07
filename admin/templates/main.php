@@ -50,87 +50,40 @@
 <div id="popup" style="display: none"><img src="/images/preload.gif" alt=""></div>
 <input type="hidden" name="imgUrl" value="<?=core\Config::$imgUrl?>">
 <div id="container">
-	<?if ($_SESSION['auth']){?>
+	<?if ($_SESSION['auth']){
+		?>
 		<div id="left_menu">
 			<span id="closeLeftMenu" class="icon-cross1"></span>
 			<div class="block">
 				<div class="title">Главное меню</div>
-				<ul>
-					<li>
-						<a href="">Администрирование</a>
-						<ul>
-							<?if (isset(core\Managers::$permissions['Обновление цен'])){?>
-								<li class="<?=($view == 'min_prices') ? "checked" : ""?>"><a href="?view=min_prices">Обновление цен</a>
-							<?}?>
-							<?if (isset(core\Managers::$permissions['Финансовые операции'])){?>
-								<li class="<?=($view == 'funds')  ? "checked" : ""?>">
-									<a href="?view=funds">Финансовые операции</a>
-									<?getCountLeftMenu('funds', '`type_operation`=1 AND `is_new`=1')?>
-							<?}?>
-							<?if (isset(core\Managers::$permissions['Валюта'])){?>
-								<li class="<?=($view == 'currencies' or $view == 'currencies')  ? "checked" : ""?>"><a href="?view=currencies">Валюта</a>
-							<?}?>
-							<?if (isset(core\Managers::$permissions['Точки выдачи'])){?>
-								<li class="<?=($view == 'issues')  ? "checked" : ""?>"><a href="?view=issues">Точки выдачи</a>
-							<?}?>
-							<?if (isset(core\Managers::$permissions['Тексты'])){?>
-								<li class="<?=$view == 'help'  ? "checked" : ""?>"><a href="?view=texts&tab=">Тексты</a>
-							<?}?>
-							<?if (isset(core\Managers::$permissions['Файлы'])){?>
-								<li class="<?=$view == 'files'  ? "checked" : ""?>"><a href="?view=files">Файлы</a>
-							<?}?>
-							<?if (isset(core\Managers::$permissions['Отчеты'])){?>
-								<li class="<?=$view == 'reports'  ? "checked" : ""?>"><a href="?view=reports">Отчеты</a>
-							<?}?>
-						</ul>
-					</li>
-					<?if (isset(core\Managers::$permissions['Номенклатура'])){?>
-						<li class="<?=($view == 'items' or $view == 'item' or $view == 'substitutes' or $view == 'analogies')  ? "checked" : ""?>"><a href="?view=items">Номенклатура</a>
-					<?}?>
-					
-					<?if (isset(core\Managers::$permissions['Доставки'])){?>
-						<li class="<?=($view == 'sendings')  ? "checked" : ""?>">
-							<a href="?view=sendings">Доставки</a>
-							<?getCountLeftMenu('sendings', '`is_new`=1')?>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Заказы'])){?>
-						<li class="<?=($view == 'orders')  ? "checked" : ""?>">
-							<a href="?view=orders">Заказы</a>
-							<?getCountLeftMenu('orders', '`is_new`=1')?>
-						</li>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Категории товаров'])){?>
-						<li class="<?=($view == 'categories' or $view =='category') ? "checked" : ""?>"><a href="?view=categories">Категории товаров</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Бренды товаров'])){?>
-						<li class="<?=($view == 'brends') ? "checked" : ""?>"><a href="?view=brends">Бренды товаров</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Сообщения'])){?>
-						<li class="<?=($view == 'messages' or $view == 'correspond' or $view == 'news')  ? "checked" : ""?>">
-							<a href="?view=messages">Сообщения</a>
-							<?getCountLeftMenu('messages', '`is_read`=0 AND `sender`=1');?>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Прайсы'])){?>
-						<li class="<?=($view == 'prices')  ? "checked" : ""?>"><a href="?view=prices">Прайсы</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Поставщики'])){?>
-						<li class="<?=($view == 'providers')  ? "checked" : ""?>"><a href="?view=providers">Поставщики</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Пользователи'])){?>
-						<li class="<?=$view == 'users'  ? "checked" : ""?>"><a href="?view=users">Пользователи</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Соединения'])){?>
-						<li class="<?=$view == 'connections'  ? "checked" : ""?>"><a href="?view=connections">Соединения</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Оригинальные каталоги'])){?>
-						<li class="<?=$view == 'original-catalogs'  ? "checked" : ""?>"><a href="?view=original-catalogs">Оригинальные каталоги</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Выдачи товара'])){?>
-						<li class="<?=$view == 'order_issues'  ? "checked" : ""?>"><a href="?view=order_issues">Выдачи товара</a>
-					<?}?>
-					<?if ($_SESSION['auth']){?>
-						<li><a href="?view=authorization&act=regout">Выйти</a></li>
-					<?}?>
+					<ul>
+						<?foreach(core\Config::$leftMenu as $key => $value){
+							if (
+								!is_array($value) &&
+								core\Managers::isAccessForbidden($value)
+							) continue;
+							?>
+							<li class="<?=$_GET['view'] == $value ? 'checked' : ''?>">
+								<a class="<?=is_array($value) ? 'isExistsSubMenu' : ''?>" href="<?=is_array($value) ? '' : "?view=$value"?>">
+									<?if (is_array($value)){?>
+										<span class="<?=core\Managers::isActiveMenuGroup($value, $_GET['view']) ? 'icon-circle-up' : 'icon-circle-down'?>"></span>
+									<?}?>
+									<?=$key?>
+								</a>
+								<?if (is_array($value)){?>
+									<ul class="<?=core\Managers::isActiveMenuGroup($value, $_GET['view']) ? 'active' : ''?>">
+										<?foreach($value as $k => $v){
+											if (core\Managers::isAccessForbidden($v)) continue;?>
+											<li class="<?=$_GET['view'] == $v ? 'checked' : ''?>"><a href="?view=<?=$v?>"><?=$k?></a></li>
+										<?}?>
+									</ul>
+								<?}?>
+							</li>
+						<?}?>
+						<?if ($_SESSION['auth']){?>
+							<li><a href="?view=authorization&act=regout">Выйти</a></li>
+						<?}?>
+					</ul>
 				</ul>
 			</div>
 		</div>

@@ -15,8 +15,11 @@ function getImgUrl(){
 	return $('input[name=imgUrl]').val();
 }
 $('#left_menu > div > ul > li > a').on('click', function(){
-	$(this).next().toggleClass('active');
-	return false;
+	if ($(this).next('ul').size()){
+		$(this).next().toggleClass('active');
+		$(this).find('span').toggleClass('icon-circle-up').toggleClass('icon-circle-down');
+		return false;
+	}
 })
 $(document).ready(function(e){
 	// $('.price_format').priceFormat({

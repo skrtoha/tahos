@@ -70,7 +70,7 @@ class Managers{
 		'Подкатегории' => ['category'],
 		'Бренды товаров' => ['brends'],
 		'Сообщения' => ['messages', 'correspond'],
-		'Валюта' => ['currencies'],
+		'Валюта' => ['currencies', 'get_currencies'],
 		'Прайсы' => ['prices'],
 		'Поставщики' => ['providers'],
 		'Точки выдачи' => ['issues'],

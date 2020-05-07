@@ -14,6 +14,10 @@ function show_message(msg, type = 'ok'){
 function getImgUrl(){
 	return $('input[name=imgUrl]').val();
 }
+$('#left_menu > div > ul > li > a').on('click', function(){
+	$(this).next().toggleClass('active');
+	return false;
+})
 $(document).ready(function(e){
 	// $('.price_format').priceFormat({
 	// 	allowNegative: true,

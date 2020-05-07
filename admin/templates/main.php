@@ -56,12 +56,38 @@
 			<div class="block">
 				<div class="title">Главное меню</div>
 				<ul>
+					<li>
+						<a href="">Администрирование</a>
+						<ul>
+							<?if (isset(core\Managers::$permissions['Обновление цен'])){?>
+								<li class="<?=($view == 'min_prices') ? "checked" : ""?>"><a href="?view=min_prices">Обновление цен</a>
+							<?}?>
+							<?if (isset(core\Managers::$permissions['Финансовые операции'])){?>
+								<li class="<?=($view == 'funds')  ? "checked" : ""?>">
+									<a href="?view=funds">Финансовые операции</a>
+									<?getCountLeftMenu('funds', '`type_operation`=1 AND `is_new`=1')?>
+							<?}?>
+							<?if (isset(core\Managers::$permissions['Валюта'])){?>
+								<li class="<?=($view == 'currencies' or $view == 'currencies')  ? "checked" : ""?>"><a href="?view=currencies">Валюта</a>
+							<?}?>
+							<?if (isset(core\Managers::$permissions['Точки выдачи'])){?>
+								<li class="<?=($view == 'issues')  ? "checked" : ""?>"><a href="?view=issues">Точки выдачи</a>
+							<?}?>
+							<?if (isset(core\Managers::$permissions['Тексты'])){?>
+								<li class="<?=$view == 'help'  ? "checked" : ""?>"><a href="?view=texts&tab=">Тексты</a>
+							<?}?>
+							<?if (isset(core\Managers::$permissions['Файлы'])){?>
+								<li class="<?=$view == 'files'  ? "checked" : ""?>"><a href="?view=files">Файлы</a>
+							<?}?>
+							<?if (isset(core\Managers::$permissions['Отчеты'])){?>
+								<li class="<?=$view == 'reports'  ? "checked" : ""?>"><a href="?view=reports">Отчеты</a>
+							<?}?>
+						</ul>
+					</li>
 					<?if (isset(core\Managers::$permissions['Номенклатура'])){?>
 						<li class="<?=($view == 'items' or $view == 'item' or $view == 'substitutes' or $view == 'analogies')  ? "checked" : ""?>"><a href="?view=items">Номенклатура</a>
 					<?}?>
-					<?if (isset(core\Managers::$permissions['Обновление цен'])){?>
-						<li class="<?=($view == 'min_prices') ? "checked" : ""?>"><a href="?view=min_prices">Обновление цен</a>
-					<?}?>
+					
 					<?if (isset(core\Managers::$permissions['Доставки'])){?>
 						<li class="<?=($view == 'sendings')  ? "checked" : ""?>">
 							<a href="?view=sendings">Доставки</a>
@@ -72,11 +98,6 @@
 							<a href="?view=orders">Заказы</a>
 							<?getCountLeftMenu('orders', '`is_new`=1')?>
 						</li>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Финансовые операции'])){?>
-						<li class="<?=($view == 'funds')  ? "checked" : ""?>">
-							<a href="?view=funds">Финансовые операции</a>
-							<?getCountLeftMenu('funds', '`type_operation`=1 AND `is_new`=1')?>
 					<?}?>
 					<?if (isset(core\Managers::$permissions['Категории товаров'])){?>
 						<li class="<?=($view == 'categories' or $view =='category') ? "checked" : ""?>"><a href="?view=categories">Категории товаров</a>
@@ -89,17 +110,11 @@
 							<a href="?view=messages">Сообщения</a>
 							<?getCountLeftMenu('messages', '`is_read`=0 AND `sender`=1');?>
 					<?}?>
-					<?if (isset(core\Managers::$permissions['Валюта'])){?>
-						<li class="<?=($view == 'currencies' or $view == 'currencies')  ? "checked" : ""?>"><a href="?view=currencies">Валюта</a>
-					<?}?>
 					<?if (isset(core\Managers::$permissions['Прайсы'])){?>
 						<li class="<?=($view == 'prices')  ? "checked" : ""?>"><a href="?view=prices">Прайсы</a>
 					<?}?>
 					<?if (isset(core\Managers::$permissions['Поставщики'])){?>
 						<li class="<?=($view == 'providers')  ? "checked" : ""?>"><a href="?view=providers">Поставщики</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Точки выдачи'])){?>
-						<li class="<?=($view == 'issues')  ? "checked" : ""?>"><a href="?view=issues">Точки выдачи</a>
 					<?}?>
 					<?if (isset(core\Managers::$permissions['Пользователи'])){?>
 						<li class="<?=$view == 'users'  ? "checked" : ""?>"><a href="?view=users">Пользователи</a>
@@ -112,15 +127,6 @@
 					<?}?>
 					<?if (isset(core\Managers::$permissions['Выдачи товара'])){?>
 						<li class="<?=$view == 'order_issues'  ? "checked" : ""?>"><a href="?view=order_issues">Выдачи товара</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Тексты'])){?>
-						<li class="<?=$view == 'help'  ? "checked" : ""?>"><a href="?view=texts&tab=">Тексты</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Файлы'])){?>
-						<li class="<?=$view == 'files'  ? "checked" : ""?>"><a href="?view=files">Файлы</a>
-					<?}?>
-					<?if (isset(core\Managers::$permissions['Отчеты'])){?>
-						<li class="<?=$view == 'reports'  ? "checked" : ""?>"><a href="?view=reports">Отчеты</a>
 					<?}?>
 					<?if ($_SESSION['auth']){?>
 						<li><a href="?view=authorization&act=regout">Выйти</a></li>

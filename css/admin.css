@@ -31,7 +31,12 @@ span[class^=icon]{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+#left_menu > div > ul > li > ul{
+	display: none;
+}
+#left_menu > div > ul > li > ul.active{
+	display: block;
+}
 .icon-cross1:before {
   content: "\ea0f";
 }

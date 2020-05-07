@@ -1,14 +1,26 @@
 <?php
+use core\Managers;
 $act = $_GET['act'];
 switch ($act) {
-	case 'add': show_form('s_add'); break;
+	case 'add': 
+		if (Managers::isActionForbidden('Точки выдачи', 'Добавление')){
+			Managers::handlerAccessNotAllowed();
+		}
+		show_form('s_add'); 
+		break;
 	case 's_add':
+		if (Managers::isActionForbidden('Точки выдачи', 'Добавление')){
+			Managers::handlerAccessNotAllowed();
+		}
 		if ($db->insert('issues', $_POST)){
 			message('Точка выдачи успешно сохранена!');
 			header('Location: ?view=issues');
 		}
 	case 'change': show_form('s_change'); break;
 	case 'delete':
+		if (Managers::isActionForbidden('Точки выдачи', 'Удаление')){
+			Managers::handlerAccessNotAllowed();
+		}
 		$res = $db->delete('issues', "`id`=".$_GET['id']);
 		if ($res === true){
 			message('Точка выдачи успешно удалена!');
@@ -17,6 +29,9 @@ switch ($act) {
 		else echo $res;
 		break;
 	case 's_change':
+		if (Managers::isActionForbidden('Точки выдачи', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		}
 		$db->update('issues', ['is_main' => 0], '1');
 		// debug($_POST); exit();
 		if ($_POST['is_main']) $_POST['is_main'] = 1;

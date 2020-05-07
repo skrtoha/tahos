@@ -21,10 +21,11 @@ class Connection{
 		// debug($_SERVER); exit();
 		// var_dump($this->isDeniedIP($remoteAddr));
 		// var_dump($this->isDeniedPage($_SERVER['REQUEST_URI']));
-		if ($_SESSION['user']) $this->add([ 
+		if (isset($_SESSION['manager']['id']) || isset($_SESSION['user'])) $this->add([
 			'ip' => $remoteAddr,
 			'url' => $_SERVER['REQUEST_URI'],
-			'user_id' => $_SESSION['user'],
+			'user_id' => $_SESSION['user'] ? $_SESSION['user'] : null,
+			'manager_id' => $_SESSION['manager']['id'] ? $_SESSION['manager']['id'] : null,
 			'comment' => $_SERVER['HTTP_USER_AGENT']
 		]);
 		elseif (
@@ -77,6 +78,7 @@ class Connection{
 				'ip' => $params['ip'],
 				'url' => $params['url'],
 				'user_id' => isset($params['user_id']) ? $params['user_id'] : null,
+				'manager_id' => isset($params['manager_id']) ? $params['manager_id'] : null,
 				'isDeniedAccess' => isset($params['isDeniedAccess']) ? $params['isDeniedAccess'] : null,
 				'comment' => isset($params['comment']) ? $params['comment'] : null
 			],
@@ -85,7 +87,7 @@ class Connection{
 		$this->connection_id = $this->db->last_id();
 	}
 	public static function getCommonList($pageSize = null, $pageNumber = null, $params = []){
-		$where = '';
+		$where = "c.url NOT LIKE '/admin/?view=connections%' AND ";
 		$having = '';
 		if (!empty($params)){
 			foreach($params as $key => $value){
@@ -103,6 +105,9 @@ class Connection{
 						break;
 					case 'isHiddenAdminPages':
 						$where .= "`url` NOT LIKE '/admin%' AND ";
+						break;
+					case 'manager_id':
+						$where .= "manager_id = $value AND ";
 						break;
 				}
 			}
@@ -123,9 +128,13 @@ class Connection{
 				c.user_id,
 				IF(c.isDeniedAccess = '1', 'Да', '') AS isDeniedAccess,
 				IF(
-					u.organization_name <> '',
-					CONCAT_WS (' ', u.organization_name, ot.title),
-					CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
+					c.manager_id IS NOT NULL,
+					CONCAT_WS(' ', m.first_name, m.last_name),
+					IF(
+						u.organization_name <> '',
+						CONCAT_WS (' ', u.organization_name, ot.title),
+						CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
+					)
 				) AS name,
 				c.comment,
 				DATE_FORMAT(c.created, '%d.%m.%Y %H:%i:%s') AS created
@@ -133,6 +142,8 @@ class Connection{
 				#connections c
 			LEFT JOIN	
 				#users u ON u.id = c.user_id
+			LEFT JOIN 
+				#managers m ON m.id = c.manager_id
 			LEFT JOIN 
 				#organizations_types ot ON ot.id=u.organization_type
 			$where

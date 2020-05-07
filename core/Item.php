@@ -20,6 +20,9 @@ class Item{
 	public static function get($brend_id, $article){
 		return $GLOBALS['db']->select_one('items', '*', "`brend_id` = $brend_id AND `article` = '$article'");
 	}
+	public static function getInstanceDataBase(){
+		return $GLOBALS['db'];
+	}
 	private function processUpdate($fields, $where){
 		$conditions = '';
 		foreach($where as $key => $value) $conditions .= "`{$key}` = '{$value}' AND ";
@@ -59,5 +62,47 @@ class Item{
 	}
 	public static function getHrefArticle($article){
 		return "/search/article/$article";
+	}
+	public function getFilters($item_id){
+		$res_filters = self::getInstanceDataBase()->query("
+			SELECT
+				c.title AS category,
+				ci.category_id,
+				f.id AS filter_id,
+				f.title AS filter,
+				fv.id AS fv_id,
+				fv.title AS fv,
+				IF(iv.value_id IS NOT NULL, 'selected', '') AS selected,
+				iv.value_id,
+				CAST(fv.title AS UNSIGNED) as sort_fv
+			FROM
+				#categories_items ci
+			LEFT JOIN
+				#filters f ON f.category_id = ci.category_id
+			LEFT JOIN
+				#filters_values fv ON fv.filter_id = f.id
+			LEFT JOIN
+				#categories c ON c.id = ci.category_id
+			LEFT JOIN
+				#items_values iv ON iv.item_id = {$_GET['id']} AND iv.value_id = fv.id
+			WHERE
+				ci.item_id = {$item_id}
+			ORDER BY
+				f.pos, sort_fv, fv.title
+		", '');
+		if(!$res_filters->num_rows) return false;
+		$output = [];
+		foreach($res_filters as $v){
+			$c = & $output[$v['category']];
+			$c['id'] = $v['category_id'];
+			$c['title'] = $v['category'];
+			$f = & $c['filters'][$v['filter_id']];
+			$f['id'] = $v['filter_id'];
+			$f['title'] = $v['filter'];
+			$f['filter_values'][$v['fv_id']]['id'] = $v['fv_id'];
+			$f['filter_values'][$v['fv_id']]['title'] = $v['fv'];
+			$f['filter_values'][$v['fv_id']]['selected'] = $v['selected'];
+		}
+		return $output;
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+use core\Managers;
 $act = $_GET['act'];
 if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH'])){
 	print_r($_POST);
@@ -6,6 +7,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH
 };
 switch ($act){
 	case 'delete':
+		if (Managers::isActionForbidden('Бренды товаров', 'Удаление')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		$res = $db->delete('brends', "`id`=".$_GET['id']);
 		if ($res === true){
 			$db->delete('brends', '`parent_id`='.$_GET['id']);
@@ -17,13 +21,29 @@ switch ($act){
 		break;
 	case 'items': items(); break;
 	case 'items_search': items_search(); break;
-	case 'change': show_form('s_change');break;
-	case 'add': show_form('s_add');break;
+	case 'change': 
+		if (Managers::isActionForbidden('Бренды товаров', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
+		show_form('s_change');
+		break;
+	case 'add': 
+		if (Managers::isActionForbidden('Бренды товаров', 'Добавление')){
+			Managers::handlerAccessNotAllowed();
+		} 
+		show_form('s_add');
+		break;
 	case 'image_delete':
+		if (Managers::isActionForbidden('Бренды товаров', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		array_map('unlink', glob(core\Config::$imgPath . "/brends/{$_GET['id']}.*"));
 		header("Location: /admin/?view=brends&id={$_GET['id']}&act=change");
 		break;
 	case 's_change':
+		if (Managers::isActionForbidden('Бренды товаров', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		foreach ($_POST as $key => $value) $_POST[$key] = $value;
 		if (!empty($_FILES['image'])){
 			$f = $_FILES['image'];
@@ -41,6 +61,9 @@ switch ($act){
 		}
 		break;
 	case 's_add':
+		if (Managers::isActionForbidden('Бренды товаров', 'Добавление')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		foreach ($_POST as $key => $value) $_POST[$key] = $value;
 		// print_r($_GET);
 		// exit();
@@ -54,15 +77,23 @@ switch ($act){
 		elseif ($db->insert('brends', $_POST)){
 			if (!empty($_FILES['image'])) brend_set_image($_FILES['image'], $db->last_id());
 			message('Бренд успешно добавлен!');
-			if ($_GET['from_item'] == 'new_item') header('Location: ?view=item&act=add&new_brend='.$db->getMax('brends', 'id'));
-			elseif ($_GET['from_item']) header('Location: ?view=item&id='.$_GET['from_item'].'&new_brend='.$db->getMax('brends', 'id'));
+			if ($_GET['from_item'] == 'new_item') header('Location: ?view=items&act=add&new_brend='.$db->getMax('brends', 'id'));
+			elseif ($_GET['from_item']) header('Location: ?view=items&id='.$_GET['from_item'].'&new_brend='.$db->getMax('brends', 'id'));
 			else header("Location: ?view=brends");
 		}
 		break;
 	case 'subbrends':
+		if (Managers::isActionForbidden('Бренды товаров', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		subbrends();
 		break;
-	case 'chb': chb(); break;
+	case 'chb': 
+		if (Managers::isActionForbidden('Бренды товаров', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
+		chb(); 
+		break;
 	default:
 		view();
 }
@@ -95,9 +126,9 @@ function view(){
 	$brends = $db->select_unique($select, '');
 	$page_title = "Бренды товаров";
 	$status = "<a href='/admin'>Главная</a> > $page_title"?>
-	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
+	<div id="total" style="margin-top: 5px;">Всего: <?=$all?></div>
 	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=brends" method="post">
+		<form style="float: left;margin-bottom: 10px;" action="?view=brends" method="post">
 			<input style="width: 264px;" required type="text" name="search" value="<?=$search?>" placeholder="Поиск по бренду">
 			<input type="submit" value="Искать">
 		</form>
@@ -271,7 +302,7 @@ function items(){
 			<input type="submit" value="Искать">
 		</form>
 	</div>
-	<table class="t_table" cellspacing="1" view="item">
+	<table class="t_table" cellspacing="1" view="items">
 		<tr class="head">
 			<td>Бренд</td>
 			<td>Артикул</td>
@@ -284,10 +315,10 @@ function items(){
 			foreach($res_items as $item){?>
 				<tr class="clickable_1 <?=$item['is_blocked'] ? 'is_blocked' : ''?>" value_id="<?=$item['id']?>">
 					<td><?=$item['brend']?></td>
-					<td><a target="_blank" href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-					<td><a target="_blank" href="?view=item&id=<?=$item['id']?>"><?=$item['article_cat']?></a></td>
+					<td><a target="_blank" href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+					<td><a target="_blank" href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article_cat']?></a></td>
 					<td><?=$item['title_full']?></td>
-					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['barcode']?></a></td>
+					<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['barcode']?></a></td>
 					<td><?=$item['categories']?></td>
 				</tr>
 			<?}

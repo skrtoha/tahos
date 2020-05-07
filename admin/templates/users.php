@@ -135,12 +135,13 @@ function view(){
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;">
+		<form style="float: left;margin-bottom: 10px;">
 			<input type="hidden" name="view" value="users">
 			<input style="width: 264px;"  required type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по пользователям">
 			<input type="submit" value="Искать">
 		</form>
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=add">Добавить</a>
+		<a style="position: relative;left: 14px;top: 5px;" href="?view=managers">Менеджеры</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

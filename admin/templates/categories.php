@@ -1,4 +1,5 @@
 <?php
+use core\Managers;
 $act = $_GET['act'];
 if ($_POST['submit']){
 	$id = $_GET['id'];
@@ -22,8 +23,18 @@ if ($_POST['submit']){
 		message('Такая ссылка уже присутствует!', false);
 	}
 	if ($bl){
-		if ($id) $db->update('categories', $array, "`id`=$id");
-		else $db->insert('categories', $array, ['print_query' => false]);
+		if ($id){
+			if (Managers::isActionForbidden('Категории товаров', 'Изменение')){
+				Managers::handlerAccessNotAllowed();
+			} 
+			$db->update('categories', $array, "`id`=$id");
+		} 
+		else{
+			if (Managers::isActionForbidden('Категории товаров', 'Добавление')){
+				Managers::handlerAccessNotAllowed();
+			} 
+			$db->insert('categories', $array, ['print_query' => false]);
+		} 
 		message('Изменения успешно сохранены!');
 		header('Location: ?view=categories');
 	}
@@ -31,8 +42,25 @@ if ($_POST['submit']){
 	// exit();
 }
 switch ($act) {
-	case 'change': case 'save': case 'add': show_form(); break;
+	case 'change': 
+		if (Managers::isActionForbidden('Категории товаров', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
+		show_form(); 
+		break;
+	case 'save': 
+		show_form(); 
+		break;
+	case 'add': 
+		if (Managers::isActionForbidden('Категории товаров', 'Добавление')){
+			Managers::handlerAccessNotAllowed();
+		} 
+		show_form(); 
+		break;
 	case 'delete':
+		if (Managers::isActionForbidden('Категории товаров', 'Удаление')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		if ($db->delete('categories', "`id`=".$_GET['id'])){
 			message('Категория успешно удалена!');
 			header('Location: ?view=categories');	

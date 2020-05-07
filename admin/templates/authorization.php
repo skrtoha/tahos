@@ -1,10 +1,14 @@
 <?
 $act = $_GET['act'];
 if (isset($_GET['auth']) && $_SERVER['REMOTE_ADDR'] == '188.64.169.59') $_SESSION['user'] = $_GET['auth'];
-if ($_POST['name'] || $_GET['auth']){
-	if ($_POST['name'] == 'vadim' && $_POST['password'] == '10317' || isset($_GET['auth'])){
+if (!empty($_POST)){
+	$login = $_POST['login'];
+	$password = md5($_POST['password']);
+	$manager = $db->select_one('managers', '*', "`login` = '$login' AND `password` = '$password' AND `is_blocked` = 0");
+	if (!empty($manager)){
 		message('Вы успешно авторизовались!');
 		$_SESSION['auth'] = 1;	
+		$_SESSION['manager'] = $manager;
 		header('Location: /admin/?view=orders');
 	}
 	else{
@@ -13,7 +17,7 @@ if ($_POST['name'] || $_GET['auth']){
 }
 switch ($act) {
 	case 'regout':
-		$_SESSION['auth'] = 0;	
+		session_destroy();
 		message('Вы успешно вышли!');
 		header('Location: ?view=authorization');
 		break;
@@ -34,11 +38,11 @@ function view(){
 						<table class="t_table" cellspacing="1">
 							<tr>
 								<td>Имя пользователя</td>
-								<td><input type="text" name="name" value="<?=$_POST['name']?>"></td>
+								<td><input type="text" name="login" value="<?=$_POST['login']?>"></td>
 							</tr>
 							<tr>
 								<td>Пароль:</td>
-								<td><input type="password" name="password"></td>
+								<td><input type="password" name="password" value="<?=$_POST['password']?>"></td>
 							</tr>
 							<tr>
 								<td colspan="2"><input type="submit" value="Авторизоваться"></td>

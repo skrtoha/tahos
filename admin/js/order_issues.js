@@ -107,7 +107,7 @@
 								'</td>' +
 								'<td>' + d.brend + '</td>' +
 								'<td>' +
-									'<a href="http://tahos/admin/?view=item&id=' + d.item_id + '">' + d.article + '</a>' +
+									'<a href="http://tahos/admin/?view=items&act=item&id=' + d.item_id + '">' + d.article + '</a>' +
 								'</td>' +
 								'<td>' + d.issued + '</td>' +
 								'<td>' + d.comment + '</td>' +

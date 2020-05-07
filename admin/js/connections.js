@@ -10,10 +10,13 @@
 			$(document).on('keyup change', 'div[data-name=common_list] .filter', function(e){
 				if (e.type == 'keyup' && e.keyCode != 13) return false;
 				connections.commonListFilters = [];
+				if ($(this).attr('name') == 'manager_id') {
+					$(this).closest('.actions').find('input[name=isHiddenAdminPages]').prop('checked', false);
+				}
 				$('div[data-name=common_list] .filter').each(function(){
 					var th = $(this);
-					switch(th.attr('type')){
-						case 'checkbox':
+					switch(th.attr('name')){
+						case 'isHiddenAdminPages':
 							if (th.is(':checked')) connections.commonListFilters.isHiddenAdminPages = 1;
 							break;
 						default:

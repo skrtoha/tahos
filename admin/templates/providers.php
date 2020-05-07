@@ -1,12 +1,21 @@
 <?php
+use core\Managers;
 $act = $_GET['act'];
 $id = $_GET['id'];
 if ($_POST['store_id']) items_submit();
 switch ($act) {
-	case 'provider': provider(); break;
+	case 'provider': 
+		if (Managers::isActionForbidden('Поставщики', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		}
+		provider(); 
+		break;
 	case 'stores': stores(); break;
 	case 'orders': orders(); break;
 	case 'provider_delete':
+		if (Managers::isActionForbidden('Поставщики', 'Удаление')){
+			Managers::handlerAccessNotAllowed();
+		}
 		$res = $db->delete('providers', "`id`=".$_GET['id']);
 		if ($res === true){
 			message('Поставщик успешно удален!');
@@ -44,7 +53,7 @@ function view(){
 	$providers = $db->select('providers', 'id,title,legal_region', $where, 'title', true, "$start,$perPage", true);?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=providers&act=search" method="post">
+		<form style="float: left;margin-bottom: 10px;" action="?view=providers&act=search" method="post">
 			<input style="width: 264px;" required type="text" name="search" value="<?=$search?>" placeholder="Поиск по поставщикам">
 			<input type="submit" value="Искать">
 		</form>

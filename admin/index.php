@@ -1,5 +1,6 @@
 <?php 
 use core\Log;
+use core\Managers;
 
 // set_exception_handler('error_handler',);
 // function error_handler($e){
@@ -15,12 +16,18 @@ ini_set('display_startup_errors', 1);
 require_once('../core/DataBase.php');
 require_once('templates/functions.php');
 session_start();
-$view = $_GET['view'] ? $_GET['view'] : 'items';
+$view = $_GET['view'];
+if (!$view) header("Location: /admin/?view=index");
 
 $db = new core\DataBase();
 $connection = new core\Connection($db);
 $db->setProfiling($connection->connection_id);
 $settings = $db->select('settings', '*'); $settings = $settings[0];
+Managers::$permissions = json_decode(Managers::getPermissions($_SESSION['manager']['group_id']), true);
+
+if (core\Managers::isAccessForbidden($_GET['view'])){
+	$view = 'forbidden';
+} 
 
 // debug($_SERVER);
 if ($view == 'orders' && $_GET['act'] == 'print'){

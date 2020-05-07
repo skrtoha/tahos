@@ -90,7 +90,7 @@ function view(){
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions" style="">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" method="post">
+		<form style="float: left;margin-bottom: 10px;" method="post">
 			<input style="width: 264px;" type="text" name="search" value="<?=$search?>" placeholder="Поиск">
 			<input type="submit" value="Искать">
 		</form>
@@ -250,7 +250,7 @@ function items(){
 			while($pi = $res_items->fetch_assoc()){?>
 				<tr>
 					<td><?=$pi['brend']?></td>
-					<td><a href="?view=item&id=<?=$pi['item_id']?>&act=change"><?=$pi['article']?></a></td>
+					<td><a href="?view=items&id=<?=$pi['item_id']?>&act=change"><?=$pi['article']?></a></td>
 					<td><?=$pi['title_full']?></td>
 					<td><input type="text" class="store_item" value="<?=$pi['price']?>" column="price" item_id="<?=$pi['item_id']?>"></td>
 					<td><input type="text" class="store_item" value="<?=$pi['in_stock']?>" column="in_stock" item_id="<?=$pi['item_id']?>"></td>

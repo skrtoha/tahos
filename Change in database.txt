@@ -113,19 +113,39 @@ CREATE TABLE IF NOT EXISTS `tahos_forbidden_pages` (
   PRIMARY KEY (`page`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-CREATE TABLE `tahos_autoeuro_order_keys` (
-  `store_id` int(10) UNSIGNED NOT NULL,
-  `item_id` int(10) UNSIGNED NOT NULL,
-  `order_term` int(2) UNSIGNED NOT NULL DEFAULT '0',
-  `order_key` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-ALTER TABLE `tahos_autoeuro_order_keys`
-  ADD PRIMARY KEY (`store_id`,`item_id`),
-  ADD UNIQUE KEY `item_id` (`item_id`),
-  ADD UNIQUE KEY `order_key` (`order_key`(1000));
-ALTER TABLE `tahos_autoeuro_order_keys`
-  ADD CONSTRAINT `tahos_autoeuro_order_keys_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `tahos_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `tahos_autoeuro_order_keys_ibfk_2` FOREIGN KEY (`store_id`) REFERENCES `tahos_provider_stores` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
+--------managers--------
+CREATE TABLE `tahos_managers` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `login` varchar(255) NOT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `last_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `password` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `group_id` int(10) UNSIGNED DEFAULT NULL,
+  `is_blocked` int(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `tahos_managers` (`id`, `login`, `first_name`, `last_name`, `password`, `group_id`, `is_blocked`) VALUES
+(3, 'vadim', 'Вадим', 'Баранов', '9c6947bd95ae487c81d4e19d3ed8cd6f', 1, 0),
+(6, 'skrtoha', 'Антон', 'Скричевский', 'e10adc3949ba59abbe56e057f20f883e', 2, 0);
+CREATE TABLE `tahos_manager_groups` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `permissions` json DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `tahos_manager_groups` (`id`, `title`, `permissions`) VALUES
+(1, 'Администратор', '{\"Файлы\": \"1\", \"Валюта\": \"1\", \"Заказы\": \"1\", \"Отчеты\": \"1\", \"Прайсы\": \"1\", \"Тексты\": \"1\", \"Доставки\": \"1\", \"Менеджеры\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Сообщения\": \"1\", \"Поставщики\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Соединения\": \"1\", \"Точки выдачи\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Номенклатура\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Подкатегории\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Пользователи\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Выдачи товара\": \"1\", \"Бренды товаров\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Обновление цен\": \"1\", \"Категории товаров\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Финансовые операции\": \"1\", \"Оригинальные каталоги\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}}'),
+(2, 'Менеджер по продажам', '{\"Заказы\": \"1\", \"Сообщения\": \"1\", \"Поставщики\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}, \"Точки выдачи\": {\"Удаление\": \"1\", \"Изменение\": \"1\", \"Добавление\": \"1\"}}');
+ALTER TABLE `tahos_managers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `login_2` (`login`),
+  ADD KEY `group_id` (`group_id`);
+ALTER TABLE `tahos_manager_groups`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `login_2` (`title`),
+  ADD KEY `login` (`title`) USING BTREE;
+ALTER TABLE `tahos_managers`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+ALTER TABLE `tahos_manager_groups`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `tahos_managers`
+  ADD CONSTRAINT `tahos_managers_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `tahos_manager_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `tahos_connections` ADD `manager_id` INT UNSIGNED NULL DEFAULT NULL AFTER `user_id`;

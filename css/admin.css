@@ -11,6 +11,9 @@
 *{
 	box-sizing: border-box;
 }
+.red{
+	color: red;
+}
 span[class^=icon]{
 	cursor: pointer;
 }
@@ -28,6 +31,7 @@ span[class^=icon]{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 .icon-cross1:before {
   content: "\ea0f";
 }
@@ -110,9 +114,15 @@ input[readonly]{
 	#left_menu div.block {padding: 20px 0px 10px 0px;background: #f7f7f7;}
 
 	#left_menu div.block .title {background: #f0f0f0;padding:5px 5px 5px 15px;font-weight:bold;}
+	#userInfo{
+		position: absolute;
+		right: 15px;
+		top: 5px;
+	}
 	#main_field {
   width: calc(100% - 165px);
   float: right;
+  position: relative;
   padding-right: 10px;}
 
 	#header {}
@@ -120,7 +130,7 @@ input[readonly]{
 	#status{
 
 	}
-	#contents {overflow:hidden;box-sizing:border-box;}
+	#contents {overflow:hidden;box-sizing:border-box;margin-top: 10px}
 
 	.t_form {width:inherit;overflow:hidden;border:solid 1px #606060;padding:1px;}
 	.t_form .delimiter {font-weight:bold;padding:10px;background:#e8e7e7;}
@@ -154,12 +164,19 @@ input[readonly]{
 
 	#total {float: right;line-height: 25px;}
 
-	div.actions {padding: 5px 0 5px 0;margin-top: 10px;;}
+	/*div.actions {padding: 5px 0 5px 0;margin-top: 10px;;}*/
 	#filters{ margin: 10px 0px 0px 0px; clear: both;}
 	#filters input{height: auto;}
 
 	#status { font-size:10px; background:#f0f0f0; padding:5px 0 5px 10px;}
-
+.actions.items {
+    display: flex;
+    flex-wrap: wrap;
+}
+.actions.items a {
+    margin-left: 10px;
+    line-height: 20px;
+}
 	#stats {padding:5px 0 0 15px;}
 	#stats div {padding:5px 0 0 0;}
 				#stats .right {float:right;width:40px;}
@@ -343,7 +360,7 @@ input[readonly]{
 	background: #a5bed1;
 }
 #need_similar{
-  margin: 10px 0;
+  margin: 0 0 10px 0;
 }
 #need_similar a:nth-child(n + 2){
 	margin-left: 10px;
@@ -2103,6 +2120,9 @@ span.icon-menu{
 	margin-right: 10px;
 }
 @media screen and (max-width: 550px){
+	#userInfo{
+		display: none;
+	}
 	textarea[name^=comment]{
 		min-height: 50px;
 	}
@@ -2209,4 +2229,7 @@ span.icon-menu{
     float: none !important;
     margin: 0 auto;
     margin-top: 100px;
+}
+.actions.items > form{
+	width: 340px;
 }

@@ -176,7 +176,7 @@ function request_delete_item($values){?>
 					<tr item_id="<?=$v['item_id']?>" user_id="<?=$v['user_id']?>">
 						<td><a target="_blank" href="/admin/?view=users&act=change&id=<?=$v['user_id']?>"><?=$v['name']?></a></td>
 						<td><?=$v['brend']?></td>
-						<td><a target="_blank" href="/admin/?view=item&id=<?=$v['item_id']?>"><?=$v['article']?></a></td>
+						<td><a target="_blank" href="/admin/?view=items&act=item&id=<?=$v['item_id']?>"><?=$v['article']?></a></td>
 						<td><?=$v['title_full']?></td>
 						<td><span title="Подтвердить удаление" class="icon-cross1"></span></td>
 					</tr>

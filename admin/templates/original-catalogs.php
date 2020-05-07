@@ -1,4 +1,5 @@
 <?php
+use core\Managers;
 if ($_FILES['model_image']){
 	error_reporting(E_ERROR);
 	$res = model_set_image($_FILES['model_image'], $_POST['model_id']);
@@ -116,7 +117,9 @@ function vehicles(){
 	$status = "<a href='/admin'>Главная</a> > $page_title"?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=$res_vehicles->num_rows?></span></div>
 	<div id="action">
-		<a class="vehicle_add" href="#">Добавить</a>
+		<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Добавление')){?>
+			<a class="vehicle_add" href="#">Добавить</a>
+		<?}?>
 		<a id="vehicle_categories" href="#">Категории</a>
 		<a href="/admin/?view=original-catalogs&act=recalculate_subgroups">Пересчитать подгруппы</a>
 	</div>
@@ -140,8 +143,12 @@ function vehicles(){
 					<td><?=$value['is_mosaic'] ? 'да' : 'нет'?></td>
 					<td><?=$value['category']?></td>
 					<td>
-						<a href="#" class="vehicle_change not_clickable">Изменить</a>
-						<a href="#" class="vehicle_remove not_clickable">Удалить</a>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Изменение')){?>
+							<a href="#" class="vehicle_change not_clickable">Изменить</a>
+						<?}?>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Удаление')){?>
+							<a href="#" class="vehicle_remove not_clickable">Удалить</a>
+						<?}?>
 						<?$is_image = file_exists(core\Config::$imgPath . "/vehicles/{$value['id']}.jpg") ? 1 : 0?>
 						<input type="hidden" name="is_image" value="<?=$is_image?>">
 					</td>
@@ -181,7 +188,11 @@ function vehicle_brends(){
 		ORDER BY b.title
 	", '');?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=$res_brends->num_rows?></span></div>
-	<div id="action"><a class="brend_add" href="#">Добавить</a></div>
+	<div id="action">
+		<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Добавление')){?>
+			<a class="brend_add" href="#">Добавить</a>
+		<?}?>
+	</div>
 	<table vehicle_id=<?=$_GET['vehicle_id']?> class="t_table brends" cellspacing="1">
 		<tr class="head">
 			<td>Бренд</td>
@@ -194,8 +205,12 @@ function vehicle_brends(){
 						<a href="<?=$_SERVER['REQUEST_URI']?>&brend_id=<?=$row['id']?>"><?=$row['title']?></a>
 					</td>
 					<td>
-						<a href="/admin/?view=brends&id=<?=$row['id']?>&act=change&from=<?=get_from_uri()?>">Изменить</a>
-						<a href="#" class="brend_remove not_clickable">Удалить</a>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Изменение')){?>
+							<a href="/admin/?view=brends&id=<?=$row['id']?>&act=change&from=<?=get_from_uri()?>">Изменить</a>
+						<?}?>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Удаление')){?>
+							<a href="#" class="brend_remove not_clickable">Удалить</a>
+						<?}?>
 					</td>
 				</tr>
 			<?}
@@ -219,7 +234,12 @@ function models(){
 	";
 	$models = $db->select('models', '*', "`brend_id`={$_GET['brend_id']} AND `vehicle_id`={$_GET['vehicle_id']}", 'title', true)?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=count($models)?></span></div>
-	<div id="action"><a class="model_add" href="">Добавить</a> <a href="#" class="filters">Фильтры</a></div>
+	<div id="action">
+		<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Добавление')){?>
+			<a class="model_add" href="">Добавить</a> 
+		<?}?>
+		<a href="#" class="filters">Фильтры</a>
+	</div>
 	<table vehicle_id="<?=$_GET['vehicle_id']?>" brend_id="<?=$_GET['brend_id']?>" class="t_table models" cellspacing="1">
 		<tr class="head">
 			<td>Модель</td>
@@ -237,8 +257,12 @@ function models(){
 						<?$img_path = core\Config::$imgPath . "/models/{$value['id']}.jpg";
 						$model_image_exists = file_exists($img_path) ? 1 : 0;?>
 						<input type="hidden" name="model_image_exists" value="<?=$model_image_exists?>">
-						<a class="model_change not_clickable" href="">Изменить</a>
-						<a href="#" class="model_remove not_clickable">Удалить</a>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Изменение')){?>
+							<a class="model_change not_clickable" href="">Изменить</a>
+						<?}?>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Удаление')){?>
+							<a href="#" class="model_remove not_clickable">Удалить</a>
+						<?}?>
 					</td>
 				</tr>
 			<?}
@@ -295,7 +319,9 @@ function modifications(){
 	", '')?>
 	<div id="total" style="margin-top: 10px;">Всего: <span><?=$res_modifications->num_rows?></span></div>
 	<div id="action">
-		<a class="modification_add" href="">Добавить</a>
+		<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Добавление')){?>
+			<a class="modification_add" href="">Добавить</a>
+		<?}?>
 	</div>
 	<table model_id="<?=$_GET['model_id']?>" brend_id="<?=$_GET['brend_id']?>" vehicle_id="<?=$_GET['vehicle_id']?>" class="t_table modifications" cellspacing="1">
 		<tr class="head">
@@ -327,8 +353,12 @@ function modifications(){
 						<?}
 					}?>
 					<td>
-						<a class="modification_change not_clickable" href="">Изменить</a>
-						<a href="#" class="modification_remove not_clickable">Удалить</a>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Изменение')){?>
+							<a class="modification_change not_clickable" href="">Изменить</a>
+						<?}?>
+						<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Удаление')){?>
+							<a href="#" class="modification_remove not_clickable">Удалить</a>
+						<?}?>
 					</td>
 				</tr>
 			<?}
@@ -457,7 +487,9 @@ function node(){
 			<input type="submit" value="Сохранить">
 		</form>
 	<?}?>
-	<a id="item_add" href="">Добавить деталь</a>
+	<?if (!Managers::isActionForbidden('Оригинальные каталоги', 'Добавление')){?>
+			<a id="item_add" href="">Добавить деталь</a>
+		<?}?>
 	<!-- <a id="item_create" href="">Создать деталь</a> -->
 	<table style="width: auto" node_id="<?=$_GET['node_id']?>" class="t_table nodes" cellspacing="1">
 		<tr class="head">

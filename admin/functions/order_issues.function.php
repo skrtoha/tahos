@@ -19,7 +19,7 @@ class Issues{
 				i.id={$item_id}
 		", '');
 		$item = $item[0];
-		return '<a href="/admin/?view=item&id='.$item_id.'">'.$item['brend'].' - '.$item['article'].' - '.$item['title_full'].'</a>';
+		return '<a href="/admin/?view=items&act=item&id='.$item_id.'">'.$item['brend'].' - '.$item['article'].' - '.$item['title_full'].'</a>';
 	}
 	protected function getOrderValue($order_id, $item_id){
 		return $this->db->select_one('orders_values', '*', "`order_id`={$order_id} AND `item_id`={$item_id}");

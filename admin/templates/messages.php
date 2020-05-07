@@ -1,4 +1,5 @@
-<?require_once('templates/pagination.php');
+<?
+require_once('templates/pagination.php');
 if (!$_GET['archive']) $where = "c.is_archive IS NULL OR c.is_archive=0";
 else $where = "c.is_archive>0";
 if (!$_GET['archive']){

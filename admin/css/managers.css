@@ -1,0 +1,16 @@
+tr[manager_id]{
+	cursor: pointer;
+}
+div.permissions > ul{
+	display: flex;
+   flex-wrap: wrap;
+}
+div.permissions > ul > li > label{
+	border-bottom: 1px solid black;
+}
+div.permissions > ul > li{
+	    border: 1px solid #e6e6e6;
+    padding: 5px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}

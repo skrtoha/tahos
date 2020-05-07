@@ -2,6 +2,9 @@
 $act = $_GET['act'];
 switch ($act) {
 	case 'delete':
+		if (Managers::isActionForbidden('Подкатегории', 'Удаление')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		$id = $_GET['id'];
 		$db->delete('categories', "`id`=$id");
 		debug($db->get_mysqli());
@@ -10,6 +13,9 @@ switch ($act) {
 		break;
 	case 'items_search':items_search();break;
 	case 'add_item':
+		if (Managers::isActionForbidden('Подкатегории', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		$item_id = $_GET['item_id'];
 		$category_id = $_GET['id'];
 		if ($db->getCount('categories_items', "`item_id`=$item_id AND `category_id`=$category_id")){
@@ -26,6 +32,9 @@ switch ($act) {
 	case 'filters_values': filters_values(); break;
 	case 'items_filters_values': items_filters_values(); break;
 	case 'delete_filter':
+		if (Managers::isActionForbidden('Подкатегории', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		$filters_values = $db->select('filters_values', 'id', "`filter_id`={$_GET['id']}");
 		foreach ($filters_values as $value) $in[] = $value['id'];
 		$db->delete('filters', "`id`={$_GET['id']}");
@@ -36,6 +45,9 @@ switch ($act) {
 		// debug($filters_values);
 		break;
 	case 'add_slider':
+		if (Managers::isActionForbidden('Подкатегории', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		$bool = true;
 		$filters_values = $db->select('filters_values', 'title', "`filter_id`={$_GET['id']}");
 		if (!count($filters_values)){
@@ -55,6 +67,9 @@ switch ($act) {
 		header("Location: ?view=category&act=filters&id={$_GET['from']}");
 		break;
 	case 'delete_slider':
+		if (Managers::isActionForbidden('Подкатегории', 'Изменение')){
+			Managers::handlerAccessNotAllowed();
+		} 
 		$db->update('filters', ['slider' => 0], "`id`={$_GET['id']}");
 		message('Успешно изменено!');
 		header("Location: ?view=category&act=filters&id={$_GET['from']}");
@@ -203,7 +218,7 @@ function items(){
 			foreach($items as $item){?>
 				<tr>
 					<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+					<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
 					<td><?=$item['title_full']?></td>
 					<?if (count($filters_values_table)){
 						foreach($filters_values_table as $filter_id => $filter_value_table){
@@ -289,7 +304,7 @@ function items_search(){
 					}?>
 				</td>
 				<td>
-					<a href="?view=item&id=<?=$item['id']?>&act=change">Изменить</a>
+					<a href="?view=items&id=<?=$item['id']?>&act=item">Изменить</a>
 					<a href="?view=items&id=<?=$item['id']?>&act=delete" class="delete_item" item_id="<?=$item['id']?>">Удалить</a>
 				</td>
 			</tr>
@@ -421,7 +436,7 @@ function items_filters_values(){
 		<?foreach($items as $item){?>
 			<tr>
 				<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-				<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+				<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
 				<td><?=$item['title']?></td>
 				<td><?=$item['barcode']?></td>
 				<td>

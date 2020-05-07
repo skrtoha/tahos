@@ -71,7 +71,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			</span>
 			<table id="statistics" class="t_table" cellspacing="1">
 				<thead class="head">
-					<tr>
+					<tr class="head">
 						<th>IP</th>
 						<th>Количество</th>
 						<th>Комментарий</th>
@@ -87,13 +87,21 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					<input class="filter" type="checkbox" value="1" name="isHiddenAdminPages" checked="checked">
 					Скрыть администратора
 				</label>
+				<label style="margin-left: 10px">Менеджер</label>
+				<select name="manager_id" class="filter">
+					<option value="">...выбрать менеджера</option>
+					<?$managers = core\Managers::get()?>
+					<?foreach($managers as $m){?>
+						<option value="<?=$m['id']?>"><?=$m['login']?></option>
+					<?}?>
+				</select>
 			</div>
 			<span class="total">
 				Всего: <input type="text" readonly name="totalNumber" value="">
 			</span>
 			<table id="common_list" class="t_table" cellspacing="1">
 				<thead class="head">
-					<tr>
+					<tr class="head">
 						<th>IP</th>
 						<th>Страница</th>
 						<th>Пользователь</th>
@@ -102,11 +110,11 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 						<th>Дата</th>
 					</tr>
 					<tr>
-						<td><input class="filter" type="text" name="ip"></td>
-						<td><input class="filter" type="text" name="url"></td>
-						<td><input class="filter" type="text" name="name"></td>
-						<td><input class="filter" type="text" name="comment"></td>
-						<td>
+						<td label="IP"><input class="filter" type="text" name="ip"></td>
+						<td label="Страница"><input class="filter" type="text" name="url"></td>
+						<td label="Пользователь"><input class="filter" type="text" name="name"></td>
+						<td label="Комментарий"><input class="filter" type="text" name="comment"></td>
+						<td label="Заблокировано">
 							<select class="filter" name="isDeniedAccess">
 								<option></option>
 								<option value="1">Да</option>

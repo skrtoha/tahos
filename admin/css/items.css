@@ -25,3 +25,6 @@ span.icon-cross.translate_delete{
 .clearAnalogies{
 	display: inline-block;
 }
+table.category select{
+	width: 200px;
+}

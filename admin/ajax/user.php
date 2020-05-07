@@ -115,9 +115,9 @@ switch($_POST['act']){
 		// print_r($item_id);
 		// print_r($item_diff);
 		$text = "
-			у <a target='_blank' href='/admin/?view=item&id={$item_id['id']}'>{$item_id['brend']} - {$item_id['article']} - {$item_id['title_full']}</a> 
+			у <a target='_blank' href='/admin/?view=items&act=item&id={$item_id['id']}'>{$item_id['brend']} - {$item_id['article']} - {$item_id['title_full']}</a> 
 			неправильный аналог
-			<a target='_blank' href='/admin/?view=item&id={$item_diff['id']}'>{$item_diff['brend']} - {$item_diff['article']} - {$item_diff['title_full']}</a> 
+			<a target='_blank' href='/admin/?view=items&act=item&id={$item_diff['id']}'>{$item_diff['brend']} - {$item_diff['article']} - {$item_diff['title_full']}</a> 
 		";
 		$db->insert('log_diff', [
 			'type' => 'wrongAnalogy',

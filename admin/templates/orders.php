@@ -293,7 +293,7 @@ function show_form($act){
 						<?}?>
 					</td>
 					<td label="Бренд"><?=$ov['brend']?></td>
-					<td label="Артикул"><a href="/admin/?view=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>
+					<td label="Артикул"><a href="/admin/?view=items&act=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>
 					<td label="Наименование"><?=$ov['title_full']?></td>
 					<td label="Цена" class="price_format">
 						<?if (!$order['is_draft']){?>

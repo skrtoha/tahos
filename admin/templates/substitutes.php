@@ -162,7 +162,7 @@ function item(){
 	$categories = $db->select('categories', 'id,title', "", '', '', '', true);
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=substitutes'>Замены</a> > $page_title";
 	$substitutes = $db->select('substitutes', 'item_diff', "`item_id`=$item_id");?>
-	<a href="?view=item&id=<?=$item_id?>" style="margin-bottom: 10px;display: block">Карточка товара</a>
+	<a href="?view=items&act=item&id=<?=$item_id?>" style="margin-bottom: 10px;display: block">Карточка товара</a>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Бренд</td>
@@ -173,7 +173,7 @@ function item(){
 		</tr>
 		<tr>
 			<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-			<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+			<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
 			<td><?=$item['title_full']?></td>
 			<td><?=$item['barcode']?></td>
 			<td>
@@ -209,7 +209,7 @@ function item(){
 				$item = $item[0]?>
 				<tr>
 					<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+					<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
 					<td><?=$item['title_full']?></td>
 					<td><?=$item['barcode']?></td>
 					<td>
@@ -260,7 +260,7 @@ function item_search(){
 		</tr>
 		<tr>
 			<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-			<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+			<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
 			<td><?=$item['title_full']?></td>
 			<td><?=$item['barcode']?></td>
 			<td>
@@ -295,7 +295,7 @@ function item_search(){
 			foreach($items as $item){?>
 				<tr>
 					<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
+					<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
 					<td><?=$item['title_full']?></td>
 					<td><?=$item['barcode']?></td>
 					<td>

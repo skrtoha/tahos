@@ -558,7 +558,7 @@ $(document).ready(function(e){
 		}
 	})
 	$('.items_box').on('click', function(){
-		document.location.href = "?view=item&id=" + $(this).attr('item_id');
+		document.location.href = "?view=items&act=item&id=" + $(this).attr('item_id');
 	})
 	$('.users_box').on('click', function(){
 		document.location.href = "?view=users&act=change&id=" + $(this).attr('user_id');
@@ -567,7 +567,7 @@ $(document).ready(function(e){
 		document.location.href = '/admin/?view=correspond&id=' + $(this).attr('correspond_id');
 	})
 	$('tr.clickable_1').on('click', function(){
-		document.location.href = '/admin/?view=' + $(this).closest('table').attr('view') + '&id=' + $(this).attr('value_id');
+		document.location.href = '/admin/?view=' + $(this).closest('table').attr('view') + '&act=item&id=' + $(this).attr('value_id');
 	})
 	$('input[name=delivery_type]').on('click', function(){
 		if ($(this).next().html() == 'Доставка') $('select[name=issue_id]').prop('disabled', true);

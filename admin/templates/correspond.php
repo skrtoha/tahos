@@ -1,4 +1,5 @@
-<?if ($_POST['image_submit']){
+<?
+if ($_POST['image_submit']){
 	$bool = true;
 	$name = $_FILES['image']['name'];
 	$type = $_FILES['image']['type'];

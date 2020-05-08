@@ -75,7 +75,6 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		<li class="ionTabs__tab" data-target="brends">Бренды</li>
 		<li class="ionTabs__tab" data-target="wrongAnalogy">Неправильный аналог</li>
 		<li class="ionTabs__tab" data-target="request_delete_item">Удаление товара</li>
-		<li class="ionTabs__tab" data-target="items_statistic">Удаление товара</li>
 	</ul>
 	<div class="ionTabs__body">
 		<div class="ionTabs__item" data-name="nomenclature"></div>

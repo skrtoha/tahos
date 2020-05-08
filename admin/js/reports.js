@@ -1,9 +1,14 @@
 var tab;
+console.log(window.location.hash);
 $(function(){
 	window['reports'] = {
 		tab: null,
 		ajaxUrl: '/admin/?view=reports',
 		init: function(){
+			if (!window.location.hash){
+				get = getParams();
+				window.history.pushState(null, null,  '/admin/?view=reports&tab=' + get.tab + '#tabs|reports:' + get.tab)
+			}
 			this.setTabs();
 			$(document).on('click', 'a.clearLog', function(e){
 				e.preventDefault();

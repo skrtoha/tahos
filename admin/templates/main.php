@@ -73,7 +73,7 @@
 								<?if (is_array($value)){?>
 									<ul class="<?=core\Managers::isActiveMenuGroup($value, $_GET['view']) ? 'active' : ''?>">
 										<?foreach($value as $k => $v){
-											if (core\Managers::isAccessForbidden($v)) continue;?>
+											/*if (core\Managers::isAccessForbidden($v)) continue*/;?>
 											<li class="<?=$_GET['view'] == $v ? 'checked' : ''?>"><a href="?view=<?=$v?>"><?=$k?></a></li>
 										<?}?>
 									</ul>

@@ -100,17 +100,32 @@ $(function(){
 				})
 			})
 		},
-		setDateTimePicker: function(){
+		setDateTimePicker: function(tab = 'purchaseability'){
 			$.datetimepicker.setLocale('ru');
-			$('.datetimepicker[name=dateFrom], .datetimepicker[name=dateTo]').datetimepicker({
+			$('[data-name=' + tab + '] .datetimepicker[name=dateFrom], [data-name=' + tab + '] .datetimepicker[name=dateTo]').datetimepicker({
 				format:'d.m.Y H:i',
 				onChangeDateTime: function(db, $input){
-					resports.purchaseability();
+					$.ajax({
+						type: 'post',
+						url: reports.ajaxUrl,
+						data: {
+							tab: tab,
+							dateFrom: $('div[data-name=' + tab + '] input[name=dateFrom]').val(),
+							dateTo: $('div[data-name=' + tab + '] input[name=dateTo]').val()
+						},
+						success: function(response){
+							$('div[data-name=purchaseability] table tbody').empty();
+							if (!response) return false;
+							var items = JSON.parse(response);
+							reports.parsePurchaseability(items);
+							reports.setDateTimePicker();
+							}
+					});
 				},
 				closeOnDateSelect: true,
 				closeOnWithoutClick: true
 			});
-		}
+		},
 		setTabs: function(){
 			$.ionTabs("#tabs_1", {
 				type: "hash",
@@ -127,10 +142,12 @@ $(function(){
 							dateTo: $('div[data-name=' + obj.tab + '] input[name=dateTo]').val()
 						},
 						success: function(response){
-							// console.log(response); return false;
 							switch(obj.tab){
 								case 'purchaseability':
-									resports.purchaseability();
+									$('div[data-name=purchaseability] table tbody').empty();
+									if (!response) return false;
+									var items = JSON.parse(response);
+									reports.parsePurchaseability(items);
 									reports.setDateTimePicker();
 									break;
 								default:
@@ -141,6 +158,20 @@ $(function(){
 					window.history.pushState(null, null, str)
 				}
 			});
+		},
+		parsePurchaseability: function(items){
+			if (!items) return false;
+			for(var key in items){
+				$('[data-name=purchaseability] table tbody').append(
+					'<tr>' +
+						'<td>' + items[key].brend + '</td> ' +
+						'<td>' + items[key].article + '</td> ' +
+						'<td>' + items[key].title_full + '</td> ' +
+						'<td>' + items[key].purchases + '</td> ' +
+						'<td>' + items[key].tahos_in_stock + '</td> ' +
+					'</tr>'
+				);
+			}
 		}
 	}
 	reports.init();

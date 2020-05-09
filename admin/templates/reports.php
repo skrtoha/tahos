@@ -67,6 +67,9 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$db->delete('user_request_delete_item', "`item_id`={$_POST['item_id']} AND `user_id`={$_POST['user_id']}");
 			break;
 		case 'purchaseability':
+			$output = [];
+			$from = core\Connection::getTimestamp($_POST['dateFrom']);
+			$to = core\Connection::getTimestamp($_POST['dateTo']);
 			$res_purchaseability = $db->query("
 				SELECT
 					ov.item_id,
@@ -87,12 +90,16 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					#brends b ON b.id = i.brend_id
 				LEFT JOIN
 					#store_items si ON si.item_id = ov.item_id AND si.store_id = 23
+				WHERE
+					o.created BETWEEN '$from' AND '$to'
 				GROUP BY
 					ov.item_id
 				ORDER BY
 					purchases DESC
 			", '');
-			purchaseability($res_purchaseability);
+			if (!$res_purchaseability->num_rows) return;
+			foreach($res_purchaseability as $value) $output[] = $value;
+			echo json_encode($output);
 			break;
 	}
 	exit();
@@ -118,6 +125,18 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			?>
 			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
 			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+			<table class="t_table">
+				<thead>
+					<tr class="head">
+						<td>Бренд</td>
+						<td>Артикул</td>
+						<td>Название</td>
+						<td>Заказов</td>
+						<td>На складе</td>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
 		</div>
 		<div class="ionTabs__preloader"></div>
 	</div>
@@ -229,11 +248,3 @@ function request_delete_item($values){?>
 	</form>
 	<div id="pagination-container"></div>
 <?}
-function purchaseability(mysqli_result $res_purchaseability){
-	$dateTo = new DateTime();
-	$dateFrom = new DateTime();
-	$dateFrom->sub(new DateInterval('P30D'));
-	?>
-	<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
-	<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
-<?}?>

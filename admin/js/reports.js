@@ -100,6 +100,15 @@ $(function(){
 					}
 				})
 			})
+			$.datetimepicker.setLocale('ru');
+			$('.datetimepicker[name=dateFrom], .datetimepicker[name=dateTo]').datetimepicker({
+				format:'d.m.Y H:i',
+				onChangeDateTime: function(db, $input){
+					connections.statistics();
+				},
+				closeOnDateSelect: true,
+				closeOnWithoutClick: true
+			});
 		},
 		setTabs: function(){
 			$.ionTabs("#tabs_1", {

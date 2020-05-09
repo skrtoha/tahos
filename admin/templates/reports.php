@@ -66,6 +66,33 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		case 'delete_item':
 			$db->delete('user_request_delete_item', "`item_id`={$_POST['item_id']} AND `user_id`={$_POST['user_id']}");
 			break;
+		case 'purchaseability':
+			$res = $db->query("
+				SELECT
+					ov.item_id,
+					i.title_full,
+					i.brend_id,
+					b.title AS brend,
+					i.article,
+					COUNT(ov.item_id) AS count_items,
+					si.in_stock AS tahos_in_stock,
+					o.created
+				FROM
+					#orders_values ov
+				LEFT JOIN
+					#orders o ON o.id = ov.order_id
+				LEFT JOIN	
+					#items i ON i.id = ov.item_id
+				LEFT JOIN
+					#brends b ON b.id = i.brend_id
+				LEFT JOIN
+					#store_items si ON si.item_id = ov.item_id AND si.store_id = 23
+				GROUP BY
+					ov.item_id
+				ORDER BY
+					count_items DESC
+			", 'result');
+			break;
 	}
 	exit();
 }?>
@@ -75,12 +102,22 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		<li class="ionTabs__tab" data-target="brends">Бренды</li>
 		<li class="ionTabs__tab" data-target="wrongAnalogy">Неправильный аналог</li>
 		<li class="ionTabs__tab" data-target="request_delete_item">Удаление товара</li>
+		<li class="ionTabs__tab" data-target="purchaseability">Покупаемость</li>
 	</ul>
 	<div class="ionTabs__body">
 		<div class="ionTabs__item" data-name="nomenclature"></div>
 		<div class="ionTabs__item" data-name="brends">	</div>
 		<div class="ionTabs__item" data-name="wrongAnalogy"></div>
 		<div class="ionTabs__item" data-name="request_delete_item"></div>
+		<div class="ionTabs__item" data-name="purchaseability">
+			<?
+			$dateTo = new DateTime();
+			$dateFrom = new DateTime();
+			$dateFrom->sub(new DateInterval('P1D'));
+			?>
+			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
+			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+		</div>
 		<div class="ionTabs__preloader"></div>
 	</div>
 </div>

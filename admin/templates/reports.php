@@ -78,7 +78,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					b.title AS brend,
 					i.article,
 					COUNT(ov.item_id) AS purchases,
-					si.in_stock AS tahos_in_stock,
+					IF(si.in_stock > 0, si.in_stock, '') AS tahos_in_stock,
 					o.created
 				FROM
 					#orders_values ov

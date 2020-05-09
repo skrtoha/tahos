@@ -6,7 +6,7 @@
 	<?if(file_exists("css/{$_GET['view']}.css")){?>
 		<link rel="stylesheet" type="text/css" href="css/<?=$_GET['view']?>.css">
 	<?}?>
-	<?if (in_array($_GET['view'], ['connections'])){?>
+	<?if (in_array($_GET['view'], ['connections', 'reports'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/datetimepicker/jquery.datetimepicker.min.css">
 	<?}?>
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
@@ -113,7 +113,7 @@
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/vendor/accordion.js", "async" : false},
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
-		<?if (in_array($view, ['connections'])){?>
+		<?if (in_array($view, ['connections', 'reports'])){?>
 			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
 		<?}?>
 		<?if (file_exists("js/$view.js")){

@@ -67,14 +67,14 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$db->delete('user_request_delete_item', "`item_id`={$_POST['item_id']} AND `user_id`={$_POST['user_id']}");
 			break;
 		case 'purchaseability':
-			$res = $db->query("
+			$res_purchaseability = $db->query("
 				SELECT
 					ov.item_id,
 					i.title_full,
 					i.brend_id,
 					b.title AS brend,
 					i.article,
-					COUNT(ov.item_id) AS count_items,
+					COUNT(ov.item_id) AS purchases,
 					si.in_stock AS tahos_in_stock,
 					o.created
 				FROM
@@ -90,8 +90,9 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				GROUP BY
 					ov.item_id
 				ORDER BY
-					count_items DESC
-			", 'result');
+					purchases DESC
+			", '');
+			purchaseability($res_purchaseability);
 			break;
 	}
 	exit();
@@ -113,7 +114,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			<?
 			$dateTo = new DateTime();
 			$dateFrom = new DateTime();
-			$dateFrom->sub(new DateInterval('P1D'));
+			$dateFrom->sub(new DateInterval('P30D'));
 			?>
 			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
 			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
@@ -228,4 +229,11 @@ function request_delete_item($values){?>
 	</form>
 	<div id="pagination-container"></div>
 <?}
-
+function purchaseability(mysqli_result $res_purchaseability){
+	$dateTo = new DateTime();
+	$dateFrom = new DateTime();
+	$dateFrom->sub(new DateInterval('P30D'));
+	?>
+	<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
+	<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+<?}?>

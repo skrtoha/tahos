@@ -1,5 +1,4 @@
 var tab;
-console.log(window.location.hash);
 $(function(){
 	window['reports'] = {
 		tab: null,
@@ -104,7 +103,7 @@ $(function(){
 			$('.datetimepicker[name=dateFrom], .datetimepicker[name=dateTo]').datetimepicker({
 				format:'d.m.Y H:i',
 				onChangeDateTime: function(db, $input){
-					connections.statistics();
+					// connections.statistics();
 				},
 				closeOnDateSelect: true,
 				closeOnWithoutClick: true
@@ -125,7 +124,13 @@ $(function(){
 						},
 						success: function(response){
 							// console.log(response); return false;
-							$('div[data-name=' + obj.tab + ']').html(response);
+							switch(obj.tab){
+								case 'purchaseability':
+									*********
+									break;
+								default:
+									$('div[data-name=' + obj.tab + ']').html(response);
+							}
 						}
 					});
 					window.history.pushState(null, null, str)

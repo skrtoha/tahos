@@ -121,7 +121,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			<?
 			$dateTo = new DateTime();
 			$dateFrom = new DateTime();
-			$dateFrom->sub(new DateInterval('P30D'));
+			$dateFrom->sub(new DateInterval('P90D'));
 			?>
 			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
 			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">

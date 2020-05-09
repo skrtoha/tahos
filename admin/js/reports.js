@@ -99,16 +99,18 @@ $(function(){
 					}
 				})
 			})
+		},
+		setDateTimePicker: function(){
 			$.datetimepicker.setLocale('ru');
 			$('.datetimepicker[name=dateFrom], .datetimepicker[name=dateTo]').datetimepicker({
 				format:'d.m.Y H:i',
 				onChangeDateTime: function(db, $input){
-					// connections.statistics();
+					resports.purchaseability();
 				},
 				closeOnDateSelect: true,
 				closeOnWithoutClick: true
 			});
-		},
+		}
 		setTabs: function(){
 			$.ionTabs("#tabs_1", {
 				type: "hash",
@@ -121,12 +123,15 @@ $(function(){
 						url: reports.ajaxUrl,
 						data: {
 							tab: obj.tab,
+							dateFrom: $('div[data-name=' + obj.tab + '] input[name=dateFrom]').val(),
+							dateTo: $('div[data-name=' + obj.tab + '] input[name=dateTo]').val()
 						},
 						success: function(response){
 							// console.log(response); return false;
 							switch(obj.tab){
 								case 'purchaseability':
-									*********
+									resports.purchaseability();
+									reports.setDateTimePicker();
 									break;
 								default:
 									$('div[data-name=' + obj.tab + ']').html(response);

@@ -500,8 +500,11 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$array['query'] = $db->query($q_item, 'query');
 		return $array;
 	} 
+
+	$items = core\Provider\Tahos::parseResItem($res_item);
+
 	$c = 0;
-	while ($v = $res_item->fetch_assoc()){
+	foreach ($items as $v){
 		$p = & $store_items[$v['item_id']];
 		if (!(int)$v['in_stock'] && $v['provider_id'] != 1) continue;
 		$p['title_full'] = $v['title_full'];

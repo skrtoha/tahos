@@ -16,7 +16,7 @@ class Mailer{
 	];
 	/**
 	 * Отправляет сообщение
-	 * @param  [array] $params массив параметров (email, subject, body)
+	 * @param  [array] $params массив параметров (['emails'], subject, body)
 	 * @return [mixed] true в случае удачной отправки либо сообщение об ошибке  
 	 */
 	public static function send($params){
@@ -31,7 +31,9 @@ class Mailer{
 		$mail->setFrom(self::$config['email'], 'Tahos.ru');     
 		$mail->SMTPSecure = 'tls';            
 		$mail->Port = 2525;
-		$mail->addAddress($params['email']);
+		if (is_array($params['emails'])){
+			foreach($params['emails'] as $email) $mail->addAddress($email);
+		} else $mail->addAddress($params['emails']);
 		$mail->addReplyTo(self::$config['email'], 'Tahos.ru');
 		$mail->Body = $params['body'];
 		$mail->Subject = $params['subject'];

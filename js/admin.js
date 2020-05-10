@@ -1,5 +1,21 @@
 var cookieOptions = {path: '/'};
 var item_id = $('input[name=id]').val();
+function getParams(){
+	if (!window.location.search) return false;
+	return window
+		.location
+		.search
+		.replace('?','')
+		.split('&')
+		.reduce(
+			function(p,e){
+				var a = e.split('=');
+				p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
+				return p;
+			},
+			{}
+		);
+};
 function show_message(msg, type = 'ok'){
 	if (type == 'error') $('#message div div').css('background', 'rgba(214, 50, 56, 0.97)');
 	else $('#message div div').css('background', 'green');
@@ -14,6 +30,26 @@ function show_message(msg, type = 'ok'){
 function getImgUrl(){
 	return $('input[name=imgUrl]').val();
 }
+$('#left_menu > div > ul > li > a').on('click', function(){
+	var th = $(this);
+	if (th.next('ul').size()){
+		th.next().toggleClass('active');
+		th.find('span').toggleClass('icon-circle-up').toggleClass('icon-circle-down');
+		var title = th.text();
+		title = title.trim(title);
+		$.ajax({
+			url: '/admin/ajax/submenu.php',
+			type: 'get',
+			data:{
+				title: title
+			},
+			success: function(response){
+				$('#main_field').html(response);
+			}
+		})
+		return false;
+	}
+})
 $(document).ready(function(e){
 	// $('.price_format').priceFormat({
 	// 	allowNegative: true,

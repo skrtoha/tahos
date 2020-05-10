@@ -101,3 +101,9 @@ tr[text_id], tr[rubric_id]{
 .t_form .title{
     width: 100px;
 }
+div[data-name=purchaseability] table{
+    margin-top: 10px;
+}
+div[data-name=purchaseability] input.datetimepicker{
+    width: 115px;
+}

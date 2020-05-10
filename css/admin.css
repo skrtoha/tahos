@@ -8,14 +8,30 @@
   font-weight: normal;
   font-style: normal;
 }
+div#submenu {
+    display: flex;
+    flex-direction: column;
+}
+div#submenu > a{
+	padding: 5px;
+}
 *{
 	box-sizing: border-box;
+}
+.icon-circle-up:before {
+  content: "\ea41";
 }
 .red{
 	color: red;
 }
 span[class^=icon]{
 	cursor: pointer;
+}
+.icon-circle-down:before {
+  content: "\ea43";
+}
+#left_menu > div > ul > li{
+	padding-left: 20px;
 }
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
@@ -31,7 +47,12 @@ span[class^=icon]{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+#left_menu > div > ul > li > ul{
+	display: none;
+}
+#left_menu > div > ul > li > ul.active{
+	display: block;
+}
 .icon-cross1:before {
   content: "\ea0f";
 }
@@ -62,6 +83,11 @@ span[class^=icon]{
 }
 .icon-checkmark2:before {
   content: "\ea11";
+}
+.icon-circle-down, .icon-circle-up{
+	width: 10px;
+	height: 10px;
+	color: #007f8e !important
 }
 #closeLeftMenu{
 	display: none;
@@ -109,7 +135,7 @@ input[readonly]{
 
 	#container {width: 100%;height:auto;}
 
-	#left_menu {float: left;width: 155px;overflow:hidden;margin-right: 10px;}
+	#left_menu {float: left;width: 180px;overflow:hidden;margin-right: 10px;}
 
 	#left_menu div.block {padding: 20px 0px 10px 0px;background: #f7f7f7;}
 
@@ -120,7 +146,7 @@ input[readonly]{
 		top: 5px;
 	}
 	#main_field {
-  width: calc(100% - 165px);
+  width: calc(100% - 190px);
   float: right;
   position: relative;
   padding-right: 10px;}
@@ -504,12 +530,6 @@ input[name=return]{width: 14px;height: 14px;}d
 	text-decoration: none;
 	color: red;
 	font-weight: 700;
-}
-#left_menu li span:before{
-	content: '(';
-}
-#left_menu li span:after{
-	content: ')';
 }
 .is_new{
 	font-weight: 700;
@@ -2220,6 +2240,9 @@ span.icon-menu{
 	#left_menu div.block{
 		padding-top: 0;
 	}
+	a.isExistsSubMenu{
+		position: relative;
+	}
 	div.actions{
 		margin-top: 0px;
 	}
@@ -2230,6 +2253,11 @@ span.icon-menu{
     margin: 0 auto;
     margin-top: 100px;
 }
-.actions.items > form{
-	width: 340px;
+#left_menu span.icon-circle-down,
+#left_menu span.icon-circle-up{
+	position: absolute;
+    margin-left: -18px;
+}
+a.isExistsSubMenu{
+	position: relative;
 }

@@ -1,94 +1,6 @@
 <?php
 namespace core;
 class Managers{
-	public static $pages = [
-		'Номенклатура' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Обновление цен',
-		'Доставки',
-		'Заказы',
-		'Финансовые операции',
-		'Категории товаров' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Подкатегории' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Бренды товаров' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Сообщения',
-		'Валюта',
-		'Прайсы',
-		'Поставщики' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Точки выдачи' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Соединения',
-		'Пользователи' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Менеджеры' => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Оригинальные каталоги'  => [
-			'Добавление',
-			'Удаление',
-			'Изменение'
-		],
-		'Выдачи товара',
-		'Тексты',
-		'Файлы',
-		'Отчеты'
-	];
-	private static $pagesViews = [
-		'Номенклатура' => ['items'],
-		'Обновление цен' => ['min_prices'],
-		'Доставки' => ['sendings'],
-		'Заказы' => ['orders'],
-		'Финансовые операции' => ['funds'],
-		'Категории товаров' => ['categories'],
-		'Подкатегории' => ['category'],
-		'Бренды товаров' => ['brends'],
-		'Сообщения' => ['messages', 'correspond'],
-		'Валюта' => ['currencies'],
-		'Прайсы' => ['prices'],
-		'Поставщики' => ['providers'],
-		'Точки выдачи' => ['issues'],
-		'Соединения' => ['connections'],
-		'Пользователи' => ['users'],
-		'Менеджеры' => ['managers'],
-		'Оригинальные каталоги' => ['original-catalogs'],
-		'Выдачи товара' => ['order_issues'],
-		'Тексты' => ['texts'],
-		'Файлы' => ['files'],
-		'Отчеты' => ['reports']
-	];
-	private static $defaultPermissions = [
-		'authorization',
-		'managers',
-		'index',
-		'cron'
-	];
 	public static $permissions;
 
 	private static function getInstanceDatabase(){
@@ -139,16 +51,6 @@ class Managers{
 		", '');
 		return $res;
 	}
-	public static function getChecked($p){
-		var_dump($p);
-		if (is_array($p)){
-			foreach($p as $value){
-				if ($value) return 'checked';
-			}
-		}
-		if ($p) return 'checked';
-		return '';
-	}
 	public static function addGroup($fields){
 		$res = self::getInstanceDatabase()->insert('manager_groups', [
 			'title' => $fields['title'],
@@ -197,13 +99,19 @@ class Managers{
 	}
 	public static function isAccessForbidden(string  $view = null)
 	{
-		if (in_array($view, self::$defaultPermissions)) return false;
+		if (in_array($view, Config::$defaultPermissions)) return false;
 		foreach(self::$permissions as $key => $value){
-			if (in_array($view, self::$pagesViews[$key])) return false;
+			if (in_array($view, Config::$pagesViews[$key])) return false;
 		}
 		return true;
 	}
 	public static function handlerAccessNotAllowed($manager = []){
 		die("Доступ заперещен");
+	}
+	public static function isActiveMenuGroup($subgroup, $view){
+		foreach($subgroup as $key => $value){
+			if ($value == $view) return true;
+		}
+		return false;
 	}
 }

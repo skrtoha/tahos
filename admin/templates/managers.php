@@ -201,7 +201,7 @@ function group($group = []){
 					<div class="title">Разрешения</div>
 					<div class="value permissions">
 						<ul>
-							<?foreach(Managers::$pages as $key => $value){
+							<?foreach(core\Config::$commonPermisions as $key => $value){
 								$title = is_array($value) ? $key : $value;
 								?>
 								<li class="parent">

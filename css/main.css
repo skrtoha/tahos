@@ -23,7 +23,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.icon-circle-down:before {
+  content: "\ea43";
+}
 div.gif, tr.gif{
   display: block;
 }

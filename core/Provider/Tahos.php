@@ -3,7 +3,7 @@ namespace core\Provider;
 class Tahos{
 	public static $store_id = 23;
 	public static $provider_id = 14;
-	public static $isDoNotShowStoresCheeperTahos = false;
+	public static $isDoNotShowStoresCheeperTahos = true;
 
 	public function parseResItem(\mysqli_result $res_items): array
 	{

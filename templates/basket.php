@@ -4,7 +4,6 @@ $user_id = $_SESSION['user'];
 // debug($basket, 'basket');
 // debug($user); exit();
 if ($_GET['act'] == 'to_offer'){
-	// exit();
 	$res_basket = core\Basket::get($user_id, true);
 	if (!$res_basket->num_rows){
 		message('Нечего отправлять!', false);
@@ -43,6 +42,11 @@ if ($_GET['act'] == 'to_offer'){
 	} 
  	$db->delete('basket', "`user_id`={$_SESSION['user']} AND `isToOrder`=1");
 	message('Успешно отправлено в заказы!');
+	core\Mailer::send([
+		'email' => 'info@tahos.ru',
+		'subject' => 'Новый заказ на tahos.ru',
+		'body' => 'На сайте tahos.ru появился новый заказ'
+	])
 	header('Location: /orders');
 }
 $res_basket = core\Basket::get($_SESSION['user']);

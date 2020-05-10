@@ -46,7 +46,7 @@ if ($_GET['act'] == 'to_offer'){
 		'email' => 'info@tahos.ru',
 		'subject' => 'Новый заказ на tahos.ru',
 		'body' => 'На сайте tahos.ru появился новый заказ'
-	])
+	]);
 	header('Location: /orders');
 }
 $res_basket = core\Basket::get($_SESSION['user']);

@@ -94,7 +94,7 @@ function view(){
 		</tr>
 		<?if (count($subcategories)){
 			foreach ($subcategories as $category) {?>
-			<tr class="subcategory">
+			<tr class="subcategory" data-id="<?=$category['id']?>">
 				<td title="Нажмите, чтобы изменить" class="category" data-id="<?=$category['id']?>">
 					<?=$category['title']?>
 				</td>

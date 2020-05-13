@@ -679,7 +679,7 @@ $(document).ready(function(e){
 	})
 	$('.subcategory td.href, .subcategory td.category, .subcategory td.pos').on('click', function(){
 		elem = $(this);
-		var id = elem.data('id');
+		var id = elem.closest('tr').data('id');
 		var table = elem.attr('class');
 		var old_value = elem.html();
 		old_value = old_value.trim();

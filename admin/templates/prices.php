@@ -250,7 +250,7 @@ function items(){
 			while($pi = $res_items->fetch_assoc()){?>
 				<tr>
 					<td><?=$pi['brend']?></td>
-					<td><a href="?view=items&id=<?=$pi['item_id']?>&act=change"><?=$pi['article']?></a></td>
+					<td><a href="?view=items&id=<?=$pi['item_id']?>&act=item"><?=$pi['article']?></a></td>
 					<td><?=$pi['title_full']?></td>
 					<td><input type="text" class="store_item" value="<?=$pi['price']?>" column="price" item_id="<?=$pi['item_id']?>"></td>
 					<td><input type="text" class="store_item" value="<?=$pi['in_stock']?>" column="in_stock" item_id="<?=$pi['item_id']?>"></td>

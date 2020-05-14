@@ -168,7 +168,6 @@ var get_items = function(){
 			set_fixed();
 			// return;
 			var res = JSON.parse(msg);
-			console.log(res);
 			if (!res.items){
 				$('.mosaic-view').html('<div>Ничего не найдено</div>');
 				$('.wide-view tr:nth-child(n+2)').remove();
@@ -303,7 +302,7 @@ function getFullItem(i){
 						'</button>';
 	}
 	str +=	'' +
-		'<button href="/search/article/' + item.article + '"  id="search-same"><span class="icon_search"></span>Другие предложения</button>' +
+		'<button href="/article/' + item.id + '-' + item.article + '"  id="search-same"><span class="icon_search"></span>Другие предложения</button>' +
 		'<div class="clearfix"></div>' +
 	'</div>';
 	return str;
@@ -471,7 +470,6 @@ $(document).ready(function(){
 					console.log(msg);
 					// return;
 					var res = JSON.parse(msg);
-					console.log(res);
 					if (Object.keys(res).length < 5 && chunk >= 10) fixed = false;
 					else  fixed = true;
 					var get_html = getHtmlItems(res.items);

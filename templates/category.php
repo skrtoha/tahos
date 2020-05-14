@@ -141,7 +141,7 @@ else{
 							<div class="product">
 								<p>
 									<b class="brend_info" brend_id="<?=$item['brend_id']?>"><?=$item['brend']?></b> 
-									<a href="<?=core\Item::getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
+									<a href="/article/<?=$item['id']?>-<?=$item['article']?>" class="articul"><?=$item['article']?></a> 
 								</p>
 								<p><strong><?=$item['title_full']?></strong></p>
 								<div class="pic-and-description">

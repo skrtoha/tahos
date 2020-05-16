@@ -1,96 +1,5 @@
 var ajax_url = '/admin/ajax/orders.php';
 var reg_integer = /^\d+$/;
-var currencies;
-var store = {
-	id: '',
-	title: '',
-	city: '',
-	cipher: '',
-	currency_id: '',
-	percent: '0.00',
-	provider_id: '',
-	delivery: '',
-	delivery_max: '',
-	under_order: '',
-	prevail: '',
-	noReturn: 0
-};
-function get_str_currencies(currency_id = false){
-	var str = '<select disabled name="currency_id">';
-	for(var key in currencies) {
-		var c = currencies[key];
-		var selected = c.id == currency_id ? 'selected' : '';
-		str += '<option ' + selected + ' value="' + c.id + '">' + c.title + '</option>';
-	}
-	str += '</select>';
-	return str;
-}
-function get_str_form(){
-	var form_bottom;
-	var str = '';
-	str +=
-		'<form name="store_change">' +
-			'<input type="hidden" name="store_id" value="' + store.id + '">' +
-			'<table>' +
-			 	'<tr>' +
-				 	'<td>Название:</td>' +
-				 	'<td><input disabled type="text" name="title" value="' +  store.title + '"></td>' +
-			 	'</tr>' +
-			 		'<tr>' +
-				 	'<td>Город:</td>' +
-				 	'<td><input disabled type="text" name="city" value="' +  store.city + '"></td>' +
-			 	'</tr>' +
-			 	'<tr>' +
-				 	'<td>Шифр:</td>' +
-				 	'<td><input disabled type="text" name="cipher" value="' +  store.cipher + '"></td>' +
-			 	'</tr>' +
-			 	'<tr>' +
-				 	'<td>Валюта</td>' +
-				 	'<td>' + get_str_currencies(store.currency_id) + '</td>' +
-			 	'</tr>' +
-			 	'<tr>' +
-				 	'<td>Процент надбавки</td>' +
-				 	'<td><input disabled type="text" name="percent" value="' + store.percent + '" /></td>' +
-			 	'</tr>' +
-		 		'<tr>' +
-				 	'<td>Срок доставки</td>' +
-				 	'<td><input disabled type="text" name="delivery" value="' + store.delivery + '" /></td>' +
-			 	'</tr>' +
-			 	'<tr>' +
-				 	'<td>Максимальный срок</td>' +
-				 	'<td><input disabled type="text" name="delivery_max" value="' + store.delivery_max + '" /></td>' +
-			 	'</tr>' +
-			 	'<tr>' +
-				 	'<td>Под заказ</td>' +
-				 	'<td><input disabled type="text" name="under_order" value="' + store.under_order + '" /></td>' +
-			 	'</tr>' +
-			 	'<tr>' +
-				 	'<td>Подсвечивать</td>' +
-				 	'<td><input disabled type="checkbox" name="prevail" ' + store.prevail + ' value="1"></td>' +
-			 	'</tr>' +
-			 	'<tr>' +
-				 	'<td>Без возврата</td>' +
-				 	'<td><input disabled type="checkbox" name="noReturn" ' + store.noReturn + ' value="1"></td>' +
-			 	'</tr>' +
-	 		'</table>' +
-		'</form>';
-	return str;
-}
-function set_store(store_id){
-	var array = new Array();
-	$.ajax({
-		type: 'post',
-		async: false,
-		url: '/admin/ajax/providers.php',
-		data: 'act=get_store&store_id=' + store_id,
-		success: function(response){
-			store = JSON.parse(response);
-			store.prevail = +store.prevail ? 'checked' : '';
-			store.noReturn = +store.noReturn ? 'checked' : '';
-			// console.log(store);
-		}
-	})
-}
 function first_option(obj){
 	obj.find('option').prop('selected', false);
 	obj.find('option:first-child').prop('selected', true);
@@ -186,22 +95,8 @@ $(function(){
 		e.preventDefault();
 		$(this).next().toggleClass('active');
 	});
-	$.ajax({
-		type: 'post',
-		url: '/admin/ajax/providers.php',
-		data: '&act=get_currencies',
-		success: function(response){
-			// console.log(response);
-			currencies = JSON.parse(response);
-		}
-	});
 	$(document).on('submit', 'form[name=store_change]', function(e){
 		return false;
-	})
-	$(document).on('click', 'a.store', function(e){
-		var store_id = $(this).attr('store_id');
-		set_store(store_id);
-		modal_show(get_str_form());
 	})
 	$('.orders_box').on('click', function(){
 		document.location.href = $(this).attr('href');

@@ -21,6 +21,7 @@ switch($_POST['act']){
 			'delivery' => $_POST['delivery'],
 			'delivery_max' => $_POST['delivery_max'],
 			'under_order' => $_POST['under_order'],
+			'daysForReturn' => $_POST['daysForReturn'],
 			'prevail' => $_POST['prevail'] ? 1 : 0,
 			'noReturn' => $_POST['noReturn'] ? 1 : 0
 		];

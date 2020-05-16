@@ -54,7 +54,6 @@ $status_classes = [
 	'В работе' => 'status-sended'
 ];
 $orders = get_order_group($params, '');
-// debug($orders);
 ?>
 <h1>Заказы</h1>
 <?if ($user['delivery_type'] == 'Доставка'){?>
@@ -65,6 +64,7 @@ $orders = get_order_group($params, '');
 	<ul class="ionTabs__head">
 		<li class="ionTabs__tab" data-target="common">Общий список</li>
 		<li class="ionTabs__tab" data-target="group">По заказам</li>
+		<li class="ionTabs__tab" data-target="returns">Возвраты</li>
 		<li class="ionTabs__tab" data-target="sendings">Доставки</li>
 	</ul>
 	<div class="ionTabs__body">
@@ -200,7 +200,7 @@ $orders = get_order_group($params, '');
 										case 'date_from': $o['date'] = $value; break;
 									}
 								}?>
-								<tr order_id="<?=$order['order_id']?>">
+								<tr order_id="<?=$order['order_id']?>" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>">
 									<td class="name-col">
 										<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> 
 										<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
@@ -211,7 +211,7 @@ $orders = get_order_group($params, '');
 										<td style="padding-right: 10px"><?=$order['date_from']?></td>
 									<?}?>
 									<td><?=$order['date_to']?></td>
-									<td><?=$order['quan']?></td>
+									<td class="quan"><?=$order['quan']?></td>
 									<td>
 										<?
 										// debug($order)?>
@@ -316,6 +316,12 @@ $orders = get_order_group($params, '');
 											<?=$summ?>
 										</span>
 										<i class="fa fa-rub" aria-hidden="true"></i>
+										<?if ($order['is_return_available']){?>
+											<a days_from_purchase="<?=$order['days_from_purchase']?>" return_price="<?=$order['return_price']?>" packaging="<?=$order['packaging']?>" class="return" href="">Вернуть</a>
+										<?}?>
+										<?if (in_array($order['status_id'], [5, 7])){?>
+											<a class="removeFromOrder" href="">Удалить</a>
+										<?}?>
 									</td>
 									<td style="width: 70px; position: relative">
 										<?if ($order['comment']){?>
@@ -369,15 +375,23 @@ $orders = get_order_group($params, '');
 										case 'date_from': $o['date'] = $value; break;
 									}
 								}?>
-								<tr order_id="<?=$order['order_id']?>">
+								<tr order_id="<?=$order['order_id']?>" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>">
 									<td>
-										<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> <br> <a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> <br> <?=$order['title']?> <br> <br>
+										<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> <br> 
+										<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> <br> 
+										<?=$order['title']?> <br> <br>
 										Поставщик: <strong><?=$order['cipher']?></strong> <br>
 										Дата заказа: <strong><?=$order['date_from']?></strong> <br>
 										Дата доставки: <strong><?=$order['date_to']?></strong> <br>
 										Количество: <strong><?=$order['quan']?></strong> <br>
 										Статус: <strong><span class="status-col <?=$order['status_class']?>"><?=$order['status']?></span></strong> <br>
 										Сумма: <strong><span class="price_format"><?=$order['price']?></span> <i class="fa fa-rub" aria-hidden="true"></i></strong>
+										<?if ($order['is_return_available']){?>
+											<a days_from_purchase="<?=$order['days_from_purchase']?>" return_price="<?=$order['return_price']?>" packaging="<?=$order['packaging']?>" class="return" href="">Вернуть</a>
+										<?}?>
+										<?if (in_array($order['status_id'], [5, 7])){?>
+											<a class="removeFromOrder" href="">Удалить</a>
+										<?}?>
 									</td>
 									<td>
 										<?if ($order['correspond_id']) $href = "/correspond/{$order['correspond_id']}";
@@ -509,6 +523,37 @@ $orders = get_order_group($params, '');
 				}?>
 			</table>
 		</div>
+		<div class="ionTabs__item" data-name="returns">
+			<table class="orders-table">
+				<thead>
+					<tr>
+						<th>Наименование</th>
+						<th>Количество</th>
+						<th>Сумма</th>
+						<th>Причина</th>
+						<th>Дата</th>
+						<th>Статус</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
 		<div class="ionTabs__preloader gif"></div>
 	</div>
+</div>
+<div id="mgn_popup" class="product-popup mfp-hide">
+	<h1>Оформление возврата</h1>
+	<table class="basket-table">
+		<thead>
+			<tr>
+				<th>Наименование</th>
+				<th>Причина</th>
+				<th>Количество</th>
+				<th>Сумма</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+	<a class="button" href="">Оформить</a>
+	<div style="clear: both"></div>
 </div>

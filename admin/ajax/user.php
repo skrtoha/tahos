@@ -43,7 +43,7 @@ switch($_POST['act']){
 				$where
 		", '');
 		if ($res->num_rows == 0) exit();
-		if ($res->num_rows > 10){
+		if ($res->num_rows > 50){
 			echo $res->num_rows;
 			exit();
 		}

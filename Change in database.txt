@@ -149,3 +149,13 @@ ALTER TABLE `tahos_manager_groups`
 ALTER TABLE `tahos_managers`
   ADD CONSTRAINT `tahos_managers_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `tahos_manager_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `tahos_connections` ADD `manager_id` INT UNSIGNED NULL DEFAULT NULL AFTER `user_id`;
+
+/*
+returns
+ */
+ALTER TABLE `tahos_provider_stores` ADD `daysForReturn` INT(2) NOT NULL DEFAULT '14' AFTER `noReturn`;
+ALTER TABLE `tahos_providers` ADD `return_percent` INT(2) UNSIGNED NOT NULL DEFAULT '0' AFTER `api_title`;
+ALTER TABLE `tahos_returns` ADD `is_new` INT(1) UNSIGNED NOT NULL DEFAULT '1' AFTER `status_id`;
+ALTER TABLE `tahos_email_prices` CHANGE `settings` `settings` JSON NULL;
+ALTER TABLE `tahos_returns` ADD `comment` VARCHAR(255) NULL DEFAULT NULL AFTER `status_id`;
+ALTER TABLE `tahos_returns` ADD `amount_returned` INT UNSIGNED NULL DEFAULT NULL AFTER `comment`;

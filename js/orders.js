@@ -1,3 +1,70 @@
+var reasonsOfReturn;
+function show_form_returns(items){
+	if (typeof reasonsOfReturn == 'undefined'){
+		$.ajax({
+			url: '/ajax/order.php',
+			type: 'post',
+			data: {
+				act: 'get_reasons'
+			},
+			async: false,
+			success: function(response){
+				reasonsOfReturn = JSON.parse(response);
+			}
+		})
+	}
+	$.magnificPopup.open({
+		type: 'inline',
+		preloader: false,
+		mainClass: 'product-popup-wrap',
+		callbacks: {
+			open: function(){
+				$('#mgn_popup table.basket-table tbody').empty();
+				let return_summ = 0;
+				for(var k in items){
+					let strReason = '';
+					return_summ = items[k].return_price * items[k].quan;
+					for(let i in reasonsOfReturn){
+						strReason += '<option ' + (reasonsOfReturn[i].id == items[k].reason_id ? 'selected' : '') + ' value="' + reasonsOfReturn[i].id + '">' + reasonsOfReturn[i].title + '</option>';
+					}
+					$('#mgn_popup table.basket-table tbody').append(
+						'<tr order_id="' + items[k].order_id + '" store_id="' + items[k].store_id + '" item_id="' + items[k].item_id + '">' +
+							'<td>' + items[k].title + '</td>' + 
+							'<td>' +
+								'<select name="reason_id">' +
+									strReason +
+								'</select>' +
+							'</td>' +
+							'<td class="quan">' + 
+								'<input type="hidden" name="available" value="' + items[k].quan + '">' +
+								'<div summand="' + items[k].return_price + '" packaging="' + items[k].packaging + '" class="count-block">' +
+									'<span class="minus">-</span>' +
+									'<input value="' + items[k].quan + '">' +
+									'<span class="plus">+</span>' +
+								'</div>' +
+							'</td>' +
+							'<td>' + 
+								'<span class="summ">'
+									 + items[k].summ + 
+									' <i class="fa fa-rub" aria-hidden="true"></i>' +
+								'</span>' +
+								'<span class="label">с комиссией</span>' +
+								'<span class="summ_return">'
+									 + '<span>' + return_summ + '</span>' +
+									' <i class="fa fa-rub" aria-hidden="true"></i>' +
+								'</span>' +
+							'</td>' +
+						'</tr>'
+					)
+				}
+			}
+		},
+		items: {
+			src: '#mgn_popup'
+		}
+	});
+	$('select').styler();
+}
 $(function(){
 	var get = window
 		.location
@@ -12,6 +79,7 @@ $(function(){
 			},
 			{}
 		);
+	var itemsForReturn = new Array();
 	pickmeup.defaults.locales['ru'] = {
 		days: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
 		daysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
@@ -78,6 +146,41 @@ $(function(){
 	});
 	$.ionTabs("#orders_tabs",{
 		type: "hash",
+		onChange: function(obj){
+			let $tab = $('div[data-name=returns]');
+			switch(obj.tab){
+				case 'returns':
+					$.ajax({
+						url: '/ajax/order.php',
+						type: 'post',
+						processData: true,
+						data: {
+							act: 'get_returns',
+						},
+						success: function(response){
+							$tab.find('table.orders-table tbody').empty();
+							if (!response) return false;
+							let items = JSON.parse(response);
+							console.log(items);
+							for(var k in items) $tab.find('table.orders-table tbody').append(
+								'<tr>' +
+									'<td>' +
+										'<b class="brend_info" brend_id="' + items[k].brend_id + '">' + items[k].brend + '</b> ' + 
+										'<a href="/search/article/' + items[k].article + '" class="articul">' + items[k].article + '</a> ' +
+											items[k].title_full +
+									'</td>' +
+									'<td>' + items[k].quan + '</td>' +
+									'<td>' + (items[k].return_price * items[k].quan) + '<i class="fa fa-rub" aria-hidden="true"></i>' + '</td>' +
+									'<td>' + items[k].reason + '</td>' +
+									'<td>' + items[k].created + '</td>' +
+									'<td class="status_return_' + items[k].status_id + '">' + items[k].status + '</td>' +
+								'</tr>'
+							);
+						}
+					})
+					break;
+			}
+		}
 	});
 	if (get.tab) $.ionTabs.setTab('orders', get.tab);
 	$('[data-name=group] tr[order_id]').on('click', function(){
@@ -85,5 +188,91 @@ $(function(){
 	})
 	$('tr[sending_id]').on('click', function(e){
 		document.location.href = '/sending/' + $(this).attr('sending_id');
+	})
+	$(document).on('click', 'a.return', function(e){
+		e.preventDefault();
+		var tr = $(this).closest('tr');
+		var order_id = + tr.attr('order_id');
+		var store_id = + tr.attr('store_id');
+		var item_id = + tr.attr('item_id');
+		var key = order_id + '-' + store_id + '-' + item_id;
+		if (typeof itemsForReturn[key] !== 'undefined') return show_form_returns(itemsForReturn);
+		itemsForReturn[key] = {
+			order_id: order_id, 
+			store_id: store_id, 
+			item_id: item_id,
+			title: tr.find('.name-col').html(),
+			summ: + tr.find('.price_format').text(),
+			return_price: + $(this).attr('return_price'),
+			days_from_purchase: + $(this).attr('days_from_purchase'),
+			packaging: + $(this).attr('packaging'),
+			reason_id: 1,
+			quan: + tr.find('.quan').text()
+		};
+		console.log(itemsForReturn);
+		show_form_returns(itemsForReturn);
+	})
+	$(document).on('change', 'select[name=reason_id]', function(){
+		var order_id = $(this).closest('tr').attr('order_id');
+		var store_id = $(this).closest('tr').attr('store_id');
+		var item_id = $(this).closest('tr').attr('item_id');
+		itemsForReturn[order_id + '-' + store_id + '-' + item_id].reason_id = $(this).val();
+	})
+	$(document).on('click', ".count-block .minus, .count-block .plus", function(event) {
+		var e = $(this);
+		var act = e.attr('class');
+		e = $(this).parent();
+		var order_id = e.closest('tr').attr('order_id');
+		var store_id = e.closest('tr').attr('store_id');
+		var item_id = e.closest('tr').attr('item_id');
+		var packaging = + e.attr('packaging');
+		var summand = + e.attr('summand');
+		var available = e.prevAll('input[name=available]').val();
+		var newVal = 0;
+		if (act == 'plus') newVal = +e.find('input').val() + packaging;
+		else newVal = +e.find('input').val() - packaging;
+		if (newVal < 1 || newVal > available) return false;
+		e.find('input').val(newVal);
+		e.closest('tr').find('span.summ_return > span').html(newVal * summand);
+		itemsForReturn[order_id + '-' + store_id + '-' + item_id].quan = newVal;
+	});
+	$('#mgn_popup a.button').on('click', function(){
+		let data = new Array();
+		for(var k in itemsForReturn) data.push(itemsForReturn[k]);
+		$.ajax({
+			url: '/ajax/order.php',
+			type: 'post',
+			processData: true,
+			data: {
+				act: 'to_return',
+				items: data
+			},
+			success: function(response){
+				$.cookie('message', 'Возврат успешно оформлен', cookieOptions);
+				$.cookie('message_type', 'ok', cookieOptions);
+				document.location.reload();
+			}
+		})
+		return false;
+	})
+	$('a.removeFromOrder').on('click', function(){
+		if (!confirm('Вы действительно хотите удалить?')) return false;
+		var th = $(this);
+		$.ajax({
+			url: '/ajax/order.php',
+			type: 'post',
+			processData: true,
+			data: {
+				act: 'removeFromOrder',
+				order_id: th.closest('tr').attr('order_id'),
+				store_id: th.closest('tr').attr('store_id'),
+				item_id: th.closest('tr').attr('item_id')
+			},
+			success: function(response){
+				th.closest('tr').remove();
+				show_message('Успешно удалено!');
+			}
+		})
+		return false;
 	})
 });

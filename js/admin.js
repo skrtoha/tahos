@@ -27,6 +27,20 @@ function show_message(msg, type = 'ok'){
 	$.cookie('message', '', cookieOptions);
 	$.cookie('message_type', '', cookieOptions);
 }
+function get_currencies(){
+	var currencies;
+	$.ajax({
+		type: 'post',
+		url: '/admin/ajax/providers.php',
+		data: '&act=get_currencies',
+		async: false,
+		success: function(response){
+			// console.log(response);
+			currencies = JSON.parse(response);
+		}
+	});
+	return currencies;
+}
 function getImgUrl(){
 	return $('input[name=imgUrl]').val();
 }

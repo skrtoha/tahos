@@ -11,7 +11,53 @@ tr[sending_id]:hover
 	cursor: pointer;
 	background: #e4faff;
 }
-
+div[data-name=returns] table.orders-table tr{
+	border-bottom: 1px dashed #c8c8c8 !important;
+}
+#mgn_popup td.quan{
+	position: relative;
+	width: 145px;
+}
+#mgn_popup span.summ_return {
+    font-weight: bold;
+}
+#mgn_popup span.label {
+    display: block;
+    font-size: 13px;
+    white-space: nowrap;
+    color: #e47474;
+}
+#mgn_popup span.summ{
+	display: block;
+}
+#mgn_popup .jq-selectbox__select{
+	background: white;
+}
+#mgn_popup a.button{
+	margin-top: 15px;
+}
+#mgn_popup .basket-table tr{
+	    border-bottom: 1px dashed #c8c8c8 !important;
+}
+#mgn_popup .basket-table td{
+	padding: 15px 0;
+}
+#mgn_popup .count-block{
+	position: static;
+}
+a.return,
+a.removeFromOrder
+ {
+    color: red;
+    display: block;
+    font-size: 13px;
+}
+.jq-selectbox li.selected{
+	text-align: left;
+}
+.jq-selectbox li {
+    text-align: left;
+}
 div.status{
 	position: relative;
     width: 250px;
@@ -767,8 +813,14 @@ img.mfp-img {
 /* =====================================================================================================================
 // Ion.Tabs: Base */
 .ionTabs {
+	margin-top: 0;
 	position: relative; }
-
+#main > h1{
+	float: left;
+}
+#main > a{
+	float: right;
+}
 .ionTabs__head {
 	position: relative;
 	display: block;

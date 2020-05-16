@@ -421,11 +421,12 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 				)
 			) as article,
 			IF (i.title_full!='', i.title_full, i.title) as title_full,
-			CASE
+			@delivery := CASE
 				WHEN aok.order_term IS NOT NULL THEN aok.order_term
 				ELSE
 					IF (si.in_stock = 0, ps.under_order, ps.delivery) 
 			END AS delivery,
+			DATE_FORMAT(DATE_ADD(CURDATE(), Interval @delivery DAY), '%d.%m') AS delivery_date,
 			ps.prevail,
 			ps.noReturn,
 			CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100 $userDiscount) as price,
@@ -520,6 +521,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$list['packaging'] = $v['packaging'];
 		$list['packaging_text'] = $v['packaging_text'];
 		$list['delivery'] = $v['delivery'];
+		$list['delivery_date'] = $v['delivery_date'];
 		$list['price'] = $v['price'];
 		$list['in_basket'] = $v['in_basket'];
 		$list['prevail'] = $v['prevail'];
@@ -619,33 +621,49 @@ function get_orders($params, $flag = ''){
 			IF (ps.noReturn, 'class=\"noReturn\" title=\"Возврат поставщику невозможен!\"', '') AS noReturn,
 			ov.item_id,
 			ov.price,
+			CEIL(ov.price - ov.price * p.return_percent / 100) AS return_price,
+			ps.provider_id,
 			ov.quan,
 			ov.ordered,
 			ov.arrived,
 			ov.issued,
 			ov.returned,
 			ov.declined,
-			os.id AS status_id,
+			ov.status_id,
 			os.title AS status,
 			os.class AS status_class,
 			@delivery:=IF(si.in_stock = 0, ps.under_order, ps.delivery) AS delivery,
+			si.packaging,
 			IF (c.id IS NULL, 'disable', '') AS message,
-			DATE_FORMAT(o.created, '%d.%m.%Y') as date_from,
+			DATE_FORMAT(o.created, '%d.%m.%Y') AS date_from,
 			DATE_FORMAT(DATE_ADD(o.created, Interval @delivery DAY), '%d.%m.%Y') AS date_to,
-			c.id AS correspond_id
+			c.id AS correspond_id,
+			TO_DAYS(CURDATE()) - TO_DAYS(ov.updated) AS days_from_purchase,
+			@end_date := DATE_ADD(ov.updated, Interval ps.daysForReturn DAY) AS end_date,
+			IF(
+				@end_date > CURDATE() AND ov.status_id = 1 AND ps.noReturn != 1 AND r.item_id IS NULL,
+				1,
+				0
+			) AS is_return_available
 		FROM 
 			#orders_values ov
 		LEFT JOIN #items i ON i.id=ov.item_id
 		LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
+		LEFT JOIN #providers p ON p.id = ps.provider_id
 		LEFT JOIN #orders_statuses os ON ov.status_id=os.id
 		LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
+		LEFT JOIN #returns r 
+			ON 
+				r.order_id = ov.order_id AND
+				r.store_id = ov.store_id AND
+				r.item_id = ov.item_id
 		LEFT JOIN #brends b ON b.id=i.brend_id
 		LEFT JOIN #orders o ON o.id=ov.order_id
 		LEFT JOIN #corresponds c 
-		ON 
-			c.order_id=ov.order_id AND
-			c.store_id=ov.store_id AND
-			c.item_id=c.item_id
+			ON 
+				c.order_id = ov.order_id AND
+				c.store_id = ov.store_id AND
+				c.item_id = c.item_id
 		WHERE 
 			o.is_draft = 0 AND
 			ov.user_id = {$_SESSION['user']} 
@@ -662,7 +680,7 @@ function get_orders($params, $flag = ''){
 		$str = '';
 		foreach($params['status_id'] as $key => $value) $str .= "$key,";
 		$str = substr($str, 0, -1);
-		$query .= " AND status_id IN ($str)";
+		$query .= " AND ov.status_id IN ($str)";
 	}
 	$query .= "
 		ORDER BY o.created DESC

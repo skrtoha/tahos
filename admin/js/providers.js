@@ -13,7 +13,6 @@ var store = {
 	noReturn: 0
 };
 var reg_interger = /^\d+$/;
-var currencies;
 function set_store(store_id){
 	var array = new Array();
 	$.ajax({
@@ -30,6 +29,7 @@ function set_store(store_id){
 	})
 }
 function get_str_currencies(currency_id = false){
+	currencies = get_currencies();
 	var str = '<select name="currency_id">';
 	for(var key in currencies) {
 		var c = currencies[key];
@@ -96,6 +96,10 @@ function get_str_form(){
 				 	'<td><input type="text" name="under_order" value="' + store.under_order + '" /></td>' +
 			 	'</tr>' +
 			 	'<tr>' +
+				 	'<td>Количество дней возврата</td>' +
+				 	'<td><input type="text" name="daysForReturn" value="' + store.daysForReturn + '" /></td>' +
+			 	'</tr>' +
+			 	'<tr>' +
 				 	'<td>Подсвечивать</td>' +
 				 	'<td><input type="checkbox" name="prevail" ' + store.prevail + ' value="1"></td>' +
 			 	'</tr>' +
@@ -125,15 +129,6 @@ function set_empty_store(){
 }
 $(function(){
 	// console.log(store);
-	$.ajax({
-		type: 'post',
-		url: '/admin/ajax/providers.php',
-		data: '&act=get_currencies',
-		success: function(response){
-			// console.log(response);
-			currencies = JSON.parse(response);
-		}
-	});
 	$(document).on('click','#load_price', function(e){
 		e.preventDefault();
 		$(this).next('form').toggleClass('hidden');

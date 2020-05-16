@@ -137,7 +137,6 @@ function set_tabs(){
 					success: function(msg){
 						if (msg){
 							res = JSON.parse(msg);
-							console.log(res);
 							sortStoreItems('brend');
 							var si = store_items(res.store_items, res.user, search_type);
 							if (Object.keys(res.prices).length){
@@ -314,7 +313,7 @@ function store_items(store_items, user, search_type = null){
 					'<b class="brend_info" brend_id="' + si.brend_id + '">' +
 						si.brend +
 					'</b> ' +
-					'<a href="' + si.href_article + '" class="articul">' +
+					'<a href="/article/' + si.item_id + '-' + si.article + '" class="articul">' +
 						si.article + 
 					'</a>' +
 				'</td>' +
@@ -323,7 +322,7 @@ function store_items(store_items, user, search_type = null){
 			'<div class="goods-header">' +
 				'<p>' +
 					'<b class="brend_info" brend_id="' + si.brend_id + '"> ' + si.brend + '</b> ' +
-					'<a href="' + si.href_article + '" class="articul">' + si.article + '</a>' +
+					'<a href="/article/' + si.item_id + '-' + si.article + '" class="articul">' + si.article + '</a>' +
 				'</p>' +
 				'<p>' + si.title_full + '</p>';
 		if (search_type == 'analogies' && typeof user.id !== 'undefined' && user.allow_request_delete_item == '1'){
@@ -477,9 +476,9 @@ function store_items(store_items, user, search_type = null){
 						'<ul class="prevail">';	
 			for (var p in si.prevails){
 				full +=
-						'<li>' + si.prevails[p].delivery + ' дн.</li>';
+						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
 				mobile +=
-						'<li>' + si.prevails[p].delivery + ' дн.</li>';
+						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
 			}
 			full += 
 					'</ul>';
@@ -489,15 +488,15 @@ function store_items(store_items, user, search_type = null){
 		if (csi){
 			full +=
 					'<ul>' +
-						'<li>' + si_price.delivery + ' дн.</li>';
+						'<li>' + si_price.delivery + ' дн. (' + si_price.delivery_date + ' )</li>';
 			mobile +=
 					'<ul>' +
-						'<li>' + si_price.delivery + ' дн.</li>';
+						'<li>' + si_price.delivery + ' дн. (' + si_price.delivery_date + ')</li>';
 			if (si_delivery){
 				full += 
-						'<li>' + si_delivery.delivery + ' дн.</li>';
+						'<li>' + si_delivery.delivery + ' дн. (' + si_delivery.delivery_date + ')</li>';
 				mobile +=
-						'<li>' + si_delivery.delivery + ' дн.</li>';
+						'<li>' + si_delivery.delivery + ' дн. (' + si_delivery.delivery_date + ')</li>';
 			};
 			full +=
 					'</ul>';
@@ -869,9 +868,9 @@ function store_items(store_items, user, search_type = null){
 					'<ul class="prevail">';
 				for(var p in si.prevails){
 					full +=
-						'<li>' + si.prevails[p].delivery + ' дн.</li>';
+						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
 					mobile +=
-						'<li>' + si.prevails[p].delivery + ' дн.</li>';
+						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
 				}
 				full +=
 					'</ul>';
@@ -884,9 +883,9 @@ function store_items(store_items, user, search_type = null){
 					'<ul>';
 			for (var k in si.list){
 				full += 			
-						'<li>' + si.list[k].delivery + ' дн.</li>';
+						'<li>' + si.list[k].delivery + ' дн. (' +  si.list[k].delivery_date+ ')</li>';
 				mobile += 			
-						'<li>' + si.list[k].delivery + ' дн.</li>';
+						'<li>' + si.list[k].delivery + ' дн. (' + si.list[k].delivery_date + ')</li>';
 			} 
 			full +=
 					'</ul>' +

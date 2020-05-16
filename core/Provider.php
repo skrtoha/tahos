@@ -14,6 +14,14 @@ abstract class Provider{
 		$res = self::getInstanceDataBase()->select('providers', 'id,title', '', 'title');
 		return $res;
 	}
+	public static function getEmailPrices(){
+		static $emailPrices;
+		if ($emailPrices) return $emailPrices;
+		$res = $GLOBALS['db']->query("SELECT store_id FROM #email_prices", '');
+		if (!$res->num_rows) return false;
+		foreach($res as $value) $emailPrices[] = $value['store_id'];
+		return $emailPrices;
+	}
 	public static function getProviderBasket($provider_id, $flag = NULL): \mysqli_result
 	{
 		return self::getInstanceDataBase()->query("

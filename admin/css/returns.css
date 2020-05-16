@@ -1,0 +1,14 @@
+#contents{
+	margin-top: 0;
+}
+tr[osi]{
+	cursor: pointer;
+}
+input[name=return_price]{
+	width: 80px !important;
+    font-weight: 900;
+    text-align: center;
+}
+input.datetimepicker {
+    width: 112px;
+}

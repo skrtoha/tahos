@@ -352,10 +352,6 @@ $orders = get_order_group($params, '');
 				<?}
 				else{?>
 					<table class="orders-table small-view">
-						<tr>
-							<th>Товар</th>
-							<th>Сообщение</th>
-						</tr>
 						<?if (!$res_orders_values->num_rows){?>
 						<td colspan="2">Заказов не найдено</td>
 						<?}
@@ -380,15 +376,17 @@ $orders = get_order_group($params, '');
 								}?>
 								<tr order_id="<?=$order['order_id']?>" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>">
 									<td>
-										<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> <br> 
-										<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> <br> 
-										<?=$order['title']?> <br> <br>
+										<span class="name-col">
+											<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b>
+											<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
+											<?=$order['title']?>
+										</span>
 										Поставщик: <strong><?=$order['cipher']?></strong> <br>
 										Дата заказа: <strong><?=$order['date_from']?></strong> <br>
 										Дата доставки: <strong><?=$order['date_to']?></strong> <br>
-										Количество: <strong><?=$order['quan']?></strong> <br>
+										Количество: <strong class="quan"><?=$order['quan']?></strong> <br>
 										Статус: <strong><span class="status-col <?=$order['status_class']?>"><?=$order['status']?></span></strong> <br>
-										Сумма: <strong><span class="price_format"><?=$order['price']?></span> <i class="fa fa-rub" aria-hidden="true"></i></strong>
+										Сумма: <strong><span class="price_format"><?=$order['price'] * $order['quan']?></span> <i class="fa fa-rub" aria-hidden="true"></i></strong>
 										<?if ($order['is_return_available']){?>
 											<a days_from_purchase="<?=$order['days_from_purchase']?>" return_price="<?=$order['return_price']?>" packaging="<?=$order['packaging']?>" class="return" href="">Вернуть</a>
 										<?}?>

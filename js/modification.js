@@ -22,10 +22,10 @@ $(function(){
 	})
 	.jstree();
 	$('.tree-structure').on("changed.jstree", function (e, data) {
-		// console.log(data.node);
+		console.log(data.node);
 		var childs = '';
-		for(var k in data.node.children_d){
-			childs += data.node.children_d[k].replace('node_', '') + ',';
+		for(var k in data.node.children){
+			childs += data.node.children[k].replace('node_', '') + ',';
 		}
 		childs = childs.slice(0, -1);
 		var brend = $('.content').attr('brend');

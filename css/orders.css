@@ -14,6 +14,13 @@ tr[sending_id]:hover
 div[data-name=returns] table.orders-table tr{
 	border-bottom: 1px dashed #c8c8c8 !important;
 }
+.small-view span.name-col{
+	display: block;
+	margin-bottom: 10px;
+}
+#mgn_popup .basket-table{
+	display: block;
+}
 #mgn_popup td.quan{
 	position: relative;
 	width: 145px;
@@ -7279,6 +7286,29 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
 
 /* Small Devices, Tablets */
 @media only screen and (max-width: 750px) {
+	div[data-name=returns] td[class^=status_return]{
+		width: auto;
+	}
+	div[data-name=returns] table tr {
+		display: block;
+	}
+	div[data-name=returns] table thead{
+		display: none;
+	}
+	div[data-name=returns] table td{
+		display: block;
+		text-align: left;
+		    padding: 5px 0;
+	}
+	div[data-name=returns] table td:before {
+    content: attr(label);
+    float: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: block;
+    padding: 0 8px;
+}
+	div[data-name=returns] 
 	header .catalog_btn {
 		margin: 27px 0 0 -webkit-calc((100% - 351px)/5);
 		margin: 27px 0 0 calc((100% - 351px)/5); }
@@ -7376,6 +7406,58 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
 		margin-left: 0; } }
 
 @media screen and (max-width: 700px) {
+	#mgn_popup .count-block{
+		display: inline-block;
+	}
+	#mgn_popup span.summ{
+		display: inline-block;
+	}
+	#mgn_popup span.label{
+		display: inline-block;
+		margin: 0 10px;
+	}
+	#mgn_popup td.quan{
+		width: auto;
+	}
+	#mgn_popup select[name=reason_id]{
+		float: left;
+		width: calc(100% - 100px);
+	}
+	td[label^=Причина]:before,
+	td[label^=Количество]:before{
+		position: relative;
+		top: 10px;
+	}
+	#mgn_popup{
+		padding: 10px;
+	}
+	#mgn_popup h1{
+		margin-bottom: 10px;
+	}
+	#mgn_popup .jq-selectbox{
+		width: auto;
+	}
+	#mgn_popup .basket-table td{
+		text-align: left;
+		padding: 5px 0;
+	}
+	#mgn_popup .basket-table td:before{
+		content: attr(label);
+    float: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: block;
+    padding: 0 8px;
+	}
+	#mgn_popup thead{
+		display: none;
+	}
+	#mgn_popup tbody tr{
+		display: block;
+	}
+	#mgn_popup tbody tr td{
+		display: block;
+	}
 	h1 {
 		font-size: 26px; }
 	header .catalog {
@@ -7831,6 +7913,9 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
  }
 
 @media screen and (max-width: 415px) {
+	.ionTabs__head li:nth-child(n + 2){
+		padding-right: 5px;
+	}
 	header .profile, header .settings {
 		right: 50%;
 		margin-right: -webkit-calc(375px/2*(-1));

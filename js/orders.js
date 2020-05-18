@@ -29,21 +29,29 @@ function show_form_returns(items){
 						strReason += '<option ' + (reasonsOfReturn[i].id == items[k].reason_id ? 'selected' : '') + ' value="' + reasonsOfReturn[i].id + '">' + reasonsOfReturn[i].title + '</option>';
 					}
 					if (return_summ != items[k].summ) commission = 
+						'<span class="summ">'
+							 + items[k].summ + 
+							' <i class="fa fa-rub" aria-hidden="true"></i>' +
+						'</span>' +
 						'<span class="label">с комиссией</span>' +
-							'<span class="summ_return">'
-								 + '<span>' + return_summ + '</span>' +
-								' <i class="fa fa-rub" aria-hidden="true"></i>' +
-							'</span>';
-					else commission = '';
+						'<span class="summ_return">'
+							 + '<span>' + return_summ + '</span>' +
+							' <i class="fa fa-rub" aria-hidden="true"></i>' +
+						'</span>';
+					else commission = 
+						'<span class="summ_return">'
+							 + '<span>' + return_summ + '</span>' +
+							' <i class="fa fa-rub" aria-hidden="true"></i>' +
+						'</span>';
 					$('#mgn_popup table.basket-table tbody').append(
 						'<tr order_id="' + items[k].order_id + '" store_id="' + items[k].store_id + '" item_id="' + items[k].item_id + '">' +
-							'<td>' + items[k].title + '</td>' + 
+							'<td label="Наменование: ">' + items[k].title + '</td>' + 
 							'<td>' +
 								'<select name="reason_id">' +
 									strReason +
 								'</select>' +
 							'</td>' +
-							'<td class="quan">' + 
+							'<td label="Количество: " class="quan">' + 
 								'<input type="hidden" name="available" value="' + items[k].quan + '">' +
 								'<div summand="' + items[k].return_price + '" packaging="' + items[k].packaging + '" class="count-block">' +
 									'<span class="minus">-</span>' +
@@ -51,11 +59,7 @@ function show_form_returns(items){
 									'<span class="plus">+</span>' +
 								'</div>' +
 							'</td>' +
-							'<td>' + 
-								'<span class="summ">'
-									 + items[k].summ + 
-									' <i class="fa fa-rub" aria-hidden="true"></i>' +
-								'</span>' +
+							'<td label="Сумма: ">' + 
 								commission +
 							'</td>' +
 						'</tr>'
@@ -168,16 +172,16 @@ $(function(){
 							console.log(items);
 							for(var k in items) $tab.find('table.orders-table tbody').append(
 								'<tr>' +
-									'<td>' +
+									'<td label="Наменование: ">' +
 										'<b class="brend_info" brend_id="' + items[k].brend_id + '">' + items[k].brend + '</b> ' + 
 										'<a href="/search/article/' + items[k].article + '" class="articul">' + items[k].article + '</a> ' +
 											items[k].title_full +
 									'</td>' +
-									'<td>' + items[k].quan + '</td>' +
-									'<td>' + (items[k].return_price * items[k].quan) + '<i class="fa fa-rub" aria-hidden="true"></i>' + '</td>' +
-									'<td>' + items[k].reason + '</td>' +
-									'<td>' + items[k].created + '</td>' +
-									'<td class="status_return_' + items[k].status_id + '">' + items[k].status + '</td>' +
+									'<td label="Количество: ">' + items[k].quan + '</td>' +
+									'<td label="Сумма: ">' + (items[k].return_price * items[k].quan) + '<i class="fa fa-rub" aria-hidden="true"></i>' + '</td>' +
+									'<td label="Причина: ">' + items[k].reason + '</td>' +
+									'<td label="Дата: ">' + items[k].created + '</td>' +
+									'<td label="Статус: " class="status_return_' + items[k].status_id + '">' + items[k].status + '</td>' +
 								'</tr>'
 							);
 						}

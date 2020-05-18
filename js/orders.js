@@ -23,10 +23,18 @@ function show_form_returns(items){
 				let return_summ = 0;
 				for(var k in items){
 					let strReason = '';
+					let commission;
 					return_summ = items[k].return_price * items[k].quan;
 					for(let i in reasonsOfReturn){
 						strReason += '<option ' + (reasonsOfReturn[i].id == items[k].reason_id ? 'selected' : '') + ' value="' + reasonsOfReturn[i].id + '">' + reasonsOfReturn[i].title + '</option>';
 					}
+					if (return_summ != items[k].summ) commission = 
+						'<span class="label">с комиссией</span>' +
+							'<span class="summ_return">'
+								 + '<span>' + return_summ + '</span>' +
+								' <i class="fa fa-rub" aria-hidden="true"></i>' +
+							'</span>';
+					else commission = '';
 					$('#mgn_popup table.basket-table tbody').append(
 						'<tr order_id="' + items[k].order_id + '" store_id="' + items[k].store_id + '" item_id="' + items[k].item_id + '">' +
 							'<td>' + items[k].title + '</td>' + 
@@ -48,11 +56,7 @@ function show_form_returns(items){
 									 + items[k].summ + 
 									' <i class="fa fa-rub" aria-hidden="true"></i>' +
 								'</span>' +
-								'<span class="label">с комиссией</span>' +
-								'<span class="summ_return">'
-									 + '<span>' + return_summ + '</span>' +
-									' <i class="fa fa-rub" aria-hidden="true"></i>' +
-								'</span>' +
+								commission +
 							'</td>' +
 						'</tr>'
 					)

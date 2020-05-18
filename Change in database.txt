@@ -159,3 +159,5 @@ ALTER TABLE `tahos_returns` ADD `is_new` INT(1) UNSIGNED NOT NULL DEFAULT '1' AF
 ALTER TABLE `tahos_email_prices` CHANGE `settings` `settings` JSON NULL;
 ALTER TABLE `tahos_returns` ADD `comment` VARCHAR(255) NULL DEFAULT NULL AFTER `status_id`;
 ALTER TABLE `tahos_returns` ADD `amount_returned` INT UNSIGNED NULL DEFAULT NULL AFTER `comment`;
+
+ALTER TABLE `tahos_returns` ADD `id` INT(10) UNSIGNED NOT NULL FIRST;

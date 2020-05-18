@@ -27,6 +27,12 @@ div[data-name=returns] table.orders-table tr{
     white-space: nowrap;
     color: #e47474;
 }
+td.status_return_1 {
+    color: #ecbf3e;
+}
+td.status_return_2 {
+    color: #ecbf3e;
+}
 #mgn_popup span.summ{
 	display: block;
 }

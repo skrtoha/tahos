@@ -1,5 +1,6 @@
 <?php
 use core\Returns;
+use core\Managers;
 switch ($_GET['act']){
 	case 'form': 
 		$is_validated = true;
@@ -16,6 +17,9 @@ switch ($_GET['act']){
 		$res_return = Returns::get($osi);
 		$return = $res_return->fetch_assoc();
 		if (!empty($_POST)){
+			if (Managers::isActionForbidden('Возвраты', 'Изменение')){
+				Managers::handlerAccessNotAllowed();
+			} 
 			if ($_POST['quan'] > $return['quan'] || !$_POST['quan']){
 				$is_validated = false;
 				message('Количество указано неккоректно!', false);
@@ -78,8 +82,7 @@ switch ($_GET['act']){
 			'article' => $_GET['article'] ? $_GET['article'] : ''
 		]);
 }
-function views(array $params){
-	?>
+function views(array $params){?>
 	<form id="filter">
 		<input type="hidden" name="view" value="returns">
 		<input class="datetimepicker filter" name="dateFrom" type="text" value="<?=$params['dateFrom']->format('d.m.Y H:i')?>">
@@ -107,7 +110,7 @@ function views(array $params){
 		</tr>
 		<?if ($params['res_returns']->num_rows){
 			foreach($params['res_returns'] as $value){?>
-				<tr class="<?=$value['is_new'] ? 'is_new' : ''?>" osi="<?=$value['order_id']?>-<?=$value['store_id']?>-<?=$value['item_id']?>">
+				<tr class="<?=$value['is_new'] ? 'is_new' : ''?> return_class_<?=$value['status_id']?>" osi="<?=$value['order_id']?>-<?=$value['store_id']?>-<?=$value['item_id']?>">
 					<td label="Пользователь"><?=$value['fio']?></td>
 					<td label="Бренд"><?=$value['brend']?></td>
 					<td label="Артикул"><?=$value['article']?></td>

@@ -22,7 +22,9 @@ class Returns{
 						$where .= "r.created <='" . $params['dateTo']->format('Y-m-d H:i:s') . "' AND ";
 						break;
 					case 'article':
-						$where .= "i.article = '{$params['article']}' AND ";
+						$article = article_clear($params['article']);
+						if (!$article) break;
+						$where .= "i.article = '$article' AND ";
 						break;
 				}
 			}

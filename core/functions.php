@@ -644,7 +644,8 @@ function get_orders($params, $flag = ''){
 				@end_date > CURDATE() AND ov.status_id = 1 AND ps.noReturn != 1 AND r.item_id IS NULL,
 				1,
 				0
-			) AS is_return_available
+			) AS is_return_available,
+			IF(r.item_id IS NOT NULL, 1, 0) AS ordered_return
 		FROM 
 			#orders_values ov
 		LEFT JOIN #items i ON i.id=ov.item_id

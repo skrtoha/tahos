@@ -310,6 +310,9 @@ $orders = get_order_group($params, '');
 										<?}
 										?>
 										</span>
+										<?if ($order['ordered_return']){?>
+											<span class="ordered_return">Заявка на возврат</span>
+										<?}?>
 									</td>
 									<td>
 										<span class="price_format">

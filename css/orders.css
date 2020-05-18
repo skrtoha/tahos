@@ -31,20 +31,20 @@ td[class^=status_return] {
     width: 123px;
 }
 span.ordered_return {
-    font-size: 11px;
+       font-size: 11px;
     white-space: nowrap;
-    color: red;
+    display: block;
 }
-td.status_return_1 {
+.status_return_1 {
     color: #ecbf3e;
 }
-td.status_return_2 {
+.status_return_2 {
     color: #ecbf3e;
 }
-td.status_return_4 {
+.status_return_4 {
     color: #f4191f;
 }
-td.status_return_3{
+.status_return_3{
 	color: #65b562;
 }
 #mgn_popup span.summ{

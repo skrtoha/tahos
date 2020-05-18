@@ -311,7 +311,7 @@ $orders = get_order_group($params, '');
 										?>
 										</span>
 										<?if ($order['ordered_return']){?>
-											<span class="ordered_return">Заявка на возврат</span>
+											<span class="ordered_return status_return_<?=$order['return_status_id']?>">Возврат: <?=$order['ordered_return']?></span>
 										<?}?>
 									</td>
 									<td>

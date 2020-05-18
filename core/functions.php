@@ -645,7 +645,8 @@ function get_orders($params, $flag = ''){
 				1,
 				0
 			) AS is_return_available,
-			IF(r.item_id IS NOT NULL, 1, 0) AS ordered_return
+			r.status_id AS return_status_id,
+			rs.title AS ordered_return
 		FROM 
 			#orders_values ov
 		LEFT JOIN #items i ON i.id=ov.item_id
@@ -658,6 +659,7 @@ function get_orders($params, $flag = ''){
 				r.order_id = ov.order_id AND
 				r.store_id = ov.store_id AND
 				r.item_id = ov.item_id
+		LEFT JOIN #return_statuses rs ON rs.id = r.status_id
 		LEFT JOIN #brends b ON b.id=i.brend_id
 		LEFT JOIN #orders o ON o.id=ov.order_id
 		LEFT JOIN #corresponds c 

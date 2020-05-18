@@ -21,3 +21,12 @@ input.datetimepicker {
 	border: 1px solid #c8c8c8;
     border-radius: 4px;
 }
+tr.return_class_2, tr.return_class_1 {
+    background: #dcdca7 !important;
+}
+tr.return_class_3 {
+    background: #c7dac8 !important;
+}
+tr.return_class_4 {
+    background: #e4d4d4;
+}

@@ -27,11 +27,25 @@ div[data-name=returns] table.orders-table tr{
     white-space: nowrap;
     color: #e47474;
 }
+td[class^=status_return] {
+    width: 123px;
+}
+span.ordered_return {
+    font-size: 11px;
+    white-space: nowrap;
+    color: red;
+}
 td.status_return_1 {
     color: #ecbf3e;
 }
 td.status_return_2 {
     color: #ecbf3e;
+}
+td.status_return_4 {
+    color: #f4191f;
+}
+td.status_return_3{
+	color: #65b562;
 }
 #mgn_popup span.summ{
 	display: block;

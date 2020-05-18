@@ -1,5 +1,6 @@
 <?php
 namespace core;
+use admin\functions\LeftMenu;
 class Managers{
 	public static $permissions;
 
@@ -99,9 +100,9 @@ class Managers{
 	}
 	public static function isAccessForbidden(string  $view = null)
 	{
-		if (in_array($view, Config::$defaultPermissions)) return false;
+		if (in_array($view, LeftMenu::$defaultPermissions)) return false;
 		foreach(self::$permissions as $key => $value){
-			if (in_array($view, Config::$pagesViews[$key])) return false;
+			if (in_array($view, LeftMenu::$pagesViews[$key])) return false;
 		}
 		return true;
 	}

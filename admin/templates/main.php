@@ -1,3 +1,6 @@
+<?
+use admin\functions\LeftMenu;
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
@@ -57,7 +60,7 @@
 			<div class="block">
 				<div class="title">Главное меню</div>
 					<ul>
-						<?foreach(core\Config::$leftMenu as $key => $value){
+						<?foreach(admin\functions\LeftMenu::$leftMenu as $key => $value){
 							if (
 								!is_array($value) &&
 								core\Managers::isAccessForbidden($value)
@@ -69,6 +72,11 @@
 										<span class="<?=core\Managers::isActiveMenuGroup($value, $_GET['view']) ? 'icon-circle-up' : 'icon-circle-down'?>"></span>
 									<?}?>
 									<?=$key?>
+									<?if (!is_array($value) && in_array($_GET['view'], ['returns', 'orders'])){
+										if ($countNew = LeftMenu::getCountNew($value)){?>
+											<span>(<?=$countNew?>)</span>
+										<?}
+									}?>
 								</a>
 								<?if (is_array($value)){?>
 									<ul class="<?=core\Managers::isActiveMenuGroup($value, $_GET['view']) ? 'active' : ''?>">

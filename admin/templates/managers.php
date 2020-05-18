@@ -1,5 +1,6 @@
 <?php
 use core\Managers;
+use admin\functions\LeftMenu;
 $page_title = "Менеджеры";
 $status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 switch($_GET['act']){
@@ -201,7 +202,7 @@ function group($group = []){
 					<div class="title">Разрешения</div>
 					<div class="value permissions">
 						<ul>
-							<?foreach(core\Config::$commonPermisions as $key => $value){
+							<?foreach(LeftMenu::$commonPermisions as $key => $value){
 								$title = is_array($value) ? $key : $value;
 								?>
 								<li class="parent">

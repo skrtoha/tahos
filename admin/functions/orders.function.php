@@ -79,8 +79,8 @@ function get_order_values($flag = '', $order_id = null, $ov = null){
 			ps.delivery,
 			ps.title AS providerStore,
 			ps.provider_id,
-			mc.code,
 			mzc.ZakazCode,
+			IF(r.item_id IS NOT NULL, 1, 0) return_ordered,
 			IF (ps.noReturn, 'class=\"noReturn\" title=\"Возврат поставщику невозможен!\"', '') AS noReturn,
 			c.id AS correspond_id,
 			(
@@ -94,7 +94,7 @@ function get_order_values($flag = '', $order_id = null, $ov = null){
 			#orders_values ov
 		LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
 		LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
-		LEFT JOIN #mparts_codes mc ON mc.store_id=ov.store_id AND mc.item_id=ov.item_id
+		LEFT JOIN #returns r ON r.order_id = ov.order_id AND r.store_id=ov.store_id AND r.item_id=ov.item_id
 		LEFT JOIN #providers p ON p.id=ps.provider_id
 		LEFT JOIN #items i ON i.id=ov.item_id
 		LEFT JOIN #brends b ON b.id=i.brend_id

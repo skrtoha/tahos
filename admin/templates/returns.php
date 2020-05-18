@@ -65,31 +65,34 @@ switch ($_GET['act']){
 		$res_returns = Returns::get([
 			'dateFrom' => $dateFrom,
 			'dateTo' => $dateTo,
-			'status_id' => $_GET['status_id']
+			'status_id' => $_GET['status_id'],
+			'article' => $_GET['article']
 		]);
 		$page_title = 'Возвраты';
-		views(
-			$res_returns, 
-			Returns::getStatuses(),
-			$dateFrom,
-			$dateTo,
-			$_GET['status_id']
-		);
+		views([
+			'res_returns' => $res_returns, 
+			'statuses' => Returns::getStatuses(),
+			'dateFrom' => $dateFrom,
+			'dateTo' => $dateTo,
+			'status_id' => $_GET['status_id'] ? $_GET['status_id'] : '',
+			'article' => $_GET['article'] ? $_GET['article'] : ''
+		]);
 }
-function views(mysqli_result $res_returns, array $statuses, $dateFrom, $dateTo, $status_id = null){
+function views(array $params){
 	?>
 	<form id="filter">
 		<input type="hidden" name="view" value="returns">
-		<input class="datetimepicker filter" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
-		<input class="datetimepicker filter" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+		<input class="datetimepicker filter" name="dateFrom" type="text" value="<?=$params['dateFrom']->format('d.m.Y H:i')?>">
+		<input class="datetimepicker filter" name="dateTo" type="text" value="<?=$params['dateTo']->format('d.m.Y H:i')?>">
 		<select name="status_id" class="filter">
-			<option>...статус</option>
-			<?foreach($statuses as $status){?>
-				<option <?=$status['id'] == $status_id ? 'selected' : ''?>  value="<?=$status['id']?>"><?=$status['title']?></option>
+			<option value="">...статус</option>
+			<?foreach($params['statuses'] as $status){?>
+				<option <?=$status['id'] == $params['status_id'] ? 'selected' : ''?>  value="<?=$status['id']?>"><?=$status['title']?></option>
 			<?}?>
 		</select>
+		<input placeholder="Артикул" type="text" class="filter" value="<?=$params['article']?> " name="article" >
 	</form>
-	<div id="total">Всего: <?=$res_returns->num_rows?></div>
+	<div id="total">Всего: <?=$params['res_returns']->num_rows?></div>
 	<div style="clear: both"></div>
 	<div class="actions"></div>
 	<table class="t_table" cellspacing="1">
@@ -102,8 +105,8 @@ function views(mysqli_result $res_returns, array $statuses, $dateFrom, $dateTo, 
 			<td>Статус</td>
 			<td>Дата</td>
 		</tr>
-		<?if ($res_returns->num_rows){
-			foreach($res_returns as $value){?>
+		<?if ($params['res_returns']->num_rows){
+			foreach($params['res_returns'] as $value){?>
 				<tr class="<?=$value['is_new'] ? 'is_new' : ''?>" osi="<?=$value['order_id']?>-<?=$value['store_id']?>-<?=$value['item_id']?>">
 					<td label="Пользователь"><?=$value['fio']?></td>
 					<td label="Бренд"><?=$value['brend']?></td>

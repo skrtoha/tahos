@@ -269,6 +269,9 @@ function show_form($act){
 								&item_id={$ov['item_id']}
 							";?>
 							<a href="<?=$href?>">Переписка в товаре (<?=$v?>)</a>
+							<?if ($ov['return_ordered']){?>
+								<a href="/admin/?view=returns&act=form&osi=<?=$ov['order_id']?>-<?=$ov['store_id']?>-<?=$ov['item_id']?>">Заявка на возврат</a>
+							<?}?>
 						</td>
 					</tr>
 				<?}?>

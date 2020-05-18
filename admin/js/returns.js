@@ -11,14 +11,16 @@
 				}
 				$(this).closest('form').submit();
 			})
+			$('#filter .filter').on('change', function(){
+				$('#filter').submit();
+			})
 		},
 		setDateTimePicker: function(){
 			$.datetimepicker.setLocale('ru');
 			$('.datetimepicker[name=dateFrom], .datetimepicker[name=dateTo]').datetimepicker({
 				format:'d.m.Y H:i',
 				onChangeDateTime: function(db, $input){
-					let str = '/admin/?view=returns&dateFrom=' + $('input[name=dateFrom]').val() + '&dateTo=' + $('input[name=dateTo]').val();
-					document.location.href = encodeURI(str);
+					$('#filter').submit();
 				},
 				closeOnDateSelect: true,
 				closeOnWithoutClick: true

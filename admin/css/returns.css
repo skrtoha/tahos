@@ -10,5 +10,14 @@ input[name=return_price]{
     text-align: center;
 }
 input.datetimepicker {
-    width: 112px;
+    width: 130px;
+}
+#filter{
+	float: left;
+	    margin-bottom: 5px;
+}
+#filter select{
+	height: 25px;
+	border: 1px solid #c8c8c8;
+    border-radius: 4px;
 }

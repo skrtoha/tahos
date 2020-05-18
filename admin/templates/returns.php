@@ -64,21 +64,33 @@ switch ($_GET['act']){
 		
 		$res_returns = Returns::get([
 			'dateFrom' => $dateFrom,
-			'dateTo' => $dateTo
+			'dateTo' => $dateTo,
+			'status_id' => $_GET['status_id']
 		]);
 		$page_title = 'Возвраты';
 		views(
 			$res_returns, 
 			Returns::getStatuses(),
 			$dateFrom,
-			$dateTo
+			$dateTo,
+			$_GET['status_id']
 		);
 }
-function views(mysqli_result $res_returns, array $statuses, $dateFrom, $dateTo){
+function views(mysqli_result $res_returns, array $statuses, $dateFrom, $dateTo, $status_id = null){
 	?>
-	<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
-	<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+	<form id="filter">
+		<input type="hidden" name="view" value="returns">
+		<input class="datetimepicker filter" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
+		<input class="datetimepicker filter" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+		<select name="status_id" class="filter">
+			<option>...статус</option>
+			<?foreach($statuses as $status){?>
+				<option <?=$status['id'] == $status_id ? 'selected' : ''?>  value="<?=$status['id']?>"><?=$status['title']?></option>
+			<?}?>
+		</select>
+	</form>
 	<div id="total">Всего: <?=$res_returns->num_rows?></div>
+	<div style="clear: both"></div>
 	<div class="actions"></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

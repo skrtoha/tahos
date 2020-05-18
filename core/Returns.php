@@ -12,6 +12,7 @@ class Returns{
 					case 'order_id':
 					case 'store_id':
 					case 'item_id':
+					case 'status_id':
 						$where .= "r.{$key} = '{$value}' AND ";
 						break;
 					case 'dateFrom':

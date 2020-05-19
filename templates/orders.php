@@ -310,7 +310,7 @@ $orders = get_order_group($params, '');
 										<?}
 										?>
 										</span>
-										<?if ($order['ordered_return']){?>
+										<?if ($order['ordered_return'] && $order['status_id'] != '2'){?>
 											<span class="ordered_return status_return_<?=$order['return_status_id']?>">Возврат: <?=$order['ordered_return']?></span>
 										<?}?>
 									</td>

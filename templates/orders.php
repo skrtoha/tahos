@@ -528,6 +528,7 @@ $orders = get_order_group($params, '');
 			<table class="orders-table">
 				<thead>
 					<tr>
+						<th></th>
 						<th>Наименование</th>
 						<th>Количество</th>
 						<th>Сумма</th>

@@ -35,6 +35,7 @@ class Returns{
 		} 
 		$query = "
 			SELECT
+				r.id AS return_id,
 				o.user_id,
 				r.order_id,
 				r.item_id,

@@ -172,6 +172,7 @@ $(function(){
 							console.log(items);
 							for(var k in items) $tab.find('table.orders-table tbody').append(
 								'<tr>' +
+									'<td>' + items[k].return_id + '</td>' +
 									'<td label="Наменование: ">' +
 										'<b class="brend_info" brend_id="' + items[k].brend_id + '">' + items[k].brend + '</b> ' + 
 										'<a href="/search/article/' + items[k].article + '" class="articul">' + items[k].article + '</a> ' +

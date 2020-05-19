@@ -1,4 +1,41 @@
 var reasonsOfReturn;
+function getReturns(){
+	$.ajax({
+		url: '/ajax/order.php',
+		type: 'post',
+		processData: true,
+		data: {
+			act: 'get_returns',
+		},
+		success: function(response){
+			let $tab = $('div[data-name=returns]');
+			$tab.find('table.orders-table tbody').empty();
+			if (!response) return false;
+			let items = JSON.parse(response);
+			for(var k in items){
+				let returnUndo = (items[k].status_id == '2' || items[k].status_id == 1) ? '<a class="undoReturn">Отменить</a>' : '';
+				$tab.find('table.orders-table tbody').append(
+					'<tr>' +
+						'<td>' + items[k].return_id + '</td>' +
+						'<td class="title" label="Наменование: ">' +
+							'<b class="brend_info" brend_id="' + items[k].brend_id + '">' + items[k].brend + '</b> ' + 
+							'<a href="/search/article/' + items[k].article + '" class="articul">' + items[k].article + '</a> ' +
+								items[k].title_full +
+						'</td>' +
+						'<td label="Количество: ">' + items[k].quan + '</td>' +
+						'<td label="Сумма: ">' + (items[k].return_price * items[k].quan) + '<i class="fa fa-rub" aria-hidden="true"></i>' + '</td>' +
+						'<td label="Причина: ">' + items[k].reason + '</td>' +
+						'<td label="Дата: ">' + items[k].created + '</td>' +
+						'<td label="Статус: " class="status_return_' + items[k].status_id + '">' + 
+							items[k].status + 
+							returnUndo +
+						'</td>' +
+					'</tr>'
+				);
+			} 
+		}
+	})
+}
 function show_form_returns(items){
 	if (typeof reasonsOfReturn == 'undefined'){
 		$.ajax({
@@ -155,42 +192,29 @@ $(function(){
 	$.ionTabs("#orders_tabs",{
 		type: "hash",
 		onChange: function(obj){
-			let $tab = $('div[data-name=returns]');
 			switch(obj.tab){
-				case 'returns':
-					$.ajax({
-						url: '/ajax/order.php',
-						type: 'post',
-						processData: true,
-						data: {
-							act: 'get_returns',
-						},
-						success: function(response){
-							$tab.find('table.orders-table tbody').empty();
-							if (!response) return false;
-							let items = JSON.parse(response);
-							console.log(items);
-							for(var k in items) $tab.find('table.orders-table tbody').append(
-								'<tr>' +
-									'<td>' + items[k].return_id + '</td>' +
-									'<td label="Наменование: ">' +
-										'<b class="brend_info" brend_id="' + items[k].brend_id + '">' + items[k].brend + '</b> ' + 
-										'<a href="/search/article/' + items[k].article + '" class="articul">' + items[k].article + '</a> ' +
-											items[k].title_full +
-									'</td>' +
-									'<td label="Количество: ">' + items[k].quan + '</td>' +
-									'<td label="Сумма: ">' + (items[k].return_price * items[k].quan) + '<i class="fa fa-rub" aria-hidden="true"></i>' + '</td>' +
-									'<td label="Причина: ">' + items[k].reason + '</td>' +
-									'<td label="Дата: ">' + items[k].created + '</td>' +
-									'<td label="Статус: " class="status_return_' + items[k].status_id + '">' + items[k].status + '</td>' +
-								'</tr>'
-							);
-						}
-					})
-					break;
+				case 'returns': getReturns(); break;
 			}
 		}
 	});
+	$(document).on('click', 'a.undoReturn', function(e){
+		var th = $(this);
+		if (!confirm('Вы действительно хотите отменить возврат?')) return false;
+		$.ajax({
+			url: '/ajax/order.php',
+			type: 'post',
+			processData: true,
+			data: {
+				act: 'undoReturn',
+				return_id: th.closest('tr').find('td:first-child').text()
+			},
+			success: function(response){
+				$.cookie('message', 'Успешно отменено!', cookieOptions);
+				$.cookie('message_type', 'ok', cookieOptions);
+				document.location.reload();
+			}
+		})
+	})
 	if (get.tab) $.ionTabs.setTab('orders', get.tab);
 	$('[data-name=group] tr[order_id]').on('click', function(){
 		document.location.href = '/order/' + $(this).attr('order_id');

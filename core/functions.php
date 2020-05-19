@@ -641,7 +641,10 @@ function get_orders($params, $flag = ''){
 			TO_DAYS(CURDATE()) - TO_DAYS(ov.updated) AS days_from_purchase,
 			@end_date := DATE_ADD(ov.updated, Interval ps.daysForReturn DAY) AS end_date,
 			IF(
-				@end_date > CURDATE() AND ov.status_id = 1 AND ps.noReturn != 1 AND r.item_id IS NULL,
+				@end_date > CURDATE() AND 
+				ov.status_id = 1 AND 
+				ps.noReturn != 1 AND 
+				(r.status_id = 5 OR r.status_id IS NULL),
 				1,
 				0
 			) AS is_return_available,

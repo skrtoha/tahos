@@ -58,6 +58,11 @@ input[name=quan]{
     border: 1px solid #c8c8c8;
     border-radius: 5px;
 }
+select[name=status_id]{
+	padding: 3px;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+}
 .actions form{
 	margin-top: -3px;float: left;margin-bottom: 10px;
 }

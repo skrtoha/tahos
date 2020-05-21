@@ -37,11 +37,29 @@ function get_order($flag = ''){
 	$order = $db->select_unique($query, $flag);
 	return $order[0];
 }
-function get_order_values($flag = '', $order_id = null, $ov = null){
+function get_order_values(array $params, string $flag = ''): mysqli_result
+{
 	global $db;
-	if (!$order_id) $order_id = $_GET['id'];
-	if (!empty($ov)) $where = "ov.order_id = {$ov['order_id']} AND ov.item_id = {$ov['item_id']}";
-	else $where = "ov.order_id={$order_id}";
+	$where = '';
+	$limit = '';
+	if (!empty($params)){
+		foreach($params as $key => $value){
+			switch($key){
+				case 'order_id':
+				case 'item_id':
+				case 'status_id':
+					$where .= "ov.$key = '$value' AND ";
+					break;
+				case 'limit':
+					$limit = "LIMIT $value";
+					break;
+			}
+		}
+	}
+	if ($where){
+		$where = substr($where, 0, -5);
+		$where = "WHERE $where";
+	}
 	return $db->query("
 		SELECT
 			ps.cipher,
@@ -108,7 +126,9 @@ function get_order_values($flag = '', $order_id = null, $ov = null){
 			c.item_id=ov.item_id
 		LEFT JOIN
 			#mikado_zakazcode mzc ON mzc.item_id = ov.item_id 
-		WHERE $where
+		$where
+		ORDER BY o.created
+		$limit
 	", $flag);
 }
 function order_print($order, $res_orders_values){
@@ -253,20 +273,6 @@ function get_status_color($status){
 		case 'Ожидает': return 'status_5'; break;
 		case 'В работе': return 'status_7'; break;
 	}
-}
-/**
- * [orderReady Проверяет готовность заказа]
- * @param  [integer]  $order_id Номер заказа
- * @return [boolean] true - заказ готов, false - заказ не готов
- */
-function isOrderReady($order_id){
-	$orderValues = get_order_values('', $order_id);
-	foreach($orderValues as $value){
-		if (in_array($value['status'], ['Возврат', 'Нет в наличии', 'Отменен'])) continue;
-		if (in_array($value['status'], ['Заказано', 'В работе', 'Приостановлено'])) return false;
-
-	}
-	return true;
 }
 /**
  * [getTableOrder Получение html-таблицы товаров в заказе]

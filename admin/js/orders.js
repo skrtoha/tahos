@@ -1,5 +1,6 @@
 var ajax_url = '/admin/ajax/orders.php';
 var reg_integer = /^\d+$/;
+var is_reload = true;
 function first_option(obj){
 	obj.find('option').prop('selected', false);
 	obj.find('option:first-child').prop('selected', true);
@@ -31,7 +32,7 @@ function arrived_new(obj){
 		success: function(response){
 			// console.log(response); return false;
 			$('#modal-container').removeClass('active');
-			document.location.reload();
+			if (is_reload) document.location.reload();
 		}
 	})
 }
@@ -59,7 +60,7 @@ function issued_new(obj){
 		success: function(response){
 			// console.log(response); return false;
 			$('#modal-container').removeClass('active');
-			document.location.reload();
+			if (is_reload) document.location.reload();
 		}
 	})
 }
@@ -91,6 +92,9 @@ function setTotalSumm(){
 	$('td.total').html(total);
 }
 $(function(){
+	$('.actions select[name=status_id]').on('change', function(){
+		$(this).closest('form').submit();
+	})
 	$('a.show_stringLog').on('click', function(e){
 		e.preventDefault();
 		$(this).next().toggleClass('active');
@@ -128,7 +132,7 @@ $(function(){
 			data: data,
 			success: function(response){
 				// console.log(response); return false;
-				document.location.reload();
+				if (is_reload) document.location.reload();
 			}
 		})
 	})
@@ -180,6 +184,7 @@ $(function(){
 		data += '&reserved_funds=' + th.find('input[name=reserved_funds]').val();
 		switch(status_id){
 			case 1:
+				data += '&arrived=' + th.find('input[name=arrived]').val();
 				break;
 			//выделено в отдельную функцию
 			case 2:break;
@@ -207,7 +212,7 @@ $(function(){
 			data: data,
 			success: function(response){
 				// console.log(response); return false;
-				document.location.reload();
+				if (is_reload) document.location.reload();
 			}
 		})
 	})

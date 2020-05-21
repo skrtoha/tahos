@@ -1,5 +1,6 @@
 <?php
 use core\Provider;
+use core\OrderValue;
 //SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 // require_once('functions/')
 $act = $_GET['act'];
@@ -14,7 +15,7 @@ switch ($act) {
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	case 'allInWork':
-		$res_order_values = get_order_values('');
+		$res_order_values = get_order_values(['order_id' => $_GET['id']]);
 		while($ov = $res_order_values->fetch_assoc()){
 			if (!in_array($ov['status_id'], [5])) continue;
 			if (!Provider::getIsEnabledApiOrder($ov['provider_id'])){
@@ -53,8 +54,26 @@ switch ($act) {
 		break;
 	case 'print':
 		$order = get_order('');
-		$res_order_values = get_order_values('');
+		$res_order_values = get_order_values(['order_id' => $_GET['id']]);
 		order_print($order, $res_order_values);
+		break;
+	case 'items_status':
+		require_once('templates/pagination.php');
+		$status_id = $_GET['status_id'];
+		$items_status = $db->getFieldOnID('orders_statuses', $_GET['status_id'], 'title');
+		$page_title = "Товары со статусом \"$items_status\" ";
+		$status = "<a href='/admin'>Главная</a> > <a href='?view=orders'>Заказы</a> > $page_title";
+		$perPage = 30;
+		$linkLimit = 10;
+		$all = $db->getCount('orders_values', "`status_id` = {$_GET['status_id']}");
+		$page = $_GET['page'] ? $_GET['page'] : 1;
+		$chank = getChank($all, $perPage, $linkLimit, $page);
+		$start = $chank[$page] ? $chank[$page] : 0;
+		$res_order_values = get_order_values([
+			'status_id' => $_GET['status_id'],
+			'limit' => "$start, $perPage"
+		], '');
+		items_status(compact('res_order_values', 'all', 'chank', 'page', 'status_id'));
 		break;
 	default:
 		view();
@@ -142,6 +161,16 @@ function view(){
 			</select>
 			<input type="submit" value="Искать">
 		</form>
+		<form style="margin-left: 10px;">
+			<input type="hidden" name="view" value="orders">
+			<input type="hidden" name="act" value="items_status">
+			<select name="status_id">
+				<option value="">...статус товара</option>
+				<?foreach(OrderValue::getStatuses() as $s){?>
+					<option value="<?=$s['id']?>"><?=$s['title']?></option>
+				<?}?>
+			</select>
+		</form>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -186,7 +215,7 @@ function show_form($act){
 	switch($act){
 		case 's_change':
 			$order = get_order('');
-			$res_order_values = get_order_values('');
+			$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
 			$page_title = "Просмотр заказа";
 			break;
 		case 's_add':
@@ -542,6 +571,215 @@ function user_orders(){
 			<?}?>
 		</table>
 	</form>
-		
+<?}
+function items_status(array $params = []){
+	extract($params);
+	?>
+	<div id="total">Всего: <?=$all?></div>
+	<table class="t_table" cellspacing="1">
+		<tr class="head">
+			<td>Поставщик</td>
+			<td>Бренд</td>
+			<td>Артикул</td>
+			<td>Наименование</td>
+			<td>Цена</td>
+			<td>Кол-во</td>
+			<td>Сумма</td>
+			<td>Комментарий</td>
+			<?if (!$order['is_draft']){?>
+				<td>Статус</td>
+				<td></td>
+			<?}?>
+		</tr>
+		<?if (!$res_order_values->num_rows){?>
+			<td colspan="12">Ничего не найдено</td>
+		<?}
+		else{
+			while ($ov = $res_order_values->fetch_assoc()){
+				$res_stringLog = core\Provider::getStringLog($ov);
+				$selector = "store_id='{$ov['store_id']}' item_id='{$ov['item_id']}'";?>
+				<?if (!$order['is_draft']){?>
+					<tr <?=$selector?>>
+						<td colspan="10">
+							<?$v = 0;
+							if ($ov['correspond_id']){
+								$href = "?view=correspond&id={$ov['correspond_id']}";
+								$v = $ov['count'];
+							} 
+							else $href = "
+								?view=correspond
+								&user_id={$ov['user_id']}
+								&order_id={$_GET['id']}
+								&store_id={$ov['store_id']}
+								&item_id={$ov['item_id']}
+							";?>
+							<a href="<?=$href?>">Переписка в товаре (<?=$v?>)</a>
+							<?if ($ov['return_ordered']){?>
+								<a href="/admin/?view=returns&act=form&osi=<?=$ov['order_id']?>-<?=$ov['store_id']?>-<?=$ov['item_id']?>">Заявка на возврат</a>
+							<?}?>
+						</td>
+					</tr>
+				<?}?>
+				<tr <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
+					<td label="Поставщик">
+						<a class="store" store_id="<?=$ov['store_id']?>"><?=$ov['cipher']?></a>
+						<?if ($ov['provider_id'] && core\Provider::isInBasket($ov)){?>
+							<a class="removeFromBasket" href="?view=orders&act=removeFromBasket&<?=http_build_query($ov)?>">
+								Удалить из корзины
+							</a>
+						<?}?>
+						<?if ($res_stringLog->num_rows){?>
+							<a href="#" class="show_stringLog">Показать лог</a>
+							<table class="stringLog">
+								<?foreach($res_stringLog as $value){?>
+									<tr>
+										<td><?=$value['date']?></td>
+										<td><?=$value['text']?></td>
+									</tr>
+								<?}?>
+							</table>
+						<?}?>
+					</td>
+					<td label="Бренд"><?=$ov['brend']?></td>
+					<td label="Артикул"><a href="/admin/?view=items&act=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>
+					<td label="Наименование"><?=$ov['title_full']?></td>
+					<td label="Цена" class="price_format">
+						<?if (!$order['is_draft']){?>
+							<?=$ov['price']?>
+						<?}
+						else{?>
+							<input <?=$ov['store_id'] ? 'readonly' : ''?> type="text" name="price" value="<?=$ov['price']?>">
+						<?}?>
+					</td>
+					<td label="Кол-во">
+						<?if (!$order['is_draft']){?>
+							Заказ - <?=$ov['quan']?> шт.
+						<?}
+							else{?>
+								<input type="text" name="quan" value="<?=$ov['quan']?>">
+							<?}?>
+						<?switch($ov['status_id']){
+							case 1://выдано
+								$summ = $ov['price'] * ($ov['issued'] - $ov['returned']);
+								if ($ov['issued'] < $ov['arrived']){?>
+									<br>Пришло - <?=($ov['arrived'] - $ov['issued'])?> шт.
+								<?}
+								if ($ov['issued'] && $ov['issued'] < $ov['arrived']){?>
+									<br>Выдано - <a href="" class="issued_change"><?=$ov['issued']?></a> шт.
+								<?}
+								if ($ov['issued'] && $ov['arrived'] < $ov['ordered']){?>
+									<br>Выдано - <?=$ov['issued']?> шт.
+								<?}
+								if ($ov['returned']){?>
+									<br>Возврат - <?=$ov['returned']?> шт.
+								<?}
+								if ($ov['arrived'] < $ov['ordered'] && !$ov['declined']){?>
+									<br>Ожидается - <a class="arrived_change" href=""><?=($ov['ordered'] - $ov['arrived'])?></a> шт.
+								<?}
+								break;
+							case 2://возврат
+								$summ = 0;
+								break;
+							case 3://пришло
+								//закоментировано, т.к. если пришел не весь товар, то сумма уменьшалась
+								// $summ = $ov['price'] * ($ov['arrived'] - $ov['issued']);
+								$summ = $ov['price'] * $ov['ordered'];
+								if ($ov['issued'] && $ov['issued'] < $ov['arrived']){?>
+									<br>Пришло - <?=$ov['arrived'] - $ov['issued']?> шт.
+									<br>Выдано - <?=$ov['issued']?> шт.
+								<?}
+								if ($ov['arrived'] < $ov['ordered'] && !$ov['issued']){?>
+									<br>Пришло - <?=$ov['arrived']?> шт.
+									<?if ($ov['arrived'] < $ov['ordered'] && !$ov['declined']){?>
+										<br>Ожидается - <a class="arrived_change" href=""><?=($ov['ordered'] - $ov['arrived'])?></a> шт.
+									<?}
+								}
+								break;
+							case 5://приостановлено
+								$summ = $ov['price'] * $ov['quan'];
+								break;
+							case 7://в работе
+								$summ = $ov['quan'] * $ov['price'];
+								break;
+							case 8: $summ = 0; break;	
+							case 11://заказано
+								$summ = $ov['price'] * $ov['ordered'];
+								if ($ov['ordered'] < $ov['quan']){?>
+									<br>Заказано - <?=$ov['ordered']?> шт.
+								<?}
+								break;
+						}
+						if (
+								($ov['ordered'] && $ov['ordered'] < $ov['quan']) || 
+								($ov['arrived'] < $ov['ordered'] && $ov['declined'])
+							){
+							$declined = !$ov['declined'] ? ($ov['quan'] - $ov['ordered']) : ($ov['quan'] - $ov['arrived']);?>
+							<br>Отказ - <?=$declined?> шт.
+						<?}?>
+					</td>
+					<td label="Сумма" class="price_format sum">
+						<?if (!$order['is_draft']){?>
+							<?=$summ?>
+						<?}
+						else{?>
+							<?=$ov['sum']?>
+						<?}?>
+					</td>
+					<td label="Комментарий">
+						<?if ($order['is_draft']){?>
+							<input type="text" name="comment" value="<?=$ov['comment']?>">
+						<?}
+						else{?>
+							<?=$ov['comment']?>
+						<?}?>
+					</td>
+					<?if (!$order['is_draft']){?>
+						<td label="Статус" class="change_status">
+							<form method="post">
+								<input type="hidden" name="user_id" value="<?=$ov['user_id']?>">
+								<input type="hidden" name="order_id" value="<?=$ov['order_id']?>">
+								<input type="hidden" name="store_id" value="<?=$ov['store_id']?>">
+								<input type="hidden" name="item_id" value="<?=$ov['item_id']?>">
+
+								<input type="hidden" name="quan" value="<?=$ov['quan']?>">
+								<input type="hidden" name="ordered" value="<?=$ov['ordered']?>">
+								<input type="hidden" name="arrived" value="<?=$ov['arrived']?>">
+								<input type="hidden" name="issued" value="<?=$ov['issued']?>">
+								<input type="hidden" name="returned" value="<?=$ov['returned']?>">
+
+								<input type="hidden" name="price" value="<?=$ov['price']?>">
+								<input type="hidden" name="bill" value="<?=$ov['bill']?>">
+								<input type="hidden" name="reserved_funds" value="<?=$ov['reserved_funds']?>">
+								<input type="hidden" name="brend" value="<?=$ov['brend']?>">
+								<input type="hidden" name="article" value="<?=$ov['article']?>">
+								<input type="hidden" name="title" value="<?=$ov['title_full']?>">
+								<b><?=$ov['status']?></b>
+								<?$no_show = array(9, 6, 8, 10);
+								if (!in_array($ov['status_id'], $no_show)){
+									$orders_statuses = get_order_statuses($ov['status_id']);?>
+									<br>новый статус:
+									<select class="change_status" name="status_id">
+									<option value="">...выбрать</option>
+										<?foreach($orders_statuses as $order_status){
+											$selected = $ov['status_id'] == $order_status['id'] ? 'selected' : '';?>
+											<option <?=$selected?> value="<?=$order_status['id']?>"><?=$order_status['title']?></option>
+										<?}?>
+									</select>
+								<?}?>
+							</form>
+						</td>
+						<td>
+							<?$disabled = $ov['status_id'] == 5 ? '' : 'disabled';?>
+								<input <?=$disabled?> type="checkbox" name="return_to_basket">
+						</td>
+					<?}?>
+					<?if ($order['is_draft']){?>
+						<td><span class="icon-cancel-circle"></span></td>
+					<?}?>
+				</tr>
+			<?}
+		}?>
+	</table>
+	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=orders&act=items_status&status_id=$status_id&page=");?>
 <?}
 ?>

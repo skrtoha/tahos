@@ -242,4 +242,8 @@ class OrderValue{
 		";
 		return $GLOBALS['db']->query($query, '');
 	}
+	public static function getStatuses(): \mysqli_result
+	{
+		return $GLOBALS['db']->query("SELECT * FROM #orders_statuses ORDER BY title");
+	}
 }

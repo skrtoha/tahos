@@ -16,7 +16,7 @@ class Tahos{
 		if (!self::$isDoNotShowStoresCheeperTahos || !$priceTahos) return $items;
 		$output = [];
 		foreach($items as $v){
-			if ($v['price'] < $priceTahos) continue;
+			if ($v['price'] < $priceTahos && $v['store_id'] != self::$store_id) continue;
 			$output[] = $v;
 		}
 		return $output;

@@ -632,7 +632,7 @@ function get_orders($params, $flag = ''){
 			ov.status_id,
 			os.title AS status,
 			os.class AS status_class,
-			@delivery:=IF(si.in_stock = 0, ps.under_order, ps.delivery) AS delivery,
+			@delivery := ps.delivery AS delivery,
 			si.packaging,
 			IF (c.id IS NULL, 'disable', '') AS message,
 			DATE_FORMAT(o.created, '%d.%m.%Y') AS date_from,

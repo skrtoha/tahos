@@ -1,1 +1,0 @@
-<a href="/admin/?view=prices&act=items&id=23">Основной склад</a>

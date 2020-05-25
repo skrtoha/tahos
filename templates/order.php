@@ -3,7 +3,7 @@ require_once('admin/functions/orders.function.php');
 require_once('admin/functions/sendings.function.php');
 if (isset($_GET['act']) && $_GET['act'] == 'edit') $title = 'Редактирование заказа';
 else $title = "Просмотр заказа";
-$res_orders_values = get_order_values('');
+$res_orders_values = get_order_values();
 $total = 0;
 $status_classes = [ 
 	'Отменен' => 'status-return',

@@ -37,7 +37,7 @@ function get_order($flag = ''){
 	$order = $db->select_unique($query, $flag);
 	return $order[0];
 }
-function get_order_values(array $params, string $flag = ''): mysqli_result
+function get_order_values(array $params = [], string $flag = ''): mysqli_result
 {
 	global $db;
 	$where = '';

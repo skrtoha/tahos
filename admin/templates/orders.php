@@ -620,7 +620,7 @@ function items_status(array $params = []){
 						</td>
 					</tr>
 				<?}?>
-				<tr <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
+				<tr order_id="<?=$ov['order_id']?>" <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
 					<td label="Поставщик">
 						<a class="store" store_id="<?=$ov['store_id']?>"><?=$ov['cipher']?></a>
 						<?if ($ov['provider_id'] && core\Provider::isInBasket($ov)){?>

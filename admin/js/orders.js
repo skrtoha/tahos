@@ -390,4 +390,7 @@ $(function(){
 			}
 		})
 	})
+	$('tr[order_id]').on('click', function(){
+		document.location.href = '/admin/?view=orders&act=change&id=' + $(this).attr('order_id');
+	})
 })

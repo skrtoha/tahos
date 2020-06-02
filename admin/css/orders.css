@@ -12,6 +12,9 @@ a.show_stringLog{
 	display: block;
 	font-size: 11px;
 }
+tr[order_id]{
+	cursor: pointer;
+}
 #arrived_change > label{
 	display: block;
     text-align: left;

@@ -127,7 +127,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 		LEFT JOIN
 			#mikado_zakazcode mzc ON mzc.item_id = ov.item_id 
 		$where
-		ORDER BY o.created
+		ORDER BY o.created DESC
 		$limit
 	", $flag);
 }

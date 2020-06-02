@@ -119,7 +119,7 @@ class LeftMenu{
 		'Возвраты' => 'returns',
 		'Категории товаров' => 'categories',
 		'Бренды товаров' => 'brends',
-		'Сообщения' => 'correspond',
+		'Сообщения' => 'messages',
 		'Прайсы' => 'prices',
 		'Поставщики' => 'providers',
 		'Пользователи' => 'users',
@@ -133,6 +133,9 @@ class LeftMenu{
 			case 'returns':
 			case 'orders':
 				return $GLOBALS['db']->getCount($view, '`is_new` = 1');
+				break;
+			case 'messages':
+				return $GLOBALS['db']->getCount('messages', '`is_read` = 0');
 				break;
 			default: return 0;
 		}

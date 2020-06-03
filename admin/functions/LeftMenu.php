@@ -135,7 +135,7 @@ class LeftMenu{
 				return $GLOBALS['db']->getCount($view, '`is_new` = 1');
 				break;
 			case 'messages':
-				return $GLOBALS['db']->getCount('messages', '`is_read` = 0');
+				return $GLOBALS['db']->getCount('messages', '`is_read` = 0 AND sender = 1');
 				break;
 			default: return 0;
 		}

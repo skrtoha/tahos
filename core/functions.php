@@ -176,21 +176,7 @@ function get_rating($rate, $ratings){
 	}
 	return 10;
 }
-function getHtmlRating($rating){
-	$str = '';
-	$div = $rating / 2;
-	// echo $rating;
-	for ($i = 1; $i <= 5; $i++){
-		if ($i < $div) $fa = 'fa-star';
-		else{
-			if ($div == $i) $fa = 'fa-star';
-			elseif ($div + 0.5 == $i) $fa = 'fa-star-half-o';
-			else $fa = 'fa-star-o';
-		}
-		$str .= '<i class="fa '.$fa.'" aria-hidden="true"></i>';
-	}
-	return $str;
-}
+
 function get_filters($category_id){
 	global $db;
 	$query = "

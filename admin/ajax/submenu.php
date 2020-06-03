@@ -10,7 +10,7 @@ $title = trim($_GET['title']);
 </div>
 <div id="contents">
 	<div id="submenu">
-		<?foreach(core\Config::$leftMenu[$title] as $key => $value){?>
+		<?foreach(admin\functions\LeftMenu::$leftMenu[$title] as $key => $value){?>
 			<a href="/admin/?view=<?=$value?>"><?=$key?></a>
 		<?}?>
 	</div>

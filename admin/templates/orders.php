@@ -575,6 +575,16 @@ function user_orders(){
 function items_status(array $params = []){
 	extract($params);
 	?>
+	<form style="margin: 0 0 10px 0; float: left">
+		<input type="hidden" name="view" value="orders">
+		<input type="hidden" name="act" value="items_status">
+		<select name="status_id">
+			<option value="">...статус товара</option>
+			<?foreach(OrderValue::getStatuses() as $s){?>
+				<option <?=$s['id'] == $params['status_id'] ? 'selected' : ''?>  value="<?=$s['id']?>"><?=$s['title']?></option>
+			<?}?>
+		</select>
+	</form>
 	<div id="total">Всего: <?=$all?></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

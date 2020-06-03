@@ -49,5 +49,4 @@ if (file_exists($path)){
 }
 // debug($user);
 require_once('templates/main.php');
-
 ?>

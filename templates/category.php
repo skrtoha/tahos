@@ -1,8 +1,9 @@
-<?$href = $_GET['href'];
+<?
+use core\Item;
+$href = $_GET['href'];
 $category = $db->select('categories', '*', "`parent_id`=0 AND `href`='$href'");
 $category = $category[0];
 $category_id = $category['id'];
-$_SESSION['start'] = 0;
 $subs = $db->select('categories', '*', "`parent_id`=$category_id", 'pos', true);
 if (!$_GET['sub']) $title = $category['title'];
 else{
@@ -14,35 +15,69 @@ else{
 			} 
 		}
 	}
-	$filters = get_filters($sub_id);
-	$items = category_items_without_filters($sub_id);
-	$c_items = count($items);
-	// echo var_dump(strpos('52', ','));
+
+	$params = ['view' => 'mosaic-view'];
+	if (isset($_GET['search'])) $params['search'] = $_GET['search'];
+	if (isset($_GET['fv'])) $params['fv'] = $_GET['fv'];
+	if (isset($_GET['sliders'])) $params['sliders'] = $_GET['sliders'];
+	$params['perPage'] = $_GET['perPage'] ? $_GET['perPage'] : 20;
+	$params['pageNumber'] = $_GET['pageNumber'] ? $_GET['pageNumber'] : 1;
+
+	$items = core\Item::getItemsByCategoryID($sub_id, $params);
+	$filtersInitial = core\Filter::getFilterValuesByCategoryID($sub_id);
+
+	//добавлени информации о том, выбрана ли позиция
+	if (!empty($filtersInitial) && !empty($params['fv'])){
+		$filtersApplied = core\Filter::getFilterValuesByCategoryID($sub_id, $params);
+		foreach($filtersInitial as $title => $filter){
+			foreach($filter['filter_values'] as $fv_id => $fv){
+				if (in_array($fv['id'], $params['fv'])){
+					$filtersInitial[$title]['filter_values'][$fv_id]['added'] = 'added';
+					$filtersInitial[$title]['filter_values'][$fv_id]['disabled'] = 'disabled';
+				}
+				else {
+					$filtersInitial[$title]['filter_values'][$fv_id]['added'] = '';
+					$filtersInitial[$title]['filter_values'][$fv_id]['disabled'] = '';
+				}
+				if (!isset($filtersApplied[$title]['filter_values'][$fv_id])){
+					$filtersInitial[$title]['filter_values'][$fv_id]['disabled'] = 'disabled';
+				}
+			}
+		}
+	}
+
+	//проверка нужно ли блокировать, если выбрано единственное значение
+	foreach($filtersInitial as $title => $filter){
+		$filtersInitial[$title]['hidden'] = 'hidden';
+		foreach($filter['filter_values'] as $fv_id => $fv){
+			if (!$fv['added'] && !$fv['disabled']){
+				$filtersInitial[$title]['hidden'] = '';
+			}
+			if ($filter['slider']){
+				$filtersInitial[$title]['from'] = $filtersApplied[$title]['min'];
+				$filtersInitial[$title]['to'] = $filtersApplied[$title]['max'];
+			}
+		}
+	}
 } 
 ?>
 <div class="catalogue catalogue-filter">
-	<input type="hidden" id="category_id" value="<?=$category['id']?>">
-	<input type="hidden" id="sub_id" value="<?=$sub_id?>">
-	<input type="hidden" id="category_href" value="<?=$category['href']?>">
-	<input type="hidden" id="user_id" value="<?=$_SESSION['user']?>">
-	<input type="hidden" id="filters" value="<?=str_replace('"', '#', json_encode($filters))?>">
-	<input type="hidden" id="filters_on" value="">
-	<?if ($c_items > 4){?>
-		<div id="sub_filter"></div>
-	<?}?>
+	<input type="hidden" name="href" value="<?=$_GET['href']?>">
+	<input type="hidden" name="sub" value="<?=$_GET['sub']?>">
 	<div class="filter-form">
 		<h3><?=$category['title']?></h3>
-		<form action="#" method="post">
+		<form id="filter" action="#" method="post">
+			<input type="hidden" name="category_id" value="<?=$sub_id?>">
 			<?if (count($subs)){?>
 				<div class="search-wrap">
-					<input id="search" type="text" placeholder="Поиск по наименованию">
+					<input name="search" id="search" type="text" placeholder="Поиск по наименованию">
 					<div class="search-icon"></div>
 				</div>
 				<p>Выберите параметры фильтра:</p>
 				<div class="input_box clearfix">
 					<div class="input">
 						<div class="select">
-							<select name="sub" class="subcategory" data-placeholder="<?=$category['title']?>" id="parameter">
+							<select class="subcategory" data-placeholder="<?=$category['title']?>" id="parameter">
 								<option selected></option>
 								<?foreach($subs as $value){
 									$sel = $value['href'] == $_GET['sub'] ? 'selected' : '';?>
@@ -53,32 +88,42 @@ else{
 					</div>
 				</div>
 			<?}
-			if (isset($filters) && count($filters)){
-				foreach ($filters as $id => $filter){
+			if (isset($filtersInitial) && count($filtersInitial)){
+				foreach ($filtersInitial as $filter){
 					if (!$filter['slider']){?>
 						<div class="input_box clearfix">
 							<div class="input">
 								<div class="select">
-									<select name="<?=$id?>" data-placeholder="<?=$filter['title']?>">
+									<select class="filter <?=$filter['hidden']?>" data-placeholder="<?=$filter['title']?>">
 										<option selected></option>
-										<?if (count($filter['filters_values'])){
-											foreach($filter['filters_values'] as $k => $value){?>
-												<option value="<?=$k?>"><?=$value?></option>
+										<?if (!empty($filter['filter_values'])){
+											$checked = [];
+											foreach($filter['filter_values'] as $value){
+												if ($value['added']) $checked[] = $value;
+												?>
+												<option class="<?=$value['added']?>" <?=$value['disabled']?> value="<?=$value['id']?>"><?=$value['title']?></option>
 											<?}
 										}?>
 									</select>
 								</div>
 							</div>
+							<div class="selected">
+								<!-- ?debug($checked)?> -->
+								<?foreach($checked as $value){?>
+									<label class="filter_value">
+										<input type="hidden" name="fv[]" value="<?=$value['id']?>">
+										<?=$value['title']?> 
+										 <span class="icon-cross1"></span>
+									</label>
+								<?}?>
+							</div>
 						</div>
 					<?}
-					else{
-						$min = $db->getMin('filters_values', 'title + 0', "`filter_id`=$id");
-						$max = $db->getMax('filters_values', 'title + 0', "`filter_id`=$id");
-						?>
+					else{?>
 						<div class="input_box volume_input clearfix">
 							<p><?=$filter['title']?></p>
 							<div class="input">
-								<input class="slider" from="<?=$min?>" to="<?=$max?>" min="<?=$min?>" max="<?=$max?>" type="text" name="<?=$id?>">
+								<input class="slider" from="<?=$filter['from']?>" to="<?=$filter['to']?>" min="<?=$filter['min']?>" max="<?=$filter['max']?>" type="text" freak="sliders[<?=$filter['id']?>]">
 							</div>
 						</div>
 					<?}?>
@@ -104,22 +149,35 @@ else{
 			</div>
 		</div>
 		<div class="option-panel">
-			<a sort="title_full" class="name-sort active" href="#">Наименование</a>
+			<?$active = !isset($_GET['sort']) || $_GET['sort'] == 'title_full' ? 'active' : '';
+			$direction = $_GET['direction'] == 'desc' ? 'desc' : '';?>
+			<a sort="title_full" class="<?=$active?> <?=$direction?>" href="#">Наименование</a>
 			<?if ($_GET['sub']){?>
-				<a sort="price" class="price-sort" href="#">Цена</a>
-				<a sort="rating" class="rating-sort" href="#">Рейтинг</a>
+				<?$active = isset($_GET['sort']) && $_GET['sort'] == 'price' ? 'active' : '';?>
+				<a sort="price"  class="<?=$active?> <?=$direction?>" href="#">Цена</a>
+				<?$active = isset($_GET['sort']) && $_GET['sort'] == 'rating' ? 'active' : '';?>
+				<a sort="rating" class="<?=$active?> <?=$direction?>" href="#">Рейтинг</a>
+			<?}?>
+			<?if ($_GET['sub']){?>
+				<div id="perPage">
+					<span>Отображать по:</span>
+					<?foreach(core\Config::$categoryPerPage as $page){?>
+						<a class="perPage <?=$params['perPage'] == $page ? 'checked' : ''?>" href=""><?=$page?></a>
+					<?}?>
+				</div>
 			<?}?>
 			<div class="view-switchs">
-				<div class="view-switch mosaic-view-switch active" id="mosaic-view-switch">
+				<div class="view-switch mosaic-view-switch <?=!isset($_GET['viewTab']) || $_GET['viewTab'] == 'mosaic-view' ? 'active' : ''?>" id="mosaic-view">
 					<img src="/img/icons/option-panel_mosaic_view.png" alt="Мозайкой">
 				</div>
-				<div class="view-switch list-view-switch" id="list-view-switch">
+				<div class="view-switch list-view-switch <?=$_GET['viewTab'] == 'list-view' ? 'active' : ''?>" id="list-view">
 					<img src="/img/icons/option-panel_list-view.png" alt="Списком">
 				</div>
 			</div>
 		</div>
 		<div class="content">
-			<div class="mosaic-view" <?=$_GET['sub'] ? "style='display: flex'" : ''?>>
+			<input type="hidden" name="pageNumber" value="<?=$_GET['pageNumber'] ? $_GET['pageNumber'] : 1?>">
+			<div class="mosaic-view <?=!isset($_GET['viewTab']) || $_GET['viewTab'] == 'mosaic-view' ? '' : 'hidden'?>">
 				<?if (!$_GET['sub']){
 					if (count($subs)){?>
 						<div class="flex">
@@ -133,52 +191,11 @@ else{
 					else{?>
 						<p>Подкатегорий не найдено.</p>
 					<?}
-				}
-				else{
-					if (!empty($items)){
-						foreach ($items as $item){?>
-						<div class="item_1 product-popup-link" item_id="<?=$item['id']?>">
-							<div class="product">
-								<p>
-									<b class="brend_info" brend_id="<?=$item['brend_id']?>"><?=$item['brend']?></b> 
-									<a href="/article/<?=$item['id']?>-<?=$item['article']?>" class="articul"><?=$item['article']?></a> 
-								</p>
-								<p><strong><?=$item['title_full']?></strong></p>
-								<div class="pic-and-description">
-									<div class="img-wrap">
-										<?if ($item['foto']){?>
-											<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$item['foto']?>">
-										<?}
-										else{?>
-											<img src="/images/no_foto.png" alt="Фото отсутствует">
-										<?}?>
-									</div>
-									<div class="description">
-										<?if (isset($item['filters_values']) && count($item['filters_values'])){
-											foreach ($item['filters_values'] as $value){?>
-												<p><?=$value?></p>
-											<?}
-										}?>
-									</div>
-								</div>
-								<div class="clearfix"></div>
-								<div class="rating no_selectable">
-									<?=getHtmlRating($item['rating'])?>
-								</div>
-							</div>
-							<div class="price-and-delivery">
-								<p class="price">от <span><?=$item['price']?></span></p>
-								<p class="delivery">от <?=$item['delivery']?> дн.</p>
-							</div>
-						</div>
-					<?}
-					}
-					else{?>
-						<div>Товаров данной подкатегории не найдено.</div>
-					<?}
-				}?>		
+				}?>
+				<div class="goods"></div>
+				<div class="pagination-container"></div>
 			</div>
-			<div class="list-view">
+			<div class="list-view <?=$_GET['viewTab'] == 'list-view' ? '' : 'hidden'?>">
 				<div>
 					<?if (!$_GET['sub']){
 						foreach($subs as $value){?>
@@ -187,40 +204,8 @@ else{
 				</div>
 				<?}
 				else{?>
-					<table class="wide-view">
-						<tbody>
-							<tr>
-								<th>Название</th>
-								<?if (count($filters)){
-									foreach ($filters as $value){?>
-										<th><?=$value['title']?></th>
-									<?}	
-								}?>
-								<th>Рейтинг</th>
-								<th>Доставка</th>
-								<th>Цена</th>
-							</tr>
-							<?if (!empty($items)){
-								foreach ($items as $item){?>
-									<tr class="product-popup-link" item_id="<?=$item['id']?>">
-										<td class="name-col">
-											<b class="brend_info" brend_id="<?=$item['brend_id']?>"><?=$item['brend']?></b> 
-											<a href="<?=core\Item::getHrefArticle($item['article'])?>" class="articul"><?=$item['article']?></a> 
-											<?=$item['title_full']?>
-										</td>
-										<?if (count($filters)){
-											foreach ($filters as $id => $filter){?>
-												<td><?=$item['filters_values'][$id]?></td>
-											<?}	
-										}?>
-										<td class="rating"><?=getHtmlRating($item['rating'])?></td>
-										<td><?=$item['delivery']?></td>
-										<td><?=$item['price']?></td>
-									</tr>
-								<?}
-							}?>
-						</tbody>
-					</table>
+					<table class="goods"></table>
+					<div class="pagination-container"></div>
 			<?}?>
 			</div>
 		</div>

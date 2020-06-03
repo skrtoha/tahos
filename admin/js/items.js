@@ -133,4 +133,26 @@ $(function(){
 	$('a.clearAnalogies').on('click', function(e){
 		if (!confirm('Вы действительно хотите очистить список аналогов')) e.preventDefault();
 	})
+	$('select[filter_id]').on('change', function(){
+		let th = $(this);
+		let fv_id = th.val();
+		let title = th.find('option[value=' + fv_id + ']').text();
+		th.find('option[value=' + fv_id + ']').prop('disabled', true);
+		th.next().append(
+			'<label class="filter_value">' +
+				'<input type="hidden" name="fv[]" value="' + fv_id + '">' +
+				title +
+				' <span class="icon-cross1"></span>' +
+			'</label>'
+		)
+		th.find('option:first-child').prop('selected', true);
+	})
+	$(document).on('click', 'label.filter_value', function(){
+		let th = $(this);
+		let title = th.text();
+		title = title.trim(title);
+		let fv_id = th.find('input').val();
+		th.parent().prev().find('option[value=' + fv_id + ']').prop('disabled', false);
+		$(this).remove();
+	})
 })

@@ -161,3 +161,9 @@ ALTER TABLE `tahos_returns` ADD `comment` VARCHAR(255) NULL DEFAULT NULL AFTER `
 ALTER TABLE `tahos_returns` ADD `amount_returned` INT UNSIGNED NULL DEFAULT NULL AFTER `comment`;
 
 ALTER TABLE `tahos_returns` ADD `id` INT(10) UNSIGNED NOT NULL FIRST;
+
+ALTER TABLE `tahos_filters` ADD `isShowInCategoryItem` INT(1) UNSIGNED NOT NULL DEFAULT '1' AFTER `slider`;
+ALTER TABLE `tahos_filters` ADD `isShowListView` INT(1) UNSIGNED NOT NULL DEFAULT '1' AFTER `isShowInCategoryItem`;
+ALTER TABLE `tahos_filters` ADD `isActive` INT(1) UNSIGNED NOT NULL DEFAULT '1' AFTER `isShowListView`;
+
+ALTER TABLE `tahos_filters` CHANGE `isShowInCategoryItem` `isShowMosaicView` INT(1) UNSIGNED NOT NULL DEFAULT '1';

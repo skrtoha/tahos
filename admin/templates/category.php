@@ -1,4 +1,5 @@
 <?php
+use core\Managers;
 $act = $_GET['act'];
 switch ($act) {
 	case 'delete':
@@ -73,6 +74,31 @@ switch ($act) {
 		$db->update('filters', ['slider' => 0], "`id`={$_GET['id']}");
 		message('Успешно изменено!');
 		header("Location: ?view=category&act=filters&id={$_GET['from']}");
+		break;
+	case 'delete_isShowMosaicView': 
+		$db->update('filters', ['isShowMosaicView' => 0], "`id` = {$_GET['id']}"); 
+		header("Location: ?view=category&act=filters&id={$_GET['from']}");
+		break;
+	case 'add_isShowMosaicView': 
+		$db->update('filters', ['isShowMosaicView' => 1], "`id` = {$_GET['id']}"); 
+		header("Location: ?view=category&act=filters&id={$_GET['from']}");
+		break;
+	case 'delete_isShowListView': 
+		$db->update('filters', ['isShowListView' => 0], "`id` = {$_GET['id']}"); 
+		header("Location: ?view=category&act=filters&id={$_GET['from']}");
+		break;
+	case 'add_isShowListView': 
+		$db->update('filters', ['isShowListView' => 1], "`id` = {$_GET['id']}"); 
+		header("Location: ?view=category&act=filters&id={$_GET['from']}");
+		break;
+	case 'delete_isActive': 
+		$db->update('filters', ['isActive' => 1], "`id` = {$_GET['id']}"); 
+		header("Location: ?view=category&act=filters&id={$_GET['from']}");
+		break;
+	case 'add_isActive': 
+		$db->update('filters', ['isActive' => 0], "`id` = {$_GET['id']}"); 
+		header("Location: ?view=category&act=filters&id={$_GET['from']}");
+		break;
 	default:
 		view();
 }
@@ -325,7 +351,7 @@ function filters(){
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=categories'>Категории товаров</a> > ";
 	$status .= "<a href='?view=category&id=".$category[0]['parent_id']."'>".$db->getFieldOnID('categories', $category[0]['parent_id'], 'title')."</a> > $page_title";?>
 	<div id="total" style="margin: 0">Всего: <?=count($filters)?></div>
-	<div class="actions"><a id="add_filter" category_id=<?=$id?> href="">Добавить</a></div>
+	<div class="actions"><a id="add_filter" category_id="<?=$id?>" href="">Добавить</a></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Заголовок</td>
@@ -339,12 +365,30 @@ function filters(){
 				<td class="filter_pos"><?=$filter['pos']?></td>
 				<td>
 					<?$count_filters_values = $db->getCount('filters_values', "`filter_id`=".$filter['id'])?>
-					<a href="?view=category&act=filters_values&id=<?=$filter['id']?>">Свойства фильров(<?=$count_filters_values?>)</a>
+					<a href="?view=category&act=filters_values&id=<?=$filter['id']?>">Свойства(<?=$count_filters_values?>)</a>
 					<?if (!$filter['slider']){?>
 						<a href="?view=category&from=<?=$_GET['id']?>&act=add_slider&id=<?=$filter['id']?>">Отображать слайдером</a>
 					<?}
 					else{?>
 						<a href="?view=category&from=<?=$_GET['id']?>&act=delete_slider&id=<?=$filter['id']?>">Удалить слайдер</a>
+					<?}?>
+					<?if (!$filter['isShowMosaicView']){?>
+						<a href="?view=category&from=<?=$_GET['id']?>&act=add_isShowMosaicView&id=<?=$filter['id']?>">Отображать в мозаике</a>
+					<?}
+					else{?>
+						<a href="?view=category&from=<?=$_GET['id']?>&act=delete_isShowMosaicView&id=<?=$filter['id']?>">Не отображать в мозаике</a>
+					<?}?>
+					<?if (!$filter['isShowListView']){?>
+						<a href="?view=category&from=<?=$_GET['id']?>&act=add_isShowListView&id=<?=$filter['id']?>">Отображать в списке</a>
+					<?}
+					else{?>
+						<a href="?view=category&from=<?=$_GET['id']?>&act=delete_isShowListView&id=<?=$filter['id']?>">Не отображать в списке</a>
+					<?}?>
+					<?if ($filter['isActive']){?>
+						<a href="?view=category&from=<?=$_GET['id']?>&act=add_isActive&id=<?=$filter['id']?>">Сделать неактивным</a>
+					<?}
+					else{?>
+						<a href="?view=category&from=<?=$_GET['id']?>&act=delete_isActive&id=<?=$filter['id']?>">Активировать</a>
 					<?}?>
 					<a class="delete_item" href="?view=category&act=delete_filter&id=<?=$filter['id']?>&category_id=<?=$_GET['id']?>" filter_id="<?=$filter['id']?>">Удалить</a>
 				</td>

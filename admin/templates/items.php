@@ -26,22 +26,19 @@ if ($_POST['item_image_submit']){
 }
 $act = $_GET['act'];
 if ($_POST['form_submit']){
+	// debug($_POST); exit();
+	$db->delete('items_values', "`item_id` = {$_GET['id']}");
 	if (Managers::isActionForbidden('Номенклатура', 'Изменение')){
 		Managers::handlerAccessNotAllowed();
 	} 
-	if (isset($_POST['values'])){
-		$db->delete('items_values', "`item_id` = {$_GET['id']}");
-		foreach($_POST['values'] as $category_id => $fv){
-			foreach($fv as $v){
-				if (!$v) continue;
-				$db->insert('items_values', [
-					'item_id' => $_GET['id'],
-					'value_id' => $v,
-					'category_id' => $category_id
-				]/*, ['print' => true]*/);
-			}
+	if (isset($_POST['fv'])){
+		foreach($_POST['fv'] as $fv){
+			$db->insert('items_values', [
+				'item_id' => $_GET['id'],
+				'value_id' => $fv
+			]/*, ['print' => true]*/);
 		}
-		unset($_POST['values']);
+		unset($_POST['fv']);
 	}
 	foreach($_POST as $key => $value){
 		if ($key == 'form_submit') continue;
@@ -490,22 +487,37 @@ function item($act){
 					<div class="field">
 						<div class="title">Свойства</div>
 						<div class="value" id="properties">
-							<?$array = Item::getFilters($_GET['id']);
+							<?$array = Item::getFiltersByItemID($_GET['id']);
 							if (!empty($array)){?>
 								<div id="category_items" item_id="<?=$_GET['id']?>">
 									<?foreach($array as $category){?>
 										<div class="category_item">
 											<table class="category" category_id="<?=$category['id']?>">
-												<?foreach($category['filters'] as $filter){?>
+												<?foreach($category['filters'] as $filter){
+													$checked = [];
+													?>
 													<tr>
 														<td><?=$filter['title']?></td>
 														<td>
-															<select name="values[<?=$category['id']?>][<?=$filter['id']?>]">
+															<select filter_id="<?=$filter['id']?>">
 																<option value="">...выберите</option>
-																<?foreach($filter['filter_values'] as $fv){?>
-																	<option <?=$fv['selected']?> value="<?=$fv['id']?>"><?=$fv['title']?></option>
+																<?foreach($filter['filter_values'] as $fv){
+																	if($fv['checked']) $checked[] = $fv;
+																	?>
+																	<option  <?=$fv['checked'] ? 'disabled' : ''?> value="<?=$fv['id']?>"><?=$fv['title']?></option>
 																<?}?>
 															</select>
+															<div class="checked" filter_id="<?=$filter['id']?>">
+																<?if (!empty($checked)){
+																	foreach($checked as $ch){?>
+																		<label class="filter_value">
+																			<input type="hidden" name="fv[]" value="<?=$ch['id']?>">
+																			<?=$ch['title']?>
+																			<span class="icon-cross1"></span>
+																		</label>
+																	<?}?>
+																<?}?>
+															</div>
 														</td>
 													</tr>
 												<?}?>

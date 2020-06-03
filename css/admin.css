@@ -1897,8 +1897,6 @@ form#model_image{
 }
 #category_items .category_item{
 	margin: 5px;
-	padding: 10px;
-	border: 1px solid #d2e4c1;
 }
 #properties_categories{
 	display: flex;

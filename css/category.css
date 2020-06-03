@@ -2,7 +2,67 @@
 .jspTrack, .mfp-container {
     -webkit-box-sizing: border-box
 }
-
+.item_1.product-popup-link:hover {
+    overflow: visible !important
+}
+/*.item_1.product-popup-link:hover .description{
+    background: white;
+    border: 1px solid #C7C7C7;
+    z-index: 2;
+}*/
+span.filter_value:not(:last-child)::after {
+    content: ', ';
+}
+.list-view{
+    margin-top: 10px;
+}
+#perPage a.perPage {
+    padding: 0 0px;
+    line-height: 20px;
+}  
+div#perPage {
+    color: white;
+    font-size: 13px;
+    float: right;
+    margin-right: 120px;
+    margin-top: 10px;
+}
+.jq-selectbox.hidden{
+    display: none !important;
+}
+a.perPage.checked {
+    background: white;
+    color: #0082BF;
+}
+.icon-cross1:before {
+    content: "\ea0f";
+    font-size: 13px;
+    color: red;
+}
+.catalogue.catalogue-filter .input_box{
+    margin-bottom: 8px;
+}
+label.filter_value {
+    color: #5f5f5f;
+    font-size: 19px;
+    padding: 2px;
+    display: inline-block;
+    margin: 5px 5px 0 0;
+    cursor: pointer;
+}
+select.filter option[disabled]{
+    display: none;
+}
+.paginationjs .paginationjs-pages li.active>a{
+    background: #0082bf !important;
+    color: white !important;
+}
+.pagination-container{
+    margin-top: 20px;
+}
+div.filter-form li.disabled{
+    display: none;
+}
   i[class$=fa-rub],
   i[class$=fa-usd],
    i[class$=fa-eur],
@@ -10,6 +70,9 @@
       margin-left: 3px}
 .mfp-wrap, .owl-carousel .owl-item, .owl-carousel .owl-video-play-icon {
     -webkit-backface-visibility: hidden
+}
+label.filter_value{
+
 }
 .catalogue .content .mosaic-view .item a{
     width: 100%;
@@ -4762,7 +4825,7 @@ header .login .social_buttons {
 .items .content .active-tab .item .remove-item, .items .content .not-active-tab .item .restore-item {
     float: right
 }
-.items .content .list-view, .items .content .list-view table.middle-view, .items .content .list-view table.small-view, .not-active-tab {
+.items .content .list-view table.middle-view, .items .content .list-view table.small-view, .not-active-tab {
     display: none
 }
 .items .content .item .img {
@@ -6770,7 +6833,7 @@ span.delete-btn:hover {
         margin-left: 0
     }
 }
-.items .mosaic-view{
+.items .mosaic-view .goods{
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -6834,7 +6897,6 @@ span.delete-btn:hover {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     display: inline-block;
-    height: 90px;
     width: -webkit-calc(100% - 100px);
     position: absolute;
     width: 100%;
@@ -6897,6 +6959,7 @@ span.delete-btn:hover {
     .catalogue .items .content .item_1 {
            width: 100%;
     margin: 10px 0 0 0;
+    padding: 5px;
     }
     h1 {
         font-size: 26px
@@ -7068,9 +7131,6 @@ span.delete-btn:hover {
     }
     .catalogue .items .content .item {
         width: 100%
-    }
-    .catalogue .items .content .mosaic-view {
-        display: none;
     }
     .mosaic_mosaic{
         display: none !important;

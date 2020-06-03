@@ -2,76 +2,69 @@
 require_once ("../core/DataBase.php");
 require_once('../core/functions.php');
 session_start();
-$res['post'] = $_POST;
-$sub_id = $_POST['sub_id'];
 
 $db = new core\DataBase();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
+$output = [];
 
-$chunk = $_POST['chunk'];
-$settings = $db->select('settings', '*', '`id`=1'); $settings = $settings[0];
-if (!$_POST['filters_on']){
-	if ($chunk < $settings['cat_countChunk'] && $chunk > 0){
-		$items = $_SESSION['items_chunks'][$chunk];
-		if (!count($items)) exit();
-		$items_values = cat_get_items_values($items);
-		$user = core\User::get();
-		$ratings = json_decode($settings['ratings'], true);
-		foreach ($items as $key => $item){
-			$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];
-			$items[$key]['filters_values'] = $items_values[$item['id']];
-			$items[$key]['rating'] = get_rating($item['rating'], $ratings);
-		} 
-		unset($items_values);
-		$chunk++;
-		$res['chunk'] = $chunk;
-		$res['items'] = $items;
-		if ($chunk == $settings['cat_countChunk']) $res['reset'] = 1;
-	}
-	else{
-		if ($chunk == 0) $_SESSION['start'] = 0;
-		else $_SESSION['start'] += $settings['cat_perPage'] * $settings['cat_countChunk'];
-		$sort = [
-			'type' => $_POST['sort'],
-			'desc' => $_POST['desc'] ? 'DESC' : ''
-		];
-		$res['items'] = category_items_without_filters($sub_id, $sort);
-		$res['chunk'] = 1;
-	}
-}
-else{
-	if ($chunk < $settings['cat_countChunk'] && $chunk > 0){
-		$items = $_SESSION['items_chunks'][$chunk];
-		$items_values = cat_get_items_values($items);
-		$user = core\User::get();
-		$ratings = json_decode($settings['ratings'], true);
-		foreach ($items as $key => $item){
-			$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];
-			$items[$key]['filters_values'] = $items_values[$item['id']];
-			$items[$key]['rating'] = get_rating($item['rating'], $ratings);
-		} 
-		unset($items_values);
-		$chunk++;
-		$res['chunk'] = $chunk;
-		$res['items'] = $items;
-		if ($chunk == $settings['cat_countChunk']) $res['reset'] = 1;
-	}
-	else{
-		if ($chunk == 0) $_SESSION['start'] = 0;
-		else $_SESSION['start'] += $settings['cat_perPage'] * $settings['cat_countChunk'];
-		$sort = [
-			'type' => $_POST['sort'],
-			'desc' => $_POST['desc'] ? 'DESC' : ''
-		];
-		$res['items'] = category_items_with_filters($sub_id, $sort);
-		$res['chunk'] = 1;
+// debug($_GET);
+
+$params = ['viewTab' => $_GET['viewTab']];
+if (isset($_GET['search']) && $_GET['search']) $params['search'] = $_GET['search'];
+if (isset($_GET['fv']) && $_GET['fv']) $params['fv'] = $_GET['fv'];
+if (isset($_GET['sliders']) && $_GET['sliders']) $params['sliders'] = $_GET['sliders'];
+
+foreach($_GET['acts'] as $act){
+	switch($act){
+		case 'items':
+			$start = ($_GET['pageNumber'] - 1) * $_GET['perPage'];
+			$params['limit'] = "$start,{$_GET['perPage']}";
+			$params['sort'] = $_GET['sort'];
+			$params['direction'] = $_GET['direction'];
+			$items = core\Item::getItemsByCategoryID($_GET['category_id'], $params);
+			if (empty($items)){
+				$output['items'] = [];
+				break;
+			}
+			// debug($items);
+			foreach($items as $key => $item){
+				if ($item['foto']){
+					$items[$key]['src'] = core\Config::$imgUrl. "/items/small/{$item['item_id']}/{$item['foto']}";
+					$items[$key]['alt'] = '';
+				} 
+				else{
+					$items[$key]['src'] = core\Config::$imgUrl. '/no_foto.png';
+					$items[$key]['alt'] = 'Фото отсутствует';
+				}
+				if (isset($item['filter_values']) && !empty($item['filter_values'])){
+					$items[$key]['description'] = '<div class="description">';
+					foreach($item['filter_values'] as $value) $items[$key]['description'] .= "<p>{$value['filter_value']}</p>";
+					$items[$key]['description'] .= '</div>';
+				}
+				else $items[$key]['description'] = '';
+				$items[$key]['rating'] = core\Item::getHtmlRating($item['rating']);
+				if ($item['price'] || $item['delivery']) $items[$key]['priceDelivery'] = '
+					<div class="price-and-delivery">
+						<p class="price">от <span>' . $item['price'] . '</span></p>
+						<p class="delivery">от ' . $item['delivery'] . ' дн.</p>
+					</div>
+				';
+				else $items[$key]['priceDelivery'] = '';
+			}
+			$output['items'] = $items;
+			break;
+		case 'filters':
+			$output['filters'] = core\Filter::getFilterValuesByCategoryID($_GET['category_id'], $params);
+			break;
+		case 'totalNumber':
+			$query = core\Item::getQueryItemsByCategoryID($_GET['category_id'], $params);
+			$res = $db->query($query, '');
+			$output['totalNumber'] = $res->num_rows;
+			break;
 	}
 }
-echo json_encode($res);
-function end_script(){
-	echo false;
-	exit();
-}
+
+echo json_encode($output);
 ?>

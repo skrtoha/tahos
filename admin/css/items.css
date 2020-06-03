@@ -1,6 +1,9 @@
 #need_similar a.red{
 	color: red;
 }
+label{
+	margin-top: 0;
+}
 label.item_translate{
 	display: block;
 	margin-top: 10px;	
@@ -27,4 +30,26 @@ span.icon-cross.translate_delete{
 }
 table.category select{
 	width: 200px;
+	display: block;
+	    border: none;
+}
+label.filter_value {
+   padding: 2px;
+    border: 1px solid black;
+    cursor: pointer;
+    background: white;
+    margin-right: 5px;
+        font-size: 12px;
+}
+.checked {
+    margin-top: 7px;
+}
+.icon-cross1:before {
+  content: "\ea0f";
+}
+.filter_value .icon-cross1:before {
+	    font-size: 10px;
+}
+option[disabled] {
+    display: none;
 }

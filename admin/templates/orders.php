@@ -575,7 +575,7 @@ function user_orders(){
 function items_status(array $params = []){
 	extract($params);
 	?>
-	<form style="margin: 0 0 10px 0; float: left">
+	<form id="changeStatus" style="margin: 0 0 10px 0; float: left">
 		<input type="hidden" name="view" value="orders">
 		<input type="hidden" name="act" value="items_status">
 		<select name="status_id">

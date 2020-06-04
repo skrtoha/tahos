@@ -92,7 +92,7 @@ function setTotalSumm(){
 	$('td.total').html(total);
 }
 $(function(){
-	$('select[name=status_id]').on('change', function(){
+	$('#changeStatus select[name=status_id]').on('change', function(){
 		$(this).closest('form').submit();
 	})
 	$('a.show_stringLog').on('click', function(e){

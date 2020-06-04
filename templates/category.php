@@ -81,7 +81,7 @@ else{
 								<option selected></option>
 								<?foreach($subs as $value){
 									$sel = $value['href'] == $_GET['sub'] ? 'selected' : '';?>
-									<option <?=$sel?> value="<?=$value['href']?>"><?=$value['title']?></option>
+									<option <?=$sel?> value="<?=$_GET['href']?>/<?=$value['href']?>"><?=$value['title']?></option>
 								<?}?>
 							</select>
 						</div>

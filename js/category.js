@@ -238,10 +238,7 @@
 				category.sliders[e.attr('freak')] = instance.data('ionRangeSlider');
 			})
 			$('.subcategory').on('change', function(){
-				let href = window.location.href;
-				href = href.replace(/&.*$/, '');
-				href= href.replace(/[\w-_]+$/, '');
-				window.location.href = href + $(this).val();
+				window.location.href = '/category/' + $(this).val();
 				return false;
 			})
 			$('input[type=reset]').on('click', function(){

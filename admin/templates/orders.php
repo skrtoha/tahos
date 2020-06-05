@@ -161,13 +161,13 @@ function view(){
 			</select>
 			<input type="submit" value="Искать">
 		</form>
-		<form style="margin-left: 10px;">
+		<form id="changeStatus" style="position: relative;left: 10px;">
 			<input type="hidden" name="view" value="orders">
 			<input type="hidden" name="act" value="items_status">
 			<select name="status_id">
 				<option value="">...статус товара</option>
 				<?foreach(OrderValue::getStatuses() as $s){?>
-					<option value="<?=$s['id']?>"><?=$s['title']?></option>
+					<option <?=$s['id'] == $params['status_id'] ? 'selected' : ''?>  value="<?=$s['id']?>"><?=$s['title']?></option>
 				<?}?>
 			</select>
 		</form>

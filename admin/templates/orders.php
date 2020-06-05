@@ -630,7 +630,7 @@ function items_status(array $params = []){
 						</td>
 					</tr>
 				<?}?>
-				<tr order_id="<?=$ov['order_id']?>" <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
+				<tr <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
 					<td label="Поставщик">
 						<a class="store" store_id="<?=$ov['store_id']?>"><?=$ov['cipher']?></a>
 						<?if ($ov['provider_id'] && core\Provider::isInBasket($ov)){?>
@@ -767,9 +767,8 @@ function items_status(array $params = []){
 								<?$no_show = array(9, 6, 8, 10);
 								if (!in_array($ov['status_id'], $no_show)){
 									$orders_statuses = get_order_statuses($ov['status_id']);?>
-									<br>новый статус:
 									<select class="change_status" name="status_id">
-									<option value="">...выбрать</option>
+									<option value="">...новый статус</option>
 										<?foreach($orders_statuses as $order_status){
 											$selected = $ov['status_id'] == $order_status['id'] ? 'selected' : '';?>
 											<option <?=$selected?> value="<?=$order_status['id']?>"><?=$order_status['title']?></option>
@@ -777,6 +776,7 @@ function items_status(array $params = []){
 									</select>
 								<?}?>
 							</form>
+							<a href="/admin/?view=orders&id=<?=$ov['order_id']?>&act=change">В заказ</a>
 						</td>
 						<td>
 							<?$disabled = $ov['status_id'] == 5 ? '' : 'disabled';?>

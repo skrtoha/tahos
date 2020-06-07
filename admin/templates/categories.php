@@ -41,6 +41,7 @@ if ($_POST['submit']){
 	// debug($array);
 	// exit();
 }
+// debug($_POST);
 switch ($act) {
 	case 'change': 
 		if (Managers::isActionForbidden('Категории товаров', 'Изменение')){
@@ -66,6 +67,39 @@ switch ($act) {
 			header('Location: ?view=categories');	
 		}
 		break;
+	case 'subs':
+		if (!empty($_POST)){
+			$db->update('categories', ['parent_id' => $_POST['parent_id']], "`id` = {$_POST['id']}");
+		}
+		$page_title = 'Подкатегории';
+		$status = '<a href="/">Главная</a> > <a href="?view=categories">Категории товаров</a>';
+		$status .= " > $page_title";
+		$res_subs = $db->query("
+			SELECT
+				sub.id,
+				sub.title AS sub,
+				sub.pos,
+				sub.parent_id,
+				main.title AS main,
+				sub.href
+			FROM
+				#categories sub
+			LEFT JOIN
+				#categories main ON main.id = sub.parent_id
+			WHERE
+				sub.parent_id > 0
+			ORDER BY
+				sub.title
+		", '');
+		$subs = [];
+		$mains = [];
+		foreach($res_subs as $sub){
+			$subs[$sub['id']]['title'] = $sub['sub'];
+			$subs[$sub['id']]['parent_id'] = $sub['parent_id'];
+			$mains[$sub['parent_id']] = $sub['main'];
+		}
+		subs($subs, $mains);
+		break;
 	default: view();
 }
 function view(){
@@ -75,7 +109,10 @@ function view(){
 	$status = "<a href='/admin'>Главная</a> > $page_title";
 	$count_categories = count($categories);?>
 	<div id="total" style="margin: 0">Всего: <?=$count_categories?></div>
-	<div class="actions"><a href="?view=categories&act=add">Добавить</a></div>
+	<div class="actions">
+		<a href="?view=categories&act=add">Добавить</a>
+		<a href="?view=categories&act=subs">Подкатегории</a>
+	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Заголовок</td>
@@ -146,4 +183,27 @@ function show_form(){
 		</div>	
 	</div>
 	<div class="actions"><a href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a></div>
+<?}
+function subs($subs, $mains){?>
+	<table class="t_table" cellspacing="1">
+		<tr class="head">
+			<td>Название</td>
+			<td>Категория</td>
+		</tr>
+		<?foreach ($subs as $sub_id => $sub){?>
+			<tr>
+				<td><?=$sub['title']?></td> 
+				<td>
+					<form method="post" class="subs">
+						<input type="hidden" name="id" value="<?=$sub_id?>">
+						<select name="parent_id">
+							<?foreach($mains as $id => $title){?>
+								<option <?=$sub['parent_id'] == $id ? 'selected' : ''?> value="<?=$id?>"><?=$title?></option>
+							<?}?>
+						</select>
+					</form>
+				</td>
+			</tr>
+		<?}?>
+	</table>
 <?}?>

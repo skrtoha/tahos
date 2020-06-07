@@ -3,6 +3,7 @@
 		sliders: new Array(),
 		totalNumber: null,
 		pageNumber: $('input[name=pageNumber]').val(),
+		comparingMode: $('input[name=comparing]').is(':checked') ? true : false,
 		filterListTitles: new Array(),
 		init: function(){
 			$(document).on('click', ".option-panel a[sort]", function(event) {
@@ -222,7 +223,15 @@
 					} 
 				})
 			})
-			$('.slider').each(function(){
+			$('input[name=comparing]').on('change', function(){
+				category.filterReset();
+				if ($(this).is(':checked')){
+					category.comparingMode = true;
+					history.pushState(false, false, document.location.href + '&comparing=on');
+				} 
+				else category.comparingMode = false;
+			})
+			$('input.slider').each(function(){
 				var e = $(this);
 				let instance = e.ionRangeSlider({
 					type: "double",
@@ -242,29 +251,7 @@
 				return false;
 			})
 			$('input[type=reset]').on('click', function(){
-				$('select.filter option').prop('disabled', false);
-				$('select.filter').removeClass('hidden');
-				$('input[name=search]').val('');
-				$('div.selected').empty();
-				
-				for(let key in category.sliders){
-					let slider = category.sliders[key];
-					slider.update({
-						from: slider.options.min,
-						to: slider.options.max
-					});
-				}
-
-				$('a[sort]').removeClass('active').removeClass('desc');
-				$('a[sort]:first-child').addClass('active');
-
-				$('input.slider').removeAttr('name');
-				$('select.filter').trigger('refresh');
-				category.setPerPage();
-				category.pageNumber = 1;
-				category.totalNumber = category.getTotalNumber();
-				category.setPagination();
-				category.setHistoryFilter();
+				category.filterReset();
 			})
 			$('a.perPage').on('click', function(e){
 				e.preventDefault();
@@ -272,20 +259,20 @@
 				category.setItems();
 			})
 			$('select.filter').on('change', function(){
-				let th = $(this);
-				let value = th.val();
-				let title = th.find('option[value=' + value + ']').text();
-				th.find('option[value=' + value + ']').prop('disabled', true).addClass('added');
-				th.find('option:first-child').prop('selected', true);
+				let select = $(this);
+				let value = select.val();
+				let title = select.find('option[value=' + value + ']').text();
+				select.find('option[value=' + value + ']').prop('disabled', true).addClass('added');
+				select.find('option:first-child').prop('selected', true);
 				title = title.trim(title);
-				th.closest('div.input').next().append(
+				select.closest('div.input').next().append(
 					'<label class="filter_value">' +
-						'<input type="hidden" name="fv[]" value="' + value + '">' +
+						'<input type="hidden" name="fv[' + select.attr('filter_id') + '][]" value="' + value + '">' +
 						title +
 						' <span class="icon-cross1"></span>' +
 					'</label>'
 				)
-				th.trigger('refresh');
+				select.trigger('refresh');
 				category.setItems();
 			});
 			$('input[name=search]').on('keyup', function(e){
@@ -294,6 +281,33 @@
 			})
 			category.totalNumber = category.getTotalNumber();
 			category.setPagination();
+		},
+		filterReset: function(){
+			$('select.filter option').prop('disabled', false);
+			$('select.filter').removeClass('hidden');
+			$('input[name=search]').val('');
+			$('div.selected').empty();
+			$('select.filter option').removeClass('added');
+			
+			for(let key in category.sliders){
+				let slider = category.sliders[key];
+				slider.update({
+					from: slider.options.min,
+					to: slider.options.max
+				});
+			}
+
+			$('a[sort]').removeClass('active').removeClass('desc');
+			$('a[sort]:first-child').addClass('active');
+
+			$('input.slider').removeAttr('name');
+			$('select.filter').trigger('refresh');
+			category.setPerPage();
+			category.pageNumber = 1;
+			category.totalNumber = category.getTotalNumber();
+			category.comparingMode = false;
+			category.setPagination();
+			category.setHistoryFilter();
 		},
 		setPageNumber: function(View){
 			let tab = category.getTab();
@@ -533,12 +547,26 @@
 				url: '/ajax/get_items.php?acts[]=filters&acts[]=totalNumber&' + category.getFormData(),
 				success: function(response){
 					let itemsData = JSON.parse(response);
-					category.setFilters(itemsData.filters);
+					if (!category.comparingMode) category.setFilters(itemsData.filters);
+					else category.hideUterlyEmptySelects();
 					category.totalNumber = itemsData.totalNumber;
 					category.pageNumber = 1;
 					category.setHistoryFilter(category.getFormData());
 					category.setPagination();
 				}
+			})
+		},
+		hideUterlyEmptySelects: function(){
+			$('select.filter').each(function(){
+				let select = $(this);
+				let isEmpty = true;
+				select.find('option').each(function(){
+					let option = $(this);
+					if (!option.attr('value')) return 1;
+					if (typeof option.attr('disabled') == 'undefined') isEmpty = false;
+				})
+				if (isEmpty) select.addClass('hidden');
+				$('select').trigger('refresh');
 			})
 		},
 		setFilters: function(filters){
@@ -564,13 +592,13 @@
 		},
 		hideEmptyFilters: function(){
 			$('select.filter').each(function(){
-				let select = $(this);
-				let isEmpty = true;
-				$(select).find('option').each(function(){
-					let th = $(this);
-					if (typeof th.attr('disabled') == 'undefined') isEmpty = false;
-				})
-				if (isEmpty) select.addClass('hidden');
+			let select = $(this);
+			let isEmpty = true;
+			$(select).find('option').each(function(){
+				let th = $(this);
+				if (typeof th.attr('disabled') == 'undefined') isEmpty = false;
+			})
+			if (isEmpty) select.addClass('hidden');
 			})
 		},
 		setHistoryPagination: function(pageNumber){

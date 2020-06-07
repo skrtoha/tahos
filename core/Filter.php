@@ -3,7 +3,6 @@ namespace core;
 class Filter{
 	public static function getFilterValuesByCategoryID($category_id, $params = []){
 		$where = "(f.category_id = {$category_id} AND iv.value_id IS NOT NULL) AND f.isActive = 1 AND ";
-		
 		if (!empty($params)){
 			$query = Item::getQueryItemsByCategoryID($category_id, $params);
 			$res_items = $GLOBALS['db']->query($query, '');
@@ -64,5 +63,11 @@ class Filter{
 			$output[$title]['filter_values'] = array_values($output[$title]['filter_values']);
 		}*/
 		return $output;
+	}
+	public static function isSelectedFilterValue(string $fv_id, array $params_fv){
+		foreach($params_fv as $filter_id => $fv_ids){
+			if (in_array($fv_id, $fv_ids)) return true;
+		}
+		return false;
 	}
 }

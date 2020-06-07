@@ -118,8 +118,20 @@ class Item{
 						$having .= "bat LIKE '%$value%' AND ";
 						break;
 					case 'fv':
-						$where .= 'fv.id IN ('.implode(',', $value).') OR ';
-						$cnt = $cnt + count($value);
+						if ($params['comparing']){
+							foreach($value as $filter_id => $fv_ids){
+								$where .= '(fv.id IN (' . implode(',', $fv_ids) . ') AND fv.filter_id = ' . $filter_id . ') OR ';
+								$cnt ++;
+							}
+						}
+						else{
+							$values = [];
+							foreach($value as $filter_id => $fv_ids){
+								foreach($fv_ids as $fv) $values[] = $fv;
+							}
+							$where .= 'fv.id IN ('.implode(',', $values).') OR ';
+							$cnt = $cnt + count($values);
+						}
 						break;
 					case 'sliders':
 						foreach($value as $filter_id => $slider){
@@ -171,7 +183,7 @@ class Item{
 				#filters_values fv ON fv.id = iv.value_id
 			LEFT JOIN
 				#brends b ON b.id = i.brend_id
-			LEFT JOIN
+			RIGHT JOIN
 				#prices p ON ci.item_id = p.item_id 
 			WHERE
 				ci.category_id = $category_id

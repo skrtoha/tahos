@@ -9,12 +9,13 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 $output = [];
 
-// debug($_GET);
+// debug ($_GET);
 
 $params = ['viewTab' => $_GET['viewTab']];
 if (isset($_GET['search']) && $_GET['search']) $params['search'] = $_GET['search'];
 if (isset($_GET['fv']) && $_GET['fv']) $params['fv'] = $_GET['fv'];
 if (isset($_GET['sliders']) && $_GET['sliders']) $params['sliders'] = $_GET['sliders'];
+$params['comparing'] = isset($_GET['comparing']) && $_GET['comparing'] == 'on';
 
 foreach($_GET['acts'] as $act){
 	switch($act){
@@ -28,7 +29,6 @@ foreach($_GET['acts'] as $act){
 				$output['items'] = [];
 				break;
 			}
-			// debug($items);
 			foreach($items as $key => $item){
 				if ($item['foto']){
 					$items[$key]['src'] = core\Config::$imgUrl. "/items/small/{$item['item_id']}/{$item['foto']}";

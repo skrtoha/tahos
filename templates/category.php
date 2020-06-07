@@ -5,6 +5,8 @@ $category = $db->select('categories', '*', "`parent_id`=0 AND `href`='$href'");
 $category = $category[0];
 $category_id = $category['id'];
 $subs = $db->select('categories', '*', "`parent_id`=$category_id", 'pos', true);
+
+
 if (!$_GET['sub']) $title = $category['title'];
 else{
 	if (count($subs)){
@@ -17,21 +19,36 @@ else{
 	}
 
 	$params = ['view' => 'mosaic-view'];
+	$params['comparing'] = isset($_GET['comparing']) && $_GET['comparing'] == 'on';
 	if (isset($_GET['search'])) $params['search'] = $_GET['search'];
 	if (isset($_GET['fv'])) $params['fv'] = $_GET['fv'];
+	/*if (isset($_GET['fv'])){
+		$params['fv'] = array();
+		foreach($_GET['fv'] as $filter_id => $fv_ids){
+			foreach($fv_ids as $fv) $params['fv'][] = $fv;
+		}
+	} */
 	if (isset($_GET['sliders'])) $params['sliders'] = $_GET['sliders'];
 	$params['perPage'] = $_GET['perPage'] ? $_GET['perPage'] : 20;
 	$params['pageNumber'] = $_GET['pageNumber'] ? $_GET['pageNumber'] : 1;
+	
+	// debug($_GET);
+	// debug($params);
 
 	$items = core\Item::getItemsByCategoryID($sub_id, $params);
 	$filtersInitial = core\Filter::getFilterValuesByCategoryID($sub_id);
 
-	//добавлени информации о том, выбрана ли позиция
+	//добавление информации о том, выбрана ли позиция
 	if (!empty($filtersInitial) && !empty($params['fv'])){
-		$filtersApplied = core\Filter::getFilterValuesByCategoryID($sub_id, $params);
+		
+		//если режим сравнения не включен, то нам не нужно проверять какие фильтры доступны
+		if (!$params['comparing']){
+			$filtersApplied = core\Filter::getFilterValuesByCategoryID($sub_id, $params);
+		}
+
 		foreach($filtersInitial as $title => $filter){
 			foreach($filter['filter_values'] as $fv_id => $fv){
-				if (in_array($fv['id'], $params['fv'])){
+				if (core\Filter::isSelectedFilterValue($fv['id'], $params['fv'])){
 					$filtersInitial[$title]['filter_values'][$fv_id]['added'] = 'added';
 					$filtersInitial[$title]['filter_values'][$fv_id]['disabled'] = 'disabled';
 				}
@@ -39,27 +56,32 @@ else{
 					$filtersInitial[$title]['filter_values'][$fv_id]['added'] = '';
 					$filtersInitial[$title]['filter_values'][$fv_id]['disabled'] = '';
 				}
-				if (!isset($filtersApplied[$title]['filter_values'][$fv_id])){
-					$filtersInitial[$title]['filter_values'][$fv_id]['disabled'] = 'disabled';
+				if (!$params['comparing']){
+					if (!isset($filtersApplied[$title]['filter_values'][$fv_id])){
+						$filtersInitial[$title]['filter_values'][$fv_id]['disabled'] = 'disabled';
+					}
 				}
 			}
 		}
 	}
 
 	//проверка нужно ли блокировать, если выбрано единственное значение
-	foreach($filtersInitial as $title => $filter){
-		$filtersInitial[$title]['hidden'] = 'hidden';
-		foreach($filter['filter_values'] as $fv_id => $fv){
-			if (!$fv['added'] && !$fv['disabled']){
-				$filtersInitial[$title]['hidden'] = '';
-			}
-			if ($filter['slider']){
-				$filtersInitial[$title]['from'] = $filtersApplied[$title]['min'];
-				$filtersInitial[$title]['to'] = $filtersApplied[$title]['max'];
+	if (!$params['comparing']){
+		foreach($filtersInitial as $title => $filter){
+			$filtersInitial[$title]['hidden'] = 'hidden';
+			foreach($filter['filter_values'] as $fv_id => $fv){
+				if (!$fv['added'] && !$fv['disabled']){
+					$filtersInitial[$title]['hidden'] = '';
+				}
+				if ($filter['slider']){
+					$filtersInitial[$title]['from'] = $filtersApplied[$title]['min'];
+					$filtersInitial[$title]['to'] = $filtersApplied[$title]['max'];
+				}
 			}
 		}
 	}
 } 
+// debug($subs);
 ?>
 <div class="catalogue catalogue-filter">
 	<input type="hidden" name="href" value="<?=$_GET['href']?>">
@@ -68,6 +90,17 @@ else{
 		<h3><?=$category['title']?></h3>
 		<form id="filter" action="#" method="post">
 			<input type="hidden" name="category_id" value="<?=$sub_id?>">
+			<?if (isset($filtersInitial) && count($filtersInitial)){?>
+				<div class="input-wrap">
+					<label for="comparing">
+						Режим сравнения
+					</label>
+					<label class="switch">
+						<input name="comparing" id="comparing" type="checkbox" <?=isset($_GET['comparing']) && $_GET['comparing'] ? 'checked' : ''?>>
+						<div class="slider round"></div>
+					</label>
+				</div>
+			<?}?>
 			<?if (count($subs)){?>
 				<div class="search-wrap">
 					<input name="search" id="search" type="text" placeholder="Поиск по наименованию">
@@ -94,13 +127,18 @@ else{
 						<div class="input_box clearfix">
 							<div class="input">
 								<div class="select">
-									<select class="filter <?=$filter['hidden']?>" data-placeholder="<?=$filter['title']?>">
+									<select filter_id="<?=$filter['id']?>" class="filter <?=$filter['hidden']?>" data-placeholder="<?=$filter['title']?>">
 										<option selected></option>
 										<?if (!empty($filter['filter_values'])){
 											$checked = [];
 											foreach($filter['filter_values'] as $value){
-												if ($value['added']) $checked[] = $value;
-												?>
+												if ($value['added']) $checked[] = [
+													'id' => $value['id'],
+													'title' => $value['title'],
+													'added' => $value['added'],
+													'disabled' => $value['disabled'],
+													'filter_id' => $filter['id']
+												]?>
 												<option class="<?=$value['added']?>" <?=$value['disabled']?> value="<?=$value['id']?>"><?=$value['title']?></option>
 											<?}
 										}?>
@@ -108,10 +146,9 @@ else{
 								</div>
 							</div>
 							<div class="selected">
-								<!-- ?debug($checked)?> -->
 								<?foreach($checked as $value){?>
 									<label class="filter_value">
-										<input type="hidden" name="fv[]" value="<?=$value['id']?>">
+										<input type="hidden" name="fv[<?=$value['filter_id']?>][]" value="<?=$value['id']?>">
 										<?=$value['title']?> 
 										 <span class="icon-cross1"></span>
 									</label>

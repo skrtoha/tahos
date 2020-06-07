@@ -5,15 +5,6 @@
  * Include this stylesheet in your site or copy and paste the styles below into your stylesheet - jScrollPane
  * may not operate correctly without them.
  */
-tr[order_id]:hover,
-tr[sending_id]:hover
-{
-	cursor: pointer;
-	background: #e4faff;
-}
-div[data-name=returns] table.orders-table tr{
-	border-bottom: 1px dashed #c8c8c8 !important;
-}
 a.undoReturn {
     display: block;
     font-size: 12px;
@@ -7295,6 +7286,17 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
 
 /* Small Devices, Tablets */
 @media only screen and (max-width: 750px) {
+	div[data-name=returns] td.icon{
+		position: absolute;
+    right: 0px;
+    top: 0;
+	}
+	div[data-name=returns] .undoReturn{
+		width: 60px;
+	}
+	div[data-name=returns] tr.first{
+		position: relative;
+	}
 	div[data-name=returns] td[class^=status_return]{
 		width: auto;
 	}
@@ -8065,3 +8067,55 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+tr[order_id]:hover,
+tr[sending_id]:hover
+{
+	cursor: pointer;
+	background: #e4faff;
+}
+[data-name=returns] table tr{
+	border: none;
+}
+[data-name=returns] table td {
+   padding: 0px;
+}
+[data-name=returns] table tr.second{
+	display: none;
+}
+[data-name=returns] table tr.first {
+    cursor: pointer;
+    border-bottom: 1px dashed #c8c8c8;
+}
+[data-name=returns] table tr.first > td{
+	padding: 5px;
+}
+[data-name=returns] table tr.first.active{
+	border-bottom: none;
+}
+[data-name=returns] table tr.first.active + tr.second {
+    display: table-row;
+    width: 100%;
+}
+[data-name=returns] table table.full_info{
+	width: calc(100% - 30px);
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+[data-name=returns] tr.first.active + tr.second{
+	border-bottom: 1px dashed #c8c8c8;
+}
+[data-name=returns] tr.second{
+	padding: 10px 20px;
+}
+[data-name=returns] tr.first .icon-enlarge2:before {
+  content: "\e98b";
+  color: #0082BF;
+}
+[data-name=returns] tr.first.active .icon-enlarge2:before{
+	content: "\e98c";
+	color: #0082BF;
+}
+[data-name=returns] table table.full_info tr td{
+	padding: 10px 0;
+}

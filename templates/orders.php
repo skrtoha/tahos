@@ -529,12 +529,9 @@ $orders = get_order_group($params, '');
 				<thead>
 					<tr>
 						<th></th>
-						<th>Наименование</th>
-						<th>Количество</th>
-						<th>Сумма</th>
-						<th>Причина</th>
-						<th>Дата</th>
 						<th>Статус</th>
+						<th>Сумма</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody></tbody>

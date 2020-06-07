@@ -14,21 +14,44 @@ function getReturns(){
 			let items = JSON.parse(response);
 			for(var k in items){
 				let returnUndo = (items[k].status_id == '2' || items[k].status_id == 1) ? '<a class="undoReturn">Отменить</a>' : '';
-				$tab.find('table.orders-table tbody').append(
-					'<tr>' +
+				$tab.find('table.orders-table > tbody').append(
+					'<tr class="first">' +
 						'<td>' + items[k].return_id + '</td>' +
-						'<td class="title" label="Наменование: ">' +
-							'<b class="brend_info" brend_id="' + items[k].brend_id + '">' + items[k].brend + '</b> ' + 
-							'<a href="/search/article/' + items[k].article + '" class="articul">' + items[k].article + '</a> ' +
-								items[k].title_full +
-						'</td>' +
-						'<td label="Количество: ">' + items[k].quan + '</td>' +
-						'<td label="Сумма: ">' + (items[k].return_price * items[k].quan) + '<i class="fa fa-rub" aria-hidden="true"></i>' + '</td>' +
-						'<td label="Причина: ">' + items[k].reason + '</td>' +
-						'<td label="Дата: ">' + items[k].created + '</td>' +
 						'<td label="Статус: " class="status_return_' + items[k].status_id + '">' + 
 							items[k].status + 
 							returnUndo +
+						'</td>' +
+						'<td label="Сумма: ">' + 
+							(items[k].return_price * items[k].quan) + '<i class="fa fa-rub" aria-hidden="true"></i>' + 
+						'</td>' +
+						'<td class="icon">' +
+							'<span class="icon-enlarge2"></span>' +
+						'</td>' +
+					'</tr>' +
+					'<tr class="second">' +
+						'<td colspan="4">' +
+							'<table class="full_info">' +
+								'<thead>' +
+									'<tr>' +
+										'<th>Наименование</th>' +
+										'<th>Количество</th>' + 
+										'<th>Причина</th>' + 
+										'<th>Дата</th>' + 
+									'</tr>' +
+								'</thead>' +
+								'<tbody>' +
+									'<tr>' +
+										'<td class="title" label="Наменование: ">' +
+											'<b class="brend_info" brend_id="' + items[k].brend_id + '">' + items[k].brend + '</b> ' + 
+											'<a href="/search/article/' + items[k].article + '" class="articul">' + items[k].article + '</a> ' +
+												items[k].title_full +
+										'</td>' +
+										'<td label="Количество: ">' + items[k].quan + '</td>' +
+										'<td label="Причина: ">' + items[k].reason + '</td>' +
+										'<td label="Дата: ">' + items[k].created + '</td>' +
+									'</tr>' +
+								'</tbody>' +
+							'</table>' +
 						'</td>' +
 					'</tr>'
 				);
@@ -125,6 +148,9 @@ $(function(){
 			{}
 		);
 	var itemsForReturn = new Array();
+	$(document).on('click', 'tr.first', function(){
+		$(this).toggleClass('active');
+	})
 	pickmeup.defaults.locales['ru'] = {
 		days: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
 		daysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],

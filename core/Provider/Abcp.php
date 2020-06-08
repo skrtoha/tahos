@@ -184,6 +184,7 @@ class Abcp extends Provider{
 			]);
 			$items = json_decode($response, true);
 			if (empty($items)) continue;
+			if (isset($items['errorMessage'])) continue;
 			foreach($items as $value){
 				if (!self::getComparableString($value['description'])) continue;
 				$coincidences[$value['brand']] = $value['description'];

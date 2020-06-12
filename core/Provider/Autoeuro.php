@@ -204,12 +204,12 @@ class Autoeuro extends Provider{
 			[
 				'store_id' => self::$minPriceStoreID,
 				'item_id' => $item_id,
-				'order_term' => $code['price']->order_term,
+				'order_term' => $code['order_term']->order_term ? $code['order_term']->order_term : 1,
 				'order_key' => $code['price']->order_key
 			],
 			['duplicate' => [
 				'order_key' => $code['price']->order_key,
-				'order_term' => $code['price']->order_term,
+				'order_term' => $code['order_term']->order_term ? $code['order_term']->order_term : 1,
 			]]
 		);
 		//order_term
@@ -233,12 +233,12 @@ class Autoeuro extends Provider{
 			[
 				'store_id' => self::$minDeliveryStoreID,
 				'item_id' => $item_id,
-				'order_term' => $code['order_term']->order_term,
+				'order_term' => $code['order_term']->order_term ? $code['order_term']->order_term : 1,
 				'order_key' => $code['order_term']->order_key
 			],
 			['duplicate' => [
 				'order_key' => $code['order_term']->order_key,
-				'order_term' => $code['order_term']->order_term,
+				'order_term' => $code['order_term']->order_term ? $code['order_term']->order_term : 1
 			]]
 		);
 	}

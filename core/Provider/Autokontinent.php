@@ -269,6 +269,7 @@ class Autokontinent extends Provider{
 	}
 	public static function sendOrder(){
 		$basket = self::getBasket();
+		if (empty($basket)) return false;
 		try{
 			$json = Provider::getCurlUrlData(
 				self::$params['url'].'/basket/order.json', 
@@ -281,6 +282,17 @@ class Autokontinent extends Provider{
 			$e->process($basket);
 			return false;
 		}
-		debug($response);
+
+		foreach($basket as $b){
+			$osi = explode('-', $b->comment);
+			OrderValue::changeStatus(11, [
+				'order_id' => $osi[0],
+				'store_id' => $osi[1],
+				'item_id' => $osi[2],
+				'price' => $b->price,
+				'quan' => $b->quantity,
+				'user_id' => parent::getInstanceDataBase()->getField('orders', 'user_id', 'id', $osi[0])
+			]);
+		}
 	}
 }

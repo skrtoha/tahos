@@ -68,6 +68,11 @@ switch($_GET['act']){
 		} 
 		echo "<br>Обработка завершена.";
 		break;
+	case 'orderForumAuto':
+		echo "<h2>Отправка заказа в Форум-Авто</h2>";
+		core\Provider\ForumAuto::sendOrder();
+		echo "<br>Обработка завершена.";
+		break;
 	case 'orderVoshod':
 		core\Provider\Abcp::sendOrder(6);
 		break;

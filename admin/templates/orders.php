@@ -36,6 +36,7 @@ switch ($act) {
 				case 6: //Восход
 				case 13: //МПартс
 				case 15: //Росско
+				case 17://ForumAuto
 					Provider::addToProviderBasket($ov);
 					if ($ov['store_id'] == 24) Provider\Rossko::sendOrder($ov['store_id']);
 					break;

@@ -18,7 +18,9 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$abcp = new core\Provider\Abcp(NULL, $db);
 	setCoincidences($abcp->getSearch($_GET['search']));
 
-	core\Provider\Autokontinent::getCoincidences($_GET['search']);
+	setCoincidences(core\Provider\Autokontinent::getCoincidences($_GET['search']));
+
+	setCoincidences(core\Provider\ForumAuto::getCoincidences($_GET['search']));
 	
 	if (empty($coincidences)) exit();
 	echo json_encode($coincidences);

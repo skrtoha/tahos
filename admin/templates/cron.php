@@ -88,6 +88,9 @@ switch($_GET['act']){
 	case 'orderAutoeuro':
 		core\Provider\Autoeuro::sendOrder();
 		break;
+	case 'orderAutokontinent':
+		core\Provider\Autokontinent::sendOrder();
+		break;
 	case 'getItemsVoshod':
 		$abcp = new core\Provider\Abcp(NULL, $db);
 		$countTransaction = 50;

@@ -267,4 +267,20 @@ class Autokontinent extends Provider{
 		OrderValue::changeStatus(7, $ov);
 		return true;
 	}
+	public static function sendOrder(){
+		$basket = self::getBasket();
+		try{
+			$json = Provider::getCurlUrlData(
+				self::$params['url'].'/basket/order.json', 
+				['username' => '010345', 'password' => '7373366']
+			);
+			$response = json_decode($json);
+			if ($response->status != 'OK') throw new EAuto\ErrorSendOrder('Ошибка отправления заказа');
+		}
+		catch(EAuto\ErrorSendOrder $e){
+			$e->process($basket);
+			return false;
+		}
+		debug($response);
+	}
 }

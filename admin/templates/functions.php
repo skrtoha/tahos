@@ -10,7 +10,6 @@ function get_from_uri($from = ''){
 	else return '/'.str_replace(['|', '\\', '^'], ['&', '/', '?'],  $from);
 }
 function article_clear($article){
-	debug($article);
 	return preg_replace('/[^\w_а-яА-Я]+/u', '', $article);
 }
 function console($str){

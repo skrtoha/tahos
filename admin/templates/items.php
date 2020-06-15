@@ -8,7 +8,6 @@ if ($_POST['item_image_submit']){
 	} 
 	$item_id = $_POST['item_id'];
 	$image = set_image($_FILES['image'], $item_id);
-	// debug($image);
 	if (!$image['error']){
 		$title = $image['name'];
 		$db->insert('fotos', ['item_id' => $item_id, 'title' => $title]);
@@ -26,7 +25,6 @@ if ($_POST['item_image_submit']){
 }
 $act = $_GET['act'];
 if ($_POST['form_submit']){
-	// debug($_POST); exit();
 	$db->delete('items_values', "`item_id` = {$_GET['id']}");
 	if (Managers::isActionForbidden('Номенклатура', 'Изменение')){
 		Managers::handlerAccessNotAllowed();
@@ -294,7 +292,6 @@ function item($act){
 					<div class="value" id="brends">
 						<input type="hidden" >
 						<?$brends = $db->select('brends', 'id,title',  '`parent_id`=0', 'title', true, '', true);
-						// debug($brends);
 						$brend_id = $item['brend_id']?>
 						<select style="opacity: 1000" name="brend_id">
 							<option value="">ничего не выбрано</option>
@@ -602,7 +599,6 @@ function history(){
 		WHERE
 			ov.item_id = {$_GET['item_id']}
 	", '');
-	// debug($item);
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=items'>Номенклатура</a> > ";
 	$status .= "<a href='/admin/?view=items&act=item&id={$_GET['item_id']}'>{$item['brend']} - {$item['article']}</a> > $page_title";
 	?>
@@ -1104,7 +1100,6 @@ function analogies_substitutes($type){
 	}
 	$item_temp = get_item();
 	$item = $item_temp['item'];
-	// debug($item);
 	$status = "
 		<a href='/admin'>Главная</a> > 
 		<a href='/admin/?view=items'>Номенклатура</a> >
@@ -1144,7 +1139,6 @@ function analogies_substitutes($type){
 			$i['hidden'] = $r['hidden'];
 			if ($r['category_id']) $i['categories'][$r['category_id']] = $r['category'];
 		};
-		// debug($items);
 	}
 	?>
 	<a id="goToItemCard" href="?view=items&id=<?=$item_id?>&act=item">Карточка товара</a>
@@ -1209,7 +1203,6 @@ function analogies_substitutes_search($type){
 	$article = article_clear($_POST['search']);
 	$item_temp = get_item();
 	$item = $item_temp['item'];
-	// debug($item);
 	$status = "
 		<a href='/admin'>Главная</a> > 
 		<a href='/admin/?view=items'>Номенклатура</a> >
@@ -1295,7 +1288,6 @@ function analogies_substitutes_search($type){
 <?}
 function analogies_substitutes_add($type){
 	global $db;
-	debug($_GET); //exit();
 	if ($_GET['all'] == 1) {
 		$res = $db->query("
 			SELECT * FROM #analogies WHERE item_id={$_GET['item_id']}
@@ -1314,7 +1306,6 @@ function analogies_substitutes_add($type){
 }
 function analogies_substitutes_delete($type){
 	global $db;
-	debug($_GET); //exit();
 	if ($_GET['all']){
 		$res = $db->query("
 			SELECT item_diff FROM #analogies WHERE `item_id`={$_GET['item_id']}

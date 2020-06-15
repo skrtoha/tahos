@@ -56,13 +56,8 @@ if ($_POST['form_submit']){
 	else{
 		$res = $db->insert(
 			'items', 
-			$array, 
-			[
-				'print_query' => false, 
-				'duplicate' => [
-					'weight' => '`weight`+ 10', 
-				]
-			]); 
+			$array
+		); 
 		if ($res === true){
 			$last_id = $db->last_id();
 			$db->insert('articles', ['item_id' => $last_id, 'item_diff' => $last_id]);

@@ -9,12 +9,9 @@ class Item{
 	 */
 	public static function update($fields, $where){
 		if (!$where) return false;
-		$conditions = '';
-		if (strpos($_SERVER['REQUEST_URI'], '/admin/?view=item&id=') !== false) return self::processUpdate($fields, $where);
-		if (isset($where['id'])) $conditions = "`id`={$where['id']}";
-		elseif (isset($where['article']) && isset($where['brend_id'])) $conditions = "`article`='{$where['article']}' AND `brend_id`='{$where['brend_id']}'";
-		$item = $GLOBALS['db']->select('items', "is_blocked", $conditions);
-		if ($item['is_blocked'] || empty($item)) return false;
+		if (strpos($_SERVER['REQUEST_URI'], '/admin/?view=item&id=') == false){
+			$where['is_blocked'] = 0;
+		}
 		return self::processUpdate($fields, $where);
 	}
 	public static function get($brend_id, $article){

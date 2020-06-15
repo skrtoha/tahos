@@ -228,6 +228,14 @@ class ForumAuto extends Provider{
 				return false;
 			}
 			OrderValue::changeStatus(11, $pb);
+			parent::updateProviderBasket(
+				[
+					'order_id' => $pb['order_id'],
+					'store_id' => $pb['store_id'],
+					'item_id' => $pb['item_id']
+				],
+				['response' => 'OK']
+			);
 		}
 	}
 }

@@ -15,6 +15,8 @@ $rossko->execute("{$abcp->item['article']} {$abcp->item['brand']}");
 
 core\Provider\Autoeuro::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
+core\Provider\Autokontinent::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+
 $title = "Список предложений";
 
 $array = article_store_items($_GET['item_id'], [], 'articles');

@@ -1,6 +1,6 @@
 <?php  
 namespace core;
-use core\Exception\DataBaseNoConnectException;
+use core\Exceptions\DataBaseNoConnectException;
 class DataBase {
 	public $config;
 	public $mysqli;

@@ -18,6 +18,7 @@ class Item{
 		return self::processUpdate($fields, $where);
 	}
 	public static function get($brend_id, $article){
+		$article = article_clear($article);
 		return $GLOBALS['db']->select_one('items', '*', "`brend_id` = $brend_id AND `article` = '$article'");
 	}
 	public static function getInstanceDataBase(){

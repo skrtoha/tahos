@@ -1,4 +1,4 @@
 4<?php
-namespace core\Exception;
+namespace core\Exceptions;
 class InvalidItemIDException extends \Exception{
 }

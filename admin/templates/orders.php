@@ -45,6 +45,9 @@ switch ($act) {
 				case 19://Favorit
 					core\Provider\FavoriteParts::addToBasket($ov);
 					break;
+				case 20://Autokontinent
+					core\Provider\Autokontinent::addToBasket($ov);
+					break;
 				default:
 					core\OrderValue::changeStatus(7, $ov);
 			}

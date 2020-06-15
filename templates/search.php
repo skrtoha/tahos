@@ -8,7 +8,6 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$armtek = new core\Provider\Armtek($db);
 	setCoincidences($armtek->getSearch($_GET['search']));
 
-
 	setCoincidences(core\Provider\FavoriteParts::getSearch($_GET['search']));
 
 	$rossko = new core\Provider\Rossko($db);
@@ -18,6 +17,8 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 
 	$abcp = new core\Provider\Abcp(NULL, $db);
 	setCoincidences($abcp->getSearch($_GET['search']));
+
+	core\Provider\Autokontinent::getCoincidences($_GET['search']);
 	
 	if (empty($coincidences)) exit();
 	echo json_encode($coincidences);

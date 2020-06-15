@@ -5,7 +5,7 @@ class Tahos{
 	public static $provider_id = 14;
 	public static $isDoNotShowStoresCheeperTahos = true;
 
-	public function parseResItem(\mysqli_result $res_items): array
+	public static function parseResItem(\mysqli_result $res_items): array
 	{
 		$priceTahos = NULL;	
 		$items = [];

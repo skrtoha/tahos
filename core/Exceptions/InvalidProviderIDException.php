@@ -1,4 +1,4 @@
 <?php
-namespace core\Exception;
+namespace core\Exceptions;
 class InvalidProviderIDException extends \Exception{
 }

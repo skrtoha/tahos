@@ -172,6 +172,10 @@ abstract class Provider{
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, empty($data) ? 'GET' : 'POST');
+		if (isset($data['username']) && isset($data['password'])){
+			curl_setopt($curl, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
+			unset($data['username'], $data['password']);
+		}
 		if (!empty($data)){
 			curl_setopt($curl, CURLOPT_POST, true);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $data);

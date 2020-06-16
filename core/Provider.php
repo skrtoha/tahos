@@ -257,10 +257,9 @@ abstract class Provider{
 		if (!$params['provider_id']) return false;
 		if (!$params['store_id']) throw new Exception\InvalidStoreIDException;
 		$provider = self::getInstanceProvider($params['provider_id']);
-		if (!$provider || !self::getIsEnabledApiOrder($params['provider_id'])) return [
-			'price' => 0,
-			'available' => $params['in_stock']
-		];
+		if (!$provider || !self::getIsEnabledApiOrder($params['provider_id'])){
+			return self::getStoreItem($params['store_id'], $params['item_id']);
+		} 
 		$price = $provider::getPrice($params);
 		if (!$price) return [
 			'price' => 0,
@@ -314,6 +313,14 @@ abstract class Provider{
 		", '');
 		$user = $res_user->fetch_assoc();
 		return $user['user_type'];
+	}
+	public static function getStoreItem(int $store_id, int $item_id)
+	{
+		$storeItem = self::getInstanceDataBase()->select_one('store_items', 'price,in_stock', "`item_id` = $item_id AND `store_id` = $store_id");
+		return [
+			'price' => $storeItem['price'],
+			'available' => $storeItem['in_stock']
+		];
 	}
 	protected static function getProviderBrend($provider_id, $brend): string
 	{

@@ -53,6 +53,17 @@ switch($_GET['act']){
 			$log->alert("$str для пользователя id={$row['user_id']} в размере {$row['sum']} руб.");
 		}
 		break;
+	case 'clearStores':
+		$db->query("
+			DELETE si FROM #store_items si
+			LEFT JOIN
+				#provider_stores ps ON ps.id = si.store_id
+			WHERE
+				ps.is_main = 0
+		",'');
+		$mysqli = $db->get_mysqli();
+		echo "<br>Удалено {$mysqli->affected_rows} строк.";
+		break;
 	case 'orderArmtek':
 		echo "<h2>Отправка заказа в Армтек</h2>";
 		core\Provider\Armtek::sendOrder();

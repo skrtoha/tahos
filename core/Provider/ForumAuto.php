@@ -122,9 +122,10 @@ class ForumAuto extends Provider{
 		}
 		return $response;
 	}
-	public static function setArticle($brend, $article){
-		$mainItemID = NULL;
+	public static function setArticle($mainItemID, $brend, $article){
 		$item_id = NULL;
+
+		Provider::clearStoresItemsByProviderID(self::$params['provider_id'], ['item_id' => $mainItemID]);
 
 		$response = self::getItemsByBrendAndArticle($brend, $article);
 
@@ -141,12 +142,6 @@ class ForumAuto extends Provider{
 					return false;
 				}
 				$item_id = self::getItemID($item[0]);
-				if (
-					Provider::getComparableString($brend) == Provider::getComparableString($item[0]->brand) &&
-					Provider::getComparableString($article) == Provider::getComparableString($item[0]->art)
-				){
-					$mainItemID = $item_id;
-				}
 				if ($mainItemID != $item_id) self::addAnalogy($mainItemID, $item_id);
 				parent::getInstanceDataBase()->insert('store_items', [
 					'store_id' => $store_id,

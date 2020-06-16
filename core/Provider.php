@@ -331,4 +331,27 @@ abstract class Provider{
 		$array = $res->fetch_assoc();
 		return $array['title'];
 	}
+
+	public static function clearStoresItemsByProviderID(int $provider_id, array $params = []){
+		$where = "ps.provider_id = $provider_id AND ";
+		if (!empty($params)){
+			foreach($params as $key => $value){
+				switch($key){
+					case 'item_id': 
+						$where .= "(si.item_id = $value OR diff.item_id = $value) AND ";
+						break;
+				}
+			}
+		}
+		$where = substr($where, 0, -5);
+		return self::getInstanceDataBase()->query("
+			DELETE si FROM #store_items si
+			LEFT JOIN
+				#provider_stores ps ON ps.id = si.store_id
+			LEFT JOIN
+				#analogies diff ON diff.item_diff = si.item_id
+			WHERE
+				$where
+		", '');
+	}
 }

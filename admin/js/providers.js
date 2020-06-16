@@ -24,7 +24,7 @@ function set_store(store_id){
 			store = JSON.parse(response);
 			store.prevail = +store.prevail ? 'checked' : '';
 			store.noReturn = +store.noReturn ? 'checked' : '';
-			// console.log(store);
+			store.is_main = +store.is_main ? 'checked' : '';
 		}
 	})
 }
@@ -98,6 +98,10 @@ function get_str_form(){
 			 	'<tr>' +
 				 	'<td>Количество дней возврата</td>' +
 				 	'<td><input type="text" name="daysForReturn" value="' + store.daysForReturn + '" /></td>' +
+			 	'</tr>' +
+			 	'<tr>' +
+				 	'<td>Основной склад</td>' +
+				 	'<td><input type="checkbox" name="is_main" ' + store.is_main + ' value="1"></td>' +
 			 	'</tr>' +
 			 	'<tr>' +
 				 	'<td>Подсвечивать</td>' +

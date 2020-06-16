@@ -23,7 +23,8 @@ switch($_POST['act']){
 			'under_order' => $_POST['under_order'],
 			'daysForReturn' => $_POST['daysForReturn'],
 			'prevail' => $_POST['prevail'] ? 1 : 0,
-			'noReturn' => $_POST['noReturn'] ? 1 : 0
+			'noReturn' => $_POST['noReturn'] ? 1 : 0,
+			'is_main' => $_POST['is_main'] ? 1 : 0
 		];
 		if ($_POST['store_id']) $res = $db->update(
 			'provider_stores',

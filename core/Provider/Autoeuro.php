@@ -175,7 +175,6 @@ class Autoeuro extends Provider{
 		}
 	}
 	private static function parseCode($code, $mainItemID = null){
-		// debug($code, $mainItemID);
 		$item_id = self::insertItem($code['price']);
 		if (!$item_id) return;
 
@@ -199,19 +198,22 @@ class Autoeuro extends Provider{
 				'price' => $code['price']->price
 			]]
 		);
+
+		$order_term = isset($code['order_term']->order_term) ? $code['order_term']->order_term : $code['price']->order_term;
 		$resInsertAutoeuroOrderKeys = parent::getInstanceDataBase()->insert(
 			'autoeuro_order_keys',
 			[
 				'store_id' => self::$minPriceStoreID,
 				'item_id' => $item_id,
-				'order_term' => $code['order_term']->order_term ? $code['order_term']->order_term : 1,
+				'order_term' => $order_term ? $order_term : 1,
 				'order_key' => $code['price']->order_key
 			],
 			['duplicate' => [
 				'order_key' => $code['price']->order_key,
-				'order_term' => $code['order_term']->order_term ? $code['order_term']->order_term : 1,
-			]]
+				'order_term' => $order_term ? $order_term : 1,
+			]/*, 'print' => true*/]
 		);
+
 		//order_term
 		if (!isset($code['order_term'])) return;
 		$resInsertStoreItem = parent::getInstanceDataBase()->insert(

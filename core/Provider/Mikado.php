@@ -242,7 +242,6 @@ class Mikado extends Provider{
 		} 
 	}
 	private function compareBrends($b1, $b2){
-		// echo "запрос для $b1 и $b2<br>";
 		if (self::getComparableString($b1) == self::getComparableString($b2)) return true;
 		$in = '';
 		if (!isset($this->brends[$b1])) $in .= "'$b1',";
@@ -259,12 +258,14 @@ class Mikado extends Provider{
 			", '');
 			if (!$res->num_rows) return false;
 			foreach($res as $value){
-				$this->brends[$value['title']]['id'] = $value['id'];
-				$this->brends[$value['title']]['parent_id'] = $value['parent_id'];
+				$title = self::getComparableString($value['title']);
+				$this->brends[$title]['id'] = $value['id'];
+				$this->brends[$title]['parent_id'] = $value['parent_id'];
 			}
 		} 
+		$b1 = self::getComparableString($b1);
+		$b2 = self::getComparableString($b2);
 		if ($this->brends[$b1]['id'] == $this->brends[$b2]['parent_id'] || $this->brends[$b2]['id'] == $this->brends[$b1]['parent_id']){
-			// echo "$b1 и $b2 равны<br>";
 			return true;
 		} 
 	}
@@ -275,14 +276,12 @@ class Mikado extends Provider{
 		$object->NAME = $row->Name;
 		$object->ZakazCode = $row->ZakazCode;
 		$item_id = $this->armtek->getItemId($object, 'mikado');
-		// debug($row, $item_id);
 		if (!$item_id) return false;
 		$this->db->query(Abcp::getQueryDeleteByProviderId($item_id, 8), ''); 
 		if ($row->CodeType == 'Analog' || $row->CodeType == 'AnalogOEM'){
 			$this->db->insert('analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id], ['print_query' => false]);
 			$this->db->insert('analogies', ['item_id' => $item_id, 'item_diff' => $_GET['item_id']], ['print_query' => false]);
 		}
-		// var_dump(empty($row->onStocks));
 		if (!empty($row->OnStocks)){
 			if (is_array($row->OnStocks->StockLine)){
 				foreach($row->OnStocks->StockLine as $stock) $this->parseStockLine($stock, $item_id, $row);

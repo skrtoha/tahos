@@ -480,10 +480,11 @@ function itemsToOrder(){
 	$items = array();
 	foreach($res_providers as $p){
 		switch($p['title']){
-			case 'Авторусь':
 			case 'М Партс':
+			case 'Армтек':
 			case 'Авторусь':
 			case 'Rossko':
+			case 'Forum-Avto':
 				$output = core\Provider\Abcp::getItemsToOrder($p['id']);
 				break;
 			default:

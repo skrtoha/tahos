@@ -74,6 +74,25 @@ class Autoeuro extends Provider{
 	}
 	public static function getItemsToOrder($provider_id){
 		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
+		$basket_items = self::getBasket();
+		debug($basket_items);
+		$output = [];
+		foreach($basket_items->DATA as $bi){
+			if (!$bi->comment) continue;
+			$osi = explode('-', $bi->comment);
+			debug($osi);
+			$storeItem = core\OrderValue::get([
+				'order_id' => $osi[0],
+				'store_id' => $osi[1],
+				'item_id' => $osi[2]
+			]);
+			debug($storeItem);
+			// $output[] = [
+			// 	'provider' => 'АвтоЕвро',
+			// 	'store' => parent::getInstanceDataBase()->getFieldOnID('provider_stores', $osi['2'])
+			// ]
+			debug($osi);
+		}
 	}
 	private static function insertItem($o){
 		/**
@@ -316,7 +335,6 @@ class Autoeuro extends Provider{
 				'item_note' => self::getStringBasketComment($params)
 			]
 		);
-		debug(json_decode($response));
 		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK'){
 			Log::insert([
 				'text' => 'Произошла ошибка добавления в корзину',

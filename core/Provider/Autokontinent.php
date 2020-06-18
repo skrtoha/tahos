@@ -22,7 +22,9 @@ class Autokontinent extends Provider{
 	//в скрипте данные авторизации вставляются напрямую, т.к. при использовании self::$auth не срабатывает
 	private static $auth = ['username' => '010345', 'password' => '​7373366'];
 
-	public static function getItemsToOrder(int $provider_id){}
+	public static function getItemsToOrder(int $provider_id){
+		if (!parent::getIsEnabledApiOrder($provider_id)) return false;
+	}
 	public static function getPrice(array $params){
 		$part_id = self::getPartIdByBrandAndArticle($params['brend'], $params['article']);
 		$itemsList = self::getItemsByPartID($part_id);

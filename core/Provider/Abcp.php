@@ -458,7 +458,7 @@ class Abcp extends Provider{
 			]
 		);
 		$responseData = json_decode($res, true);
-		if ($responseData['status'] != 1) return false;
+		if ($responseData['status'] != 1) return;
 		foreach($responseData['orders'] as $number => $value){
 			foreach($value['positions'] as $position){
 				$osi = explode('-', $position['comment']);

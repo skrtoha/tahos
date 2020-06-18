@@ -458,7 +458,20 @@ class Abcp extends Provider{
 			]
 		);
 		$responseData = json_decode($res, true);
-		debug($responseData);
+		if ($responseData['status'] != 1) return false;
+		foreach($responseData['orders'] as $number => $value){
+			foreach($value['positions'] as $position){
+				$osi = explode('-', $position['comment']);
+				Provider::updateProviderBasket(
+					[
+						'order_id' => $osi[0],
+						'store_id' => $osi[1],
+						'item_id' => $osi[2]
+					],
+					['response' => 'OK']
+				);
+			}
+		}
 	}
 }
 ?>

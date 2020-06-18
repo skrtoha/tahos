@@ -9,7 +9,7 @@ class Item{
 	 */
 	public static function update($fields, $where){
 		if (!$where) return false;
-		if (strpos($_SERVER['REQUEST_URI'], '/admin/?view=item&id=') == false){
+		if (strpos($_SERVER['REQUEST_URI'], '/admin/?view=items') === false){
 			$where['is_blocked'] = 0;
 		}
 		return self::processUpdate($fields, $where);

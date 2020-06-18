@@ -30,10 +30,20 @@ switch($_POST['status_id']){
 		break;
 	case 6://нет в наличии
 		core\OrderValue::changeStatus(6, $post);
+		core\Provider::updateProviderBasket([
+			'order_id' => $post['order_id'],
+			'store_id' => $post['store_id'],
+			'item_id' => $post['item_id']
+		], ['response' => 'нет в наличии']);
 		break;
 	case 8://отменен
 		$post['quan'] = $_POST['ordered'];
 		core\OrderValue::changeStatus(8, $post);
+		core\Provider::updateProviderBasket([
+			'order_id' => $post['order_id'],
+			'store_id' => $post['store_id'],
+			'item_id' => $post['item_id']
+		], ['response' => 'отменен']);
 		break;
 	case 11://заказано
 		$post['quan'] = $_POST['ordered'];

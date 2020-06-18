@@ -100,7 +100,7 @@ abstract class Provider{
 		if (in_array($provider_id, $enabledArrayApiSearch)) return true;
 		else return false;
 	}
-	protected function updateProviderBasket(array $params, array $fields){
+	public static function updateProviderBasket(array $params, array $fields){
 		return self::getInstanceDataBase()->update('provider_basket', $fields, self::getWhere($params));
 	}
 	public static function isAdminArea(){

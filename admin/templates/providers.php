@@ -491,9 +491,9 @@ function itemsToOrder(){
 				eval("\$output = core\\Provider\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
 		}
 		if (!count($output)) continue;
-		foreach($output as $value) $items[] = $value;
+		foreach($output as $value) $items[$value['provider']][] = $value;
 	}?>
-	<div id="total" style="margin-top: 10px;">Всего: <?=count($items)?></div>
+	<div id="total" style="margin-top: 0;">Всего: <?=count($items)?></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Поставщик</td>
@@ -505,16 +505,25 @@ function itemsToOrder(){
 			<td>Количество</td>
 		</tr>
 		<?if (count($items)){
-			foreach($items as $i){?>
-				<tr>
-					<td><?=$i['provider']?></td>
-					<td><?=$i['store']?></td>
-					<td><?=$i['brend']?></td>
-					<td><?=$i['article']?></td>
-					<td><?=$i['title_full']?></td>
-					<td><?=$i['price']?></td>
-					<td><?=$i['count']?></td>
-				</tr>
+			foreach($items as $providerTitle => $item){
+				$showNextTd = true;
+				foreach($item as $i){?>
+					<tr class="sendOrder" title="Отправить в заказ">
+						<?if ($showNextTd){?>
+							<td rowspan="<?=count($item)?>">
+								<a title="Отправить заказ" class="sendOrder" href="/admin/?view=cron&act=order<?=$providerTitle?>&from=providers"><?=$i['provider']?></a>
+							</td>
+							<?
+							$showNextTd = false;
+						}?>
+						<td><?=$i['store']?></td>
+						<td><?=$i['brend']?></td>
+						<td><?=$i['article']?></td>
+						<td><?=$i['title_full']?></td>
+						<td><?=$i['price']?></td>
+						<td><?=$i['count']?></td>
+					</tr>
+				<?}?>
 			<?}
 		}
 		else{?>

@@ -13,6 +13,7 @@ class Abcp extends Provider{
 	public static $params = [
 		6 => [
 			'title' => 'Восход',
+			'cronOrder' => 'Voshod',
 			'url' => 'http://autorus.public.api.abcp.ru',
 			'userlogin' => 'info@tahos.ru',
 			'userpsw' => 'vk640431',
@@ -27,6 +28,7 @@ class Abcp extends Provider{
 		],
 		13 => [
 			'title' => 'МПартс',
+			'cronOrder' => 'Mparts',
 			'url' => 'http://v01.ru/api/devinsight',
 			'private' => [
 				'userlogin' => 'info@tahos.ru',
@@ -93,15 +95,18 @@ class Abcp extends Provider{
 		$basketProvider = parent::getProviderBasket($provider_id, '');
 		if (!$basketProvider->num_rows) return false;
 		$output = array();
-		foreach($basketProvider as $bp) $output[] = [
-			'provider' => $bp['provider'],
-			'store' => $bp['cipher'],
-			'brend' => $bp['brend'],
-			'article' => $bp['article'],
-			'title_full' => $bp['title_full'],
-			'price' => $bp['price'],
-			'count' => $bp['quan']
-		];
+		foreach($basketProvider as $bp){
+			$provider = self::$params[$bp['provider_id']]['cronOrder'] ? self::$params[$bp['provider_id']]['cronOrder'] : $bp['api_title'];
+			$output[] = [
+				'provider' => $provider,
+				'store' => $bp['cipher'],
+				'brend' => $bp['brend'],
+				'article' => $bp['article'],
+				'title_full' => $bp['title_full'],
+				'price' => $bp['price'],
+				'count' => $bp['quan']
+			];
+		} 
 		return $output;
 	}
 	public static function getQueryDeleteByProviderId($item_id, $provider_id){

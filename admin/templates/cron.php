@@ -897,4 +897,8 @@ switch($_GET['act']){
 
 		break;
 }
+if (isset($_GET['from'])){
+	header("Location: {$_SERVER['HTTP_REFERER']}");
+	exit();
+} 
 echo "<br>Время обработки: <b>".core\Timer::end()."</b> секунд";

@@ -28,3 +28,6 @@ form input[type=submit]{
 div.actions a{
 	margin-left: 5px;
 }
+a.sendOrder{
+	display: block;
+}

@@ -24,6 +24,29 @@ class Autokontinent extends Provider{
 
 	public static function getItemsToOrder(int $provider_id){
 		if (!parent::getIsEnabledApiOrder($provider_id)) return false;
+		$basketList = self::getBasket();
+		if (empty($basketList)) return [];
+		$output = [];
+		foreach($basketList as $basket){
+			if (!$basket->comment) continue;
+			$osi = json_decode('-', $basket->comment);
+			$resOrderValue = OrderValue::get([
+				'order_id' => $osi[0],
+				'store_id' => $osi[1],
+				'item_id' => $osi[2]
+			]);
+			$orderValue = $resOrderValue->fetch_assoc();
+			$output[] = [
+				'provider' => 'Autokontinent',
+				'store' => $orderValue['cipher'],
+				'brend' => $orderValue['brend'],
+				'article' => $orderValue['article'],
+				'title_full' => $orderValue['title_full'],
+				'price' => $orderValue['price'],
+				'count' => $orderValue['quan']
+			];
+		}
+		return $output;
 	}
 	public static function getPrice(array $params){
 		$part_id = self::getPartIdByBrandAndArticle($params['brend'], $params['article']);

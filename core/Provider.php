@@ -31,6 +31,7 @@ abstract class Provider{
 				pb.item_id,
 				ps.title AS store,
 				ps.cipher,
+				ps.provider_id,
 				ov.quan,
 				ov.price,
 				i.article,
@@ -38,6 +39,7 @@ abstract class Provider{
 				IF(pbr.title IS NOT NULL, pbr.title, b.title) AS brend,
 				u.id AS user_id,
 				p.title AS provider,
+				p.api_title,
 				u.user_type
 			FROM
 				#provider_basket pb

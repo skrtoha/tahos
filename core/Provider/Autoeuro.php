@@ -72,27 +72,33 @@ class Autoeuro extends Provider{
 			'available' => $params['in_stock']
 		];
 	}
-	public static function getItemsToOrder($provider_id){
+	public static function getItemsToOrder($provider_id): array
+	{
 		if (!parent::getIsEnabledApiOrder(self::$provider_id)) return false;
 		$basket_items = self::getBasket();
-		debug($basket_items);
 		$output = [];
 		foreach($basket_items->DATA as $bi){
 			if (!$bi->comment) continue;
 			$osi = explode('-', $bi->comment);
-			debug($osi);
-			$storeItem = core\OrderValue::get([
+			$storeItem = OrderValue::get([
 				'order_id' => $osi[0],
 				'store_id' => $osi[1],
 				'item_id' => $osi[2]
 			]);
-			debug($storeItem);
-			// $output[] = [
-			// 	'provider' => 'АвтоЕвро',
-			// 	'store' => parent::getInstanceDataBase()->getFieldOnID('provider_stores', $osi['2'])
-			// ]
-			debug($osi);
+			if (!$storeItem->num_rows) return [];
+			foreach($storeItem as $si){
+				$output[] = [
+					'provider' => 'Autoeuro',
+					'store' => $si['cipher'],
+					'brend' => $si['brend'],
+					'article' => $si['article'],
+					'title_full' => $si['title_full'],
+					'price' => $si['price'],
+					'count' => $si['quan']
+				];
+			}
 		}
+		return $output;
 	}
 	private static function insertItem($o){
 		/**

@@ -175,6 +175,7 @@ function view(){
 				<?}?>
 			</select>
 		</form>
+		<a style="margin-left: 15px;" href="?view=providers&act=itemsToOrder">Товары, ожидающие отправку в заказ</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

@@ -184,7 +184,7 @@
 				},
 				callback: function(data, pagination){
 					for(var key in data) $('#statistics tbody').append(
-						'<tr>' +
+						'<tr class="' + data[key].is_blocked + '">' +
 							'<td label="ip"><a class="addToBlockedIP" href="">' + data[key].ip + '</a></td>' +
 							'<td label="Количество">' + data[key].cnt + '</td>' +
 							'<td label="Коментарий">' + data[key].comment + '</td>' +

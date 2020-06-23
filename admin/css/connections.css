@@ -100,6 +100,9 @@ span.forbidden_page:hover{
     cursor: pointer;
     color: red;
 }
+tr.is_blocked {
+    background: #ffecec;
+}
 .icon-cross1:before {
     position: absolute;
     right: 5px;

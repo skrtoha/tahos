@@ -170,14 +170,16 @@ class Connection{
 			SELECT
 				c.ip,
 				COUNT(c.ip) as cnt,
-				c.comment
+				c.comment,
+				IF(dd.ip IS NOT NULL, 'is_blocked', '') AS is_blocked
 			FROM
 				#connections c
+			LEFT JOIN #denied_addresses dd ON c.ip = dd.ip
 			WHERE
 				c.created >= '$from' AND c.created <= '$to' AND isDeniedAccess = 0
 			GROUP BY
 				c.ip
-			ORDER BY cnt DESC
+			ORDER BY is_blocked, cnt DESC
 		";
 		if (isset($params['getCount']) && $params['getCount']){
 			$query = str_replace('SELECT', 'SELECT SQL_CALC_FOUND_ROWS', $query);

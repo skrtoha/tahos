@@ -214,6 +214,8 @@ class Autokontinent extends Provider{
 		return $part_id;
 	}
 	public static function setArticle(string $brand, string $article){
+		if(!parent::getIsEnabledApiSearch(self::$params['provider_id'])) return false;
+		
 		$part_id = self::getPartIdByBrandAndArticle($brand, $article);
 		if (!$part_id) return false;
 

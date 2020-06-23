@@ -123,9 +123,11 @@ class ForumAuto extends Provider{
 		return $response;
 	}
 	public static function setArticle($mainItemID, $brend, $article){
+		if(!parent::getIsEnabledApiSearch(self::$params['provider_id'])) return false;
+		
 		$item_id = NULL;
 
-		Provider::clearStoresItemsByProviderID(self::$params['provider_id'], ['item_id' => $mainItemID]);
+		// Provider::clearStoresItemsByProviderID(self::$params['provider_id'], ['item_id' => $mainItemID]);
 
 		$response = self::getItemsByBrendAndArticle($brend, $article);
 

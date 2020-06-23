@@ -109,6 +109,14 @@ class Connection{
 					case 'manager_id':
 						$where .= "manager_id = $value AND ";
 						break;
+					case 'dateFrom':
+						$from = self::getTimestamp($params['dateFrom']);
+						$where .= "c.created >= '$from' AND ";
+						break;
+					case 'dateTo':
+						$to = self::getTimestamp($params['dateTo']);
+						$where .= "c.created <= '$to' AND ";
+						break;
 				}
 			}
 		}

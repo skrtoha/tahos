@@ -95,6 +95,50 @@
 				connections.add_denied_address(th.text());
 				return false;
 			})
+			$(document).on('click', '#statistics span[class^=icon-circle]', function(){
+				let th = $(this);
+				th.toggleClass('icon-circle-up').toggleClass('icon-circle-down');
+				let act = th.attr('class');
+				if (th.attr('class') == 'icon-circle-up'){
+					let dateFrom = th.closest('div[data-name=statistics]').find('input[name=dateFrom]').val();
+					let dateTo = th.closest('div[data-name=statistics]').find('input[name=dateTo]').val();
+					let ip = th.next().text();
+					th.closest('tr').after(
+						'<tr class="detailedInformation">' + 
+							'<td colspan="3">' +
+								'<div class="ionTabs__preloader"></div>' +
+							'</td>' +
+						'</tr>'
+					);
+					connections.setDetailedInformationAboutIP(th.closest('tr').next(), ip, dateFrom, dateTo);
+				}
+				else th.closest('tr').next().remove();
+			})
+		},
+		setDetailedInformationAboutIP: function($obj, ip, dateFrom, dateTo){
+			$.ajax({
+				type: 'get',
+				url: '/admin/?view=connections&tab=getDetailedInformationAboutIP',
+				data: {
+					ip: ip,
+					dateFrom: dateFrom,
+					dateTo: dateTo
+				},
+				success: function(response){
+					let items = JSON.parse(response);
+					let str = '<table class="detailedInformationAboutIP">';
+					$.each(items, function(i, item){
+						str += 
+							'<tr>' +
+								'<td>' + item.url + '</td>' +
+								'<td>' + item.created + '</td>' +
+							'<tr>'
+					})
+					str += '</table>';
+					$obj.find('.ionTabs__preloader').remove();
+					$obj.find('td').html(str);
+				}
+			})
 		},
 		add_denied_address: function(text){
 			if (!/^\d+\.\d+\.\d+\.\d+$/.test(text)) return show_message('Адрес введен некоректно!', 'error');
@@ -185,7 +229,10 @@
 				callback: function(data, pagination){
 					for(var key in data) $('#statistics tbody').append(
 						'<tr class="' + data[key].is_blocked + '">' +
-							'<td label="ip"><a class="addToBlockedIP" href="">' + data[key].ip + '</a></td>' +
+							'<td label="ip">' +
+								'<span class="icon-circle-down"></span>' +
+								'<a class="addToBlockedIP" href="">' + data[key].ip + '</a>' + 
+							'</td>' +
 							'<td label="Количество">' + data[key].cnt + '</td>' +
 							'<td label="Коментарий">' + data[key].comment + '</td>' +
 						'<tr>'

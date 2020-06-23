@@ -45,7 +45,20 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		case 'getStatisticsTotalNumber':
 			echo core\Connection::getStatistics($_GET['dateFrom'], $_GET['dateTo'], ['getCount' => true]);
 			break;
-
+		case 'getDetailedInformationAboutIP':
+			$commonList = core\Connection::getCommonList(null, null, [
+				'ip' => $_GET['ip'],
+				'dateFrom' => $_GET['dateFrom'],
+				'dateTo' => $_GET['dateTo']
+			]);
+			if (!$commonList->num_rows) return false;
+			$output = [];
+			foreach($commonList as $row) $output[] = [
+				'url' => $row['url'],
+				'created' => $row['created']
+			];
+			echo json_encode($output);
+			break;
 	}
 	exit();
 }?>

@@ -8,8 +8,24 @@
 .pagination-container{
     margin-top: 10px;
 }
+#statistics .icon-circle-up, #statistics .icon-circle-down{
+    margin-right: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+#statistics .icon-circle-down:hover, #statistics .icon-circle-up:hover{
+    color: red !important;
+}
+#statistics .ionTabs__preloader{
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+}
 .ionTabs {
     position: relative;
+}
+table.detailedInformationAboutIP tr td {
+    word-wrap: break-all;
 }
     .ionTabs__head {
         position: relative; display: block;

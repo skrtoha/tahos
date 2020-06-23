@@ -29,7 +29,7 @@ class Autokontinent extends Provider{
 		$output = [];
 		foreach($basketList as $basket){
 			if (!$basket->comment) continue;
-			$osi = json_decode('-', $basket->comment);
+			$osi = explode('-', $basket->comment);
 			$resOrderValue = OrderValue::get([
 				'order_id' => $osi[0],
 				'store_id' => $osi[1],

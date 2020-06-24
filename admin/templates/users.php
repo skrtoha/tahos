@@ -61,22 +61,27 @@ switch ($act) {
 	case 'search_history': search_history(); break;
 	case 'basket': basket(); break;
 	case 'checkOrderedWithReserved':
-		debug($_GET);
 		$res = $db->query("
 			SELECT
+				o.user_id,
 				SUM(ov.price * ov.ordered) AS sum
 			FROM
 				#orders_values ov
+			LEFT JOIN
+				#orders o ON o.id = ov.order_id
 			WHERE
-				ov.user_id = {$_GET['user_id']} AND ov.status_id = 11
+				ov.status_id = 11
+			GROUP BY
+				o.user_id
 		", '');
-		if ($res->num_rows) $array = $res->fetch_assoc();
-		else $array['sum'] = 0;
-		if (core\User::update($_GET['user_id'], ['reserved_funds' => $array['sum']]) === true){
-			message("В зарезервировано установлено {$array['sum']}");
-			header("Location: /admin/?view=users&act=change&id={$_GET['user_id']}");
+		$updatedUsers = [];
+		foreach($res as $row){
+			$updatedUsers[] = $row['user_id'];
+			core\User::update($row['user_id'], ['reserved_funds' => $row['sum']]);
 		}
-		else die("Произошла ошибка");
+		$db->update('users', ['reserved_funds' => 0], '`id` NOT IN (' . implode(',', $updatedUsers) . ')');
+		message('Успешно обновлено!');
+		header("Location: /admin/?view=users");
 		break;
 	case 'delete':
 		if ($db->delete('users', "`id`=".$_GET['id'])){
@@ -142,6 +147,7 @@ function view(){
 		</form>
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=add">Добавить</a>
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=managers">Менеджеры</a>
+		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=checkOrderedWithReserved">Сверить "заказано"</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -188,7 +194,6 @@ function show_form($act){
 		<a href="?view=correspond&user_id=<?=$id?>">Написать сообщение</a>
 		<a href="?view=order_issues&user_id=<?=$id?>">На выдачу</a>
 		<a href="?view=order_issues&user_id=<?=$id?>&issued=1">Выданные</a>
-		<a href="?view=users&act=checkOrderedWithReserved&user_id=<?=$id?>">Сверить "заказано"</a>
 		<a href="?view=users&id=<?=$id?>&act=search_history">История поиска</a>
 		<a href="?view=users&id=<?=$id?>&act=basket">Товары в корзине</a>
 		<a href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>

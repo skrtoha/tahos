@@ -12,9 +12,9 @@ class Mikado extends Provider{
 	private $armtek;
 	private $brends;
 	public static $stocks = [
-		1 => 14,
-		10 => 13,
-		35 => 12
+		1 => 14, // MIPI
+		10 => 13, //MIPE
+		35 => 12 //MIVO
 	];
 	public static $clientData  = [
 		'entity' => [

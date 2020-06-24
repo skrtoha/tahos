@@ -167,7 +167,6 @@ class Autoeuro extends Provider{
 			if ($o->price < $output[$key]['price']->price) $output[$key]['price'] = $o;
 			if ($o->order_term < $output[$key]['order_term']->order_term) $output[$key]['order_term'] = $o;
 		}
-
 		//это цикл нужен для того, чтобы удалить order_term если цена и доставка равна price
 		foreach($output as $key => $o){
 			if (
@@ -221,21 +220,20 @@ class Autoeuro extends Provider{
 			['duplicate' => [
 				'in_stock' => $code['price']->amount,
 				'price' => $code['price']->price
-			]]
+			]/*, 'print' => true*/]
 		);
 
-		$order_term = isset($code['order_term']->order_term) ? $code['order_term']->order_term : $code['price']->order_term;
 		$resInsertAutoeuroOrderKeys = parent::getInstanceDataBase()->insert(
 			'autoeuro_order_keys',
 			[
 				'store_id' => self::$minPriceStoreID,
 				'item_id' => $item_id,
-				'order_term' => $order_term ? $order_term : 1,
+				'order_term' => $code['price']->order_term ? $code['price']->order_term : 1,
 				'order_key' => $code['price']->order_key
 			],
 			['duplicate' => [
 				'order_key' => $code['price']->order_key,
-				'order_term' => $order_term ? $order_term : 1,
+				'order_term' => $code['price']->order_term ? $code['price']->order_term : 1,
 			]/*, 'print' => true*/]
 		);
 
@@ -253,7 +251,7 @@ class Autoeuro extends Provider{
 			['duplicate' => [
 				'in_stock' => $code['order_term']->amount,
 				'price' => $code['order_term']->price
-			]]
+			]/*, 'print' => true*/]
 		);
 		$resInsertAutoeuroOrderKeys = parent::getInstanceDataBase()->insert(
 			'autoeuro_order_keys',
@@ -266,7 +264,7 @@ class Autoeuro extends Provider{
 			['duplicate' => [
 				'order_key' => $code['order_term']->order_key,
 				'order_term' => $code['order_term']->order_term ? $code['order_term']->order_term : 1
-			]]
+			]/*, 'print' => true*/]
 		);
 	}
 	public static function getSearch($code){

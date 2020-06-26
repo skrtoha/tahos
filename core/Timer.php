@@ -3,9 +3,9 @@ namespace core;
 class Timer{
 	private static $start;
 	public static function start(){
-		self::$start = time();
+		self::$start = microtime(true);
 	}
 	public static function end(){
-		return time() - self::$start;
+		return round(microtime(true) - self::$start, 2);
 	}
 }

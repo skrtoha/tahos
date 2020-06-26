@@ -1,0 +1,11 @@
+a.resultItem {
+    display: block;
+    cursor: pointer;
+}
+p.title {
+    font-weight: bold;
+    margin: 20px 0 10px 0;
+}
+.hidden{
+	display: none;
+}

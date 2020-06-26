@@ -21,6 +21,41 @@ class Item{
 	public static function getInstanceDataBase(){
 		return $GLOBALS['db'];
 	}
+	public static function getByID($item_id){
+		$res = $GLOBALS['db']->query("
+			SELECT
+				i.id,
+				IF(i.article_cat != '', i.article_cat, i.article) AS article,
+				i.title_full,
+				i.brend_id,
+				b.title AS brand
+			FROM
+				#items i
+			LEFT JOIN
+				#brends b ON b.id = i.brend_id
+			WHERE
+				i.id = $item_id
+		", '');
+		return $res->fetch_assoc();
+	}
+	public static function getByArticle(string $article, $additionalFields = []): \mysqli_result
+	{
+		$article = article_clear($article);
+		return $GLOBALS['db']->query("
+			SELECT
+				i.id,
+				IF(i.article_cat != '', i.article_cat, i.article) AS article,
+				i.title_full,
+				i.brend_id,
+				b.title AS brend
+			FROM
+				#items i
+			LEFT JOIN
+				#brends b ON b.id = i.brend_id
+			WHERE
+				i.article = '$article'
+		", '');
+	}
 	private function processUpdate($fields, $where){
 		$conditions = '';
 		foreach($where as $key => $value) $conditions .= "`{$key}` = '{$value}' AND ";

@@ -273,6 +273,9 @@ function item($act){
 			<a class="<?=$class?>" href="?view=items&act=analogies&item_id=<?=$item['id']?>">Аналоги(<?=$count?>)</a>
 			<a href="?view=items&act=history&item_id=<?=$item['id']?>">История</a>
 			<?if (!Managers::isActionForbidden('Номенклатура', 'Удаление')){?>
+				<a href="/admin/?view=test_api_providers&item_id=<?=$_GET['id']?>">
+					Тестировать на API
+				</a>
 				<a style="float: right" href="?view=items&id=<?=$item['id']?>&act=delete" class="delete_item" item_id="<?=$item['id']?>">Удалить</a>
 			<?}?>
 		</div>

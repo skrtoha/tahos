@@ -30,8 +30,8 @@ foreach($_GET['acts'] as $act){
 				break;
 			}
 			foreach($items as $key => $item){
-				if ($item['foto']){
-					$items[$key]['src'] = core\Config::$imgUrl. "/items/small/{$item['item_id']}/{$item['foto']}";
+				if ($item['photo']){
+					$items[$key]['src'] = core\Config::$imgUrl. "/items/small/{$item['item_id']}/{$item['photo']}";
 					$items[$key]['alt'] = '';
 				} 
 				else{

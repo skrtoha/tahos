@@ -141,88 +141,6 @@
 					} 
 				});
 			});
-			$(document).on('mouseover', '.product-popup .rating i', function(){
-				e = $(this);
-				if (e.parent().hasClass('no_selectable')) return false;
-				e.removeClass('fa-star-o');
-				e.addClass('fa-star');
-				e.prevAll().removeClass('fa-star-o');
-				e.prevAll().addClass('fa-star');
-			});
-			$(document).on('mouseout', '.product-popup .rating i', function(){
-				e = $(this);
-				if (e.parent().hasClass('no_selectable')) return false;
-				e.removeClass('fa-star');
-				e.addClass('fa-star-o');
-				e.prevAll().removeClass('fa-star');
-				e.prevAll().addClass('fa-star-o');
-			})
-			$(document).on('click', '.product-popup-link', function(e){
-				e.preventDefault();
-				var t = e.target;
-				if (t.className == 'brend_info') return false;
-				var item_id = $(this).attr('item_id');
-				$.ajax({
-					type: "POST",
-					url: "/ajax/item_full.php",
-					data: 'id=' + item_id + '&category=1',
-					success: function(msg){
-						// console.log(msg);
-						// return;
-						// console.log(JSON.parse(msg));
-						$('#mgn_popup').html(category.getFullItem(JSON.parse(msg)));
-						$.magnificPopup.open({
-							type: 'inline',
-							preloader: false,
-							mainClass: 'product-popup-wrap',
-							items: {
-								src: '#mgn_popup'
-							},
-							callbacks: {
-								beforeOpen: function() {
-									if($(window).width() < 700) this.st.focus = false;
-									else this.st.focus = '#name';
-								},
-								open: function() {
-									$("#gallery img").on("click", function(event) {
-										$("#main-pic img").attr("src", $(this).attr("src"));
-										$("#main-pic img").attr("data-zoom-image", $(this).attr('data-big-img'));
-										// console.log($("#main-pic").html());
-									});
-									$.ionTabs(".product-popup-tabs",{
-										type: "none"
-									});
-									$(".ionTabs__tab:first-child").click();
-									$('#gallery').owlCarousel({
-										loop: true,
-										margin: 5,
-										nav: true,
-										dots: false,
-										items: 3
-									});
-								}
-							}
-						});
-					} 
-				})
-			})
-			$(document).on('click', '.product-popup .rating i', function(){
-				if ($('.login_btn span').html() == 'Войти') return false;
-				var e = $(this);
-				if (e.parent().hasClass('no_selectable')) return false;
-				var rate = $(this).prevAll().length + 1;
-				$.ajax({
-					type: "POST",
-					url: "/ajax/category.php",
-					data: 'table=rating&item_id=' + e.parent().attr('item_id') + '&user_id=' + $('#user_id').val() + '&rate=' + rate,
-					success: function(msg){
-						// console.log(msg);
-						e.parent().addClass('no_selectable');
-						e.removeClass('fa-star-o').addClass('fa-star');
-						e.prevAll().removeClass('fa-star-o').addClass('fa-star');
-					} 
-				})
-			})
 			$('input[name=comparing]').on('change', function(){
 				category.filterReset();
 				if ($(this).is(':checked')){
@@ -441,21 +359,21 @@
 			'</div>' +
 			'<div class="clearfix"></div>' + 
 		 	'<div class="gallery-block" style="' + s + '">';
-			var is_foto = item.foto ? true : false;
-			var c_fotos = Object.keys(i.fotos).length;
+			var is_photo = item.photo ? true : false;
+			var c_photos = Object.keys(i.photos).length;
 			// console.log(c_fotos);
-			if (is_foto){
-				var src_small = getImgUrl() + '/items/small/' + item.id + '/' + item.foto;
-				var src_big = getImgUrl() + '/items/big/' + item.id + '/' + item.foto;
+			if (is_photo){
+				var src_small = getImgUrl() + '/items/small/' + item.id + '/' + item.photo;
+				var src_big = getImgUrl() + '/items/big/' + item.id + '/' + item.photo;
 				str += '' +
 						'<div id="main-pic">' + 
 							'<img src="'+ src_small + '" data-zoom-image="' + src_big + '">' + 
 						'</div>';
-				if (c_fotos){
+				if (c_photos){
 					str += '<div id="gallery">';
-					for (var k in i.fotos){
-						var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.fotos[k];
-						var src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.fotos[k];
+					for (var k in i.photos){
+						var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.photos[k];
+						var src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.photos[k];
 						str += '<img src="' + src_small + '" data-big-img="' + src_big + '">';
 					}
 					str += '</div>';
@@ -467,7 +385,7 @@
 						'</div>';
 			var rating = item.rating ? item.rating - 1 : -1;
 			var no_selectable = item.rating ? 'no_selectable' : '';
-			s = is_foto ? '' : 'margin-top: 0px';
+			s = is_photo ? '' : 'margin-top: 0px';
 			str += '<div style="' + s + '" item_id="' + item.id + '" class="rating ' + no_selectable + '">';
 			for (var k = 0; k < 5; k++){
 				var kkk = k <= rating ? 'fa-star' : 'fa-star-o';

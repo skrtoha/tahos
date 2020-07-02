@@ -79,11 +79,19 @@ class Abcp extends Provider{
 		);
 		$result = json_decode($res, true);
 		foreach($result as $value){
-			if ($value['distributorId'] == $distributorId) return [
+			if ($value['distributorId'] != $distributorId) continue;
+			if (Provider::getComparableString($value['number']) != Provider::getComparableString($params['article'])){
+				continue;
+			}
+			if (Provider::getComparableString($value['brand']) != Provider::getComparableString($params['brend'])){
+				continue;
+			}
+			return [
 				'price' => $value['price'],
 				'available' => $value['availability']
 			];
 		}
+		return false;
 	}
 	public static function isInBasket($ov){
 		return Armtek::isInBasket($ov);

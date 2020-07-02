@@ -56,7 +56,7 @@ class Item{
 				i.article = '$article'
 		", '');
 	}
-	private function processUpdate($fields, $where){
+	private static function processUpdate($fields, $where){
 		$conditions = '';
 		foreach($where as $key => $value) $conditions .= "`{$key}` = '{$value}' AND ";
 		$conditions = substr($conditions, 0, -5);
@@ -202,7 +202,7 @@ class Item{
 				i.title_full,
 				b.title AS brend,
 				CONCAT_WS(' ', b.title, i.article, i.title_full) AS bat,
-				i.foto,
+				i.photo,
 				p.price,
 				COUNT(iv.item_id) AS cnt,
 				p.delivery

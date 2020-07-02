@@ -622,7 +622,7 @@ label[for^=cat]{
   background: #fff;
   padding: 30px 20px 20px 20px;
   text-align: center;
-  max-height: 90%;
+  height: auto;
   overflow: auto;
   position: relative;
 }

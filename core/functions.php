@@ -393,7 +393,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			si.packaging,
 			b.title as brend,
 			i.brend_id as brend_id,
-			i.foto,
+			i.photo,
 			ps.cipher,
 			ps.provider_id,
 			ps.id as store_id,
@@ -418,7 +418,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100 $userDiscount) as price,
 			$ba_quan
 			IF (
-				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.foto != '',
+				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.photo != '',
 				1,
 				0
 			) as is_desc

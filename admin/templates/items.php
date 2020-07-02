@@ -2,29 +2,51 @@
 use core\Managers;
 use core\Item;
 
-if ($_POST['item_image_submit']){
-	if (Managers::isActionForbidden('Номенклатура', 'Изменение')){
-		Managers::handlerAccessNotAllowed();
-	} 
-	$item_id = $_POST['item_id'];
-	$image = set_image($_FILES['image'], $item_id);
-	if (!$image['error']){
-		$title = $image['name'];
-		$db->insert('fotos', ['item_id' => $item_id, 'title' => $title]);
-		message('Фото успешно загружено!');?>
-		<li foto_name="<?=$title?>">
-			<div>
-				<a class="loop" href="#">Увеличить</a>
-				<a table="fotos" class="delete_foto" href="#">Удалить</a>
-			</div>
-			<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item_id?>/<?=$title?>" alt="">
-		</li>
-	<?}
-	else message($image['error'], false);
+if (isset($_FILES['photo'])){
+	copy($_FILES['photo']['tmp_name'], $_SERVER['DOCUMENT_ROOT'].'/tmp/'.$_FILES['photo']['name']);?>
+		<img id="uploadedPhoto" src="/tmp/<?=$_FILES['photo']['name']?>">
+		<button id="savePhoto">Сохранить</button>
+	<?
 	exit();
 }
 $act = $_GET['act'];
 if ($_POST['form_submit']){
+	// debug($_POST); exit();
+
+	//удаляем отсутствующие фото
+	$filesBig = glob(core\Config::$imgPath . '/items/big/' . $_GET['id'] . '/*');
+	$filesSmall = glob(core\Config::$imgPath . '/items/small/' . $_GET['id'] . '/*');
+	if ($filesBig){
+		foreach($filesBig as $existingFile){
+			$isForDeleting = true;
+			if (isset($_POST['photos'])){
+				foreach($_POST['photos'] as $photo){
+					if (strpos($existingFile, $photo['big'])){
+						$isForDeleting = false;
+						break;
+					} 
+				}
+			}
+			if ($isForDeleting) unlink($existingFile);
+		}
+	}
+	if ($filesSmall){
+		foreach($filesSmall as $existingFile){
+			$isForDeleting = true;
+			if (isset($_POST['photos'])){
+				foreach($_POST['photos'] as $photo){
+					if (strpos($existingFile, $photo['small'])){
+						$isForDeleting = false;
+						break;
+					} 
+				}
+			}
+			if ($isForDeleting) unlink($existingFile);
+		}
+	}
+	Item::update(['photo' => NULL], ['id' => $_GET['id']]);
+
+
 	$db->delete('items_values', "`item_id` = {$_GET['id']}");
 	if (Managers::isActionForbidden('Номенклатура', 'Изменение')){
 		Managers::handlerAccessNotAllowed();
@@ -43,6 +65,7 @@ if ($_POST['form_submit']){
 		if ($key == 'is_stay') continue;
 		if ($key == 'language_id') continue;
 		if ($key == 'translate') continue;
+		if ($key == 'photos') continue;
 		$array[$key] = $value;
 	}
 	if ($array['article_cat'] && !$array['article']) $array['article'] = article_clear($array['article_cat']);
@@ -64,9 +87,23 @@ if ($_POST['form_submit']){
 		}
 	} 
 	if ($res === true) {
-		if (!empty($_FILES['foto'])){
-			$res_image = set_image($_FILES['foto'], $last_id);
-			core\Item::update(['foto' => $res_image['name']], ['id' => $last_id]);
+		if (isset($_POST['photos']) && !empty($_POST['photos'])){
+			$dir_big = core\Config::$imgPath . "/items/big/$last_id";
+			$dir_small = core\Config::$imgPath . "/items/small/$last_id";
+			if (!file_exists($dir_big)) mkdir($dir_big);
+			if (!file_exists($dir_small)) mkdir($dir_small);
+			$i = 0;
+			$time = time();
+
+			foreach($_POST['photos'] as $photo){
+				$nameBody = $time . $i;
+				copy($_SERVER['DOCUMENT_ROOT'] . $photo['big'], "$dir_big/$nameBody.jpg");
+				copy($_SERVER['DOCUMENT_ROOT'] . $photo['small'], "$dir_small/$nameBody.jpg");
+				if ($photo['is_main']) Item::update(['photo' => "$nameBody.jpg"], ['id' => $last_id]);
+				unlink($_SERVER['DOCUMENT_ROOT'] . $photo['big']);
+				unlink($_SERVER['DOCUMENT_ROOT'] . $photo['small']);
+				$i++;
+			}
 		} 
 		if (!empty($_POST['translate'])){
 			$i = 0;
@@ -205,7 +242,9 @@ switch ($act) {
 		echo "Обработка заняла ".core\Timer::end()." секунд";
 		break;
 	case 'items': items(); break;
-	case 'item': item('s_change'); break;
+	case 'item': 
+		item('s_change'); 
+		break;
 	default: items();
 }
 function item($act){
@@ -376,49 +415,34 @@ function item($act){
 						</div>
 					</div>
 				</div>
-					<div class="field">
-						<div class="title">Основное фото</div>
-						<div class="value">
-							<?if ($item['foto']){?>	
-								<ul item_id="<?=$item['id']?>" id="fotos_item_1">
-									<li foto_name="<?=$item['foto']?>">
+				<div class="field">
+					<div class="title">Фото</div>
+					<div class="value">
+						<a href="" class="hide">Показать</a>
+						<div style="display: none; margin-top: 10px">
+							<ul class="photo" id="photos">
+								<?$photoNames = scandir(core\Config::$imgPath . "/items/small/{$_GET['id']}/");
+								$i = -1;
+								foreach($photoNames as $name){
+									if (!preg_match('/.+\.jpg/', $name)) continue;
+									$i++;?>
+									<li class="<?=$name == $item['photo'] ? 'main-photo' : ''?>" big="<?=core\Config::$imgUrl?>/items/big/<?=$item['id']?>/<?=$name?>">
 										<div>
 											<a class="loop" href="#">Увеличить</a>
-											<a class="delete_item" href="?view=items&id=<?=$item['id']?>&act=delete_foto&title=<?=$item['foto']?>">Удалить</a>
+											<a class="removePhoto">Удалить</a>
+											<span class="main-photo <?=$name == $item['photo'] ? 'icon-lock' : 'icon-unlocked'?>"></span>
 										</div>
-										<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$item['foto']?>" alt="">
+										<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$name?>" alt="">
+										<input type="hidden" name="photos[<?=$i?>][small]" value="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$name?>">
+										<input type="hidden" name="photos[<?=$i?>][big]" value="<?=core\Config::$imgUrl?>/items/big/<?=$item['id']?>/<?=$name?>">
+										<input type="hidden" name="photos[<?=$i?>][is_main]" value="<?=$name == $item['photo'] ? '1' : '0'?>">
 									</li>
-								</ul>
-							<?}
-							else{?><input type="file" name="foto"><?}?>
-						</div>
-					</div> 
-				<? if ($act != 's_add'){?> 
-					<div class="field">
-						<div class="title">Другие фото</div>
-						<div class="value">
-								<a href="" class="hide">Показать</a>
-								<div style="display: none; margin-top: 10px">
-								<?$fotos = $db->select('fotos', 'item_id,title', "`item_id`=".$item['id']);?>
-								<ul item_id="<?=$_GET['id']?>" style="padding-left: 0" id="fotos_item">
-									<?if (count($fotos)){
-										foreach($fotos as $foto){?>
-											<li foto_name="<?=$foto['title']?>">
-												<div>
-													<a class="loop" href="#">Увеличить</a>
-													<a table="fotos" class="delete_foto" href="#">Удалить</a>
-												</div>
-												<img src="<?=core\Config::$imgUrl?>/items/small/<?=$foto['item_id']?>/<?=$foto['title']?>" alt="">
-											</li>
-										<?}
-									}?>
-								</ul>
-								<div id="temp_foto"></div>
-								<input type="button" accept="image/*" value="Загрузить фото" id="click_image_item">
-								</div>
+								<?}?>
+							</ul>
+							<input type="button" accept="image/*" value="Загрузить фото" id="buttonLoadPhoto">
 						</div>
 					</div>
-				<?}?> 
+				</div>
 				<div class="field">
 					<div class="title">Вес, гр.</div>
 					<div class="value"><input type=text name="weight" value="<?=$_POST['weight'] ? $_POST['weight'] : $item['weight']?>"></div>
@@ -542,10 +566,8 @@ function item($act){
 			</form>
 		</div>
 	</div>
-	<form style="display: none" id="upload_image" action="/admin/?view=items&act=item&id=<?=$item['id']?>?>" enctype="multipart/form-data" method="post">
-		<input id="item_image" name="image" type="file">
-		<input type="hidden" value="<?=$item['id']?>" name="item_id">
-		<input type="hidden" name="item_image_submit" value="1" style="display: none">
+	<form style="display: none" action="/admin/?view=items&act=item&id=<?=$_GET['id']?>" enctype="multipart/form-data" method="post">
+		<input id="loadPhoto" name="photo" type="file">
 	</form>
 	<div class="actions"><a href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a></div>
 	<div class="popup-gallery"></div>

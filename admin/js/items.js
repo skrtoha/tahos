@@ -155,4 +155,208 @@ $(function(){
 		th.parent().prev().find('option[value=' + fv_id + ']').prop('disabled', false);
 		$(this).remove();
 	})
+	$('#buttonLoadPhoto').on('click', function(e){
+		e.preventDefault();
+		$('#loadPhoto').click();
+	})
+	$(document).on('click', '.loop', function(e){
+		e.preventDefault();
+		let th = $(this);
+		let big = th.closest('li').attr('big');
+		let ul = th.closest('ul');
+		let items = new Array();
+		let number = 0;
+		let currentNumber = 0;
+		ul.find('li').each(function(){
+			if ($(this).attr('big') == big) currentNumber = number;
+			items.push({src: $(this).attr('big')});
+			number++;
+		});
+		let magnificPopup = $.magnificPopup.instance;
+		magnificPopup.open({
+			items: items,
+			type: 'image',
+			gallery:{
+				enabled: true,
+				navigateByImgClick: true,
+				preload: [0, 1]
+			}
+		});
+		magnificPopup.goTo(currentNumber);
+	})
+	$(document).on('click', 'span.main-photo', function(){
+		let th = $(this);
+		$('span.main-photo').removeClass('icon-lock').addClass('icon-unlocked');
+		th.removeClass('icon-unlocked').addClass('icon-lock');
+		$('li[big]').removeClass('main-photo');
+		$('li[big]').find('input[name*=is_main]').val(0);
+		th.closest('li').addClass('main-photo').find('input[name*=is_main]').val(1);
+	})
+	$(document).on('change', '#loadPhoto', function(){
+		$(this).closest('form').ajaxForm({
+			target: '#modal_content',
+			beforeSubmit: function(){},
+			success: function(response){
+				let image = document.getElementById('uploadedPhoto');
+				let item_id = $('#item_id').val();
+				let cropper = new Cropper(image, {
+					autoCropArea: 1,
+					aspectRatio: 0.8,
+					cropBoxResizable: false
+				});
+				$('#modal-container').addClass('active');
+				$('#modal-container').on('click', function(event){
+					var t = $('#modal-container');
+					if (t.is(event.target)){
+			      	cropper.reset();
+						$('#modal_content').empty();
+						t.removeClass('active');
+						$('#loadPhoto').closest('form').resetForm();
+					} 
+				})
+				$('#savePhoto').on('click', function(){
+					cropper
+						.getCroppedCanvas({
+							'fillColor': '#fff',
+							'width': 200,
+							height: 250
+						})
+						.toBlob((blob) => {
+							const formData = new FormData();
+							formData.append('croppedImage', blob/*, 'example.png' */);
+							formData.append('item_id', item_id);
+							formData.append('act', 'savePhoto');
+							formData.append('initial', $('#uploadedPhoto').attr('src'));
+							$.ajax('/admin/ajax/item.php', {
+								method: 'POST',
+								data: formData,
+								processData: false,
+								contentType: false,
+								success(response) {
+									let images = JSON.parse(response);
+									let count = $('#photos li').size();
+									$('#photos').append(
+										'<li big="' + images.big + '">' +
+											'<div>' +
+												'<a class="loop" href="#">Увеличить</a>' +
+												'<a table="fotos" class="delete_foto" href="#">Удалить</a>' +
+												'<span class="main-photo icon-unlocked"></span>' +
+											'</div>' +
+											'<img src="' + images.small + '" alt="">' +
+											'<input type="hidden" name="photos[' + count + '][small]" value="' + images.small + '">' +
+											'<input type="hidden" name="photos[' + count + '][big]" value="' + images.big + '">' +
+											'<input type="hidden" name="photos[' + count + '][is_main]" value="0">' +
+										'</li>'
+									);
+						      	cropper.destroy();
+									$('#modal_content').empty();
+									$('#modal-container').removeClass('active');
+								},
+								error() {
+									console.log('Upload error');
+								},
+							});
+						});
+				})
+			}
+		}).submit();
+	})
+	$(document).on('click', 'a.removePhoto', function(e){
+		e.preventDefault();
+		if (!confirm('Вы действительно хотите удалить?')) return false;
+		$(this).closest('li').remove();
+	})
+	$('#add_category').on('click', function(e){
+		$('#popup').css('display', 'flex');
+		e.preventDefault();
+		var elem = $(this);
+		$.ajax({
+			type: "POST",
+			url: "/ajax/add_category.php",
+			data: '',
+			success: function(msg){
+				$('#popup').css('display', 'none');
+				elem.before(msg);
+			}
+		});
+	})
+	$(document).on('change', '#add_subcategories', function(){
+		$('#popup').css('display', 'flex');
+		elem = $(this);
+		elem.next('select').remove();
+		elem.next('a').remove();
+		var category_id = elem.val();
+		if (!category_id){
+			$('#popup').css('display', 'none');
+			return false;
+		} 
+		$.ajax({
+			type: "POST",
+			url: "/ajax/add_subcategories.php",
+			data: 'category_id=' + category_id,
+			success: function(msg){
+				$('#popup').css('display', 'none');
+				elem.after(msg);
+			}
+		});
+	})
+	$(document).on('click', '#apply_category', function(e){
+		e.preventDefault();
+		var category_id = $(this).prev('#subcategory').val();
+		if (!category_id){
+			show_message('Выберите подкатегорию!', 'error');
+			return false;
+		}
+		$.ajax({
+			type: "POST",
+			url: "/admin/ajax/item.php",
+			data: {
+				act: 'applyCategory',
+				category_id: category_id,
+				item_id: $('#item_id').val()
+			},
+			success: function(msg){
+				$.cookie('message', 'Категоря успешно применена!', cookieOptions);
+				$.cookie('message_type', 'ok', cookieOptions);
+				document.location.reload();
+			}
+		});
+	})
+	$('#add_subcategory').on('click', function(e){
+		e.preventDefault();
+		var new_value = prompt('Введите название новой подкатегории:');
+		if (new_value){
+			var parent_id = $(this).attr('category_id');
+			$.ajax({
+				type: "POST",
+				url: "/ajax/category.php",
+				data: 'table=add&parent_id=' + parent_id + '&new_value=' + new_value,
+				success: function(msg){
+					// console.log(msg);
+					var res = JSON.parse(msg);
+					if (res.error) show_message(res.error, 'error');
+					else{
+						$('[colspan=4]').remove();
+						var str = '<tr>' +
+						'<td title="Нажмите, чтобы изменить" class="category" data-id="' + res.id + '">' + 
+							res.title +
+						'</td>' + 
+						'<td title="Нажмите, чтобы изменить" class="href" data-id="' + res.id + '">' +
+							res.href +
+						'</td>' + 
+						'<td>' + 
+							'<a href="?view=category&act=items&id=' + res.id + '">Товаров (0)</a> ' + 
+							'<a href="?view=category&act=filters&id=' + res.id + '">Фильров (0)</a>' +
+						'</td>' +
+						'<td>' + 
+							'<a class="delete_item" href="?view=category&act=delete&id=' + res.id + '&parent_id=' + parent_id + '">Удалить</a>' + 
+						'</td>' +
+						'</tr>';
+						$('.t_table').append(str);
+						show_message("Подкатегория '" + new_value + "' успешно добавлена!");
+					}
+				}
+			})
+		}
+	})
 })

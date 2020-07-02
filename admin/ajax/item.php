@@ -80,5 +80,22 @@ switch($_POST['act']){
 			"
 		);
 		break;
+	case 'savePhoto':
+		// debug($_POST);
+		// debug($_FILES);
+		$name = time();
+		$pathBig = "/tmp/big_$name.jpg";
+		$pathSmall = "/tmp/small_$name.jpg";
+		copy($_FILES['croppedImage']['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . "$pathSmall");
+
+		copy($_SERVER['DOCUMENT_ROOT'] . $_POST['initial'], $_SERVER['DOCUMENT_ROOT'] . "$pathBig");
+		echo json_encode([
+			'small' => $pathSmall,
+			'big' => $pathBig
+		]);
+		break;
+	case 'applyCategory':
+		$db->insert('categories_items', ['item_id' => $_POST['item_id'], 'category_id' => $_POST['category_id']]);
+		break;
 }
 ?>

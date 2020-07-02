@@ -408,95 +408,6 @@ $(document).ready(function(e){
 		if ($(this).html() == "Показать") $(this).html('Скрыть').next().show();
 		else $(this).html('Показать').next().hide();
 	})
-	$('#add_category').on('click', function(e){
-		$('#popup').css('display', 'flex');
-		e.preventDefault();
-		var elem = $(this);
-		$.ajax({
-			type: "POST",
-			url: "/ajax/add_category.php",
-			data: '',
-			success: function(msg){
-				$('#popup').css('display', 'none');
-				elem.before(msg);
-			}
-		});
-	})
-	$(document).on('change', '#add_subcategories', function(){
-		$('#popup').css('display', 'flex');
-		elem = $(this);
-		elem.next('select').remove();
-		elem.next('a').remove();
-		var category_id = elem.val();
-		if (!category_id){
-			$('#popup').css('display', 'none');
-			return false;
-		} 
-		$.ajax({
-			type: "POST",
-			url: "/ajax/add_subcategories.php",
-			data: 'category_id=' + category_id,
-			success: function(msg){
-				$('#popup').css('display', 'none');
-				elem.after(msg);
-			}
-		});
-	})
-	$(document).on('click', '#apply_category', function(e){
-		e.preventDefault();
-		var category_id = $(this).prev('#subcategory').val();
-		if (!category_id){
-			show_message('Выберите подкатегорию!', 'error');
-			return false;
-		}
-		$.ajax({
-			type: "POST",
-			url: "/ajax/apply_category.php",
-			data: 'category_id=' + category_id + '&item_id=' + $('input[name=item_id]').val(),
-			success: function(msg){
-				$.cookie('message', 'Категоря успешно применена!', cookieOptions);
-				$.cookie('message_type', 'ok', cookieOptions);
-				document.location.reload();
-			}
-		});
-	})
-	$('#add_subcategory').on('click', function(e){
-		e.preventDefault();
-		var new_value = prompt('Введите название новой подкатегории:');
-		if (new_value){
-			var parent_id = $(this).attr('category_id');
-			$.ajax({
-				type: "POST",
-				url: "/ajax/category.php",
-				data: 'table=add&parent_id=' + parent_id + '&new_value=' + new_value,
-				success: function(msg){
-					// console.log(msg);
-					var res = JSON.parse(msg);
-					if (res.error) show_message(res.error, 'error');
-					else{
-						$('[colspan=4]').remove();
-						var str = '<tr>' +
-						'<td title="Нажмите, чтобы изменить" class="category" data-id="' + res.id + '">' + 
-							res.title +
-						'</td>' + 
-						'<td title="Нажмите, чтобы изменить" class="href" data-id="' + res.id + '">' +
-							res.href +
-						'</td>' + 
-						'<td>' + 
-							'<a href="?view=category&act=items&id=' + res.id + '">Товаров (0)</a> ' + 
-							'<a href="?view=category&act=filters&id=' + res.id + '">Фильров (0)</a>' +
-						'</td>' +
-						'<td>' + 
-							'<a class="delete_item" href="?view=category&act=delete&id=' + res.id + '&parent_id=' + parent_id + '">Удалить</a>' + 
-						'</td>' +
-						'</tr>';
-						$('.t_table').append(str);
-						show_message("Подкатегория '" + new_value + "' успешно добавлена!");
-					}
-				}
-			})
-		}
-	})
 	$('.filter_title, .filter_pos').on('click', function(e){
 		e.preventDefault();
 		th = $(this);
@@ -718,37 +629,6 @@ $(document).ready(function(e){
 				}
 			}
 		})
-	})
-	$(document).on('click', '.loop', function(e){
-		e.preventDefault();
-		var str = '';
-		var li = $(this).parent().parent();
-		var item_id = li.parent().attr('item_id');
-		var curr = li.attr('foto_name');
-		elems = li.parent().find('li');
-		var i = 1;
-		var child = 0;
-		elems.each(function(){
-			var title = $(this).attr('foto_name');
-			if (title == curr) child = i;
-			var href = '/images/items/big/' + item_id + '/' + title;
-			str += '<a href="' + href +'" rel="alternate">' +
-								'<img src="' + href + '" alt="" />' +
-							'</a>';
-			i++;
-		})
-		$('.popup-gallery').html(str);
-		// console.log(child);
-		$('.popup-gallery').magnificPopup({
-			delegate: 'a',
-			type: 'image',
-			gallery:{
-				enabled: true,
-				navigateByImgClick: true,
-				preload: [0, 1]
-			}
-		});
-		$('.popup-gallery a:nth-child(' + child + ') img').click();
 	})
 	$('#add_theme').on('click', function(e){
 		e.preventDefault();

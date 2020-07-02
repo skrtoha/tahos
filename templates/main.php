@@ -361,6 +361,9 @@
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/js/jquery.form.js", "async" : false},
 		// {"src" : "/js/to_top.js", "async" : false},
+		<?if (in_array($view, ['category', 'article'])){?>
+			{"src" : "/js/item_full.js", "async" : false},
+		<?}?>
 		<?if (in_array($view, ['category'])){?>
 			{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
 		<?}?>

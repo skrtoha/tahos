@@ -35,7 +35,7 @@ $q_item = "
 		b.title AS brend,
 		i.brend_id,
 		i.full_desc,
-		i.foto,
+		i.photo,
 		IF (i.title_full, i.title_full, i.title) AS title_full,
 		IF (si.in_stock = 0, ps.under_order, ps.delivery) AS delivery,
 		CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100 $userDiscount) as price,
@@ -72,7 +72,7 @@ if ($res_item->num_rows){
 		$item['item']['brend'] = $v['brend'];
 		$item['item']['brend_id'] = $v['brend_id'];
 		$item['item']['full_desc'] = $v['full_desc'];
-		$item['item']['foto'] = $v['foto'];
+		$item['item']['photo'] = $v['photo'];
 		if (!$v['store_id']) continue;
 		$item['store_items'][$v['store_id']]['price'] = $v['price'];
 		$item['store_items'][$v['store_id']]['in_stock'] = $v['in_stock'];
@@ -82,11 +82,19 @@ if ($res_item->num_rows){
 		$item['store_items'][$v['store_id']]['in_basket'] = $v['in_basket'];
 	}
 }
-$fotos = $db->select('fotos', 'title', "`item_id`=$id");
-if (isset($fotos) && count($fotos)){
-	foreach($fotos as $key => $value) $item['fotos'][] = $value['title'];
-} 
-else $item['fotos'] = array();
+
+$item['photos'] = array();
+$dirPhotos = core\Config::$imgPath . "/items/small/{$_POST['id']}/";
+if (file_exists($dirPhotos)){
+	$photoNames = scandir($dirPhotos);
+	if (!empty($photoNames)){
+		foreach($photoNames as $name){
+			if (!preg_match('/.+\.jpg/', $name)) continue;
+			$item['photos'][] = $name;
+		}
+	} 
+}
+
 $user = core\User::get();
 $item['user_id'] = $_SESSION['user'];
 $item['designation'] = $user['designation'];

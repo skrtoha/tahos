@@ -12,6 +12,9 @@ a.sortable.in_stock.asc{
     line-height: 17px;
     width: 80px;
 }
+table#item_into {
+    display: none;
+}
 li.count-block input{
   position: relative;
   top: -3px;

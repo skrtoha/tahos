@@ -147,7 +147,7 @@
 						'<div id="main-pic">' + 
 							'<img src="'+ src_small + '" data-zoom-image="' + src_big + '">' + 
 						'</div>';
-				if (c_photos){
+				if (c_photos > 1){
 					str += '<div id="gallery">';
 					for (var k in i.photos){
 						var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.photos[k];

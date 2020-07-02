@@ -53,13 +53,13 @@ $res_bonuses = $db->query("
 		`user_id`={$_SESSION['user']} AND
 		transfered=1
 ", '');
-
 // debug($funds);
 ?>
 <div class="account">
 	<div class="sidebar">
 		<div class="balance-block">
 			<h1>Баланс</h1>
+			<p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit']?></span><?=$designation?></p>
 			<?$bill = payment_funds('bill', $user);?>
 			<p>Средств на счету: <span class="account-money "><?=$bill?></span><?=$designation?></p>
 			<?$reserved_funds = payment_funds('reserved_funds', $user);?>

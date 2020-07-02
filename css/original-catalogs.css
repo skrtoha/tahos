@@ -4560,12 +4560,7 @@ body {
 select {
   opacity: 0;
 }
-.login {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  width: 375px;
-  background: #fff;
-}
+
 .login h3 {
   padding: 0 0 22px 0;
   font-size: 24px;
@@ -4708,10 +4703,7 @@ select {
   color: #cc0000;
   display: none;
 }
-.login .social_buttons {
-  padding: 22px 0 0 0;
-  border-top: 1px solid #c8c8c8;
-}
+
 .login .social_buttons p {
   margin: 0 0 15px 0;
   font-size: 18px;
@@ -4743,16 +4735,7 @@ select {
 .login .social_buttons a.gp {
   background: url(../img/icons/login__social_icons.png) -200px top no-repeat;
 }
-header .login {
-  display: none;
-  padding: 23px 0 22px 26px;
-  position: absolute;
-  top: 75px;
-  right: 0;
-}
-header .login .social_buttons {
-  margin: 22px 26px 0 0;
-}
+
 #main .login {
   margin: 16px auto;
   padding: 22px 0 22px 25px;

@@ -9,7 +9,9 @@
   overflow: hidden;
   position: relative;
   outline: none; }
-
+span.credit_limit {
+    color: #5ece5e;
+}
 .jspPane {
   position: absolute;
   width: 100%; }

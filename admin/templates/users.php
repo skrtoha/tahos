@@ -372,6 +372,10 @@ function show_form($act){
 					<div class="value"><input type=text name="markup" value="<?=$_POST['markup'] ? $_POST['markup'] : $user['markup']?>"></div>
 				</div>
 				<div class="field">
+					<div class="title">Кредитный лимит</div>
+					<div class="value"><input type="text" name="credit_limit" value="<?=$_POST['credit_limit'] ? $_POST['credit_limit'] : $user['credit_limit']?>"></div>
+				</div>
+				<div class="field">
 					<div class="title">Пароль
 						<?if ($act == 's_change'){?>
 							<span style="display:block;font-size:12px;margin-top: 5px;font-weight: 400">Заполните поле для сброса пароля</span>

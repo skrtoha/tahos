@@ -5,11 +5,22 @@ $user_id = $_SESSION['user'];
 // debug($user); exit();
 if ($_GET['act'] == 'to_offer'){
 	$res_basket = core\Basket::get($user_id, true);
+
 	if (!$res_basket->num_rows){
 		message('Нечего отправлять!', false);
 		header('Location: /basket');
 		exit();
 	}
+
+	//проверяем превышение лимита
+	$available = $user['bill'] - $user['reserved_funds'];
+	$totalAmountBasket = 0;
+	if ($available < 0 && abs($available) > $user['credit_limit']){
+		message('Превышен кредитный лимит!', false);
+		header("Location: /basket");
+		exit();
+	}
+
 	$res = $db->insert('orders', [
 		'user_id' => $_SESSION['user'],
 		'is_draft' => 0

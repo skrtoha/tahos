@@ -390,4 +390,61 @@ $(function(){
 			}
 		})
 	})
+	$('a.editOrderValue').on('click', function(e){
+		e.preventDefault();
+		var th = $(this);
+		$.ajax({
+			type: 'post',
+			url: '/admin/ajax/orders.php',
+			data: {
+				status_id: 'getOrderValue',
+				osi: th.attr('osi')
+			},
+			success: function(response){
+				let ov = JSON.parse(response);
+				ov.comment = ov.comment ? ov.comment : '';
+				modal_show(
+					'<form class="editOrderValue">' +
+						'<input type="hidden" name="status_id" value="editOrderValue">' +
+						'<input type="hidden" name="osi" value="' + th.attr('osi') + '">' +
+						'<table>' +
+							'<tr>' +
+								'<td>Цена:</td>' +
+								'<td><input type="text" name="price" value="' + ov.price + '"></td>' +
+							'</tr>' +
+							'<tr>' +
+								'<td>Количество:</td>' +
+								'<td><input type="text" name="quan" value="' + ov.quan + '"></td>' +
+							'</tr>' +
+							'<tr>' +
+								'<td>Комментарий:</td>' +
+								'<td><input type="text" name="comment" value="' + ov.comment + '"></td>' +
+							'</tr>' +
+							'<tr>' +
+								'<td colspan="2"><input type="submit"  value="Сохранить"></td>' +
+							'</tr>' +
+						'</table>' +
+					'</form>'
+				);
+				$(document).on('submit', 'form.editOrderValue', function(e){
+					e.preventDefault();
+					let form = $(this);
+					$.ajax({
+						type: 'post',
+						url: '/admin/ajax/orders.php',
+						data: form.serialize(),
+						success: function(response){
+							ov = JSON.parse(response);
+							let tr = th.closest('tr').next();
+							tr.find('[label=Кол-во]').html('Заказ - ' + ov.quan + ' шт.');
+							tr.find('[label=Цена]').html(ov.price);
+							tr.find('[label=Сумма]').html(ov.price * ov.quan);
+							tr.find('[label=Комментарий]').html(ov.comment);
+							$('#modal-container').removeClass('active');
+						}
+					})
+				})
+			}
+		})
+	})
 })

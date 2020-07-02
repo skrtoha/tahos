@@ -15,6 +15,10 @@ a.show_stringLog{
 tr[order_id]{
 	cursor: pointer;
 }
+.modal table input[type=text] {
+    width: 100%;
+    text-align: center;
+}
 #arrived_change > label{
 	display: block;
     text-align: left;

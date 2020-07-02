@@ -1,4 +1,7 @@
-<?require_once('../../core/DataBase.php');
+<?
+use core\OrderValue;
+
+require_once('../../core/DataBase.php');
 
 $db = new core\DataBase();
 $connection = new core\Connection($db);
@@ -154,12 +157,37 @@ switch($_POST['status_id']){
 		echo $count;
 		break;
 	case 'change_draft':
-	$db->update('orders_values', [$_POST['name'] => $_POST['value'] ? $_POST['value'] : null], $where);
+		$db->update('orders_values', [$_POST['name'] => $_POST['value'] ? $_POST['value'] : null], $where);
 		break;
 	case 'to_order':
 		// print_r($_POST); exit();
 		$db->update('orders', ['is_draft' => 0], "`id`={$_POST['order_id']}");
 		$db->update('orders_values', ['status_id' => 5], "`order_id`={$_POST['order_id']}");
+		break;
+	case 'getOrderValue':
+		$array = explode('-', $_POST['osi']);
+		$res = OrderValue::get([
+			'order_id' => $array[0],
+			'store_id' => $array[1],
+			'item_id' => $array[2]
+		]);
+		echo json_encode($res->fetch_assoc());
+		break;
+	case 'editOrderValue':
+		$array = explode('-', $_POST['osi']);
+		OrderValue::update(
+			[
+				'price' => $_POST['price'], 
+				'quan' => $_POST['quan'],
+				'comment' => $_POST['comment']
+			],
+			[
+				'order_id' => $array[0],
+				'store_id' => $array[1],
+				'item_id' => $array[2]
+			]
+		);
+		echo json_encode($_POST);
 		break;
 	default:
 		core\OrderValue::changeStatus($_POST['status_id'], $_POST);

@@ -306,6 +306,9 @@ function show_form($act){
 							<?if ($ov['return_ordered']){?>
 								<a href="/admin/?view=returns&act=form&osi=<?=$ov['order_id']?>-<?=$ov['store_id']?>-<?=$ov['item_id']?>">Заявка на возврат</a>
 							<?}?>
+							<?if (in_array($ov['status_id'], [5, 7])){?>
+								<a class="editOrderValue" href="#" osi="<?=$ov['order_id']?>-<?=$ov['store_id']?>-<?=$ov['item_id']?>">Редактировать</a>
+							<?}?>
 						</td>
 					</tr>
 				<?}?>

@@ -232,7 +232,7 @@ function search_items($flag = ''){
 			ps.cipher AS cipher,
 			i.is_blocked,
 			IF (
-				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.foto != '',
+				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.photo != '',
 				1,
 				0
 			) as is_desc

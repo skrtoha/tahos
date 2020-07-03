@@ -377,10 +377,14 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 	} 
 	if (!$user['show_all_analogies'] && $search_type == 'analogies') $hide_analogies = true;
 	else $hide_analogies = false;
+	if ($search_type == 'analogies'){
+		$selectAnalogies = 'diff.checked, ';
+		$whereAnalogies = 'AND diff.hidden=0';
+	}
 	$q_item = "
 		SELECT
 			diff.item_diff as item_id,
-			diff.checked, 
+			$selectAnalogies
 			si.in_stock,
 			IF(
 				si.packaging != 1,
@@ -431,7 +435,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 		LEFT JOIN #brends b ON b.id=i.brend_id
 		LEFT JOIN #autoeuro_order_keys aok ON aok.item_id = si.item_id AND aok.store_id = si.store_id
 		$join_basket
-		WHERE diff.item_id=$item_id AND diff.hidden=0
+		WHERE diff.item_id=$item_id $whereAnalogies
 	";
 	if ($hide_analogies) $q_item .= ' AND si.item_id IS NOT NULL';
 	if (!empty($filters)){

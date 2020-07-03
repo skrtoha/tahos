@@ -110,7 +110,16 @@ $(function(){
 		$.ajax({
 			type: 'post',
 			url: '/admin/ajax/item.php',
-			data: 'act=analogy_hide&value=' + $(this).val() + '&item_id=' + $('input[name=item_id]').val() + '&checked=' + checked,
+			data: 'act=analogy_hide&value=' + $(this).val() + '&item_id=' + $('input[name=item_id]').val() + '&hidden=' + checked,
+			success: function(response){}
+		})
+	})
+	$('input[name=checked]').on('click', function(){
+		var checked = $(this).is(':checked') ? 1 : 0;
+		$.ajax({
+			type: 'post',
+			url: '/admin/ajax/item.php',
+			data: 'act=analogy_checked&value=' + $(this).val() + '&item_id=' + $('input[name=item_id]').val() + '&checked=' + checked,
 			success: function(response){}
 		})
 	})

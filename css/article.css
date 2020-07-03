@@ -12,6 +12,11 @@ a.sortable.in_stock.asc{
     line-height: 17px;
     width: 80px;
 }
+.icon-checkmark1:before {
+  content: "\ea10";
+    color: #77d077;
+    font-size: 18px;
+}
 table#item_into {
     display: none;
 }
@@ -23,6 +28,9 @@ a.sortable.asc, a.sortable.desc{
 	padding-right: 10px;
 	position: relative;
 	display: block;
+}
+span.icon-checkmark1 {
+    margin-right: 3px;
 }
 a.sortable.asc::after, a.sortable.desc::after{
 	content: '';
@@ -6024,7 +6032,7 @@ span.delete-btn {
 
 .search-result .mobile-layout .goods-header {
 	float: left;
-    width: calc(100% - 50px);
+	width: 100%;
 	position: relative; }
 		.search-result .mobile-layout .goods-header p:first-child {
 			padding-bottom: 0; }
@@ -7560,6 +7568,22 @@ span.delete-btn {
 		.ts-info .note {
 			width: 100%;
 			height: auto; }
+		.mobile-layout	.icon-checkmark1:before{
+			font-size: 25px;;
+		}
+		.mobile-layout .icon-tab:before{
+			font-size: 14px;
+		}
+		.mobile-layout span.icon-tab.wrongAnalogy{
+			position: absolute;
+		    right: 0;
+		   top: 10px;
+		}
+		.mobile-layout .icon-checkmark1{
+			position: absolute;
+		    right: 0;
+		    top: 0;
+		}
 		.ts-info .img-and-name label,
 		.ts-info .img-and-name button {
 			bottom: -320px; }

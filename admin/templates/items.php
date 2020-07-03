@@ -1130,6 +1130,7 @@ function analogies_substitutes($type){
 		SELECT
 			diff.item_diff AS item_id,
 			diff.hidden,
+			diff.checked,
 			i.article,
 			i.title_full,
 			i.barcode,
@@ -1157,6 +1158,7 @@ function analogies_substitutes($type){
 			$i['barcode'] = $r['barcode'];
 			$i['brend'] = $r['brend'];
 			$i['hidden'] = $r['hidden'];
+			$i['checked'] = $r['checked'];
 			if ($r['category_id']) $i['categories'][$r['category_id']] = $r['category'];
 		};
 	}
@@ -1184,6 +1186,7 @@ function analogies_substitutes($type){
 			<td>Категории</td>
 			<?if ($type == 'analogies'){?>
 				<td>Скрыть</td>
+				<td>Проверен</td>
 			<?}?>
 			<td></td>
 		</tr>
@@ -1203,6 +1206,7 @@ function analogies_substitutes($type){
 					</td>
 					<?if ($type == 'analogies'){?>
 						<td label="Скрыть"><input <?=$item['hidden'] ? 'checked' : ''?> name="hidden" type="checkbox" value="<?=$id?>"></td>
+						<td label="Скрыть"><input <?=$item['checked'] ? 'checked' : ''?> name="checked" type="checkbox" value="<?=$id?>"></td>
 					<?}?>
 					<td label=""><a class="<?=$type?>_delete delete_item" href="?view=items&act=<?=$type?>_delete&item_id=<?=$item_id?>&delete_item=<?=$id?>">Удалить</a></td>
 				</tr>

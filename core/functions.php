@@ -380,6 +380,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 	$q_item = "
 		SELECT
 			diff.item_diff as item_id,
+			diff.checked, 
 			si.in_stock,
 			IF(
 				si.packaging != 1,
@@ -499,8 +500,9 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$p['brend'] = $v['brend'];
 		$p['brend_id'] = $v['brend_id'];
 		$p['is_desc'] = $v['is_desc'];
-		$p['foto'] = $v['foto'];
+		$p['photo'] = $v['photo'];
 		$p['item_id'] = $v['item_id'];
+		$p['checked'] = $v['checked'];
 		$list['store_id'] = $v['store_id'];
 		$list['in_stock'] = (int) $v['in_stock'] ? $v['in_stock'] : 'Под заказ';
 		$list['cipher'] = $v['cipher'];

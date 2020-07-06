@@ -1,6 +1,9 @@
 a.sortable{
 	color: white;
 }
+a[store_id]{
+	text-decoration: none;
+}
 table.small-view li.count-block input{
   position: relative;
   top: 0px;
@@ -468,7 +471,8 @@ header .hints a.jspArrow:hover {
 
 .mfp-inline-holder .mfp-content,
 .mfp-ajax-holder .mfp-content {
-	width: 100%;
+	width: auto;
+	background: white;
 	cursor: auto; }
 
 .mfp-ajax-cur {
@@ -484,8 +488,19 @@ header .hints a.jspArrow:hover {
 	cursor: zoom-in; }
 
 .mfp-auto-cursor .mfp-content {
+	padding: 20px;
+	padding-top: 30px;
 	cursor: auto; }
-
+#providerInfo td{
+	padding: 5px 0;
+}
+#providerInfo td:nth-child(2){
+	padding-left: 10px;
+	text-align: left;
+}
+#providerInfo td:nth-child(1){
+	font-weight: 800;
+}
 .mfp-close,
 .mfp-arrow,
 .mfp-preloader,

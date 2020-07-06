@@ -62,4 +62,105 @@ switch($_POST['act']){
 	case 'providerBrendDelete':
 		$db->delete('provider_brends', "`brend_id`={$_POST['brend_id']} AND `provider_id`= {$_POST['provider_id']}");
 		break;
+	case 'getStoreInfo':
+		$storeInfo = core\Provider::getStoreInfo($_POST['store_id']);
+		if ($storeInfo['is_main']) getStoreInfo($storeInfo);
+		else{
+			getProviderInfo($db->select_one('providers', '*', "`id` = {$storeInfo['provider_id']}"));
+		}
+		break;
 }
+function getStoreInfo($storeInfo){?>
+	<table id="providerInfo">
+		<?foreach($storeInfo as $key => $value){
+			if (!$value) continue;?>
+			<tr>
+				<?switch($key){
+					case 'title':?> 
+						<td>Название</td><td><?=$value?></td>
+						<?break;
+					case 'city':?>
+						<td>Город</td><td><?=$value?></td>
+						<?break;
+					case 'provider':?>
+						<td>Поставщик</td><td><?=$value?></td>
+						<?break;
+					case 'cipher':?>
+						<td>Шифр</td><td><?=$value?></td>
+						<?break;
+					case 'delivery':?>
+						<td>Доставка</td><td><?=$value?></td>
+						<?break;
+					case 'delivery_max':?>
+						<td>Максимальный срок	</td><td><?=$value?></td>
+						<?break;
+					case 'under_order':?>
+						<td>Под заказ	</td><td><?=$value?></td>
+						<?break;
+					case 'is_main':?>
+						<td>Основной склад</td><td><?=$value ? 'Да' : 'Нет'?></td>
+						<?break;
+					case 'noReturn':?>
+						<td>Возврат</td><td><?=$value ? 'Да' : 'Нет'?></td>
+						<?break;
+					case 'daysForReturn':?>
+						<td>Кол-во дней возврата</td><td><?=$value?></td>
+						<?break;
+					case 'currency':?>
+						<td>Валюта</td><td><?=$value?></td>
+						<?break;
+				}?>
+			</tr>
+		<?}?>
+	</table>
+<?}
+function getProviderInfo($providerInfo){?>
+	<table id="providerInfo">
+		<?foreach($providerInfo as $key => $value){
+			if (!$value) continue;?>
+			<tr>
+				<?switch($key){
+					case 'title':?> 
+						<td>Название</td><td><?=$value?></td>
+						<?break;
+					case 'email':?>  
+						<td>E-mail</td><td><?=$value?></td>
+						<?break;
+					case 'telephone':?>  
+						<td>Телефон</td><td><?=$value?></td>
+						<?break;
+					case 'telephone_extra':?>  
+						<td>Дополнительный телефон</td><td><?=$value?></td>
+						<?break;
+					case 'ogrn':?>  
+						<td>ОГРН</td><td><?=$value?></td>
+						<?break;
+					case 'okpo':?>  
+						<td>ОКПО</td><td><?=$value?></td>
+						<?break;
+					case 'inn':?> 
+						<td>ИНН</td><td><?=$value?></td>
+						<?break;
+					case 'legal_index':?>  
+						<td>Юридический адрес: индекс</td><td><?=$value?></td>
+						<?break;
+					case 'legal_region':?>  
+						<td>Юридический адрес: регион</td><td><?=$value?></td>
+						<?break;
+					case 'legal_adres':?>  
+						<td>Юридический адрес: адрес</td><td><?=$value?></td>
+						<?break;
+					case 'fact_index':?>  
+						<td>Фактический адрес: индекс</td><td><?=$value?></td>
+						<?break;
+					case 'fact_region':?>  
+						<td>Фактический адрес: регион</td><td><?=$value?></td>
+						<?break;
+					case 'fact_adres':?>  
+						<td>Фактический адрес: адрес</td><td><?=$value?></td>
+						<?break;
+				}?>
+			</tr>
+		<?}?>
+	</table>
+<?}

@@ -219,16 +219,16 @@ abstract class Provider{
 		if (isset($storeInfo[$store_id])) return $storeInfo[$store_id];
 		$res = self::getInstanceDataBase()->query("
 			SELECT
-				ps.id, 
-				ps.title,
-				ps.cipher,
-				ps.percent,
-				ps.provider_id,
-				c.rate
+				ps.*,
+				p.title AS provider,
+				c.rate,
+				c.title AS currency
 			FROM
 				#provider_stores ps
 			LEFT JOIN
 				#currencies c ON c.id = ps.currency_id
+			LEFT JOIN
+				#providers p ON p.id = ps.provider_id
 			WHERE
 				ps.id = $store_id
 		", $params['flag']);

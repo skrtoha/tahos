@@ -1,1 +1,4 @@
 ALTER TABLE `tahos_users` ADD `credit_limit` INT(10) UNSIGNED NOT NULL DEFAULT '25000' AFTER `isAutomaticOrder`;
+
+ALTER TABLE `tahos_users` ADD `isProvider` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `isAutomaticOrder`;
+

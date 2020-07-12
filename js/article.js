@@ -158,7 +158,6 @@ function setNewValue(obj){
 	setNewValueAjax(obj);
 }
 function store_items(store_items, user, search_type = null){
-	user.isProvider = + user.isProvider;
 	var isInBasket = window.isInBasket(store_items);
 	/**
 	 * adds to class if no items exists in basket
@@ -283,16 +282,10 @@ function store_items(store_items, user, search_type = null){
 						'<li ' + si.prevails[p].noReturn + '>';
 				mobile +=
 						'<li ' + si.prevails[p].noReturn + '>'; + si.prevails[p].cipher + '</li>';
-						if (user.isProvider){
-							full +=
-								'<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
-							mobile +=
-								'<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
-						}
-						else{
-							full += si.prevails[p].cipher;
-							mobile += si.prevails[p].cipher; 
-						}
+				full +=
+							'<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
+				mobile +=
+							'<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
 						full += '</li>';
 						mobile += '</li>';
 			} 
@@ -308,27 +301,15 @@ function store_items(store_items, user, search_type = null){
 			mobile +=
 							'<ul>' +
 								'<li ' + si_price.noReturn + '>'; 
-			if (user.isProvider){
-				full += '<a href="" store_id="' + si_price.store_id + '">' + si_price.cipher + '</a>';
-				mobile += '<a href="" store_id="' + si_price.store_id + '">' + si_price.cipher + '</a>';
-			}
-			else{
-				full += si_price.cipher;
-				mobile += si_price.cipher;
-			}
+			full += '<a href="" store_id="' + si_price.store_id + '">' + si_price.cipher + '</a>';
+			mobile += '<a href="" store_id="' + si_price.store_id + '">' + si_price.cipher + '</a>';
 			full += '</li>';
 			mobile += '</li>';
 			if (si_delivery){
 				full += 
 								'<li ' + si_delivery.noReturn + '>';
-				if (user.isProvider){
-					full += '<a href="" store_id="' + si_delivery.store_id + '">' + si_delivery.cipher + '</a>';
-					mobile += '<a href="" store_id="' + si_delivery.store_id + '">' + si_delivery.cipher + '</a>';
-				}
-				else{
-					full += si_delivery.cipher;
-					mobile += si_delivery.cipher;
-				}
+				full += '<a href="" store_id="' + si_delivery.store_id + '">' + si_delivery.cipher + '</a>';
+				mobile += '<a href="" store_id="' + si_delivery.store_id + '">' + si_delivery.cipher + '</a>';
 				full += '</li>';
 				mobile += '</li>';
 			}
@@ -720,10 +701,7 @@ function store_items(store_items, user, search_type = null){
 					for (var p in si.prevails){
 						full +=
 							'<li ' + si.prevails[p].noReturn + '>'; 
-						if (user.isProvider){
-							full += '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
-						}
-						else full += si.prevails[p].cipher;
+						full += '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
 						full += '</li>'
 					} 
 				full += 
@@ -740,10 +718,7 @@ function store_items(store_items, user, search_type = null){
 				for (var p in si.prevails){
 					mobile +=
 								'<li ' + si.prevails[p].noReturn + '>';
-					if (user.isProvider){
-						mobile += '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
-					}
-					else mobile += si.prevails[p].cipher;
+					mobile += '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
 					mobile += '</li>';
 				} 
 				mobile += 
@@ -756,14 +731,8 @@ function store_items(store_items, user, search_type = null){
 						'<li ' + si.list[k].noReturn + '>'; 
 				mobile +=
 							'<li ' + si.list[k].noReturn + '>';
-				if (user.isProvider){
-					full += '<a href="" store_id="' + si.list[k].store_id + '">' + si.list[k].cipher + '</a>';
-					mobile += '<a href="" store_id="' + si.list[k].store_id + '">' + si.list[k].cipher + '</a>';
-				}
-				else{
-					full += si.list[k].cipher;
-					mobile += si.list[k].cipher;
-				}
+				full += '<a href="" store_id="' + si.list[k].store_id + '">' + si.list[k].cipher + '</a>';
+				mobile += '<a href="" store_id="' + si.list[k].store_id + '">' + si.list[k].cipher + '</a>';
 			} 
 			full +=
 					'</ul>' +

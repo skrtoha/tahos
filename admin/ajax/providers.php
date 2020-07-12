@@ -1,4 +1,6 @@
-<?require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
+<?
+session_start();
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 
 $db = new core\DataBase();
@@ -69,11 +71,12 @@ switch($_POST['act']){
 		$db->delete('provider_brends', "`brend_id`={$_POST['brend_id']} AND `provider_id`= {$_POST['provider_id']}");
 		break;
 	case 'getStoreInfo':
-		$storeInfo = core\Provider::getStoreInfo($_POST['store_id']);
-		if ($storeInfo['is_main']) getStoreInfo($storeInfo);
-		else{
-			getProviderInfo($db->select_one('providers', '*', "`id` = {$storeInfo['provider_id']}"));
+		$storeInfo = core\Provider::getStoreInfo($_POST['store_id'], ['flag' => '']);
+		$user = core\User::get($_SESSION['user']);
+		if(!$user['showProvider']){
+			unset($storeInfo['provider'], $storeInfo['title']);
 		}
+		getStoreInfo($storeInfo);
 		break;
 }
 function getStoreInfo($storeInfo){?>
@@ -82,14 +85,14 @@ function getStoreInfo($storeInfo){?>
 			if (!$value) continue;?>
 			<tr>
 				<?switch($key){
+					case 'provider':?>
+						<td>Поставщик</td><td><?=$value?></td>
+						<?break;
 					case 'title':?> 
 						<td>Название</td><td><?=$value?></td>
 						<?break;
 					case 'city':?>
 						<td>Город</td><td><?=$value?></td>
-						<?break;
-					case 'provider':?>
-						<td>Поставщик</td><td><?=$value?></td>
 						<?break;
 					case 'cipher':?>
 						<td>Шифр</td><td><?=$value?></td>
@@ -114,56 +117,6 @@ function getStoreInfo($storeInfo){?>
 						<?break;
 					case 'currency':?>
 						<td>Валюта</td><td><?=$value?></td>
-						<?break;
-				}?>
-			</tr>
-		<?}?>
-	</table>
-<?}
-function getProviderInfo($providerInfo){?>
-	<table id="providerInfo">
-		<?foreach($providerInfo as $key => $value){
-			if (!$value) continue;?>
-			<tr>
-				<?switch($key){
-					case 'title':?> 
-						<td>Название</td><td><?=$value?></td>
-						<?break;
-					case 'email':?>  
-						<td>E-mail</td><td><?=$value?></td>
-						<?break;
-					case 'telephone':?>  
-						<td>Телефон</td><td><?=$value?></td>
-						<?break;
-					case 'telephone_extra':?>  
-						<td>Дополнительный телефон</td><td><?=$value?></td>
-						<?break;
-					case 'ogrn':?>  
-						<td>ОГРН</td><td><?=$value?></td>
-						<?break;
-					case 'okpo':?>  
-						<td>ОКПО</td><td><?=$value?></td>
-						<?break;
-					case 'inn':?> 
-						<td>ИНН</td><td><?=$value?></td>
-						<?break;
-					case 'legal_index':?>  
-						<td>Юридический адрес: индекс</td><td><?=$value?></td>
-						<?break;
-					case 'legal_region':?>  
-						<td>Юридический адрес: регион</td><td><?=$value?></td>
-						<?break;
-					case 'legal_adres':?>  
-						<td>Юридический адрес: адрес</td><td><?=$value?></td>
-						<?break;
-					case 'fact_index':?>  
-						<td>Фактический адрес: индекс</td><td><?=$value?></td>
-						<?break;
-					case 'fact_region':?>  
-						<td>Фактический адрес: регион</td><td><?=$value?></td>
-						<?break;
-					case 'fact_adres':?>  
-						<td>Фактический адрес: адрес</td><td><?=$value?></td>
 						<?break;
 				}?>
 			</tr>

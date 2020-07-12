@@ -36,8 +36,8 @@ $inBasket = json_encode(getInBasket($basket));
 					<td class="name-col" style="padding-top: 20px;text-align:left">
 						<?$class = '';
 							if($si['is_desc'] || $si['foto']){
-								if($si['is_desc']) $class ='fa-cog';
-								if ($si['foto']) $class = 'fa-camera';?>
+								if ($si['is_desc']) $class ='fa-cog';
+								if ($si['photo']) $class = 'fa-camera';?>
 								<a href="#">
 									<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
 								</a>
@@ -244,7 +244,7 @@ $inBasket = json_encode(getInBasket($basket));
 							<?$class = '';
 							if($si['is_desc'] || $si['foto']){
 								if($si['is_desc']) $class ='fa-cog';
-								if ($si['foto']) $class = 'fa-camera';?>
+								if ($si['photo']) $class = 'fa-camera';?>
 								<a href="#">
 									<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
 								</a>

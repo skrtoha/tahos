@@ -403,11 +403,6 @@ $(document).ready(function(e){
 			$.cookie('message_type', 'ok', cookieOptions);
 		}
 	})
-	$('.hide').on('click', function(e){
-		e.preventDefault();
-		if ($(this).html() == "Показать") $(this).html('Скрыть').next().show();
-		else $(this).html('Показать').next().hide();
-	})
 	$('.filter_title, .filter_pos').on('click', function(e){
 		e.preventDefault();
 		th = $(this);

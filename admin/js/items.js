@@ -6,6 +6,11 @@ $(function(){
 			show_message('Поиск по id содержит неккоректные данные!', 'error');
 		}
 	})
+	$('.hide').on('click', function(e){
+		e.preventDefault();
+		if ($(this).html() == "Показать") $(this).html('Скрыть').next().show();
+		else $(this).html('Показать').next().hide();
+	})
 	$('.category_item .item_filter').on('click', function(e){
 		e.preventDefault();
 		var th = $(this);

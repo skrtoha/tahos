@@ -402,6 +402,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			ps.cipher,
 			ps.provider_id,
 			ps.id as store_id,
+			ps.workSchedule,
 			IF (
 				i.article_cat != '', 
 				i.article_cat, 
@@ -417,7 +418,6 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 				ELSE
 					IF (si.in_stock = 0, ps.under_order, ps.delivery) 
 			END AS delivery,
-			DATE_FORMAT(DATE_ADD(CURDATE(), Interval @delivery DAY), '%d.%m') AS delivery_date,
 			ps.prevail,
 			ps.noReturn,
 			CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100 $userDiscount) as price,
@@ -507,13 +507,13 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$p['photo'] = $v['photo'];
 		$p['item_id'] = $v['item_id'];
 		$p['checked'] = $v['checked'];
+		$list['delivery_date'] = core\Provider::getDiliveryDate(json_decode($v['workSchedule'], true), $v['delivery']);
 		$list['store_id'] = $v['store_id'];
 		$list['in_stock'] = (int) $v['in_stock'] ? $v['in_stock'] : 'Под заказ';
 		$list['cipher'] = $v['cipher'];
 		$list['packaging'] = $v['packaging'];
 		$list['packaging_text'] = $v['packaging_text'];
 		$list['delivery'] = $v['delivery'];
-		$list['delivery_date'] = $v['delivery_date'];
 		$list['price'] = $v['price'];
 		$list['in_basket'] = $v['in_basket'];
 		$list['prevail'] = $v['prevail'];
@@ -529,7 +529,6 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$prices[] = $v['price'];
 		$deliveries[] = $v['delivery'];
 	}
-	// debug($store_items);
 	foreach($store_items as $key => $value){
 		$p = & $store_items[$key];
 		if (!empty($p['list'])) $p['list'] = array_merge($p['list']);

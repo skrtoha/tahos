@@ -10,6 +10,7 @@ var store = {
 	delivery_max: '',
 	under_order: '',
 	prevail: '',
+	workSchedule: '',
 	noReturn: 0
 };
 var reg_interger = /^\d+$/;
@@ -100,6 +101,12 @@ function get_str_form(){
 				 	'<td><input type="text" name="daysForReturn" value="' + store.daysForReturn + '" /></td>' +
 			 	'</tr>' +
 			 	'<tr>' +
+				 	'<td>График выходных</td>' +
+				 	'<td>' +
+				 		get_str_work_schedule(store.workSchedule) +
+				 	'</td>' +
+			 	'</tr>' +
+			 	'<tr>' +
 				 	'<td>Основной склад</td>' +
 				 	'<td><input type="checkbox" name="is_main" ' + store.is_main + ' value="1"></td>' +
 			 	'</tr>' +
@@ -115,6 +122,46 @@ function get_str_form(){
 	 		'</table>' +
 		'</form>';
 	return str;
+}
+function get_str_work_schedule(jsonWorkSchedule){
+	let workSchedule = jsonWorkSchedule ? JSON.parse(jsonWorkSchedule) : false;
+	checked1 = workSchedule && workSchedule[1] ? 'checked' : '';
+	checked2 = workSchedule && workSchedule[2] ? 'checked' : '';
+	checked3 = workSchedule && workSchedule[3] ? 'checked' : '';
+	checked4 = workSchedule && workSchedule[4] ? 'checked' : '';
+	checked5 = workSchedule && workSchedule[5] ? 'checked' : '';
+	checked6 = workSchedule && workSchedule[6] ? 'checked' : '';
+	checked7 = workSchedule && workSchedule[7] ? 'checked' : '';
+	output = 
+		'<label class="workSchedule">' + 
+			'<span>Пн</span>' +
+			'<input ' + checked1 + ' value="1" name="workSchedule[1]" type="checkbox">' +
+		'</label>' +
+		'<label class="workSchedule">' + 
+			'<span>Вт</span>' +
+			'<input ' + checked2 + ' value="1" name="workSchedule[2]" type="checkbox">' +
+		'</label>' +
+		'<label class="workSchedule">' + 
+			'<span>Ср</span>' +
+			'<input ' + checked3 + ' value="1" name="workSchedule[3]" type="checkbox">' +
+		'</label>' +
+		'<label class="workSchedule">' + 
+			'<span>Чт</span>' +
+			'<input ' + checked4 + ' value="1" name="workSchedule[4]" type="checkbox">' +
+		'</label>' +
+		'<label class="workSchedule">' + 
+			'<span>Пт</span>' +
+			'<input ' + checked5 + ' value="1" name="workSchedule[5]" type="checkbox">' +
+		'</label>' +
+		'<label class="workSchedule">' + 
+			'<span>Сб</span>' +
+			'<input ' + checked6 + ' value="1" name="workSchedule[6]" type="checkbox">' +
+		'</label>' +
+		'<label class="workSchedule">' + 
+			'<span>Вс</span>' +
+			'<input ' + checked7 + ' value="1" name="workSchedule[7]" type="checkbox">' +
+		'</label>';
+	return output;
 }
 function set_empty_store(){
 	store = {

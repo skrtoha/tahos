@@ -418,8 +418,8 @@ function item($act){
 				<div class="field">
 					<div class="title">Фото</div>
 					<div class="value">
-						<a href="" class="hide">Показать</a>
-						<div style="display: none; margin-top: 10px">
+						<a href="" class="hide">Скрыть</a>
+						<div style="display: block; margin-top: 10px">
 							<ul class="photo" id="photos">
 								<?$photoNames = scandir(core\Config::$imgPath . "/items/small/{$_GET['id']}/");
 								$i = -1;

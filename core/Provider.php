@@ -74,6 +74,36 @@ abstract class Provider{
 		if (isset($params['provider_id'])) return 
 			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE provider_id = {$params['provider_id']}", '');
 	}
+	public static function getDiliveryDate($workSchedule, $deliveryDays){
+		if (empty($workSchedule)){
+			return self::addDaysToCurrentDate($deliveryDays);
+		}
+		$daysForAdd = 0;
+		$i = 0;
+		while($i < $deliveryDays){
+			$daysForAdd++;
+			$i++;
+			if (self::isDayOff($workSchedule)) $i--;
+		}
+		return self::addDaysToCurrentDate($daysForAdd);
+	}
+	public static function addDaysToCurrentDate($days){
+		$dateTime = new \DateTime();
+		$dateTime->add(new \DateInterval('P' . $days . 'D'));
+		return $dateTime->format('d.m');
+	}
+	private static function isDayOff($workSchedule)
+	{
+		static $counter;
+		if (!$counter){
+			$dateTime = new \DateTime();
+			$counter = $dateTime->format('N');
+		} 
+		$output = $workSchedule[$counter];
+		$counter++;
+		if ($counter > 7) $counter = 1;
+		return $output;
+	}
 	public function addToProviderBasket($ov){
 		self::getInstanceDataBase()->insert('provider_basket', [
 			'order_id' => $ov['order_id'],

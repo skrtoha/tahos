@@ -11,6 +11,11 @@ switch($_POST['act']){
 		echo json_encode($store);
 		break;
 	case 'store_change';
+		$workSchedule = [];
+		for($i = 1; $i <= 7; $i++){
+			if(isset($_POST['workSchedule'][$i])) $workSchedule[$i] = 1;
+			else $workSchedule[$i] = 0;
+		}
 		$array = [
 			'title' => $_POST['title'],
 			'cipher' => strtoupper($_POST['cipher']),
@@ -22,9 +27,10 @@ switch($_POST['act']){
 			'delivery_max' => $_POST['delivery_max'],
 			'under_order' => $_POST['under_order'],
 			'daysForReturn' => $_POST['daysForReturn'],
+			'workSchedule' => json_encode($workSchedule),
 			'prevail' => $_POST['prevail'] ? 1 : 0,
 			'noReturn' => $_POST['noReturn'] ? 1 : 0,
-			'is_main' => $_POST['is_main'] ? 1 : 0
+			'is_main' => $_POST['is_main'] ? 1 : 0,
 		];
 		if ($_POST['store_id']) $res = $db->update(
 			'provider_stores',

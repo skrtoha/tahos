@@ -8,7 +8,6 @@ function set_tabs(){
 	$.ionTabs("#search-result-tabs",{
 		type: "none",
 		onChange: function(obj){
-			// console.log(hidable_form);
 			switch(obj.tab){
 				case 'Tab_1': 
 					var search_type = "articles"; 
@@ -29,7 +28,6 @@ function set_tabs(){
 			if (search_type == 'substitutes' || search_type == 'analogies' || search_type == 'complects'){
 				var item_id = $('#item_id').val();
 				var data = "item_id=" + item_id + "&search_type=" + search_type;
-				// console.log(data);
 				$.ajax({
 					type: "POST",
 					url: "/ajax/article_filter.php",
@@ -244,10 +242,10 @@ function store_items(store_items, user, search_type = null){
 			mobile += '<span title="Проверенный аналог" class="icon-checkmark1"></span>';
 			full += '<span title="Проверенный аналог" class="icon-checkmark1"></span>';
 		}
-		if (+si.is_desc || si.foto){
+		if (+si.is_desc || si.photo){
 			var stringClass = '';
 			if (si.is_desc) stringClass = 'fa-cog';
-			if (si.foto) stringClass = 'fa-camera';
+			if (si.photo) stringClass = 'fa-camera';
 			full +=
 					'<a title="Информация о товаре" href="#">' +
 						'<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +
@@ -699,10 +697,10 @@ function store_items(store_items, user, search_type = null){
 			if (si.checked == '1'){
 				full += '<span title="Проверенный аналог" class="icon-checkmark1"></span>';
 			}
-			if (+si.is_desc || si.foto){
+			if (+si.is_desc || si.photo){
 				var stringClass = '';
 				if (si.is_desc) stringClass = 'fa-cog';
-				if (si.foto) stringClass = 'fa-camera';
+				if (si.photo) stringClass = 'fa-camera';
 				mobile +=
 					'<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
 				full +=
@@ -1317,7 +1315,6 @@ $(function(){
 				store_id: th.attr('store_id')
 			},
 			success: function(response){
-				console.log(response);
 				$.magnificPopup.open({
 					items: {
 						src: response,

@@ -52,7 +52,7 @@
 									$.ionTabs(".product-popup-tabs",{
 										type: "none"
 									});
-									$(".ionTabs__tab:first-child").click();
+									$("#Button__product-popup-tabs__Tab_1_name").click();
 									$('#gallery').owlCarousel({
 										loop: true,
 										margin: 5,

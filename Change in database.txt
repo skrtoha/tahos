@@ -2,3 +2,46 @@ ALTER TABLE `tahos_users` ADD `credit_limit` INT(10) UNSIGNED NOT NULL DEFAULT '
 
 ALTER TABLE `tahos_users` ADD `isProvider` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `isAutomaticOrder`;
 
+ALTER TABLE `tahos_provider_stores` ADD `workSchedule` JSON NULL DEFAULT NULL AFTER `daysForReturn`;
+
+set @workSchedule = '{
+    "Friday": 0,
+    "Monday": 0,
+    "Sunday": 1,
+    "Tuesday": 0,
+    "Saturday": 1,
+    "Thuesday": 0,
+    "Wednesday": 0
+}';
+
+DROP FUNCTION IF EXISTS isDayOff;
+
+DELIMITER //
+
+CREATE FUNCTION isDayOff(workSchedule JSON, currentDayWeek INT)
+RETURNS varchar(1000)
+DETERMINISTIC
+BEGIN
+	SET @output = 1000;
+	CREATE TEMPORARY TABLE tmp(
+    	num int(1),
+        title varchar(10),
+        isDayOff varchar(1)
+    );
+    #INSERT INTO tmp VALUES(
+    	#1, "Monday", JSON_EXTRACT(workSchedule, "$.Monday"),
+        #2, "Tuesday", JSON_EXTRACT(workSchedule, "$.Tuesday"),
+       # 3, "Wednesday", JSON_EXTRACT(workSchedule, "$.Wednesday"),
+        #4, "Thuesday", JSON_EXTRACT(workSchedule, "$.Thuesday"),
+        #5, "Friday", JSON_EXTRACT(workSchedule, "$.Friday"),
+        #6, "Saturday", JSON_EXTRACT(workSchedule, "$.Saturday"),
+        #7, "Sunday", JSON_EXTRACT(workSchedule, "$.Sunday")
+    #);
+    #SELECT isDayOff INTO @output FROM tmp WHERE num = 1;
+	RETURN @output;
+END//
+
+DELIMITER ;
+
+
+#SELECT isDayOff(@workSchedule, 3);

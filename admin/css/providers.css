@@ -7,6 +7,9 @@ tr.store{
 form input[type=submit]{
 	margin: 0 auto;
 }
+label.workSchedule span {
+    display: block;
+}
 .hidden{
 	display: none;
 }

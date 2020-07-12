@@ -134,7 +134,7 @@ class Autokontinent extends Provider{
 			]);
 			if ($res === true){
 				$item_id = parent::getInstanceDataBase()->last_id();
-				parent::getInstanceDataBase()->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id];
+				parent::getInstanceDataBase()->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			}
 			else {
 				$item = Item::get($brend_id, $part->part_code);

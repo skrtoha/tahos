@@ -43,7 +43,7 @@ if ($_POST['items_submit']){
 		}
 		if (!$value[1] && !$value[2]) $article = trim($value[3]);
 		elseif (!$value[1]) $article = article_clear($value[2]);
-		else $article = trim($article[1]);
+		else $article = trim($value[1]);
 		if (!$article){
 			$log->debug("для строки $r value=", $value);
 			$log->info("для строки $r article=$article");

@@ -32,7 +32,7 @@ if ($_POST['form_submit']){
 	if (!isset($array['show_all_analogies'])) $array['show_all_analogies'] = 0;
 	if (!isset($array['bonus_program'])) $array['bonus_program'] = 0;
 	if (!isset($array['allow_request_delete_item'])) $array['allow_request_delete_item'] = 0;
-	if (!isset($array['isProvider'])) $array['isProvider'] = 0;
+	if (!isset($array['showProvider'])) $array['showProvider'] = 0;
 	// debug($array, 'array'); //exit();
 	if ($array['user_type'] == 'entity' and !$array['organization_name']){
 		message('Введите название организации!', false);
@@ -353,11 +353,11 @@ function show_form($act){
 					</div>
 				</div>
 				<div class="field">
-					<div class="title">Является поставщиком</div>
+					<div class="title">Показывать поставщика</div>
 					<div class="value">
-						<?if ($_POST['isProvider']) $checked = $_POST['isProvider'] ? 'checked' : '';
-						else $checked = $user['isProvider'] ? 'checked' : '';?>
-						<input type="checkbox" name="isProvider" <?=$checked?> value="1">
+						<?if ($_POST['showProvider']) $checked = $_POST['showProvider'] ? 'checked' : '';
+						else $checked = $user['showProvider'] ? 'checked' : '';?>
+						<input type="checkbox" name="showProvider" <?=$checked?> value="1">
 					</div>
 				</div>
 				<div class="field">

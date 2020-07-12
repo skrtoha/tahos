@@ -50,11 +50,7 @@ $inBasket = json_encode(getInBasket($basket));
 							<ul class="prevail">
 								<?foreach($si['prevails'] as $value){?>
 									<li>
-										<?if ($user['isProvider']){?>
-											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
-										<?}else{?>
-											<?=$value['cipher']?>
-										<?}?>
+										<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 									</li>
 								<?}?>
 							</ul>
@@ -62,19 +58,11 @@ $inBasket = json_encode(getInBasket($basket));
 						<?if (!empty($si_price)){?>
 							<ul>
 								<li <?=$si_price['noReturn']?>>
-									<?if ($user['isProvider']){?>
-										<a href="" store_id="<?=$si_price['store_id']?>"><?=$si_price['cipher']?></a>
-									<?}else{?>
-										<?=$si_price['cipher']?>
-									<?}?>
+									<a href="" store_id="<?=$si_price['store_id']?>"><?=$si_price['cipher']?></a>
 								</li>
 								<?if (!empty($si_delivery)){?>
 									<li <?=$si_delivery['noReturn']?>>
-										<?if ($user['isProvider']){?>
-											<a href="" store_id="<?=$si_delivery['store_id']?>"><?=$si_delivery['cipher']?></a>
-										<?}else{?>
-											<?=$si_delivery['cipher']?>
-										<?}?>
+										<a href="" store_id="<?=$si_delivery['store_id']?>"><?=$si_delivery['cipher']?></a>
 									</li>
 								<?}?>
 							</ul>
@@ -257,11 +245,7 @@ $inBasket = json_encode(getInBasket($basket));
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<?if ($user['isProvider']){?>
-												<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
-											<?}else{?>
-												<?=$value['cipher']?>
-											<?}?>
+											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 										</li>
 									<?}?>
 								</ul>
@@ -269,11 +253,7 @@ $inBasket = json_encode(getInBasket($basket));
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
 									<li <?=$value['noReturn']?>>
-										<?if ($user['isProvider']){?>
-											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
-										<?}else{?>
-											<?=$value['cipher']?>
-										<?}?>
+										<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 									</li>
 								<?}?>
 							</ul>
@@ -456,11 +436,7 @@ else{?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<?if ($user['isProvider']){?>
-												<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
-											<?}else{?>
-												<?=$value['cipher']?>
-											<?}?>
+											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 										</li>
 									<?}?>
 								</ul>
@@ -468,19 +444,11 @@ else{?>
 							<?if (!empty($si_price)){?>
 								<ul>
 									<li>
-										<?if ($user['isProvider']){?>
-											<a href="" store_id="<?=$si_price['store_id']?>"><?=$si_price['cipher']?></a>
-										<?}else{?>
-											<?=$si_price['cipher']?>
-										<?}?>
+										<a href="" store_id="<?=$si_price['store_id']?>"><?=$si_price['cipher']?></a>
 									</li>
 									<?if (!empty($si_delivery)){?>
 										<li>
-											<?if ($user['isProvider']){?>
-												<a href="" store_id="<?=$si_delivery['store_id']?>"><?=$si_delivery['cipher']?></a>
-											<?}else{?>
-												<?=$si_delivery['cipher']?>
-											<?}?>
+											<a href="" store_id="<?=$si_delivery['store_id']?>"><?=$si_delivery['cipher']?></a>
 										</li>
 									<?}?>
 								</ul>
@@ -636,11 +604,7 @@ else{?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<?if ($user['isProvider']){?>
-												<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
-											<?}else{?>
-												<?=$value['cipher']?>
-											<?}?>
+											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 										</li>
 									<?}?>
 								</ul>
@@ -648,11 +612,7 @@ else{?>
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
 									<li>
-										<?if ($user['isProvider']){?>
-											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
-										<?}else{?>
-											<?=$value['cipher']?>
-										<?}?>
+										<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 									</li>
 								<?}?>
 							</ul>

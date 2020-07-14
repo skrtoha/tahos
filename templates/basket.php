@@ -127,7 +127,7 @@ $noReturnIsExists = false;
 					</td>
 					<td>
 						<b class="brend_info" brend_id="<?=$val['brend_id']?>"><?=$val['brend']?></b> 
-						<a class="articul" href="<?=core\Item::getHrefArticle($val['article'])?>"> <?=$val['article']?></a>
+						<a class="articul" href="<?=core\Item::getHrefArticle($val['article'])?>"> <?=$val['article_cat'] ? $val['article_cat'] : $val['article']?></a>
 					</td>
 					<td  style="text-align: left; padding-left: 10px">
 						<?if ($user_id){

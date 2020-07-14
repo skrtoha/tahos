@@ -7,15 +7,8 @@ class Basket{
 		return $GLOBALS['db']->query("
 			SELECT 
 			b.*,
-			IF (
-				i.article_cat != '', 
-				i.article_cat, 
-				IF (
-					i.article !='',
-					i.article,
-					i.barcode
-				)
-			) AS article,
+			i.article,
+			i.article_cat,
 			i.brend_id,
 			br.title AS brend,
 			IF(pb.title IS NOT NULL, pb.title, br.title) AS provider_brend,

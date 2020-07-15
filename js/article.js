@@ -1274,6 +1274,7 @@ $(function(){
 		})
 	})
 	$(document).on('click', 'a[store_id]', function(e){
+		return false;
 		e.preventDefault();
 		let th = $(this);
 		$.ajax({

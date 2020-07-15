@@ -49,7 +49,7 @@ a.sortable.desc::after{
 span[class^=icon]{
 	cursor: pointer;
 }
-.noReturn{
+.noReturn > a{
 	cursor: pointer;
 	color: red;
 	font-weight: 800;

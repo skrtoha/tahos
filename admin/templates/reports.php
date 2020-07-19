@@ -101,6 +101,32 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			foreach($res_purchaseability as $value) $output[] = $value;
 			echo json_encode($output);
 			break;
+		case 'remainsMainStore':
+			$output = [];
+			$res = $db->query("
+				SELECT
+					i.brend_id,
+					b.title AS brend,
+					i.article,
+					i.article_cat,
+					i.title_full,
+					si.in_stock,
+					si.price
+				FROM 
+					#store_items si
+				LEFT JOIN
+					#items i ON i.id = si.item_id
+				LEFT JOIN
+					#brends b ON b.id = i.brend_id
+				WHERE
+					si.in_stock <= {$_POST['quan']} AND
+					si.store_id = " . core\Provider\Tahos::$store_id . "
+			", '');
+			if ($res->num_rows){
+				foreach($res as $value) $output[] = $value;
+			}
+			echo json_encode($output);
+			break;
 	}
 	exit();
 }?>
@@ -111,6 +137,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		<li class="ionTabs__tab" data-target="wrongAnalogy">Неправильный аналог</li>
 		<li class="ionTabs__tab" data-target="request_delete_item">Удаление товара</li>
 		<li class="ionTabs__tab" data-target="purchaseability">Покупаемость</li>
+		<li class="ionTabs__tab" data-target="remainsMainStore">Остатки</li>
 	</ul>
 	<div class="ionTabs__body">
 		<div class="ionTabs__item" data-name="nomenclature"></div>
@@ -133,6 +160,23 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 						<td>Название</td>
 						<td>Заказов</td>
 						<td>На складе</td>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div class="ionTabs__item" data-name="remainsMainStore">
+			<form>
+				Количество меньше, чем: <input type="text" name="quan" value="1">
+				<input type="submit" value="Сформировать отчет">
+			</form>
+			<table class="t_table" cellspacing="1">
+				<thead>
+					<tr class="head">
+						<td>Бренд</td>
+						<td>Артикул</td>
+						<td>Название</td>
+						<td>Остаток</td>
 					</tr>
 				</thead>
 				<tbody></tbody>

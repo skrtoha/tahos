@@ -107,3 +107,6 @@ div[data-name=purchaseability] table{
 div[data-name=purchaseability] input.datetimepicker{
     width: 115px;
 }
+[data-name=remainsMainStore] table{
+    margin-top: 10px;
+}

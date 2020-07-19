@@ -114,7 +114,8 @@ class LeftMenu{
 			'Бренды' => 'reports&tab=brends',
 			'Неправильный аналог' => 'reports&tab=wrongAnalogy',
 			'Удаление товара' => 'reports&tab=request_delete_item',
-			'Покупаемость' => 'reports&tab=purchaseability'
+			'Покупаемость' => 'reports&tab=purchaseability',
+			'Остатки на основном складе' => 'reports&tab=remainsMainStore'
 		],
 		'Номенклатура' => 'items',
 		'Доставки' => 'sendings',

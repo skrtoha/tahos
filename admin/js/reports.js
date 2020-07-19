@@ -9,6 +9,7 @@ $(function(){
 				window.history.pushState(null, null,  '/admin/?view=reports&tab=' + get.tab + '#tabs|reports:' + get.tab)
 			}
 			this.setTabs();
+			this.remainsMainStore.init();
 			$(document).on('click', 'a.clearLog', function(e){
 				e.preventDefault();
 				var th = $(this);
@@ -31,7 +32,7 @@ $(function(){
 					}
 				})
 			})
-			$(document).on('submit', 'form', function(e){
+			$(document).on('submit', '[data-name=nomenclature] form', function(e){
 				e.preventDefault();
 				var data = $(this).serializeArray();
 				$.ajax({
@@ -150,6 +151,7 @@ $(function(){
 									reports.parsePurchaseability(items);
 									reports.setDateTimePicker();
 									break;
+								case 'remainsMainStore': break;
 								default:
 									$('div[data-name=' + obj.tab + ']').html(response);
 							}
@@ -171,6 +173,36 @@ $(function(){
 						'<td>' + items[key].tahos_in_stock + '</td> ' +
 					'</tr>'
 				);
+			}
+		},
+		remainsMainStore: {
+			selector: '[data-name=remainsMainStore]',
+			init: function(){
+				$(document).on('click', reports.remainsMainStore.selector + ' form', function(e){
+					e.preventDefault();
+					$.ajax({
+						type: 'post',
+						url: reports.ajaxUrl,
+						data: {
+							tab: 'remainsMainStore',
+							quan: $(reports.remainsMainStore.selector + ' input[name=quan]').val()
+						},
+						success: function(response){
+							let items = JSON.parse(response);
+							$(reports.remainsMainStore.selector + ' table tbody').empty();
+							$.each(items, function(i, item){
+								$(reports.remainsMainStore.selector + ' table tbody').append(
+									'<tr>' +
+										'<td>' + item.brend + '</td>' +
+										'<td>' + item.article_cat + '</td>' +
+										'<td>' + item.title_full + '</td>' +
+										'<td>' + item.in_stock + '</td>' +
+									'</tr>'
+								);
+							})
+						}
+					})
+				})
 			}
 		}
 	}

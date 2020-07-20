@@ -11,7 +11,7 @@ $armtek = new core\Provider\Armtek($db);
 $armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
 $rossko = new core\Provider\Rossko($db);
-$rossko->execute("{$abcp->item['article']} {$abcp->item['brand']}");
+$rossko->execute("{$abcp->item['brand']} {$abcp->item['article']}");
 
 core\Provider\Autoeuro::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 

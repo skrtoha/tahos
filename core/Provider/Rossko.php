@@ -6,16 +6,17 @@ use core\Log;
 
 class Rossko extends Provider{
 	private $db, $result;
+	private static $delivery_id = '000000001';
 	private static $connect = array(
-		'wsdl' => 'http://api.rossko.ru/service',
+		'wsdl' => 'http://api.rossko.ru/service/v2.1',
 		'options' => array(
-			'connection_timeout' => 5,
+			'connection_timeout' => 1,
 			'trace' => true
 		)
 	);
 	private static $param = array(
-		'KEY1' => 'd3a3b2e361276178e60d8da2f9d553b4',
-		'KEY2' => 'd2697480a48aee9f6238818072235929',
+		'KEY1' => '41d4a2a141970dfe8da7aa9e0b7396e8',
+		'KEY2' => '1955025ec3f636dc345b85fdd5c525cc',
 	);
 	public static $provider_id = 15;
 	/**
@@ -174,7 +175,8 @@ class Rossko extends Provider{
 		$query = self::getSoap('GetSearch');
 		if (!$query) return false;
 		$param = self::$param;
-		$param['TEXT'] = $search;
+		$param['text'] = $search;
+		$param['delivery_id'] = self::$delivery_id;
 		$result = $query->GetSearch($param);
 		return $result;
 	}
@@ -211,6 +213,7 @@ class Rossko extends Provider{
 	public static function sendOrder($store_id = NULL){
 		if ($store_id) $stock = parent::getInstanceDataBase()->getFieldOnID('provider_stores', $store_id, 'title');
 		$partsList = self::getPartsForSending();
+		debug($partsList, 'partsList'); //exit();
 		$entity = [];
 		$private = [];
 		if (!$partsList){
@@ -230,7 +233,6 @@ class Rossko extends Provider{
 
 		$resultEntity = self::executeSendOrder($entity, 'entity');
 		self::parseSendOrderResponse($resultEntity, $entity);
-
 
 		$resultPrivate = self::executeSendOrder($private, 'private');
 		self::parseSendOrderResponse($resultPrivate, $private);
@@ -277,6 +279,7 @@ class Rossko extends Provider{
 		);
 		try{
 			$result = $soap->GetCheckout($param);
+			debug($result);
 		} catch(\SoapFault $e){
 			return $e;
 		}
@@ -371,7 +374,9 @@ class Rossko extends Provider{
 		$storeInfo = parent::getStoreInfo($params['store_id']);
 		
 		$param = self::$param;
-		$param['TEXT'] = "{$params['article']} {$params['brend']}";
+		$param['text'] = "{$params['brend']} {$params['article']}";
+		$param['delivery_id'] = self::$delivery_id;
+
 		$result = $query->GetSearch($param);
 		// debug($storeInfo);
 		if (!$result) return false;

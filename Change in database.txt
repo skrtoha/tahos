@@ -5,5 +5,14 @@ ALTER TABLE `tahos_providers` ADD `workSchedule` JSON NULL DEFAULT NULL AFTER `r
 ALTER TABLE `tahos_provider_stores` CHANGE `workSchedule` `workSchedule` JSON NULL DEFAULT NULL COMMENT 'график выходных дней, праздников и т.д.';
 ALTER TABLE `tahos_provider_stores` ADD `calendar` JSON NULL DEFAULT NULL COMMENT 'график выходных дней, праздников и т.д.' AFTER `workSchedule`;
 
+DROP TABLE IF EXISTS `tahos_required_remains`;
+CREATE TABLE IF NOT EXISTS `tahos_required_remains` (
+  `item_id` int(10) UNSIGNED NOT NULL,
+  `requiredRemain` int(10) UNSIGNED DEFAULT '1',
+  PRIMARY KEY (`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE `tahos_required_remains` ADD FOREIGN KEY (`item_id`) REFERENCES `tahos_items`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
 
 

@@ -23,11 +23,17 @@ switch ($act) {
 				'price' => 0
 			]
 		);
+		if ($_GET['store_id'] == core\Provider\Tahos::$store_id){
+			$db->insert('required_remains', ['item_id' => $_GET['item_id']]);
+		}
 		message('Товар для поставщика успешно добавлен!');
 		header("Location: ?view=prices&act=items&id=".$_GET['store_id']);
 		break;
 	case 'delete_item':
 		if ($db->delete('store_items', "`item_id`=".$_GET['item_id']." AND `store_id`=".$_GET['store_id'])){
+			if ($_GET['store_id'] == core\Provider\Tahos::$store_id){
+				$db->delete('required_remains', "`item_id`=".$_GET['item_id']);
+			}
 			message('Товар успешно удален!');
 			header("Location: ?view=prices&act=items&id=".$_GET['store_id']);
 		}

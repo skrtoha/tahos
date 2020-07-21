@@ -9,7 +9,6 @@ $(function(){
 				window.history.pushState(null, null,  '/admin/?view=reports&tab=' + get.tab + '#tabs|reports:' + get.tab)
 			}
 			this.setTabs();
-			this.remainsMainStore.init();
 			$(document).on('click', 'a.clearLog', function(e){
 				e.preventDefault();
 				var th = $(this);
@@ -151,7 +150,20 @@ $(function(){
 									reports.parsePurchaseability(items);
 									reports.setDateTimePicker();
 									break;
-								case 'remainsMainStore': break;
+								case 'remainsMainStore': 
+									let itemRemains = JSON.parse(response);
+									$('[data-name=' + obj.tab + '] table tbody').empty();
+									$.each(itemRemains, function(i, item){
+										$('[data-name=' + obj.tab + '] table tbody').append(
+											'<tr>' +
+												'<td>' + item.brend + '</td>' +
+												'<td><a target="_blank" href="?view=items&act=item&id=' + item.id + '">' + item.article_cat + '</a></td>' +
+												'<td>' + item.title_full + '</td>' +
+												'<td>' + item.in_stock + '</td>' +
+											'</tr>'
+										);
+									})
+									break;
 								default:
 									$('div[data-name=' + obj.tab + ']').html(response);
 							}
@@ -176,32 +188,17 @@ $(function(){
 			}
 		},
 		remainsMainStore: {
-			selector: '[data-name=remainsMainStore]',
-			init: function(){
-				$(document).on('click', reports.remainsMainStore.selector + ' form', function(e){
-					e.preventDefault();
-					$.ajax({
-						type: 'post',
-						url: reports.ajaxUrl,
-						data: {
-							tab: 'remainsMainStore',
-							quan: $(reports.remainsMainStore.selector + ' input[name=quan]').val()
-						},
-						success: function(response){
-							let items = JSON.parse(response);
-							$(reports.remainsMainStore.selector + ' table tbody').empty();
-							$.each(items, function(i, item){
-								$(reports.remainsMainStore.selector + ' table tbody').append(
-									'<tr>' +
-										'<td>' + item.brend + '</td>' +
-										'<td>' + item.article_cat + '</td>' +
-										'<td>' + item.title_full + '</td>' +
-										'<td>' + item.in_stock + '</td>' +
-									'</tr>'
-								);
-							})
-						}
-					})
+			selector: '',
+			get: function(){
+				$.ajax({
+					type: 'post',
+					url: reports.ajaxUrl,
+					data: {
+						tab: 'remainsMainStore',
+					},
+					success: function(response){
+						
+					}
 				})
 			}
 		}

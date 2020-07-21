@@ -61,12 +61,18 @@ if ($_POST['form_submit']){
 		unset($_POST['fv']);
 	}
 	foreach($_POST as $key => $value){
-		if ($key == 'form_submit') continue;
-		if ($key == 'is_stay') continue;
-		if ($key == 'language_id') continue;
-		if ($key == 'translate') continue;
-		if ($key == 'photos') continue;
-		$array[$key] = $value;
+		switch($key){
+			case 'form_submit':
+			case 'is_stay':
+			case 'language_id':
+			case 'translate':
+			case 'photos':
+			case 'requiredRemain':
+				continue;
+				break;
+			default:
+				$array[$key] = $value;
+		}
 	}
 	if ($array['article_cat'] && !$array['article']) $array['article'] = article_clear($array['article_cat']);
 	if (!$array['article_cat'] && !$array['article'] && $array['barcode']) $array['article'] = $array['barcode'];
@@ -87,6 +93,17 @@ if ($_POST['form_submit']){
 		}
 	} 
 	if ($res === true) {
+		$db->insert(
+			'required_remains',
+			['item_id' => $last_id, 'requiredRemain' => $_POST['requiredRemain']],
+			[
+				'duplicate' => [
+					'requiredRemain' => $_POST['requiredRemain']
+				]/*,
+				'print' => false*/
+			]
+		); 
+
 		if (isset($_POST['photos']) && !empty($_POST['photos'])){
 			$dir_big = core\Config::$imgPath . "/items/big/$last_id";
 			$dir_small = core\Config::$imgPath . "/items/small/$last_id";
@@ -260,6 +277,10 @@ function item($act){
 			$id = $_GET['id'];
 			$item = $db->select('items', '*', "`id`=$id");
 			$item = $item[0];
+
+			$requiredRemain = $db->select_one('required_remains', '*', "`item_id` = $id");
+			$item['requiredRemain'] = $requiredRemain['requiredRemain'];
+			
 			$page_title = 'Редактирование товара';
 			$translates = array();
 			if (empty($_POST['translate'])){
@@ -551,6 +572,19 @@ function item($act){
 						</div>
 					</div>
 				<?}?>
+				<div class="field">
+				<div class="title">Обязательный остаток</div>
+					<div class="value">
+						<?if (!empty($_POST)){
+							$requiredRemain = $_POST['requiredRemain'];
+						}
+						elseif ($item['requiredRemain']){
+							$requiredRemain = $item['requiredRemain'];
+						}
+						else $requiredRemain = 1;?>
+						<input type="text" name="requiredRemain" value="<?=$requiredRemain?>">
+					</div>
+				</div>
 				<? if ($act != 's_add'){?> 
 					<div class="field">
 						<div class="title">Заблокировано</div>

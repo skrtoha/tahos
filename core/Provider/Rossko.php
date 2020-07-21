@@ -18,7 +18,6 @@ class Rossko extends Provider{
 		'KEY1' => '41d4a2a141970dfe8da7aa9e0b7396e8',
 		'KEY2' => '1955025ec3f636dc345b85fdd5c525cc',
 	);
-	private static $delivery_id = '000000001';
 	public static $provider_id = 15;
 	/**
 	 * [getItemsToOrder description]

@@ -157,7 +157,7 @@ $(function(){
 										$('[data-name=' + obj.tab + '] table tbody').append(
 											'<tr>' +
 												'<td>' + item.brend + '</td>' +
-												'<td><a target="_blank" href="?view=items&act=item&id=' + item.id + '">' + item.article_cat + '</a></td>' +
+												'<td><a target="_blank" href="?view=items&act=item&id=' + item.id + '">' + item.article + '</a></td>' +
 												'<td>' + item.title_full + '</td>' +
 												'<td>' + item.in_stock + '</td>' +
 											'</tr>'

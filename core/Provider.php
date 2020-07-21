@@ -74,27 +74,66 @@ abstract class Provider{
 		if (isset($params['provider_id'])) return 
 			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE provider_id = {$params['provider_id']}", '');
 	}
-	public static function getDiliveryDate($workSchedule, $deliveryDays){
-		if (empty($workSchedule)){
-			return self::addDaysToCurrentDate($deliveryDays);
-		}
-		$daysForAdd = 0;
+	public static function getDiliveryDate($workSchedule, $calendar, $deliveryDays){
+		$dateTimeOut = new \DateTime();
+		$dateTimeNow = new \DateTime();
 		$i = 0;
-		while($i < $deliveryDays){
-			$daysForAdd++;
-			$i++;
-			if (self::isDayOff($workSchedule)) $i--;
+
+		if (!$workSchedule && !$calendar){
+			$dateTimeOut->add(new \DateInterval('P' . $deliveryDays . 'D'));
+			return $dateTimeOut->format('d.m');
 		}
-		return self::addDaysToCurrentDate($daysForAdd);
+
+		$date = $dateTimeNow->format('d.m.Y');
+		$dayWeek = $dateTimeNow->format('l');
+		if (isset($calendar[$date])){
+			if ($calendar[$date]['isWorkDay']){
+				$dateTimeInterval = \DateTime::createFromFormat(
+					'd.m.Y G:i',
+					$date . ' ' . $calendar[$date]['hours'] . ':' . $calendar[$date]['minutes']
+				);
+				if ($dateTimeNow >= $dateTimeInterval){
+					$i = - 1;
+				} 
+			}
+			else{
+				$i = - 1;
+			}
+		}
+		elseif (isset($workSchedule[$dayWeek])){
+			if ($workSchedule[$dayWeek]['isWorkDay']){
+				$dateTimeInterval = \DateTime::createFromFormat(
+					'd.m.Y G:i',
+					$date . ' ' . $workSchedule[$dayWeek]['hours'] . ':' . $workSchedule[$dayWeek]['minutes']
+				);
+				if ($dateTimeNow >= $dateTimeInterval){
+					$i = - 1;
+				} 
+			}
+			else{
+				$i = - 1;
+			}
+		}
+		while($i < $deliveryDays){
+			$i++;
+			$dateTimeOut->add(new \DateInterval('P1D'));
+
+			// debug($workSchedule[$dayWeek], "$i, ".$dateTimeOut->format('d.m.Y'));
+
+			$date = $dateTimeOut->format('d.m.Y');
+			$dayWeek = $dateTimeOut->format('l');
+
+			if (isset($calendar[$date])){
+				if (!$calendar[$date]['isWorkDay']) $i--;
+			}
+			elseif (isset($workSchedule[$dayWeek])){
+				if (!$workSchedule[$dayWeek]['isWorkDay']) $i--;
+			}
+		}
+		return $dateTimeOut->format('d.m');
 	}
-	public static function addDaysToCurrentDate($days){
-		$dateTime = new \DateTime();
-		$dateTime->add(new \DateInterval('P' . $days . 'D'));
-		return $dateTime->format('d.m');
-	}
-	private static function isDayOff($workSchedule)
+	private static function isDayOff($array)
 	{
-		static $counter;
 		if (!$counter){
 			$dateTime = new \DateTime();
 			$counter = $dateTime->format('N');

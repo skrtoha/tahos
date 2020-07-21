@@ -1,11 +1,17 @@
 #total{
 	 margin-top: 10px;
 }
+#actions{
+	margin-bottom: 10px;
+}
 tr.store{
 	cursor: pointer;
 }
 form input[type=submit]{
 	margin: 0 auto;
+}
+tr.dayOff {
+    color: red;
 }
 label.workSchedule span {
     display: block;

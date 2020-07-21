@@ -402,7 +402,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			ps.cipher,
 			ps.provider_id,
 			ps.id as store_id,
-			ps.workSchedule,
+			IF (ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS workSchedule,
 			IF (
 				i.article_cat != '', 
 				i.article_cat, 
@@ -418,6 +418,8 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 				ELSE
 					IF (si.in_stock = 0, ps.under_order, ps.delivery) 
 			END AS delivery,
+			IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
+			IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
 			ps.prevail,
 			ps.noReturn,
 			CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100 $userDiscount) as price,
@@ -430,6 +432,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 		FROM #$search_type diff
 		RIGHT JOIN #store_items si ON si.item_id=diff.item_diff
 		LEFT JOIN #provider_stores ps ON ps.id=si.store_id
+		LEFT JOIN #providers p ON p.id = ps.provider_id
 		LEFT JOIN #currencies c ON c.id=ps.currency_id
 		LEFT JOIN #items i ON diff.item_diff=i.id
 		LEFT JOIN #brends b ON b.id=i.brend_id
@@ -507,7 +510,11 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$p['photo'] = $v['photo'];
 		$p['item_id'] = $v['item_id'];
 		$p['checked'] = $v['checked'];
-		$list['delivery_date'] = core\Provider::getDiliveryDate(json_decode($v['workSchedule'], true), $v['delivery']);
+		$list['delivery_date'] = core\Provider::getDiliveryDate(
+			json_decode($v['workSchedule'], true), 
+			json_decode($v['calendar'], true),
+			$v['delivery']
+		);
 		$list['store_id'] = $v['store_id'];
 		$list['in_stock'] = (int) $v['in_stock'] ? $v['in_stock'] : 'Под заказ';
 		$list['cipher'] = $v['cipher'];

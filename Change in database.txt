@@ -1,1 +1,9 @@
 ALTER TABLE `tahos_users` CHANGE `isProvider` `showProvider` INT(1) UNSIGNED NOT NULL DEFAULT '0';
+
+ALTER TABLE `tahos_providers` ADD `workSchedule` JSON NULL DEFAULT NULL AFTER `return_percent`;
+
+ALTER TABLE `tahos_provider_stores` CHANGE `workSchedule` `workSchedule` JSON NULL DEFAULT NULL COMMENT 'график выходных дней, праздников и т.д.';
+ALTER TABLE `tahos_provider_stores` ADD `calendar` JSON NULL DEFAULT NULL COMMENT 'график выходных дней, праздников и т.д.' AFTER `workSchedule`;
+
+
+

@@ -58,7 +58,8 @@ function get_str_form(){
 			'<input type="submit" value="Загрузить">' +
 		'</form>' +
 		'<a href="?view=prices&act=items&id=' + store.id + '">Прайс склада</a>' +
-		'<a target="" href="?view=providers&act=priceEmail&store_id=' + store.id + '">Прайс с Email</a>';
+		'<a target="" href="?view=providers&act=priceEmail&store_id=' + store.id + '">Прайс с Email</a>' +
+		'<a target="_blank" href="?view=providers&act=calendar&store_id=' + store.id + '">График поставок</a>';
 	}; 
 	str +=
 		'<form name="store_change">' +
@@ -101,12 +102,6 @@ function get_str_form(){
 				 	'<td><input type="text" name="daysForReturn" value="' + store.daysForReturn + '" /></td>' +
 			 	'</tr>' +
 			 	'<tr>' +
-				 	'<td>График выходных</td>' +
-				 	'<td>' +
-				 		get_str_work_schedule(store.workSchedule) +
-				 	'</td>' +
-			 	'</tr>' +
-			 	'<tr>' +
 				 	'<td>Основной склад</td>' +
 				 	'<td><input type="checkbox" name="is_main" ' + store.is_main + ' value="1"></td>' +
 			 	'</tr>' +
@@ -122,46 +117,6 @@ function get_str_form(){
 	 		'</table>' +
 		'</form>';
 	return str;
-}
-function get_str_work_schedule(jsonWorkSchedule){
-	let workSchedule = jsonWorkSchedule ? JSON.parse(jsonWorkSchedule) : false;
-	checked1 = workSchedule && workSchedule[1] ? 'checked' : '';
-	checked2 = workSchedule && workSchedule[2] ? 'checked' : '';
-	checked3 = workSchedule && workSchedule[3] ? 'checked' : '';
-	checked4 = workSchedule && workSchedule[4] ? 'checked' : '';
-	checked5 = workSchedule && workSchedule[5] ? 'checked' : '';
-	checked6 = workSchedule && workSchedule[6] ? 'checked' : '';
-	checked7 = workSchedule && workSchedule[7] ? 'checked' : '';
-	output = 
-		'<label class="workSchedule">' + 
-			'<span>Пн</span>' +
-			'<input ' + checked1 + ' value="1" name="workSchedule[1]" type="checkbox">' +
-		'</label>' +
-		'<label class="workSchedule">' + 
-			'<span>Вт</span>' +
-			'<input ' + checked2 + ' value="1" name="workSchedule[2]" type="checkbox">' +
-		'</label>' +
-		'<label class="workSchedule">' + 
-			'<span>Ср</span>' +
-			'<input ' + checked3 + ' value="1" name="workSchedule[3]" type="checkbox">' +
-		'</label>' +
-		'<label class="workSchedule">' + 
-			'<span>Чт</span>' +
-			'<input ' + checked4 + ' value="1" name="workSchedule[4]" type="checkbox">' +
-		'</label>' +
-		'<label class="workSchedule">' + 
-			'<span>Пт</span>' +
-			'<input ' + checked5 + ' value="1" name="workSchedule[5]" type="checkbox">' +
-		'</label>' +
-		'<label class="workSchedule">' + 
-			'<span>Сб</span>' +
-			'<input ' + checked6 + ' value="1" name="workSchedule[6]" type="checkbox">' +
-		'</label>' +
-		'<label class="workSchedule">' + 
-			'<span>Вс</span>' +
-			'<input ' + checked7 + ' value="1" name="workSchedule[7]" type="checkbox">' +
-		'</label>';
-	return output;
 }
 function set_empty_store(){
 	store = {
@@ -179,7 +134,29 @@ function set_empty_store(){
 	}
 }
 $(function(){
-	// console.log(store);
+	$(document).on('click', '[type=checkbox][name*=isWorkDay]', function(){
+		let th = $(this);
+		if (!th.is(':checked')){
+			th.closest('tr').find('option').prop('selected', false);
+			th.closest('tr').find('select').prop('disabled', true);
+		}
+		else{
+			th.closest('tr').find('select').prop('disabled', false);
+		}
+	})
+	$('#workSchedule').on('submit', function(e){
+		let th = $(this);
+		let everythingIsEmpty = true;
+		th.find('select').prop('disabled', false);
+		th.find('input[type=checkbox]').each(function(){
+			if ($(this).is(':checked')) everythingIsEmpty = false;
+		})
+		if (everythingIsEmpty){
+			e.preventDefault();
+			th.find('select').prop('disabled', true);
+			show_message('Не могут все дни быть выходными!', 'error');
+		}
+	})
 	$(document).on('click','#load_price', function(e){
 		e.preventDefault();
 		$(this).next('form').toggleClass('hidden');
@@ -188,6 +165,12 @@ $(function(){
 		if (e.target.className == 'provider_change') document.location.href = e.target.attributes[1].nodeValue;
 		else document.location.href = $(this).attr('href');
 	})
+	if (location.hash){
+		let hash = location.hash;
+		let store_id = hash.replace('#', '');
+		set_store(store_id);
+		modal_show(get_str_form());
+	}
 	$(document).on('click', 'tr.store:not(.removable)', function(e){
 		var store_id = $(this).attr('store_id');
 		set_store(store_id);

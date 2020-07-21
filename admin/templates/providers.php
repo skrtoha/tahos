@@ -28,9 +28,204 @@ switch ($act) {
 		break;
 	case 'priceEmail': priceEmail(); break;
 	case 'itemsToOrder': itemsToOrder(); break;
+	case 'calendar':
+		if(isset($_GET['provider_id'])){
+			$provider = $db->select_one('providers', ['id', 'title', 'workSchedule', 'calendar'], "`id` = {$_GET['provider_id']}");
+			$workSchedule = json_decode($provider['workSchedule'], true);
+			$calendar = json_decode($provider['calendar'], true);
+		}
+		else{
+			$providerStore = core\Provider::getStoreInfo($_GET['store_id']);
+			$workSchedule = json_decode($providerStore['workSchedule'], true);
+			$calendar = json_decode($providerStore['calendar'], true);
+		}
+
+		// debug($workSchedule, 'workSchedule');
+
+		$page_title = 'График поставок';
+
+		$status = '<a href="/">Главная</a> > ';
+		$status .= '<a href="?view=providers">Поставщики</a> > ';
+		if (isset($_GET['provider_id'])){
+			$status .= '<a href="?view=providers&act=provider&id=' . $_GET['provider_id'] . '">' . $provider['title'] . '</a> > ';
+		}
+		else{
+			$status .= '<a href="?view=providers&act=stores&id=' . $providerStore['provider_id'] . '">' . $providerStore['provider'] . '</a> > ';
+			$status .= '<a href="?view=providers&id=' . $providerStore['provider_id'] . '&act=stores#' . $_GET['store_id'] . '">' . $providerStore['cipher'] . '</a> > ';
+		}
+		$status .= $page_title;
+
+		if (!empty($_POST)){
+			$toSave = [];
+			foreach($_POST as $date => $value){
+				$toSave[str_replace('_', '.', $date)] = [
+					'isWorkDay' => isset($value['isWorkDay']) ? $value['isWorkDay'] : 0,
+					'hours' => str_pad($value['hours'], 2, 0, STR_PAD_LEFT),
+					'minutes' => str_pad($value['minutes'], 2, 0, STR_PAD_LEFT)
+				];
+			}
+			if (isset($_GET['provider_id'])) $db->update('providers', ['calendar' => json_encode($toSave)], "`id` = {$_GET['provider_id']}");
+			if (isset($_GET['store_id'])) $db->update('provider_stores', ['calendar' => json_encode($toSave)], "`id` = {$_GET['store_id']}");
+			header("Location: {$_SERVER['HTTP_REFERER']}");
+		}
+		$dateTime = new DateTime();
+		$dateTime->sub(new DateInterval('P1D'));
+		calendar($dateTime, $workSchedule, $calendar);
+		break;
+	case 'workSchedule':
+		if(isset($_GET['provider_id'])){
+			$provider = $db->select_one('providers', ['id', 'title', 'workSchedule'], "`id` = {$_GET['provider_id']}");
+			$workSchedule = json_decode($provider['workSchedule'], true);
+		}
+		else{
+			$providerStore = core\Provider::getStoreInfo($_GET['store_id']);
+			$workSchedule = json_decode($providerStore['workSchedule'], true);
+		}
+
+		$page_title = 'Расписание';
+
+		$status = '<a href="/">Главная</a> > ';
+		$status .= '<a href="?view=providers">Поставщики</a> > ';
+		if (isset($_GET['provider_id'])){
+			$status .= '<a href="?view=providers&act=provider&id=' . $_GET['provider_id'] . '">' . $provider['title'] . '</a> > ';
+			$status .= '<a href="?view=providers&act=calendar&provider_id=' . $_GET['provider_id'] . '">График поставок</a> > ';
+		}
+		else{
+			$status .= '<a href="?view=providers&act=stores&id=' . $providerStore['provider_id'] . '">' . $providerStore['provider'] . '</a> > ';
+			$status .= '<a href="?view=providers&id=' . $providerStore['provider_id'] . '&act=stores#' . $_GET['store_id'] . '">' . $providerStore['cipher'] . '</a> > ';
+			$status .= '<a href="?view=providers&act=calendar&store_id=' . $_GET['store_id'] . '">График поставок</a> > ';
+		}
+		$status .= $page_title;
+
+		if (!empty($_POST)){
+			$toSave = [];
+			foreach($_POST as $dayWeek => $value){
+				$toSave[$dayWeek] = [
+					'isWorkDay' => isset($value['isWorkDay']) ? $value['isWorkDay'] : 0,
+					'hours' => str_pad($value['hours'], 2, 0, STR_PAD_LEFT),
+					'minutes' => str_pad($value['minutes'], 2, 0, STR_PAD_LEFT)
+				];
+			}
+			debug($toSave);
+			if (isset($_GET['provider_id'])) $db->update('providers', ['workSchedule' => json_encode($toSave)], "`id` = {$_GET['provider_id']}");
+			if (isset($_GET['store_id'])) $db->update('provider_stores', ['workSchedule' => json_encode($toSave)], "`id` = {$_GET['store_id']}");
+			header("Location: {$_SERVER['HTTP_REFERER']}");
+		}
+		workSchedule($workSchedule);
+		break;
 	default:
 		view();
 }
+function calendar($dateTime, $workSchedule, $calendar){
+	//debug($calendar, 'calendar');
+	?>
+	<div id="actions">
+		<?if (isset($_GET['provider_id'])){?>
+			<a href="?view=providers&act=workSchedule&provider_id=<?=$_GET['provider_id']?>">Расписание</a>
+		<?}?>
+		<?if (isset($_GET['store_id'])){?>
+			<a href="?view=providers&act=workSchedule&store_id=<?=$_GET['store_id']?>">Расписание</a>
+		<?}?>
+	</div>
+	<form id="workSchedule" method="post">
+		<table class="t_table" cellspacing="1">
+			<tr class="head">
+				<td>Дата, день недели</td>
+				<td>Рабочий<br> день</td>
+				<td>Прием заказов</td>
+			</tr>
+			<?for($i = 0; $i < 14; $i++){
+				$dateTime->add(new DateInterval('P1D'));
+				$isWorkDay = !in_array($dateTime->format('l'), ['Saturday', 'Sunday']);
+				$date = $dateTime->format('d.m.Y');
+				$dayWeek = $dateTime->format('l');
+
+				if (isset($calendar[$date])){
+					$isChecked = $calendar[$date]['isWorkDay'] ? 'checked' : '';
+				}
+				else{
+					$isChecked = $workSchedule[$dayWeek]['isWorkDay'] ? 'checked' : '';
+				}
+				?>
+				<tr class="<?=$isWorkDay ? '' : 'dayOff'?>">
+					<td>
+						<?=$date?>, <?=mb_strtolower(core\Config::$daysWeek[$dateTime->format('l')])?>
+					</td>
+					<td>
+						<input <?=$isChecked ? 'checked' : ''?> type="checkbox" name="<?=$date?>[isWorkDay]" value="1">
+					</td>
+					<td>
+						<select <?=$isChecked ? '' : 'disabled'?> name="<?=$date?>[hours]">
+							<?for($h = 0; $h <= 23; $h++){
+								if (isset($calendar[$date])){
+									$selected = $calendar[$date]['hours'] == $h ? 'selected' : '';
+								}
+								else{
+									$selected = $workSchedule[$dayWeek]['hours'] == $h ? 'selected' : '';
+								}?>
+								<option <?=$selected?> value="<?=$h?>"><?=$h?></option>
+							<?}?>
+						</select>
+						:
+						<select <?=$isChecked ? '' : 'disabled'?> name="<?=$date?>[minutes]">
+							<?for($m = 0; $m <= 59; $m++){
+								if (isset($calendar[$date])){
+									$selected = $calendar[$date]['minutes'] == $m ? 'selected' : '';
+								}
+								else{
+									$selected = $workSchedule[$dayWeek]['minutes'] == $m ? 'selected' : '';
+								}?>
+								<option <?=$selected?> value="<?=$m?>"><?=$m?></option>
+							<?}?>
+						</select>
+					</td>
+				</tr>
+			<?}?>
+		</table>
+		<input style="margin-top: 10px" type="submit" value="Сохранить ">
+	</form>
+<?}
+function workSchedule($workSchedule){
+	//debug($workSchedule);
+	?>
+	<div id="actions">
+		<?if (isset($_GET['provider_id'])){?>
+			<a href="?view=providers&act=calendar&provider_id=<?=$_GET['provider_id']?>">График поставок</a>
+		<?}?>
+		<?if (isset($_GET['store_id'])){?>
+			<a href="?view=providers&act=calendar&store_id=<?=$_GET['store_id']?>">График поставок</a>
+		<?}?>
+	</div>
+	<form id="workSchedule" method="post">
+		<table class="t_table" cellspacing="1">
+			<tr class="head">
+				<td>День недели</td>
+				<td>Рабочий<br> день</td>
+				<td>Окончание<br>рабочего дня</td>
+			</tr>
+			<?foreach(core\Config::$daysWeek as $en => $rus){?>
+				<tr>
+					<td><?=$rus?></td>
+					<td><input type="checkbox" <?=$workSchedule[$en]['isWorkDay'] ? 'checked' : ''?> name="<?=$en?>[isWorkDay]" value="1"></td>
+					<td>
+						<select <?=$workSchedule[$en]['isWorkDay'] ? '' : 'disabled'?> name="<?=$en?>[hours]">
+							<?for($h = 0; $h <= 23; $h++){?>
+								<option <?=$h == $workSchedule[$en]['hours'] ? 'selected' : ''?> value="<?=$h?>"><?=$h?></option>
+							<?}?>
+						</select>
+						:
+						<select <?=$workSchedule[$en]['isWorkDay'] ? '' : 'disabled'?> name="<?=$en?>[minutes]">
+							<?for($m = 0; $m <= 59; $m++){?>
+								<option <?=$m == $workSchedule[$en]['minutes'] ? 'selected' : ''?> value="<?=$m?>"><?=$m?></option>
+							<?}?>
+						</select>
+					</td>
+				</tr>
+			<?}?>
+		</table>
+		<input style="margin-top: 10px" type="submit" value="Сохранить">
+	</form>
+<?}
 function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');
@@ -111,7 +306,7 @@ function stores(){
 		</tr>
 		<?if ($res_stores->num_rows){
 			while($row = $res_stores->fetch_assoc()){?>
-				<tr class="store" store_id="<?=$row['id']?>">
+				<tr id="someTr" class="store" store_id="<?=$row['id']?>">
 					<td><?=$row['title']?></td>
 					<td><?=$row['price_updated']?></td>
 					<td><?=$row['cipher']?></td>
@@ -136,6 +331,7 @@ function provider(){
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
 	if ($_GET['id']){?>
 		<a href="?view=providers&id=<?=$_GET['id']?>&act=provider_delete" class="delete_item">Удалить</a>
+		<a href="?view=providers&act=calendar&provider_id=<?=$_GET['id']?>">График поставок</a>
 		<div style="width: 100%; height: 10px"></div>
 		<?if (!empty($stores)){?>
 			<form method="post" enctype="multipart/form-data">

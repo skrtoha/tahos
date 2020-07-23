@@ -222,7 +222,7 @@ function items(){
 	$all = $db->found_rows();
 	$page_title = "Прайс $title_store";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=prices'>Прайсы</a> > $page_title";
-	$perPage = 5;
+	$perPage = 30;
 	$linkLimit = 10;
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);

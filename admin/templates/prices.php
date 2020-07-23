@@ -238,8 +238,8 @@ function items(){
 		'price' => 'Цена',
 	];
 	if ($id == 23){
-		$menu['requiredRemain'] = 'Мин. наличие';
 		$menu['summ'] = 'Сумма';
+		$menu['requiredRemain'] = 'Мин. наличие';
 	}
 	$res_items = $db->query($query, '');?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
@@ -279,10 +279,10 @@ function items(){
 					<td><input type="text" class="store_item" value="<?=$pi['in_stock']?>" column="in_stock" item_id="<?=$pi['item_id']?>"></td>
 					<td><input type="text" class="store_item" value="<?=$pi['price']?>" column="price" item_id="<?=$pi['item_id']?>"></td>
 					<?if ($id == 23){?>
+						<td><?=$pi['price'] * $pi['in_stock']?></td>
 						<td>
 							<input type="text" class="store_item" value="<?=$pi['requiredRemain']?>" column="requiredRemain" item_id="<?=$pi['item_id']?>">
 							</td>
-						<td><?=$pi['price'] * $pi['in_stock']?></td>
 					<?}?>
 					<td><a title="Удалить" class="delete_item" href="?view=prices&act=delete_item&item_id=<?=$pi['item_id']?>&store_id=<?=$id?>"><span class="icon-cancel-circle1"></span></a></td>
 				</tr>

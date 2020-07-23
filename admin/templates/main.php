@@ -134,6 +134,9 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['items'])){?>
 			{"src" : "/vendor/cropper/cropper.js", "async" : false},
 		<?}?>
+		<?if (in_array($view, ['prices'])){?>
+			{"src" : "/admin/js/add_item_to_store.js", "async" : false},
+		<?}?>
 		<?if (file_exists("js/$view.js")){
 			echo '{"src" : "/admin/js/'.$view.'.js", "async" : false},';
 		}?>

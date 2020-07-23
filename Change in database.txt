@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS `tahos_required_remains` (
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ALTER TABLE `tahos_required_remains` ADD FOREIGN KEY (`item_id`) REFERENCES `tahos_items`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `tahos_store_items` ADD `created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP AFTER `packaging`;
+
 
 
 

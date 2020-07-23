@@ -10,16 +10,35 @@ $value = $_POST['value'];
 $where = "`store_id`={$_POST['store_id']} AND `item_id`={$_POST['item_id']}";
 switch ($_POST['column']) {
 	case 'price':
-		$res = $db->update('store_items', array('price' => $value), $where);
-		break;
 	case 'in_stock':
-		$res = $db->update('store_items', array('in_stock' => $value), $where);
-		break;
 	case 'delivery':
-		$res = $db->update('store_items', array('delivery' => $value), $where);
-		break;
 	case 'packaging':
-		$res = $db->update('store_items', array('packaging' => $value), $where);
+		$res = $db->update('store_items', array($_POST['column'] => $value), $where);
+		break;
+	case 'requiredRemain':
+		$res = $db->insert('required_remains', ['item_id' => $_POST['item_id'], 'requiredRemain' => $value], [
+			'duplicate' => [
+				'requiredRemain' => $value
+			]/*,
+			'print' => true*/
+		]);
+		break;
+	case 'add_item_to_store':
+		print_r($_POST);
+		$db->insert(
+			'store_items',
+			[
+				'store_id' => $_POST['store_id'],
+				'item_id' => $_POST['item_id'],
+				'price' => $_POST['price'],
+				'in_stock' => $_POST['in_stock'],
+				'packaging' => $_POST['packaging']
+			]
+		);
+
+		if (isset($_POST['requiredRemain'])){
+			$db->insert('required_remains', ['item_id' => $_POST['item_id'], 'requiredRemain' => $_POST['requiredRemain']]);
+		}
 		break;
 }
 $price_updated = $db->query("

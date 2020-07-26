@@ -240,7 +240,7 @@ function endSuccessfullyProccessing(){
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 }
-function parseWithPhpOffice($workingFile){
+function parseWithPhpOffice($workingFile, $debuggingMode){
 	global $emailPrice, $price, $stringNumber;
 	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
 	$xls->setActiveSheetIndex(0);
@@ -254,8 +254,10 @@ function parseWithPhpOffice($workingFile){
 		} 
 		$stringNumber++;
 
-		// debug($row);
-		// if ($stringNumber > 100) die("Обработка прошла");
+		if ($debuggingMode){
+			debug($row);
+			if ($stringNumber > 100) die("Обработка прошла");
+		}
 
 		parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 	}

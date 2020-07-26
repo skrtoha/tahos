@@ -778,7 +778,7 @@ switch($_GET['act']){
 		$fileImap = $imap->getLastMailFrom([
 			'from' => $emailPrice['from'],
 			'name' => $emailPrice['name']
-		]);
+		], $debuggingMode);
 		if ($debuggingMode) debug($fileImap, 'fileImap');
 		if (!$fileImap){
 			$errorText = "Не удалось скачать {$emailPrice['name']} из почты.";
@@ -860,7 +860,7 @@ switch($_GET['act']){
 				catch(\Box\Spout\Common\Exception\UnsupportedTypeException $e){
 					echo "<br>" . $e->getMessage();
 					echo "<br>Обработка с помощью PhpOffice...";
-					parseWithPhpOffice($workingFile);
+					parseWithPhpOffice($workingFile, $debuggingMode);
 					break;
 				}
 				try{
@@ -868,7 +868,7 @@ switch($_GET['act']){
 				} catch(\Box\Spout\Common\Exception\IOException $e){
 					echo "<br>Ошибка: <b>" . $e->getMessage() . "</b>";
 					echo "<br>Попытка обработки файла другим способом....";
-					parseWithPhpOffice($workingFile);
+					parseWithPhpOffice($workingFile, $debuggingMode);
 					break;
 				}
 				foreach ($reader->getSheetIterator() as $sheet) {
@@ -878,8 +878,10 @@ switch($_GET['act']){
 						foreach($cells as $value) $row[] = $value->getValue();
 						$stringNumber++;
 
-						// debug($row);
-						// if ($stringNumber > 100) die("Обработка прошла");
+						if ($debuggingMode){
+							debug($row);
+							if ($stringNumber > 100) die("Обработка прошла");
+						}
 
 						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 					}
@@ -890,6 +892,10 @@ switch($_GET['act']){
 					$row = iconv('windows-1251', 'utf-8', $data[0]);
 					$row = explode(';', str_replace('"', '', $row));
 					$stringNumber++;
+					if ($debuggingMode){
+						debug($row);
+						if ($stringNumber > 100) die("Обработка прошла");
+					}
 					parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 				}
 				break;

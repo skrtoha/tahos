@@ -14,7 +14,7 @@ class Imap{
 			Log::insertThroughException($e);
 		}
 	}
-	public function getLastMailFrom($params){
+	public function getLastMailFrom($params, $debuggingMode = false){
 		$data = array();
 		if ($this->error) return false;
 		$num = imap_num_msg($this->connection);
@@ -50,13 +50,18 @@ class Imap{
 				$body = $this->convert_to_utf8($recursive_data["charset"], $msg_body);
 			}
 			$d['body'] = base64_encode($body);
-			// debug($msg_structure->parts); //exit();
+			//debug($msg_structure->parts, 'parts'); //exit();
 			if(isset($msg_structure->parts)){
 				for($j = 1, $f = 2; $j < count($msg_structure->parts); $j++, $f++){
 					$type = $msg_structure->parts[$j]->subtype;
 					$d["attachs"][$j]["type"] = $type;
 					$d["attachs"][$j]["size"] = $msg_structure->parts[$j]->bytes;
-					$d["attachs"][$j]["name"] = $this->getNameFromParameters($msg_structure->parts[$j]->parameters);
+					$d["attachs"][$j]["name"] = $this->getNameFromParameters($msg_structure->parts[$j]->parameters, $msg_structure->parts[$j]->encoding);
+					if ($debuggingMode) debug([
+						'type' => $d["attachs"][$j]["type"],
+						'size' => $d["attachs"][$j]["size"],
+						'name' => $d["attachs"][$j]["name"]
+					], 'email');
 					if (!preg_match('/'.quotemeta($params['name']).'/u', $d["attachs"][$j]["name"])) continue;
 					$d["attachs"][$j]["file"] = $this->structure_encoding(
 						$msg_structure->parts[$j]->encoding,
@@ -73,9 +78,24 @@ class Imap{
 			}
 		}
 	}
-	private function getNameFromParameters($parameters){
+	private function getNameFromParameters($parameters, $encoding){
 		foreach ($parameters as $value){
-			if ($value->attribute == 'name') return $value->value;
+			if ($value->attribute == 'name'){
+				/*switch ($encoding){
+					case 0: 
+					case 1:
+						return $value->value; 
+						break;
+					case 2:
+					case 3:
+					case 4:
+						return imap_base64($value->value);
+						break;
+					default:
+						return $value->value;
+				}*/
+				return imap_utf8($value->value);
+			} 
 		}
 	}
 	private function get_imap_title($str){

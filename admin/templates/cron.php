@@ -816,12 +816,16 @@ switch($_GET['act']){
 				break;
 			} 
 			try{
-				$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$emailPrice['nameInArchive']]);
+				$nameInArchive = $emailPrice['nameInArchive'];
+				$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$nameInArchive]);
 				if (!$res) throw new Exception ("Ошибка извлечения файла {$emailPrice['nameInArchive']}. Попытка использовать альтернативный способ.");
 			} catch(Exception $e){
-				echo "<br>" . $e->getMessage();
-				if ($emailPrice['indexInArchive'] !== false){
-					$bites = file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
+				echo "<br>" . $e->getMessage(); 
+				if ($emailPrice['indexInArchive'] == '0' || $emailPrice['indexInArchive']){
+					echo "<br>обработка через indexInArchive";
+					$nameInArchive = $zipArchive->getNameIndex($emailPrice['indexInArchive']);
+					$bites = file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/$nameInArchive", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
+					debug($bites, 'bites');
 					if (!$bites) throw new Exception("Возникла ошибка. Ни один из способов извлечь архив не сработали");
 				}
 				else{
@@ -833,12 +837,11 @@ switch($_GET['act']){
 					echo "<br>Укажите настройках в поле \"Индекс файла в архиве\" необходимый индекс.";
 				}
 			}
-			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/{$emailPrice['nameInArchive']}";
-			else $workingFile = $zipArchive->getStream($emailPrice['nameInArchive']);
+			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/$nameInArchive";
+			else $workingFile = $zipArchive->getStream($nameInArchive);
 		}
 		else $workingFile = $fileImap;
 
-		// $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Armtek_CRS_40068974.xlsx";
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer

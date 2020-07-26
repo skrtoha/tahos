@@ -62,9 +62,10 @@ class Imap{
 						$msg_structure->parts[$j]->encoding,
 						imap_fetchbody($this->connection, $i, $f)
 					);
-					file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$d["attachs"][$j]["name"]}", $d["attachs"][$j]["file"]);
-					return $_SERVER['DOCUMENT_ROOT']."/tmp/{$d["attachs"][$j]["name"]}";
-					debug($d); exit();
+					if (preg_match('/[а-яёА-ЯЁ-\._0-9=a-zA-Z]/u', $d["attachs"][$j]["name"])) $filename = $d["attachs"][$j]["name"];
+					else $filename = 'file.zip';
+					file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/$filename", $d["attachs"][$j]["file"]);
+					return $_SERVER['DOCUMENT_ROOT']."/tmp/$filename";
 				}
 			}
 		}

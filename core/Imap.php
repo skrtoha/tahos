@@ -62,8 +62,11 @@ class Imap{
 						$msg_structure->parts[$j]->encoding,
 						imap_fetchbody($this->connection, $i, $f)
 					);
-					if (preg_match('/[а-яёА-ЯЁ-\._0-9=a-zA-Z]/u', $d["attachs"][$j]["name"])) $filename = $d["attachs"][$j]["name"];
-					else $filename = 'file.zip';
+					if (preg_match('/^[ \w\.-]+$/u', $d["attachs"][$j]["name"])) $filename = $d["attachs"][$j]["name"];
+					else{
+						if ($d["attachs"][$j]["type"] == 'VND.MS-EXCEL') $filename = 'file.xls';
+						else $filename = 'file.zip';
+					} 
 					file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/$filename", $d["attachs"][$j]["file"]);
 					return $_SERVER['DOCUMENT_ROOT']."/tmp/$filename";
 				}

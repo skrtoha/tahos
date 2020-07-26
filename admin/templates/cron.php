@@ -747,9 +747,12 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 	case 'emailPrice':
+		$debuggingMode = false;
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
+
+		if ($debuggingMode) debug($emailPrice, 'emailPrice');
 		$store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
@@ -776,6 +779,7 @@ switch($_GET['act']){
 			'from' => $emailPrice['from'],
 			'name' => $emailPrice['name']
 		]);
+		if ($debuggingMode) debug($fileImap, 'fileImap');
 		if (!$fileImap){
 			$errorText = "Не удалось скачать {$emailPrice['name']} из почты.";
 			echo "<br>$errorText";
@@ -825,7 +829,6 @@ switch($_GET['act']){
 					echo "<br>обработка через indexInArchive";
 					$nameInArchive = $zipArchive->getNameIndex($emailPrice['indexInArchive']);
 					$bites = file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/$nameInArchive", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
-					debug($bites, 'bites');
 					if (!$bites) throw new Exception("Возникла ошибка. Ни один из способов извлечь архив не сработали");
 				}
 				else{
@@ -841,6 +844,8 @@ switch($_GET['act']){
 			else $workingFile = $zipArchive->getStream($nameInArchive);
 		}
 		else $workingFile = $fileImap;
+
+		if ($debuggingMode) debug($workingFile, 'workingFile');
 
 		/**
 		 * [$stringNumber counter for strings in file]

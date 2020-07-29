@@ -19,7 +19,7 @@ class Mailer{
 	 * @param  [array] $params массив параметров (['emails'], subject, body)
 	 * @return [mixed] true в случае удачной отправки либо сообщение об ошибке  
 	 */
-	public static function send($params){
+	public static function send($params, $attachments = []){
 		$mail = new PHPMailer();
 		$mail->isSMTP();
 		$mail->isHTML(true);  
@@ -38,6 +38,9 @@ class Mailer{
 		$mail->Body = $params['body'];
 		$mail->Subject = $params['subject'];
 		$mail->CharSet = 'UTF-8';
+		if (!empty($attachments)){
+			foreach($attachments as $a) $mail->addAttachment($a);
+		}
 		if ($mail->send()) return true;
 		else return $mail->ErrorInfo;
 	}

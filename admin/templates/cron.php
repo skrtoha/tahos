@@ -910,6 +910,91 @@ switch($_GET['act']){
 		endSuccessfullyProccessing();
 
 		break;
+	case 'subscribeUserPrices':
+		require_once($_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php');
+		$successedDelivery = 0;
+		$res_users = $db->query("
+			SELECT
+				u.id,
+				u.discount,
+				u.currency_id,
+				u.subscribe_type,
+				u.subscribe_email
+			FROM
+				#users u
+			WHERE
+				u.is_subscribe = 1 
+		", '');
+		if (!$res_users) break;
+
+		$res_store_items = $db->query("
+			SELECT
+				i.article,
+				b.title AS brend,
+				i.title_full,
+				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) as price,
+				si.in_stock
+			FROM
+				#store_items si
+			LEFT JOIN
+				#items i ON i.id = si.item_id
+			LEFT JOIN
+				#brends b ON b.id = i.brend_id
+			LEFT JOIN
+				#provider_stores ps ON ps.id = si.store_id
+			LEFT JOIN 
+				#currencies c ON c.id=ps.currency_id
+			WHERE
+				si.store_id = " . core\Provider\Tahos::$store_id . "
+		", '');
+		foreach($res_users as $user){
+			// debug($user); exit();
+			switch($user['subscribe_type']){
+				case 'xls':
+					$spreadsheet = new PhpOffice\PhpSpreadsheet\Spreadsheet();
+					$sheet = $spreadsheet->getActiveSheet();
+					$row = 1;
+
+					$sheet->setCellValueByColumnAndRow(1, $row, 'Артикул');
+					$sheet->setCellValueByColumnAndRow(2, $row, 'Бренд');
+					$sheet->setCellValueByColumnAndRow(3, $row, 'Название');
+					$sheet->setCellValueByColumnAndRow(4, $row, 'Цена');
+					$sheet->setCellValueByColumnAndRow(5, $row, 'Наличие');
+
+					foreach($res_store_items as $si){
+						$row++;
+						$si['price'] = ceil($si['price'] - $si['price'] * $user['discount'] / 100);
+						$sheet->setCellValueByColumnAndRow(1, $row, $si['article']);
+						$sheet->setCellValueByColumnAndRow(2, $row, $si['brend']);
+						$sheet->setCellValueByColumnAndRow(3, $row, $si['title_full']);
+						$sheet->setCellValueByColumnAndRow(4, $row, $si['price']);
+						$sheet->setCellValueByColumnAndRow(5, $row, $si['in_stock']);
+					}
+
+					$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+					$file = $_SERVER['DOCUMENT_ROOT'] . '/tmp/price.xlsx';
+					$writer->save($file);
+					break;
+				case 'csv':
+					$file = $_SERVER['DOCUMENT_ROOT'] . '/tmp/price.csv';
+					$fp = fopen($file, 'w');
+					foreach($res_store_items as $si){
+						$si['price'] = ceil($si['price'] - $si['price'] * $user['discount'] / 100); 
+						fputcsv($fp, $si, ';');
+					}
+					fclose($fp);
+					break;
+			}
+			$res = core\Mailer::send([
+				'emails' => $user['subscribe_email'],
+				'subject' => 'Прайс с tahos.ru',
+				'body' => 'Прайс с tahos.ru'
+			], [$file]);
+			if ($res === true) $successedDelivery++;
+		}
+		echo "<h2>Рассылка прайсов</h2>";
+		echo "<br>Всего отпрвлено $successedDelivery сообщений пользователям";
+		break;
 }
 if (isset($_GET['from'])){
 	header("Location: {$_SERVER['HTTP_REFERER']}");

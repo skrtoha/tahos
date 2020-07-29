@@ -4,6 +4,14 @@ function sel_user($column){
 	global $user;
 	return $_POST[$column] ? $_POST[$column] : $user[$column];
 }
+if (isset($_POST['form_subscribe_submitted'])){
+	unset($_POST['form_subscribe_submitted']);
+	$update = $_POST;
+	if (!$update['is_subscribe']) $update['is_subscribe'] = 0;
+	$db->update('users', $update, "`id` = {$_SESSION['user']}");
+	message('Успешно сохранено!');
+	header("Location: /settings");
+}
 $res_user_socials = $db->query("
 	SELECT
 		s.id,
@@ -185,6 +193,35 @@ $res_user_socials = $db->query("
 					<?}
 				}?>
 			</div>
+		</form>
+		<form id="subscribe" method="post">
+			<h3>Рассылка</h3>
+			<input type="hidden" name="form_subscribe_submitted" value="1">
+			<div class="input-wrap">
+				<label for="is_subscribe">
+					Рассылка прайсов
+				</label>
+				<label style="position: relative;top: 5px" class="switch">
+					<input name="is_subscribe" type="checkbox" <?=$user['is_subscribe'] ? 'checked' : ''?> value="1">
+					<div class="slider round"></div>
+				</label>
+			</div>
+			<div class="input-wrap">
+				<label for="email">
+					Электронная почта:
+				</label>
+				<input type="email" name="subscribe_email" value="<?=$user['subscribe_email']?>">
+			</div>
+			<div class="input-wrap">
+				<label for="delivery-way">
+					Формат:
+				</label>
+				<select name="subscribe_type">
+					<option <?=$user['subscribe_type'] == 'csv' ? 'selected' : ''?>  value="csv">CSV</option>
+					<option <?=$user['subscribe_type'] == 'xls' ? 'selected' : ''?> value="xls">XLS</option>
+				</select>
+			</div>
+			<input type="submit" value="Сохранить">
 		</form>
 	</div>
 </div>

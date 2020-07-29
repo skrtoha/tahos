@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `tahos_required_remains` (
 ALTER TABLE `tahos_required_remains` ADD FOREIGN KEY (`item_id`) REFERENCES `tahos_items`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `tahos_store_items` ADD `created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP AFTER `packaging`;
 
+ALTER TABLE `tahos_users` ADD `is_subscribe` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `allow_request_delete_item`, ADD `subscribe_email` VARCHAR(255) NULL DEFAULT NULL AFTER `is_subscribe`, ADD `subscribe_type` VARCHAR(3) NULL DEFAULT NULL AFTER `subscribe_email`;
 
 
 

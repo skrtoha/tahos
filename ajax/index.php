@@ -1,6 +1,6 @@
 <?php
 require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/DataBase.php");
-// require_once ($_SERVER['DOCUMENT_ROOT'] . "/templates/functions.php");
+// require_once ($_SERVER['DOsCUMENT_ROOT'] . "/templates/functions.php");
 
 $db = new core\DataBase();
 $connection = new core\Connection($db);

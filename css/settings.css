@@ -12,6 +12,10 @@
 #div_issue > p{
   padding: 0 0 10px 0
 }
+.settings-page form#subscribe label.switch {
+    width: 34px;
+    top: 6px;
+}
 #div_issue {
   position: absolute;
     width: 265px;
@@ -6082,14 +6086,22 @@ span.delete-btn:hover {
 .settings-page form#additional {
   margin-top: 30px;
 }
-.settings-page form#additional label {
+.settings-page form#subscribe label
+ {
+  width: 170px;
+}
+.settings-page form#additional label
+ {
   width: 330px;
 }
-.settings-page form#additional label.switch {
+.settings-page form#additional label.switch,
+.settings-page form#subscribe label.switch {
   width: 34px;
   top: 6px;
 }
-.settings-page form#additional label.switch input {
+.settings-page form#additional label.switch input,
+.settings-page form#subscribe label.switch input
+ {
   display: none;
 }
 .settings-page #additional-address-field {

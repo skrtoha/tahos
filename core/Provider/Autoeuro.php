@@ -299,7 +299,7 @@ class Autoeuro extends Provider{
 		}
 		return false;
 	}
-	private static function getStringBasketComment($params): string
+	public static function getStringBasketComment($params): string
 	{
 		return "{$params['order_id']}-{$params['store_id']}-{$params['item_id']}";
 	}

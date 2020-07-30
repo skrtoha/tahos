@@ -49,6 +49,9 @@ switch ($act) {
 				case 20://Autokontinent
 					core\Provider\Autokontinent::addToBasket($ov);
 					break;
+				case 27:
+					core\Provider\Autopiter::addToBasket($ov); 
+					break;
 				default:
 					core\OrderValue::changeStatus(7, $ov);
 			}

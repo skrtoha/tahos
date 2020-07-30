@@ -18,7 +18,44 @@ class Autopiter extends Provider{
 	}
 
 	public static function getPrice($params){
-		debug($params);
+		try{
+			$model = self::getModelByBrendArticleStoreID($params['brend'], $params['article'], $params['store_id']);
+		}
+		catch(EAutopiter\ErrorGetModel $e){
+			return false;
+		}
+		return [
+			'price' => $model->SalePrice,
+			'available' => $model->NumberOfAvailable 
+		];
+	}
+	private static function getModelByBrendArticleStoreID($brend, $article, $store_id){
+		try{
+			$articleId = self::getArticleIdByBrendAndArticle($brend, $article);
+		}
+		catch (EAutopiter\ErrorArticleId $e){
+			$e->process();
+			return false;
+		}
+		$PriceIdResult = self::getClient()->GetPriceId([
+			'ArticleId' => $articleId
+		]);
+		$storeInfo = Provider::getStoreInfo($store_id);
+		$SellerId = $storeInfo['title'];
+		$SM = & $PriceIdResult->GetPriceIdResult->PriceSearchModel;
+		if (is_array($SM)){
+			foreach($SM as $model){
+				if ($model->SellerId == $SellerId){
+					return $model;
+				} 
+			}
+		}
+		else{
+			if ($SM->SellerId == $SellerId){
+				return $SM;
+			}
+		}
+		throw new EAutopiter\ErrorGetModel("Ошибка получение model");
 	}
 	public static function getItemsToOrder($provider_id): array
 	{
@@ -67,12 +104,8 @@ class Autopiter extends Provider{
 			return false;
 		}
 		$PriceIdResult = self::getClient()->GetPriceId([
-			'ArticleId' => $articleId/*,
-			'SearchCross' => 1,*/
+			'ArticleId' => $articleId
 		]);
-		$items = [];
-		$sellers = [];
-		$storesTypes = [];
 		if (is_array($PriceIdResult->GetPriceIdResult->PriceSearchModel)){
 			foreach($PriceIdResult->GetPriceIdResult->PriceSearchModel as $model){
 				self::parseSearchModel($model);
@@ -106,9 +139,56 @@ class Autopiter extends Provider{
 			'packaging' => $model->MinNumberOfSales
 		]/*, ['print' => true]*/);
 	}
-	public static function isInBasket($params){}
+	public static function isInBasket($params){
+		$basket = self::getClient()->GetBasket();
+		if (empty($basket->GetBasketResult)) return false;
+		$br = & $basket->GetBasketResult->ItemCartModel;
+		if (is_array($br)){
+			foreach($br as $cartModel){
+				if ($cartModel->Comment == Autoeuro::getStringBasketComment($params)){
+					return true;
+				}
+			}
+		}
+		else{
+			if ($br->Comment == Autoeuro::getStringBasketComment($params)){
+				return true;
+			}
+		}
+		return false;
+	}
 	public static function removeFromBasket($ov){}
-	public static function puIntBusket($params){}
+	public static function addToBasket($params){
+		try{
+			$model = self::getModelByBrendArticleStoreID($params['brend'], $params['article'], $params['store_id']);
+		}
+		catch(EAutopiter\ErrorGetModel $e){
+			Log::insert([
+				'text' => 'Ошибка получения model',
+				'additional' => "osi: " . Autoeuro::getStringBasketComment($params)
+			]);
+			return false;
+		}
+		$item = [
+			'DetailUid' => $model->DetailUid,
+			'Comment' => Autoeuro::getStringBasketComment($params),
+			'SalePrice' => $model->SalePrice,
+			'Quantity' => $params['quan']
+		];
+		$resInsertToBasket = self::getClient()->InsertToBasket(['Items' => [
+			0 => $item 
+		]]);
+		if ($resInsertToBasket->InsertToBasketResult->ResponseCodeItemCart->Code->ResponseCode != '0'){
+			Log::insert([
+				'text' => 'Ошибка добавления в корзину',
+				'additional' => 'osi: ' . Autoeuro::getStringBasketComment($params),
+				'query' => json_encode($resInsertToBasket)
+			]);
+			return false;
+		}
+		OrderValue::changeStatus(7, $params);
+		return true;
+	}
 	public static function getBasket(){}
 	public static function sendOrder(){}
 	public static function getCoincidences($search){

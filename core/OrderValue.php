@@ -194,7 +194,7 @@ class OrderValue{
 
 	/**
 	 * gets common information of order value
-	 * @param  array  $fields user_id|status_id|order_id|store_id|
+	 * @param  array  $fields user_id|status_id|order_id|store_id|item_id
 	 * @return object mysqli object
 	 */
 	public static function get($fields = array()){

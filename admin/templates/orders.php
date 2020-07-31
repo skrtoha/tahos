@@ -49,7 +49,7 @@ switch ($act) {
 				case 20://Autokontinent
 					core\Provider\Autokontinent::addToBasket($ov);
 					break;
-				case 27:
+				case core\Provider\Autopiter::$provider_id:
 					core\Provider\Autopiter::addToBasket($ov); 
 					break;
 				default:

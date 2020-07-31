@@ -6,8 +6,7 @@ use core\OrderValue;
 use core\Exceptions\Autopiter as EAutopiter;
 
 class Autopiter extends Provider{
-	public static $provider_id = 27;
-	public static $store_id = 46472;
+	public static $provider_id = 24;
 
 	private static function getClient(){
 		$client = new \SoapClient("http://service.autopiter.ru/v2/price?WSDL");
@@ -59,7 +58,35 @@ class Autopiter extends Provider{
 	}
 	public static function getItemsToOrder($provider_id): array
 	{
-		return [];
+		$output = [];
+		$basket = self::getClient()->GetBasket();
+		$br = & $basket->GetBasketResult->ItemCartModel;
+		if (!$br) return $output;
+		if (is_array($br)){
+			foreach($br as $cartModel){
+				$output[] = self::parseBasketForItemToOrder($cartModel);
+			}
+		}
+		else $output = self::parseBasketForItemToOrder($br);
+		return $output;
+	}
+	private static function parseBasketForItemToOrder($model){
+		$osi = explode('-', $model->Comment);
+		$resOrderValue = OrderValue::get([
+			'order_id' => $osi[0],
+			'store_id' => $osi[1],
+			'item_id' => $osi[2]
+		]);
+		$orderValue = $resOrderValue->fetch_assoc();
+		return [
+			'provider' => 'Autopiter',
+			'store' => $orderValue['cipher'],
+			'brend' => $orderValue['brend'],
+			'article' => $orderValue['article'],
+			'title_full' => $orderValue['title_full'],
+			'price' => $orderValue['price'],
+			'count' => $orderValue['quan']
+		];
 	}
 	private static function getBrend($brend){
 		static $brends;
@@ -157,7 +184,24 @@ class Autopiter extends Provider{
 		}
 		return false;
 	}
-	public static function removeFromBasket($ov){}
+	public static function removeFromBasket($ov){
+		$basket = self::getClient()->GetBasket();
+		$br = & $basket->GetBasketResult->ItemCartModel;
+		if (is_array($br)){
+			foreach($br as $cartModel){
+				if ($cartModel->Comment == Autoeuro::getStringBasketComment($ov)){
+					$DetailUid = $cartModel->DetailUid;
+				}
+			}
+		}
+		else{
+			if ($br->Comment == Autoeuro::getStringBasketComment($ov)){
+				$DetailUid = $br->DetailUid;
+			}
+		}
+		self::getClient()->DeleteItemCart(['DetailUid' => $DetailUid]);
+		return true;
+	}
 	public static function addToBasket($params){
 		try{
 			$model = self::getModelByBrendArticleStoreID($params['brend'], $params['article'], $params['store_id']);
@@ -189,8 +233,32 @@ class Autopiter extends Provider{
 		OrderValue::changeStatus(7, $params);
 		return true;
 	}
-	public static function getBasket(){}
-	public static function sendOrder(){}
+	public static function sendOrder(){
+		$res = self::getClient()->MakeOrderFromBasket();
+		$itemCart = & $res->Items->ResponseCodeItemCart;
+		if (!$itemCart) return false;
+		if (is_array($itemCart)){
+			foreach($itemCart as $ic) self::parseSendOrderItemCart($ic);
+		}
+		else self::parseSendOrderItemCart($itemCart);
+	}
+	private static function parseSendOrderItemCart($model){
+		$osi = explode('-', $model->Item->Comment);
+		if ($model->Code->ResponseCode == 0){
+			$resOrderValue = $orderValue = OrderValue::get([
+				'order_id' => $osi[0],
+				'store_id' => $osi[1],
+				'item_id' => $osi[2]
+			]);
+			OrderValue::changeStatus(11, $resOrderValue->fetch_assoc());
+		}
+		else{
+			Log::insert([
+				'text' => 'Ошибка отправка заказа',
+				'additional' => "osi: " . $model->Item->Comment
+			]);
+		}
+	}
 	public static function getCoincidences($search){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		$client = self::getClient();

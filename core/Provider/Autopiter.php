@@ -67,7 +67,7 @@ class Autopiter extends Provider{
 				$output[] = self::parseBasketForItemToOrder($cartModel);
 			}
 		}
-		else $output = self::parseBasketForItemToOrder($br);
+		else $output[] = self::parseBasketForItemToOrder($br);
 		return $output;
 	}
 	private static function parseBasketForItemToOrder($model){

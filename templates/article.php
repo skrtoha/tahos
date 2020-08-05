@@ -1,25 +1,27 @@
 <?
 use core\Provider\Autoeuro;
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
-$abcp->render(13); 
-$abcp->render(6);
+if (core\Config::$isUseApiProviders){
+	$abcp->render(13); 
+	$abcp->render(6);
 
-$mikado = new core\Provider\Mikado($db);
-$mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
+	$mikado = new core\Provider\Mikado($db);
+	$mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
 
-$armtek = new core\Provider\Armtek($db);
-$armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
+	$armtek = new core\Provider\Armtek($db);
+	$armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
-$rossko = new core\Provider\Rossko($db);
-$rossko->execute("{$abcp->item['brand']} {$abcp->item['article']}");
+	$rossko = new core\Provider\Rossko($db);
+	$rossko->execute("{$abcp->item['brand']} {$abcp->item['article']}");
 
-core\Provider\Autoeuro::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+	core\Provider\Autoeuro::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
-core\Provider\Autokontinent::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+	core\Provider\Autokontinent::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
-core\Provider\ForumAuto::setArticle($_GET['item_id'], $abcp->item['brand'], $abcp->item['article']);
+	core\Provider\ForumAuto::setArticle($_GET['item_id'], $abcp->item['brand'], $abcp->item['article']);
 
-core\Provider\Autopiter::setArticle($abcp->item['brand'], $abcp->item['article']);
+	core\Provider\Autopiter::setArticle($abcp->item['brand'], $abcp->item['article']);
+}
 
 $title = "Список предложений";
 

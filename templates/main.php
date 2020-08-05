@@ -367,6 +367,9 @@
 		<?if (in_array($view, ['category'])){?>
 			{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
 		<?}?>
+		<?if (in_array($view, ['article'])){?>
+			{"src" : "/js/get_store_info.js", "async" : false},
+		<?}?>
 		{"src" : "/js/<?=$view?>.js", "async" : false}
 		]};!function(t,n,r){"use strict";var c=function(t){if("[object Array]"!==Object.prototype.toString.call(t))return!1;for(var r=0;r<t.length;r++){var c=n.createElement("script"),e=t[r];c.src=e.src,c.async=e.async,n.body.appendChild(c)}return!0};t.addEventListener?t.addEventListener("load",function(){c(r.scripts);},!1):t.attachEvent?t.attachEvent("onload",function(){c(r.scripts)}):t.onload=function(){c(r.scripts)}}(window,document,scr);
 	</script>

@@ -70,50 +70,60 @@ switch($_POST['act']){
 		if(!$user['showProvider']){
 			unset($storeInfo['provider'], $storeInfo['title']);
 		}
+		$commonOrderValues = $db->getCount('orders_values', "`store_id` = {$_POST['store_id']}");
+		$refusedOrderValues = $db->getCount('orders_values', "`store_id` = {$_POST['store_id']} AND `status_id` = 6");
+		if ($commonOrderValues){
+			$storeInfo['percentRefusedOrderValues'] = round($refusedOrderValues / $commonOrderValues * 100);
+			$storeInfo['percentSuccessOrderValues'] = 100 - $storeInfo['percentRefusedOrderValues'];
+		}
+		$date = new DateTime();
+		if ($storeInfo['cron_hours'] && $storeInfo['cron_minutes']){
+			$storeInfo['orderProcessed'] = $date->format('d.m.Y') . " {$storeInfo['cron_hours']}:{$storeInfo['cron_minutes']}";
+		}
+		// debug($storeInfo);
 		getStoreInfo($storeInfo);
 		break;
 }
 function getStoreInfo($storeInfo){?>
-	<table id="providerInfo">
-		<?foreach($storeInfo as $key => $value){
-			if (!$value) continue;?>
-			<tr>
-				<?switch($key){
-					case 'provider':?>
-						<td>Поставщик</td><td><?=$value?></td>
-						<?break;
-					case 'title':?> 
-						<td>Название</td><td><?=$value?></td>
-						<?break;
-					case 'city':?>
-						<td>Город</td><td><?=$value?></td>
-						<?break;
-					case 'cipher':?>
-						<td>Шифр</td><td><?=$value?></td>
-						<?break;
-					case 'delivery':?>
-						<td>Доставка</td><td><?=$value?></td>
-						<?break;
-					case 'delivery_max':?>
-						<td>Максимальный срок	</td><td><?=$value?></td>
-						<?break;
-					case 'under_order':?>
-						<td>Под заказ	</td><td><?=$value?></td>
-						<?break;
-					case 'is_main':?>
-						<td>Основной склад</td><td><?=$value ? 'Да' : 'Нет'?></td>
-						<?break;
-					case 'noReturn':?>
-						<td>Возврат</td><td><?=$value ? 'Да' : 'Нет'?></td>
-						<?break;
-					case 'daysForReturn':?>
-						<td>Кол-во дней возврата</td><td><?=$value?></td>
-						<?break;
-					case 'currency':?>
-						<td>Валюта</td><td><?=$value?></td>
-						<?break;
-				}?>
-			</tr>
+	<div id="providerInfo">
+		<h3>Информация о складе</h3>
+		<div class="information">
+			<?if ($storeInfo['orderProcessed']){?>
+				<div class="row">
+					<span class="left">Заказ будет обработан:</span>
+					<span class="right"><?=$storeInfo['orderProcessed']?></span>
+				</div>
+			<?}?>
+			<div class="row">
+				<span class="left">Дата обновления прайса:</span>
+				<span class="right"><?=$storeInfo['price_updated']?></span>
+			</div>
+		</div>
+		<?if (isset($storeInfo['percentRefusedOrderValues']) && isset($storeInfo['percentSuccessOrderValues'])){?>
+			<div class="donut">
+				<span data-peity='{"fill":["#768c77", "#eeeeee"],"innerRadius": 30,"radius": 40}' class="donut"><?=$storeInfo['percentSuccessOrderValues']?>/100</span>
+				<div class="text">
+					<span class="percent green"><?=$storeInfo['percentSuccessOrderValues']?></span>
+					<span class="describe">выдано</span>
+				</div>
+			</div>
+			<div class="donut">
+				<span data-peity='{"fill":["red", "#eeeeee"],"innerRadius": 30,"radius": 40}' class="donut"><?=$storeInfo['percentRefusedOrderValues']?>/100</span>
+				<div class="text">
+					<span class="percent red"><?=$storeInfo['percentRefusedOrderValues']?></span>
+					<span class="describe">отказано</span>
+				</div>
+			</div>
 		<?}?>
-	</table>
+		<?if (!$storeInfo['noReturn']){?>
+			<div class="informationReturn">
+				<span class="icon-circle-down"></span>
+				<p>Возврат возможен</p>
+			</div>
+			<div class="informationReturn">
+				<span class="icon-notification"></span>
+				<p class="returnText">Возврат возможен в течение <?=$storeInfo['daysForReturn']?> дней после получения товара</p>
+			</div>
+		<?}?>
+	</div>
 <?}

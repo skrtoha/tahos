@@ -16,6 +16,9 @@ ALTER TABLE `tahos_store_items` ADD `created` TIMESTAMP NULL DEFAULT CURRENT_TIM
 
 ALTER TABLE `tahos_users` ADD `is_subscribe` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `allow_request_delete_item`, ADD `subscribe_email` VARCHAR(255) NULL DEFAULT NULL AFTER `is_subscribe`, ADD `subscribe_type` VARCHAR(3) NULL DEFAULT NULL AFTER `subscribe_email`;
 
+ALTER TABLE `tahos_providers` ADD `cron_hours` INT(2) UNSIGNED NOT NULL AFTER `is_enabled_api_order`, ADD `cron_minutes` INT(2) UNSIGNED NOT NULL AFTER `cron_hours`;
+ALTER TABLE `tahos_providers` CHANGE `cron_hours` `cron_hours` INT(2) UNSIGNED NOT NULL DEFAULT '0', CHANGE `cron_minutes` `cron_minutes` INT(2) UNSIGNED NOT NULL DEFAULT '0';
+
 
 
 

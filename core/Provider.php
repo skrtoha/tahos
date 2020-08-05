@@ -289,9 +289,12 @@ abstract class Provider{
 		$res = self::getInstanceDataBase()->query("
 			SELECT
 				ps.*,
+				DATE_FORMAT(ps.price_updated, '%d.%m.%Y') AS price_updated, 
 				p.title AS provider,
 				c.rate,
-				c.title AS currency
+				c.title AS currency,
+				p.cron_hours,
+				p.cron_minutes
 			FROM
 				#provider_stores ps
 			LEFT JOIN

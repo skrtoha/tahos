@@ -422,6 +422,22 @@ function provider(){
 					</div>
 				<?}?>
 				<div class="field">
+					<div class="title">Время отправки заказов</div>
+					<div class="value">
+						<select name="cron_hours">
+							<?for($h = 0; $h <= 23; $h++){?>
+								<option <?=$h == $array['cron_hours'] ? 'selected' : ''?> value="<?=$h?>"><?=$h?></option>
+							<?}?>
+						</select>
+						:
+						<select name="cron_minutes">
+							<?for($m = 0; $m <= 59; $m++){?>
+								<option <?=$m == $array['cron_minutes'] ? 'selected' : ''?> value="<?=$m?>"><?=$m?></option>
+							<?}?>
+						</select>
+					</div>
+				</div>
+				<div class="field">
 					<div class="title"></div>
 					<div class="value"><input type="submit" class="button" value="Сохранить"></div>
 				</div>

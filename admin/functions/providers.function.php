@@ -161,7 +161,7 @@ function items_submit(){
 function provider_save(){
 	global $db;
 	$saveble = true;
-	// debug($_POST);
+	// debug($_POST); exit();
 	$id = $_GET['id'];
 	foreach($_POST as $key => $value){
 		switch($key){

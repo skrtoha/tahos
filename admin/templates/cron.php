@@ -932,11 +932,12 @@ switch($_GET['act']){
 
 		$res_store_items = $db->query("
 			SELECT
-				i.article,
 				b.title AS brend,
+				i.article,
 				i.title_full,
+				si.in_stock,
 				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) as price,
-				si.in_stock
+				si.packaging
 			FROM
 				#store_items si
 			LEFT JOIN
@@ -958,20 +959,22 @@ switch($_GET['act']){
 					$sheet = $spreadsheet->getActiveSheet();
 					$row = 1;
 
-					$sheet->setCellValueByColumnAndRow(1, $row, 'Артикул');
-					$sheet->setCellValueByColumnAndRow(2, $row, 'Бренд');
+					$sheet->setCellValueByColumnAndRow(1, $row, 'Бренд');
+					$sheet->setCellValueByColumnAndRow(2, $row, 'Артикул');
 					$sheet->setCellValueByColumnAndRow(3, $row, 'Название');
-					$sheet->setCellValueByColumnAndRow(4, $row, 'Цена');
-					$sheet->setCellValueByColumnAndRow(5, $row, 'Наличие');
+					$sheet->setCellValueByColumnAndRow(4, $row, 'Наличие');
+					$sheet->setCellValueByColumnAndRow(5, $row, 'Цена');
+					$sheet->setCellValueByColumnAndRow(6, $row, 'Кратность');
 
 					foreach($res_store_items as $si){
 						$row++;
 						$si['price'] = ceil($si['price'] - $si['price'] * $user['discount'] / 100);
-						$sheet->setCellValueByColumnAndRow(1, $row, $si['article']);
-						$sheet->setCellValueByColumnAndRow(2, $row, $si['brend']);
+						$sheet->setCellValueByColumnAndRow(1, $row, $si['brend']);
+						$sheet->setCellValueByColumnAndRow(2, $row, $si['article']);
 						$sheet->setCellValueByColumnAndRow(3, $row, $si['title_full']);
-						$sheet->setCellValueByColumnAndRow(4, $row, $si['price']);
-						$sheet->setCellValueByColumnAndRow(5, $row, $si['in_stock']);
+						$sheet->setCellValueByColumnAndRow(4, $row, $si['in_stock']);
+						$sheet->setCellValueByColumnAndRow(5, $row, $si['price']);
+						$sheet->setCellValueByColumnAndRow(6, $row, $si['packaging']);
 					}
 
 					$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);

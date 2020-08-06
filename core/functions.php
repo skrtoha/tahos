@@ -373,8 +373,9 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 				ba.user_id={$_SESSION['user']}
 		";
 		$ba_quan = " ba.quan as in_basket, ";
-		$userDiscount = " - si.price * c.rate * {$user['discount']} / 100";
+		$userDiscount = "@price * {$user['discount']} / 100";
 	} 
+	else $userDiscount = 0;
 	if (!$user['show_all_analogies'] && $search_type == 'analogies') $hide_analogies = true;
 	else $hide_analogies = false;
 	if ($search_type == 'analogies'){
@@ -422,7 +423,9 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
 			ps.prevail,
 			ps.noReturn,
-			CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100 $userDiscount) as price,
+			ps.percent,
+			@price := si.price * c.rate + si.price * c.rate * ps.percent / 100,
+			CEIL(@price - $userDiscount) AS price,
 			$ba_quan
 			IF (
 				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.photo != '',

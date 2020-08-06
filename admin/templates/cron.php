@@ -936,7 +936,7 @@ switch($_GET['act']){
 				i.article,
 				i.title_full,
 				si.in_stock,
-				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) as price,
+				si.price * c.rate + si.price * c.rate * ps.percent / 100 as price,
 				si.packaging
 			FROM
 				#store_items si

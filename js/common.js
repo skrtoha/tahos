@@ -209,11 +209,14 @@ $(function() {
 							'<td><b>Страна:</b></td>' +
 							'<td>' + res.country + '</td>' +
 						'</tr>';
-				if (res.site != null) str +=
+				if (res.site != null){
+					res.site = res.site.replace(/http:\/\/|https:\/\//, '');
+					str +=
 						'<tr>' +
 							'<td><b>Веб-сайт:</b></td>' +
-							`<td><a href="${res.site}" target="_blank"> ${res.site} </td>` +
+							`<td><a href="http://${res.site}" target="_blank"> ${res.site} </td>` +
 						'</tr>';
+				} 
 				str +=
 					'</table>' +
 				'</div>' +

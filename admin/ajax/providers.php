@@ -101,14 +101,14 @@ function getStoreInfo($storeInfo){?>
 		</div>
 		<?if (isset($storeInfo['percentRefusedOrderValues']) && isset($storeInfo['percentSuccessOrderValues'])){?>
 			<div class="donut">
-				<span data-peity='{"fill":["#768c77", "#eeeeee"],"innerRadius": 30,"radius": 40}' class="donut"><?=$storeInfo['percentSuccessOrderValues']?>/100</span>
+				<span data-peity='{"fill":["#438e53", "#eeeeee"],"innerRadius": 30,"radius": 40}' class="donut"><?=$storeInfo['percentSuccessOrderValues']?>/100</span>
 				<div class="text">
 					<span class="percent green"><?=$storeInfo['percentSuccessOrderValues']?></span>
 					<span class="describe">выдано</span>
 				</div>
 			</div>
 			<div class="donut">
-				<span data-peity='{"fill":["red", "#eeeeee"],"innerRadius": 30,"radius": 40}' class="donut"><?=$storeInfo['percentRefusedOrderValues']?>/100</span>
+				<span data-peity='{"fill":["red", "#d8d8d8"],"innerRadius": 30,"radius": 40}' class="donut"><?=$storeInfo['percentRefusedOrderValues']?>/100</span>
 				<div class="text">
 					<span class="percent red"><?=$storeInfo['percentRefusedOrderValues']?></span>
 					<span class="describe">отказано</span>
@@ -122,7 +122,7 @@ function getStoreInfo($storeInfo){?>
 			</div>
 			<div class="informationReturn">
 				<span class="icon-notification"></span>
-				<p class="returnText">Возврат возможен в течение <?=$storeInfo['daysForReturn']?> дней после получения товара</p>
+				<p class="returnText">Возврат возможен в течение <span style="color: red; font-weight: bold;"><?=$storeInfo['daysForReturn']?></span> дней после получения товара</p>
 			</div>
 		<?}?>
 	</div>

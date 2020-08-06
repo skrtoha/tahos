@@ -43,10 +43,10 @@ switch($_POST['act']){
 				$where
 		", '');
 		if ($res->num_rows == 0) exit();
-		if ($res->num_rows > 50){
+		/*if ($res->num_rows > 50){
 			echo $res->num_rows;
 			exit();
-		}
+		}*/
 		while($row = $res->fetch_assoc()){
 			$i = & $items[$row['id']];
 			$i['title_full'] = $row['title_full'];

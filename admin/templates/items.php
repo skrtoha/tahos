@@ -1468,8 +1468,7 @@ function search(){
 	if (!$search) header ('Location: ?view=items');
 	$where = "
 		`article`='$search' OR 
-		`barcode`='$search' OR 
-		`id`='$search'
+		`barcode`='$search'
 	";
 	$all = $db->getCount('items', $where);
 	$items = $db->select('items', 'title_full,id,article,barcode,brend_id', $where);
@@ -1496,7 +1495,9 @@ function search(){
 			foreach($items as $item){?>
 			<tr class="items_box" item_id="<?=$item['id']?>">
 				<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-				<td label="Артикул"><?=$item['article']?></td>
+				<td label="Артикул">
+					<a target="_blank" href="/admin/?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a>
+				</td>
 				<td label="Название"><?=$item['title_full']?></td>
 				<td label="Штрих-код"><?=$item['barcode']?></td>
 				<td label="Категории">

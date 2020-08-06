@@ -33,9 +33,12 @@
 #providerInfo span.icon-notification
  {
     line-height: 35px;
-    color: #768c77;
+    color: #438e53;
     margin: 10px;
     font-size: 20px;
+}
+#providerInfo span.icon-notification{
+  color: red;
 }
 #providerInfo .informationReturn {
     display: flex;
@@ -74,10 +77,10 @@ div.donut span.percent {
     font-size: 21px;
 }
 div.donut span.percent.green {
-    color: #768c77;
+    color: #438e53;
 }
 div.donut span.percent.red {
-    color: #768c77;
+    color: red;
 }
 div.donut span.percent::after {
     content: '%';

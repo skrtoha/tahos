@@ -122,7 +122,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				LEFT JOIN
 					#brends b ON b.id = i.brend_id
 				WHERE
-					si.in_stock <= rr.requiredRemain AND
+					si.in_stock < rr.requiredRemain AND
 					si.store_id = " . core\Provider\Tahos::$store_id . "
 			", '');
 			if ($res->num_rows){

@@ -80,7 +80,7 @@ abstract class Provider{
 		$i = 0;
 
 		if (!$workSchedule && !$calendar){
-			$dateTimeOut->add(new \DateInterval('P' . $deliveryDays . 'D'));
+			$dateTimeOut->add(new \DateInterval('P' . abs($deliveryDays) . 'D'));
 			return $dateTimeOut->format('d.m');
 		}
 

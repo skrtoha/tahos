@@ -2552,8 +2552,8 @@ footer .social_networks a.ok{
   width: auto;
   border-spacing: 10px;
 }
-#brend_info table tr td:nth-child(2){
-  text-align: right;
+#brend_info table td {
+    text-align: left;
 }
 #brend_info table tr{
   border: none;

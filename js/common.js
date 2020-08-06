@@ -203,15 +203,18 @@ $(function() {
 						'<tr>' +
 							'<td><b>Название:</b></td>' +
 							'<td>' + res.title + '</td>'+
-						'</tr>' +
+						'</tr>';
+				if (res.country != null) str +=
 						'<tr>' +
 							'<td><b>Страна:</b></td>' +
 							'<td>' + res.country + '</td>' +
-						'</tr>' +
+						'</tr>';
+				if (res.site != null) str +=
 						'<tr>' +
 							'<td><b>Веб-сайт:</b></td>' +
-							'<td>' + res.site + '</td>' +
-						'</tr>' +
+							`<td><a href="${res.site}" target="_blank"> ${res.site} </td>` +
+						'</tr>';
+				str +=
 					'</table>' +
 				'</div>' +
 				'<a class="close" href="#" title="Закрыть"></a>';

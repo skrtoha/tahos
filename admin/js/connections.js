@@ -81,10 +81,18 @@
 				})
 			})
 			$.datetimepicker.setLocale('ru');
-			$('.datetimepicker[name=dateFrom], .datetimepicker[name=dateTo]').datetimepicker({
+			$('[data-name=statistics] .datetimepicker[name=dateFrom], [data-name=statistics] .datetimepicker[name=dateTo]').datetimepicker({
 				format:'d.m.Y H:i',
 				onChangeDateTime: function(db, $input){
 					connections.statistics();
+				},
+				closeOnDateSelect: true,
+				closeOnWithoutClick: true
+			});
+			$('[data-name=common_list] .datetimepicker[name=dateFrom], [data-name=common_list] .datetimepicker[name=dateTo]').datetimepicker({
+				format:'d.m.Y H:i',
+				onChangeDateTime: function(db, $input){
+					connections.common_list();
 				},
 				closeOnDateSelect: true,
 				closeOnWithoutClick: true
@@ -179,6 +187,8 @@
 		common_list: function(){
 			var $tab = $('div[data-name=common_list]');
 			var dataSource = '/admin/?view=connections&tab=common_list';
+			connections.commonListFilters.dateFrom = $tab.find('input[name=dateFrom]').val();
+			connections.commonListFilters.dateTo = $tab.find('input[name=dateTo]').val();
 			var strFilters = connections.getHttpStiringFromObject(connections.commonListFilters);
 			if (strFilters) dataSource += strFilters;
 			$tab.find('.pagination-container').pagination({

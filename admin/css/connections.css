@@ -5,6 +5,12 @@
 #common_list tr{
     cursor: pointer;
 }
+[data-name=common_list] .actions{
+    display: inline-block;
+}
+[data-name=common_list] table#common_list{
+    margin-top: 10px;
+}
 .pagination-container{
     margin-top: 10px;
 }

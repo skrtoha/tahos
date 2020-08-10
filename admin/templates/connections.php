@@ -95,6 +95,13 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			<div class="pagination-container"></div>
 		</div>
 		<div class="ionTabs__item" data-name="common_list">
+				<?
+			$dateTo = new DateTime();
+			$dateFrom = new DateTime();
+			$dateFrom->sub(new DateInterval('P10D'));
+			?>
+			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
+			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
 			<div class="actions">
 				<label>
 					<input class="filter" type="checkbox" value="1" name="isHiddenAdminPages" checked="checked">
@@ -117,7 +124,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					<tr class="head">
 						<th>IP</th>
 						<th>Страница</th>
-						<th>Пользователь</th>
+						<th>Пользователь/Менеджер</th>
 						<th>Комментарий</th>
 						<th>Заблокировано</th>
 						<th>Дата</th>

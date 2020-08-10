@@ -19,6 +19,30 @@ ALTER TABLE `tahos_users` ADD `is_subscribe` INT(1) UNSIGNED NOT NULL DEFAULT '0
 ALTER TABLE `tahos_providers` ADD `cron_hours` INT(2) UNSIGNED NOT NULL AFTER `is_enabled_api_order`, ADD `cron_minutes` INT(2) UNSIGNED NOT NULL AFTER `cron_hours`;
 ALTER TABLE `tahos_providers` CHANGE `cron_hours` `cron_hours` INT(2) UNSIGNED NOT NULL DEFAULT '0', CHANGE `cron_minutes` `cron_minutes` INT(2) UNSIGNED NOT NULL DEFAULT '0';
 
+CREATE TABLE `tahos_subscribe_prices` (
+  `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `phone` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `updated` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `tahos_subscribe_prices`
+--
+
+INSERT INTO `tahos_subscribe_prices` (`email`, `title`, `phone`, `updated`) VALUES
+('1111@list.ru', '1111@list.ru', NULL, NULL),
+('222@list.ru', '222@list.ru', NULL, NULL),
+('333@list.ru', '333@list.ru', NULL, NULL),
+('444@list.ru', '444@list.ru', NULL, NULL),
+('555@list.ru', '555@list.ru', NULL, NULL),
+('6666@list.ru', '6666@list.ru', NULL, NULL),
+('666@list.ru', '666@list.ru', NULL, NULL),
+('skrtoha@gmail.com', 'Фильтр масляный', '+380503176162', '2020-08-06 14:03:00'),
+('skrtohabook111@gmail.com', 'Узел 12', '89148749063', NULL),
+('skrtohabook@gmail.com', 'Узел 12', '89148749063', NULL);
+
 
 
 

@@ -441,7 +441,7 @@ form#send-message textarea {
 form input:hover{
 	cursor: pointer;
 }
-form input[type=text], form button, form input[type=submit], form input[type=button], input[type=password]{box-sizing: border-box;display: inline-block;padding: 0 10px;border: 1px solid #c8c8c8;-webkit-border-radius: 4px;border-radius: 4px;background: #fff;color: #5f5f5f;height: 25px;}
+form input[type=email], form input[type=text], form button, form input[type=submit], form input[type=button], input[type=password]{box-sizing: border-box;display: inline-block;padding: 0 10px;border: 1px solid #c8c8c8;-webkit-border-radius: 4px;border-radius: 4px;background: #fff;color: #5f5f5f;height: 25px;}
 
 #fotos li, #fotos_item li{display: inline-block;position: relative;padding: 0;
 }

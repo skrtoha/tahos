@@ -1,0 +1,18 @@
+.icon-cancel-circle1:before {
+  content: "\ea0d";
+}
+tr.edit{
+	cursor: pointer;
+}
+#actions{
+	margin-bottom: 10px;
+}
+#actions form{
+	display: inline-block;
+}
+a.delete{
+	text-decoration: none;
+}
+#add{
+	cursor: pointer;
+}

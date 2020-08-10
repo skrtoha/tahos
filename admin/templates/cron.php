@@ -914,7 +914,6 @@ switch($_GET['act']){
 
 		break;
 	case 'subscribeUserPrices':
-		require_once($_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php');
 		$successedDelivery = 0;
 		$res_users = $db->query("
 			SELECT
@@ -928,58 +927,14 @@ switch($_GET['act']){
 			WHERE
 				u.is_subscribe = 1 
 		", '');
-		if (!$res_users) break;
+		if (!$res_users->num_rows) break;
 
-		$res_store_items = $db->query("
-			SELECT
-				b.title AS brend,
-				i.article,
-				i.title_full,
-				si.in_stock,
-				si.price * c.rate + si.price * c.rate * ps.percent / 100 as price,
-				si.packaging
-			FROM
-				#store_items si
-			LEFT JOIN
-				#items i ON i.id = si.item_id
-			LEFT JOIN
-				#brends b ON b.id = i.brend_id
-			LEFT JOIN
-				#provider_stores ps ON ps.id = si.store_id
-			LEFT JOIN 
-				#currencies c ON c.id=ps.currency_id
-			WHERE
-				si.store_id = " . core\Provider\Tahos::$store_id . "
-		", '');
+		$res_store_items = core\Provider\Tahos::getStoreItems();
 		foreach($res_users as $user){
 			// debug($user); exit();
 			switch($user['subscribe_type']){
 				case 'xls':
-					$spreadsheet = new PhpOffice\PhpSpreadsheet\Spreadsheet();
-					$sheet = $spreadsheet->getActiveSheet();
-					$row = 1;
-
-					$sheet->setCellValueByColumnAndRow(1, $row, 'Бренд');
-					$sheet->setCellValueByColumnAndRow(2, $row, 'Артикул');
-					$sheet->setCellValueByColumnAndRow(3, $row, 'Название');
-					$sheet->setCellValueByColumnAndRow(4, $row, 'Наличие');
-					$sheet->setCellValueByColumnAndRow(5, $row, 'Цена');
-					$sheet->setCellValueByColumnAndRow(6, $row, 'Кратность');
-
-					foreach($res_store_items as $si){
-						$row++;
-						$si['price'] = ceil($si['price'] - $si['price'] * $user['discount'] / 100);
-						$sheet->setCellValueByColumnAndRow(1, $row, $si['brend']);
-						$sheet->setCellValueByColumnAndRow(2, $row, $si['article']);
-						$sheet->setCellValueByColumnAndRow(3, $row, $si['title_full']);
-						$sheet->setCellValueByColumnAndRow(4, $row, $si['in_stock']);
-						$sheet->setCellValueByColumnAndRow(5, $row, $si['price']);
-						$sheet->setCellValueByColumnAndRow(6, $row, $si['packaging']);
-					}
-
-					$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-					$file = $_SERVER['DOCUMENT_ROOT'] . '/tmp/price.xlsx';
-					$writer->save($file);
+					$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, $user['discount']);
 					break;
 				case 'csv':
 					$file = $_SERVER['DOCUMENT_ROOT'] . '/tmp/price.csv';
@@ -1000,6 +955,26 @@ switch($_GET['act']){
 		}
 		echo "<h2>Рассылка прайсов</h2>";
 		echo "<br>Всего отпрвлено $successedDelivery сообщений пользователям";
+		break;
+	case 'subscribeCommonPrices':
+		$emails = [];
+		$res_emails = $db->query("SELECT * FROM #subscribe_prices", '');
+		if (!$res_emails->num_rows) break;
+		foreach($res_emails as $row) $emails[] = $row['email'];
+
+		$res_store_items = core\Provider\Tahos::getStoreItems();
+		$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items);
+
+		// debug($emails);
+
+		$res = core\Mailer::send([
+			'emails' => $emails,
+			'subject' => 'Прайс с tahos.ru',
+			'body' => 'Прайс с tahos.ru'
+		], [$file]);
+		echo "<h2>Общая рассылка прайсов</h2>";
+		echo "<br>Всего отпрвлено " . count($emails) . " прайсов";
+
 		break;
 }
 if (isset($_GET['from'])){

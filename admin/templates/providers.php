@@ -113,9 +113,49 @@ switch ($act) {
 		}
 		workSchedule($workSchedule);
 		break;
+	case 'mainStores':
+		$page_title = 'Список основных складов';
+		$status = "<a href='/'>Главная</a> > <a href='?view=providers'>Поставщики </a> > $page_title";
+		$res_main_stores = $db->query("
+			SELECT
+				ps.id,
+				ps.title,
+				ps.cipher,
+				p.title AS provider
+			FROM
+				#provider_stores ps
+			LEFT JOIN
+				#providers p ON PS.provider_id = p.id
+			ORDER BY
+				p.title
+		", '');
+		mainStores($res_main_stores);
+		break;
 	default:
 		view();
 }
+function mainStores($res_main_stores){?>
+	<div style="float: right;margin-bottom: 5px;">Всего: <?=$res_main_stores->num_rows?></div>
+	<table class="t_table" cellspacing="1">
+		<tr class="head">
+			<td>Шифр</td>
+			<td>Название</td>
+			<td>Поставщик</td>
+		</tr>
+		<?if ($res_main_stores->num_rows){
+			foreach($res_main_stores as $row){?>
+				<tr>
+					<td><?=$row['cipher']?></td>
+					<td><?=$row['title']?></td>
+					<td><?=$row['provider']?></td>
+				</tr>
+			<?}
+		}
+		else{?>
+			<tr><td colspan="3">Ничего не найдено</td></tr>
+		<?}?>
+	</table>
+<?}
 function calendar($dateTime, $workSchedule, $calendar){
 	//debug($calendar, 'calendar');
 	?>
@@ -254,6 +294,7 @@ function view(){
 		</form>
 		<a href="?view=providers&act=provider">Добавить</a>
 		<a href="?view=providers&act=itemsToOrder">Товары, ожидающие отправку в заказ</a>
+		<a href="?view=providers&act=mainStores">Основные склады</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

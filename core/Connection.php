@@ -107,7 +107,8 @@ class Connection{
 						$where .= "`url` NOT LIKE '/admin%' AND ";
 						break;
 					case 'manager_id':
-						$where .= "manager_id = $value AND ";
+					case 'user_id':
+						$where .= "$key = $value AND ";
 						break;
 					case 'dateFrom':
 						$from = self::getTimestamp($params['dateFrom']);

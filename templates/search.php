@@ -2,7 +2,7 @@
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$coincidences = array();
 
-	/*$mikado = new core\Provider\Mikado($db);
+	$mikado = new core\Provider\Mikado($db);
 	setCoincidences($mikado->getCoincidences($_GET['search']));
 
 	$armtek = new core\Provider\Armtek($db);
@@ -20,7 +20,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 
 	setCoincidences(core\Provider\Autokontinent::getCoincidences($_GET['search']));
 
-	setCoincidences(core\Provider\ForumAuto::getCoincidences($_GET['search']));*/
+	setCoincidences(core\Provider\ForumAuto::getCoincidences($_GET['search']));
 
 	setCoincidences(core\Provider\Autopiter::getCoincidences($_GET['search']));
 	

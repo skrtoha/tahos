@@ -204,6 +204,12 @@
 							'<td label="Дата">' + data[key].created + '</td>' +
 						'<tr>'
 					)
+					$('select[name=user_id]').chosen({
+						disable_search_threshold: 5,
+						no_results_text: "не найден",
+						allow_single_deselect: true,
+						width: "200px"
+					});
 				}
 			})
 		},

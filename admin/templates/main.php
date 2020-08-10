@@ -16,6 +16,9 @@ use admin\functions\LeftMenu;
 	<?if (in_array($_GET['view'], ['items'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/cropper/cropper.css">
 	<?}?>
+	<?if (in_array($_GET['view'], ['connections'])){?>
+		<link rel="stylesheet" type="text/css" href="/vendor/chosen/chosen.css">
+	<?}?>
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-touch-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
@@ -136,6 +139,9 @@ use admin\functions\LeftMenu;
 		<?}?>
 		<?if (in_array($view, ['prices'])){?>
 			{"src" : "/admin/js/add_item_to_store.js", "async" : false},
+		<?}?>
+		<?if (in_array($view, ['connections'])){?>
+			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
 		<?}?>
 		<?if (file_exists("js/$view.js")){
 			echo '{"src" : "/admin/js/'.$view.'.js", "async" : false},';

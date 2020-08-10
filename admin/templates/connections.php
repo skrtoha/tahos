@@ -125,7 +125,29 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					<tr>
 						<td label="IP"><input class="filter" type="text" name="ip"></td>
 						<td label="Страница"><input class="filter" type="text" name="url"></td>
-						<td label="Пользователь"><input class="filter" type="text" name="name"></td>
+						<td label="Пользователь">
+							<?$res_users = $db->query("
+								SELECT
+									u.id,
+									IF(
+										u.organization_name <> '',
+										CONCAT_WS (' ', u.organization_name, ot.title),
+										CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
+									) AS name
+								FROM 
+									#users u
+								LEFT JOIN 
+									#organizations_types ot ON ot.id=u.organization_type
+								ORDER BY
+									name
+							", '')?>
+							<select class="filter" data-placeholder="выберите..." name="user_id">
+								<option value=""></option>
+								<?foreach($res_users as $user){?>
+									<option value="<?=$user['id']?>"><?=$user['name']?></option>
+								<?}?>
+							</select>
+						</td>
 						<td label="Комментарий"><input class="filter" type="text" name="comment"></td>
 						<td label="Заблокировано">
 							<select class="filter" name="isDeniedAccess">

@@ -8,6 +8,14 @@
 .pagination-container{
     margin-top: 10px;
 }
+#common_list .filter {
+    height: 23px;
+    border-radius: 5px;
+    border: 1px solid;
+}
+#contents{
+    overflow: inherit;
+}
 #statistics .icon-circle-up, #statistics .icon-circle-down{
     margin-right: 5px;
     font-size: 12px;

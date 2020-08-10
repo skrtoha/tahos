@@ -267,8 +267,8 @@
 			<div class="item catalog_list">
 				<h4>Каталог товаров</h4>
 				<ul>
-					<li><a href="/original-catalogs">Каталоги автозапчастей</a></li>
-					<li><a href="#">Все для автосервиса</a></li>
+					<!-- <li><a href="/original-catalogs">Каталоги автозапчастей</a></li>
+					<li><a href="#">Все для автосервиса</a></li> -->
 					<?if (!empty($categories)) foreach ($categories as $value){?>
 						<li><a href="/category/<?=$value['href']?>"><?=$value['title']?></a></li>
 					<?}?>

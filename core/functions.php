@@ -283,7 +283,6 @@ function category_items_without_filters($sub_id, $sort = ['type' => 'title_full'
 	$_SESSION['items_chunks'] = cat_get_chunks_items($q_items);
 	$items = $_SESSION['items_chunks'][0];
 	$items_values = cat_get_items_values($items);
-	$user = core\User::get();
 	$ratings = json_decode($settings['ratings'], true);
 	if (empty($items)) return false;
 	foreach ($items as $key => $item){
@@ -349,7 +348,7 @@ function category_items_with_filters($sub_id, $sort = ['type' => 'title_full', '
 	$_SESSION['items_chunks'] = $items_chunks;
 	$items = $_SESSION['items_chunks'][0];
 	$items_values = cat_get_items_values($items);
-	$user = core\User::get();
+	$user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] : null]);
 	$ratings = json_decode($settings['ratings'], true);
 	foreach ($items as $key => $item){
 		$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];

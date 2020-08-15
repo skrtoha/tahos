@@ -9,8 +9,10 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
 $id = $_POST['id'];
+$user_id = $_SESSION['user'] ? $_SESSION['user'] : null;
+$user = core\User::get(['user_id' => $user_id]);
+
 if ($_SESSION['user']){
-	$user = core\User::get();
 	$where_basket = "LEFT JOIN #basket ba  ON ba.item_id=i.id AND ba.store_id=ps.id AND ba.user_id={$_SESSION['user']}";
 	$where_basket .= " LEFT JOIN #items_ratings ir ON ir.item_id=i.id AND ir.user_id={$_SESSION['user']}";
 	$clause = ",ir.rate AS rating, ba.quan as in_basket";
@@ -95,8 +97,7 @@ if (file_exists($dirPhotos)){
 	} 
 }
 
-$user = core\User::get();
-$item['user_id'] = $_SESSION['user'];
+$item['user_id'] = $user_id;
 $item['designation'] = $user['designation'];
 if (isset($item['providers_items']) && !count($item['providers_items'])) {
 	$item['min']['delivery'] = array();

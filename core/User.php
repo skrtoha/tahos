@@ -11,16 +11,28 @@ class User{
 	 * @param  [integer] $user_id user id
 	 * @return [type] if no $user_id and $_SESSION['user'] returns default values, if no user_id then by $_SESSION['user']
 	 */
-	public static function get($user_id = null){
+	public static function get($params = []){
 		$db = $GLOBALS['db'];
-		if (!$user_id && !$_SESSION['user']) return [
-			'markup' => 0,
-			'designation' => '<i class="fa fa-rub" aria-hidden="true"></i>',
-			'currency_id' => 1,
-			'rate' => 1,
-			'show_all_analogies' => 0
-		];
-		if (!$user_id) $user_id = $_SESSION['user'];
+		$where = '';
+		if (!empty($params)){
+			if (!$params['user_id']) return [
+				'markup' => 0,
+				'designation' => '<i class="fa fa-rub" aria-hidden="true"></i>',
+				'currency_id' => 1,
+				'rate' => 1,
+				'show_all_analogies' => 0
+			];
+			foreach($params as $key => $value){
+				switch($key){
+					case 'user_id': $where .= "u.id = {$value} AND "; break;
+					case 'withWithdraw': $where .= "u.bill < 0 AND "; break;
+				}
+			}
+			if ($where){
+				$where = substr($where, 0, -5);
+				$where = "WHERE $where";
+			} 
+		}
 		$q_user = "
 			SELECT 
 				u.*,
@@ -47,7 +59,7 @@ class User{
 			LEFT JOIN #issues i ON i.id=u.issue_id
 			LEFT JOIN 
 				#organizations_types ot ON ot.id=u.organization_type
-			WHERE u.id=$user_id
+			$where
 		";
 		$res = $db->query($q_user, '');
 		return $res->fetch_assoc();

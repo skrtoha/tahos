@@ -318,7 +318,7 @@ abstract class Provider{
 	public static function getPriceWithMarkups($price, int $store_id, int $user_id)
 	{
 		$storeInfo = self::getStoreInfo($store_id, '');
-		$userInfo = User::get($user_id);
+		$userInfo = User::get(['user_id' => $user_id]);
 		$price = $price + $price * $storeInfo['percent'] / 100 - $price * $userInfo['discount'] / 100;
 		return ceil($price);
 	}

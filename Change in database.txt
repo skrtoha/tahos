@@ -43,6 +43,22 @@ INSERT INTO `tahos_subscribe_prices` (`email`, `title`, `phone`, `updated`) VALU
 ('skrtohabook111@gmail.com', 'Узел 12', '89148749063', NULL),
 ('skrtohabook@gmail.com', 'Узел 12', '89148749063', NULL);
 
-
-
-
+SELECT
+    @temp := REGEXP_REPLACE(
+        URLDECODER(c.url),
+        '/search/article/| |/yes|-|,|\\.',
+        ''
+    ) AS temp,
+    i.id,
+    @search := regexp_replace(@temp, '/[a-zA-Z -]+', '') as search,
+    COUNT(@search) as cnt
+FROM
+    tahos_connections c
+LEFT JOIN
+	tahos_items i ON i.article = @search  
+WHERE
+    c.created BETWEEN '2020-07-01 16:50' AND '2020-08-13 16:50' AND c.url LIKE '/search/article/%'
+GROUP BY
+	c.url 
+ORDER BY
+	cnt DESC

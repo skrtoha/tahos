@@ -118,6 +118,7 @@ class LeftMenu{
 			'Неправильный аналог' => 'reports&tab=wrongAnalogy',
 			'Удаление товара' => 'reports&tab=request_delete_item',
 			'Покупаемость' => 'reports&tab=purchaseability',
+			'История поиска' => 'reports&tab=searchHistory',
 			'Остатки на основном складе' => 'reports&tab=remainsMainStore'
 		],
 		'Номенклатура' => 'items',

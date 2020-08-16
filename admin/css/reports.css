@@ -101,10 +101,14 @@ tr[text_id], tr[rubric_id]{
 .t_form .title{
     width: 100px;
 }
-div[data-name=purchaseability] table{
+div[data-name=purchaseability] table,
+div[data-name=searchHistory] table
+{
     margin-top: 10px;
 }
-div[data-name=purchaseability] input.datetimepicker{
+div[data-name=purchaseability] input.datetimepicker,
+div[data-name=searchHistory] input.datetimepicker
+{
     width: 115px;
 }
 [data-name=remainsMainStore] table{

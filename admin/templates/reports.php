@@ -101,6 +101,35 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			foreach($res_purchaseability as $value) $output[] = $value;
 			echo json_encode($output);
 			break;
+		case 'searchHistory':
+			$output = [];
+			$from = core\Connection::getTimestamp($_POST['dateFrom']);
+			$to = core\Connection::getTimestamp($_POST['dateTo']);
+			$res_search = $db->query("
+				SELECT
+					@temp := REPLACE(c.url, '/article/', '') as temp,
+				   REGEXP_REPLACE (c.url, '^/article/.*?-', '') AS article,
+					@item_id := REGEXP_REPLACE(@temp, '-.*$', '') AS item_id,
+					c.url,
+				   COUNT(c.url) AS cnt
+				FROM 
+					`tahos_connections` c 
+				WHERE 
+					c.created BETWEEN '$from' AND '$to' AND
+					c.url LIKE '/article/%'
+				GROUP BY
+					c.url
+				ORDER BY
+					cnt DESC
+			", '');
+			if (!$res_search->num_rows) return;
+			foreach($res_search as $value) $output[] = [
+				'article' => urldecode($value['article']),
+				'item_id' => $value['item_id'],
+				'count' => $value['cnt']
+			];
+			echo json_encode($output);
+			break;
 		case 'remainsMainStore':
 			$output = [];
 			$res = $db->query("
@@ -140,6 +169,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		<li class="ionTabs__tab" data-target="wrongAnalogy">Неправильный аналог</li>
 		<li class="ionTabs__tab" data-target="request_delete_item">Удаление товара</li>
 		<li class="ionTabs__tab" data-target="purchaseability">Покупаемость</li>
+		<li class="ionTabs__tab" data-target="searchHistory">История поиска</li>
 		<li class="ionTabs__tab" data-target="remainsMainStore">Остатки</li>
 	</ul>
 	<div class="ionTabs__body">
@@ -163,6 +193,24 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 						<td>Название</td>
 						<td>Заказов</td>
 						<td>На складе</td>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div class="ionTabs__item" data-name="searchHistory">
+			<?
+			$dateTo = new DateTime();
+			$dateFrom = new DateTime();
+			$dateFrom->sub(new DateInterval('P30D'));
+			?>
+			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
+			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+			<table class="t_table">
+				<thead>
+					<tr class="head">
+						<td>Артикул</td>
+						<td>Количество</td>
 					</tr>
 				</thead>
 				<tbody></tbody>

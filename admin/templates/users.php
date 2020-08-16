@@ -71,7 +71,7 @@ switch ($act) {
 			LEFT JOIN
 				#orders o ON o.id = ov.order_id
 			WHERE
-				ov.status_id = 11
+				ov.status_id IN (11, 3)
 			GROUP BY
 				o.user_id
 		", '');

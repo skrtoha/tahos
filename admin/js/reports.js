@@ -100,7 +100,8 @@ $(function(){
 				})
 			})
 		},
-		setDateTimePicker: function(tab = 'purchaseability'){
+		setDateTimePicker: function(tab){
+			console.log(tab);			
 			$.datetimepicker.setLocale('ru');
 			$('[data-name=' + tab + '] .datetimepicker[name=dateFrom], [data-name=' + tab + '] .datetimepicker[name=dateTo]').datetimepicker({
 				format:'d.m.Y H:i',
@@ -114,11 +115,11 @@ $(function(){
 							dateTo: $('div[data-name=' + tab + '] input[name=dateTo]').val()
 						},
 						success: function(response){
-							$('div[data-name=purchaseability] table tbody').empty();
+							$('div[data-name=' + tab + '] table tbody').empty();
 							if (!response) return false;
 							var items = JSON.parse(response);
-							reports.parsePurchaseability(items);
-							reports.setDateTimePicker();
+							reports.parsePurchaseability(items, tab);
+							reports.setDateTimePicker(tab);
 							}
 					});
 				},
@@ -144,11 +145,12 @@ $(function(){
 						success: function(response){
 							switch(obj.tab){
 								case 'purchaseability':
-									$('div[data-name=purchaseability] table tbody').empty();
+								case 'searchHistory':
+									$('div[data-name=' + obj.tab + '] table tbody').empty();
 									if (!response) return false;
 									var items = JSON.parse(response);
-									reports.parsePurchaseability(items);
-									reports.setDateTimePicker();
+									reports.parsePurchaseability(items, obj.tab);
+									reports.setDateTimePicker(obj.tab);
 									break;
 								case 'remainsMainStore': 
 									let itemRemains = JSON.parse(response);
@@ -173,18 +175,34 @@ $(function(){
 				}
 			});
 		},
-		parsePurchaseability: function(items){
+		parsePurchaseability: function(items, tab){
 			if (!items) return false;
-			for(var key in items){
-				$('[data-name=purchaseability] table tbody').append(
-					'<tr>' +
-						'<td>' + items[key].brend + '</td> ' +
-						'<td>' + items[key].article + '</td> ' +
-						'<td>' + items[key].title_full + '</td> ' +
-						'<td>' + items[key].purchases + '</td> ' +
-						'<td>' + items[key].tahos_in_stock + '</td> ' +
-					'</tr>'
-				);
+			switch(tab){
+				case 'purchaseability':
+					for(var key in items){
+						$('[data-name=purchaseability] table tbody').append(
+							'<tr>' +
+								'<td>' + items[key].brend + '</td> ' +
+								'<td>' + items[key].article + '</td> ' +
+								'<td>' + items[key].title_full + '</td> ' +
+								'<td>' + items[key].purchases + '</td> ' +
+								'<td>' + items[key].tahos_in_stock + '</td> ' +
+							'</tr>'
+						);
+					}
+					break;
+				case 'searchHistory':
+					console.log(items, tab);
+					$.each(items, function(i, item){
+						$('[data-name=searchHistory] table tbody').append(`
+							<tr>
+								<td>
+									<a target="_blank" href="/admin/?view=items&id=${item.item_id}&act=item">${item.article}</a>
+								</td>
+								<td>${item.count}</td>
+						`);
+					})
+					break;
 			}
 		},
 		remainsMainStore: {

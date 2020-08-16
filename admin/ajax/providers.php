@@ -66,7 +66,8 @@ switch($_POST['act']){
 		break;
 	case 'getStoreInfo':
 		$storeInfo = core\Provider::getStoreInfo($_POST['store_id'], ['flag' => '']);
-		$user = core\User::get(['user_id' => $_SESSION['user']]);
+		$res_user = core\User::get(['user_id' => $_SESSION['user']]);
+		$user = $res_user->fetch_assoc();
 		if(!$user['showProvider']){
 			unset($storeInfo['provider'], $storeInfo['title']);
 		}

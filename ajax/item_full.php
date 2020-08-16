@@ -9,8 +9,9 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
 $id = $_POST['id'];
-$user_id = $_SESSION['user'] ? $_SESSION['user'] : null;
-$user = core\User::get(['user_id' => $user_id]);
+$user_id = $_SESSION['user'] ? $_SESSION['user'] : false;
+$res_user = core\User::get(['user_id' => $user_id]);
+$user = $res_user->fetch_assoc();
 
 if ($_SESSION['user']){
 	$where_basket = "LEFT JOIN #basket ba  ON ba.item_id=i.id AND ba.store_id=ps.id AND ba.user_id={$_SESSION['user']}";

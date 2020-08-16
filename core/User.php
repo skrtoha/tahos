@@ -15,7 +15,7 @@ class User{
 		$db = $GLOBALS['db'];
 		$where = '';
 		if (!empty($params)){
-			if (!$params['user_id']) return [
+			if (isset($params['user_id']) && !$params['user_id']) return [
 				'markup' => 0,
 				'designation' => '<i class="fa fa-rub" aria-hidden="true"></i>',
 				'currency_id' => 1,
@@ -61,8 +61,7 @@ class User{
 				#organizations_types ot ON ot.id=u.organization_type
 			$where
 		";
-		$res = $db->query($q_user, '');
-		return $res->fetch_assoc();
+		return $db->query($q_user, '');
 	}
 
 	/**

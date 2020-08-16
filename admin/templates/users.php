@@ -90,8 +90,15 @@ switch ($act) {
 			header('Location: ?view=users');
 		}
 		break;
+	case 'usersWithWithdraw':
+		$res_users = core\User::get(['withWithdraw' => true]);
+		usersWithWithdraw($res_users);
+		break;
 	default:
 		view();
+}
+function usersWithWithdraw(mysqli_result $res_users){
+
 }
 function view(){
 	global $status, $db, $page_title;
@@ -149,6 +156,7 @@ function view(){
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=add">Добавить</a>
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=managers">Менеджеры</a>
 		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=checkOrderedWithReserved">Сверить "заказано"</a>
+		<a style="position: relative;left: 14px;top: 5px;" href="?view=users&act=usersWithWithdraw">Отрицательный баланс</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -611,7 +619,8 @@ function search_history(){
 		WHERE
 			user_id = {$_GET['id']}
 	", '');
-	$user = core\User::get($_GET['id']);
+	$res_user = core\User::get(['user_id' => $_GET['id']]);
+	$user = $res_user->fetch_assoc();
 	$page_title = 'История поиска';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
@@ -641,7 +650,8 @@ function search_history(){
 function basket(){
 	global $db, $status, $page_title;
 	$basket = core\Basket::get($_GET['id']);
-	$user = core\User::get($_GET['id']);
+	$res_user = core\User::get(['user_id' => $_GET['id']]);
+	$user = $res_user->fetch_assoc();
 	$page_title = 'Корзина';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";

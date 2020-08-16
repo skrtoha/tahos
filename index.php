@@ -39,7 +39,10 @@ if($_GET['act'] == 'unbind'){
 }
 $path = "templates/$view.php";
 
-$user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] : null]);
+$res_user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] : false]);
+if ($res_user->num_rows) $user = $res_user->fetch_assoc();
+else $user = $res_user;
+
 $basket = get_basket();
 if (file_exists($path)){
 	ob_start();

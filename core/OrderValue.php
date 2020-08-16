@@ -21,7 +21,8 @@ class OrderValue{
 				$quan = $params['issued'];
 				$values['issued'] = "`issued` + $quan";
 				self::update($values, $params);
-				$user = User::get(['user_id' => $ov['user_id']]);
+				$res_user = User::get(['user_id' => $ov['user_id']]);
+				$user = $res_user->fetch_assoc();
 				$title = self::getTitleComment($params['item_id']);
 				Fund::insert(2, [
 					'sum' => $ov['price'] * $quan,
@@ -45,7 +46,8 @@ class OrderValue{
 				$values['returned'] = "`returned` + {$params['quan']}";
 				self::update($values, $params);
 				self::changeInStockStoreItem($params['quan'], $params, 'plus');
-				$user = User::get(['user_id' => $params['user_id']]);
+				$res_user = User::get(['user_id' => $params['user_id']]);
+				$user = $res_user->fetch_assoc();
 				$title = self::getTitleComment($params['item_id']);
 				Fund::insert(1, [
 					'sum' => $params['quan'] * $params['price'],

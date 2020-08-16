@@ -9,7 +9,8 @@ if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
 $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
 	if (!empty($_POST['income'])) $issues->setIncome();
-	$user = core\User::get(['user_id' => $issues->user_id]);
+	$res_user = core\User::get(['user_id' => $issues->user_id]);
+	$user = $res_user->fetch_assoc();
 	$page_title = "Выдача товара";
 	$res_orders_values = core\OrderValue::get(['user_id' => $issues->user_id, 'status_id' => 3]);
 	$status .= "

@@ -104,14 +104,14 @@ function usersWithWithdraw(mysqli_result $res_users){?>
 		<tr class="head">
 			<td>ФИО</td>
 			<td>Телефон</td>
-			<td>E-mail</td>
+			<td>Баланс</td>
 		</tr>
 		<?if ($res_users->num_rows){
 			foreach($res_users as $user){?>
 				<tr class="users_box" user_id="<?=$user['id']?>">
 					<td label="ФИО"><?=$user['full_name']?></td>
-					<td label="Телефон"><?=$user['telefon']?></td>
 					<td label="E-mail"><?=$user['email']?></td>
+					<td label="Баланс"><?=$user['bill']?></td>
 				</tr>
 			<?}
 		}

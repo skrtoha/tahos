@@ -91,15 +91,35 @@ switch ($act) {
 		}
 		break;
 	case 'usersWithWithdraw':
+		$page_title = 'Отрицательный баланс';
+		$status = '<a href="/">Главная</a> > <a href="/admin/?view=users">Пользователи</a> > ' . $page_title;
 		$res_users = core\User::get(['withWithdraw' => true]);
 		usersWithWithdraw($res_users);
 		break;
 	default:
 		view();
 }
-function usersWithWithdraw(mysqli_result $res_users){
-
-}
+function usersWithWithdraw(mysqli_result $res_users){?>
+	<table class="t_table" cellspacing="1">
+		<tr class="head">
+			<td>ФИО</td>
+			<td>Телефон</td>
+			<td>E-mail</td>
+		</tr>
+		<?if ($res_users->num_rows){
+			foreach($res_users as $user){?>
+				<tr class="users_box" user_id="<?=$user['id']?>">
+					<td label="ФИО"><?=$user['full_name']?></td>
+					<td label="Телефон"><?=$user['telefon']?></td>
+					<td label="E-mail"><?=$user['email']?></td>
+				</tr>
+			<?}
+		}
+		else{?>
+			<tr><td colspan="3">Пользователей не найдено</td></tr>
+		<?}?>
+	</table>
+<?}
 function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');

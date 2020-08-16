@@ -55,8 +55,10 @@ class User{
 					CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
 				) AS full_name
 			FROM #users u
-			LEFT JOIN #currencies c ON c.id=u.currency_id
-			LEFT JOIN #issues i ON i.id=u.issue_id
+			LEFT JOIN 
+				#currencies c ON c.id=u.currency_id
+			LEFT JOIN 
+				#issues i ON i.id=u.issue_id
 			LEFT JOIN 
 				#organizations_types ot ON ot.id=u.organization_type
 			$where

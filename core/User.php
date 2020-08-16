@@ -89,7 +89,8 @@ class User{
 	 */
 	public static function setBonusProgram($user_id, $item_id, $sum){
 		$db = $GLOBALS['db'];
-		$user = self::get($user_id);
+		$res_user = self::get(['user_id' => $user_id]);
+		$user = $res_user->fetch_assoc();
 		if (!$user['bonus_program']) return false;
 		$current_bonus_count = floor($sum * self::$bonus_size / 100);
 		$title = orderValue::getTitleComment($item_id);

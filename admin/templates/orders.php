@@ -277,6 +277,10 @@ function show_form($act){
 			<td>Цена</td>
 			<td>Кол-во</td>
 			<td>Сумма</td>
+			<td>
+				Доставка<br>
+				Выдача
+			</td>
 			<td>Комментарий</td>
 			<?if (!$order['is_draft']){?>
 				<td>Статус</td>
@@ -418,6 +422,30 @@ function show_form($act){
 						<?}
 						else{?>
 							<?=$ov['sum']?>
+						<?}?>
+					</td>
+					<td label="Доставка">
+						<?if ($ov['status_id'] == 1){
+							$res_order_issues_values = $db->query("
+								SELECT
+									oiv.issue_id,
+									DATE_FORMAT(oi.created, '%d.%m.%Y') AS date
+								FROM
+									#order_issue_values oiv
+								LEFT JOIN
+									#order_issues oi ON oi.id = oiv.issue_id
+								WHERE
+									oiv.order_id = {$ov['order_id']} AND oiv.store_id = {$ov['store_id']} AND oiv.item_id = {$ov['item_id']}
+							", '');
+							$oiv = $res_order_issues_values->fetch_assoc();?>
+							<a href="/admin/?view=order_issues&issue_id=<?=$oiv['issue_id']?>"><?=$oiv['date']?></a>
+						<?}
+						else{?>
+							<?=Provider::getDiliveryDate(
+								json_decode($ov['workSchedule'], true), 
+								json_decode($ov['calendar'], true),
+								$ov['delivery']
+							)?>
 						<?}?>
 					</td>
 					<td label="Комментарий">

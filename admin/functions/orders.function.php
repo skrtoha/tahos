@@ -101,6 +101,8 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			IF(r.item_id IS NOT NULL, 1, 0) return_ordered,
 			IF (ps.noReturn, 'class=\"noReturn\" title=\"Возврат поставщику невозможен!\"', '') AS noReturn,
 			c.id AS correspond_id,
+			IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
+			IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
 			(
 				SELECT 
 					COUNT(id)

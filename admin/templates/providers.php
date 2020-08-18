@@ -116,28 +116,44 @@ switch ($act) {
 	case 'mainStores':
 		$page_title = 'Список основных складов';
 		$status = "<a href='/'>Главная</a> > <a href='?view=providers'>Поставщики </a> > $page_title";
+		$handlePrices = [
+			24 => 'priceRossko',
+			25 => 'priceRossko',
+			14 => 'priceMikado',
+			13 => 'priceMikado',
+			35 => 'priceMikado',
+			7 => 'priceSportAvto',
+			22 => 'priceMparts',
+			22380 => 'priceForumAuto',
+			276 => 'BERG_Yar',
+			275 => 'BERG_MSK'
+		];
 		$res_main_stores = $db->query("
 			SELECT
 				ps.id,
 				ps.title,
 				ps.cipher,
 				p.title AS provider,
+				p.api_title,
+				IF (ep.settings IS NOT NULL, 1, 0) AS isSetEmailPrice,
 				DATE_FORMAT(ps.price_updated, '%d.%m.%Y %H:%i:%s') AS price_updated
 			FROM
 				#provider_stores ps
 			LEFT JOIN
 				#providers p ON PS.provider_id = p.id
+			LEFT JOIN
+				#email_prices ep ON ep.store_id = ps.id
 			WHERE
 				ps.is_main = 1
 			ORDER BY
 				ps.price_updated DESC
 		", '');
-		mainStores($res_main_stores);
+		mainStores($res_main_stores, $handlePrices);
 		break;
 	default:
 		view();
 }
-function mainStores($res_main_stores){?>
+function mainStores($res_main_stores, $handlePrices){?>
 	<div style="float: right;margin-bottom: 5px;">Всего: <?=$res_main_stores->num_rows?></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -145,6 +161,7 @@ function mainStores($res_main_stores){?>
 			<td>Название</td>
 			<td>Поставщик</td>
 			<td>Дата<br>обновления</td>
+			<td></td>
 		</tr>
 		<?if ($res_main_stores->num_rows){
 			foreach($res_main_stores as $row){?>
@@ -153,6 +170,14 @@ function mainStores($res_main_stores){?>
 					<td><?=$row['title']?></td>
 					<td><?=$row['provider']?></td>
 					<td><?=$row['price_updated']?></td>
+					<td>
+						<?if ($row['isSetEmailPrice']){?>
+							<a href="/admin/?view=cron&act=emailPrice&store_id=<?=$row['id']?>">Обновить прайс</a>
+						<?}?>
+						<?if (isset($handlePrices[$row['id']])){?>
+							<a href="/admin/?view=cron&act=<?=$handlePrices[$row['id']]?>">Обновить прайс</a>
+						<?}?>
+					</td>
 				</tr>
 			<?}
 		}

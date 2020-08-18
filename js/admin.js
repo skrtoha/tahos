@@ -516,9 +516,6 @@ $(document).ready(function(e){
 	$('.items_box').on('click', function(){
 		document.location.href = "?view=items&act=item&id=" + $(this).attr('item_id');
 	})
-	$('.users_box').on('click', function(){
-		document.location.href = "?view=users&act=change&id=" + $(this).attr('user_id');
-	})
 	$('.messages_box').on('click', function(){
 		document.location.href = '/admin/?view=correspond&id=' + $(this).attr('correspond_id');
 	})

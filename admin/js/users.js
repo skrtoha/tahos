@@ -100,6 +100,9 @@
 				if (!$(uoa.getSelector('tr.item')).size()) $(uoa.getSelector('tr.hiddable')).show();
 				uoa.setTotal();
 			})
+			$('.users_box').on('click', function(){
+				document.location.href = "?view=users&act=funds&id=" + $(this).attr('user_id');
+			})
 		},
 		getSelector: function(str){
 			return this.mainSelector + str;

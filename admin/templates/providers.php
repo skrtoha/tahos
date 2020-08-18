@@ -121,13 +121,16 @@ switch ($act) {
 				ps.id,
 				ps.title,
 				ps.cipher,
-				p.title AS provider
+				p.title AS provider,
+				DATE_FORMAT(ps.price_updated, '%d.%m.%Y %H:%i:%s') AS price_updated
 			FROM
 				#provider_stores ps
 			LEFT JOIN
 				#providers p ON PS.provider_id = p.id
+			WHERE
+				ps.is_main = 1
 			ORDER BY
-				p.title
+				ps.price_updated DESC
 		", '');
 		mainStores($res_main_stores);
 		break;
@@ -141,6 +144,7 @@ function mainStores($res_main_stores){?>
 			<td>Шифр</td>
 			<td>Название</td>
 			<td>Поставщик</td>
+			<td>Дата<br>обновления</td>
 		</tr>
 		<?if ($res_main_stores->num_rows){
 			foreach($res_main_stores as $row){?>
@@ -148,6 +152,7 @@ function mainStores($res_main_stores){?>
 					<td><?=$row['cipher']?></td>
 					<td><?=$row['title']?></td>
 					<td><?=$row['provider']?></td>
+					<td><?=$row['price_updated']?></td>
 				</tr>
 			<?}
 		}

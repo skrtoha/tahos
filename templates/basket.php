@@ -109,7 +109,21 @@ $noReturnIsExists = false;
 						$val['isToOrder'] = 0;
 						$checkbox = 'disabled';
 						$db->update('basket', ['isToOrder' => 0], "`store_id` = {$val['store_id']} AND `item_id` = {$val['item_id']}");
-					} 
+					}
+
+					//обновление прайса в случае изменения количества 
+					if (
+						$pp['available'] == -1 ||
+						($pp['available'] > 0 && $pp['available'] < $val['quan'])
+					){
+						$res = $db->update('store_items', ['quan' => $pp['available']], "`store_id` = {$val['store_id']} AND `item_id` = {$val['item_id']}");
+						//после тестирования удалить
+						core\Log::insert([
+							'url' => 'Обновление в прайсах после срабатывания api',
+							'text' => json_encode($val),
+							'additional' => json_encode($pp)
+						]);
+					}
 				}
 
 				if ($val['noReturn']) $noReturnIsExists = true;

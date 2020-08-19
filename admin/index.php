@@ -27,9 +27,8 @@ Managers::$permissions = json_decode(Managers::getPermissions($_SESSION['manager
 
 if (core\Managers::isAccessForbidden($_GET['view'])){
 	$view = 'forbidden';
-} 
+}
 
-// debug($_SERVER);
 if ($view == 'orders' && $_GET['act'] == 'print'){
 	require_once('functions/orders.function.php');
 	require_once 'templates/orders.php';

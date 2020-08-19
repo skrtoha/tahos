@@ -4,6 +4,8 @@ use admin\functions\LeftMenu;
 class Managers{
 	public static $permissions;
 
+	public static $administratorGroupID = 1;
+
 	private static function getInstanceDatabase(){
 		return $GLOBALS['db'];
 	}

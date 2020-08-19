@@ -11,7 +11,14 @@ if (isset($_FILES['photo'])){
 }
 $act = $_GET['act'];
 if ($_POST['form_submit']){
-	// debug($_POST); exit();
+	
+	//если товар заблокирован и пользователь не является администртором
+	if (
+			$_SESSION['manager']['group_id'] != Managers::$administratorGroupID && 
+			$db->getFieldOnID('items', $_GET['id'], 'is_blocked') == 1
+	){
+		Managers::handlerAccessNotAllowed();
+	}
 
 	//удаляем отсутствующие фото
 	$filesBig = glob(core\Config::$imgPath . '/items/big/' . $_GET['id'] . '/*');
@@ -44,7 +51,7 @@ if ($_POST['form_submit']){
 			if ($isForDeleting) unlink($existingFile);
 		}
 	}
-	Item::update(['photo' => NULL], ['id' => $_GET['id']]);
+	$db->update('items', ['photo' => NULL], "'id' = {$_GET['id']}");
 
 
 	$db->delete('items_values', "`item_id` = {$_GET['id']}");
@@ -70,7 +77,6 @@ if ($_POST['form_submit']){
 	}
 	if ($array['article_cat'] && !$array['article']) $array['article'] = article_clear($array['article_cat']);
 	if (!$array['article_cat'] && !$array['article'] && $array['barcode']) $array['article'] = $array['barcode'];
-	if (!$array['is_blocked']) $array['is_blocked'] = 0;
 	if (isset($_GET['id'])){
 		$db->delete('items_titles', "`item_id`={$_GET['id']}");
 		$res = core\Item::update($array, ['id' => $_GET['id']]);
@@ -550,7 +556,16 @@ function item($act){
 					<div class="field">
 						<div class="title">Заблокировано</div>
 						<div class="value">
-							<input type="checkbox" <?=$_POST['is_blocked'] || $item['is_blocked'] ? 'checked' : ''?> name="is_blocked" value="1">
+							<?if (!empty($_POST)){
+								$selected = $_POST['is_blocked'];
+							}
+							else{
+								$selected = $item['is_blocked'];
+							}?>
+							<select name="is_blocked">
+								<option <?=$selected == 0 ? 'selected' : ''?> value="0">Нет</option>
+								<option <?=$selected == 1 ? 'selected' : ''?> value="1">Да</option>
+							</select>
 						</div>
 					</div>
 				<?}?>

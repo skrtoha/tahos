@@ -25,10 +25,28 @@ if ($_GET['act'] == 'to_offer'){
 		'user_id' => $_SESSION['user'],
 		'is_draft' => 0
 	]);
+
 	if ($res !== true) die ("$res | $db->last_query");
+
 	$order_id = $db->last_id();
+
+	$body = "<h1>Заказанные товары:</h1><table style='width: 100%;border-collapse: collapse;''>";
+
 	foreach ($res_basket as $value){
 		if (!$value['isToOrder']) continue;
+
+		$body .= "
+			<tr>
+				<td style='border: 1px solid black'>{$value['brend']}</td>
+				<td style='border: 1px solid black'>{$value['article']}</td>
+				<td style='border: 1px solid black'>{$value['title']}</td>
+				<td style='border: 1px solid black'>{$value['cipher']}</td>
+				<td style='border: 1px solid black'>{$value['price']}</td>
+				<td style='border: 1px solid black'>{$value['quan']}</td>
+				<td style='border: 1px solid black'>{$value['comment']}</td>
+			</tr>
+		";
+
 		$res = $db->insert(
 			'orders_values', 
 			[
@@ -51,12 +69,14 @@ if ($_GET['act'] == 'to_offer'){
 			} 
 		}
 	} 
+	$body .= "</table>";
+
  	$db->delete('basket', "`user_id`={$_SESSION['user']} AND `isToOrder`=1");
 	message('Успешно отправлено в заказы!');
 	core\Mailer::send([
 		'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
 		'subject' => 'Новый заказ на tahos.ru',
-		'body' => 'На сайте tahos.ru появился новый заказ'
+		'body' => $body
 	]);
 	header('Location: /orders');
 }

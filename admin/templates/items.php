@@ -763,13 +763,13 @@ function related(){
 		</tr>
 		<tr>
 			<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-			<td label="Артикул"><a href="?items&id=<?=$item['id']?>&act=change"><?=$item['article']?></a></td>
+			<td label="Артикул"><a href="?view=items&id=<?=$item['id']?>&act=item"><?=$item['article']?></a></td>
 			<td label="Название"><?=$item['title_full']?></td>
 			<td label="Штрих-код"><?=$item['barcode']?></td>
 		</tr>
 	</table>
 	<!-- <div id="total" style="margin-top: 20px">Всего: <?=$res_items->num_rows?></div> -->
-	<div id="relatedActs" style="margin-top: 5px" class="actions">
+	<div id="relatedActs" style="    margin: 10px 0;" class="actions">
 		<form action="/admin/?view=items&act=related_search&id=<?=$item_id?>" method="post">
 			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск для добавления">
 			<label>

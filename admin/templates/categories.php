@@ -1,5 +1,14 @@
 <?php
 use core\Managers;
+
+if (isset($_FILES['photo'])){
+	copy($_FILES['photo']['tmp_name'], $_SERVER['DOCUMENT_ROOT'].'/tmp/'.$_FILES['photo']['name']);?>
+		<img id="uploadedPhoto" src="/tmp/<?=$_FILES['photo']['name']?>">
+		<button id="savePhoto">Сохранить</button>
+	<?
+	exit();
+}
+
 $act = $_GET['act'];
 if ($_POST['submit']){
 	$id = $_GET['id'];
@@ -9,6 +18,7 @@ if ($_POST['submit']){
 		'title' => $_POST['title'],
 		'href' => $href,
 		'pos' => $_POST['pos'] ? $_POST['pos'] : 0,
+		'isShowOnMainPage' => $_POST['isShowOnMainPage']
 	];
 	$bl = true;
 	if ($id) $where = "`href`='{$array['href']}' AND `id`!=$id";
@@ -34,12 +44,19 @@ if ($_POST['submit']){
 				Managers::handlerAccessNotAllowed();
 			} 
 			$db->insert('categories', $array, ['print_query' => false]);
+			$id = $db->last_id();
 		} 
+
+		debug($_POST);
+		$imgPath =  core\Config::$imgPath . '/categories/' . $id . '.jpg';
+		if (!isset($_POST['photo']) && file_exists($imgPath)) unlink($imgPath);
+		if (isset($_POST['photo']) && preg_match('/\/tmp\//', $_POST['photo'])){
+			copy($_SERVER['DOCUMENT_ROOT'] . $_POST['photo'], $imgPath);
+		}
+
 		message('Изменения успешно сохранены!');
 		header('Location: ?view=categories');
 	}
-	// debug($array);
-	// exit();
 }
 // debug($_POST);
 switch ($act) {
@@ -99,6 +116,10 @@ switch ($act) {
 			$mains[$sub['parent_id']] = $sub['main'];
 		}
 		subs($subs, $mains);
+		break;
+	case 'changeIsShowOnMainPage':
+		$db->update('categories', ['isShowOnMainPage' => $_GET['isShowOnMainPage']], "`id` = {$_GET['category_id']}");
+		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
 	default: view();
 }
@@ -176,10 +197,41 @@ function show_form(){
 					<div class="value"><input type="text" name="pos" value="<?=$array['pos']?>"></div>
 				</div>
 				<div class="field">
+					<div class="title">Показывать на<br>основной странице</div>
+					<div class="value">
+						<select name="isShowOnMainPage">
+							<option <?=$array['isShowOnMainPage'] == 0 ? 'selected' : ''?> value="0">нет</option>
+							<option <?=$array['isShowOnMainPage'] == 1 ? 'selected' : ''?> value="1">да</option>
+						</select>
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Изображение на <br>главной странице</div>
+					<div class="value">
+						<?$imgPath = core\Config::$imgPath . '/categories/' . $id . '.jpg';?>
+						<input class="<?=file_exists($imgPath) ? 'hidden' : ''?>" type="button" accept="image/*" value="Загрузить фото" id="buttonLoadPhoto">
+						<ul class="photo" id="photos">
+							<?if(file_exists($imgPath)){?>
+								<li big="<?=core\Config::$imgUrl?>/categories/<?=$id?>.jpg">
+									<div>
+										<a table="fotos" class="delete_foto" href="#">Удалить</a>
+									</div>
+									<img src="<?=core\Config::$imgUrl?>/categories/<?=$id?>.jpg">
+									<input type="hidden" name="photo" value="<?=core\Config::$imgUrl?>/categories/<?=$id?>.jpg">
+								</li>
+							<?}?>
+						</ul>
+					</div>
+				</div>
+				<div class="field">
 					<div class="title"></div>
 					<div class="value"><input type="submit" value="Сохранить"></div>
 				</div>
+				</div>
 			</form>
+			<form style="display: none" action="?view=categories&act=change&id=<?=$_GET['id']?>" enctype="multipart/form-data" method="post">
+			<input id="loadPhoto" name="photo" type="file">
+		</form>
 		</div>	
 	</div>
 	<div class="actions"><a href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a></div>

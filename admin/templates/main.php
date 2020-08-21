@@ -13,7 +13,7 @@ use admin\functions\LeftMenu;
 	<?if (in_array($_GET['view'], ['connections', 'reports', 'returns'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/datetimepicker/jquery.datetimepicker.min.css">
 	<?}?>
-	<?if (in_array($_GET['view'], ['items'])){?>
+	<?if (in_array($_GET['view'], ['items', 'categories'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/cropper/cropper.css">
 	<?}?>
 	<?if (in_array($_GET['view'], ['connections'])){?>
@@ -134,7 +134,7 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['items', 'orders', 'returns'])){?>
 			{"src" : "/admin/js/show_store_info.js", "async" : false},
 		<?}?>
-		<?if (in_array($view, ['items'])){?>
+		<?if (in_array($view, ['items', 'categories'])){?>
 			{"src" : "/vendor/cropper/cropper.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['prices'])){?>

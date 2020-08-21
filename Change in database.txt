@@ -62,3 +62,7 @@ GROUP BY
 	c.url 
 ORDER BY
 	cnt DESC
+
+  ALTER TABLE `tahos_categories` ADD `isShowOnMainPage` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `parent_id`;
+
+  создать папку categoriess

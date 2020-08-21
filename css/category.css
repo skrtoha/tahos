@@ -6537,11 +6537,6 @@ span.delete-btn:hover {
     #news a:last-child, .selection .select:nth-child(4) {
         margin: 0
     }
-    #selection {
-        float: none;
-        padding: 47px 0 0;
-        width: 100%
-    }
     .selection h2 {
         position: absolute;
         top: -46px;

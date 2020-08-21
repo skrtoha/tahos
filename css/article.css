@@ -7089,10 +7089,6 @@ span.delete-btn {
 	.ionTabs__head li {
 		padding: 0 22px;
 		font-size: 0.8em; }
-	#selection {
-		float: none;
-		padding: 47px 0 0 0;
-		width: 100%; }
 	.selection h2 {
 		position: absolute;
 		top: -46px;

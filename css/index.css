@@ -11,7 +11,32 @@
 .irs-from, .irs-grid-text, .irs-single, .irs-to, .jstree-anchor, .jstree-node, .mfp-counter, .vakata-context li>a {
 	white-space: nowrap
 }
-#selection {
+#selection .categories{
+	display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+#selection .categories h2{
+
+}
+#selection .category .right {
+    float: right;
+    margin-left: 10px;
+}
+#selection .category .left {
+    float: left;
+    width: 220px;
+}
+#selection .category .left li {
+	padding: 0 0 9px 0;
+}
+#selection .category .left li a{
+	text-decoration: none;
+}
+#selection .category {
+	    border: 1px solid silver;
+	    margin-top: 10px;
+    padding: 20px;
 }
 .mfp-content .filter-form h3, .option-panel a, .registration h1, footer h4 {
 	text-transform: uppercase
@@ -576,6 +601,17 @@ img.mfp-img {
 	color: #F3F3F3;
 	word-wrap: break-word;
 	padding-right: 36px
+}
+@media screen and (max-width:565px){
+	#selection .categories .category{
+		width: 100%;
+	}
+	#selection .categories .category .left{
+		width: 100%;
+	}
+	#selection .categories .category .right{
+		display: none;
+	}
 }
 @media screen and (max-width:800px) and (orientation:landscape), screen and (max-height:300px) {
 	.mfp-img-mobile .mfp-image-holder {
@@ -6601,14 +6637,7 @@ span.delete-btn:hover {
 		margin: 0
 	}
 	#selection {
-		float: none;
-		padding: 47px 0 0;
 		width: 100%
-	}
-	.selection h2 {
-		position: absolute;
-		top: -46px;
-		left: 0
 	}
 	#news a, #news h3 {
 		margin: 0 0 15px

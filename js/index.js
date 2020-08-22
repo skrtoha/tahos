@@ -73,4 +73,26 @@ $(function(){
 			'/' + model +
 			'/' + year;
 	})
+	$('.categories .category .left').each(function(){
+		let ul = $(this);
+		console.log(ul.height());
+		if (ul.height() > 250){
+			let i = ul.find('li').size();
+			while(ul.height() > 240){
+				ul.find('li:nth-child(' + i + ')').addClass('hidden');
+				i--;
+			}
+			/*console.log(ul.height);
+			for(let i = 9; i <= li_count; i++){
+				ul.find('li:nth-child(' + i + ')').addClass('hidden');
+			}*/
+			ul.append('<li><a class="more" href="#">еще..<a></li>');
+		}
+	})
+	$(document).on('click', 'a.more', function(e){
+		e.preventDefault();
+		let more = $(this);
+		more.closest('ul').find('li').removeClass('hidden');
+		more.remove();
+	})
 });

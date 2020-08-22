@@ -8,6 +8,33 @@ $res_vehicles = $db->query("
 		#vehicles v
 	ORDER BY v.title
 ");
+$res_categories = $db->query("
+	SELECT 
+		c.id AS category_id,
+		c.title AS category,
+		c.pos AS category_pos,
+		sc.pos AS subcategory_pos,
+		sc.title AS subcategory,
+		sc.id AS subcategory_id,
+		c.href AS category_href,
+		sc.href AS subcategory_href
+	FROM #categories c
+	LEFT JOIN #categories sc ON c.id = sc.parent_id
+	WHERE
+		c.isShowOnMainPage = 1
+	ORDER BY c.pos, sc.pos
+", '');
+$categories = [];
+foreach($res_categories as $row){
+	$c = & $categories[$row['category']];
+	$c['id'] = $row['category_id'];
+	$c['href'] = $row['category_href'];
+	$c['subcategories'][] = [
+		'title' => $row['subcategory'],
+		'href' => $row['subcategory_href']
+	];
+}
+// debug($categories);
 ?>
 <div id="selection">
 	<div class="selection">
@@ -38,7 +65,29 @@ $res_vehicles = $db->query("
 				</select>
 			</div>
 		</form>
+	</div>
+	<div class="selection">
+		<h2>Каталог товаров</h2>
+		<div class="categories">
+			<?foreach($categories as $category_title => $value){?>
+				<div class="category">
+					<h3 class="title"><?=$category_title?></h3>
+					<ul class="left">
+						<?foreach($value['subcategories'] as $sc){?>
+							<li>
+								<a href="/category/<?=$value['href']?>/<?=$sc['href']?>"><?=$sc['title']?></a>
+							</li>
+						<?}?>
+					</ul>
+					<?if (file_exists(core\Config::$imgPath . '/' . "categories/{$value['id']}.jpg")){?>
+						<div class="right">
+							<img src="<?=core\Config::$imgUrl?>/categories/<?=$value['id']?>.jpg">
+						</div>
+					<?}?>
+				</div>
+			<?}?>
 		</div>
 	</div>
+</div>
 
 	

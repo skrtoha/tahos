@@ -22,6 +22,14 @@
 #selection .category .right {
     float: right;
     margin-left: 10px;
+    width: 120px;
+}
+#selection .category h3.title a{
+	text-decoration: none;
+	color: #737373;
+}
+#selection .category .right img{
+	width: 100%;
 }
 #selection .category .left {
     float: left;
@@ -34,9 +42,7 @@
 	text-decoration: none;
 }
 #selection .category {
-	    border: 1px solid silver;
 	    margin-top: 10px;
-    padding: 20px;
 }
 .mfp-content .filter-form h3, .option-panel a, .registration h1, footer h4 {
 	text-transform: uppercase

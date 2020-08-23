@@ -67,11 +67,10 @@ foreach($res_categories as $row){
 		</form>
 	</div>
 	<div class="selection">
-		<h2>Каталог товаров</h2>
 		<div class="categories">
 			<?foreach($categories as $category_title => $value){?>
 				<div class="category">
-					<h3 class="title"><?=$category_title?></h3>
+					<h3 class="title"><a href="/category/<?=$value['href']?>"><?=$category_title?></a></h3>
 					<ul class="left">
 						<?foreach($value['subcategories'] as $sc){?>
 							<li>
@@ -81,7 +80,9 @@ foreach($res_categories as $row){
 					</ul>
 					<?if (file_exists(core\Config::$imgPath . '/' . "categories/{$value['id']}.jpg")){?>
 						<div class="right">
-							<img src="<?=core\Config::$imgUrl?>/categories/<?=$value['id']?>.jpg">
+							<a href="/category/<?=$value['href']?>">
+								<img src="<?=core\Config::$imgUrl?>/categories/<?=$value['id']?>.jpg">
+							</a>
 						</div>
 					<?}?>
 				</div>

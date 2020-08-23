@@ -1,4 +1,8 @@
 <?
+ini_set('error_reporting', E_ERROR | E_PARSE);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 session_start();
 require_once('../core/DataBase.php');
 require_once('../core/functions.php');
@@ -11,7 +15,8 @@ $db->setProfiling();
 $id = $_POST['id'];
 $user_id = $_SESSION['user'] ? $_SESSION['user'] : false;
 $res_user = core\User::get(['user_id' => $user_id]);
-$user = $res_user->fetch_assoc();
+if ($user_id) $user = $res_user->fetch_assoc();
+else $user = $res_user;
 
 if ($_SESSION['user']){
 	$where_basket = "LEFT JOIN #basket ba  ON ba.item_id=i.id AND ba.store_id=ps.id AND ba.user_id={$_SESSION['user']}";

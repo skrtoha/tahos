@@ -99,6 +99,10 @@ switch ($act) {
 		$db->update('filters', ['isActive' => 0], "`id` = {$_GET['id']}"); 
 		header("Location: ?view=category&act=filters&id={$_GET['from']}");
 		break;
+	case 'changeIsShowOnMainPage':
+		$db->update('categories', ['isShowOnMainPage' => $_GET['isShowOnMainPage']], "`id` = {$_GET['id']}");
+		header("Location: {$_SERVER['HTTP_REFERER']}");
+		break;
 	default:
 		view();
 }
@@ -109,12 +113,13 @@ function view(){
 	$page_title = $db->getFieldOnID('categories', $id, 'title');
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=categories'>Категории товаров</a> > $page_title";?>
 	<div id="total" style="margin: 0">Всего: <?=count($subcategories)?></div>
-	<div class="actions"><a id="add_subcategory" category_id=<?=$id?> href="">Добавить</a></div>
+	<div class="actions"><a id="add_subcategory" category_id="<?=$id?>" href="">Добавить</a></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Заголовок</td>
 			<td>Позиция</td>
 			<td>Ссылка</td>
+			<td>Отображать<br>на главной</td>
 			<td></td>
 			<td></td>
 		</tr>
@@ -132,6 +137,17 @@ function view(){
 					else{?>
 						Ссылка не задана
 					<?}?>
+				</td>
+				<td>
+					<form>
+						<input type="hidden" name="view" value="category">
+						<input type="hidden" name="act" value="changeIsShowOnMainPage">
+						<input type="hidden" name="id" value="<?=$category['id']?>">
+						<select name="isShowOnMainPage">
+							<option <?=$category['isShowOnMainPage'] == 0 ? 'selected' : ''?> value="0">нет</option>
+							<option <?=$category['isShowOnMainPage'] == 1 ? 'selected' : ''?> value="1">да</option>
+						</select>
+					</form>
 				</td>
 				<td>
 					<?$items = $db->select('categories_items', 'item_id', "`category_id`=".$category['id']." GROUP BY `item_id`")?>

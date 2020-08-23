@@ -21,7 +21,7 @@ $res_categories = $db->query("
 	FROM #categories c
 	LEFT JOIN #categories sc ON c.id = sc.parent_id
 	WHERE
-		c.isShowOnMainPage = 1
+		c.isShowOnMainPage = 1 AND sc.isShowOnMainPage = 1
 	ORDER BY c.pos, sc.pos
 ", '');
 $categories = [];

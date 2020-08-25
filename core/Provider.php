@@ -320,7 +320,8 @@ abstract class Provider{
 		$storeInfo = self::getStoreInfo($store_id, '');
 		$res_user = User::get(['user_id' => $user_id]);
 		$userInfo = $res_user->fetch_assoc();
-		$price = $price + $price * $storeInfo['percent'] / 100 - $price * $userInfo['discount'] / 100;
+		$price = $price + $price * $storeInfo['percent'] / 100;
+		$price -= $price * $userInfo['discount'] / 100;
 		return ceil($price);
 	}
 	/**

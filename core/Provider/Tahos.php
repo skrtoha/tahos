@@ -46,7 +46,12 @@ class Tahos extends Provider{
 				si.store_id = " . self::$store_id . "
 		", '');
 	}
-	public static function getPrice($params){}
+	public static function getPrice($params){
+		return [
+			'price' => $params['price'],
+			'available' => $params['in_stock']
+		];
+	}
 	public static function getItemsToOrder($provider_id): array {
 		return [];
 	}

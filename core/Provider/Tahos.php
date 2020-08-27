@@ -47,7 +47,9 @@ class Tahos extends Provider{
 		", '');
 	}
 	public static function getPrice($params){}
-	public static function getItemsToOrder($provider_id): array {}
+	public static function getItemsToOrder($provider_id): array {
+		return [];
+	}
 	public static function isInBasket($params){}
 	public static function removeFromBasket($ov){}
 	public static function addToBasket($params){}

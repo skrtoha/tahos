@@ -381,6 +381,15 @@ function show_form($act){
 					</div>
 				</div>
 				<div class="field">
+					<div class="title">Автоматически <br>отправлять в заказ</div>
+					<div class="value">
+						<select name="isAutomaticOrder">
+							<option <?=$array['isAutomaticOrder'] == 0 ? 'selected' : ''?> value="0">нет</option>
+							<option <?=$array['isAutomaticOrder'] == 1 ? 'selected' : ''?> value="1">да</option>
+						</select>
+					</div>
+				</div>
+				<div class="field">
 					<div class="title">Показывать поставщика</div>
 					<div class="value">
 						<?if ($_POST['showProvider']) $checked = $_POST['showProvider'] ? 'checked' : '';

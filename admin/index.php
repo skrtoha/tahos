@@ -29,12 +29,16 @@ if (core\Managers::isAccessForbidden($_GET['view'])){
 	$view = 'forbidden';
 }
 
-if ($view == 'orders' && $_GET['act'] == 'print'){
+if ($_GET['view'] == 'orders' && ($_GET['act'] == 'print' || isset($_GET['automaticOrder']))){
 	require_once('functions/orders.function.php');
 	require_once 'templates/orders.php';
 	exit();
 }
-if (!$_SESSION['auth'] && $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest' && $view != 'cron') $view = 'authorization';
+if (
+	!$_SESSION['auth'] && 
+	$_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest' && 
+	$view != 'cron'
+) $view = 'authorization';
 if (file_exists("functions/$view.function.php")) require_once("functions/$view.function.php");
 
 ob_start();

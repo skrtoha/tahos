@@ -2,7 +2,6 @@
 $title = "Корзина";
 $user_id = $_SESSION['user'];
 // debug($basket, 'basket');
-// debug($user); exit();
 if ($_GET['act'] == 'to_offer'){
 	$res_basket = core\Basket::get($user_id, true);
 
@@ -26,7 +25,8 @@ if ($_GET['act'] == 'to_offer'){
 		'is_draft' => 0
 	]);
 
-	if ($res !== true) die ("$res | $db->last_query");
+	//закоментирована эта строка, т.к. очень часто появлялся пустой заказ
+	// if ($res !== true) die ("$res | $db->last_query");
 
 	$order_id = $db->last_id();
 
@@ -60,24 +60,27 @@ if ($_GET['act'] == 'to_offer'){
 		 	]
 		 	// ,['print_query' => 1]
 	 	);
-		if ($res !== true) die("$res | $last_query");
-		if ($user['isAutomaticOrder']){
-			$armtek = new core\Provider\Armtek($db);
-			if ($armtek->isKeyzak($value['store_id'])){
-				$value['order_id'] = $order_id;
-				$armtek->toOrder($value);
-			} 
-		}
+
+	 	//закоментирована эта строка, т.к. очень часто появлялся пустой заказ
+		// if ($res !== true) die("$res | $last_query");
+		
 	} 
 	$body .= "</table>";
 
  	$db->delete('basket', "`user_id`={$_SESSION['user']} AND `isToOrder`=1");
-	message('Успешно отправлено в заказы!');
+
 	core\Mailer::send([
-		'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
+		'emails' => [/*'info@tahos.ru', */'skrtoha@gmail.com'],
 		'subject' => 'Новый заказ на tahos.ru',
 		'body' => $body
 	]);
+	
+ 	if ($user['isAutomaticOrder'] && $value['api_title']){
+		header("Location: /admin/?view=orders&id=$order_id&act=allInWork&automaticOrder=1");
+		exit();
+	}
+
+	message('Успешно отправлено в заказы!');
 	header('Location: /orders');
 }
 $res_basket = core\Basket::get($_SESSION['user']);

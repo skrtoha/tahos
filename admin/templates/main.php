@@ -9,13 +9,13 @@ use admin\functions\LeftMenu;
 	<?if(file_exists("css/{$_GET['view']}.css")){?>
 		<link rel="stylesheet" type="text/css" href="css/<?=$_GET['view']?>.css">
 	<?}?>
-	<?if (in_array($_GET['view'], ['connections', 'reports', 'returns'])){?>
+	<?if (in_array($_GET['view'], ['connections', 'reports', 'returns', 'index'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/datetimepicker/jquery.datetimepicker.min.css">
 	<?}?>
 	<?if (in_array($_GET['view'], ['items', 'categories'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/cropper/cropper.css">
 	<?}?>
-	<?if (in_array($_GET['view'], ['connections'])){?>
+	<?if (in_array($_GET['view'], ['connections', 'index'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/chosen/chosen.css">
 	<?}?>
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
@@ -127,7 +127,7 @@ use admin\functions\LeftMenu;
 		{"src" : "/js/jquery.form.js", "async" : false},
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
-		<?if (in_array($view, ['connections', 'reports', 'returns'])){?>
+		<?if (in_array($view, ['connections', 'reports', 'returns', 'index'])){?>
 			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['items', 'orders', 'returns'])){?>
@@ -139,7 +139,7 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['prices'])){?>
 			{"src" : "/admin/js/add_item_to_store.js", "async" : false},
 		<?}?>
-		<?if (in_array($view, ['connections'])){?>
+		<?if (in_array($view, ['connections', 'index'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
 		<?}?>
 		<?if (file_exists("js/$view.js")){

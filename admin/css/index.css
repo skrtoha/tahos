@@ -1,0 +1,26 @@
+#contents{
+	overflow: inherit;
+}
+li.active-result {
+    text-align: left;
+}
+#index h2{
+	margin-bottom: 10px;
+}
+#index .datetimepicker{
+	margin-bottom: 10px;
+    width: 115px;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid lightslategrey;
+    background: linear-gradient(#fff 20%, #f6f6f6 50%, #eee 52%, #f4f4f4 100%);
+}
+#index {
+    width: 50%;
+    border: 1px solid lightgrey;
+    padding: 5px;
+}
+#index select[name=user_id] ~ .chosen-container{
+	top: -1px;
+    margin-left: 10px;
+}

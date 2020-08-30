@@ -95,6 +95,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			u.bill,
 			u.reserved_funds,
 			ps.delivery,
+			p.api_title,
 			ps.title AS providerStore,
 			ps.provider_id,
 			mzc.ZakazCode,

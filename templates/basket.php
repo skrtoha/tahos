@@ -1,7 +1,6 @@
 <?if (!$_SESSION['user']) header('Location: /');
 $title = "Корзина";
 $user_id = $_SESSION['user'];
-// debug($basket, 'basket');
 if ($_GET['act'] == 'to_offer'){
 	$res_basket = core\Basket::get($user_id, true);
 
@@ -75,7 +74,7 @@ if ($_GET['act'] == 'to_offer'){
 		'body' => $body
 	]);
 	
- 	if ($user['isAutomaticOrder'] && $value['api_title']){
+ 	if ($user['isAutomaticOrder']){
 		header("Location: /admin/?view=orders&id=$order_id&act=allInWork&automaticOrder=1");
 		exit();
 	}

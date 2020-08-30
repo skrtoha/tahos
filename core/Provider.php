@@ -1,7 +1,7 @@
 <?php
 namespace core;
 abstract class Provider{
-	private static $ignoreProvidersForMarkups = [18];
+	private static $ignoreProvidersForMarkups = [18, 14];
 	protected abstract static function getItemsToOrder(int $provider_id);
 
 	public static function getProviderTitle($provider_id){

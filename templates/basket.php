@@ -69,7 +69,7 @@ if ($_GET['act'] == 'to_offer'){
  	$db->delete('basket', "`user_id`={$_SESSION['user']} AND `isToOrder`=1");
 
 	core\Mailer::send([
-		'emails' => [/*'info@tahos.ru', */'skrtoha@gmail.com'],
+		'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
 		'subject' => 'Новый заказ на tahos.ru',
 		'body' => $body
 	]);

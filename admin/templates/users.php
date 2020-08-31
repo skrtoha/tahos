@@ -649,7 +649,8 @@ function search_history(){
 			user_id = {$_GET['id']}
 	", '');
 	$res_user = core\User::get(['user_id' => $_GET['id']]);
-	$user = $res_user->fetch_assoc();
+	if (is_object($res_user)) $user = $res_user->fetch_assoc();
+	else $user = $res_user;
 	$page_title = 'История поиска';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
@@ -680,7 +681,8 @@ function basket(){
 	global $db, $status, $page_title;
 	$basket = core\Basket::get($_GET['id']);
 	$res_user = core\User::get(['user_id' => $_GET['id']]);
-	$user = $res_user->fetch_assoc();
+	if (is_object($res_user)) $user = $res_user->fetch_assoc();
+	else $user = $res_user;
 	$page_title = 'Корзина';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";

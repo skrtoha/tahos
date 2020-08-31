@@ -349,7 +349,8 @@ function category_items_with_filters($sub_id, $sort = ['type' => 'title_full', '
 	$items = $_SESSION['items_chunks'][0];
 	$items_values = cat_get_items_values($items);
 	$res_user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] : false]);
-	$user = $res_user->fetch_assoc();
+	if (is_object($res_user)) $user = $res_user->fetch_assoc();
+	else $user = $res_user;
 	$ratings = json_decode($settings['ratings'], true);
 	foreach ($items as $key => $item){
 		$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];

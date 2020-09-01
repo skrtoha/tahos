@@ -100,15 +100,15 @@ $inBasket = json_encode(getInBasket($basket));
 						<?if (!empty($si['prevails'])){?>
 							<ul class="prevail">
 								<?foreach($si['prevails'] as $value){?>
-									<li><?=$value['delivery']?> дн. (<?=$value['delivery_date']?>)</li>
+									<li><?=$value['delivery_date']?></li>
 								<?}?>
 							</ul>
 						<?}?>
 						<?if (!empty($si_price)){?>
 							<ul>
-								<li><?=$si_price['delivery']?> дн. (<?=$si_price['delivery_date']?>)</li>
+								<li><?=$si_price['delivery_date']?></li>
 								<?if (!empty($si_delivery)){?>
-									<li><?=$si_delivery['delivery']?> дн. (<?=$si_delivery['delivery_date']?>)</li>
+									<li><?=$si_delivery['delivery_date']?></li>
 								<?}?>
 							</ul>
 						<?}?>
@@ -284,13 +284,13 @@ $inBasket = json_encode(getInBasket($basket));
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
-										<li><?=$value['delivery']?> дн. (<?=$value['delivery_date']?>)</li>
+										<li><?=$value['delivery_date']?></li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
-									<li><?=$value['delivery']?> дн. (<?=$value['delivery_date']?>)</li>
+									<li><?=$value['delivery_date']?></li>
 								<?}?>
 							</ul>
 						</td>
@@ -484,15 +484,15 @@ else{?>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
-										<li><?=$value['delivery']?> дн. (<?=$value['delivery_date']?>)</li>
+										<li><?=$value['delivery_date']?></li>
 									<?}?>
 								</ul>
 							<?}?>
 							<?if (!empty($si_price)){?>
 								<ul>
-									<li><?=$si_price['delivery']?> дн. (<?=$si_price['delivery_date']?>)</li>
+									<li><?=$si_price['delivery_date']?></li>
 									<?if (!empty($si_delivery)){?>
-										<li><?=$si_delivery['delivery']?> дн. (<?=$si_delivery['delivery_date']?>)</li>
+										<li><?=$si_delivery['delivery_date']?></li>
 									<?}?>
 								</ul>
 							<?}?>
@@ -641,13 +641,13 @@ else{?>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
-										<li><?=$value['delivery']?> дн. (<?=$value['delivery_date']?>)</li>
+										<li><?=$value['delivery_date']?></li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
-									<li><?=$value['delivery']?> дн. (<?=$value['delivery_date']?>)</li>
+									<li><?=$value['delivery_date']?></li>
 								<?}?>
 							</ul>
 						</td>

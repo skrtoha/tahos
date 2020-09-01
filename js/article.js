@@ -399,9 +399,9 @@ function store_items(store_items, user, search_type = null){
 						'<ul class="prevail">';	
 			for (var p in si.prevails){
 				full +=
-						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
+						'<li>'  + si.prevails[p].delivery_date + '</li>';
 				mobile +=
-						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
+						'<li>' + si.prevails[p].delivery_date + '</li>';
 			}
 			full += 
 					'</ul>';
@@ -411,15 +411,15 @@ function store_items(store_items, user, search_type = null){
 		if (csi){
 			full +=
 					'<ul>' +
-						'<li>' + si_price.delivery + ' дн. (' + si_price.delivery_date + ' )</li>';
+						'<li>' + si_price.delivery_date + '</li>';
 			mobile +=
 					'<ul>' +
-						'<li>' + si_price.delivery + ' дн. (' + si_price.delivery_date + ')</li>';
+						'<li>' + si_price.delivery_date + '</li>';
 			if (si_delivery){
 				full += 
-						'<li>' + si_delivery.delivery + ' дн. (' + si_delivery.delivery_date + ')</li>';
+						'<li>' + si_delivery.delivery_date + '</li>';
 				mobile +=
-						'<li>' + si_delivery.delivery + ' дн. (' + si_delivery.delivery_date + ')</li>';
+						'<li>' + si_delivery.delivery_date + '</li>';
 			};
 			full +=
 					'</ul>';
@@ -804,9 +804,9 @@ function store_items(store_items, user, search_type = null){
 					'<ul class="prevail">';
 				for(var p in si.prevails){
 					full +=
-						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
+						'<li>' + si.prevails[p].delivery_date + '</li>';
 					mobile +=
-						'<li>' + si.prevails[p].delivery + ' дн. (' + si.prevails[p].delivery_date + ')</li>';
+						'<li>' + si.prevails[p].delivery_date + '</li>';
 				}
 				full +=
 					'</ul>';
@@ -819,9 +819,9 @@ function store_items(store_items, user, search_type = null){
 					'<ul>';
 			for (var k in si.list){
 				full += 			
-						'<li>' + si.list[k].delivery + ' дн. (' +  si.list[k].delivery_date+ ')</li>';
+						'<li>' +  si.list[k].delivery_date+ '</li>';
 				mobile += 			
-						'<li>' + si.list[k].delivery + ' дн. (' + si.list[k].delivery_date + ')</li>';
+						'<li>' + si.list[k].delivery_date + '</li>';
 			} 
 			full +=
 					'</ul>' +

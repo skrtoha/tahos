@@ -9,7 +9,6 @@ var store = {
 	delivery: '',
 	delivery_max: '',
 	under_order: '',
-	prevail: '',
 	workSchedule: '',
 	noReturn: 0
 };
@@ -23,7 +22,6 @@ function set_store(store_id){
 		data: 'act=get_store&store_id=' + store_id,
 		success: function(response){
 			store = JSON.parse(response);
-			store.prevail = +store.prevail ? 'checked' : '';
 			store.noReturn = +store.noReturn ? 'checked' : '';
 			store.is_main = +store.is_main ? 'checked' : '';
 		}
@@ -106,10 +104,6 @@ function get_str_form(){
 				 	'<td><input type="checkbox" name="is_main" ' + store.is_main + ' value="1"></td>' +
 			 	'</tr>' +
 			 	'<tr>' +
-				 	'<td>Подсвечивать</td>' +
-				 	'<td><input type="checkbox" name="prevail" ' + store.prevail + ' value="1"></td>' +
-			 	'</tr>' +
-			 	'<tr>' +
 				 	'<td>Без возврата</td>' +
 				 	'<td><input type="checkbox" name="noReturn" ' + store.noReturn + ' value="1"></td>' +
 			 	'</tr>' +
@@ -129,8 +123,7 @@ function set_empty_store(){
 		provider_id: '',
 		delivery: '',
 		delivery_max: '',
-		under_order: '',
-		prevail: ''
+		under_order: ''
 	}
 }
 $(function(){

@@ -24,7 +24,6 @@ switch($_POST['act']){
 			'delivery_max' => $_POST['delivery_max'],
 			'under_order' => $_POST['under_order'],
 			'daysForReturn' => $_POST['daysForReturn'],
-			'prevail' => $_POST['prevail'] ? 1 : 0,
 			'noReturn' => $_POST['noReturn'] ? 1 : 0,
 			'is_main' => $_POST['is_main'] ? 1 : 0,
 		];
@@ -82,7 +81,6 @@ switch($_POST['act']){
 		if ($storeInfo['cron_hours'] && $storeInfo['cron_minutes']){
 			$storeInfo['orderProcessed'] = $date->format('d.m.Y') . " {$storeInfo['cron_hours']}:{$storeInfo['cron_minutes']}";
 		}
-		// debug($storeInfo);
 		getStoreInfo($storeInfo);
 		break;
 }
@@ -90,6 +88,12 @@ function getStoreInfo($storeInfo){?>
 	<div id="providerInfo">
 		<h3>Информация о складе</h3>
 		<div class="information">
+			<?if ($storeInfo['provider']){?>
+				<div class="row">
+					<span class="left">Поставщик:</span>
+					<span class="right"><?=$storeInfo['provider']?></span>
+				</div>
+			<?}?>
 			<?if ($storeInfo['orderProcessed']){?>
 				<div class="row">
 					<span class="left">Заказ будет обработан:</span>

@@ -422,7 +422,6 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			END AS delivery,
 			IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
 			IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
-			ps.prevail,
 			ps.noReturn,
 			ps.percent,
 			@price := si.price * c.rate + si.price * c.rate * ps.percent / 100,
@@ -455,7 +454,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 	}
 	else $q_item .= " HAVING price>0";
 	if (!$hide_analogies) $q_item .= " OR price IS NULL";
-	$q_item .= ' ORDER BY ps.prevail DESC, price, delivery';
+	$q_item .= ' ORDER BY price, delivery';
 	return $q_item;
 }
 function article_store_items($item_id, $filters = [], $search_type = 'articles'){
@@ -519,6 +518,11 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 			json_decode($v['calendar'], true),
 			$v['delivery']
 		);
+
+		// debug(core\Provider::$counterDaysDelivery);
+		if (core\Provider::$todayIssue) $v['prevail'] = 1;
+		else $v['prevail'] = 0;
+
 		$list['store_id'] = $v['store_id'];
 		$list['in_stock'] = (int) $v['in_stock'] ? $v['in_stock'] : 'Под заказ';
 		$list['cipher'] = $v['cipher'];
@@ -527,7 +531,6 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$list['delivery'] = $v['delivery'];
 		$list['price'] = $v['price'];
 		$list['in_basket'] = $v['in_basket'];
-		$list['prevail'] = $v['prevail'];
 		$list['noReturn'] = $v['noReturn'] ? "class='noReturn' title='Возврат поставщику невозможен!'" : '';
 		if ($v['prevail']){
 			$p['prevails'][$v['store_id']] = $list;
@@ -560,6 +563,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 			}
 		}
 	}
+
 	return [
 		'store_items' => $store_items,
 		'prices' => $prices ? $prices : array(),

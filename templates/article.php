@@ -26,6 +26,7 @@ if (core\Config::$isUseApiProviders){
 $title = "Список предложений";
 
 $array = article_store_items($_GET['item_id'], [], 'articles');
+// debug($array);
 $store_items = array();
 foreach($array['store_items'] as $key => $value){
 	$store_items[] = [

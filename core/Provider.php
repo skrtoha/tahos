@@ -2,6 +2,10 @@
 namespace core;
 abstract class Provider{
 	private static $ignoreProvidersForMarkups = [18, 14];
+	private static $counterDaysDelivery;
+
+	public static $todayIssue;
+
 	protected abstract static function getItemsToOrder(int $provider_id);
 
 	public static function getProviderTitle($provider_id){
@@ -77,13 +81,16 @@ abstract class Provider{
 	public static function getDiliveryDate($workSchedule, $calendar, $deliveryDays){
 		$dateTimeOut = new \DateTime();
 		$dateTimeNow = new \DateTime();
-		$i = 0;
+		self::$counterDaysDelivery = 0;
+		self::$todayIssue = true;
 
 		if (!$workSchedule && !$calendar){
 			$dateTimeOut->add(new \DateInterval('P' . abs($deliveryDays) . 'D'));
+			self::$todayIssue = false;
 			return $dateTimeOut->format('d.m');
 		}
 
+		self::$counterDaysDelivery = 0;
 		$date = $dateTimeNow->format('d.m.Y');
 		$dayWeek = $dateTimeNow->format('l');
 		if (isset($calendar[$date])){
@@ -93,11 +100,13 @@ abstract class Provider{
 					$date . ' ' . $calendar[$date]['hours'] . ':' . $calendar[$date]['minutes']
 				);
 				if ($dateTimeNow >= $dateTimeInterval){
-					$i = - 1;
+					self::$counterDaysDelivery = - 1;
+					self::$todayIssue = false;
 				} 
 			}
 			else{
-				$i = - 1;
+				self::$counterDaysDelivery = - 1;
+				self::$todayIssue = false;
 			}
 		}
 		elseif (isset($workSchedule[$dayWeek])){
@@ -107,15 +116,17 @@ abstract class Provider{
 					$date . ' ' . $workSchedule[$dayWeek]['hours'] . ':' . $workSchedule[$dayWeek]['minutes']
 				);
 				if ($dateTimeNow >= $dateTimeInterval){
-					$i = - 1;
+					self::$counterDaysDelivery = - 1;
+					self::$todayIssue = false;
 				} 
 			}
 			else{
-				$i = - 1;
+				self::$counterDaysDelivery = - 1;
+				self::$todayIssue = false;
 			}
 		}
-		while($i < $deliveryDays){
-			$i++;
+		while(self::$counterDaysDelivery < $deliveryDays){
+			self::$counterDaysDelivery++;
 			$dateTimeOut->add(new \DateInterval('P1D'));
 
 			// debug($workSchedule[$dayWeek], "$i, ".$dateTimeOut->format('d.m.Y'));
@@ -124,10 +135,12 @@ abstract class Provider{
 			$dayWeek = $dateTimeOut->format('l');
 
 			if (isset($calendar[$date])){
-				if (!$calendar[$date]['isWorkDay']) $i--;
+				if (!$calendar[$date]['isWorkDay']) self::$counterDaysDelivery--;
+				self::$todayIssue = false;
 			}
 			elseif (isset($workSchedule[$dayWeek])){
-				if (!$workSchedule[$dayWeek]['isWorkDay']) $i--;
+				if (!$workSchedule[$dayWeek]['isWorkDay']) self::$counterDaysDelivery--;
+				self::$todayIssue = false;
 			}
 		}
 		return $dateTimeOut->format('d.m');

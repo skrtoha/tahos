@@ -217,16 +217,7 @@ function show_form($act){
 	}
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > $page_title";
 	if ($act == 's_change'){?>
-		<a href="?view=users&act=funds&id=<?=$id?>">Движение средств</a>
-		<a href="?view=orders&act=user_orders&id=<?=$id?>">Заказы</a>
-		<a href="?view=users&act=user_order_add&id=<?=$id?>">Добавить заказ</a>
-		<a href="?view=correspond&user_id=<?=$id?>">Написать сообщение</a>
-		<a href="?view=order_issues&user_id=<?=$id?>">На выдачу</a>
-		<a href="?view=order_issues&user_id=<?=$id?>&issued=1">Выданные</a>
-		<a href="?view=users&id=<?=$id?>&act=search_history">История поиска</a>
-		<a href="?view=users&id=<?=$id?>&act=basket">Товары в корзине</a>
-		<a href="?view=users&id=<?=$id?>&act=delete" class="delete_item">Удалить</a>
-		<div style="width: 100%; height: 10px"></div>
+		<?=User::getHtmlActions($id)?>
 	<?}?>
 	<div class="t_form">
 		<div class="bg">
@@ -513,6 +504,9 @@ function funds(){
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$funds = $db->select('funds', '*', $where, 'id', false, "$start,$perPage", true);?>
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
+
+	<?=User::getHtmlActions($id)?>
+	
 	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>
 		<?$bill = $user[0]['bill'] ? '<span class="price_format">'.$user[0]['bill'].'</span> руб.' : 'пусто';?>

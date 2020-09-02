@@ -489,16 +489,17 @@ function funds(){
 	$operations_types = array(1 => 'Пополнение счета', 2 => 'Списание средств', 3 => 'Резервирование средств', 4 => 'Отмена резервирования');
 	$id = $_GET['id'];
 	require_once('templates/pagination.php');
-	$user = $db->select('users', 'name_1,name_2,name_3', "`id`=$id");
-	$fio = $user[0]['name_1'].' '.$user[0]['name_2'].' '.$user[0]['name_3'];
+
+	$res_user = core\User::get(['user_id' => $id]);
+	$user = $res_user->fetch_assoc();
+
 	$page_title = 'Движение средств';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
-	$status .= "<a href='?view=users&act=change&id=$id'>$fio</a> > $page_title";
+	$status .= "<a href='?view=users&act=change&id=$id'>{$user['full_name']}</a> > $page_title";
 	$where =  "`user_id`=$id AND `type_operation` NOT IN (3,4)";
 	$all = $db->getCount('funds', $where);
 	$perPage = 30;
 	$linkLimit = 10;
-	$user = $db->select('users', 'name_1,name_2,name_3,bill,reserved_funds', "`id`=$id");
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
@@ -506,16 +507,18 @@ function funds(){
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
 
 	<?=User::getHtmlActions($id)?>
-	
+
 	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>
-		<?$bill = $user[0]['bill'] ? '<span class="price_format">'.$user[0]['bill'].'</span> руб.' : 'пусто';?>
+		<?$bill = $user['bill'] ? '<span class="price_format">'.$user['bill'].'</span> руб.' : 'пусто';?>
 		<span>На счету: <b><?=$bill?></b></span>
-		<?$reserved_funds = $user[0]['reserved_funds'] ? '<span class="price_format">'.$user[0]['reserved_funds'].'</span> руб.' : 'пусто';?>
+		<?$reserved_funds = $user['reserved_funds'] ? '<span class="price_format">'.$user['reserved_funds'].'</span> руб.' : 'пусто';?>
 		<span>Зарезервировано: <b><?=$reserved_funds?></b></span>
-		<?$value = $user[0]['bill'] - $user[0]['reserved_funds'];
+		<?$value = $user['bill'] - $user['reserved_funds'];
 		$available =  $value ? '<span class="price_format">'.$value.'</span> руб.' : 'пусто';?>
 		<span>Доступно: <b><?=$available?></b></span>
+		<span>Кредитный лимит: <b><?=$user['credit_limit']?> руб.</b></span>
+	</div>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

@@ -1216,7 +1216,7 @@ function analogies_substitutes($type){
 					</td>
 					<?if ($type == 'analogies'){?>
 						<td label="Скрыть"><input <?=$item['hidden'] ? 'checked' : ''?> name="hidden" type="checkbox" value="<?=$id?>"></td>
-						<td label="Скрыть"><input <?=$item['checked'] ? 'checked' : ''?> name="checked" type="checkbox" value="<?=$id?>"></td>
+						<td label="Проверен"><input <?=$item['checked'] ? 'checked' : ''?> name="checked" type="checkbox" value="<?=$id?>"></td>
 					<?}?>
 					<td label=""><a class="<?=$type?>_delete delete_item" href="?view=items&act=<?=$type?>_delete&item_id=<?=$item_id?>&delete_item=<?=$id?>">Удалить</a></td>
 				</tr>

@@ -277,4 +277,44 @@ class Item{
 		}
 		return $output;
 	}
+	public static function getCategoriesByItemID($item_id){
+		$res_items = $GLOBALS['db']->query("
+			SELECT
+				c.id AS category_id,
+				c.title AS category
+			FROM
+				#categories_items ci
+			LEFT JOIN
+				#categories c ON c.id = ci.category_id
+			WHERE
+				ci.item_id = $item_id
+		", '');
+		if (!$res_items->num_rows) return false;
+		$output = [];
+		foreach($res_items as $item) $output[$item['category_id']] = $item['category'];
+		return $output;
+	}
+	public static function getStoreItemsByItemID($item_id){
+		$res_items = $GLOBALS['db']->query("
+			SELECT
+				si.store_id,
+				si.price,
+				ps.cipher
+			FROM
+				#store_items si
+			LEFT JOIN
+				#provider_stores ps ON ps.id = si.store_id
+			WHERE
+				si.item_id = $item_id
+		", '');
+		if (!$res_items->num_rows) return false;
+		$output = [];
+		foreach($res_items as $item){
+			$output[$item['cipher']] = [
+				'store_id' => $item['store_id'],
+				'price' => $item['price']
+			];
+		} 
+		return $output;
+	}
 }

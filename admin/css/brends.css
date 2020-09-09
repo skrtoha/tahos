@@ -7,3 +7,13 @@ tr.is_blocked td:first-child{
 div.action{
 	margin: 5px 0;
 }
+a.store {
+    padding: 1px;
+    border: 1px solid white;
+    display: inline-block;
+    margin-bottom: 2px;
+    text-decoration: none;
+}
+.radio {
+    margin: 5px 0;
+}

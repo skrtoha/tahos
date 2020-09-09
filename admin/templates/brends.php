@@ -230,20 +230,42 @@ function items(){
 	require_once('templates/pagination.php');
 	$perPage = 30;
 	$linkLimit = 10;
+	$groupConcat = '';
+	$leftJoin = '';
+	$groupBy = '';
+	$having = '';
 	$where = "i.brend_id = {$_GET['id']}";
 	if (isset($_GET['type_list'])){
 		if ($_GET['type_list'] == 'blocked') $where .= " AND i.is_blocked = 1"; 
 		if ($_GET['type_list'] == 'non_blocked') $where .= " AND i.is_blocked = 0"; 
 	}
+	if (isset($_GET['categoryPrice'])){
+		$groupBy = "GROUP BY i.id";
+		if ($_GET['categoryPrice'] == 'price'){
+			$groupConcat = "GROUP_CONCAT(si.price) AS prices,";
+			$leftJoin = "LEFT JOIN #store_items si ON si.item_id = i.id";
+			$having = "HAVING prices != ''";
+		}
+		if ($_GET['categoryPrice'] == 'category'){
+			$groupConcat = "GROUP_CONCAT(ci.category_id) AS categories,";
+			$leftJoin = "LEFT JOIN #categories_items ci ON ci.item_id = i.id";
+			$having = "HAVING categories != ''";
+		}
+	}
+	if (isset($_GET['']))
 	if (isset($_GET['search']) && $_GET['search']) $where .= " AND i.article = '{$_GET['search']}'";
 	$db->query("
 		SELECT SQL_CALC_FOUND_ROWS
+			$groupConcat
 			i.id
 		FROM
 			#items i
+		$leftJoin
 		WHERE
 			$where
-	");
+		$groupBy
+		$having
+	", '');
 	$all = $db->found_rows();
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
@@ -257,30 +279,37 @@ function items(){
 			i.article_cat,
 			i.title_full,
 			i.barcode,
-			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories,
+			$groupConcat
 			i.is_blocked
 		FROM
 			#items i
 		LEFT JOIN
 			#brends b ON b.id = i.brend_id
-		LEFT JOIN
-			#categories_items ci ON ci.item_id = i.id
-		LEFT JOIN
-			#categories c ON c.id = ci.category_id
+		$leftJoin
 		WHERE
 			$where
-		GROUP BY
-			i.id
+		$groupBy
+		$having
 		ORDER BY
 			i.article
 		LIMIT
 			$start, $perPage
 	", '');
+	$items = [];
+	if ($res_items->num_rows){
+		foreach($res_items as $i){
+			$items[$i['id']] = $i;
+			$categories = core\Item::getCategoriesByItemID($i['id']);
+			if ($categories) $items[$i['id']]['categories'] = $categories;
+			$prices = core\Item::getStoreItemsByItemID($i['id']);
+			if ($prices) $items[$i['id']]['prices'] = $prices;
+		}
+	}
 	$page_title = "Товары бренда ".$db->getFieldOnID('brends', $id, 'title')."";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";?>
 	<div id="total" style="margin: 0">Всего: <?=$all?></div>
 	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" method="get">
+		<form style="float: left;margin-bottom: 10px;" method="get">
 			<input type="hidden" name="view" value="brends">
 			<input type="hidden" name="act" value="items">
 			<input type="hidden" name="id" value="<?=$_GET['id']?>">
@@ -298,9 +327,21 @@ function items(){
 					незаблокированные
 				</label>
 			</div>
+			<div class="radio">
+				<label>
+					<input <?=$_GET['categoryPrice'] == 'price' ? 'checked' : ''?> type="radio" name="categoryPrice" value="price">
+					с ценой
+				</label>
+				<label>
+					<input <?=$_GET['categoryPrice'] == 'category' ? 'checked' : ''?> type="radio" name="categoryPrice" value="category">
+					c категорией
+				</label>
+			</div>
 			<input style="width: 264px;" type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по артикулу, vid и названию">
 			<input type="submit" value="Искать">
+			<a href="/admin/?view=brends&act=items&id=<?=$_GET['id']?>">Сбросить</a>
 		</form>
+
 	</div>
 	<table class="t_table" cellspacing="1" view="items">
 		<tr class="head">
@@ -309,17 +350,31 @@ function items(){
 			<td>Каталожный номер</td>
 			<td>Название</td>
 			<td>Штрих-код</td>
+			<td>Прайсы</td>
 			<td>Категории</td>
 		</tr>
-		<?if ($res_items->num_rows){
-			foreach($res_items as $item){?>
-				<tr class="clickable_1 <?=$item['is_blocked'] ? 'is_blocked' : ''?>" value_id="<?=$item['id']?>">
+		<?if (!empty($items)){
+			foreach($items as $item){?>
+				<tr class="<?=$item['is_blocked'] ? 'is_blocked' : ''?>" value_id="<?=$item['id']?>">
 					<td><?=$item['brend']?></td>
 					<td><a target="_blank" href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
 					<td><a target="_blank" href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article_cat']?></a></td>
 					<td><?=$item['title_full']?></td>
 					<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['barcode']?></a></td>
-					<td><?=$item['categories']?></td>
+					<td>
+						<?if(isset($item['prices'])){
+							foreach($item['prices'] as $cipher => $value){?>
+								<a href="#" class="store" store_id="<?=$value['store_id']?>"><?=$cipher?> - <?=$value['price']?></a>
+							<?}?>
+						<?}?>
+					</td>
+					<td>
+						<?if (isset($item['categories'])){?>
+								<?foreach($item['categories'] as $id => $title){?>
+									<a href="?view=categories&act=change&id=<?=$id?>"><?=$title?></a>
+								<?}?>
+						<?}?>
+					</td>
 				</tr>
 			<?}
 		}
@@ -327,8 +382,8 @@ function items(){
 			<tr><td colspan="6">Товаров данного бренда не найдено</td></tr>
 		<?}?>
 	</table>
-	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=brends&act=items&id={$_GET['id']}&page=");
-}
+	<?pagination($chank, $page, ceil($all / $perPage), $href = "?" . http_build_query($_GET) . "&page=");?>
+<?}
 function show_form($act){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];

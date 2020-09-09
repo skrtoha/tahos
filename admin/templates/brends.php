@@ -252,7 +252,6 @@ function items(){
 			$having = "HAVING categories != ''";
 		}
 	}
-	if (isset($_GET['']))
 	if (isset($_GET['search']) && $_GET['search']) $where .= " AND i.article = '{$_GET['search']}'";
 	$db->query("
 		SELECT SQL_CALC_FOUND_ROWS

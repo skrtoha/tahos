@@ -39,7 +39,8 @@ $page_title = 'Главная';
 		<table class="t_table" cellspacing="1">
 			<thead>
 				<tr class="head">
-					<th>Общая сумма</th>
+					<th>Выдано</th>
+					<th>В работе</th>
 					<th>Закупка</th>
 					<th>Прибыль</th>
 					<th>Процент</th>

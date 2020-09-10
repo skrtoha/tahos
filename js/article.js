@@ -1229,6 +1229,7 @@ $(function(){
 		ionTab.find('.articul-table').html(si.full); 
 		ionTab.find('.mobile-layout').html(si.mobile); 
 		ionTab.find('a.sortable.' + sortType).addClass('asc');
+		applyUserMarkup();
 	})
 	$("input[type=checkbox], input[type=radio]").styler();
 	$(document).on('click', ".button-row button", function(event){

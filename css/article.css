@@ -28,7 +28,9 @@
     background: #0082BF;
     box-shadow: inset 1px 1px 1px rgba(0,0,0,.7);
 }
-
+.first-full.shown td{
+	padding: 0;
+}
 
 li.user_markup a{
 	color: white;
@@ -6277,8 +6279,6 @@ span.delete-btn {
 	}
 .search-result table td {
 	vertical-align: top;
-	padding-bottom: 0;
-	padding-top: 0;
 	min-height: 40px; }
 	.search-result table td:nth-child(-n+2) {
 		text-align: left; }

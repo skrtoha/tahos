@@ -101,7 +101,7 @@ else{
 							<td><a class="articul" href="/article/<?=$id?>-<?=$item['article']?>"><?=$item['article']?></a></td>
 							<td style="text-align: left"><?=$item['title_full']?></td>
 							<td>
-								<?=$item['price'] ? 'от '.get_user_price($item['price'], $user).$user['designation'] : 'Нет данных'?>
+								<?=$item['price'] ? 'от ' . core\User::getHtmlUserPrice($item['price'], $user['designation']) : 'Нет данных'?>
 							</td>
 							<td>
 								<?=$item['delivery'] ? 'от '.$item['delivery'].' дн.' : 'Нет данных'?>

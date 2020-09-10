@@ -117,11 +117,11 @@ if (isset($item['store_items']) && count($item['store_items'])){
 	foreach($item['store_items'] as $key => $value){
 		if ($value['delivery'] == $min_delivery){
 			$item['min']['delivery'] = $value;
-			$item['min']['delivery']['user_price'] = get_user_price($item['min']['delivery']['price'], $user);
+			$item['min']['delivery']['user_price'] = core\User::getHtmlUserPrice($item['min']['delivery']['price'], $user['designation']);
 		} 
 		if ($value['price'] == $min_price){
 			$item['min']['price'] = $value;
-			$item['min']['price']['user_price'] = get_user_price($item['min']['price']['price'], $user);
+			$item['min']['price']['user_price'] = core\User::getHtmlUserPrice($item['min']['price']['price'], $user['designation']);
 		} 
 	}
 }

@@ -129,7 +129,7 @@ $res_user_socials = $db->query("
 				<label for="additional-functions">
 					Включить дополнительные функции
 				</label>
-				<?$bl_addfunctions = ($user['markup'] or $user['currency_id'] != 1) ? true : false;?>
+				<?$bl_addfunctions = ($user['currency_id'] != 1) ? true : false;?>
 				<label class="switch">
 					<input id="additional-functions" type="checkbox" <?=$bl_addfunctions ? 'checked' : ''?>>
 					<div class="slider round"></div>
@@ -148,13 +148,6 @@ $res_user_socials = $db->query("
 						<?}?>
 					</select>
 				</div>
-				<div class="input-wrap markup">
-					<label for="markup">
-						Наценка:
-					</label>
-					<input id="markup" type="text" value="<?=$user['markup']?>"> <span>%</span>
-				</div>
-				<p class="note">Процент наценки и валюта при отображении цен в поиске. Цены в Корзине и цены в заказах не изменяются.</p>
 			</div>
 		</form>
 		<form id="change-password">

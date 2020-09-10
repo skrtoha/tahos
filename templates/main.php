@@ -202,6 +202,8 @@
 					<td><?=$value['brend']?> <a class="articul" href="<?=$value['href']?>"><?=$value['article']?></a> <?=$value['title']?></td>
 					<td><?=$value['quan']?> шт.</td>
 					<td>
+						<input type="hidden" name="quan" value="<?=$value['quan']?>">
+						<input type="hidden" name="price" value="<?=$value['price']?>">
 						<span class="price_format"><?=$value['price'] * $value['quan']?></span> 
 						<i class="fa fa-rub" aria-hidden="true"></i>
 					</td>

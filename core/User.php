@@ -112,4 +112,13 @@ class User{
 	public static function update($user_id, $fields){
 		return $GLOBALS['db']->update('users', $fields, "`id`=$user_id");
 	}
+
+	public static function getHtmlUserPrice($price, $designation){
+		ob_start();?>
+		<input type="hidden" value="<?=$price?>">
+		<span class="price_format"><?=$price?></span>
+		<?=$designation?>
+		<?
+		return ob_get_clean();
+	}
 }

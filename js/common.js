@@ -57,6 +57,8 @@ function get_basket(basket){
 					'<td>' + b.brend + ' <a class="articul" href="'+ b.href + '">' + b.article + '</a> ' + b.title + '</td>' +
 					'<td>' + b.quan + ' шт.</td>' +
 					'<td>' + 
+						`<input name="price" value="${b.price}" type="hidden">` +
+						`<input name="quan" value="${b.quan}" type="hidden">` +
 						'<span class="price_format">' + (b.price * b.quan) + '</span>' + 
 						'<i class="fa fa-rub" aria-hidden="true"></i>' +
 					'</td>' +
@@ -70,7 +72,7 @@ function get_basket(basket){
 	str += '' +
 				'<tr>' +	
 					'<th>Итого</th>' +
-					'<th><spanid="total_quan">' + total_quan + '</span>&nbsp;шт.</th>' +
+					'<th><span id="total_quan">' + total_quan + '</span>&nbsp;шт.</th>' +
 					'<th colspan="2"><span class="price_format"  id="total_basket">' + total_price + '</span><i class="fa fa-rub" aria-hidden="true"></i></th>' +
 				'</tr>';
 	$('.cart-popup-table').html(str);
@@ -268,9 +270,10 @@ $(function() {
 				$('.cart span').html(+$('.cart span').text() - quan);
 				$('.basket-table ' + selector).closest('tr').remove();
 				$('.basket .mobile-view ' + selector).closest('.good').remove();
-				$('#basket_basket').html(+$('#basket_basket').unmask() - (quan * division));
+				$('#basket_basket').html(+$('#basket_basket') - (quan * division));
 				$('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']').empty();
 				price_format();
+				if (typeof window['applyUserMarkup'] == 'function') applyUserMarkup();
 			}
 		});
 		show_message('Товар успешно удален из корзины!', 'ok');

@@ -127,6 +127,13 @@ switch($_POST['act']){
 			'param2' => $_POST['item_diff']
 		], ['print_query' => false]);
 		break;
+	case 'applyUserMarkup':
+		$db->update(
+			'users', 
+			['markupSettings' => !empty($_POST['params']) ? json_encode($_POST['params']) : ''], 
+			"`id` = {$_POST['user_id']}"
+		);
+		break;
 }
 
 ?>

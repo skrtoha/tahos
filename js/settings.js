@@ -152,10 +152,8 @@ $(function() {
 		data += '&adres=' + $('#address').val();
 		if (!$('#additional-functions').is(':checked')) {
 			data += '&currency_id=1';
-			data += '&markup=0';
 		} else {
 			data += '&currency_id=' + $('#currency').val();
-			data += '&markup=' + $('#markup').val();
 		}
 		// console.log(data); e.preventDefault(); 
 		$.ajax({

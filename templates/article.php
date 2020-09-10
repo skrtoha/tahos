@@ -26,7 +26,6 @@ if (core\Config::$isUseApiProviders){
 $title = "Список предложений";
 
 $array = article_store_items($_GET['item_id'], [], 'articles');
-// debug($array);
 $store_items = array();
 foreach($array['store_items'] as $key => $value){
 	$store_items[] = [
@@ -46,6 +45,10 @@ if (!empty($array['prices']) && !empty($array['deliveries'])){
 	$time_from = min($array['deliveries']);
 	$time_to = max($array['deliveries']);
 }
+
+if (isset($user['markupSettings'])) $ms = & $user['markupSettings'];
+else $ms = false;
+
 $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 <input type="hidden" id="item_id" value="<?=$_GET['item_id']?>">
 <input type="hidden" id="price_from" value="<?=$price_from?>">
@@ -53,6 +56,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 <input type="hidden" id="time_from" value="<?=$time_from?>">
 <input type="hidden" id="time_to" value="<?=$time_to?>">
 <input type="hidden" name="isCheckedFromAbcp" value="<?=$abcp->isCheckedFromAbcp?>">
+<input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
 <div class="search-result">
 	<h1>Список предложений</h1>
 	<form class="<?=$hide_form ? 'hidden' : ''?>" id="offers-filter-form" method="post">
@@ -130,6 +134,40 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 					<?=$complects?>
 				</li>
 			<?}?>
+			<li class="user_markup">
+				<a class="user_markup" href="#">%</a>
+				<div id="user_markup">
+					<!-- <div class="background"></div> -->
+					<h3>Клиентская наценка</h3>
+					<form>
+						<label class="markup">
+							<?$checked = $ms && $ms['withUserMarkup'] == 'on' ? 'checked' : ''?>
+							<input type="checkbox" name="withUserMarkup" <?=$checked?>>
+							<span>показывать с наценкой</span>
+						</label>
+						<?$disabled = $ms && $ms['withUserMarkup'] == 'on' ? '' : 'disabled'?>
+						<input type="text" name="markup" <?=$disabled?> value="<?=$ms && $ms['markup'] ? $ms['markup'] : '10'?>"> 
+						<span>%</span>
+						<div class="clearfix"></div>
+						<label class="showType">
+							<?$checked = ($ms && $ms['showType'] == 'double') || !$ms ? 'checked' : ''?>
+							<input <?=$disabled?> type="radio" name="showType" value="double" <?=$checked?>>
+							<span>нацененную и закупочную цены</span>
+						</label>
+						<label class="showType">
+							<?$checked = $ms && $ms['showType'] == 'single' ? 'checked' : ''?>
+							<input type="radio" <?=$disabled?> <?=$checked?> name="showType" value="single">
+							<span>только нацененную цену</span>
+						</label>
+						<label class="showInBasket">
+							<?$checked = $ms && $ms['showInBasket'] == 'on' ? 'checked' : ''?>
+							<input type="checkbox" <?=$disabled?> name="showInBasket" <?=$checked?>>
+							<span>показывать в корзине</span>
+						</label>
+						<button>Применить</button>
+					</form>
+				</div>
+			</li>
 		</ul>
 		<div class="ionTabs__body">
 			<div class="ionTabs__item" data-name="Tab_1">

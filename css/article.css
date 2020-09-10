@@ -1,3 +1,152 @@
+.jq-radio {
+    border-radius: 50%;
+}
+.jq-checkbox, .jq-radio {
+    vertical-align: -4px;
+    width: 18px;
+    height: 18px;
+    margin: 0 4px 0 0;
+    border: 1px solid #C3C3C3;
+    background: linear-gradient(#FFF, #E6E6E6);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05), inset -1px -1px #FFF, inset 1px -1px #FFF;
+    cursor: pointer;
+}
+.jq-checkbox, .jq-radio {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.jq-radio.checked .jq-radio__div {
+    width: 12px;
+    height: 12px;
+    margin: 3px 0 0 3px;
+    border-radius: 50%;
+    background: #0082BF;
+    box-shadow: inset 1px 1px 1px rgba(0,0,0,.7);
+}
+
+
+li.user_markup a{
+	color: white;
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: 800;
+}
+.jq-checkbox.disabled,
+.jq-radio.disabled {
+	opacity: .55;
+}
+.jq-file.disabled,
+.jq-file.disabled .jq-file__name,
+.jq-file.disabled .jq-file__browse {
+	border-color: #CCC;
+	background: #F5F5F5;
+	box-shadow: none;
+	color: #888;
+}
+.jq-radio.disabled + span,
+.jq-checkbox.disabled + span
+{
+	color: #999;
+}
+li.user_markup{
+	float: right;
+	position: relative;
+}
+li.withSubprice {
+    line-height: 30px !important;
+    position: relative;
+}
+span.subprice {
+    display: block;
+    line-height: 0px;
+    font-size: 12px;
+    color: #00aafb;
+    font-weight: 700;
+}
+#user_markup{
+  background: #f1f1f1;
+    z-index: 53;
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 47px;
+    padding: 20px;
+    color: #727272;
+    width: 346px;
+}
+#user_markup .background{
+	height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+#user_markup form button[disabled]{
+	color: #ccc;
+}
+#user_markup form button{
+	margin-top: 5px;
+	display: block;
+}
+#user_markup label:last-child{
+	margin-top: 10px;
+}
+#user_markup label.markup{
+	display: block;
+	text-align: left;
+	float: left;
+}
+#user_markup label.showInBasket{
+	display: block;
+	text-align: left;
+}
+#user_markup label.markup ~ span{
+	display: block;
+    float: left;
+    margin-left: 5px;
+    font-size: 20px;
+}
+#user_markup form input{
+	display: initial;
+}
+#user_markup label.showType{
+	display: block;
+    text-align: left;
+  margin-left: 25px;
+}
+#user_markup label span{
+	position: relative;
+}
+#user_markup input[name=markup]{
+	width: 50px;
+    text-align: center;
+    padding: 0;
+    float: left;
+    margin-left: 10px;
+}
+#user_markup input[name=showType]{
+	display: block;
+}
+#user_markup input[name=showType] ~ label{
+	display: inline-block;
+}
+#user_markup::before {
+    content: "";
+    position: absolute;
+    right: 18px;
+    top: -10px;
+    z-index: 1000;
+    height: 0;
+    width: 0;
+    border-bottom: 10px solid #f1f1f1;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+}
 a.sortable{
 	color: white;
 }
@@ -123,6 +272,12 @@ ul.prevail li{
  @media screen and (max-width: 377px){
  	li[data-target=Tab_4] span:nth-child(1)::before{
  		content: 'Ком-сть'
+ 	}
+ 	#user_markup{
+ 		padding: 5px;
+ 	}
+ 	#user_markup label.showType{
+ 		margin-left: 10px;
  	}
  }
 .jspContainer {
@@ -825,8 +980,7 @@ img.mfp-img {
 	display: block;
 	list-style-type: none;
 	margin: 0;
-	padding: 0;
-	z-index: 1; }
+	padding: 0;}
 
 .ionTabs__head:before, .ionTabs__head:after {
 	content: "";
@@ -852,8 +1006,7 @@ img.mfp-img {
 	cursor: default; }
 
 .ionTabs__body {
-	position: relative;
-	z-index: 2; }
+	position: relative;}
 
 .ionTabs__item {
 	position: relative;
@@ -6135,9 +6288,9 @@ span.delete-btn {
 	border: none; }
 	.search-result table tr.button-row {
 	border-bottom: 1px dashed #c8c8c8; }
-	.search-result table tr.button-row.empty td{
+	/*.search-result table tr.button-row.empty td{
 		padding: 20px 0;
-	}
+	}*/
 		.search-result table tr.button-row.active td {
 			padding-bottom: 20px;
 		;}
@@ -7086,6 +7239,9 @@ span.delete-btn {
 		width: 20%; } }
 
 @media screen and (max-width: 928px) {
+	#user_markup{
+		width: 289px;
+	}
 	.ionTabs__head li {
 		padding: 0 22px;
 		font-size: 0.8em; }

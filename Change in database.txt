@@ -68,3 +68,5 @@ ORDER BY
   создать папку categoriess
 
 ALTER TABLE `tahos_provider_stores` DROP `prevail`;
+
+ALTER TABLE `tahos_users`  ADD `markupSettings` JSON NULL DEFAULT NULL  AFTER `subscribe_type`;

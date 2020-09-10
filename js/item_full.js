@@ -106,7 +106,7 @@
 					'<table id="item_into">' +
 						'<tr>' +
 							'<td>' + b.delivery + ' дн.</td>' +
-							'<td>' + b.user_price + i.designation + '</td>' +
+							'<td>' + b.user_price + '</td>' +
 							'<td>' + 
 								'<i price="' + b.price + '" store_id="' + b.store_id + 
 									'" item_id="' + item.id + '" packaging="' + 
@@ -120,7 +120,7 @@
 						if (del.price) str += '' +
 						'<tr>' +
 							'<td>' + del.delivery + ' дн.</td>' +
-							'<td>' + del.user_price + i.designation + '</td>' +
+							'<td>' + del.user_price + '</td>' +
 							'<td>' + 
 								'<i price="' + del.price + '" store_id="' + del.store_id + 
 									'" item_id="' + item.id + '" packaging="' + 

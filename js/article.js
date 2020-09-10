@@ -79,6 +79,7 @@ function set_tabs(){
 						$('a.sortable').removeClass('asc');
 						$('a.sortable.brend').addClass('asc');
 						price_format();
+						applyUserMarkup();
 					} 
 				});
 			}
@@ -148,6 +149,7 @@ function setNewValueAjax(obj){
 			setTimeout(function(){
 				if (!$('.cart-popup').is(':hover')) $('.overlay').click();
 			}, 2500);
+			applyUserMarkup();
 		} 
 	});
 }
@@ -1062,9 +1064,106 @@ function sortStoreItems(sortType){
 		return a.min - b.min;
 	});
 }
+function applyAjaxUserMarkup(params){
+	let data = new Object();
+	data.params = params;
+	data.act = 'applyUserMarkup';
+	data.user_id = $('input[name=user_id]').val();
+	$.ajax({
+		type: 'post',
+		url: '/admin/ajax/user.php',
+		data: data,
+		success: function(response){
+		}
+	})
+}
+function applyUserMarkup(){
+	let params = new Object();
+	$('span.subprice').remove();
+	$('li.withSubprice').removeClass('withSubprice');
+	$.each($('#user_markup form').serializeArray(), function(i, item){
+		params[item.name] = item.value;
+	})
+
+	applyAjaxUserMarkup(params);
+
+	if (params.withUserMarkup == 'on'){
+		$('div.ionTabs__body span.price_format').each(function(){
+			let th = $(this);
+			let basePrice = + th.prev('input').val();
+			let price =  Math.floor(basePrice + basePrice * params.markup / 100);
+			if (params.showType == 'double'){
+				th.text(price);
+				th.closest('li').addClass('withSubprice');
+				th.next().after('<span class="subprice">' + Math.floor(basePrice) + '</span>');
+			}
+			if (params.showType == 'single'){
+				th.text(Math.floor(price));
+			}
+		})
+	}
+	else{
+		$('div.ionTabs__body span.price_format').each(function(){
+			let th = $(this);
+			let basePrice = + th.prev('input').val();
+			th.text(basePrice);
+		})
+		$('table.cart-popup-table span.price_format').each(function(){
+			let th = $(this);
+			let quan = th.prevAll('input[name=quan]').val();
+			let price = th.prevAll('input[name=price]').val();
+			th.text(quan * price);
+		})
+	}
+
+	let totalInBasket = 0;
+	$('table.cart-popup-table tr[store_id][item_id] span.price_format').each(function(){
+		let th = $(this);
+		let quan = th.prevAll('input[name=quan]').val();
+		let price = th.prevAll('input[name=price]').val();
+		if (params.showInBasket == 'on'){
+			let additionalPrice = Math.floor(price * quan + price * quan * params.markup / 100);
+			totalInBasket += additionalPrice;
+			th.text(additionalPrice);
+		}
+		else{
+			totalInBasket += quan * price;
+			th.text(price * quan);
+		} 
+	})
+	$('#total_basket').text(totalInBasket);
+
+	if (params.showInBasket == 'on'){
+	}
+	$('#user_markup').hide();
+}
 $(function(){
 	if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;
 	set_tabs();	
+	applyUserMarkup();
+	$(document).on('click', '.cart-popup-table .delete-btn', function(){
+		let store_id = $(this).closest('tr').attr('store_id');
+		let item_id = $(this).closest('tr').attr('item_id');
+		delete inBasket[store_id + ':' + item_id];
+		applyUserMarkup();
+	})
+	$('li.user_markup a').on('click', function(e){
+		e.preventDefault();
+		$('#user_markup').show();
+	})
+	$('#user_markup input[name=withUserMarkup]').on('change', function(){
+		let th = $(this);
+		if (th.is(':checked')){
+			th.closest('form').find('input:not([name=withUserMarkup])').prop('disabled', false).trigger('refresh');
+		}
+		else{
+			th.closest('form').find('input:not([name=withUserMarkup])').prop('disabled', true).trigger('refresh');
+		}
+	})
+	$('#user_markup form').on('submit', function(e){
+		e.preventDefault();
+		applyUserMarkup();
+	})
 	$('#offers-filter-form button').on('click', function(e){
 		e.preventDefault();
 		var elem = $(this);
@@ -1131,7 +1230,7 @@ $(function(){
 		ionTab.find('.mobile-layout').html(si.mobile); 
 		ionTab.find('a.sortable.' + sortType).addClass('asc');
 	})
-	$("#in_stock_only").styler();
+	$("input[type=checkbox], input[type=radio]").styler();
 	$(document).on('click', ".button-row button", function(event){
 		var elem = $(this);
 		var type = elem.attr('type');
@@ -1293,5 +1392,14 @@ $(function(){
 				});
 			}
 		})
+	})
+	$(document).on('click', function(e){
+		let target = $(e.target).closest('#user_markup').attr('id');
+		if (
+			target != 'user_markup' &&
+			$(e.target).attr('class') != 'user_markup'
+		){
+			$('#user_markup').hide();
+		} 
 	})
 });

@@ -42,6 +42,7 @@ $path = "templates/$view.php";
 $res_user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] : false]);
 if ($res_user->num_rows) $user = $res_user->fetch_assoc();
 else $user = $res_user;
+if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
 
 $basket = get_basket();
 if (file_exists($path)){

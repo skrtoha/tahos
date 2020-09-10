@@ -130,21 +130,6 @@ function get_price($provider_item){
 	$rubls = $provider_item['price'] * $provider_rate;
 	return round($provider_percent/100*$rubls + $rubls);
 }
-//для получение значения цены пользователя с учетом наценки
-function get_user_price($price, $user){
-	global $db;
-	//если пользователь не авторизован, то возвращаем цену в рублях
-	$price += $price * $user['markup'] / 100;
-	$rate = $user['rate'];
-	switch ($user['currency_id']){
-		case '1':
-			$value = ceil($price/$rate);
-			break;
-		default:
-			$value = round($price/$rate, 2);
-	}
-	return '<span class="price_format">'.$value.'</span>';
-}
 function getStrTemplate($template){
 	global $db, $deliveries;
 	$str = '';
@@ -286,7 +271,7 @@ function category_items_without_filters($sub_id, $sort = ['type' => 'title_full'
 	$ratings = json_decode($settings['ratings'], true);
 	if (empty($items)) return false;
 	foreach ($items as $key => $item){
-		$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];
+		$items[$key]['price'] = core\User::getHtmlUserPrice($item['price'], $user['designation']);
 		$items[$key]['filters_values'] = $items_values[$item['id']];
 		$items[$key]['rating'] = get_rating($item['rating'], $ratings);
 	} 
@@ -353,7 +338,7 @@ function category_items_with_filters($sub_id, $sort = ['type' => 'title_full', '
 	else $user = $res_user;
 	$ratings = json_decode($settings['ratings'], true);
 	foreach ($items as $key => $item){
-		$items[$key]['price'] = get_user_price($item['price'], $user).$user['designation'];
+		$items[$key]['price'] = core\User::getHtmlUserPrice($item['price'], $user['designation']);
 		$items[$key]['filters_values'] = $items_values[$item['id']];
 		$items[$key]['rating'] = get_rating($item['rating'], $ratings);
 	} 

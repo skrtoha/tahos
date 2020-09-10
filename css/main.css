@@ -597,8 +597,6 @@ a.articul {
 }
 .jq-checkbox {
   text-align: left;
-  width: 18px;
-  height: 18px;
   border: 1px solid #0082BF;
   box-sizing: border-box;
   -webkit-transition: all ease .5;

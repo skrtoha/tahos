@@ -1,6 +1,7 @@
 <?//debug($store_items);
 $hidden = isInBasketExists($store_items) ? '' : 'hidden';
 $inBasket = json_encode(getInBasket($basket));
+use core\User;
 ?>
 <?if ($device == 'tablet' || $device == 'desktop'){?>
 	<table class="articul-table">
@@ -119,8 +120,7 @@ $inBasket = json_encode(getInBasket($basket));
 							<ul class="prevail">
 								<?foreach($si['prevails'] as $value){?>
 									<li>
-										<?=get_user_price($value['price'], $user)?>
-										<?=$user['designation']?>
+										<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
 									</li>
 								<?}?>
 							</ul>
@@ -128,13 +128,11 @@ $inBasket = json_encode(getInBasket($basket));
 						<?if (!empty($si_price)){?>
 							<ul>
 								<li>
-									<?=get_user_price($si_price['price'], $user)?>
-									<?=$user['designation']?>
+									<?=User::getHtmlUserPrice($si_price['price'], $user['designation'])?>
 								</li>
 								<?if (!empty($si_delivery)){?>
 									<li>
-										<?=get_user_price($si_delivery['price'], $user)?>
-										<?=$user['designation']?>
+										<?=User::getHtmlUserPrice($si_delivery['price'], $user['designation'])?>
 									</li>
 								<?}?>
 							</ul>
@@ -300,8 +298,7 @@ $inBasket = json_encode(getInBasket($basket));
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<?=get_user_price($value['price'], $user)?>
-											<?=$user['designation']?>
+											<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
 										</li>
 									<?}?>
 								</ul>
@@ -309,8 +306,7 @@ $inBasket = json_encode(getInBasket($basket));
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
 									<li>
-										<?=get_user_price($value['price'], $user)?>
-										<?=$user['designation']?>
+										<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
 									</li>
 								<?}?>
 							</ul>
@@ -502,8 +498,7 @@ else{?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<?=get_user_price($value['price'], $user)?>
-											<?=$user['designation']?>
+											<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
 										</li>
 									<?}?>
 								</ul>
@@ -511,13 +506,11 @@ else{?>
 							<?if (!empty($si_price)){?>
 								<ul>
 									<li>
-										<?=get_user_price($si_price['price'], $user)?>
-										<?=$user['designation']?>
+										<?=User::getHtmlUserPrice($si_price['price'], $user['designation'])?>
 									</li>
 									<?if (!empty($si_delivery)){?>
 										<li>
-											<?=get_user_price($si_delivery['price'], $user)?>
-											<?=$user['designation']?>
+											<?=User::getHtmlUserPrice($si_delivery['price'], $user['designation'])?>
 										</li>
 									<?}?>
 								</ul>
@@ -656,8 +649,7 @@ else{?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<?=get_user_price($value['price'], $user)?>
-											<?=$user['designation']?>
+											<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
 										</li>
 									<?}?>
 								</ul>
@@ -666,8 +658,7 @@ else{?>
 								<ul>
 									<?foreach($si['list'] as $key => $value){?>
 										<li>
-											<?=get_user_price($value['price'], $user)?>
-											<?=$user['designation']?>
+											<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
 										</li>
 									<?}?>
 								</ul>

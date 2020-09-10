@@ -28,16 +28,16 @@ foreach ($store_items as $k => $v){
 	$si = & $store_items[$k];
 	$si['href_article'] = core\Item::getHrefArticle($si['article']);
 	if (!empty($si['list'])){
-		$si['min_price']['user_price'] = get_user_price($si['min_price']['price'], $user).$user['designation'];
+		$si['min_price']['user_price'] = core\User::getHtmlUserPrice($si['min_price']['price'], $user['designation']);
 		foreach($si['list'] as $key => $value){
-			$si['list'][$key]['user_price'] = get_user_price($value['price'], $user).$user['designation'];
+			$si['list'][$key]['user_price'] = core\User::getHtmlUserPrice($value['price'], $user['designation']);
 		} 
 	} 
 	if (!empty($si['prevails'])) foreach($si['prevails'] as $key => $value){
-		$si['prevails'][$key]['user_price'] = get_user_price($value['price'], $user).$user['designation'];
+		$si['prevails'][$key]['user_price'] = core\User::getHtmlUserPrice($value['price'], $user['designation']);
 	} 
 	if (count($si['list']) > 1){
-		$si['min_delivery']['user_price'] = get_user_price($si['min_delivery']['price'], $user).$user['designation'];
+		$si['min_delivery']['user_price'] = core\User::getHtmlUserPrice($si['min_delivery']['price'], $user['designation']);
 	}
 }
 $tempArray = array();

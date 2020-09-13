@@ -144,3 +144,19 @@ label.filter_value {
 option[disabled] {
     display: none;
 }
+div.intuitiveSearch_wrap{
+    display: inline-block;
+    position: relative;
+}
+ul.searchResult_list {
+    position: absolute;
+    background: white;
+    width: 100%;
+    border: 1px solid #f7f7f7;
+}
+ul.searchResult_list > li{
+    padding: 2px 0;
+}
+ul.searchResult_list > li a {
+    text-decoration: none;
+}

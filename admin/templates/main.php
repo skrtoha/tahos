@@ -142,6 +142,9 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['connections', 'index'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
 		<?}?>
+		<?if (in_array($view, ['items'])){?>
+			{"src" : "/vendor/intuitive_search/script.js", "async" : false},
+		<?}?>
 		<?if (file_exists("js/$view.js")){
 			echo '{"src" : "/admin/js/'.$view.'.js", "async" : false},';
 		}?>

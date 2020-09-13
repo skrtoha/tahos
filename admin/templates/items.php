@@ -1433,7 +1433,7 @@ function items(){
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions items" class="" style="">
 		<form action="?view=items&act=search" method="post">
-			<input style="width: 264px;" type="text" name="search" value="" placeholder="Поиск по артикулу, vid и названию" required>
+			<input class="intuitive_search" style="width: 264px;" type="text" name="search" value="" placeholder="Поиск по артикулу, vid и названию" required>
 			<input type="submit" value="Искать">
 		</form>
 		<a href="?view=items&act=add">Добавить</a>

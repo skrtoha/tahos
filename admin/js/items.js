@@ -1,5 +1,17 @@
 var reg_integer = /^\d+$/;
 $(function(){
+	$('input[name=search].intuitive_search').on('keyup focus', function(e){
+		let val = $(this).val();
+		let minLength = 1;
+		val = val.replace(/[^\wа-яА-Я]+/gi, '');
+		intuitive_search.getResults({
+			event: e,
+			value: val,
+			minLength: minLength,
+			tableName: 'items',
+			searchField: 'article'
+		});
+	})
 	$('form').on('submit', function(e){
 		if ($('input[name=type]:checked').val() == 'id' && !reg_integer.test($('input[name=search]').val())){
 			e.preventDefault();

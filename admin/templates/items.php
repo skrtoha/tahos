@@ -1452,7 +1452,9 @@ function items(){
 			foreach($items as $item){?>
 				<tr class="items_box" item_id="<?=$item['id']?>">
 					<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-					<td label="Артикул"><?=$item['article']?></td>
+					<td label="Артикул">
+						<a href="/admin/?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a>
+					</td>
 					<td label="Каталожный номер"><?=$item['article_cat']?></td>
 					<td label="Название"><?=$item['title_full']?></td>
 					<td label="Штрих-код"><?=$item['barcode']?></td>

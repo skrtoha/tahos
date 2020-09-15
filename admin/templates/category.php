@@ -8,9 +8,8 @@ switch ($act) {
 		} 
 		$id = $_GET['id'];
 		$db->delete('categories', "`id`=$id");
-		debug($db->get_mysqli());
 		message('Успешно удалено!');
-		// header("Location: ?view=category&id={$_GET['parent_id']}");
+		header("Location: ?view=category&id={$_GET['parent_id']}");
 		break;
 	case 'items_search':items_search();break;
 	case 'add_item':

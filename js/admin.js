@@ -594,34 +594,7 @@ $(document).ready(function(e){
 			}
 		})
 	})
-	$('.subcategory td.href, .subcategory td.category, .subcategory td.pos').on('click', function(){
-		elem = $(this);
-		var id = elem.closest('tr').data('id');
-		var table = elem.attr('class');
-		var old_value = elem.html();
-		old_value = old_value.trim();
-		var new_value = prompt('Введите новое значение:', old_value);
-		if (!new_value) return false;
-		if (new_value == old_value) return false;
-		$.ajax({
-			type: "POST",
-			url: "/ajax/category.php",
-			data: 'id=' + id + '&table=' + table + '&old_value=' + old_value + '&new_value=' + new_value,
-			success: function(msg){
-				// console.log(msg);
-				// alert(msg);
-				var res = JSON.parse(msg);
-				if (res.error) show_message(res.error, 'error');
-				else{
-					if (table == 'category'){
-						if (res.href) elem.next().html(res.href);
-					}
-					elem.html(new_value);
-					show_message('Изменения успешно сохранены!');
-				}
-			}
-		})
-	})
+	
 	$('#add_theme').on('click', function(e){
 		e.preventDefault();
 		var m = prompt('Введите название новой темы:');

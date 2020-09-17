@@ -8,12 +8,16 @@ function showStoreInfo(store_id, item_id){
 			store_id: store_id,
 			item_id: item_id
 		},
+		beforeSend: function(){
+			$('#popup').css('display', 'flex');
+		},
 		success: function(response){
 			let result = JSON.parse(response);
 			let storeInfo = add_item_to_store.storeInfo;
 			$.each(result, function(key, value){
 				storeInfo[key] = value;
 			})
+			$('#popup').css('display', 'none');
 			modal_show(add_item_to_store.getHtmlForm(storeInfo));
 		}
 	})
@@ -104,6 +108,7 @@ $(function(){
 		let $a = $(this);
 		let item_id = $a.attr('item_id');
 		let storeInfo = add_item_to_store.storeInfo;
+		$('#popup').css('display', 'flex');
 		$.ajax({
 			type: 'post',
 			url: '/admin/ajax/item.php',
@@ -112,6 +117,7 @@ $(function(){
 				act: 'getItemInfo'
 			},
 			success: function(response){
+				$('#popup').css('display', 'none');
 				itemInfo = JSON.parse(response);
 				$.each(itemInfo, function(key, value){
 					storeInfo[key] = value;

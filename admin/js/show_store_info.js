@@ -36,11 +36,10 @@
 		set_store: function (store_id){
 			$.ajax({
 				type: 'post',
-				async: false,
 				url: '/admin/ajax/providers.php',
 				data: 'act=get_store&store_id=' + store_id,
 				beforeSend: function(){
-					$('#popup').css('display', 'flex');
+					
 				},
 				success: function(response){
 					show_store_info.store = JSON.parse(response);
@@ -113,6 +112,7 @@
 		init: function(){
 			$(document).on('click', 'a.store', function(e){
 				e.preventDefault();
+				$('#popup').css('display', 'flex');
 				var store_id = $(this).attr('store_id');
 				show_store_info.set_store(store_id);
 				modal_show(show_store_info.get_str_form());

@@ -9,7 +9,7 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 switch($_POST['act']){
 	case 'get_store':
-		$store = $db->select_one('provider_stores', '*', "`id`={$_POST['store_id']}");
+		$store = core\Provider::getStoreInfo($_POST['store_id']);
 		echo json_encode($store);
 		break;
 	case 'store_change';

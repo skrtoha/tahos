@@ -54,6 +54,10 @@
 				'<form name="store_change">' +
 					'<input type="hidden" name="store_id" value="' + store.id + '">' +
 					'<table>' +
+						'<tr>' +
+						 	'<td>Поставщик:</td>' +
+						 	'<td><input disabled type="text" name="provider" value="' +  store.provider + '"></td>' +
+					 	'</tr>' +
 					 	'<tr>' +
 						 	'<td>Название:</td>' +
 						 	'<td><input disabled type="text" name="title" value="' +  store.title + '"></td>' +

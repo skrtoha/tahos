@@ -47,8 +47,8 @@ li.main-photo {
     /* content: "\ea10"; */
 }
 #modal_content{
-    height: 750px;
-    width: 600px;
+/*    height: 750px;
+    width: 600px;*/
 }
 .hidden{
     display: none;

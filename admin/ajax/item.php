@@ -107,5 +107,18 @@ switch($_POST['act']){
 	case 'applyCategory':
 		$db->insert('categories_items', ['item_id' => $_POST['item_id'], 'category_id' => $_POST['category_id']]);
 		break;
+	case 'getStoreItem':
+		$query = core\StoreItem::getQueryStoreItem();
+		$query .= "
+			WHERE
+				si.store_id = {$_POST['store_id']} AND si.item_id = {$_POST['item_id']}
+		";
+		$res_store_items = $db->query($query, '');
+		echo json_encode($res_store_items->fetch_assoc());
+		break;
+	case 'getItemInfo':
+		// debug($_POST);
+		echo json_encode(core\Item::getByID($_POST['item_id']));
+		break;
 }
 ?>

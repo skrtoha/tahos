@@ -26,24 +26,24 @@ if (isset($_GET['act'])){
 					break;
 				case 'Armtek':
 					$armtek = new core\Provider\Armtek($db);
-					$armtek->setArticle($item['brand'], $item['article']);
+					$armtek->setArticle($item['brend'], $item['article']);
 					break;
 				case 'Mikado':
 					$mikado = new core\Provider\Mikado($db);
-					$mikado->setArticle($item['brand'], $item['article']);
+					$mikado->setArticle($item['brend'], $item['article']);
 					break;
 				case 'Rossko':
 					$rossko = new core\Provider\Rossko($db);
-					$rossko->execute("{$item['article']} {$item['brand']}");
+					$rossko->execute("{$item['article']} {$item['brend']}");
 					break;
 				case 'ForumAuto':
-					core\Provider\ForumAuto::setArticle($_GET['item_id'], $item['brand'], $item['article']);
+					core\Provider\ForumAuto::setArticle($_GET['item_id'], $item['brend'], $item['article']);
 					break;
 				case 'Autoeuro':
-					core\Provider\Autoeuro::setArticle($item['brand'], $item['article'], $_GET['item_id']);
+					core\Provider\Autoeuro::setArticle($item['brend'], $item['article'], $_GET['item_id']);
 					break;
 				case 'Autokontinent':
-					core\Provider\Autokontinent::setArticle($item['brand'], $item['article'], $_GET['item_id']);
+					core\Provider\Autokontinent::setArticle($item['brend'], $item['article'], $_GET['item_id']);
 					break;
 			}
 			echo Timer::end();

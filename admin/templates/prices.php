@@ -14,8 +14,7 @@ switch ($act) {
 	case 'search_add': search_add(); break;
 	case 'delete_item':
 		if ($db->delete('store_items', "`item_id`=".$_GET['item_id']." AND `store_id`=".$_GET['store_id'])){
-			message('Товар успешно удален!');
-			header("Location: ?view=prices&act=items&id=".$_GET['store_id']);
+			exit();
 		}
 		break;
 	case 's_add':
@@ -244,14 +243,8 @@ function items(){
 	$res_items = $db->query($query, '');?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions" style="">
-		<form style="float: left;margin-bottom: 10px;" action="?view=prices&act=items&id=<?=$id?>" method="post">
-			<input style="width: 264px;" required type="text" name="search" value="<?=$search?>" placeholder="Поиск по артикулу">
-			<input type="submit" value="Искать">
-		</form>
-		<form style="margin: 0px 18px;float: left;" action="?view=prices&act=search_add&id=<?=$id?>" method="post">
-			<input style="width: 264px;" required type="text" name="search" value="<?=$search?>" placeholder="Поиск для добавления">
-			<input type="submit" value="Искать">
-		</form>
+		<input style="width: 264px;" type="text" name="searchArticle" value="" placeholder="Поиск по артикулу" class="intuitive_search">
+			<input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
 	</div>
 	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>">
 		<tr class="head sort">
@@ -273,7 +266,7 @@ function items(){
 			while($pi = $res_items->fetch_assoc()){?>
 				<tr>
 					<td><?=$pi['brend']?></td>
-					<td><a href="?view=items&id=<?=$pi['item_id']?>&act=item"><?=$pi['article']?></a></td>
+					<td><a class="item" href="?view=items&id=<?=$pi['item_id']?>&act=item"><?=$pi['article']?></a></td>
 					<td><?=$pi['title_full']?></td>
 					<td><input type="text" class="store_item" value="<?=$pi['packaging']?>" column="packaging" item_id="<?=$pi['item_id']?>"></td>
 					<td><input type="text" class="store_item" value="<?=$pi['in_stock']?>" column="in_stock" item_id="<?=$pi['item_id']?>"></td>

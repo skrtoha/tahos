@@ -28,7 +28,7 @@ class Item{
 				IF(i.article_cat != '', i.article_cat, i.article) AS article,
 				i.title_full,
 				i.brend_id,
-				b.title AS brand
+				b.title AS brend
 			FROM
 				#items i
 			LEFT JOIN
@@ -316,5 +316,19 @@ class Item{
 			];
 		} 
 		return $output;
+	}
+	public static function getQueryItemInfo(){
+		return "
+			SELECT
+				i.id,
+				IF(i.article_cat != '', i.article_cat, i.article) AS article,
+				LEFT(i.title_full, 20) AS title_full,
+				i.brend_id,
+				b.title AS brend
+			FROM
+				#items i
+			LEFT JOIN
+				#brends b ON b.id = i.brend_id
+		";
 	}
 }

@@ -32,3 +32,6 @@ a.desc ~ .icon-arrow-down2:before{
 a.delete_item{
 	text-decoration: none;
 }
+#contents{
+	overflow: visible;
+}

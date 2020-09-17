@@ -4,10 +4,36 @@
 			minLength: 2,
 			maxCountResults: 10 
 		},
+		selectItemByKey: function(event){
+			$input = $(event.target);
+			let ul = $input.nextAll('.searchResult_list');
+			let activeLi = ul.find('li.active');
+			if (event.keyCode == 40){
+				if (activeLi.next().size() == 0) return false;
+				ul.find('li').removeClass('active');
+				activeLi.next().addClass('active');
+			} 
+			if (event.keyCode == 38){
+				if (activeLi.prev().size() == 0) return false;
+				ul.find('li').removeClass('active');
+				activeLi.prev().addClass('active');
+			} 
+		},
+		applyEnterPressing: function(event){
+			$input = $(event.target);
+			$input.nextAll('.searchResult_list').find('li.active a').click();
+		},
 		getResults: function(params){
 			let self = this;
+			if (params.event.keyCode == 38 || params.event.keyCode == 40){
+				return self.selectItemByKey(params.event);
+			}
+			if (params.event.keyCode == 13){
+				return self.applyEnterPressing(params.event);
+			}
 			let minLength = typeof params.minLength != 'undefined' ? params.minLength : self.defaultParams.minLength;
 			let maxCountResults = typeof params.maxCountResults != 'undefined' ? params.maxCountResults : self.defaultParams.maxCountResults;
+			let additionalConditions = typeof params.additionalConditions != 'undefined' ? params.additionalConditions : {};
 			$(params.event.target).next('ul.searchResult_list').remove();
 			if (params.value.length <= minLength) return false;
 			$.ajax({
@@ -15,7 +41,7 @@
 				type: 'get',
 				data: {
 					tableName: params.tableName,
-					searchField: params.searchField,
+					additionalConditions: additionalConditions,
 					value: params.value,
 					maxCountResults: maxCountResults
 				},
@@ -27,7 +53,11 @@
 					$(params.event.target).nextAll('.preloader').hide();
 					let ul = $(params.event.target).nextAll('.searchResult_list');
 					if (!response) ul.html('<li>ничего не найдено</li>');
-					else ul.html(response);
+					else{
+						ul.html(response);
+						ul.find('li:first-child').addClass('active');
+					} 
+					ul.show();
 				}
 			})
 		},
@@ -37,14 +67,17 @@
 				.attr('autocomplete', 'off')
 				.closest('.intuitiveSearch_wrap')
 				.append(`
-					<div style="display: none; position: absolute;width:100%;text-align:center; background: white" class="preloader">
+					<div style="display:none;position:absolute;width:100%;text-align:center;background:white" class="preloader">
 						<img src="/vendor/intuitive_search/preload.gif">
 					</div>
 					<ul class="searchResult_list"></ul>
-				`);
+				`)
 			$(document).on('click', function(e){
 				let target = $(e.target);
-				if (!target.closest('.intuitiveSearch_wrap').size()) target.find('.searchResult_list').hide();
+				if (!target.closest('.intuitiveSearch_wrap').size()){
+					target.find('.searchResult_list').hide();
+					target.find('input.intuitive_search').val('');
+				} 
 			})
 		}
 	}

@@ -24,7 +24,6 @@ switch ($_POST['column']) {
 		]);
 		break;
 	case 'add_item_to_store':
-		print_r($_POST);
 		$db->insert(
 			'store_items',
 			[
@@ -33,11 +32,25 @@ switch ($_POST['column']) {
 				'price' => $_POST['price'],
 				'in_stock' => $_POST['in_stock'],
 				'packaging' => $_POST['packaging']
-			]
+			],
+			['duplicate' => [
+				'price' => $_POST['price'],
+				'in_stock' => $_POST['in_stock'],
+				'packaging' => $_POST['packaging']
+			]]
 		);
 
 		if (isset($_POST['requiredRemain'])){
-			$db->insert('required_remains', ['item_id' => $_POST['item_id'], 'requiredRemain' => $_POST['requiredRemain']]);
+			$db->insert(
+				'required_remains', 
+				[
+					'item_id' => $_POST['item_id'], 
+					'requiredRemain' => $_POST['requiredRemain']
+				],
+				['duplicate' => [
+					'requiredRemain' => $_POST['requiredRemain']
+				]]
+			);
 		}
 		break;
 }

@@ -39,10 +39,14 @@
 				async: false,
 				url: '/admin/ajax/providers.php',
 				data: 'act=get_store&store_id=' + store_id,
+				beforeSend: function(){
+					$('#popup').css('display', 'flex');
+				},
 				success: function(response){
 					show_store_info.store = JSON.parse(response);
 					show_store_info.store.prevail = + show_store_info.store.prevail ? 'checked' : '';
 					show_store_info.store.noReturn = + show_store_info.store.noReturn  ? 'checked' : '';
+					$('#popup').css('display', 'none');
 				}
 			})
 		},

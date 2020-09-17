@@ -267,7 +267,7 @@ input[readonly]{
 	align-items: center;
 	justify-content: center; 
 	z-index: 1000;
-	background: rgba(228, 238, 244, 0.75);
+	/*background: rgba(228, 238, 244, 0.75);*/
 }
 #popup_map{
 	align-items: center;

@@ -52,37 +52,22 @@ if ($_POST['items_submit']){
 		}
 		//заполнить, которых нет
 		if ($_POST['treatment'] == 1){
-			$res_insert = $db->insert(
-				'items',
-				[
-					'brend_id' => $brend_id,
-					'article' => $article,
-					'article_cat' => $value[2],
-					'barcode' => $value[3],
-					'title_full' => $value[4],
-					'title' => $value[4],
-					'amount_package' => $value[5] ? $value[5] : 0,
-					'weight' => $value[6] ? $value[6] : 0,
-					'full_desc' => $value[7],
-					'characteristics' => $value[8],
-					'applicability' => $value[9]
-				],
-				['deincrement_duplicate' => 1]
-			);
+			$res_insert = core\Item::insert([
+				'brend_id' => $brend_id,
+				'article' => $article,
+				'article_cat' => $value[2],
+				'barcode' => $value[3],
+				'title_full' => $value[4],
+				'title' => $value[4],
+				'amount_package' => $value[5] ? $value[5] : 0,
+				'weight' => $value[6] ? $value[6] : 0,
+				'full_desc' => $value[7],
+				'characteristics' => $value[8],
+				'applicability' => $value[9]
+			]);
 			if ($res_insert === true){
-				$item_id = $db->last_id();
+				$item_id = core\Item::$lastInsertedItemID;
 				$log->info("Артикул $article и {$value[0]} успешно добавлен с id={$item_id}");
-				$res_artticles = $db->insert(
-					'articles',
-					[
-						'item_id' => $item_id,
-						'item_diff' => $item_id
-					]
-				);
-				if ($res_artticles !== true){
-					$log->error("В строке $r ошибка вставки в `tahos_articles`: $db->last_query | $res_artticles");
-					continue;
-				}
 				$inserted++;
 			}
 			else{
@@ -162,7 +147,7 @@ if ($_POST['items_analogies']){
 		$articleMain = article_clear($value[1] ? $value[1] : $value[2]);
 		$articleAnalogy = article_clear($value[5] ? $value[5] : $value[6]);
 
-		$resMain = $db->insert('items', [
+		$resMain = core\Item::insert([
 			'brend_id' => $brendMain,
 			'article' => $articleMain,
 			'article_cat' => $value[2],
@@ -174,7 +159,7 @@ if ($_POST['items_analogies']){
 			$db->insert('articles', ['item_id' => $item_main_id, 'item_diff' => $item_main_id]);
 		} 
 		else{
-			$itemMain = $db->select_one('items', 'id', "`article` = '{$articleMain}' AND `brend_id` = $brendMain");
+			$itemMain = core\Item::getByBrendIDAndArticle($brendMain, $articleMain);
 			$item_main_id = $itemMain['id'];
 		}
 		if (!$item_main_id){
@@ -183,21 +168,16 @@ if ($_POST['items_analogies']){
 		}
 
 		if ($_POST['create_analogies']){
-			$resAnalogy = $db->insert('items', [
+			$resAnalogy = core\Item::insert([
 				'brend_id' => $brendAnalogy,
 				'article' => $articleAnalogy,
 				'article_cat' => $value[6],
 				'title_full' => $value[3]
 			]);
-			if ($resAnalogy === true){
-				$insertedItems++;
-				$item_analogy_id = $db->last_id();
-				$db->insert('articles', ['item_id' => $item_analogy_id, 'item_diff' => $item_analogy_id]);
-			} 
+			if ($resAnalogy === true) $insertedItems++;
 		}
-
 		if (!$item_analogy_id){
-			$itemAnalogy = $db->select_one('items', 'id', "`article`='{$articleAnalogy}' AND `brend_id` = $brendAnalogy");
+			$itemAnalogy = core\Item::getByBrendIDAndArticle($brendAnalogy, $articleAnalogy);
 			if (empty($itemAnalogy)){
 				$price->log->warning("В строке $r не найдено {$value[4]} - $articleAnalogy");
 				continue;

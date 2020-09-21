@@ -11,22 +11,47 @@ $db->setProfiling();
 $output = '';
 switch($_GET['tableName']){
 	case 'items':
-		$query = core\Item::getQueryItemInfo();
-		$query .= "
-			WHERE
-				i.article LIKE '{$_GET['value']}%'
-			LIMIT
-				0, {$_GET['maxCountResults']}
-		";
-		$res_items = $db->query($query);
-		if (!$res_items->num_rows) break;
-		foreach($res_items as $item){
-			$output .= "
-				<li>
-					<a href=\"/admin/?view=items&act=item&id={$item['id']}\">
-						{$item['brend']} - {$item['article']} - {$item['title_full']}
-					</a>
-				</li>";
+		switch($_GET['additionalConditions']['act']){
+			case 'items':
+				$query = core\Item::getQueryItemInfo();
+				$query .= "
+					WHERE
+						i.article LIKE '{$_GET['value']}%'
+					LIMIT
+						0, {$_GET['maxCountResults']}
+				";
+				$res_items = $db->query($query);
+				if (!$res_items->num_rows) break;
+				foreach($res_items as $item){
+					$output .= "
+						<li>
+							<a href=\"/admin/?view=items&act=item&id={$item['id']}\">
+								{$item['brend']} - {$item['article']} - {$item['title_full']}
+							</a>
+						</li>";
+				}
+				break;
+			case 'complects':
+				$query = core\Item::getQueryItemInfo();
+				$query .= "
+					LEFT JOIN
+						#{$_GET['additionalConditions']['act']} diff ON diff.item_diff = i.id
+					WHERE
+						i.article LIKE '{$_GET['value']}%' AND diff.item_id IS NULL
+					LIMIT
+						0, {$_GET['maxCountResults']}
+				";
+				$res_items = $db->query($query, '');
+				if (!$res_items->num_rows) break;
+				foreach($res_items as $item){
+					$output .= "
+						<li>
+							<a item_id=\"{$item['id']}\" class=\"addItem\" type=\"{$_GET['additionalConditions']['act']}\" href=\"#\">
+								{$item['brend']} - {$item['article']} - {$item['title_full']}
+							</a>
+						</li>";
+				}
+				break;
 		}
 		break;
 	case 'store_items':

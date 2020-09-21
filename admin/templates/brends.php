@@ -277,13 +277,15 @@ function items(){
 			i.article,
 			i.article_cat,
 			i.title_full,
-			i.barcode,
+			ib.barcode,
 			$groupConcat
 			i.is_blocked
 		FROM
 			#items i
 		LEFT JOIN
 			#brends b ON b.id = i.brend_id
+		LEFT JOIN 
+			#item_barcodes ib ON ib.item_id = i.id
 		$leftJoin
 		WHERE
 			$where
@@ -558,7 +560,7 @@ function submit_chb(){
 			$updated++;
 			continue;
 		}
-		$array = core\Item::get($_POST['brend_to'], $item['article']);
+		$array = core\Item::getByBrendIDAndArticle($_POST['brend_to'], $item['article']);
 		$item_id = $array['id'];
 		try{
 			$res = $db->update('analogies', ['item_id' => $item_id], "`item_id` = {$item['id']}");

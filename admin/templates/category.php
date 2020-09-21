@@ -214,13 +214,13 @@ function items(){
 	if (count($category_items)) foreach ($category_items as $category_item) $in .= $category_item['item_id'].",";
 	$in = substr($in, 0, -1);
 	$search = $_POST['search'] ? $_POST['search'] : $_GET['search'];
-	if ($search) $where = "`id` IN ($in) AND (`article`='$search' OR `barcode` LIKE '%$search%' OR `title_full` LIKE '%$search%')";
+	if ($search) $where = "`id` IN ($in) AND (`article`='$search' OR `title_full` LIKE '%$search%')";
 	else $where = "`id` IN ($in)";
 	$all = $db->getCount('items', $where);
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
-	$items = $db->select('items', 'title_full,id,article,barcode,brend_id', $where, 'brend_id', '', "$start,$perPage");
+	$items = $db->select('items', 'title_full,id,article,brend_id', $where, 'brend_id', '', "$start,$perPage");
 	$page_title = "Товары подкатегории <b>".$db->getFieldOnID('categories', $id, 'title')."</b>";
 	$category = $db->select('categories', '*', "`id`=".$_GET['id']);
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=categories'>Категории товаров</a> > ";
@@ -298,14 +298,14 @@ function items_search(){
 		$in = "";
 		foreach ($category_items as $category_item) $in .= $category_item['item_id'].",";
 		$in = substr($in, 0, -1);
-		$where = "(`article`='$search' OR `barcode` LIKE '%$search%' OR `title` LIKE '%$search%') AND `id` IN ($in)";
+		$where = "(`article`='$search' OR `title` LIKE '%$search%') AND `id` IN ($in)";
 		$all = $db->getCount('items', $where);
 		$perPage = 3;
 		$linkLimit = 4;
 		$page = $_GET['page'] ? $_GET['page'] : 1;
 		$chank = getChank($all, $perPage, $linkLimit, $page);
 		$start = $chank[$page] ? $chank[$page] : 0;
-		$items = $db->select('items', 'title,id,article,barcode,brend_id', $where, '', '', "$start,$perPage");
+		$items = $db->select('items', 'title,id,article,brend_id', $where, '', '', "$start,$perPage");
 	}
 	$categories = $db->select('categories', '*', '', '', '', '', true);
 	$page_title = "Поск товаров подкатегории <b>".$db->getFieldOnID('categories', $id, 'title')."</b>";
@@ -468,7 +468,7 @@ function items_filters_values(){
 	if (count($items_values)) foreach($items_values as $item_value) $items_ids[] = $item_value['item_id'];
 	$where = "`id` IN (".implode(',', $items_ids).")";
 	$all = $db->getCount('items', $where);
-	$items = $db->select('items', 'title,id,article,barcode,brend_id', $where, 'brend_id');
+	$items = $db->select('items', 'title,id,article,brend_id', $where, 'brend_id');
 	$page_title = "Товары со свойством <b>".$db->getFieldOnID('filters_values', $id, 'title')."</b>";
 	$filter_value = $db->select('filters_values', '*', "`id`=".$items_values[0]['value_id']);
 	$filter = $db->select('filters', '*', "`id`=".$filter_value[0]['filter_id']);

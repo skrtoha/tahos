@@ -120,5 +120,11 @@ switch($_POST['act']){
 		// debug($_POST);
 		echo json_encode(core\Item::getByID($_POST['item_id']));
 		break;
+	case 'addItem':
+		debug($_POST);
+		$db->insert($_POST['type'], ['item_id' => $_POST['item_id'], 'item_diff' => $_POST['item_diff']], ['print' => true]);
+		$item = core\Item::getByID($_POST['item_id']);
+		debug($item);
+		break;
 }
 ?>

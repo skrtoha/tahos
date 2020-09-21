@@ -137,7 +137,7 @@ class Autokontinent extends Provider{
 				parent::getInstanceDataBase()->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			}
 			else {
-				$item = Item::get($brend_id, $part->part_code);
+				$item = Item::getByBrendIDAndArticle($brend_id, $part->part_code);
 				$item_id = $item['id'];
 			}
 			if (!$item_id) throw new EAuto\ErrorItemID("Ошибка получения item_id");

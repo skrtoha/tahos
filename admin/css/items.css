@@ -12,7 +12,7 @@ label.item_translate{
 	margin-top: 10px;	
 }
 .modal {
-  height: 90vh;
+  max-height: 90vh;
 }
 li.main-photo {
     border: 3px solid red;

@@ -1,6 +1,7 @@
 <?php
 namespace core;
 class Item{
+	public static $lastInsertedItemID = false;
 	/**
 	 * updates item
 	 * @param  array $fields field => value
@@ -14,28 +15,48 @@ class Item{
 		}
 		return self::processUpdate($fields, $where);
 	}
-	public static function get($brend_id, $article){
+	public static function insert($fields){
+		$db = self::getInstanceDataBase();
+		$barcode = $fields['barcode'] ? $fields['barcode'] : false;
+		unset($fields['barcode']);
+		$resItems = $db->insert('items', $fields);
+		if ($resItems !== true) return $resItems;
+		$last_id = $db->last_id();
+		$db->insert('articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
+		if ($barcode){
+			$resBarcode = $db->insert('item_barcodes', [
+				'item_id' => $last_id,
+				'barcode' => $barcode
+			]);
+			if ($resBarcode !== true){
+				$db->delete('items', "`id` = $last_id");
+				return $resBarcode;
+			}
+		}
+		self::$lastInsertedItemID = $last_id;
+		return true;
+	}
+	public static function getByBrendIDAndArticle($brend_id, $article){
 		$article = article_clear($article);
-		return $GLOBALS['db']->select_one('items', '*', "`brend_id` = $brend_id AND `article` = '$article'");
+		$query = self::getQueryItemInfo();
+		$query .= "
+			WHERE
+				`brend_id` = $brend_id AND `article` = '$article'
+		";
+		$res_items = $GLOBALS['db']->query($query);
+		if (!$res_items->num_rows) return false;
+		return $res_items->fetch_assoc();
 	}
 	public static function getInstanceDataBase(){
 		return $GLOBALS['db'];
 	}
 	public static function getByID($item_id){
-		$res = $GLOBALS['db']->query("
-			SELECT
-				i.id,
-				IF(i.article_cat != '', i.article_cat, i.article) AS article,
-				i.title_full,
-				i.brend_id,
-				b.title AS brend
-			FROM
-				#items i
-			LEFT JOIN
-				#brends b ON b.id = i.brend_id
+		$query = self::getQueryItemInfo();
+		$query .= "
 			WHERE
 				i.id = $item_id
-		", '');
+		";
+		$res = $GLOBALS['db']->query($query, '');
 		return $res->fetch_assoc();
 	}
 	public static function getByArticle(string $article, $additionalFields = []): \mysqli_result
@@ -61,6 +82,19 @@ class Item{
 		foreach($where as $key => $value) $conditions .= "`{$key}` = '{$value}' AND ";
 		$conditions = substr($conditions, 0, -5);
 		try{
+			if (isset($where['id']) && isset($fields['barcode'])){
+				$GLOBALS['db']->delete('item_barcodes', "`item_id` = {$where['id']}");
+				if ($fields['barcode']) $res = $GLOBALS['db']->insert(
+					'item_barcodes',
+					[
+						'item_id' => $where['id'],
+						'barcode' => $fields['barcode']
+					]
+				); 
+				else $res = true;
+				if ($res !== true) throw new \Exception($res);
+				unset($fields['barcode']);
+			}
 			$res = $GLOBALS['db']->update('items', $fields, $conditions);
 			if ($res !== true) throw new \Exception($res);
 		} catch(\Exception $c){
@@ -320,15 +354,15 @@ class Item{
 	public static function getQueryItemInfo(){
 		return "
 			SELECT
-				i.id,
-				IF(i.article_cat != '', i.article_cat, i.article) AS article,
-				LEFT(i.title_full, 20) AS title_full,
-				i.brend_id,
+				i.*,
+				ib.barcode,
 				b.title AS brend
 			FROM
 				#items i
 			LEFT JOIN
 				#brends b ON b.id = i.brend_id
+			LEFT JOIN
+				#item_barcodes ib ON ib.item_id = i.id
 		";
 	}
 }

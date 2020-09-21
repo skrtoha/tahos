@@ -10,20 +10,22 @@ $db->setProfiling();
 switch($_POST['act']){
 	case 'item_search':
 		$items = array();
-		if ($_POST['exact_match']) $where = "i.article='{$_POST['user_item_search']}' OR i.barcode='{$_POST['user_item_search']}'";
-		else $where = "i.article REGEXP '{$_POST['user_item_search']}' OR i.barcode REGEXP '{$_POST['user_item_search']}'";
+		if ($_POST['exact_match']) $where = "i.article='{$_POST['user_item_search']}' OR ib.barcode='{$_POST['user_item_search']}'";
+		else $where = "i.article REGEXP '{$_POST['user_item_search']}' OR ib.barcode REGEXP '{$_POST['user_item_search']}'";
 		$res = $db->query("
 			SELECT
 				i.id,
 				i.title_full,
 				i.article,
-				i.barcode,
+				ib.barcode,
 				i.brend_id,
 				b.title AS brend
 			FROM
 				#items i
 			LEFT JOIN
 				#brends b ON b.id=i.brend_id
+			LEFT JOIN
+				#item_barcodes ib ON ib.item_id = i.id
 			WHERE
 				$where
 		", '');
@@ -48,7 +50,7 @@ switch($_POST['act']){
 				i.id AS item_id,
 				i.title_full,
 				i.article,
-				i.barcode,
+				ib.barcode,
 				b.title AS brend,
 				ps.id AS store_id,
 				ps.cipher AS cipher,
@@ -58,6 +60,8 @@ switch($_POST['act']){
 				#store_items si
 			LEFT JOIN
 				#items i ON i.id=si.item_id
+			LEFT JOIN
+				#item_barcodes ib ON ib.item_id = i.id
 			LEFT JOIN
 				#provider_stores ps ON ps.id=si.store_id
 			LEFT JOIN

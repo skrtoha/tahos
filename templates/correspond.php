@@ -96,7 +96,7 @@ $title = $messages[0]['theme'];
 					IF (
 						i.article !='',
 						i.article,
-						i.barcode
+						ib.barcode
 					)
 				) AS article,
 				i.brend_id,
@@ -118,6 +118,8 @@ $title = $messages[0]['theme'];
 			JOIN #orders_statuses os ON ov.status_id=os.id
 			LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
 			JOIN #brends b ON b.id=i.brend_id
+			LEFT JOIN
+				#item_barcodes ib ON ib.item_id = i.id
 			JOIN #orders o ON o.id=ov.order_id
 			WHERE 
 				ov.order_id={$order_id} AND

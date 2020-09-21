@@ -102,7 +102,7 @@ if ($order_id){
 				IF (
 					i.article !='',
 					i.article,
-					i.barcode
+					ib.barcode
 				)
 			) AS article,
 			ov.store_id,
@@ -121,6 +121,7 @@ if ($order_id){
 		LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
 		LEFT JOIN #items i ON i.id=ov.item_id
 		LEFT JOIN #brends b ON b.id=i.brend_id
+		LEFT JOIN #item_barcodes ib ON ib.item_id = i.item_id
 		LEFT JOIN #orders_statuses os ON os.id=ov.status_id
 		LEFT JOIN #orders o ON ov.order_id=o.id
 		LEFT JOIN #users u ON u.id=o.user_id

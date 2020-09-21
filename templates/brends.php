@@ -172,7 +172,14 @@ function items(){
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
-	$items = $db->select('items', 'title_full,id,article,barcode,brend_id', $where, '', '', "$start,$perPage");
+	$query = core\Item::getQueryItemInfo();
+	$query .= "
+		WHERE
+			$where
+		LIMIT
+			$start,$perPage
+	";
+	$res_items = $db->query($query);
 	$categories = $db->select('categories', '*', '', '', '', '', true);
 	$page_title = "Товары бренда <b>".$db->getFieldOnID('brends', $id, 'title')."</b>";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";?>
@@ -190,8 +197,8 @@ function items(){
 			<td>Название</td>
 			<td>Штрих-код</td>
 		</tr>
-		<?if (count($items)){
-			foreach($items as $item){?>
+		<?if ($res_items->num_rows){
+			foreach($res_items as $item){?>
 				<tr>
 					<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
 					<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
@@ -206,62 +213,6 @@ function items(){
 	</table>
 	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=brends&act=items&id=$id&page=");
 }
-function items_search(){
-	global $status, $db;
-	$id = $_GET['id'];
-	$search = $_POST['search'];
-	$category_items = $db->select('categories_items', 'item_id', "`category_id`=$id");
-	require_once('templates/pagination.php');
-	$where = "(`article`='$search' OR `barcode` LIKE '%$search%' OR `title` LIKE '%$search%') AND `brend_id`=$id";
-	$all = $db->getCount('items', $where);
-	$items = $db->select('items', 'title_full,id,article,barcode,brend_id', $where);
-	$categories = $db->select('categories', '*', '', '', '', '', true);
-	$page_title = "Поск товаров бренда <b>".$db->getFieldOnID('brends', $id, 'title')."</b>";
-	$category = $db->select('categories', '*', "`id`=$id");
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";?>
-	<div id="total" style="margin: 0">Всего: <?=$all?></div>
-	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=brends&id=<?=$id?>&act=items_search" method="post">
-			<input style="width: 264px;" required type="text" name="search" value="<?=$search?>" placeholder="Поиск по артикулу, vid и названию">
-			<input type="submit" value="Искать">
-		</form>
-	</div>
-	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-			<td></td>
-		</tr>
-		<?if (count($items)){
-			foreach($items as $item){?>
-			<tr>
-				<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-				<td><a href="?view=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-				<td><?=$item['title_full']?></td>
-				<td><?=$item['barcode']?></td>
-				<td>
-					<?$categories_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
-					if (count($categories_items)){
-						foreach ($categories_items as $category_item) {?>
-							<a href="/admin/?view=category&id=<?=$category_item['category_id']?>"><?=$categories[$category_item['category_id']]['title']?></a>
-						<?}
-					}?>
-				</td>
-				<td>
-					<a href="?view=item&id=<?=$item['id']?>&act=change">Изменить</a>
-					<a href="?view=items&id=<?=$item['id']?>&act=delete" class="delete_item" item_id="<?=$item['id']?>">Удалить</a>
-				</td>
-			</tr>
-		<?}
-		}
-		else{?>
-			<tr><td colspan="5">Товаров не найдено</td></tr>
-		<?}?>
-	</table>
-<?}
 function show_form($act){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];

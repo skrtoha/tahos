@@ -180,7 +180,7 @@ input[readonly]{
 	#status{
 
 	}
-	#contents {overflow:hidden;box-sizing:border-box;margin-top: 10px}
+	#contents {box-sizing:border-box;margin-top: 10px}
 
 	.t_form {width:inherit;overflow:hidden;border:solid 1px #606060;padding:1px;}
 	.t_form .delimiter {font-weight:bold;padding:10px;background:#e8e7e7;}

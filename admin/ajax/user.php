@@ -11,14 +11,14 @@ switch($_POST['act']){
 		// print_r($_POST);
 		$items = array();
 		$search = preg_replace('/[\W_]+/', '', $_POST['search']);
-		if ($_POST['exact_match']) $where = "i.article='{$search}' OR i.barcode='{$search}'";
-		else $where = "i.article REGEXP '{$search}' OR i.barcode REGEXP '{$search}'";
+		if ($_POST['exact_match']) $where = "i.article='{$search}' OR ib.barcode='{$search}'";
+		else $where = "i.article REGEXP '{$search}' OR ib.barcode REGEXP '{$search}'";
 		$res = $db->query("
 			SELECT
 				i.id,
 				i.title_full,
 				i.article,
-				i.barcode,
+				ib.barcode,
 				i.brend_id,
 				b.title AS brend,
 				si.store_id,
@@ -31,6 +31,8 @@ switch($_POST['act']){
 				#items i
 			LEFT JOIN
 				#brends b ON b.id=i.brend_id
+			LEFT JOIN
+				#item_barcodes ib ON ib.item_id = i.id
 			LEFT JOIN
 				#store_items si ON si.item_id=i.id
 			LEFT JOIN 

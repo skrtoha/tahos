@@ -81,7 +81,7 @@ class ForumAuto extends Provider{
 				parent::getInstanceDataBase()->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			}
 			else {
-				$item = Item::get($brend_id, $part->art);
+				$item = Item::getByBrendIDAndArticle($brend_id, $part->art);
 				$item_id = $item['id'];
 			}
 			if (!$item_id) throw new EForumAuto\ErrorItemID("Ошибка получения item_id");

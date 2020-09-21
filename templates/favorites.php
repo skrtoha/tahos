@@ -14,7 +14,7 @@ $favorites = $db->select_unique("
 				IF (
 					i.article !='',
 					i.article,
-					i.barcode
+					ib.barcode
 				)
 			) as article,
 			b.title as brend,
@@ -27,6 +27,7 @@ $favorites = $db->select_unique("
 		#favorites f
 	LEFT JOIN #items i ON i.id=f.item_id
 	LEFT JOIN #brends b ON i.brend_id=b.id
+	LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 	WHERE 
 		f.user_id={$_SESSION['user']}
 ", '');

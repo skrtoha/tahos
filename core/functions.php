@@ -396,7 +396,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 				IF (
 					i.article !='',
 					i.article,
-					i.barcode
+					ib.barcode
 				)
 			) as article,
 			IF (i.title_full!='', i.title_full, i.title) as title_full,
@@ -424,6 +424,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 		LEFT JOIN #currencies c ON c.id=ps.currency_id
 		LEFT JOIN #items i ON diff.item_diff=i.id
 		LEFT JOIN #brends b ON b.id=i.brend_id
+		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #autoeuro_order_keys aok ON aok.item_id = si.item_id AND aok.store_id = si.store_id
 		$join_basket
 		WHERE diff.item_id=$item_id $whereAnalogies
@@ -456,7 +457,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 						IF (
 							i.article !='',
 							i.article,
-							i.barcode
+							ib.barcode
 						)
 				) as article,
 				b.title as brend,
@@ -470,6 +471,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 			FROM #$search_type diff
 			LEFT JOIN #items i ON i.id=diff.item_diff
 			LEFT JOIN #brends b ON b.id=i.brend_id
+			LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 			WHERE
 				diff.item_id=$item_id
 		";
@@ -569,7 +571,7 @@ function get_basket(){
 				IF (
 					i.article !='',
 					i.article,
-					i.barcode
+					ib.barcode
 				)
 			) as article,
 			br.title as brend,
@@ -578,6 +580,7 @@ function get_basket(){
 				#basket b
 			JOIN #items i ON i.id=b.item_id
 			JOIN #brends br ON br.id=i.brend_id
+			LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 			WHERE b.user_id={$_SESSION['user']}
 	", false);
 	if (empty($basket)) return false;
@@ -603,7 +606,7 @@ function get_orders($params, $flag = ''){
 				IF (
 					i.article !='',
 					i.article,
-					i.barcode
+					ib.barcode
 				)
 			) AS article,
 			b.title AS brend,
@@ -655,6 +658,7 @@ function get_orders($params, $flag = ''){
 				r.item_id = ov.item_id
 		LEFT JOIN #return_statuses rs ON rs.id = r.status_id
 		LEFT JOIN #brends b ON b.id=i.brend_id
+		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #orders o ON o.id=ov.order_id
 		LEFT JOIN #corresponds c 
 			ON 

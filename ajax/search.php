@@ -19,21 +19,19 @@ if (!$user_id){
 	exit();
 }
 $items = $db->select('search', '*', "`user_id`=$user_id AND `type`=$type_search", 'date', false);
-// print_r($items);
-$count = count($items);
-if (!$count) echo 0;
+if (empty($items)) echo 0;
 else{
 	ob_start();
 	$str = "";?>
 	<table>
-		<?for ($i = 0; $i < $count; $i++) {?>
+		<?foreach($items as $item) {?>
 			<tr>
 				<td>
-					<a href="/search/<?=$_POST['type_search']?>/<?=$items[$i]['text']?>">
-						<?=$items[$i]['text']?>
+					<a href="/search/<?=$_POST['type_search']?>/<?=$item['text']?>">
+						<?=$item['text']?>
 					</a>
 				</td>
-				<td><?=$items[$i]['title']?></td></span>
+				<td><?=$item['title']?></td></span>
 			</tr>
 		<?}?>
 	</table>

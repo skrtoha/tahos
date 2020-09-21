@@ -1,19 +1,21 @@
 var reg_integer = /^\d+$/;
 $(function(){
-	$('input[name=search].intuitive_search')
-		.on('keyup focus', function(e){
-			e.preventDefault();
-			let val = $(this).val();
-			let minLength = 1;
-			val = val.replace(/[^\wа-яА-Я]+/gi, '');
-			intuitive_search.getResults({
-				event: e,
-				value: val,
-				minLength: minLength,
-				tableName: 'items',
-				searchField: 'article'
-			});
+	$('input.intuitive_search').on('keyup focus', function(e){
+		e.preventDefault();
+		let val = $(this).val();
+		let minLength = 1;
+		val = val.replace(/[^\wа-яА-Я]+/gi, '');
+		intuitive_search.getResults({
+			event: e,
+			value: val,
+			minLength: minLength,
+			additionalConditions: {
+				act: $(this).attr('name'),
+				item_id: $('input[name=item_id]').val()
+			},
+			tableName: 'items',
 		});
+	});
 	$('.hide').on('click', function(e){
 		e.preventDefault();
 		if ($(this).html() == "Показать") $(this).html('Скрыть').next().show();
@@ -380,5 +382,41 @@ $(function(){
 				}
 			})
 		}
+	})
+	$(document).on('click', 'a.addItem', function(){
+		let th = $(this);
+		$.ajax({
+			type: 'post',
+			url: '/admin/ajax/item.php',
+			beforeSend: function(){
+				$('#pupup').css('display', 'flex');
+			},
+			data: {
+				act: 'addItem',
+				type: th.attr('type'),
+				item_id: $('input[name=item_id]').val(),
+				item_diff: th.attr('item_id')
+			},
+			success: function(response){
+				let itemInfo = JSON.parse(response);
+				$('table.t_table').append(`
+					<tr>
+						<td label="Бренд">${itemInfo.brend}</td>
+						<td label="Артикул">
+							<a href="?view=items&act=item&id=${itemInfo.id}">
+								${itemInfo.article}
+							</a>
+						</td>
+						<td label="Название">${itemInfo.title_full}</td>
+						<td label="Штрих-код">${itemInfo.barcode}</td>
+						<td label="Категории">${itemInfo.categories}</td>
+						<td label="">
+							<a class="delete_item" href="?view=items&act=delete&type=${th.attr('type')}&item_id=${itemInfo.id}&item_diff=${th.attr('item_id')}">Удалить</a>
+						</td>
+					</tr>
+				`);
+				$('#popup').css('display', 'none');
+			}
+		})
 	})
 })

@@ -204,12 +204,12 @@ function search_items($flag = ''){
 	// print_r($_GET);
 	switch ($_GET['type']){
 		case 'article': 
-			if (mb_strlen($for_search) == 13) $where = "(i.`article`='$for_search' OR i.`barcode`='$for_search')";
+			if (mb_strlen($for_search) == 13) $where = "(i.`article`='$for_search' OR ib.`barcode`='$for_search')";
 			else $where = "i.`article`='$for_search'";
 			$type_search = 1;
 			break;
 		case 'barcode':
-			$where =  "i.`barcode`='$for_search'";
+			$where =  "ib.`barcode`='$for_search'";
 			$type_search = 2;
 			break;
 	}
@@ -224,7 +224,7 @@ function search_items($flag = ''){
 					IF (
 						i.article !='',
 						i.article,
-						i.barcode
+						ib.barcode
 					)
 			) AS article,
 			IF (i.title_full!='', i.title_full, i.title) AS title_full,
@@ -240,6 +240,7 @@ function search_items($flag = ''){
 			) as is_desc
 		FROM #items i
 		LEFT JOIN #brends b ON b.id=i.brend_id
+		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #store_items si ON si.item_id=i.id
 		LEFT JOIN #provider_stores ps ON ps.id=si.store_id
 		LEFT JOIN #currencies c ON ps.currency_id=c.id

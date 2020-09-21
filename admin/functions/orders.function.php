@@ -72,7 +72,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 				IF (
 					i.article !='',
 					i.article,
-					i.barcode
+					ib.barcode
 				)
 			) AS article,
 			IF (si.packaging IS NOT NULL, si.packaging, 1) AS packaging,
@@ -119,6 +119,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 		LEFT JOIN #providers p ON p.id=ps.provider_id
 		LEFT JOIN #items i ON i.id=ov.item_id
 		LEFT JOIN #brends b ON b.id=i.brend_id
+		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #orders_statuses os ON os.id=ov.status_id
 		LEFT JOIN #orders o ON ov.order_id=o.id
 		LEFT JOIN #users u ON u.id=o.user_id

@@ -34,7 +34,7 @@ $q_item = "
 				IF (
 					i.article !='',
 					i.article,
-					i.barcode
+					ib.barcode
 				)
 		) AS article,
 		i.full_desc,
@@ -57,6 +57,7 @@ $q_item = "
 	LEFT JOIN #provider_stores ps ON ps.id=si.store_id
 	LEFT JOIN #currencies c ON c.id=ps.currency_id
 	LEFT JOIN #brends b ON b.id=i.brend_id
+	LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 	LEFT JOIN #favorites f ON f.item_id=i.id
 	$where_basket
 	WHERE i.id={$_POST['id']}

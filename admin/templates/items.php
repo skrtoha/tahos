@@ -10,6 +10,7 @@ if (isset($_FILES['photo'])){
 	exit();
 }
 $act = $_GET['act'];
+// debug($_POST); exit();
 if ($_POST['form_submit']){
 	
 	//если товар заблокирован и пользователь не является администртором
@@ -83,15 +84,10 @@ if ($_POST['form_submit']){
 		$last_id = $_GET['id'];
 	} 
 	else{
-		$res = $db->insert(
-			'items', 
-			$array
-		); 
-		if ($res === true){
-			$last_id = $db->last_id();
-			$db->insert('articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
-		}
+		$res = core\Item::insert($array);
+		$last_id = core\Item::$lastInsertedItemID;
 	} 
+
 	if ($res === true) {
 		if (isset($_POST['photos']) && !empty($_POST['photos'])){
 			$dir_big = core\Config::$imgPath . "/items/big/$last_id";
@@ -136,7 +132,6 @@ switch ($act) {
 	case 'related': related(); break;
 	case 'related_search': related_search(); break;
 	case 'complect': complect(); break;
-	case 'complect_search': complect_search(); break;
 	case 'delete_related':
 		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
 			Managers::handlerAccessNotAllowed();
@@ -259,8 +254,7 @@ function item($act){
 			break;
 		case 's_change':
 			$id = $_GET['id'];
-			$item = $db->select('items', '*', "`id`=$id");
-			$item = $item[0];
+			$item = core\Item::getByID($id);
 			$page_title = 'Редактирование товара';
 			$translates = array();
 			if (empty($_POST['translate'])){
@@ -732,7 +726,7 @@ function related(){
 		SELECT
 			i.id,
 			i.title_full,
-			i.barcode,
+			ib.barcode,
 			i.brend_id,
 			i.article,
 			b.title AS brend,
@@ -740,6 +734,8 @@ function related(){
 		FROM
 			#items i
 		LEFT JOIN #brends b ON i.brend_id=b.id
+		LEFT JOIN
+			#item_barcodes ib ON ib.item_id = i.id
 		WHERE
 			i.id IN (
 				SELECT item_diff FROM #articles WHERE item_id=$item_id
@@ -824,13 +820,14 @@ function related_search(){
 		SELECT
 			i.id,
 			i.title_full,
-			i.barcode,
+			ib.barcode,
 			i.brend_id,
 			i.article,
 			b.title AS brend
 		FROM
 			#items i
 		LEFT JOIN #brends b ON i.brend_id=b.id
+		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #categories_items ci ON ci.item_id=i.id
 		LEFT JOIN #categories c ON c.id=ci.category_id
 		WHERE 
@@ -873,92 +870,6 @@ function related_search(){
 		}
 		else{?>
 			<tr><td colspan="5">Замен не найдено</td></tr>
-		<?}?>
-	</table>
-<?}
-function item_search(){
-	global $status, $db;
-	$item_id = $_GET['item_id'];
-	$item = $db->select('items', 'id,article,title_full,barcode,brend_id', "`id`=$item_id");
-	$item = $item[0];
-	$page_title = "Добавление замены для товара";
-	$search = article_clear($_POST['search']);
-	if (!$search) header ('Location: ?view=substitutes');
-	$is_subtitutes = $db->select('substitutes', "item_sub", "`item_id`=$item_id");
-	if (count($is_subtitutes)){
-		$in = "";
-		foreach ($is_subtitutes as $value) $in .= $value['item_sub'].',';
-		$in = substr($in, 0, -1);
-	} 
-	if ($in) $where = "(`article`='$search' OR `barcode` LIKE '%$search%' OR `title_full` LIKE '%$search%') AND `id` NOT IN ($in)";
-	else $where = "`article`='$search' OR `barcode` LIKE '%$search%' OR `title_full` LIKE '%$search%'";
-	$items = $db->select('items', 'title_full,id,article,barcode,brend_id', $where);
-	$categories = $db->select('categories', '*', '', '', '', '', true);
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=substitutes'>Замены</a> > $page_title";?>
-	<b style="margin-bottom: 10px;display: block">Товар</b>
-	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-			<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-			<td><?=$item['title_full']?></td>
-			<td><?=$item['barcode']?></td>
-			<td>
-				<?$categories_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
-				if (count($categories_items)){
-					foreach ($categories_items as $category_item) {?>
-						<a href="/admin/?view=category&id=<?=$category_item['category_id']?>"><?=$categories[$category_item['category_id']]['title']?></a>
-					<?}
-				}?>
-			</td>
-			<td></td>
-		</tr>
-	</table>
-	<b style="display: block; margin: 10px 0">Найденные товары:</b>
-	<div id="total" style="margin-top: 20px">Всего: <?=count($items)?></div>
-	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=substitutes&act=item_search&item_id=<?=$item_id?>" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск">
-			<input type="submit" value="Искать">
-		</form>
-	</div>
-	<table style="" class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-			<td></td>
-		</tr>
-		<?if (count($items)){
-			foreach($items as $item){?>
-				<tr>
-					<td><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-					<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-					<td><?=$item['title_full']?></td>
-					<td><?=$item['barcode']?></td>
-					<td>
-						<?$categories_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
-						if (count($categories_items)){
-							foreach ($categories_items as $category_item) {?>
-								<a href="/admin/?view=category&id=<?=$category_item['category_id']?>"><?=$categories[$category_item['category_id']]['title']?></a>
-							<?}
-						}?>
-					</td>
-					<td><a href="?view=substitutes&act=add_item&item_id=<?=$item_id?>&id=<?=$item['id']?>">Добавить</a></td>
-				</tr>
-			<?}	
-		}
-		else{?>
-			<tr><td colspan="5">Товары не найдены</td></tr>
 		<?}?>
 	</table>
 <?}
@@ -1029,10 +940,7 @@ function complect(){
 	</table>
 	<div id="total" style="margin-top: 20px">Всего: <?=count($items)?></div>
 	<div style="margin-top: 5px" class="actions">
-		<form action="/admin/?view=items&act=complect_search&id=<?=$item_id?>" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск для добавления">
-			<input type="submit" value="Искать">
-		</form>
+		<input style="width: 264px;" type="text" name="complects" class="intuitive_search" placeholder="Поиск для добавления">
 	</div>
 	<table style="" class="t_table" cellspacing="1">
 		<tr class="head">
@@ -1060,67 +968,6 @@ function complect(){
 		<?}?>
 	</table>
 <?}
-function complect_search(){
-	global $status, $db, $page_title;
-	$search = trim($_POST['search']);
-	$item_id = $_GET['id'];
-	$q_items = "
-		SELECT
-			i.id,
-			i.title_full,
-			i.barcode,
-			i.brend_id,
-			i.article,
-			b.title AS brend
-		FROM
-			#items i
-		LEFT JOIN #brends b ON i.brend_id=b.id
-		LEFT JOIN #categories_items ci ON ci.item_id=i.id
-		LEFT JOIN #categories c ON c.id=ci.category_id
-		WHERE 
-			i.article='$search' OR
-			i.id='$search' AND 
-			i.id<>$item_id
-	";
-	$res_items = $db->query($q_items, '');
-	if ($res_items->num_rows > 100){
-		message('Слишком много совпадений! Уточните поиск.', false);
-		header("Location: /admin/?view=items&act=complect&id=$item_id");
-	}
-	$page_title = "Поиск для добавления";
-	$status = "<a href='/admin'>Главная</a> > $page_title";?>
-	<a href="?view=items&act=item&id=<?=$item_id?>" style="margin-bottom: 10px;display: block">Карточка товара</a>
-	<div id="total" style="margin-top: 20px">Всего: <?=$res_items->num_rows?></div>
-	<div style="margin-top: 5px" class="actions">
-		<form action="/admin/?view=items&act=complect_search&id=<?=$item_id?>" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$search?>" placeholder="Поиск для добавления">
-			<input type="submit" value="Искать">
-		</form>
-	</div>
-	<table style="" class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td></td>
-		</tr>
-		<?if ($res_items->num_rows){
-			while($value = $res_items->fetch_assoc()){?>
-				<tr>
-					<td label="Бренд"><?=$value['brend']?></td>
-					<td label="Артикул"><a href="?view=items&act=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
-					<td label="Название"><?=$value['title_full']?></td>
-					<td label="Штрих-код"><?=$value['barcode']?></td>
-					<td><a href="?view=items&act=complect_add&item_related=<?=$value['id']?>&item_id=<?=$item_id?>">Добавить</a></td>
-				</tr>
-			<?}	
-		}
-		else{?>
-			<tr><td colspan="5">Комплектов не найдено</td></tr>
-		<?}?>
-	</table>
-<?}
 function analogies_substitutes($type){
 	global $status, $db, $page_title;
 	$item_id = $_GET['item_id'];
@@ -1143,7 +990,7 @@ function analogies_substitutes($type){
 			diff.checked,
 			i.article,
 			i.title_full,
-			i.barcode,
+			ib.barcode,
 			b.title AS brend,
 			ci.category_id,
 			c.title AS category
@@ -1153,6 +1000,8 @@ function analogies_substitutes($type){
 			#items i ON i.id=diff.item_diff
 		LEFT JOIN 
 			#brends b ON b.id=i.brend_id
+		LEFT JOIN
+			#item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #categories_items ci ON i.id=ci.item_id
 		LEFT JOIN #categories c ON c.id=ci.category_id
 		WHERE
@@ -1252,7 +1101,7 @@ function analogies_substitutes_search($type){
 			i.id,
 			i.article,
 			i.title_full,
-			i.barcode,
+			ib.barcode,
 			b.title AS brend,
 			ci.category_id,
 			c.title AS category,
@@ -1262,6 +1111,8 @@ function analogies_substitutes_search($type){
 			#items i
 		LEFT JOIN 
 			#brends b ON b.id=i.brend_id
+		LEFT JOIN
+			#item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #categories_items ci ON i.id=ci.item_id
 		LEFT JOIN #categories c ON c.id=ci.category_id
 		LEFT JOIN #$type diff ON diff.item_diff=i.id AND diff.item_id={$_GET['item_id']}
@@ -1365,7 +1216,7 @@ function get_item(){
 			i.id,
 			i.article,
 			i.title_full,
-			i.barcode,
+			ib.barcode,
 			b.title AS brend,
 			ci.category_id,
 			c.title AS category
@@ -1373,6 +1224,8 @@ function get_item(){
 			#items i
 		LEFT JOIN 
 			#brends b ON b.id=i.brend_id
+		LEFT JOIN
+			#item_barcodes ib ON ib.item_id = i.id
 		LEFT JOIN #categories_items ci ON i.id=ci.item_id
 		LEFT JOIN #categories c ON c.id=ci.category_id
 		WHERE
@@ -1427,15 +1280,27 @@ function items(){
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
-	$items = $db->select('items', 'title_full,id,article,article_cat,barcode,brend_id', '', 'id', false, "$start,$perPage");
+	$query = core\Item::getQueryItemInfo();
+	if (isset($_GET['items'])) $query .= "
+		WHERE
+			i.article = '{$_GET['items']}'
+	";
+	$query .= "
+		ORDER BY i.id DESC
+		LIMIT
+			$start,$perPage
+	";
+	$res_items = $db->query($query, '');
+	if (isset($_GET['items'])) $all = $res_items->num_rows;
 	$page_title = "Номенклатура";
 	$status = "<a href='/admin'>Главная</a> > $page_title"?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions items" class="" style="">
-		<form action="?view=items&act=search" method="post">
-			<input class="intuitive_search" style="width: 264px;" type="text" name="search" value="" placeholder="Поиск по артикулу, vid и названию" required>
-			<input type="submit" value="Искать">
-		</form>
+	<form>
+		<input type="hidden" name="view" value="items">
+		<input class="intuitive_search" style="width: 264px;" type="text" name="items" value="<?=$_GET['items']?>" placeholder="Поиск по артикулу, vid и названию" required>
+		<input type="submit" value="Искать">
+	</form>
 		<a href="?view=items&act=add">Добавить</a>
 	</div>
 	<table class="t_table" cellspacing="1">
@@ -1447,11 +1312,11 @@ function items(){
 			<td>Штрих-код</td>
 			<td>Категории</td>
 		</tr>
-		<?if (count($items)){
+		<?if ($res_items->num_rows){
 			$db->isProfiling = false;
-			foreach($items as $item){?>
+			foreach($res_items as $item){?>
 				<tr class="items_box" item_id="<?=$item['id']?>">
-					<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
+					<td label="Бренд"><?=$item['brend']?></td>
 					<td label="Артикул">
 						<a href="/admin/?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a>
 					</td>
@@ -1477,59 +1342,8 @@ function items(){
 			</tr>
 		<?}?>
 	</table>
-	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=items&page=");
-}
-function search(){
-	global $status, $db;
-	$search = article_clear($_POST['search']);
-	if (!$search) header ('Location: ?view=items');
-	$where = "
-		`article`='$search' OR 
-		`barcode`='$search'
-	";
-	$all = $db->getCount('items', $where);
-	$items = $db->select('items', 'title_full,id,article,barcode,brend_id', $where);
-	$page_title = "Поиск по номенклатуре";
-	$categories = $db->select('categories', '*', '', '', '', '', true);
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=items'>Номенклатура</a> > $page_title"?>
-	<div id="total">Всего: <?=$all?></div>
-	<div class="actions" style="width: 100%">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=items&act=search" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск">
-			<input type="submit" value="Искать">
-		</form>
-		<a style="margin-left: 10px;" href="?view=items&act=add">Добавить</a>
-	</div>
-	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-		</tr>
-		<?if (count($items)){
-			foreach($items as $item){?>
-			<tr class="items_box" item_id="<?=$item['id']?>">
-				<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-				<td label="Артикул">
-					<a target="_blank" href="/admin/?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a>
-				</td>
-				<td label="Название"><?=$item['title_full']?></td>
-				<td label="Штрих-код"><?=$item['barcode']?></td>
-				<td label="Категории">
-					<?$categories_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
-					if (count($categories_items)){
-						foreach ($categories_items as $category_item) {?>
-							<a href="?view=category&act=items&id=<?=$category_item['category_id']?>"><?=$db->getFieldOnID('categories', $category_item['category_id'], 'title')?></a>
-						<?}
-					}?>
-				</td>
-			</tr>
-		<?}
-		}
-		else{?>
-			<tr><td colspan="5">Товаров не найдено</td></tr>
-		<?}?>
-	</table>
-<?}?>
+	<?if (!isset($_GET['items'])){
+		pagination($chank, $page, ceil($all / $perPage), $href = "?view=items&page=");
+	}
+}?>
+<input type="hidden" name="item_id" value="<?=$_GET['id']?>">

@@ -260,6 +260,7 @@ div.gif, tr.gif td{
   width: 10px;
 }
 #full-image .img-wrap img {
+  max-width: 90vw;
   max-height: 90vh;
 }
 #full-image .img-wrap .close:after {
@@ -294,12 +295,11 @@ div.gif, tr.gif td{
     position: relative;
 }
 #full-image .img-wrap {
-   -webkit-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
     box-sizing: border-box;
     padding: 10px;
-    max-width: 95vw;
-    max-height: 95vh;
-    min-width: 320px;
+    /* max-width: 90vw; */
+    /* min-width: 320px; */
     position: absolute;
     background: white;
     left: 50%;
@@ -2553,9 +2553,6 @@ b.brend_info{
   content: 'Применяемость';
 }
 @media screen and (max-width: 800px){
-  .img-wrap{
-    width: 90%;
-  }
   .description-block .ionTabs__head{
     height: 50px;
   }

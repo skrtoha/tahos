@@ -260,10 +260,7 @@ div.gif, tr.gif td{
   width: 10px;
 }
 #full-image .img-wrap img {
-    width: 100%;
-}
-.img-wrap img {
-    width: 100%;
+  max-height: 90vh;
 }
 #full-image .img-wrap .close:after {
     content: "\f00d";
@@ -297,10 +294,11 @@ div.gif, tr.gif td{
     position: relative;
 }
 #full-image .img-wrap {
-    -webkit-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
     box-sizing: border-box;
     padding: 10px;
-    max-width: 1200px;
+    max-width: 95vw;
+    max-height: 95vh;
     min-width: 320px;
     position: absolute;
     background: white;
@@ -888,7 +886,7 @@ textarea {
 form input, header {
   -webkit-box-sizing: border-box
 }
-.filter-form .search-wrap, .filter-form input, .img-wrap img, table {
+.filter-form .search-wrap, .filter-form input, table {
   width: 100%
 }
 .filter-form h3 {

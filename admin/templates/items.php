@@ -129,43 +129,7 @@ if ($_POST['form_submit']){
 	else message($res, false);
 }
 switch ($act) {
-	case 'related': related(); break;
-	case 'related_search': related_search(); break;
-	case 'complect': complect(); break;
-	case 'delete_related':
-		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		$db->delete('articles', "`item_id`={$_GET['item_id']} AND `item_diff`={$_GET['item_diff']}");
-		$db->delete('articles', "`item_diff`={$_GET['item_id']} AND `item_id`={$_GET['item_diff']}");
-		message('Успешно удалено!');
-		header("Location: /admin/?view=items&act=related&id={$_GET['item_id']}");
-		break;
-	case 'related_add':
-		if (Managers::isActionForbidden('Номенклатура', 'Добавление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		$db->insert('articles',['item_id' => $_GET['item_id'], 'item_diff' => $_GET['item_related']], ['print_query' => false]);
-		$db->insert('articles',['item_id' => $_GET['item_related'], 'item_diff' => $_GET['item_id']], ['print_query' => false]);
-		message('Успешно добавлено!');
-		header("Location: /admin/?view=items&act=related&id={$_GET['item_id']}");
-		break;
-	case 'delete_complect':
-		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		$db->delete('complects', "`item_id`={$_GET['item_id']} AND `item_diff`={$_GET['item_diff']}");
-		message('Успешно удалено!');
-		header("Location: /admin/?view=items&act=complect&id={$_GET['item_id']}");
-		break;
-	case 'complect_add':
-		if (Managers::isActionForbidden('Номенклатура', 'Добавление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		$db->insert('complects',['item_id' => $_GET['item_id'], 'item_diff' => $_GET['item_related']]);
-		message('Успешно добавлено!');
-		header("Location: /admin/?view=items&act=complect&id={$_GET['item_id']}");
-		break;
+	case 'complects': itemDiff('complects'); break;
 	case 'delete_foto':
 		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
 			Managers::handlerAccessNotAllowed();
@@ -190,32 +154,6 @@ switch ($act) {
 	case 'prices': prices(); break;
 	case 'substitutes': analogies_substitutes('substitutes'); break;
 	case 'analogies': analogies_substitutes('analogies'); break;
-	case 'substitutes_search': analogies_substitutes_search('substitutes'); break;
-	case 'analogies_search': analogies_substitutes_search('analogies'); break;
-	case 'analogies_add':
-		if (Managers::isActionForbidden('Номенклатура', 'Добавление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		analogies_substitutes_add('analogies'); 
-		break;
-	case 'substitutes_add': 
-		if (Managers::isActionForbidden('Номенклатура', 'Добавление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		analogies_substitutes_add('substitutes'); 
-		break;
-	case 'substitutes_delete': 
-		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		analogies_substitutes_delete('substitutes'); 
-		break;
-	case 'analogies_delete': 
-		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
-			Managers::handlerAccessNotAllowed();
-		} 
-		analogies_substitutes_delete('analogies'); 
-		break;
 	case 'clearAnalogies':
 		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
 			Managers::handlerAccessNotAllowed();
@@ -235,6 +173,9 @@ switch ($act) {
 			message('Успешно удалено!');
 			header("Location: ?view=items");
 		}
+		break;
+	case 'deleteItemDiff':
+		debug($_GET);
 		break;
 	case 'search': search(); break;
 	case 'items': items(); break;
@@ -292,7 +233,7 @@ function item($act){
 		<div id="need_similar">
 			<?$count = $db->getCount('complects', "`item_id`={$item['id']} AND `item_diff`<>{$item['id']}");
 			$class = $count ? 'red' : '';?>
-			<a class="<?=$class?>" href="?view=items&act=complect&id=<?=$item['id']?>">Комплектность(<?=$count?>)</a>
+			<a class="<?=$class?>" href="?view=items&act=complects&id=<?=$item['id']?>">Комплектность(<?=$count?>)</a>
 			<?$count = $db->getCount('articles', "`item_id`={$item['id']} AND `item_diff`<>{$item['id']}");
 			$class = $count ? 'red' : '';?>
 			<a class="<?=$class?>" href="?view=items&act=related&id=<?=$item['id']?>">Подобные(<?=$count?>)</a>
@@ -706,49 +647,43 @@ function prices(){
 	</table>
 	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
 <?}
-function get_href_categories($ids, $titles){
-	if (!count($ids)) return false;
-	$str = '';
-	$ids = explode(',', $ids);
-	$titles = explode(',', $titles);
-	foreach ($ids as $key => $value){
-		$str .= "
-			<a href='/admin/?view=category&id=$value'>".
-				trim($titles[$key])
-			."</a>, ";
-	}
-	return substr($str, 0, -2);
-}
-function related(){
-	global $status, $db, $page_title;
+function itemDiff($type){
+	global $status, $page_title;
+	$itemMain = core\Item::getByID($_GET['id']);
 	$item_id = $_GET['id'];
-	$res_items = $db->query("
+	$res_items = $GLOBALS['db']->query("
 		SELECT
-			i.id,
+			i.id AS item_id,
+			b.title AS brend,
+			i.article,
 			i.title_full,
 			ib.barcode,
-			i.brend_id,
-			i.article,
-			b.title AS brend,
-			IF(i.id=$item_id, 1, 0) AS main_id
+			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories
 		FROM
-			#items i
-		LEFT JOIN #brends b ON i.brend_id=b.id
+			#$type diff
 		LEFT JOIN
-			#item_barcodes ib ON ib.item_id = i.id
+			#items i ON i.id = diff.item_diff
+		LEFT JOIN
+			#brends b ON b.id = i.brend_id
+		LEFT JOIN
+			#item_barcodes ib ON ib.item_id = diff.item_diff
+		LEFT JOIN	
+			#categories_items ci ON diff.item_diff = ci.item_id
+		LEFT JOIN
+			#categories c ON c.id = ci.category_id
 		WHERE
-			i.id IN (
-				SELECT item_diff FROM #articles WHERE item_id=$item_id
-			) 
+			diff.item_id = $item_id
+		GROUP BY
+			diff.item_diff
 	", '');
-	if ($res_items->num_rows){
-		while($v = $res_items->fetch_assoc()){
-			if ($v['main_id']) $item = $v;
-			else $items[] = $v;
-		}
+	switch($type){
+		case 'complects': $page_title = "Комплектность"; break;
 	}
-	$page_title = "Подобные товары";
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=items&act=item&id=$item_id'>{$item['title_full']}</a> > $page_title";?>
+	$status = "
+		<a href='/admin'>Главная</a> > 
+		<a href='?view=items&act=item&id=$item_id'>{$itemMain['brend']} - {$itemMain['article']}</a> > 
+		$page_title
+	";?>
 	<a href="?view=items&act=item&id=<?=$item_id?>" style="margin-bottom: 10px;display: block">Карточка товара</a>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
@@ -756,99 +691,25 @@ function related(){
 			<td>Артикул</td>
 			<td>Название</td>
 			<td>Штрих-код</td>
+			<td>Категории</td>
 		</tr>
 		<tr>
-			<td label="Бренд"><?=$db->getFieldOnID('brends', $item['brend_id'], 'title')?></td>
-			<td label="Артикул"><a href="?view=items&id=<?=$item['id']?>&act=item"><?=$item['article']?></a></td>
-			<td label="Название"><?=$item['title_full']?></td>
-			<td label="Штрих-код"><?=$item['barcode']?></td>
+			<td label="Бренд"><?=$itemMain['brend']?></td>
+			<td label="Артикул">
+				<a href="?view=items&act=item&id=<?=$itemMain['id']?>"><?=$itemMain['article']?></a>
+			</td>
+			<td label="Название"><?=$itemMain['title_full']?></td>
+			<td label="Штрих-код"><?=$itemMain['barcode']?></td>
+			<td label="Категории">
+
+			</td>
 		</tr>
 	</table>
-	<!-- <div id="total" style="margin-top: 20px">Всего: <?=$res_items->num_rows?></div> -->
-	<div id="relatedActs" style="    margin: 10px 0;" class="actions">
-		<form action="/admin/?view=items&act=related_search&id=<?=$item_id?>" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск для добавления">
-			<label>
-				<input checked type="radio" name="type" value="artical">
-				по артикулу
-			</label>
-			<label>
-				<input type="radio" name="type" value="id">
-				по id
-			</label>
-			<input type="submit" value="Искать">
-		</form>
-	</div>
-	<table style="" class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td></td>
-		</tr>
-		<?if (count($items)){
-			foreach($items as $value){?>
-				<tr>
-					<td label="Бренд"><?=$value['brend']?></td>
-					<td label="Артикул"><a href="?view=items&act=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
-					<td label="Название"><?=$value['title_full']?></td>
-					<td label="Штрих-код"><?=$value['barcode']?></td>
-					<td label=""><a class="delete_item" href="?view=items&act=delete_related&item_id=<?=$_GET['id']?>&item_diff=<?=$value['id']?>">Удалить</a></td>
-				</tr>
-			<?}	
-		}
-		else{?>
-			<tr><td colspan="5">Подобных товаров не найдено</td></tr>
-		<?}?>
-	</table>
-<?}
-function related_search(){
-	global $status, $db, $page_title;
-	$where = "i.id!={$_GET['id']}"; ;
-	switch($_POST['type']){
-		case 'artical':
-			$article = article_clear($_POST['search']);
-			$where .= " AND i.article='$article'";
-			break;
-		case 'id':
-			$where .= " AND i.id={$_POST['search']}";
-			break;
-	}
-	$item_id = $_GET['id'];
-	$q_items = "
-		SELECT
-			i.id,
-			i.title_full,
-			ib.barcode,
-			i.brend_id,
-			i.article,
-			b.title AS brend
-		FROM
-			#items i
-		LEFT JOIN #brends b ON i.brend_id=b.id
-		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
-		LEFT JOIN #categories_items ci ON ci.item_id=i.id
-		LEFT JOIN #categories c ON c.id=ci.category_id
-		WHERE 
-			$where
-	";
-	$res_items = $db->query($q_items, '');
-	if ($res_items->num_rows > 100){
-		message('Слишком много совпадений! Уточните поиск.', false);
-		header("Location: /admin/?view=items&act=related&id=$item_id");
-	}
-	$page_title = "Поиск для добавления";
-	$status = "<a href='/admin'>Главная</a> > $page_title";?>
-	<a href="?view=items&act=item&id=<?=$item_id?>" style="margin-bottom: 10px;display: block">Карточка товара</a>
 	<div id="total" style="margin-top: 20px">Всего: <?=$res_items->num_rows?></div>
-	<div style="margin-top: 5px" class="actions">
-		<form action="/admin/?view=items&act=related_search&id=<?=$item_id?>" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$search?>" placeholder="Поиск для добавления">
-			<input type="submit" value="Искать">
-		</form>
+	<div style="margin-top: 10px" class="actions">
+		<input style="width: 264px;" type="text" name="complects" class="intuitive_search" placeholder="Поиск для добавления">
 	</div>
-	<table style="" class="t_table" cellspacing="1">
+	<table id="itemDiff" style="" class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Бренд</td>
 			<td>Артикул</td>
@@ -858,108 +719,18 @@ function related_search(){
 			<td></td>
 		</tr>
 		<?if ($res_items->num_rows){
-			while($value = $res_items->fetch_assoc()){?>
-				<tr>
-					<td><?=$value['brend']?></td>
-					<td><a href="?view=items&act=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
-					<td><?=$value['title_full']?></td>
-					<td><?=$value['barcode']?></td>
-					<td><a href="?view=items&act=related_add&item_related=<?=$value['id']?>&item_id=<?=$item_id?>">Добавить</a></td>
-				</tr>
-			<?}	
-		}
-		else{?>
-			<tr><td colspan="5">Замен не найдено</td></tr>
-		<?}?>
-	</table>
-<?}
-function complect(){
-	global $status, $db, $page_title;
-	$complects = [];
-	$item_id = $_GET['id'];
-	$res_complects = $db->query("
-		SELECT `item_diff` FROM #complects WHERE `item_id`=$item_id
-	");
-	if ($res_complects->num_rows){
-		while($row = $res_complects->fetch_assoc()) $complects[] = $row['item_diff'];
-		$whereComplects = " OR I.id IN (".implode(',', $complects).")";
-	}
-	$res_items = $db->query("
-		SELECT
-			i.id,
-			i.title_full,
-			i.barcode,
-			i.brend_id,
-			i.article,
-			b.title AS brend,
-			GROUP_CONCAT(
-				c.id
-				ORDER BY c.id
-				SEPARATOR ','
-			) as categories_ids,
-			GROUP_CONCAT(
-				c.title
-				ORDER BY c.id
-				SEPARATOR ','
-			) as categories_titles,
-			IF(i.id=$item_id, 1, 0) AS main_id
-		FROM
-			#items i
-		LEFT JOIN #brends b ON i.brend_id=b.id
-		LEFT JOIN #categories_items ci ON ci.item_id=i.id
-		LEFT JOIN #categories c ON c.id=ci.category_id
-		WHERE
-			i.id=$item_id 
-			$whereComplects
-		GROUP BY i.id
-	", '');
-	if ($res_items->num_rows){
-		while($v = $res_items->fetch_assoc()){
-			if ($v['main_id']) $item = $v;
-			else $items[] = $v;
-		}
-	}
-	$page_title = "Комплектность";
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=items&act=item&id=$item_id'>{$item['title_full']}</a> > $page_title";?>
-	<a href="?view=items&act=item&id=<?=$item_id?>" style="margin-bottom: 10px;display: block">Карточка товара</a>
-	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-		</tr>
-		<tr>
-			<td label="Бренд"><?=$item['brend']?></td>
-			<td label="Артикул"><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-			<td label="Название"><?=$item['title_full']?></td>
-			<td label="Штрих-код"><?=$item['barcode']?></td>
-			<td label="Категории"><?=get_href_categories($item['categories_ids'], $item['categories_titles'])?></td>
-		</tr>
-	</table>
-	<div id="total" style="margin-top: 20px">Всего: <?=count($items)?></div>
-	<div style="margin-top: 5px" class="actions">
-		<input style="width: 264px;" type="text" name="complects" class="intuitive_search" placeholder="Поиск для добавления">
-	</div>
-	<table style="" class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-			<td></td>
-		</tr>
-		<?if (count($items)){
-			foreach($items as $value){?>
+			foreach($res_items as $value){?>
 				<tr>
 					<td label="Бренд"><?=$value['brend']?></td>
-					<td label="Артикул"><a href="?view=items&act=item&id=<?=$value['id']?>"><?=$value['article']?></a></td>
+					<td label="Артикул">
+						<a target="blank" href="?view=items&act=item&id=<?=$value['item_id']?>"><?=$value['article']?></a>
+					</td>
 					<td label="Название"><?=$value['title_full']?></td>
 					<td label="Штрих-код"><?=$value['barcode']?></td>
-					<td label="Категории"><?=get_href_categories($value['categories_ids'], $value['categories_titles'])?></td>
-					<td label=""><a class="delete_item" href="?view=items&act=delete_complect&item_id=<?=$_GET['id']?>&item_diff=<?=$value['id']?>">Удалить</a></td>
+					<td label="Категории"><?=$value['categories']?></td>
+					<td label="">
+						<a class="delete_item" href="?view=items&act=deleteItemDiff&type=<?=$type?>&item_id=<?=$_GET['id']?>&item_diff=<?=$value['item_id']?>">Удалить</a>
+					</td>
 				</tr>
 			<?}	
 		}
@@ -968,309 +739,6 @@ function complect(){
 		<?}?>
 	</table>
 <?}
-function analogies_substitutes($type){
-	global $status, $db, $page_title;
-	$item_id = $_GET['item_id'];
-	switch($type){
-		case 'analogies': $page_title = 'Аналоги'; break;
-		case 'substitutes': $page_title = 'Замены'; break;
-	}
-	$item_temp = get_item();
-	$item = $item_temp['item'];
-	$status = "
-		<a href='/admin'>Главная</a> > 
-		<a href='/admin/?view=items'>Номенклатура</a> >
-		<a href='/admin/?view=items&act=item&id={$_GET['item_id']}'>{$item['brend']} - {$item['article']}</a> >
-		$page_title
-	";
-	$res_items = $db->query("
-		SELECT
-			diff.item_diff AS item_id,
-			diff.hidden,
-			diff.checked,
-			i.article,
-			i.title_full,
-			ib.barcode,
-			b.title AS brend,
-			ci.category_id,
-			c.title AS category
-		FROM
-			#$type diff
-		LEFT JOIN
-			#items i ON i.id=diff.item_diff
-		LEFT JOIN 
-			#brends b ON b.id=i.brend_id
-		LEFT JOIN
-			#item_barcodes ib ON ib.item_id = i.id
-		LEFT JOIN #categories_items ci ON i.id=ci.item_id
-		LEFT JOIN #categories c ON c.id=ci.category_id
-		WHERE
-			diff.item_id=$item_id
-		ORDER BY
-			b.title
-	", '');
-	if ($res_items->num_rows){
-		while($r = $res_items->fetch_assoc()){
-			$i = & $items[$r['item_id']];
-			$i['article'] = $r['article'];
-			$i['title_full'] = $r['title_full'];
-			$i['barcode'] = $r['barcode'];
-			$i['brend'] = $r['brend'];
-			$i['hidden'] = $r['hidden'];
-			$i['checked'] = $r['checked'];
-			if ($r['category_id']) $i['categories'][$r['category_id']] = $r['category'];
-		};
-	}
-	?>
-	<a id="goToItemCard" href="?view=items&id=<?=$item_id?>&act=item">Карточка товара</a>
-	<?if($_GET['act'] == 'analogies'){?>
-		<a class="clearAnalogies" href="?view=items&id=<?=$item_id?>&act=clearAnalogies">Очистить аналоги</a>
-	<?}?>
-	<?=$item_temp['html']?>
-	<b style="display: block; margin: 10px 0"><?=$page_title?>:</b>
-	<div id="total" style="margin-top: 20px">Всего: <?=count($items)?></div>
-	<input type="hidden" name="item_id" value="<?=$_GET['item_id']?>">
-	<div class="actions">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=items&act=<?=$type?>_search&item_id=<?=$item_id?>" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск для добавления">
-			<input type="submit" value="Искать">
-		</form>
-	</div>
-	<table style="" class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-			<?if ($type == 'analogies'){?>
-				<td>Скрыть</td>
-				<td>Проверен</td>
-			<?}?>
-			<td></td>
-		</tr>
-		<?if (!empty($items)){
-			foreach($items as $id => $item){?>
-				<tr>
-					<td label="Бренд"><?=$item['brend']?></td>
-					<td label="Артикул"><a href="?view=items&act=item&id=<?=$id?>"><?=$item['article']?></a></td>
-					<td label="Название"><?=$item['title_full']?></td>
-					<td label="Штрих-код"><?=$item['barcode']?></td>
-					<td label="Категории">
-						<?if (!empty($item['categories'])){
-							foreach ($item['categories'] as $key => $value) {?>
-								<a href="/admin/?view=category&id=<?=$key?>"><?=$value?></a>
-							<?}
-						}?>
-					</td>
-					<?if ($type == 'analogies'){?>
-						<td label="Скрыть"><input <?=$item['hidden'] ? 'checked' : ''?> name="hidden" type="checkbox" value="<?=$id?>"></td>
-						<td label="Проверен"><input <?=$item['checked'] ? 'checked' : ''?> name="checked" type="checkbox" value="<?=$id?>"></td>
-					<?}?>
-					<td label=""><a class="<?=$type?>_delete delete_item" href="?view=items&act=<?=$type?>_delete&item_id=<?=$item_id?>&delete_item=<?=$id?>">Удалить</a></td>
-				</tr>
-			<?}	
-		}
-		else{?>
-			<tr><td colspan="6">Ничего не найдено</td></tr>
-		<?}?>
-	</table>
-<?}
-function analogies_substitutes_search($type){
-	global $status, $db, $page_title;
-	$item_id = $_GET['item_id'];
-	switch($type){
-		case 'analogies': $page_title = 'Поиск аналогов'; $status_title = 'Аналоги'; break;
-		case 'substitutes': $page_title = 'Поиск замен'; $status_title = 'Замены'; break;
-	}
-	$article = article_clear($_POST['search']);
-	$item_temp = get_item();
-	$item = $item_temp['item'];
-	$status = "
-		<a href='/admin'>Главная</a> > 
-		<a href='/admin/?view=items'>Номенклатура</a> >
-		<a href='/admin/?view=items&act=item&id={$_GET['item_id']}'>{$item['brend']} - {$item['article']}</a> >
-		<a href='/admin/?view=items&act=$type&item_id={$_GET['item_id']}'>$status_title</a> >
-		$page_title
-	";
-	$where = "i.id!={$_GET['item_id']} AND (i.article='$article'";
-	if (is_numeric($article)) $where .= " OR i.id=$article";
-	$where .= ')';
-	$res_items = $db->query("
-		SELECT
-			i.id,
-			i.article,
-			i.title_full,
-			ib.barcode,
-			b.title AS brend,
-			ci.category_id,
-			c.title AS category,
-			diff.item_diff,
-			diff.item_id
-		FROM
-			#items i
-		LEFT JOIN 
-			#brends b ON b.id=i.brend_id
-		LEFT JOIN
-			#item_barcodes ib ON ib.item_id = i.id
-		LEFT JOIN #categories_items ci ON i.id=ci.item_id
-		LEFT JOIN #categories c ON c.id=ci.category_id
-		LEFT JOIN #$type diff ON diff.item_diff=i.id AND diff.item_id={$_GET['item_id']}
-		WHERE
-			$where AND diff.item_id IS NULL
-	", '');
-	if ($res_items->num_rows){
-		while($r = $res_items->fetch_assoc()){
-			$i = & $items[$r['id']];
-			$i['article'] = $r['article'];
-			$i['title_full'] = $r['title_full'];
-			$i['barcode'] = $r['barcode'];
-			$i['brend'] = $r['brend'];
-			if ($r['category_id']) $i['categories'][$r['category_id']] = $r['category'];
-		};
-	}?>
-	<b style="margin-bottom: 10px;display: block">Товар</b>
-	<?=$item_temp['html'];?>
-	<b style="display: block; margin: 10px 0">Найденные товары:</b>
-	<div id="total">Всего: <?=count($items)?></div>
-	<div class="actions" style="width: 100%">
-		<form style="margin-top: -3px;float: left;margin-bottom: 10px;" action="?view=items&act=<?=$type?>_search&item_id=<?=$_GET['item_id']?>" method="post">
-			<input style="width: 264px;" type="text" name="search" value="<?=$_POST['search']?>" placeholder="Поиск">
-			<input type="submit" value="Искать">
-		</form>
-	</div>
-	<table style="" class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-			<td></td>
-		</tr>
-		<?if (count($items)){
-			foreach($items as $id => $item){?>
-				<tr>
-					<td label="Бренд"><?=$item['brend']?></td>
-					<td label="Артикул"><a href="?view=items&act=item&id=<?=$id?>"><?=$item['article']?></a></td>
-					<td label="Название"><?=$item['title_full']?></td>
-					<td label="Штрих-код"><?=$item['barcode']?></td>
-					<td label="Категории">
-						<?if (!empty($item['categories'])){
-							foreach ($item['categories'] as $key => $value) {?>
-								<a href="/admin/?view=category&id=<?=$key?>"><?=$value?></a> 
-							<?}
-						}?>
-					</td>
-					<td><a class="<?=$type?>_add" href="?view=items&act=<?=$type?>_add&item_id=<?=$_GET['item_id']?>&added=<?=$id?>">Добавить</a></td>
-				</tr>
-			<?}	
-		}
-		else{?>
-			<tr><td colspan="5">Товары не найдены</td></tr>
-		<?}?>
-	</table>
-<?}
-function analogies_substitutes_add($type){
-	global $db;
-	if ($_GET['all'] == 1) {
-		$res = $db->query("
-			SELECT * FROM #analogies WHERE item_id={$_GET['item_id']}
-		", '');
-		if ($res->num_rows){
-			while($row = $res->fetch_assoc()){
-				$db->insert($type, ['item_id' => $_GET['added'], 'item_diff' => $row['item_diff']]);
-				$db->insert($type, ['item_id' => $row['item_diff'], 'item_diff' => $_GET['added']]);
-			} 
-		}
-	}
-	$db->insert($type, ['item_id' => $_GET['item_id'], 'item_diff' => $_GET['added']]);
-	$db->insert($type, ['item_id' => $_GET['added'], 'item_diff' => $_GET['item_id']]);
-	message('Успешно добавлено!');
-	header("Location: ?view=items&act=$type&item_id={$_GET['item_id']}");
-}
-function analogies_substitutes_delete($type){
-	global $db;
-	if ($_GET['all']){
-		$res = $db->query("
-			SELECT item_diff FROM #analogies WHERE `item_id`={$_GET['item_id']}
-		", '');
-		if ($res->num_rows){
-			while($row = $res->fetch_assoc()){
-				$db->delete('analogies', "
-					(`item_id`={$_GET['delete_item']} AND `item_diff`={$row['item_diff']}) OR
-					(`item_id`={$row['item_diff']} AND `item_diff`={$_GET['delete_item']})
-				");
-			}
-		}
-	}
-	$db->delete($type, "`item_id`={$_GET['item_id']} AND `item_diff`={$_GET['delete_item']}");
-	$db->delete($type, "`item_id`={$_GET['delete_item']} AND `item_diff`={$_GET['item_id']}");
-	message('Успешно удалено!');
-	header("Location: ?view=items&act=$type&item_id={$_GET['item_id']}");
-}
-function get_item(){
-	global $db;
-	$res_item = $db->query("
-		SELECT
-			i.id,
-			i.article,
-			i.title_full,
-			ib.barcode,
-			b.title AS brend,
-			ci.category_id,
-			c.title AS category
-		FROM
-			#items i
-		LEFT JOIN 
-			#brends b ON b.id=i.brend_id
-		LEFT JOIN
-			#item_barcodes ib ON ib.item_id = i.id
-		LEFT JOIN #categories_items ci ON i.id=ci.item_id
-		LEFT JOIN #categories c ON c.id=ci.category_id
-		WHERE
-			i.id={$_GET['item_id']}
-	", '');
-	while($r = $res_item->fetch_assoc()){
-		$item['id'] = $r['id'];
-		$item['article'] = $r['article'];
-		$item['title_full'] = $r['title_full'];
-		$item['barcode'] = $r['barcode'];
-		$item['brend'] = $r['brend'];
-		$item['categories'][$r['category_id']] = $r['category'];
-	}
-	ob_start();?>
-	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Название</td>
-			<td>Штрих-код</td>
-			<td>Категории</td>
-		</tr>
-		<tr>
-			<td label="Бренд"><?=$item['brend']?></td>
-			<td label="Артикул"><a href="/admin/?view=items&act=item&id=<?=$item['id']?>"><?=$item['article']?></a></td>
-			<td label="Название"><?=$item['title_full']?></td>
-			<td label="Штрих-код"><?=$item['barcode']?></td>
-			<td label="Категории">
-				<?if (!empty($item['categories'])){
-					foreach($item['categories'] as $key => $value){?>
-						<a href="?view=category&act=items&id=<?=$key?>"><?=$value?></a> 
-					<?}
-				}
-				?>
-			</td>
-		</tr>
-	</table>
-	<?
-	$html = ob_get_contents();
-	ob_clean();
-	return[
-		'item' => $item,
-		'html' => $html
-	];
-}
 function items(){
 	global $status, $db, $page_title, $settings;
 	require_once('templates/pagination.php');

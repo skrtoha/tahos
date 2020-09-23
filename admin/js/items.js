@@ -399,7 +399,7 @@ $(function(){
 			},
 			success: function(response){
 				let itemInfo = JSON.parse(response);
-				$('table.t_table').append(`
+				$('#itemDiff').append(`
 					<tr>
 						<td label="Бренд">${itemInfo.brend}</td>
 						<td label="Артикул">

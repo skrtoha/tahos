@@ -351,12 +351,23 @@ class Item{
 		} 
 		return $output;
 	}
-	public static function getQueryItemInfo(){
-		return "
+	/**
+	 * get query of item
+	 * @param  array $params 
+	 *         withCategories - add info about categories, after it's nessesary add "GROUP BY i.id"
+	 * @return [type]         [description]
+	 */
+	public static function getQueryItemInfo($params = []){
+		$query = "
 			SELECT
 				i.*,
 				ib.barcode,
 				b.title AS brend
+			";
+		if (isset($params['withCategories'])){
+			$query .= ",GROUP_CONCAT(c.title SEPARATOR '; ') AS categories";
+		}
+		$query .= "
 			FROM
 				#items i
 			LEFT JOIN
@@ -364,5 +375,14 @@ class Item{
 			LEFT JOIN
 				#item_barcodes ib ON ib.item_id = i.id
 		";
+		if (isset($params['withCategories'])){
+			$query .= "
+				LEFT JOIN	
+					#categories_items ci ON diff.item_diff = ci.item_id
+				LEFT JOIN
+					#categories c ON c.id = ci.category_id
+			";
+		}
+		return $query;
 	}
 }

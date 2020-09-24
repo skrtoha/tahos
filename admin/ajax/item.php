@@ -122,10 +122,14 @@ switch($_POST['act']){
 		break;
 	case 'addItem':
 		$db->insert($_POST['type'], ['item_id' => $_POST['item_id'], 'item_diff' => $_POST['item_diff']]);
-		if (in_array($_POST['type'], ['articles', 'substitutes'])){
+		if (in_array($_POST['type'], ['articles', 'analogies', 'substitutes'])){
 			$db->insert($_POST['type'], ['item_id' => $_POST['item_diff'], 'item_diff' => $_POST['item_id']]);
 		}
 		echo json_encode(core\Item::getByID($_POST['item_diff']));
+		break;
+	case 'deleteItemDiff':
+		$db->delete($_POST['type'], "`item_id` = {$_POST['item_id']} AND `item_diff` = {$_POST['item_diff']}");
+		$db->delete($_POST['type'], "`item_id` = {$_POST['item_diff']} AND `item_diff` = {$_POST['item_id']}");
 		break;
 }
 ?>

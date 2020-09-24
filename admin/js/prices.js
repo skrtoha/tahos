@@ -37,6 +37,27 @@ function set_intuitive_search(e, tableName){
 		tableName: tableName
 	});
 }
+function deleteStoreItem(item_id, store_id){
+	$.ajax({
+		type: 'get',
+		url: '/admin/?view=prices',
+		data: {
+			act: 'delete_item',
+			item_id: item_id,
+			store_id: store_id
+		},
+		beforeSend: function(){
+			$('#popup').css('display', 'flex');
+		},
+		success: function(){
+			$('a.deleteStoreItem[item_id=' + item_id + ']').closest('tr').remove();
+			$('#popup').css('display', 'none');
+			$('#modal-container').removeClass('active');
+			$('ul.searchResult_list a[item_id=' + item_id + '][store_id=' + store_id + ']').closest('li').remove();
+			show_message('Удачно удалено!');
+		}
+	})
+}
 $(function(){
 	$('tr[store_id]').on('click', function(){
 		document.location.href = '?view=prices&act=items&id=' + $(this).attr('store_id');
@@ -81,33 +102,21 @@ $(function(){
 		}
 		if (target.hasClass('icon-cancel-circle1')){
 			if (!confirm('Действительно удалить?')) return false;
-			let tr = $(this).closest('tr');
-			$.ajax({
-				type: 'get',
-				url: '/admin/?view=prices',
-				data: {
-					act: 'delete_item',
-					item_id: tr.find('input[column=packaging]').attr('item_id'),
-					store_id: tr.closest('table').attr('store_id')
-				},
-				success: function(){
-					tr.remove();
-					show_message('Удачно удалено!');
-				}
-			})
-
+			let item_id = $(target).closest('a').attr('item_id');
+			let store_id = $(target).closest('table').attr('store_id');
+			deleteStoreItem(item_id, store_id);
 			return false;
 		}
 		showStoreInfo(
 			$(this).closest('table').attr('store_id'),
 			$(this).closest('tr').find('input[column=packaging]').attr('item_id')
 		);
-		console.log(e.target);
 	})
 	$(document).on('click', 'a.addStoreItem', function(){
 		let $a = $(this);
 		let item_id = $a.attr('item_id');
 		let storeInfo = add_item_to_store.storeInfo;
+		console.log(add_item_to_store.storeInfo);
 		$('#popup').css('display', 'flex');
 		$.ajax({
 			type: 'post',
@@ -135,7 +144,6 @@ $(function(){
 		$.each(array, function(i, value){
 			formData[value.name] = value.value
 		});
-		console.log(formData, itemInfo);
 		let str = `
 			<tr>
 				<td>${itemInfo.brend}</td>
@@ -155,12 +163,20 @@ $(function(){
 		}
 		str += `
 			<td>
-				<a title="Удалить" class="delete_item" href="?view=prices&act=delete_item&item_id=${itemInfo.id}&store_id=${formData.store_id}">
+				<a title="Удалить" item_id="${itemInfo.id}" class="deleteStoreItem" href="">
 					<span class="icon-cancel-circle1"></span>
 				</a>
 				</td>
 		</tr>
 		`;
+		$('table.t_table tbody tr.empty').remove();
 		$('table.t_table tbody tr.head.sort').after(str);
+	})
+	$(document).on('click', 'a.deleteStoreItem', function(){
+		if (!confirm('Действительно удалить')) return false;
+		let th = $(this);
+		let item_id = th.attr('item_id');
+		let store_id = $('table.t_table').attr('store_id');
+		deleteStoreItem(item_id, store_id);
 	})
 })

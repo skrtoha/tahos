@@ -9,6 +9,7 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
 $output = '';
+// debug($_GET);
 switch($_GET['tableName']){
 	case 'items':
 		switch($_GET['additionalConditions']['act']){
@@ -32,12 +33,24 @@ switch($_GET['tableName']){
 				}
 				break;
 			case 'complects':
+			case 'substitutes':
+			case 'analogies':
+			case 'articles':
 				$query = core\Item::getQueryItemInfo();
+				switch($_GET['additionalConditions']['act']){
+					case 'substitutes':
+					case 'analogies':
+					case 'complects':
+						$additionalWhere = " AND i.id != {$_GET['additionalConditions']['item_id']}";
+						break;
+					default:
+						$additionalWhere = '';
+				}
 				$query .= "
 					LEFT JOIN
-						#{$_GET['additionalConditions']['act']} diff ON diff.item_diff = i.id
+						#{$_GET['additionalConditions']['act']} diff ON diff.item_diff = i.id AND diff.item_id = {$_GET['additionalConditions']['item_id']}
 					WHERE
-						i.article LIKE '{$_GET['value']}%' AND diff.item_id IS NULL
+						i.article LIKE '{$_GET['value']}%' AND diff.item_id IS NULL $additionalWhere
 					LIMIT
 						0, {$_GET['maxCountResults']}
 				";

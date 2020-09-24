@@ -129,7 +129,12 @@ if ($_POST['form_submit']){
 	else message($res, false);
 }
 switch ($act) {
-	case 'complects': itemDiff('complects'); break;
+	case 'articles':
+	case 'complects': 
+	case 'analogies': 
+	case 'substitutes': 
+		itemDiff($act); 
+		break;
 	case 'delete_foto':
 		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
 			Managers::handlerAccessNotAllowed();
@@ -152,8 +157,6 @@ switch ($act) {
 		break;
 	case 'history': history(); break;
 	case 'prices': prices(); break;
-	case 'substitutes': analogies_substitutes('substitutes'); break;
-	case 'analogies': analogies_substitutes('analogies'); break;
 	case 'clearAnalogies':
 		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
 			Managers::handlerAccessNotAllowed();
@@ -236,16 +239,16 @@ function item($act){
 			<a class="<?=$class?>" href="?view=items&act=complects&id=<?=$item['id']?>">Комплектность(<?=$count?>)</a>
 			<?$count = $db->getCount('articles', "`item_id`={$item['id']} AND `item_diff`<>{$item['id']}");
 			$class = $count ? 'red' : '';?>
-			<a class="<?=$class?>" href="?view=items&act=related&id=<?=$item['id']?>">Подобные(<?=$count?>)</a>
+			<a class="<?=$class?>" href="?view=items&act=articles&id=<?=$item['id']?>">Подобные(<?=$count?>)</a>
 			<?$count = $db->getCount('store_items', "`item_id`=".$item['id']);
 			$class = $count ? 'red' : '';?>
 			<a class="<?=$class?>" href="?view=items&act=prices&id=<?=$item['id']?>">Прайсы(<?=$count?>)</a>
 			<?$count = $db->getCount('substitutes', "`item_id`=".$item['id']);
 			$class = $count ? 'red' : '';?>
-			<a class="<?=$class?>" href="?view=items&act=substitutes&item_id=<?=$item['id']?>">Замены(<?=$count?>)</a>
+			<a class="<?=$class?>" href="?view=items&act=substitutes&id=<?=$item['id']?>">Замены(<?=$count?>)</a>
 			<?$count = $db->getCount('analogies', "`item_id`=".$item['id']);
 			$class = $count ? 'red' : '';?>
-			<a class="<?=$class?>" href="?view=items&act=analogies&item_id=<?=$item['id']?>">Аналоги(<?=$count?>)</a>
+			<a class="<?=$class?>" href="?view=items&act=analogies&id=<?=$item['id']?>">Аналоги(<?=$count?>)</a>
 			<a href="?view=items&act=history&item_id=<?=$item['id']?>">История</a>
 			<?if (!Managers::isActionForbidden('Номенклатура', 'Удаление')){?>
 				<a href="/admin/?view=test_api_providers&item_id=<?=$_GET['id']?>">
@@ -672,12 +675,15 @@ function itemDiff($type){
 		LEFT JOIN
 			#categories c ON c.id = ci.category_id
 		WHERE
-			diff.item_id = $item_id
+			diff.item_id = $item_id AND i.id != {$_GET['id']}
 		GROUP BY
 			diff.item_diff
 	", '');
 	switch($type){
 		case 'complects': $page_title = "Комплектность"; break;
+		case 'articles': $page_title = "Подобные"; break;
+		case 'substitutes': $page_title = "Замены"; break;
+		case 'analogies': $page_title = "Аналоги"; break;
 	}
 	$status = "
 		<a href='/admin'>Главная</a> > 
@@ -700,14 +706,12 @@ function itemDiff($type){
 			</td>
 			<td label="Название"><?=$itemMain['title_full']?></td>
 			<td label="Штрих-код"><?=$itemMain['barcode']?></td>
-			<td label="Категории">
-
-			</td>
+			<td label="Категории"><?=$itemMain['categories']?></td>
 		</tr>
 	</table>
 	<div id="total" style="margin-top: 20px">Всего: <?=$res_items->num_rows?></div>
 	<div style="margin-top: 10px" class="actions">
-		<input style="width: 264px;" type="text" name="complects" class="intuitive_search" placeholder="Поиск для добавления">
+		<input style="width: 264px;" type="text" name="<?=$type?>" class="intuitive_search" placeholder="Поиск для добавления">
 	</div>
 	<table id="itemDiff" style="" class="t_table" cellspacing="1">
 		<tr class="head">
@@ -729,13 +733,13 @@ function itemDiff($type){
 					<td label="Штрих-код"><?=$value['barcode']?></td>
 					<td label="Категории"><?=$value['categories']?></td>
 					<td label="">
-						<a class="delete_item" href="?view=items&act=deleteItemDiff&type=<?=$type?>&item_id=<?=$_GET['id']?>&item_diff=<?=$value['item_id']?>">Удалить</a>
+						<a class="deleteItemDiff" href="act=deleteItemDiff&type=<?=$type?>&item_id=<?=$_GET['id']?>&item_diff=<?=$value['item_id']?>">Удалить</a>
 					</td>
 				</tr>
 			<?}	
 		}
 		else{?>
-			<tr><td colspan="5">Товаров не найдено</td></tr>
+			<tr class="empty"><td colspan="5">Товаров не найдено</td></tr>
 		<?}?>
 	</table>
 <?}

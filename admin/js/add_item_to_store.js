@@ -60,7 +60,13 @@
 				str +=
 						'<tr>' +
 						 	'<td colspan="2">' +
-						 		'<input value="Сохранить" type="submit">' +
+						 		'<input value="Сохранить" type="submit">';
+				if (storeInfo.price) str += `
+					<a class="deleteStoreItem" onClick="return false;"  href="#" item_id="${storeInfo.item_id}">
+						Удалить
+					</a>
+				`;
+				str +=
 						 	 '</td>' +
 					 	'</tr>';
 					'</table>' +

@@ -277,12 +277,12 @@ function items(){
 							<input type="text" class="store_item" value="<?=$pi['requiredRemain']?>" column="requiredRemain" item_id="<?=$pi['item_id']?>">
 							</td>
 					<?}?>
-					<td><a title="Удалить" class="delete_item" href="?view=prices&act=delete_item&item_id=<?=$pi['item_id']?>&store_id=<?=$id?>"><span class="icon-cancel-circle1"></span></a></td>
+					<td><a title="Удалить" item_id="<?=$pi['item_id']?>" class="deleteStoreItem" href="#"><span class="icon-cancel-circle1"></span></a></td>
 				</tr>
 			<?}
 		}
 		else{?>
-			<tr><td colspan="7">Товаров не найдено</td></tr>
+			<tr class="empty"><td colspan="7">Товаров не найдено</td></tr>
 		<?}?>
 	</table>
 	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>

@@ -389,7 +389,8 @@ $(function(){
 			type: 'post',
 			url: '/admin/ajax/item.php',
 			beforeSend: function(){
-				$('#pupup').css('display', 'flex');
+				$('#popup').css('display', 'flex');
+				$('tr.empty').remove();
 			},
 			data: {
 				act: 'addItem',
@@ -399,11 +400,13 @@ $(function(){
 			},
 			success: function(response){
 				let itemInfo = JSON.parse(response);
+				itemInfo.barcode = itemInfo.barcode != null ? itemInfo.barcode : '';
+				itemInfo.categories = typeof itemInfo.categories != 'undefined' ? itemInfo.categories : '';
 				$('#itemDiff').append(`
 					<tr>
 						<td label="Бренд">${itemInfo.brend}</td>
 						<td label="Артикул">
-							<a href="?view=items&act=item&id=${itemInfo.id}">
+							<a target="blank" href="?view=items&act=item&id=${itemInfo.id}">
 								${itemInfo.article}
 							</a>
 						</td>
@@ -411,11 +414,32 @@ $(function(){
 						<td label="Штрих-код">${itemInfo.barcode}</td>
 						<td label="Категории">${itemInfo.categories}</td>
 						<td label="">
-							<a class="delete_item" href="?view=items&act=delete&type=${th.attr('type')}&item_id=${itemInfo.id}&item_diff=${th.attr('item_id')}">Удалить</a>
+							<a class="deleteItemDiff" href="act=deleteItemDiff&type=${th.attr('type')}&item_id=${$('input[name=item_id]').val()}&item_diff=${th.attr('item_id')}">Удалить</a>
 						</td>
 					</tr>
 				`);
 				$('#popup').css('display', 'none');
+				th.closest('ul').find('li:first-child').addClass('active');
+				th.closest('li').remove();
+			}
+		})
+	})
+	$(document).on('click', 'a.deleteItemDiff', function(e){
+		e.preventDefault();
+		if (!confirm('Удалить?')) return false;
+		let th = $(this);
+		$.ajax({
+			type: 'post',
+			url: '/admin/ajax/item.php',
+			data: th.attr('href'),
+			beforeSend: function(){
+				$('#popup').css('display', 'flex');
+			},
+			success: function(response){
+				console.log(response);
+				$('#popup').css('display', 'none');
+				th.closest('tr').remove();
+				show_message('Успешно удалено!');
 			}
 		})
 	})

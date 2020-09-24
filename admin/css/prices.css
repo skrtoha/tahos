@@ -35,3 +35,9 @@ a.delete_item{
 #contents{
 	overflow: visible;
 }
+form.add_item_to_store a.deleteStoreItem {
+    font-weight: 400;
+    /* position: absolute; */
+    float: right;
+    margin-top: 15px;
+}

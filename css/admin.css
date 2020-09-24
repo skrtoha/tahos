@@ -19,6 +19,7 @@ ul.searchResult_list {
     width: 100%;
     border: 1px solid #f7f7f7;
    padding: 0;
+   z-index: 2;
 }
 ul.searchResult_list > li{
    padding: 2px 5px;

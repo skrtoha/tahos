@@ -957,10 +957,13 @@ switch($_GET['act']){
 		echo "<br>Всего отпрвлено $successedDelivery сообщений пользователям";
 		break;
 	case 'subscribeCommonPrices':
-		$emails = [];
-		$res_emails = $db->query("SELECT * FROM #subscribe_prices", '');
-		if (!$res_emails->num_rows) break;
-		foreach($res_emails as $row) $emails[] = $row['email'];
+		if (isset($_GET['email']) && $_GET['email']) $emails = [$_GET['email']];
+		else{
+			$emails = [];
+			$res_emails = $db->query("SELECT * FROM #subscribe_prices", '');
+			if (!$res_emails->num_rows) break;
+			foreach($res_emails as $row) $emails[] = $row['email'];
+		}
 
 		$res_store_items = core\Provider\Tahos::getStoreItems();
 		$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items);
@@ -972,6 +975,7 @@ switch($_GET['act']){
 			'subject' => 'Прайс с tahos.ru',
 			'body' => 'Прайс с tahos.ru'
 		], [$file]);
+		if ($res !== true) die($res);
 		echo "<h2>Общая рассылка прайсов</h2>";
 		echo "<br>Всего отпрвлено " . count($emails) . " прайсов";
 

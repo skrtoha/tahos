@@ -10,7 +10,10 @@
 				});
 			})
 			$('tr.edit').on('click', function(e){
-				if ($(e.target).hasClass('icon-cancel-circle1')) return false;
+				if (
+					$(e.target).hasClass('icon-cancel-circle1') ||
+					$(e.target).closest('a').hasClass('subscribeHandy')
+				) return false;
 				let self = $(this);
 				let data = {
 					email: self.closest('tr').find('td:nth-child(1)').text(),
@@ -22,6 +25,10 @@
 			$('.icon-cancel-circle1').on('click', function(){
 				if (!confirm('Действительно удалить?')) return false;
 				document.location.href = $(this).closest('a').attr('href');
+			})
+			$('a.subscribeHandy').on('click', function(e){
+				if (!confirm('Подверждаете действие?')) e.preventDefault();
+				window.open($(this).attr('href'));
 			})
 		},
 		showForm(data){

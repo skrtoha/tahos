@@ -10,9 +10,12 @@ tr.edit{
 #actions form{
 	display: inline-block;
 }
-a.delete{
+a.delete, a.subscribeHandy{
 	text-decoration: none;
 }
 #add{
 	cursor: pointer;
+}
+.icon-grin2:before {
+  content: "\e9ea";
 }

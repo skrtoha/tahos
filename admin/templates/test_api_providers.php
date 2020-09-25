@@ -68,12 +68,7 @@ $res_providers = $db->query("
 ", '');
 ?>
 <div id="articles">
-	<form id="getCoincidences">
-		<input type="text" name="article" placeholder="Артикул или id">
-		<input type="hidden" name="act" value="getCoincidences">
-		<input type="submit" value="Искать">
-	</form>
-	<div class="results"></div>
+	<input class="intuitive_search" type="text" name="items" placeholder="Артикул">
 </div>
 <div id="tests">
 	<p class="title">

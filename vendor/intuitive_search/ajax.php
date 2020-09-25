@@ -26,7 +26,7 @@ switch($_GET['tableName']){
 				foreach($res_items as $item){
 					$output .= "
 						<li>
-							<a href=\"/admin/?view=items&act=item&id={$item['id']}\">
+							<a item_id=\"{$item['id']}\" class=\"resultItem\" href=\"/admin/?view=items&act=item&id={$item['id']}\">
 								{$item['brend']} - {$item['article']} - {$item['title_full']}
 							</a>
 						</li>";

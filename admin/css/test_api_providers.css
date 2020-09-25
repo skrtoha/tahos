@@ -9,3 +9,8 @@ p.title {
 .hidden{
 	display: none;
 }
+ul.searchResult_list {
+    width: 300px;
+    background: #f7f7f7;
+     border: none;
+}

@@ -2,6 +2,22 @@
 	window['test_api_providers'] = {
 		ajax_url: '/admin/?view=test_api_providers',
 		init: function(){
+			$('input.intuitive_search').on('keyup focus', function(e){
+				e.preventDefault();
+				let val = $(this).val();
+				let minLength = 1;
+				val = val.replace(/[^\wа-яА-Я]+/gi, '');
+				intuitive_search.getResults({
+					event: e,
+					value: val,
+					minLength: minLength,
+					additionalConditions: {
+						act: $(this).attr('name'),
+						item_id: $('input[name=item_id]').val()
+					},
+					tableName: 'items',
+				});
+			});
 			$('#getCoincidences').on('submit', function(e){
 				e.preventDefault();
 				$('div.results').empty();
@@ -26,10 +42,12 @@
 				e.preventDefault();
 				let th = $(this);
 				$('div.results').empty();
+				$('input.intuitive_search').val('');
 				$('input[name=article]').val('');
 				$('#tests button').removeClass('hidden');
 				history.pushState(null, null, test_api_providers.ajax_url + '&item_id=' + th.attr('item_id'));
 				$('#tests p.title').html(th.html());
+				$('ul.searchResult_list').empty();
 				$('input[name=item_id]').val(th.attr('item_id'));
 			})
 			$('#processTest').on('click', function(){

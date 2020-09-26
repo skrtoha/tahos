@@ -330,27 +330,33 @@ function item($act){
 				<div class="field">
 					<div class="title">Описание</div>
 					<div class="value">
-						<a href="#" class="hide">Показать</a>
+						<?$full_desc = $_POST['full_desc'] ? $_POST['full_desc'] : $item['full_desc'];
+						$active = $full_desc ? 'active' : ''?>
+						<a href="#" class="hide <?=$active?>">Показать</a>
 						<div style="margin-top: 10px;display: none">
-							<textarea  class="need" name="full_desc" class="htmlarea" style=""><?=$_POST['full_desc'] ? $_POST['full_desc'] : $item['full_desc']?></textarea>
+							<textarea  class="need" name="full_desc" class="htmlarea" style=""><?=$full_desc?></textarea>
 						</div>
 					</div>
 				</div>
 				<div class="field">
 					<div class="title">Характеристики</div>
 					<div class="value">
-						<a href="" class="hide">Показать</a>
+						<?$characteristics = $_POST['characteristics'] ? $_POST['characteristics'] : $item['characteristics'];
+						$active = $characteristics ? 'active' : ''?>
+						<a href="" class="hide <?=$active?>">Показать</a>
 						<div style="margin-top: 10px;display: none">
-							<textarea class="need" name="characteristics" class="htmlarea" style=""><?=$_POST['characteristics'] ? $_POST['characteristics'] : $item['characteristics']?></textarea>
+							<textarea class="need" name="characteristics" class="htmlarea" style=""><?=$characteristics?></textarea>
 						</div>
 					</div>
 				</div>
 				<div class="field">
 					<div class="title">Применяемость</div>
 					<div class="value">
-						<a href="" class="hide">Показать</a>
+						<?$applicability = $_POST['applicability'] ? $_POST['applicability'] : $item['applicability'];
+						$active = $applicability ? 'active' : ''?>
+						<a href="" class="hide <?=$active?>">Показать</a>
 						<div style="margin-top: 10px;display: none">
-							<textarea class="need" name="applicability" class="htmlarea" style=""><?=$_POST['applicability'] ? $_POST['applicability'] : $item['applicability']?></textarea>
+							<textarea class="need" name="applicability" class="htmlarea" style=""><?=$applicability?></textarea>
 						</div>
 					</div>
 				</div>

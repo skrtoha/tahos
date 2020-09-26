@@ -147,3 +147,6 @@ option[disabled] {
 .actions.items a{
     margin-left: 0;
 }
+a.hide.active {
+    color: #0037ff;
+}

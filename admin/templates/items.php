@@ -663,7 +663,7 @@ function itemDiff($type){
 	if ($type == 'analogies'){
 		$analogiesFields = "
 			diff.hidden,
-			diff.checked
+			diff.checked,
 		";
 	}
 	$res_items = $GLOBALS['db']->query("
@@ -673,7 +673,7 @@ function itemDiff($type){
 			i.article,
 			i.title_full,
 			ib.barcode,
-			$analogiesFields,
+			$analogiesFields
 			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories
 		FROM
 			#$type diff

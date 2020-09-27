@@ -252,7 +252,7 @@ function items(){
 			$having = "HAVING categories != ''";
 		}
 	}
-	if (isset($_GET['search']) && $_GET['search']) $where .= " AND i.article = '{$_GET['search']}'";
+	if (isset($_GET['item_id']) && $_GET['item_id']) $where .= " AND i.id = {$_GET['item_id']}";
 	$db->query("
 		SELECT SQL_CALC_FOUND_ROWS
 			$groupConcat
@@ -328,7 +328,7 @@ function items(){
 					незаблокированные
 				</label>
 			</div>
-			<div class="radio">
+			<div class="radio narrow">
 				<label>
 					<input <?=$_GET['categoryPrice'] == 'price' ? 'checked' : ''?> type="radio" name="categoryPrice" value="price">
 					с ценой
@@ -338,10 +338,10 @@ function items(){
 					c категорией
 				</label>
 			</div>
-			<input style="width: 264px;" type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по артикулу, vid и названию">
 			<input type="submit" value="Искать">
 			<a href="/admin/?view=brends&act=items&id=<?=$_GET['id']?>">Сбросить</a>
 		</form>
+		<input class="intuitive_search" style="width: 264px;" type="text" name="brendItems" value="<?=$_GET['search']?>" placeholder="Поиск по артикулу">
 
 	</div>
 	<table class="t_table" cellspacing="1" view="items">
@@ -362,7 +362,7 @@ function items(){
 					<td><a target="_blank" href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['article_cat']?></a></td>
 					<td><?=$item['title_full']?></td>
 					<td><a href="?view=items&act=item&id=<?=$item['id']?>"><?=$item['barcode']?></a></td>
-					<td>
+					<td class="storeInfo">
 						<?if(isset($item['prices'])){
 							foreach($item['prices'] as $cipher => $value){?>
 								<a href="#" class="store" store_id="<?=$value['store_id']?>"><?=$cipher?> - <?=$value['price']?></a>

@@ -73,7 +73,7 @@
 					}
 				})
 			})
-			$(document).on('click', '.providerBrendDelete', function(e){
+			$('div.value.subbrends').on('click', '.providerBrendDelete', function(e){
 				if (!confirm('Вы действительно хотите удалить?')) return false;
 				var th = $(this);
 				$.ajax({
@@ -86,6 +86,39 @@
 					},
 					success: function(response){
 						th.closest('[provider_id]').remove();
+					}
+				})
+			})
+			$('input[name=brendItems].intuitive_search').on('keyup focus', function(e){
+				e.preventDefault();
+				let val = $(this).val();
+				let minLength = 1;
+				val = val.replace(/[^\wа-яА-Я]+/gi, '');
+				intuitive_search.getResults({
+					event: e,
+					value: val,
+					minLength: minLength,
+					additionalConditions: {
+						brend_id: $('input[name=id]').val(),
+					},
+					tableName: 'brendItems',
+				});
+			});
+			$('div.value.subbrends').on('click', '.subbrend_delete', function(){
+				var elem = $(this).parent();
+				var subbrend_id = elem.attr('subbrend_id');
+				if (!confirm('Вы действительно хотите удалить?')) return false;
+				$.ajax({
+					type: "POST",
+					url: "/ajax/subbrend.php",
+					data: 'act=subbrend_delete&subbrend_id=' + subbrend_id,
+					success: function(msg){
+						// alert(msg);
+						if (msg == 'ok'){
+							show_message('Подбренд успешно удален!');
+							elem.remove();
+							if (!$('.subbrend').size()) $('#add_subbrend').before('<span id="no_brends">Подбрендов не найдено</span>');
+						}
 					}
 				})
 			})

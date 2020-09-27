@@ -4,6 +4,7 @@
  * <?if (in_array($view, ['items', 'orders', 'returns'])){?>
 		{"src" : "/admin/js/show_store_info.js", "async" : false},
 	<?}?>
+	в родитель добавить класс storeInfo
  */
 (function($){
 	window['show_store_info'] = {
@@ -38,8 +39,9 @@
 				type: 'post',
 				url: '/admin/ajax/providers.php',
 				data: 'act=get_store&store_id=' + store_id,
+				async: false,
 				beforeSend: function(){
-					
+					$('#popup').css('display', 'flex');
 				},
 				success: function(response){
 					show_store_info.store = JSON.parse(response);
@@ -110,7 +112,7 @@
 			return str;
 		},
 		init: function(){
-			$(document).on('click', 'a.store', function(e){
+			$('.storeInfo').on('click', 'a.store', function(e){
 				e.preventDefault();
 				$('#popup').css('display', 'flex');
 				var store_id = $(this).attr('store_id');

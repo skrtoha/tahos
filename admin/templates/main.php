@@ -129,7 +129,7 @@ use admin\functions\LeftMenu;
 		{"src" : "/js/jquery.form.js", "async" : false},
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
-		<?if (in_array($view, ['connections', 'reports', 'returns', 'index'])){?>
+		<?if (in_array($view, ['connections', 'reports', 'returns'])){?>
 			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['items', 'orders', 'returns', 'brends'])){?>
@@ -144,7 +144,7 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['connections', 'index'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
 		<?}?>
-		<?if (in_array($view, ['items', 'prices', 'test_api_providers'])){?>
+		<?if (in_array($view, ['items', 'prices', 'test_api_providers', 'brends'])){?>
 			{"src" : "/vendor/intuitive_search/script.js", "async" : false},
 		<?}?>
 		<?if (file_exists("js/$view.js")){

@@ -17,3 +17,11 @@ a.store {
 .radio {
     margin: 5px 0;
 }
+.radio.narrow {
+    width: 175px;
+    display: inline-block;
+    box-sizing: border-box;
+}
+div.intuitiveSearch_wrap{
+	margin-left: 20px;
+}

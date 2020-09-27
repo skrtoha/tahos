@@ -639,7 +639,7 @@ function prices(){
 		<?if ($res_store_items->num_rows){
 			while($row = $res_store_items->fetch_assoc()){?>
 				<tr>
-					<td label="Шифр">
+					<td class="storeInfo" label="Шифр">
 						<a class="store" store_id="<?=$row['store_id']?>"><?=$row['cipher']?></a>
 					</td>
 					<td label="Поставщик"><?=$row['provider']?></td>

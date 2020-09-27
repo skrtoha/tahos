@@ -345,7 +345,7 @@ function show_form($act){
 					</tr>
 				<?}?>
 				<tr <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
-					<td label="Поставщик">
+					<td class="storeInfo" label="Поставщик">
 						<a class="store" store_id="<?=$ov['store_id']?>"><?=$ov['cipher']?></a>
 						<?if ($ov['provider_id'] && core\Provider::isInBasket($ov)){?>
 							<a class="removeFromBasket" href="?view=orders&act=removeFromBasket&<?=http_build_query($ov)?>">

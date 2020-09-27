@@ -576,24 +576,6 @@ $(document).ready(function(e){
 		})
 		$('#popup').css('display', 'none');
 	})
-	$(document).on('click', '.subbrend_delete', function(){
-		var elem = $(this).parent();
-		var subbrend_id = elem.attr('subbrend_id');
-		if (!confirm('Вы действительно хотите удалить?')) return false;
-		$.ajax({
-			type: "POST",
-			url: "/ajax/subbrend.php",
-			data: 'act=subbrend_delete&subbrend_id=' + subbrend_id,
-			success: function(msg){
-				// alert(msg);
-				if (msg == 'ok'){
-					show_message('Подбренд успешно удален!');
-					elem.remove();
-					if (!$('.subbrend').size()) $('#add_subbrend').before('<span id="no_brends">Подбрендов не найдено</span>');
-				}
-			}
-		})
-	})
 	
 	$('#add_theme').on('click', function(e){
 		e.preventDefault();

@@ -107,5 +107,25 @@ switch($_GET['tableName']){
 				</li>";
 		}
 		break;
+	case 'brendItems':
+		$query = core\Item::getQueryItemInfo();
+		$query .= "
+			WHERE
+				i.article LIKE '{$_GET['value']}%' AND
+				i.brend_id = {$_GET['additionalConditions']['brend_id']}
+			LIMIT
+				0, {$_GET['maxCountResults']}
+		";
+		$res_items = $db->query($query);
+		if (!$res_items->num_rows) break;
+		foreach($res_items as $item){
+			$output .= "
+				<li>
+					<a item_id=\"{$item['id']}\" class=\"resultItem\" href=\"/admin/?view=brends&act=items&id={$_GET['additionalConditions']['brend_id']}&item_id={$item['id']}\">
+						{$item['brend']} - {$item['article']} - {$item['title_full']}
+					</a>
+				</li>";
+		}
+		break;
 }
 echo $output;

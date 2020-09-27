@@ -139,7 +139,7 @@ function form($return, $statuses){
 				</div>
 				<div class="field">
 					<div class="title">Шифр</div>
-					<div class="value">
+					<div class="value storeInfo">
 						<a class="store" store_id="<?=$return['store_id']?>"><?=$return['cipher']?></a>		
 					</div>
 				</div>

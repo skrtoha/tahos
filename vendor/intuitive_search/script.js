@@ -21,7 +21,7 @@
 		},
 		applyEnterPressing: function(event){
 			$input = $(event.target);
-			$input.nextAll('.searchResult_list').find('li.active a').click();
+			$input.nextAll('.searchResult_list').find('li.active a').get(0).click();
 		},
 		getResults: function(params){
 			let self = this;

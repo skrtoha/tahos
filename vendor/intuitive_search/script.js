@@ -62,9 +62,11 @@
 			})
 		},
 		init: function(){
-			$('input.intuitive_search')
-				.wrap('<div class="intuitiveSearch_wrap"></div>')
+			let intuitiveSearch_number = 0;
+			$('input.intuitive_search').each(function(){
+				$(this).wrap('<div class="intuitiveSearch_wrap"></div>')
 				.attr('autocomplete', 'off')
+				.attr('intuitiveSearch_number', intuitiveSearch_number++)
 				.closest('.intuitiveSearch_wrap')
 				.append(`
 					<div style="display:none;position:absolute;width:100%;text-align:center;background:white" class="preloader">
@@ -72,12 +74,23 @@
 					</div>
 					<ul class="searchResult_list"></ul>
 				`)
+			})
 			$(document).on('click', function(e){
 				let target = $(e.target);
-				if (!target.closest('.intuitiveSearch_wrap').size()){
-					target.find('.searchResult_list').hide();
-					target.find('input.intuitive_search').val('');
-				} 
+				let mainNumber = $(e.target).closest('.intuitiveSearch_wrap').find('input.intuitive_search').attr('intuitiveSearch_number');
+				if (mainNumber == 'undefined'){
+					$(document).find('.searchResult_list').hide();
+					$(document).find('input.intuitive_search').val('')
+				}
+				else{
+					$('input.intuitive_search').each(function(){
+						let number = $(this).attr('intuitiveSearch_number');
+						if(number == mainNumber) return 1;
+						let wrap = $(this).closest('.intuitiveSearch_wrap');
+						wrap.find('.searchResult_list').hide();
+						wrap.find('input.intuitive_search').val('')
+					})
+				}
 			})
 		}
 	}

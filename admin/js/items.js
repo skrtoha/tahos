@@ -120,7 +120,7 @@ $(function(){
 		if (confirm('Выполнить действие для всех?')) href += '&all=1';
 		document.location.href = href;
 	})
-	$('input[name=hidden]').on('click', function(){
+	$(document).on('click', 'input[name=hidden]', function(){
 		var checked = $(this).is(':checked') ? 1 : 0;
 		$.ajax({
 			type: 'post',
@@ -129,7 +129,7 @@ $(function(){
 			success: function(response){}
 		})
 	})
-	$('input[name=checked]').on('click', function(){
+	$(document).on('click', 'input[name=checked]', function(){
 		var checked = $(this).is(':checked') ? 1 : 0;
 		$.ajax({
 			type: 'post',
@@ -400,8 +400,19 @@ $(function(){
 			},
 			success: function(response){
 				let itemInfo = JSON.parse(response);
+				let htmlAnalogies = '';
 				itemInfo.barcode = itemInfo.barcode != null ? itemInfo.barcode : '';
 				itemInfo.categories = typeof itemInfo.categories != 'undefined' ? itemInfo.categories : '';
+				if (th.attr('type') == 'analogies'){
+					htmlAnalogies = `
+						<td label="Проверен">
+							<input  name="hidden" type="checkbox" value="${itemInfo.id}">
+						</td>
+						<td label="Скрыть">
+							<input name="checked" type="checkbox" value="${itemInfo.id}">
+						</td>
+					`;
+				}
 				$('#itemDiff').append(`
 					<tr>
 						<td label="Бренд">${itemInfo.brend}</td>
@@ -412,6 +423,7 @@ $(function(){
 						</td>
 						<td label="Название">${itemInfo.title_full}</td>
 						<td label="Штрих-код">${itemInfo.barcode}</td>
+						${htmlAnalogies}
 						<td label="Категории">${itemInfo.categories}</td>
 						<td label="">
 							<a class="deleteItemDiff" href="act=deleteItemDiff&type=${th.attr('type')}&item_id=${$('input[name=item_id]').val()}&item_diff=${th.attr('item_id')}">Удалить</a>

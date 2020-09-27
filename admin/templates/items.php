@@ -660,6 +660,12 @@ function itemDiff($type){
 	global $status, $page_title;
 	$itemMain = core\Item::getByID($_GET['id']);
 	$item_id = $_GET['id'];
+	if ($type == 'analogies'){
+		$analogiesFields = "
+			diff.hidden,
+			diff.checked
+		";
+	}
 	$res_items = $GLOBALS['db']->query("
 		SELECT
 			i.id AS item_id,
@@ -667,6 +673,7 @@ function itemDiff($type){
 			i.article,
 			i.title_full,
 			ib.barcode,
+			$analogiesFields,
 			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories
 		FROM
 			#$type diff
@@ -725,6 +732,10 @@ function itemDiff($type){
 			<td>Артикул</td>
 			<td>Название</td>
 			<td>Штрих-код</td>
+			<?if ($type == 'analogies'){?>
+				<td>Проверен</td>
+				<td>Скрыть</td>
+			<?}?>
 			<td>Категории</td>
 			<td></td>
 		</tr>
@@ -737,6 +748,16 @@ function itemDiff($type){
 					</td>
 					<td label="Название"><?=$value['title_full']?></td>
 					<td label="Штрих-код"><?=$value['barcode']?></td>
+					<?if ($type == 'analogies'){?>
+						<td label="Проверен">
+							<?$checked = $value['hidden'] ? 'checked' : ''?>
+							<input <?=$checked?> name="hidden" type="checkbox" value="<?=$value['item_id']?>">
+						</td>
+						<td label="Скрыть">
+							<?$checked = $value['checked'] ? 'checked' : ''?>
+							<input <?=$checked?> name="checked" type="checkbox" value="<?=$value['item_id']?>">
+						</td>
+					<?}?>
 					<td label="Категории"><?=$value['categories']?></td>
 					<td label="">
 						<a class="deleteItemDiff" href="act=deleteItemDiff&type=<?=$type?>&item_id=<?=$_GET['id']?>&item_diff=<?=$value['item_id']?>">Удалить</a>

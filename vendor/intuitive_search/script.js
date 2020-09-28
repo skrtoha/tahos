@@ -77,7 +77,10 @@
 			})
 			$(document).on('click', function(e){
 				let target = $(e.target);
-				if(target.attr('type') == 'submit') target.closest('form').submit();
+				if(target.attr('type') == 'submit'){
+					target.closest('form').submit();
+					return false;
+				} 
 				let mainNumber = $(e.target).closest('.intuitiveSearch_wrap').find('input.intuitive_search').attr('intuitiveSearch_number');
 				if (mainNumber == 'undefined'){
 					$(document).find('.searchResult_list').hide();

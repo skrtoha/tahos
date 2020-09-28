@@ -42,7 +42,7 @@ if ($_POST['items_submit']){
 			continue;
 		}
 		if (!$value[1] && !$value[2]) $article = trim($value[3]);
-		elseif (!$value[1]) $article = article_clear($value[2]);
+		elseif (!$value[1]) $article = core\Item::articleClear($value[2]);
 		else $article = trim($value[1]);
 		if (!$article){
 			$log->debug("для строки $r value=", $value);
@@ -144,8 +144,8 @@ if ($_POST['items_analogies']){
 		$brendAnalogy = $price->getBrendId($value[4]);
 		if (!$brendMain || !$brendAnalogy) continue;
 		// debug($value);
-		$articleMain = article_clear($value[1] ? $value[1] : $value[2]);
-		$articleAnalogy = article_clear($value[5] ? $value[5] : $value[6]);
+		$articleMain = core\Item::articleClear($value[1] ? $value[1] : $value[2]);
+		$articleAnalogy = core\Item::articleClear($value[5] ? $value[5] : $value[6]);
 
 		$resMain = core\Item::insert([
 			'brend_id' => $brendMain,

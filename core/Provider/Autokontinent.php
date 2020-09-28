@@ -126,7 +126,7 @@ class Autokontinent extends Provider{
 		try{
 			$res = parent::getInstanceDataBase()->insert('items', [
 				'brend_id' => $brend_id,
-				'article' => article_clear($part->part_code),
+				'article' => Item::articleClear($part->part_code),
 				'article_cat' => $part->part_code,
 				'title' => $part->part_name ? $part->part_name : $part->part_comment,
 				'title_full' => $part->part_comment,

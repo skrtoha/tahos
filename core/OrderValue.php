@@ -167,7 +167,7 @@ class OrderValue{
 	 * @return [array]  row from orders_values
 	 */
 	public static function getByBrendAndArticle($params){
-		$article = article_clear($params['article']);
+		$article = Item::articleClear($params['article']);
 		$where = '';
 		if (isset($params['provider_id'])) {
 			$where .= " AND ps.provider_id = {$params['provider_id']}";

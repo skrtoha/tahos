@@ -309,7 +309,7 @@ foreach($brend_paths as $brend_path){
 						//если в наличии замена
 						if ($r[4]){
 							$substitution_miss = $r[4];
-							$article = article_clear($r[4]);
+							$article = core\Item::articleClear($r[4]);
 							$item_diff = $db->select_one('items', 'id', "`article`='$article' AND `brend_id`=$brend_item");
 							//если замены нету в базе
 							if (empty($item_diff)){

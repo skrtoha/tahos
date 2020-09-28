@@ -676,7 +676,7 @@ function get_orders($params, $flag = ''){
 		$end = $end->format('Y-m-d H:i:s');
 		$query .= " AND o.created BETWEEN '$begin' AND '$end'";
 	};
-	if ($params['text']) $query .= " AND i.article='".article_clear($params['text'])."'";
+	if ($params['text']) $query .= " AND i.article='".core\Item::articleClear($params['text'])."'";
 	if (isset($params['status_id'])){
 		$str = '';
 		foreach($params['status_id'] as $key => $value) $str .= "$key,";

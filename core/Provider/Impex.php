@@ -1,6 +1,7 @@
 <?php
 namespace core\Provider;
 use core\Provider;
+use core\Item;
 class Impex extends Provider{
 	public static $provider_id = 1;
 	public static $marks = [
@@ -92,7 +93,7 @@ class Impex extends Provider{
 		if (!Provider::getIsEnabledApiSearch(1)) return false;
 		$db = $GLOBALS['db'];
 		$data = self::getData([
-			'article' => article_clear($params['search']),
+			'article' => Item::articleClear($params['search']),
 			'brend' => $params['brend']
 		]);
 		$is_empty_original_parts = empty($data['original_parts']); 

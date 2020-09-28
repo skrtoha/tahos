@@ -76,7 +76,7 @@ if ($_POST['form_submit']){
 		if ($key == 'photos') continue;
 		$array[$key] = $value;
 	}
-	if ($array['article_cat'] && !$array['article']) $array['article'] = article_clear($array['article_cat']);
+	if ($array['article_cat'] && !$array['article']) $array['article'] = core\Item::articleClear($array['article_cat']);
 	if (!$array['article_cat'] && !$array['article'] && $array['barcode']) $array['article'] = $array['barcode'];
 	if (isset($_GET['id'])){
 		$db->delete('items_titles', "`item_id`={$_GET['id']}");
@@ -782,9 +782,10 @@ function items(){
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$query = core\Item::getQueryItemInfo();
+	$article = core\Item::articleClear($_GET['items']);
 	if (isset($_GET['items'])) $query .= "
 		WHERE
-			i.article = '{$_GET['items']}'
+			i.article = '$article'
 	";
 	$query .= "
 		ORDER BY i.id DESC

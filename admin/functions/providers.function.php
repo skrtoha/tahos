@@ -63,7 +63,7 @@ function items_submit(){
 				continue;
 			}
 			$brend_id = $brend['parent_id'] ? $brend['parent_id'] : $brend['id'];
-			$article = article_clear($row[1]);
+			$article = core\Item::articleClear($row[1]);
 			$item = $db->select_one('items', 'id', "`brend_id`=$brend_id AND `article`='$article'");
 			if (empty($item)){
 				$log->warning("В строке $i товар с брендом {$row[0]} и артикулом {$row[1]} не найден.");
@@ -102,7 +102,7 @@ function items_submit(){
 			}
 			$brend = $db->select_one('brends', ['id', 'title', 'parent_id'], "`title`='{$row[0]}'");
 			$brend_id = $brend['parent_id'] ? $brend['parent_id'] : $brend['id'];
-			$article = article_clear($row[1]);
+			$article = core\Item::articleClear($row[1]);
 			$item = $db->select_one('items', 'id', "`brend_id`=$brend_id AND `article`='{$article}'");
 			if (empty($item)){
 				$log->warning("В строке $i товар с брендом <b>{$row[0]}</b> и артикулом <b>{$row[1]}</b> не найден.");

@@ -70,7 +70,7 @@ class ForumAuto extends Provider{
 		try{
 			$res = parent::getInstanceDataBase()->insert('items', [
 				'brend_id' => $brend_id,
-				'article' => article_clear($part->art),
+				'article' => Item::articleClear($part->art),
 				'article_cat' => $part->art,
 				'title' => $part->name,
 				'title_full' => $part->name,

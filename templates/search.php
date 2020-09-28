@@ -199,7 +199,7 @@ function setCoincidences($c){
 }
 function search_items($flag = ''){
 	global $db, $res_items;
-	$for_search = article_clear($_GET['search']);
+	$for_search = core\Item::articleClear($_GET['search']);
 	$ucs = 10; //user_count_search
 	// print_r($_GET);
 	switch ($_GET['type']){

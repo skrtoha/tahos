@@ -2,6 +2,11 @@
 namespace core;
 class Item{
 	public static $lastInsertedItemID = false;
+
+	public static function articleClear($article){
+		return preg_replace('/[^\w_а-яА-Я]+/u', '', $article);
+	}
+
 	/**
 	 * updates item
 	 * @param  array $fields field => value
@@ -37,7 +42,7 @@ class Item{
 		return true;
 	}
 	public static function getByBrendIDAndArticle($brend_id, $article){
-		$article = article_clear($article);
+		$article = self::articleClear($article);
 		$query = self::getQueryItemInfo();
 		$query .= "
 			WHERE
@@ -61,7 +66,7 @@ class Item{
 	}
 	public static function getByArticle(string $article, $additionalFields = []): \mysqli_result
 	{
-		$article = article_clear($article);
+		$article = self::articleClear($article);
 		return $GLOBALS['db']->query("
 			SELECT
 				i.id,

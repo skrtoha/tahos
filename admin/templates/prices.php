@@ -165,7 +165,7 @@ function items(){
 	$id = $_GET['id'];
 	require_once('templates/pagination.php');
 	$search = $_GET['search'] ? $_GET['search'] : $_POST['search'];
-	$search = article_clear($search);
+	$search = core\Item::articleClear($search);
 	$title_store = $db->getFieldOnID('provider_stores', $id, 'cipher');
 	$orderBy = "si.created DESC";
 	if (isset($_GET['sort'])){
@@ -292,7 +292,7 @@ function search_add(){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];
 	$search = $_GET['search'] ? $_GET['search'] : $_POST['search'];
-	$search = article_clear($search);
+	$search = core\Item::articleClear($search);
 	$title_provider = $db->getFieldOnID('providers', $id, 'title');
 	$page_title = "Добавление товара";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=prices'>Прайсы</a> > ";

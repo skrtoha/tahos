@@ -3,6 +3,7 @@ namespace core\Provider;
 use core\Provider;
 use core\OrderValue;
 use core\Log;
+use core\Item;
 use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException; 
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
@@ -303,7 +304,7 @@ class Armtek extends Provider{
 				[
 					'title_full' => $value['NAME'],
 					'brend_id' => $brend_id,
-					'article' => article_clear($value['PIN']),
+					'article' => Item::articleClear($value['PIN']),
 					'article_cat' => $value['PIN'],
 					'amount_package' => $value['RDPRF']
 				],
@@ -314,7 +315,7 @@ class Armtek extends Provider{
 				$this->db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			} 
 			else {
-				$array = $this->db->select_one('items', 'id', "`brend_id`=$brend_id AND `article`='".article_clear($value['PIN'])."'");
+				$array = $this->db->select_one('items', 'id', "`brend_id`=$brend_id AND `article`='".Item::articleClear($value['PIN'])."'");
 				$item_id = $array['id'];
 			}
 			if ($value['ANALOG']){

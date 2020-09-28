@@ -12,7 +12,7 @@ if (isset($_GET['brend_id'])){
 	foreach($_FILES as $file){
 		$image = array();
 		$image['article_cat'] = preg_replace('/\..*$/', '', $file['name']);
-		$article = article_clear($image['article_cat']);
+		$article = core\Item::articleClear($image['article_cat']);
 		$image['fileSource'] = $file['name'];
 
 		//uncomment if need to insert new item

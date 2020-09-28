@@ -3,6 +3,7 @@ namespace core\Provider;
 use core\Provider;
 use core\Log;
 use core\OrderValue;
+use core\Item;
 
 class Autoeuro extends Provider{
 	
@@ -108,7 +109,7 @@ class Autoeuro extends Provider{
 		$brend_id = Armtek::getBrendId($o->maker);
 		if (!$brend_id) return false;
 		if (isset($items["$brend_id{$o->code}"])) return $items["$brend_id{$o->code}"];
-		$article = article_clear($o->code);
+		$article = Item::articleClear($o->code);
 		$resInsertItem = parent::getInstanceDataBase()->insert('items', [
 			'brend_id' => $brend_id,
 			'article' => $article,

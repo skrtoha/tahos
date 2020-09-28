@@ -17,7 +17,7 @@ try {
 	$params = [
 		'VKORG'         => '4000'       
 		,'KUNNR_RG'     => '43179679'
-		,'PIN'          => article_clear($_GET['search'])
+		,'PIN'          => core\Item::articleClear($_GET['search'])
 		,'BRAND'        => ''
 		,'QUERY_TYPE'   => 1
 		,'KUNNR_ZA'     => ''

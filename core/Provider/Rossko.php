@@ -3,6 +3,7 @@ namespace core\Provider;
 use core\Provider;
 use core\OrderValue;
 use core\Log;
+use core\Item;
 
 class Rossko extends Provider{
 	private $db, $result;
@@ -58,7 +59,7 @@ class Rossko extends Provider{
 	private function addItem($item, $printQuery = false){
 		$brend_id = $this->getBrandId($item->brand);
 		if (!$brend_id) return false;
-		$article = article_clear($item->partnumber);
+		$article = Item::articleClear($item->partnumber);
 		$name = $item->name ? $item->name : 'Деталь';
 		$res = $this->db->insert('items', [
 			'brend_id' => $brend_id,

@@ -290,7 +290,7 @@ switch($_POST['act']){
 		echo json_encode($nodes);
 		break;
 	case 'search_items':
-		$article = article_clear($_POST['article']);
+		$article = core\Item::articleClear($_POST['article']);
 		$res_items = $db->query("
 			SELECT
 				i.id,

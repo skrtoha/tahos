@@ -750,12 +750,12 @@ function itemDiff($type){
 					<td label="Штрих-код"><?=$value['barcode']?></td>
 					<?if ($type == 'analogies'){?>
 						<td label="Проверен">
-							<?$checked = $value['hidden'] ? 'checked' : ''?>
-							<input <?=$checked?> name="hidden" type="checkbox" value="<?=$value['item_id']?>">
-						</td>
-						<td label="Скрыть">
 							<?$checked = $value['checked'] ? 'checked' : ''?>
 							<input <?=$checked?> name="checked" type="checkbox" value="<?=$value['item_id']?>">
+						</td>
+						<td label="Скрыть">
+							<?$checked = $value['hidden'] ? 'checked' : ''?>
+							<input <?=$checked?> name="hidden" type="checkbox" value="<?=$value['item_id']?>">
 						</td>
 					<?}?>
 					<td label="Категории"><?=$value['categories']?></td>

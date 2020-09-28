@@ -406,10 +406,10 @@ $(function(){
 				if (th.attr('type') == 'analogies'){
 					htmlAnalogies = `
 						<td label="Проверен">
-							<input  name="hidden" type="checkbox" value="${itemInfo.id}">
+							<input  name="checked" type="checkbox" value="${itemInfo.id}">
 						</td>
 						<td label="Скрыть">
-							<input name="checked" type="checkbox" value="${itemInfo.id}">
+							<input name="hidden" type="checkbox" value="${itemInfo.id}">
 						</td>
 					`;
 				}

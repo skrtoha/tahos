@@ -7,7 +7,6 @@ class LeftMenu{
 			'Удаление',
 			'Изменение'
 		],
-		'Обновление цен',
 		'Доставки',
 		'Заказы',
 		'Возвраты' => [
@@ -69,7 +68,6 @@ class LeftMenu{
 	public static $pagesViews = [
 		'Администрирование' => ['administration'],
 		'Номенклатура' => ['items'],
-		'Обновление цен' => ['min_prices'],
 		'Доставки' => ['sendings'],
 		'Заказы' => ['orders'],
 		'Возвраты' => ['returns'],
@@ -102,7 +100,6 @@ class LeftMenu{
 
 	public static $leftMenu = [
 		'Администрирование' => [
-			'Обновление цен' => 'min_prices',
 			'Валюта' => 'currencies',
 			'Точки выдачи' => 'issues',
 			'Тексты' => 'texts',

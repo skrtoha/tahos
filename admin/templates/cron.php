@@ -985,6 +985,30 @@ switch($_GET['act']){
 		echo "<br>Всего отпрвлено " . count($emails) . " прайсов";
 
 		break;
+	case 'updatePrices':
+		$db->delete('prices', "item_id > 0");
+		$res = $db->query("
+			SELECT
+				ci.item_id,
+				MIN(
+					FLOOR (si.price + si.price * ps.percent / 100)
+				) AS price,
+				MIN(ps.delivery) AS delivery
+			FROM
+				#categories_items ci
+			LEFT JOIN
+				#store_items si ON si.item_id = ci.item_id
+			LEFT JOIN
+				#provider_stores ps ON ps.id = si.store_id
+			WHERE
+				si.price IS NOT null
+			GROUP BY
+				ci.item_id
+		", '');
+		if (!$res->num_rows) return true;
+		foreach($res as $item) $db->insert('prices', $item);
+		message('Обновление прошло успешно!');
+		break;
 }
 if (isset($_GET['from'])){
 	header("Location: {$_SERVER['HTTP_REFERER']}");

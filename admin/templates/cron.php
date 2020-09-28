@@ -6,7 +6,9 @@ use core\Provider;
 set_time_limit(0);
 core\Timer::start();
 
-echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
+if ($_GET['act'] != 'subscribeCommonPrices'){
+	echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
+}
 switch($_GET['act']){
 	case 'bonuses':
 		require_once ('../vendor/autoload.php');
@@ -976,6 +978,9 @@ switch($_GET['act']){
 			'body' => 'Прайс с tahos.ru'
 		], [$file]);
 		if ($res !== true) die($res);
+		if (isset($_GET['email']) && $_GET['email']){
+			die(true);
+		}
 		echo "<h2>Общая рассылка прайсов</h2>";
 		echo "<br>Всего отпрвлено " . count($emails) . " прайсов";
 

@@ -27,8 +27,21 @@
 				document.location.href = $(this).closest('a').attr('href');
 			})
 			$('a.subscribeHandy').on('click', function(e){
-				if (!confirm('Подверждаете действие?')) e.preventDefault();
-				window.open($(this).attr('href'));
+				 e.preventDefault();
+				if (!confirm('Подверждаете действие?')) return false;
+				let self = $(this);
+				$.ajax({
+					type: 'get',
+					url: self.attr('href'),
+					beforeSend: function(){
+						$('#popup').css('display', 'flex');
+					},
+					success: function(response){
+						$('#popup').css('display', 'none');
+						if (response == '1') return show_message('Прайс успешно отправлен!');
+						else return show_message(response, 'error');
+					}
+				})
 			})
 		},
 		showForm(data){

@@ -691,6 +691,8 @@ function itemDiff($type){
 			diff.item_id = $item_id AND i.id != {$_GET['id']}
 		GROUP BY
 			diff.item_diff
+		ORDER BY
+			i.article, b.title
 	", '');
 	switch($type){
 		case 'complects': $page_title = "Комплектность"; break;

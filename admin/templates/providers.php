@@ -150,6 +150,10 @@ switch ($act) {
 		", '');
 		mainStores($res_main_stores, $handlePrices);
 		break;
+	case 'removeFromBasket':
+		debug($_GET); exit();
+		core\Provider::removeFromBasket($_GET);
+		break;
 	default:
 		view();
 }
@@ -786,6 +790,7 @@ function itemsToOrder(){
 			<td>Название</td>
 			<td>Цена</td>
 			<td>Количество</td>
+			<td></td>
 		</tr>
 		<?if (count($items)){
 			foreach($items as $providerTitle => $item){
@@ -805,6 +810,11 @@ function itemsToOrder(){
 						<td><?=$i['title_full']?></td>
 						<td><?=$i['price']?></td>
 						<td><?=$i['count']?></td>
+						<td>
+							<a href="?view=providers&act=removeFromBasket&<?=http_build_query($i)?>" class="remove">
+								<span class="icon-cancel-circle1"></span>
+							</a>
+						</td>
 					</tr>
 				<?}?>
 			<?}

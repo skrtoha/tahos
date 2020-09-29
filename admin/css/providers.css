@@ -40,3 +40,12 @@ div.actions a{
 a.sendOrder{
 	display: block;
 }
+.icon-cancel-circle1:before {
+    content: "\ea0d";
+}
+span.icon-cancel-circle1{
+	cursor: pointer;
+}
+a.remove{
+	text-decoration: none;
+}

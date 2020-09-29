@@ -107,9 +107,13 @@ class Abcp extends Provider{
 		foreach($basketProvider as $bp){
 			$provider = self::$params[$bp['provider_id']]['cronOrder'] ? self::$params[$bp['provider_id']]['cronOrder'] : $bp['api_title'];
 			$output[] = [
+				'provider_id' => $bp['provider_id'],
 				'provider' => $provider,
+				'store_id' => $bp['store_id'],
 				'store' => $bp['cipher'],
+				'order_id' => $bp['order_id'],
 				'brend' => $bp['brend'],
+				'item_id' => $bp['item_id'],
 				'article' => $bp['article'],
 				'title_full' => $bp['title_full'],
 				'price' => $bp['price'],

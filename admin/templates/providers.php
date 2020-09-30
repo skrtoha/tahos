@@ -151,8 +151,10 @@ switch ($act) {
 		mainStores($res_main_stores, $handlePrices);
 		break;
 	case 'removeFromBasket':
-		debug($_GET); exit();
+		// debug($_GET); exit();
 		core\Provider::removeFromBasket($_GET);
+		message('Успешно удалено!');
+		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
 	default:
 		view();

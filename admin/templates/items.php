@@ -692,7 +692,7 @@ function itemDiff($type){
 		GROUP BY
 			diff.item_diff
 		ORDER BY
-			i.article, b.title
+			b.title
 	", '');
 	switch($type){
 		case 'complects': $page_title = "Комплектность"; break;

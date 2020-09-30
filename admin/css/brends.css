@@ -25,3 +25,6 @@ a.store {
 div.intuitiveSearch_wrap{
 	margin-left: 20px;
 }
+.t_form .value, #contents, .t_form, .t_form .field{
+   overflow: inherit;
+}

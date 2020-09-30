@@ -555,21 +555,15 @@ function submit_chb(){
 	", '');
 	if (!$res_items->num_rows) return false;
 	foreach($res_items as $item){
-		$res_update = $db->update('items', ['brend_id' => $_POST['brend_to']], "`id` = {$item['id']}");
+		$res_update = $db->update('items', ['brend_id' => $_POST['brend_to']], "`id` = {$item['id']}"); 
 		if ($res_update === true){
 			$updated++;
 			continue;
 		}
 		$array = core\Item::getByBrendIDAndArticle($_POST['brend_to'], $item['article']);
 		$item_id = $array['id'];
-		try{
-			$res = $db->update('analogies', ['item_id' => $item_id], "`item_id` = {$item['id']}");
-			if ($res === true) $replacedAnalogies += $db->rows_affected();
-			else throw new Exception($res);
-		}
-		catch(Exception $e){
-			core\Log::insertThroughException($e);
-		}
+		$res = $db->update('analogies', ['item_id' => $item_id], "`item_id` = {$item['id']}");
+		if ($res === true) $replacedAnalogies += $db->rows_affected();
 	}
 	return [
 		'updated' => $updated,

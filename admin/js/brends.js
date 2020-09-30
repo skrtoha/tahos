@@ -122,6 +122,12 @@
 					}
 				})
 			})
+			$('select[name=brend_from], select[name=brend_to]').chosen({
+				disable_search_threshold: 5,
+				no_results_text: "не найден",
+				allow_single_deselect: true,
+				width: "200px"
+			});
 		},
 		getProvidersHtml: function(e){
 			var output = '<select name="provider_id">';

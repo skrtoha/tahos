@@ -1,4 +1,41 @@
 var reg_integer = /^\d+$/;
+function addItemDiffHtml(type, items){
+	let htmlAnalogies = '';
+	console.log(items);
+	let strHtml = '';
+	$.each(items, function(key, itemInfo){
+		itemInfo.barcode = itemInfo.barcode != null ? itemInfo.barcode : '';
+		itemInfo.categories = itemInfo.categories != null ? itemInfo.categories : '';
+		strHtml += `
+			<tr>
+				<td label="Бренд">${itemInfo.brend}</td>
+				<td label="Артикул">
+					<a target="blank" href="?view=items&act=item&id=${itemInfo.id}">
+						${itemInfo.article}
+					</a>
+				</td>
+				<td label="Название">${itemInfo.title_full}</td>
+				<td label="Штрих-код">${itemInfo.barcode}</td>
+		`;
+		if (type == 'analogies') strHtml += `
+				<td label="Проверен">
+					<input  name="checked" type="checkbox" value="${itemInfo.id}">
+				</td>
+				<td label="Скрыть">
+					<input name="hidden" type="checkbox" value="${itemInfo.id}">
+				</td>
+		`;
+		strHtml += `
+				<td label="Категории">${itemInfo.categories}</td>
+				<td label="">
+					<a class="deleteItemDiff" href="act=deleteItemDiff&type=${type}&item_id=${$('input[name=item_id]').val()}&item_diff=${itemInfo.item_id}">Удалить</a>
+				</td>
+			</tr>
+		`;
+	})
+	$('#itemDiff tr:not(.head)').remove();
+	$('#itemDiff').append(strHtml);
+}
 $(function(){
 	$('input.intuitive_search').on('keyup focus', function(e){
 		e.preventDefault();
@@ -385,6 +422,10 @@ $(function(){
 	})
 	$(document).on('click', 'a.addItem', function(){
 		let th = $(this);
+		let addAllAnalogies = 0;
+		if (th.attr('type') == 'analogies'){
+			if (confirm('Выполнить действие для всех?')) addAllAnalogies = 1;
+		}
 		$.ajax({
 			type: 'post',
 			url: '/admin/ajax/item.php',
@@ -396,40 +437,12 @@ $(function(){
 				act: 'addItem',
 				type: th.attr('type'),
 				item_id: $('input[name=item_id]').val(),
-				item_diff: th.attr('item_id')
+				item_diff: th.attr('item_id'),
+				addAllAnalogies: addAllAnalogies
 			},
 			success: function(response){
-				let itemInfo = JSON.parse(response);
-				let htmlAnalogies = '';
-				itemInfo.barcode = itemInfo.barcode != null ? itemInfo.barcode : '';
-				itemInfo.categories = typeof itemInfo.categories != 'undefined' ? itemInfo.categories : '';
-				if (th.attr('type') == 'analogies'){
-					htmlAnalogies = `
-						<td label="Проверен">
-							<input  name="checked" type="checkbox" value="${itemInfo.id}">
-						</td>
-						<td label="Скрыть">
-							<input name="hidden" type="checkbox" value="${itemInfo.id}">
-						</td>
-					`;
-				}
-				$('#itemDiff').append(`
-					<tr>
-						<td label="Бренд">${itemInfo.brend}</td>
-						<td label="Артикул">
-							<a target="blank" href="?view=items&act=item&id=${itemInfo.id}">
-								${itemInfo.article}
-							</a>
-						</td>
-						<td label="Название">${itemInfo.title_full}</td>
-						<td label="Штрих-код">${itemInfo.barcode}</td>
-						${htmlAnalogies}
-						<td label="Категории">${itemInfo.categories}</td>
-						<td label="">
-							<a class="deleteItemDiff" href="act=deleteItemDiff&type=${th.attr('type')}&item_id=${$('input[name=item_id]').val()}&item_diff=${th.attr('item_id')}">Удалить</a>
-						</td>
-					</tr>
-				`);
+				let items = JSON.parse(response);
+				addItemDiffHtml(th.attr('type'), items);			
 				$('#popup').css('display', 'none');
 				th.closest('ul').find('li:first-child').addClass('active');
 				th.closest('li').remove();
@@ -439,16 +452,22 @@ $(function(){
 	$(document).on('click', 'a.deleteItemDiff', function(e){
 		e.preventDefault();
 		if (!confirm('Удалить?')) return false;
+		let addAllAnalogies = 0;
 		let th = $(this);
+		let data = getParams(th.attr('href'));
+		if (data.type == 'analogies'){
+			if (confirm('Выполнить действие для всех?')) data.addAllAnalogies = 1;
+		}
 		$.ajax({
 			type: 'post',
 			url: '/admin/ajax/item.php',
-			data: th.attr('href'),
+			data: data,
 			beforeSend: function(){
 				$('#popup').css('display', 'flex');
 			},
 			success: function(response){
-				console.log(response);
+				let items = JSON.parse(response);
+				addItemDiffHtml(data.type, items);
 				$('#popup').css('display', 'none');
 				th.closest('tr').remove();
 				show_message('Успешно удалено!');

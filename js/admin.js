@@ -1,10 +1,9 @@
 var cookieOptions = {path: '/'};
 var item_id = $('input[name=id]').val();
-function getParams(){
-	if (!window.location.search) return false;
-	return window
-		.location
-		.search
+function getParams(url = ''){
+	let str = url ? url : window.location.search;
+	if (!str) return false;
+	return str
 		.replace('?','')
 		.split('&')
 		.reduce(

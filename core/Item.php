@@ -390,4 +390,43 @@ class Item{
 		}
 		return $query;
 	}
+	public static function getResItemDiff($type, $item_id, $flag = '')
+	{
+		$analogiesFields = '';
+		if ($type == 'analogies'){
+			$analogiesFields = "
+				diff.hidden,
+				diff.checked,
+			";
+		}
+		$query = "
+			SELECT
+			i.id AS item_id,
+			b.title AS brend,
+			i.article,
+			i.title_full,
+			ib.barcode,
+			$analogiesFields
+			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories
+		FROM
+			#$type diff
+		LEFT JOIN
+			#items i ON i.id = diff.item_diff
+		LEFT JOIN
+			#brends b ON b.id = i.brend_id
+		LEFT JOIN
+			#item_barcodes ib ON ib.item_id = diff.item_diff
+		LEFT JOIN	
+			#categories_items ci ON diff.item_diff = ci.item_id
+		LEFT JOIN
+			#categories c ON c.id = ci.category_id
+		WHERE
+			diff.item_id = $item_id AND i.id != $item_id
+		GROUP BY
+			diff.item_diff
+		ORDER BY
+			b.title
+		";
+		return $GLOBALS['db']->query($query, $flag);
+	}
 }

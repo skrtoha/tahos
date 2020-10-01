@@ -660,40 +660,7 @@ function itemDiff($type){
 	global $status, $page_title;
 	$itemMain = core\Item::getByID($_GET['id']);
 	$item_id = $_GET['id'];
-	if ($type == 'analogies'){
-		$analogiesFields = "
-			diff.hidden,
-			diff.checked,
-		";
-	}
-	$res_items = $GLOBALS['db']->query("
-		SELECT
-			i.id AS item_id,
-			b.title AS brend,
-			i.article,
-			i.title_full,
-			ib.barcode,
-			$analogiesFields
-			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories
-		FROM
-			#$type diff
-		LEFT JOIN
-			#items i ON i.id = diff.item_diff
-		LEFT JOIN
-			#brends b ON b.id = i.brend_id
-		LEFT JOIN
-			#item_barcodes ib ON ib.item_id = diff.item_diff
-		LEFT JOIN	
-			#categories_items ci ON diff.item_diff = ci.item_id
-		LEFT JOIN
-			#categories c ON c.id = ci.category_id
-		WHERE
-			diff.item_id = $item_id AND i.id != {$_GET['id']}
-		GROUP BY
-			diff.item_diff
-		ORDER BY
-			b.title
-	", '');
+	$res_items = core\Item::getResItemDiff($type, $item_id);
 	switch($type){
 		case 'complects': $page_title = "Комплектность"; break;
 		case 'articles': $page_title = "Подобные"; break;

@@ -121,15 +121,52 @@ switch($_POST['act']){
 		echo json_encode(core\Item::getByID($_POST['item_id']));
 		break;
 	case 'addItem':
+		// debug($_POST); //exit;
 		$db->insert($_POST['type'], ['item_id' => $_POST['item_id'], 'item_diff' => $_POST['item_diff']]);
 		if (in_array($_POST['type'], ['articles', 'analogies', 'substitutes'])){
 			$db->insert($_POST['type'], ['item_id' => $_POST['item_diff'], 'item_diff' => $_POST['item_id']]);
 		}
-		echo json_encode(core\Item::getByID($_POST['item_diff']));
+		if ($_POST['addAllAnalogies']){
+			$res = $db->query("
+				SELECT * FROM #analogies WHERE item_id={$_POST['item_diff']}
+			", '');
+			if ($res->num_rows){
+				while($row = $res->fetch_assoc()){
+					$db->insert('analogies', ['item_id' => $_POST['item_id'], 'item_diff' => $row['item_diff']]);
+					$db->insert('analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_id']]);
+				} 
+			}
+		}
+		$res_items = core\Item::getResItemDiff($_POST['type'], $_POST['item_id'], '');
+		$output = [];
+		if ($res_items->num_rows){
+			foreach($res_items as $item) $output[] = $item;
+		}
+		echo json_encode($output);
 		break;
 	case 'deleteItemDiff':
+		//debug($_POST); exit();
 		$db->delete($_POST['type'], "`item_id` = {$_POST['item_id']} AND `item_diff` = {$_POST['item_diff']}");
 		$db->delete($_POST['type'], "`item_id` = {$_POST['item_diff']} AND `item_diff` = {$_POST['item_id']}");
+		if ($_POST['type'] == 'analogies'){
+			$res = $db->query("
+				SELECT item_diff FROM #analogies WHERE `item_id`={$_POST['item_diff']}
+			", '');
+			if ($res->num_rows){
+				while($row = $res->fetch_assoc()){
+					$db->delete('analogies', "
+						(`item_id`={$_POST['item_id']} AND `item_diff`={$row['item_diff']}) OR
+						(`item_id`={$row['item_diff']} AND `item_diff`={$_POST['item_id']})
+					");
+				}
+			}
+		}
+		$res_items = core\Item::getResItemDiff($_POST['type'], $_POST['item_id'], '');
+		$output = [];
+		if ($res_items->num_rows){
+			foreach($res_items as $item) $output[] = $item;
+		}
+		echo json_encode($output);
 		break;
 }
 ?>

@@ -37,6 +37,7 @@ function addItemDiffHtml(type, items){
 	$('#itemDiff').append(strHtml);
 }
 $(function(){
+	let get = getParams();
 	$('input.intuitive_search').on('keyup focus', function(e){
 		e.preventDefault();
 		let val = $(this).val();

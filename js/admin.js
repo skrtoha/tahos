@@ -3,17 +3,12 @@ var item_id = $('input[name=id]').val();
 function getParams(url = ''){
 	let str = url ? url : window.location.search;
 	if (!str) return false;
-	return str
-		.replace('?','')
-		.split('&')
-		.reduce(
-			function(p,e){
-				var a = e.split('=');
-				p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
-				return p;
-			},
-			{}
-		);
+	const urlParams = new URLSearchParams(str);
+	let output = new Object();
+	for(const[name, value] of urlParams){
+		output[name] = value;
+	}
+	return output;
 };
 function show_message(msg, type = 'ok'){
 	if (type == 'error') $('#message div div').css('background', 'rgba(214, 50, 56, 0.97)');

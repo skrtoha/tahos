@@ -1211,6 +1211,7 @@ $(function(){
 						break;
 				}
 				price_format();
+				applyUserMarkup();
 			} 
 		});
 	})

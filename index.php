@@ -1,6 +1,6 @@
 <?php 
 use core\Log;
-ini_set('error_reporting', E_ERROR | E_PARSE);
+// ini_set('error_reporting', E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -11,7 +11,6 @@ require_once('vendor/autoload.php');
 $db = new core\DataBase();
 session_start();
 $connection = new core\Connection($db);
-// debug($connection);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');
 $db->connection_id = $connection->connection_id;
 $settings = $db->select('settings', '*', '`id`=1'); $settings = $settings[0];
@@ -43,6 +42,11 @@ $res_user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] :
 if ($res_user->num_rows) $user = $res_user->fetch_assoc();
 else $user = $res_user;
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
+
+core\UserIPS::registerIP([
+	'user_id' => $_SESSION['user'] ? $_SESSION['user'] : null,
+	'ip' => $_SERVER['REMOTE_ADDR']
+]);
 
 $basket = get_basket();
 if (file_exists($path)){

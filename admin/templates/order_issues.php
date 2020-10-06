@@ -29,12 +29,14 @@ elseif($_GET['issue_id']){
 	$user = $array['user'];
 }
 elseif ($_GET['issued']){
-	$user = $issues->getUser();
+	$res_user = core\User::get($_GET['user_id']);
+	if (is_object($res_user)) $user = $res_user->fetch_assoc();
+	else $user = $res_user;
 	$page_title = 'Выданные товары';
 	$status .= "
 		<a href='?view=users'>Пользователи</a> >
 		<a href='?view=users&act=change&id={$_GET['user_id']}'>
-			{$user['name_1']} {$user['name_2']} {$user['name_3']}
+			{$user['full_name']}
 		</a> >
 		$page_title
 	";
@@ -141,10 +143,11 @@ elseif($_GET['issue_id']){?>
 		<?}?>
 	</table>
 <?}
-elseif($_GET['issued']){?>
+elseif($_GET['issued']){
+	//debug($issues);?>
 	<input type="hidden" name="user_id" value="<?=$_GET['user_id']?>">
 	<input type="hidden" name="page" value="<?=isset($_GET['page']) ? $_GET['page'] : 1?>">
-	<input type="hidden" name="totalNumber" value="<?=$issues->getCount('order_issues', "`user_id`={$_GET['user_id']}")?>">
+	<input type="hidden" name="totalNumber" value="<?=$db->getCount('order_issues', "`user_id`={$_GET['user_id']}")?>">
 	<table id="user_issue_values" class="t_table" cellspacing="1"></table>
 	<div id="pagination-container"></div>
 <?}

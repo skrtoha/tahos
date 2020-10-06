@@ -56,7 +56,9 @@
 				totalNumber: $('input[name=totalNumber]').val(),
 				pageSize: oi.pageSize,
 				ajax: {
-					beforeSend: function(){}
+					beforeSend: function(){
+						showGiff();
+					}
 				},
 				callback: function(data, pagination){
 					var str = oi.head_common_list;
@@ -71,6 +73,7 @@
 							'</tr>'
 					};
 					$('#common_list').html(str);
+					showGiff(false);
 					// console.log(data, pagination);
 				}
 			})
@@ -84,7 +87,7 @@
 				locator: '',
 				totalNumber: $('input[name=totalNumber]').val(),
 				pageSize: oi.pageSize,
-				ajax: {beforeSend: function(){}},
+				ajax: {beforeSend: function(){showGif()}},
 				callback: function(data, pagination){
 					console.log(pagination);
 					var str = 
@@ -98,6 +101,7 @@
 						'</tr>';
 					for(var key in data){
 						var d = data[key];
+						d = setNullToEmptyStrings(d);
 						str += 
 							'<tr issue_value="' + d.issue_id + ':' + d.order_id + ':' + d.item_id + '">' +
 								'<td>' +
@@ -114,6 +118,7 @@
 							'</tr>'
 					};
 					$('#user_issue_values').html(str);
+					showGif(false);
 					// console.log(data, pagination);
 				}
 			})

@@ -10,6 +10,16 @@ function getParams(url = ''){
 	}
 	return output;
 };
+function showGif(hide = true){
+	let display = hide ? 'flex' : 'none';
+	$('#popup').css('display', display);
+}
+function setNullToEmptyStrings(obj){
+	for(let k in obj){
+		if (obj[k] === null) obj[k] = '';
+	}
+	return obj;
+}
 function show_message(msg, type = 'ok'){
 	if (type == 'error') $('#message div div').css('background', 'rgba(214, 50, 56, 0.97)');
 	else $('#message div div').css('background', 'green');

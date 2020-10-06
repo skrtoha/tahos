@@ -128,12 +128,12 @@ switch($_POST['act']){
 		}
 		if ($_POST['addAllAnalogies']){
 			$res = $db->query("
-				SELECT * FROM #analogies WHERE item_id={$_POST['item_diff']}
+				SELECT * FROM #analogies WHERE item_id={$_POST['item_id']}
 			", '');
 			if ($res->num_rows){
 				while($row = $res->fetch_assoc()){
-					$db->insert('analogies', ['item_id' => $_POST['item_id'], 'item_diff' => $row['item_diff']]);
-					$db->insert('analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_id']]);
+					$db->insert('analogies', ['item_id' => $_POST['item_diff'], 'item_diff' => $row['item_diff']]);
+					$db->insert('analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_diff']]);
 				} 
 			}
 		}
@@ -150,13 +150,13 @@ switch($_POST['act']){
 		$db->delete($_POST['type'], "`item_id` = {$_POST['item_diff']} AND `item_diff` = {$_POST['item_id']}");
 		if ($_POST['type'] == 'analogies'){
 			$res = $db->query("
-				SELECT item_diff FROM #analogies WHERE `item_id`={$_POST['item_diff']}
+				SELECT item_diff FROM #analogies WHERE `item_id`={$_POST['item_id']}
 			", '');
 			if ($res->num_rows){
 				while($row = $res->fetch_assoc()){
 					$db->delete('analogies', "
-						(`item_id`={$_POST['item_id']} AND `item_diff`={$row['item_diff']}) OR
-						(`item_id`={$row['item_diff']} AND `item_diff`={$_POST['item_id']})
+						(`item_id`={$_POST['item_diff']} AND `item_diff`={$row['item_diff']}) OR
+						(`item_id`={$row['item_diff']} AND `item_diff`={$_POST['item_diff']})
 					");
 				}
 			}

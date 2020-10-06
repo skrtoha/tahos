@@ -10,7 +10,7 @@ function addItemDiffHtml(type, items){
 			<tr>
 				<td label="Бренд">${itemInfo.brend}</td>
 				<td label="Артикул">
-					<a target="blank" href="?view=items&act=item&id=${itemInfo.id}">
+					<a target="blank" href="?view=items&act=item&id=${itemInfo.item_id}">
 						${itemInfo.article}
 					</a>
 				</td>
@@ -19,10 +19,10 @@ function addItemDiffHtml(type, items){
 		`;
 		if (type == 'analogies') strHtml += `
 				<td label="Проверен">
-					<input  name="checked" type="checkbox" value="${itemInfo.id}">
+					<input  name="checked" type="checkbox" value="${itemInfo.item_id}">
 				</td>
 				<td label="Скрыть">
-					<input name="hidden" type="checkbox" value="${itemInfo.id}">
+					<input name="hidden" type="checkbox" value="${itemInfo.item_id}">
 				</td>
 		`;
 		strHtml += `

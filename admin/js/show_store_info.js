@@ -47,6 +47,7 @@
 					show_store_info.store = JSON.parse(response);
 					show_store_info.store.prevail = + show_store_info.store.prevail ? 'checked' : '';
 					show_store_info.store.noReturn = + show_store_info.store.noReturn  ? 'checked' : '';
+					show_store_info.store = setNullToEmptyStrings(show_store_info.store);
 					showGif(false);
 				}
 			})

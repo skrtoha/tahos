@@ -71,7 +71,7 @@ function commonList($res_common_list, $params){?>
 						<a class="delete" href="?view=subscribePrices&act=delete&email=<?=$item['email']?>">
 							<span class="icon-cancel-circle1"></span>
 						</a>
-						<a target="_blank" title="Отправить вручную" class="subscribeHandy" href="/admin/?view=cron&act=subscribeCommonPrices&email=<?=$item['email']?>"><span class="icon-grin2"></span></a>
+						<a target="_blank" title="Отправить вручную" class="subscribeHandy" href="/admin/?view=cron&act=subscribeCommonPrices&email=<?=$item['email']?>"><span class="icon-envelop"></span></a>
 					</td>
 				</tr>
 			<?}

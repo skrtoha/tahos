@@ -16,6 +16,7 @@ a.delete, a.subscribeHandy{
 #add{
 	cursor: pointer;
 }
-.icon-grin2:before {
-  content: "\e9ea";
+.icon-envelop:before {
+    content: "\e945";
+    font-size: 15px;
 }

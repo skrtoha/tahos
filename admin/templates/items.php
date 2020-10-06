@@ -672,7 +672,8 @@ function itemDiff($type){
 		<a href='?view=items&act=item&id=$item_id'>{$itemMain['brend']} - {$itemMain['article']}</a> > 
 		$page_title
 	";?>
-	<a href="?view=items&act=item&id=<?=$item_id?>" style="margin-bottom: 10px;display: block">Карточка товара</a>
+	<a href="?view=items&act=item&id=<?=$item_id?>">Карточка товара</a>
+	<a href="#" id="clearItemDiff" item_id="<?=$item_id?>" type="<?=$_GET['act']?>">Очистить "<?=$page_title?>"</a>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Бренд</td>

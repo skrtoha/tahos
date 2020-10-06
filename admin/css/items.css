@@ -150,3 +150,7 @@ option[disabled] {
 a.hide.active {
     color: #0037ff;
 }
+a#clearItemDiff {
+    margin-bottom: 10px;
+    display: inline-block;
+}

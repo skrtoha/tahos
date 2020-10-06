@@ -151,13 +151,6 @@ $(function(){
 	$(document).on('click', 'span.translate_delete', function(){
 		$(this).closest('label').remove();
 	})
-	$('a.analogies_add, a.analogies_delete').on('click', function(e){
-		e.preventDefault();
-		var href = $(this).attr('href');
-		if ($(this).hasClass('analogies_delete') && !confirm('Действительно хотите удалить?')) return false;
-		if (confirm('Выполнить действие для всех?')) href += '&all=1';
-		document.location.href = href;
-	})
 	$(document).on('click', 'input[name=hidden]', function(){
 		var checked = $(this).is(':checked') ? 1 : 0;
 		$.ajax({
@@ -192,8 +185,27 @@ $(function(){
 			}
 		})
 	})
-	$('a.clearAnalogies').on('click', function(e){
-		if (!confirm('Вы действительно хотите очистить список аналогов')) e.preventDefault();
+	$('#clearItemDiff').on('click', function(e){
+		e.preventDefault();
+		if (!confirm('Подтверждаете действие?')) return false;
+		let self = $(this);
+		$.ajax({
+			type: 'post',
+			url: '/admin/ajax/item.php',
+			data: {
+				act: 'clearItemDiff',
+				item_id: self.attr('item_id'),
+				type: self.attr('type')
+			},
+			beforeSend: function(){
+				$('#popup').css('display', 'flex');
+			},
+			success: function(response){
+				$('#itemDiff tr:not(.head)').remove();
+				show_message('Успешно удалено!');
+				$('#popup').css('display', 'none');
+			}
+		})
 	})
 	$('select[filter_id]').on('change', function(){
 		let th = $(this);

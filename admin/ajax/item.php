@@ -168,5 +168,8 @@ switch($_POST['act']){
 		}
 		echo json_encode($output);
 		break;
+	case 'clearItemDiff':
+		$db->delete($_POST['type'], "`item_id` = {$_POST['item_id']} OR `item_diff` = {$_POST['item_id']}");
+		break;
 }
 ?>

@@ -9,7 +9,7 @@ function showStoreInfo(store_id, item_id){
 			item_id: item_id
 		},
 		beforeSend: function(){
-			$('#popup').css('display', 'flex');
+			showGif();
 		},
 		success: function(response){
 			let result = JSON.parse(response);
@@ -17,7 +17,7 @@ function showStoreInfo(store_id, item_id){
 			$.each(result, function(key, value){
 				storeInfo[key] = value;
 			})
-			$('#popup').css('display', 'none');
+			showGif(false);
 			modal_show(add_item_to_store.getHtmlForm(storeInfo));
 		}
 	})
@@ -47,11 +47,11 @@ function deleteStoreItem(item_id, store_id){
 			store_id: store_id
 		},
 		beforeSend: function(){
-			$('#popup').css('display', 'flex');
+			showGif();
 		},
 		success: function(){
 			$('a.deleteStoreItem[item_id=' + item_id + ']').closest('tr').remove();
-			$('#popup').css('display', 'none');
+			showGif(false);
 			$('#modal-container').removeClass('active');
 			$('ul.searchResult_list a[item_id=' + item_id + '][store_id=' + store_id + ']').closest('li').remove();
 			show_message('Удачно удалено!');
@@ -117,7 +117,7 @@ $(function(){
 		let item_id = $a.attr('item_id');
 		let storeInfo = add_item_to_store.storeInfo;
 		console.log(add_item_to_store.storeInfo);
-		$('#popup').css('display', 'flex');
+		showGif();
 		$.ajax({
 			type: 'post',
 			url: '/admin/ajax/item.php',
@@ -126,7 +126,7 @@ $(function(){
 				act: 'getItemInfo'
 			},
 			success: function(response){
-				$('#popup').css('display', 'none');
+				showGif(false);
 				itemInfo = JSON.parse(response);
 				$.each(itemInfo, function(key, value){
 					storeInfo[key] = value;

@@ -41,13 +41,13 @@
 				data: 'act=get_store&store_id=' + store_id,
 				async: false,
 				beforeSend: function(){
-					$('#popup').css('display', 'flex');
+					showGif();
 				},
 				success: function(response){
 					show_store_info.store = JSON.parse(response);
 					show_store_info.store.prevail = + show_store_info.store.prevail ? 'checked' : '';
 					show_store_info.store.noReturn = + show_store_info.store.noReturn  ? 'checked' : '';
-					$('#popup').css('display', 'none');
+					showGif(false);
 				}
 			})
 		},
@@ -114,7 +114,6 @@
 		init: function(){
 			$('.storeInfo').on('click', 'a.store', function(e){
 				e.preventDefault();
-				$('#popup').css('display', 'flex');
 				var store_id = $(this).attr('store_id');
 				show_store_info.set_store(store_id);
 				modal_show(show_store_info.get_str_form());

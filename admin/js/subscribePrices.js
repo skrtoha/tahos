@@ -34,10 +34,10 @@
 					type: 'get',
 					url: self.attr('href'),
 					beforeSend: function(){
-						$('#popup').css('display', 'flex');
+						showGif();
 					},
 					success: function(response){
-						$('#popup').css('display', 'none');
+						showGif(false);
 						if (response == '1') return show_message('Прайс успешно отправлен!');
 						else return show_message(response, 'error');
 					}

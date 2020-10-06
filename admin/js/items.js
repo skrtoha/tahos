@@ -198,12 +198,12 @@ $(function(){
 				type: self.attr('type')
 			},
 			beforeSend: function(){
-				$('#popup').css('display', 'flex');
+				showGif();
 			},
 			success: function(response){
 				$('#itemDiff tr:not(.head)').remove();
 				show_message('Успешно удалено!');
-				$('#popup').css('display', 'none');
+				showGif(false);
 			}
 		})
 	})
@@ -341,7 +341,7 @@ $(function(){
 		$(this).closest('li').remove();
 	})
 	$('#add_category').on('click', function(e){
-		$('#popup').css('display', 'flex');
+		showGif();
 		e.preventDefault();
 		var elem = $(this);
 		$.ajax({
@@ -349,19 +349,19 @@ $(function(){
 			url: "/ajax/add_category.php",
 			data: '',
 			success: function(msg){
-				$('#popup').css('display', 'none');
+				showGif(false);
 				elem.before(msg);
 			}
 		});
 	})
 	$(document).on('change', '#add_subcategories', function(){
-		$('#popup').css('display', 'flex');
+		showGif();
 		elem = $(this);
 		elem.next('select').remove();
 		elem.next('a').remove();
 		var category_id = elem.val();
 		if (!category_id){
-			$('#popup').css('display', 'none');
+			showGif(false);
 			return false;
 		} 
 		$.ajax({
@@ -369,7 +369,7 @@ $(function(){
 			url: "/ajax/add_subcategories.php",
 			data: 'category_id=' + category_id,
 			success: function(msg){
-				$('#popup').css('display', 'none');
+				showGif(false);
 				elem.after(msg);
 			}
 		});
@@ -443,7 +443,7 @@ $(function(){
 			type: 'post',
 			url: '/admin/ajax/item.php',
 			beforeSend: function(){
-				$('#popup').css('display', 'flex');
+				showGif();
 				$('tr.empty').remove();
 			},
 			data: {
@@ -456,7 +456,7 @@ $(function(){
 			success: function(response){
 				let items = JSON.parse(response);
 				addItemDiffHtml(th.attr('type'), items);			
-				$('#popup').css('display', 'none');
+				showGif(false);
 				th.closest('ul').find('li:first-child').addClass('active');
 				th.closest('li').remove();
 			}
@@ -476,12 +476,12 @@ $(function(){
 			url: '/admin/ajax/item.php',
 			data: data,
 			beforeSend: function(){
-				$('#popup').css('display', 'flex');
+				showGif();
 			},
 			success: function(response){
 				let items = JSON.parse(response);
 				addItemDiffHtml(data.type, items);
-				$('#popup').css('display', 'none');
+				showGif(false);
 				th.closest('tr').remove();
 				show_message('Успешно удалено!');
 			}

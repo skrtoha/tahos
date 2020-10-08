@@ -3,7 +3,7 @@ namespace core;
 class UserIPS{
 
 	private const MaxAuthorizatedConnections = 1000;
-	private const MaxNonAuthorizatedConnections = 200;
+	private const MaxNonAuthorizatedConnections = 100;
 	private const MaxPeriodHours = 24;
 
 	public static function getHoursBetweenTwoDays($start, $end){
@@ -14,6 +14,7 @@ class UserIPS{
 	}
 
 	public static function registerIP($params){
+		if ($params['view'] == 'exceeded_connections') return false;
 		if (!$params['user_id']){
 			$params['user_id'] = 'DEFAULT';
 			$maxConnections = self::MaxNonAuthorizatedConnections;
@@ -46,7 +47,8 @@ class UserIPS{
 	}
 
 	private static function handleRefuseAccess(){
-		die("Превышено количество запросов");
+		message("Превышено количество запросов. Авторизуйтесь для продолжения", false);
+		header("Location: /exceeded_connections");
 	}
 
 	private static function insert($params){

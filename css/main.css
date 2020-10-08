@@ -20,6 +20,15 @@
     width: 50%;
     display: inline-block;
 }
+@media screen and (max-width: 1490px) {
+  header .catalog_btn {
+    margin: 27px 37px 0 4px;
+  }
+  header .search {
+    width: -webkit-calc(100% - 582px);
+    width: calc(100% - 582px);
+  }
+}
 #providerInfo .information .row span.left{
   font-size: bold;
 }

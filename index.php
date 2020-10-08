@@ -45,7 +45,8 @@ if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user[
 
 core\UserIPS::registerIP([
 	'user_id' => $_SESSION['user'] ? $_SESSION['user'] : null,
-	'ip' => $_SERVER['REMOTE_ADDR']
+	'ip' => $_SERVER['REMOTE_ADDR'],
+	'view' => $view
 ]);
 
 $basket = get_basket();

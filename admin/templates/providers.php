@@ -763,25 +763,8 @@ function itemsToOrder(){
 	global $status, $page_title, $db;
 	$page_title = "Товары, ожидающие отправку в заказы";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
-	$res_providers = $db->query("
-		SELECT id, title, api_title FROM #providers WHERE api_title IS NOT NULL
-	", '');
-	$items = array();
-	foreach($res_providers as $p){
-		switch($p['title']){
-			case 'М Партс':
-			case 'Армтек':
-			case 'Авторусь':
-			case 'Rossko':
-			case 'Forum-Avto':
-				$output = core\Provider\Abcp::getItemsToOrder($p['id']);
-				break;
-			default:
-				eval("\$output = core\\Provider\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
-		}
-		if (!count($output)) continue;
-		foreach($output as $value) $items[$value['provider']][] = $value;
-	}?>
+	$items = core\Provider::getCommonItemsToOrders();
+	?>
 	<div id="total" style="margin-top: 0;">Всего: <?=count($items)?></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

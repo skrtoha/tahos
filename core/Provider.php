@@ -450,4 +450,27 @@ abstract class Provider{
 				$where
 		", '');
 	}
+
+	public static function getCommonItemsToOrders(){
+		$res_providers = self::getInstanceDataBase()->query("
+			SELECT id, title, api_title FROM #providers WHERE api_title IS NOT NULL
+		", '');
+		$items = array();
+		foreach($res_providers as $p){
+			switch($p['title']){
+				case 'М Партс':
+				case 'Армтек':
+				case 'Авторусь':
+				case 'Rossko':
+				case 'Forum-Avto':
+					$output = Provider\Abcp::getItemsToOrder($p['id']);
+					break;
+				default:
+					eval("\$output = core\\Provider\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
+			}
+			if (!count($output)) continue;
+			foreach($output as $value) $items[$value['provider']][] = $value;
+		}
+		return $items;
+	}
 }

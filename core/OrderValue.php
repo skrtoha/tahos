@@ -213,6 +213,7 @@ class OrderValue{
 		$query = "
 			SELECT
 				ps.cipher,
+				ps.provider_id,
 				b.title AS brend,
 				i.article,
 				i.id AS item_id,

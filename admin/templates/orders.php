@@ -203,11 +203,12 @@ function view(){
 				<?}?>
 			</select>
 		</form>
-		<?$commonItemsToOrders = core\Provider::getCommonItemsToOrders();?>
-		<?if (count($commonItemsToOrders)){?>
+		<?$commonItemsToOrders = core\Provider::getCommonItemsToOrders();
+		$countItemsToOrder = core\Provider::getCountItemsToOrders($commonItemsToOrders);?>
+		<?if ($countItemsToOrder){?>
 			<a style="margin-left: 15px;" href="?view=providers&act=itemsToOrder">
-				Товары, ожидающие отправку в заказ 
-				<strong style="color: red">(<?=count($commonItemsToOrders)?>)</strong>
+				Товары ожидающие отправку в заказ 
+				<strong style="color: red">(<?=$countItemsToOrder?>)</strong>
 			</a>
 		<?}?>
 	</div>

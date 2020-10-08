@@ -473,4 +473,10 @@ abstract class Provider{
 		}
 		return $items;
 	}
+
+	public static function getCountItemsToOrders($items){
+		$count = 0;
+		foreach($items as $providerTitle => $item) $count += count($item);
+		return $count;
+	}
 }

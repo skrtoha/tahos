@@ -91,22 +91,27 @@ class Mikado extends Provider{
 			}
 		} 
 	}
-	public static function getItemsToOrder(int $provider_id = null, $order_id = null){
-		$clientData = self::getClientData($order_id);
-		$xml = self::getUrlData(
-			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
-			$clientData
-		);
-		if (!$xml) return false;
-		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
-		$result = json_decode(json_encode($result));
-		$basketItem = & $result->List->BasketItem;
-		if (is_object($basketItem)) return [
-			0 => self::parseBasketItem($basketItem)
-		];
+	public static function getItemsToOrder(int $provider_id = null, $order_id = null, $fullList = false){
+		if ($order_id) $clientData = [0 => self::getClientData($order_id)];
+		else $clientData = self::$clientData;
+
 		$output = [];
-		foreach($basketItem as $value){
-			$output[] = self::parseBasketItem($value);
+		foreach($clientData as $cd){
+			$xml = self::getUrlData(
+				'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
+				$cd
+			);
+			if (!$xml) continue;
+			$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
+			$result = json_decode(json_encode($result));
+			$basketItem = & $result->List->BasketItem;
+			if (is_object($basketItem)){
+				$output[] = self::parseBasketItem($basketItem);
+				continue;
+			} 
+			foreach($basketItem as $value){
+				$output[] = self::parseBasketItem($value);
+			}
 		}
 		return $output;
 	}
@@ -133,8 +138,13 @@ class Mikado extends Provider{
 				mz.ZakazCode = '{$basketItem->ZakazCode}'
 		", '');
 		$item = $res->fetch_assoc();
+		$osi = explode('-', $basketItem->Notes);
 		return [
 			'provider' => 'Mikado',
+			'provider_id' => self::$provider_id,
+			'order_id' => $osi[0],
+			'store_id' => $osi[1],
+			'item_id' => $osi[2],
 			'store' => self::getCipher($basketItem->Notes),
 			'brend' => $item['brend'],
 			'article' => $item['article'],

@@ -764,8 +764,9 @@ function itemsToOrder(){
 	$page_title = "Товары, ожидающие отправку в заказы";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
 	$items = core\Provider::getCommonItemsToOrders();
+	$countItems = core\Provider::getCountItemsToOrders($items);
 	?>
-	<div id="total" style="margin-top: 0;">Всего: <?=count($items)?></div>
+	<div id="total" style="margin-top: 0;">Всего: <?=$countItems?></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Поставщик</td>

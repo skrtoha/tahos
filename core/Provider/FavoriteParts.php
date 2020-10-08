@@ -74,15 +74,22 @@ class FavoriteParts extends Provider{
 		$basket = self::getBasket();
 		if (!$basket) return false;
 		$output = [];
-		foreach($basket['cart'] as $c) $output[] = [
-			'provider' => 'FavoriteParts',
-			'store' => self::getStoreByWarehouseGroup($basket, $c['warehouseGroup']),
-			'brend' => $basket['goods'][$c['goods']]['Brand'],
-			'article' => $basket['goods'][$c['goods']]['Number'],
-			'title_full' => $basket['goods'][$c['goods']]['Name'],
-			'price' => $c['price'],
-			'count' => $c['count']
-		];
+		foreach($basket['cart'] as $c){
+			$osi = explode('-', $c['comment']);
+			$output[] = [
+				'provider' => 'FavoriteParts',
+				'provider_id' => self::$provider_id,
+				'order_id' => $osi[0],
+				'store_id' => $osi[1],
+				'item_id' => $osi[2],
+				'store' => self::getStoreByWarehouseGroup($basket, $c['warehouseGroup']),
+				'brend' => $basket['goods'][$c['goods']]['Brand'],
+				'article' => $basket['goods'][$c['goods']]['Number'],
+				'title_full' => $basket['goods'][$c['goods']]['Name'],
+				'price' => $c['price'],
+				'count' => $c['count']
+			];
+		} 
 		return $output;
 	}
 

@@ -37,8 +37,12 @@ class Autokontinent extends Provider{
 			]);
 			$orderValue = $resOrderValue->fetch_assoc();
 			$output[] = [
+				'provider_id' => $orderValue['provider_id'],
 				'provider' => 'Autokontinent',
 				'store' => $orderValue['cipher'],
+				'order_id' => $orderValue['order_id'],
+				'store_id' => $orderValue['store_id'],
+				'item_id' => $orderValue['item_id'],
 				'brend' => $orderValue['brend'],
 				'article' => $orderValue['article'],
 				'title_full' => $orderValue['title_full'],

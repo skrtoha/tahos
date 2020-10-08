@@ -90,7 +90,11 @@ class Autoeuro extends Provider{
 			foreach($storeItem as $si){
 				$output[] = [
 					'provider' => 'Autoeuro',
+					'provider_id' => $si['provider_id'],
 					'store' => $si['cipher'],
+					'order_id' => $si['order_id'],
+					'store_id' => $si['store_id'],
+					'item_id' => $si['item_id'],
 					'brend' => $si['brend'],
 					'article' => $si['article'],
 					'title_full' => $si['title_full'],

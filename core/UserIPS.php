@@ -3,7 +3,7 @@ namespace core;
 class UserIPS{
 
 	private const MaxAuthorizatedConnections = 1000;
-	private const MaxNonAuthorizatedConnections = 100;
+	private const MaxNonAuthorizatedConnections = 200;
 	private const MaxPeriodHours = 24;
 
 	public static function getHoursBetweenTwoDays($start, $end){

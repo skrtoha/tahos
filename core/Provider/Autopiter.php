@@ -80,7 +80,11 @@ class Autopiter extends Provider{
 		$orderValue = $resOrderValue->fetch_assoc();
 		return [
 			'provider' => 'Autopiter',
+			'provider_id' => $orderValue['provider_id'],
 			'store' => $orderValue['cipher'],
+			'store_id' => $orderValue['store_id'],
+			'order_id' => $orderValue['order_id'],
+			'item_id' => $orderValue['item_id'],
 			'brend' => $orderValue['brend'],
 			'article' => $orderValue['article'],
 			'title_full' => $orderValue['title_full'],

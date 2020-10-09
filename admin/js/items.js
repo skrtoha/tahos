@@ -17,14 +17,18 @@ function addItemDiffHtml(type, items){
 				<td label="Название">${itemInfo.title_full}</td>
 				<td label="Штрих-код">${itemInfo.barcode}</td>
 		`;
-		if (type == 'analogies') strHtml += `
-				<td label="Проверен">
-					<input  name="checked" type="checkbox" value="${itemInfo.item_id}">
-				</td>
-				<td label="Скрыть">
-					<input name="hidden" type="checkbox" value="${itemInfo.item_id}">
-				</td>
-		`;
+		if (type == 'analogies'){
+			let checkedHidden = itemInfo.hidden == '1' ? 'checked' : '';
+			let checkedChecked = itemInfo.checked == '1' ? 'checked' : '';
+			strHtml += `
+					<td label="Проверен">
+						<input ${checkedChecked}  name="checked" type="checkbox" value="${itemInfo.item_id}">
+					</td>
+					<td label="Скрыть">
+						<input ${checkedHidden} name="hidden" type="checkbox" value="${itemInfo.item_id}">
+					</td>
+			`;
+		} 
 		strHtml += `
 				<td label="Категории">${itemInfo.categories}</td>
 				<td label="">

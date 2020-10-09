@@ -189,13 +189,14 @@ $(function(){
 			//выделено в отдельную функцию
 			case 2:break;
 			case 3:
-				var ordered = + th.find('input[name=ordered]').val();
-				var arrived = prompt('Укажите количество:', ordered);
+				ordered = + th.find('input[name=ordered]').val();
+				if (ordered == 1) arrived = ordered;
+				else arrived = prompt('Укажите количество:', ordered);
 				if (!check_value(th, arrived, ordered)) return false;
 				data += '&arrived=' + arrived;
 				break;
 			case 8:
-				var ordered = + th.find('input[name=ordered]').val();
+				ordered = + th.find('input[name=ordered]').val();
 				data += '&ordered=' + ordered;
 				break;
 			case 11:

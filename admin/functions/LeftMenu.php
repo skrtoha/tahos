@@ -137,6 +137,7 @@ class LeftMenu{
 		switch($view){
 			case 'returns':
 			case 'orders':
+			case 'funds':
 				return $GLOBALS['db']->getCount($view, '`is_new` = 1');
 				break;
 			case 'messages':

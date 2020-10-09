@@ -1,7 +1,6 @@
 var reg_integer = /^\d+$/;
 function addItemDiffHtml(type, items){
 	let htmlAnalogies = '';
-	console.log(items);
 	let strHtml = '';
 	$.each(items, function(key, itemInfo){
 		itemInfo.barcode = itemInfo.barcode != null ? itemInfo.barcode : '';
@@ -22,7 +21,7 @@ function addItemDiffHtml(type, items){
 			let checkedChecked = itemInfo.checked == '1' ? 'checked' : '';
 			strHtml += `
 					<td label="Проверен">
-						<input ${checkedChecked}  name="checked" type="checkbox" value="${itemInfo.item_id}">
+						<input ${checkedChecked} name="checked" type="checkbox" value="${itemInfo.item_id}">
 					</td>
 					<td label="Скрыть">
 						<input ${checkedHidden} name="hidden" type="checkbox" value="${itemInfo.item_id}">

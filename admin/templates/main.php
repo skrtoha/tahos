@@ -82,7 +82,7 @@ use admin\functions\LeftMenu;
 										<span class="<?=core\Managers::isActiveMenuGroup($value, $_GET['view']) ? 'icon-circle-up' : 'icon-circle-down'?>"></span>
 									<?}?>
 									<?=$key?>
-									<?if (!is_array($value) && in_array($value, ['returns', 'orders', 'messages'])){
+									<?if (!is_array($value) && in_array($value, ['returns', 'orders', 'messages', 'funds'])){
 										if ($countNew = LeftMenu::getCountNew($value)){?>
 											<span>(<?=$countNew?>)</span>
 										<?}

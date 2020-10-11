@@ -5,7 +5,7 @@ use admin\functions\LeftMenu;
 <html>
 <head>
 	<title><?=$page_title?></title>
-	<link rel="stylesheet" type="text/css" href="/css/admin.css">
+	<link rel="stylesheet" type="text/css" href="/admin/css/common.css">
 	<?if(file_exists("css/{$_GET['view']}.css")){?>
 		<link rel="stylesheet" type="text/css" href="css/<?=$_GET['view']?>.css">
 	<?}?>
@@ -126,7 +126,7 @@ use admin\functions\LeftMenu;
 		{"src" : "/js/libs.min.js", "async" : false},
 		{"src" : "/js/jquery.priceformat.min.js", "async" : false},
 		{"src" : "/js/jquery.cookie.js", "async" : false},
-		{"src" : "/js/admin.js", "async" : false},
+		{"src" : "/admin/js/common.js", "async" : false},
 		{"src" : "/js/jquery.form.js", "async" : false},
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
@@ -159,7 +159,7 @@ use admin\functions\LeftMenu;
 <div id="modal-container">
 	<div class="modal">
 		<div id="modal_content"></div>
-		<div id="modal_close"></div>
+		<span id="modal_close" class="icon-cross1"></span>
 	</div>
 </div>
 </body>

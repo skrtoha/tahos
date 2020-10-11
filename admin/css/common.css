@@ -350,29 +350,6 @@ input[readonly]{
 #left_menu .checked{
 	background: #e0e0e0;
 }
-
-.properties:nth-child(n + 2){
-}
-.properties{
-	border: 1px solid #8A8A8A;
-	padding: 5px 5px 5px 5px;
-	margin: 5px;
-	cursor: pointer;;;
-}
-.properties:hover{
-	border: 1px solid #ff0505;
-}
-.properties::after{
-	content: '';
-	background: url(/images/close.png);
-	height: 15px;
-	width: 14px;
-	display: inline-block;
-	position: relative;
-	top: 3px;
-	cursor: pointer;;;;;;;
-	box-sizing: border-box;
-}
 #search{
 	position: absolute;
 	top: 10px;
@@ -393,9 +370,6 @@ input[readonly]{
 	text-decoration: none;
 	z-index: 10;
 	position: relative;
-}
-#searched{
-
 }
 #search span{
 	font-weight: 400;
@@ -666,7 +640,6 @@ label[for^=cat]{
   right: 8px;
   width: 15px;
   height: 15px;
-  background: url(/images/close.png) no-repeat;
   cursor: pointer;
   top: 8px;
 }

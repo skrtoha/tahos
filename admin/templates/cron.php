@@ -931,7 +931,7 @@ switch($_GET['act']){
 		", '');
 		if (!$res_users->num_rows) break;
 
-		$res_store_items = core\Provider\Tahos::getStoreItems();
+		$res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
 		foreach($res_users as $user){
 			// debug($user); exit();
 			switch($user['subscribe_type']){
@@ -967,7 +967,7 @@ switch($_GET['act']){
 			foreach($res_emails as $row) $emails[] = $row['email'];
 		}
 
-		$res_store_items = core\Provider\Tahos::getStoreItems();
+		$res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
 		$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items);
 
 		// debug($emails);

@@ -22,30 +22,6 @@ class Tahos extends Provider{
 		}
 		return $output;
 	}
-	public static function getStoreItems(): \mysqli_result
-	{
-		return parent::getInstanceDataBase()->query("
-			SELECT
-				b.title AS brend,
-				i.article,
-				i.title_full,
-				si.in_stock,
-				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) as price,
-				si.packaging
-			FROM
-				#store_items si
-			LEFT JOIN
-				#items i ON i.id = si.item_id
-			LEFT JOIN
-				#brends b ON b.id = i.brend_id
-			LEFT JOIN
-				#provider_stores ps ON ps.id = si.store_id
-			LEFT JOIN 
-				#currencies c ON c.id=ps.currency_id
-			WHERE
-				si.store_id = " . self::$store_id . "
-		", '');
-	}
 	public static function getPrice($params){
 		return [
 			'price' => $params['price'],

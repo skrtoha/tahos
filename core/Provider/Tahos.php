@@ -10,14 +10,17 @@ class Tahos extends Provider{
 	{
 		$priceTahos = NULL;	
 		$items = [];
+		$tahosPrices = [];
 		foreach($res_items as $v){
 			$items[] = $v;
-			if ($v['store_id'] == self::$store_id) $priceTahos = $v['price'];
+			if ($v['store_id'] == self::$store_id) $tahosPrices[$v['item_id']] = $v['price'];
 		}
-		if (!self::$isDoNotShowStoresCheeperTahos || !$priceTahos) return $items;
 		$output = [];
 		foreach($items as $v){
-			if ($v['price'] < $priceTahos && $v['store_id'] != self::$store_id) continue;
+			if (
+				isset($tahosPrices[$v['item_id']]) &&
+				 $v['price'] < $tahosPrices[$v['item_id']]
+			) continue;
 			$output[] = $v;
 		}
 		return $output;

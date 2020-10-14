@@ -62,7 +62,8 @@ class LeftMenu{
 		'Файлы',
 		'Отчеты',
 		'Тест API поставщиков',
-		'Рассылки прайсов'
+		'Рассылки прайсов',
+		'Настройки'
 	];
 
 	public static $pagesViews = [
@@ -88,6 +89,7 @@ class LeftMenu{
 		'Тексты' => ['texts'],
 		'Файлы' => ['files'],
 		'Отчеты' => ['reports'],
+		'Настройки' => ['settings'],
 		'Тест API поставщиков' => ['test_api_providers'],
 		'Рассылки прайсов' => ['subscribePrices']
 	];
@@ -117,6 +119,9 @@ class LeftMenu{
 			'Покупаемость' => 'reports&tab=purchaseability',
 			'История поиска' => 'reports&tab=searchHistory',
 			'Остатки на основном складе' => 'reports&tab=remainsMainStore'
+		],
+		'Настройки' => [
+			'Склады для рассылки' => 'settings&act=storesForSubscribe'
 		],
 		'Номенклатура' => 'items',
 		'Доставки' => 'sendings',

@@ -14,7 +14,6 @@ $where = "
 	`item_id`={$_POST['item_id']}
 ";
 $user = $db->select_one('users', 'id,bonus_program,bonus_count', "`id`={$_POST['user_id']}");
-$settings = $db->select_one('settings', '*', '`id`=1');
 
 $post = $_POST;
 switch($_POST['status_id']){

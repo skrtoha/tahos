@@ -65,7 +65,7 @@ $q_item = "
 // $item['query'] = $db->query($q_item, 'get');
 $res_item = $db->query($q_item, '');
 $settings = $db->select('settings', '*', '`id`=1'); $settings = $settings[0];
-$ratings = json_decode($settings['ratings'], true);
+$ratings = json_decode(core\Setting::get('items', 'ratings'), true);
 if ($res_item->num_rows){
 	while($v = $res_item->fetch_assoc()){
 		$prices[] = $v['price'];

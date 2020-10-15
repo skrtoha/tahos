@@ -248,11 +248,9 @@ function set_ratings(){
 	', false);
 	$rate_min = $min_max[0]['min'];
 	$rate_max = $min_max[0]['max'];
-	// $time_end = time();
-	// echo "Выполнено за ".($time_end - $time_start). ' секунд.';
 	$r = ($rate_max - $rate_min) / 10;
 	$ratings[1] = $rate_min;
 	for ($i = 2; $i <=10; $i++) $ratings[$i] = $ratings[$i - 1] + $r;
-	$db->update('settings', ['ratings' => json_encode($ratings)], '`id`=1');
+	core\Setting::update('items', 'ratings', json_encode($ratings));
 }
 ?>

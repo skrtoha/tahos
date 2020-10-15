@@ -280,7 +280,8 @@
 	}
 	function settings($field, $title = ''){
 		if (!empty($_POST) && $_GET['tab'] == $field){
-			$this->db->update('settings', [$field => $_POST['text']], "`id`=1");
+			// $this->db->update('settings', [$field => $_POST['text']], "`id`=1");
+			core\Setting::update($field, $_POST['text']);
 			message('Успешно сохранено');
 		}?>
 		<?if ($title){?>
@@ -291,7 +292,7 @@
 				<form action="" method="post" enctype="multipart/form-data">
 					<div class="field">
 						<div class="value">
-							<textarea name="text" class="need"><?=$this->db->getField('settings', $field, 'id', 1)?></textarea>
+							<textarea name="text" class="need"><?=core\Setting::get($field)?></textarea>
 						</div>
 					</div>
 					<div class="field">

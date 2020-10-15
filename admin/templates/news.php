@@ -32,10 +32,10 @@ function view(){
 	global $status, $db, $page_title, $settings;
 	require_once('templates/pagination.php');
 	$all = $db->getCount('news');
-	$perPage = $settings['news_perPage'];
-	$linksLimit = $settings['news_linksLimit'];
+	$perPage = core\Setting::get('perPage');
+	$linkLimit = core\Setting::get('linkLimit');
 	$page = $_GET['page'] ? $_GET['page'] : 1;
-	$chank = getChank($all, $perPage, $linksLimit, $page);
+	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$res_messages = $db->query("
 		SELECT 
@@ -44,7 +44,7 @@ function view(){
 			text 
 		FROM #news 
 		ORDER BY created DESC 
-		LIMIT $start,$linksLimit
+		LIMIT $start,$linkLimit
 	", '');
 	$page_title= 'Новости';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=messages'>Сообщения</a> > Новости"

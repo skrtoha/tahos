@@ -22,7 +22,7 @@ if (!$view) header("Location: /admin/?view=index");
 $db = new core\DataBase();
 $connection = new core\Connection($db);
 $db->setProfiling($connection->connection_id);
-$settings = $db->select('settings', '*'); $settings = $settings[0];
+// $settings = $db->select('settings', '*'); $settings = $settings[0];
 Managers::$permissions = json_decode(Managers::getPermissions($_SESSION['manager']['group_id']), true);
 
 if (core\Managers::isAccessForbidden($_GET['view'])){

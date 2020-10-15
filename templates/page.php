@@ -9,4 +9,4 @@ switch($_GET['type']){
 	
 }?>
 <h2><?=$title?></h2>
-<?=$db->getField('settings', $_GET['type'], 'id', 1);?>
+<?=core\Setting::get('texts', $_GET['type'])?>

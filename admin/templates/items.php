@@ -743,9 +743,9 @@ function itemDiff($type){
 function items(){
 	global $status, $db, $page_title, $settings;
 	require_once('templates/pagination.php');
-	$all = $settings['countItems'];
-	$perPage = 30;
-	$linkLimit = 10;
+	$all = core\Setting::get('commonCount');
+	$perPage = core\Setting::get('perPage');
+	$linkLimit = core\Setting::get('linkLimit');
 	$page = $_GET['page'] ? $_GET['page'] : 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;

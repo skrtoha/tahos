@@ -1,0 +1,7 @@
+#storesForSubscribe label {
+    display: block;
+    margin: 2px 0px;
+}
+#storesForSubscribe input[type="submit"] {
+    margin-top: 10px;
+}

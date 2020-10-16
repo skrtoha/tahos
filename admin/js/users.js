@@ -103,6 +103,27 @@
 			$('.users_box').on('click', function(){
 				document.location.href = "?view=users&act=funds&id=" + $(this).attr('user_id');
 			})
+			$('a.return_money').on('click', function(e){
+				e.preventDefault();
+				let amount = + prompt('Введите сумму:');
+				if (!amount) return false;
+				if (!/\d+/.test(amount)) return show_message('Сумма указано неверно!', 'error');
+				$.ajax({
+					type: 'post',
+					url: '/admin/ajax/user.php',
+					data: {
+						act: 'return_money',
+						amount: amount,
+						user_id: $('input[name=user_id]').val()
+					},
+					success: function(){
+						let $obj = $('div.actions.users > span:nth-child(2) > b > span');
+						let currentAmount = +$obj.html();
+						$obj.html(currentAmount + amount);
+						show_message('Успешно возвращено!');
+					}
+				})
+			})
 		},
 		getSelector: function(str){
 			return this.mainSelector + str;

@@ -136,6 +136,20 @@ switch($_POST['act']){
 			"`id` = {$_POST['user_id']}"
 		);
 		break;
+	case 'return_money':
+		$res_user = core\User::get(['user_id' => $_POST['user_id']]);
+		$user = $res_user->fetch_assoc();
+		core\Fund::insert(1, [
+			'sum' => $_POST['amount'],
+			'remainder' => $user['bill'] + $_POST['amount'],
+			'user_id' => $_POST['user_id'],
+			'comment' => 'Возврат средств'
+		]);
+		core\User::update(
+			$_POST['user_id'],
+			['bill' => "`bill` + ".$_POST['amount']]
+		);
+		break;
 }
 
 ?>

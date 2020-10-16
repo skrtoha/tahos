@@ -219,6 +219,7 @@ function show_form($act){
 	if ($act == 's_change'){?>
 		<?=User::getHtmlActions($id)?>
 	<?}?>
+	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
 	<div class="t_form">
 		<div class="bg">
 			<form method="post" enctype="multipart/form-data">
@@ -504,6 +505,7 @@ function funds(){
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$funds = $db->select('funds', '*', $where, 'id', false, "$start,$perPage", true);?>
+	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
 
 	<?=User::getHtmlActions($id)?>

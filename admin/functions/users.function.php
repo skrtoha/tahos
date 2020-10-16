@@ -10,6 +10,7 @@ class User{
 		<a href="?view=order_issues&user_id=<?=$user_id?>&issued=1">Выданные</a>
 		<a href="?view=users&id=<?=$user_id?>&act=search_history">История поиска</a>
 		<a href="?view=users&id=<?=$user_id?>&act=basket">Товары в корзине</a>
+		<a class="return_money" href="#">Вернуть средства</a>
 		<a href="?view=users&id=<?=$user_id?>&act=delete" class="delete_item">Удалить</a>
 		<div style="width: 100%; height: 10px"></div>
 		<?

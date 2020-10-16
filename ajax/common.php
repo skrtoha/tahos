@@ -32,7 +32,7 @@ switch($_POST['act']){
 			'title' => $_POST['title'],
 			'title_full' => $_POST['title'],
 			'source' => 'страницы поиска'
-		], ['print_query' => false]);
+		]/*, ['print' => true]*/);
 		$item_id = $db->last_id();
 		$db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 		echo $item_id;

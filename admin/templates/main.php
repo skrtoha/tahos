@@ -162,5 +162,6 @@ use admin\functions\LeftMenu;
 		<span id="modal_close" class="icon-cross1"></span>
 	</div>
 </div>
+<div id="tooltip"></div>
 </body>
 </html>

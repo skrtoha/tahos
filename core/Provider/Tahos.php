@@ -43,7 +43,7 @@ class Tahos extends Provider{
 	 * @param  integer        $discount        [description]
 	 * @return string file path
 	 */
-	public static function processExcelFileForSubscribePrices(\mysqli_result $res_store_items, $discount = 0): string
+	public static function processExcelFileForSubscribePrices(\mysqli_result $res_store_items, $fileName, $discount = 0): string
 	{
 		require_once($_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php');
 		
@@ -70,7 +70,7 @@ class Tahos extends Provider{
 		}
 
 		$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-		$file = $_SERVER['DOCUMENT_ROOT'] . '/tmp/price.xlsx';
+		$file = $_SERVER['DOCUMENT_ROOT'] . "/tmp/$fileName.xlsx";
 		$writer->save($file);
 		return $file;
 	}

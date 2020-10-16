@@ -136,6 +136,34 @@ switch($_POST['act']){
 			"`id` = {$_POST['user_id']}"
 		);
 		break;
+	case 'subscribeTahosPrice':
+		$res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
+		$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'price_tahos');
+
+		$res = core\Mailer::send([
+			'emails' => [$_POST['email']],
+			'subject' => 'Прайс с tahos.ru',
+			'body' => 'Прайс с tahos.ru'
+		], [$file]);
+		if ($res !== true) die($res);
+		echo true;
+		break;
+	case 'subscribeMainStoresPrice':
+		if ($_POST['isFormNew'] == 'true'){
+			$mainStores = json_decode(core\Setting::get('settings', 'storesForSubscribe'));
+			$res_store_items = core\StoreItem::getStoreItemsByStoreID($mainStores);
+			$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'main_stores');
+		}
+		else $file = $_SERVER['DOCUMENT_ROOT'] . "/tmp/main_stores.xlsx";
+
+		$res = core\Mailer::send([
+			'emails' => [$_POST['email']],
+			'subject' => 'Прайс с tahos.ru',
+			'body' => 'Прайс с tahos.ru'
+		], [$file]);
+		if ($res !== true) die($res);
+		echo (true);
+		break;
 	case 'return_money':
 		$res_user = core\User::get(['user_id' => $_POST['user_id']]);
 		$user = $res_user->fetch_assoc();

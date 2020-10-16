@@ -20,3 +20,22 @@ a.delete, a.subscribeHandy{
     content: "\e945";
     font-size: 15px;
 }
+#modal_subscribePrice div.left {
+    float: left;
+    margin-right: 10px;
+}
+#modal_subscribePrice div.right {
+    float: right;
+}
+#modal_subscribePrice div.left label{
+	margin-top: 10px;
+	 display: block;
+}
+#modal_subscribePrice a.subcribePrice{
+	margin-top: 10px;
+    display: block;
+}
+#modal_subscribePrice > div{
+	border: 1px solid grey;
+	padding: 10px;
+}

@@ -27,13 +27,36 @@
 				document.location.href = $(this).closest('a').attr('href');
 			})
 			$('a.subscribeHandy').on('click', function(e){
-				 e.preventDefault();
-				if (!confirm('Подверждаете действие?')) return false;
+				e.preventDefault();
+				let self = $(this);
+				modal_show(`
+					<div id="modal_subscribePrice">
+						<div class="left">
+							<a price="${self.attr('email')}" act="subscribeMainStoresPrice" class="subcribePrice" href="">Отправить полный прайс</a>
+							<label>
+								<input id="formNew" type="checkbox" name="formNew" value="1">
+								<span>Сформировать заново</span>
+							</label>
+						</div>
+						<div class="right">
+							<a price="${self.attr('email')}" act="subscribeTahosPrice" class="subcribePrice" href="">Отправить прайс Тахос</a>
+						</div>
+					</div>
+				`);
+			})
+			$(document).on('click', 'a.subcribePrice', function(e){
+				e.preventDefault();
 				let self = $(this);
 				$.ajax({
-					type: 'get',
-					url: self.attr('href'),
+					type: 'post',
+					url: '/admin/ajax/user.php',
+					data: {
+						act: self.attr('act'),
+						email: self.attr('price'),
+						isFormNew: $('#formNew').is(':checked')
+					},
 					beforeSend: function(){
+						$('#modal-container').removeClass('active');
 						showGif();
 					},
 					success: function(response){

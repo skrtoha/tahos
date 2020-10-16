@@ -35,11 +35,12 @@ class StoreItem{
 	{
 		return $GLOBALS['db']->query("
 			SELECT
+				si.item_id,
 				b.title AS brend,
 				i.article,
 				i.title_full,
 				si.in_stock,
-				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) as price,
+				MIN(CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100)) as price,
 				si.packaging
 			FROM
 				#store_items si
@@ -53,6 +54,8 @@ class StoreItem{
 				#currencies c ON c.id=ps.currency_id
 			WHERE
 				si.store_id IN (" . implode(',', $store_ids) . ")
+			GROUP BY
+				si.item_id
 		", '');
 	}
 }

@@ -76,6 +76,23 @@ $(document).ready(function(e){
 	//     thousandsSeparator: ' ',
 	//     clearOnEmpty: true,
 	// });
+	// 
+	$("[tooltip]").on('mouseover', function (eventObject) {
+       let data_tooltip = $(this).attr("tooltip");
+       $("#tooltip").html(data_tooltip)
+           .css({ 
+             "top" : eventObject.pageY + 5,
+             "left" : eventObject.pageX +5
+           })
+           .show();
+       }).on('mouseout', function () {
+         $("#tooltip").hide()
+           .html("")
+           .css({
+               "top" : 0,
+               "left" : 0
+           });
+   });
 	$.mask.definitions['~']='[+-]';
 	$('input[name=telefon]').mask("+7 (999) 999-99-99");
 	$('input[name=telefon_extra]').mask("+7 (999) 999-99-99");

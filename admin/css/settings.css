@@ -5,3 +5,6 @@
 #storesForSubscribe input[type="submit"] {
     margin-top: 10px;
 }
+#storesForSubscribe .subcribePrice{
+	display: block;
+}

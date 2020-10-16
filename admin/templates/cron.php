@@ -6,7 +6,7 @@ use core\Provider;
 set_time_limit(0);
 core\Timer::start();
 
-if ($_GET['act'] != 'subscribeCommonPrices'){
+if ($_GET['act'] != 'subscribeTahosPrice'){
 	echo "<br>Начало: <b>".date("d.m.Y H:i:s")."</b>";
 }
 switch($_GET['act']){
@@ -936,7 +936,7 @@ switch($_GET['act']){
 			// debug($user); exit();
 			switch($user['subscribe_type']){
 				case 'xls':
-					$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, $user['discount']);
+					$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price', $user['discount']);
 					break;
 				case 'csv':
 					$file = $_SERVER['DOCUMENT_ROOT'] . '/tmp/price.csv';
@@ -958,33 +958,7 @@ switch($_GET['act']){
 		echo "<h2>Рассылка прайсов</h2>";
 		echo "<br>Всего отпрвлено $successedDelivery сообщений пользователям";
 		break;
-	case 'subscribeCommonPrices':
-		if (isset($_GET['email']) && $_GET['email']) $emails = [$_GET['email']];
-		else{
-			$emails = [];
-			$res_emails = $db->query("SELECT * FROM #subscribe_prices", '');
-			if (!$res_emails->num_rows) break;
-			foreach($res_emails as $row) $emails[] = $row['email'];
-		}
-
-		$res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
-		$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items);
-
-		// debug($emails);
-
-		$res = core\Mailer::send([
-			'emails' => $emails,
-			'subject' => 'Прайс с tahos.ru',
-			'body' => 'Прайс с tahos.ru'
-		], [$file]);
-		if ($res !== true) die($res);
-		if (isset($_GET['email']) && $_GET['email']){
-			die(true);
-		}
-		echo "<h2>Общая рассылка прайсов</h2>";
-		echo "<br>Всего отпрвлено " . count($emails) . " прайсов";
-
-		break;
+	
 	case 'updatePrices':
 		$db->delete('prices', "item_id > 0");
 		$res = $db->query("

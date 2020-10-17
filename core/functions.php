@@ -377,7 +377,6 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 	$c = 0;
 	foreach ($items as $v){
 		$p = & $store_items[$v['item_id']];
-		if (!(int)$v['in_stock'] && $v['provider_id'] != 1) continue;
 		$p['title_full'] = $v['title_full'];
 		$p['article'] = $v['article'];
 		$p['brend'] = $v['brend'];
@@ -401,6 +400,9 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$list['cipher'] = $v['cipher'];
 		$list['packaging'] = $v['packaging'];
 		$list['packaging_text'] = $v['packaging_text'];
+
+		if (!(int)$v['in_stock'] && $v['provider_id'] != 1) continue;
+		
 		$list['delivery'] = $v['delivery'];
 		$list['price'] = $v['price'];
 		$list['in_basket'] = $v['in_basket'];

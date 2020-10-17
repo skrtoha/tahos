@@ -218,7 +218,7 @@ function store_items(store_items, user, search_type = null){
 		else si_delivery = false;
 		full +=
 			'<tr class="' + button_row + ' ' + empty + ' shown first-full">' +
-				'<td style="padding: 20px 0 0 0;text-align:left">' +
+				'<td style="padding: 20px 0;text-align:left">' +
 					'<b class="brend_info" brend_id="' + si.brend_id + '">' +
 						si.brend +
 					'</b> ' +
@@ -261,7 +261,7 @@ function store_items(store_items, user, search_type = null){
 				'</td>';
 		if (!csi && typeof si.prevails == 'undefined'){
 			full +=
-				'<td colspan="5" style="">Поставщиков не найдено</td>';
+				'<td colspan="5" style="padding: 20px 0">Поставщиков не найдено</td>';
 			mobile += 
 				'<tr class="shown first-mobile empty">' +
 					'<td colspan="5">Поставщиков не найдено</td>' +

@@ -119,7 +119,7 @@
 					success: function(){
 						let $obj = $('div.actions.users > span:nth-child(2) > b > span');
 						let currentAmount = +$obj.html();
-						$obj.html(currentAmount + amount);
+						$obj.html(currentAmount - amount);
 						show_message('Успешно возвращено!');
 					}
 				})

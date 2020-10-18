@@ -167,15 +167,15 @@ switch($_POST['act']){
 	case 'return_money':
 		$res_user = core\User::get(['user_id' => $_POST['user_id']]);
 		$user = $res_user->fetch_assoc();
-		core\Fund::insert(1, [
+		core\Fund::insert(2, [
 			'sum' => $_POST['amount'],
-			'remainder' => $user['bill'] + $_POST['amount'],
+			'remainder' => $user['bill'] - $_POST['amount'],
 			'user_id' => $_POST['user_id'],
 			'comment' => 'Возврат средств'
 		]);
 		core\User::update(
 			$_POST['user_id'],
-			['bill' => "`bill` + ".$_POST['amount']]
+			['bill' => "`bill` - ".$_POST['amount']]
 		);
 		break;
 }

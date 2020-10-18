@@ -121,6 +121,7 @@ class LeftMenu{
 			'Остатки на основном складе' => 'reports&tab=remainsMainStore'
 		],
 		'Настройки' => [
+			'Настройки организации' => 'settings&act=organization',
 			'Склады для рассылки' => 'settings&act=storesForSubscribe'
 		],
 		'Номенклатура' => 'items',

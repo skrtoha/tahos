@@ -34,6 +34,20 @@ switch($_GET['act']){
 
 		storesForSubscribe($res_mainStores, $currentStoresForSubscribe);
 		break;
+	case 'organization':
+		$page_title = "Настройки организации";
+		$status .= $page_title;
+		if (!empty($_POST)){
+			foreach($_POST as $name => $value){
+				core\Setting::update('organization', $name, $value);
+			}
+			message('Успешно сохранено!');
+		}
+		$array = $db->select('settings', ['name', 'value'], "`view` = 'organization'");
+		$settings = [];
+		foreach($array as $value) $settings[$value['name']] = $value['value'];
+		organization($settings);
+		break;
 }
 function storesForSubscribe($res_mainStores, $currentStoresForSubscribe){?>
 	<div class="t_form">
@@ -55,4 +69,72 @@ function storesForSubscribe($res_mainStores, $currentStoresForSubscribe){?>
 			</form>
 		</div>
 	</div>
+<?}
+function organization($organization = array()){?>
+	<div class="t_form">
+		<div class="bg">
+			<form id="storesForSubscribe" method="post" enctype="multipart/form-data">
+				<div class="field">
+					<div class="title">Короткое название</div>
+					<div class="value">
+						<input type="text" name="shortTitle" value="<?=$organization['shortTitle']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Полное название</div>
+					<div class="value">
+						<input type="text" name="fullTitle" value="<?=$organization['fullTitle']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Реквизиты</div>
+					<div class="value">
+						<input type="text" name="requisites" value="<?=$organization['requisites']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Почта организации</div>
+					<div class="value">
+						<input type="text" name="organizationEmail" value="<?=$organization['organizationEmail']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Почта для отправки прайса</div>
+					<div class="value">
+						<input type="text" name="priceEmail" value="<?=$organization['priceEmail']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Почта для отправки рассылок</div>
+					<div class="value">
+						<input type="text" name="subscribeEmail" value="<?=$organization['subscribeEmail']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Юридический адрес</div>
+					<div class="value">
+						<input type="text" name="legalAddress" value="<?=$organization['legalAddress']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Фактический адрес</div>
+					<div class="value">
+						<input type="text" name="factAddress" value="<?=$organization['factAddress']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">IP адресс</div>
+					<div class="value">
+						<input type="text" name="ip" value="<?=$organization['factAddress']?>">
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Телефон</div>
+					<div class="value">
+						<input type="text" name="telephone" value="<?=$organization['telephone']?>">
+					</div>
+				</div>
+				<input type="submit" value="Сохранить">
+			</form>
+		</div>
 <?}?>

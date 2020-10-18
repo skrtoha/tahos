@@ -1,3 +1,12 @@
-DROP TRIGGER IF EXISTS `icreaseCountItems`;CREATE TRIGGER `icreaseCountItems` AFTER INSERT ON `tahos_items` FOR EACH ROW BEGIN UPDATE tahos_settings SET value = value + 1 WHERE `view` = 'items' AND `name` = 'commonCount'; END
-
-DROP TRIGGER IF EXISTS `SubAfterDelete`;CREATE TRIGGER `SubAfterDelete` AFTER DELETE ON `tahos_items` FOR EACH ROW BEGIN UPDATE tahos_settings SET value = value - 1 WHERE `view` = 'items' AND `name` = 'commonCount'; END
+INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES 
+	('organization', 'requisites', NULL), 
+    ('organization', 'organizationEmail', NULL),
+    ('organization', 'priceEmail', NULL),
+     ('organization', 'subscribeEmail', NULL),
+      ('organization', 'legalAddress', NULL),
+       ('organization', 'factAddress', NULL),
+        ('organization', 'ip', NULL),
+        ('organization', 'fullTitle', NULL),
+        ('organization', 'shortTitle', NULL),
+        ('organization', 'telephone', NULL)
+;

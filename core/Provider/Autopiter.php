@@ -6,14 +6,22 @@ use core\OrderValue;
 use core\Exceptions\Autopiter as EAutopiter;
 
 class Autopiter extends Provider{
-	public static $provider_id = 24;
 
 	private static function getClient(){
-		$client = new \SoapClient("http://service.autopiter.ru/v2/price?WSDL");
+		$client = new \SoapClient(self::getParams()->url);
 		if (!($client->IsAuthorization()->IsAuthorizationResult)){
-			$client->Authorization(array("UserID"=>"737995", "Password"=>"047135", "Save"=> "true"));
+			$client->Authorization(array(
+				"UserID"=>self::getParams()->UserID, "Password" => self::getParams()->Password, "Save"=> "true"));
 		}
 		return $client;
+	}
+
+	public static function getParams(){
+		static $params;
+		if (!$params){
+			$params = json_decode(\core\Setting::get('api_settings', 24));
+		} 
+		return $params;
 	}
 
 	public static function getPrice($params){
@@ -56,8 +64,7 @@ class Autopiter extends Provider{
 		}
 		throw new EAutopiter\ErrorGetModel("Ошибка получение model");
 	}
-	public static function getItemsToOrder($provider_id): array
-	{
+	public static function getItemsToOrder($provider_id){
 		$output = [];
 		$basket = self::getClient()->GetBasket();
 		$br = & $basket->GetBasketResult->ItemCartModel;
@@ -96,7 +103,7 @@ class Autopiter extends Provider{
 		static $brends;
 		$output = '';
 		if (isset($brends[$brend])) return $brends[$brend];
-		$providerBrend = Provider::getProviderBrend(self::$provider_id, $brend);
+		$providerBrend = Provider::getProviderBrend(self::getParams()->provider_id, $brend);
 		$output = $providerBrend ? $providerBrend : $brend;
 		$brends[$brend] = $output;
 		return $output;
@@ -126,7 +133,9 @@ class Autopiter extends Provider{
 		]));
 	}
 	public static function setArticle($brend, $article){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
+		
 		try{
 			$articleId = self::getArticleIdByBrendAndArticle($brend, $article);
 		}
@@ -145,11 +154,11 @@ class Autopiter extends Provider{
 		else self::parseSearchModel($PriceIdResult->GetPriceIdResult->PriceSearchModel);
 	}
 	private static function getStoreID($model){
-		$providerStore = Provider::getInstanceDataBase()->select_one('provider_stores', 'id', "`title` = '{$model->SellerId}' AND `provider_id` = ".self::$provider_id);
+		$providerStore = Provider::getInstanceDataBase()->select_one('provider_stores', 'id', "`title` = '{$model->SellerId}' AND `provider_id` = " . self::getParams()->provider_id);
 		if ($providerStore) return $providerStore['id'];
 		$res = Provider::getInstanceDataBase()->insert('provider_stores', [
 			'title' => $model->SellerId, 
-			'provider_id' => self::$provider_id,
+			'provider_id' => self::getParams()->provider_id,
 			'percent' => '10',
 			'cipher' => strtoupper(parent::getRandomString(4)),
 			'currency_id' => 1,
@@ -264,7 +273,8 @@ class Autopiter extends Provider{
 		}
 	}
 	public static function getCoincidences($search){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$client = self::getClient();
 		$result = $client->FindCatalog(["Number" => $search]);
 		$items = $result->FindCatalogResult->SearchCatalogModel;

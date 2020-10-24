@@ -122,7 +122,8 @@ class LeftMenu{
 		],
 		'Настройки' => [
 			'Настройки организации' => 'settings&act=organization',
-			'Склады для рассылки' => 'settings&act=storesForSubscribe'
+			'Склады для рассылки' => 'settings&act=storesForSubscribe',
+			'Поставщики' => 'settings&act=providers'
 		],
 		'Номенклатура' => 'items',
 		'Доставки' => 'sendings',

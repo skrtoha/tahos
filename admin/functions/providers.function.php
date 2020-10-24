@@ -172,6 +172,7 @@ function provider_save(){
 	} 
 	if (!isset($_POST['is_enabled_api_search'])) $array['is_enabled_api_search'] = 0;
 	if (!isset($_POST['is_enabled_api_order'])) $array['is_enabled_api_order'] = 0;
+	if (!isset($_POST['is_active'])) $array['is_active'] = 0;
 	if ($_POST['is_legal']){
 		$array['fact_index'] = $array['legal_index'];
 		$array['fact_region'] = $array['legal_region'];

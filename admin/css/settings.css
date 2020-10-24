@@ -8,3 +8,13 @@
 #storesForSubscribe .subcribePrice{
 	display: block;
 }
+#providers tbody tr{
+	cursor: pointer;
+}
+#providers tbody tr:not(.active){
+	color: darkgrey;
+   font-style: oblique;
+}
+#api_settings input {
+    width: 100%;
+}

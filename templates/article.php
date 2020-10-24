@@ -1,9 +1,12 @@
 <?
 use core\Provider\Autoeuro;
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
+// debug($abcp);
 if (core\Config::$isUseApiProviders){
 	$abcp->render(13); 
 	$abcp->render(6);
+
+	core\Provider\Impex::getData(['article' => $abcp->item['article']]);
 
 	$mikado = new core\Provider\Mikado($db);
 	$mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
@@ -193,8 +196,8 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 <div class="popup-gallery"></div>
 <script type="text/javascript">
 	var storesAutoeuro = [
-		<?=Autoeuro::$mainStoreID?>,
-		<?=Autoeuro::$minPriceStoreID?>,
-		<?=Autoeuro::$minDeliveryStoreID?>
+		<?=Autoeuro::getParams()->mainStoreID?>,
+		<?=Autoeuro::getParams()->minPriceStoreID?>,
+		<?=Autoeuro::getParams()->minDeliveryStoreID?>
 	]
 </script>

@@ -80,9 +80,14 @@ class Impex extends Provider{
 		'SUZUKI MARINE' => 10002,
 	]; 
 	public static function getPrice(array $params){}
+	public static function getParams(){
+		static $params;
+		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 1));
+		return $params;
+	}
 	public static function getItemsToOrder(int $provider_id){}
 	public static function getData($params){
-		$url = "https://www.impex-jp.com/api/parts/search.html?part_no={$params['article']}&key=EicWfyYXZs5xJeKtrVuQ";
+		$url = "https://www.impex-jp.com/api/parts/search.html?part_no={$params['article']}&key=" . self::getParams()->key;
 		if (isset($params['brend']) && $params['brend']){
 			$mark_id = self::$marks[strtoupper($params['brend'])];
 			$url .= "&mark_id=$mark_id";

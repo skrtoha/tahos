@@ -20,6 +20,12 @@ class Rossko extends Provider{
 		'KEY2' => '1955025ec3f636dc345b85fdd5c525cc',
 	);
 	public static $provider_id = 15;
+
+	public static function getParams(){
+		static $params;
+		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 15));
+		return $params;
+	}
 	/**
 	 * [getItemsToOrder description]
 	 * @param  int $provider_id provider_id
@@ -84,7 +90,7 @@ class Rossko extends Provider{
 			'provider_stores', 
 			[
 				'title' => $stock->id,
-				'provider_id' => self::$provider_id,
+				'provider_id' => self::getParams()->provider_id,
 				'cipher' => strtoupper(parent::getRandomString(4)),
 				'currency_id' => 1,
 				'delivery' => $stock->delivery,
@@ -96,7 +102,7 @@ class Rossko extends Provider{
 			]
 		);
 		if (parent::isDuplicate($res)){
-			$where = "`title`='{$stock->id}' AND `provider_id` = " . self::$provider_id;
+			$where = "`title`='{$stock->id}' AND `provider_id` = " . self::getParams()->provider_id;
 			$this->db->update('provider_stores', ['delivery' => $stock->delivery], $where);
 			$array = $this->db->select_one('provider_stores', 'id', $where);
 			return $array['id'];
@@ -174,13 +180,19 @@ class Rossko extends Provider{
 	}
 	private function getDeliveryID(){
 		$query = self::getSoap('GetCheckoutDetails');
-		$result = $query->GetCheckoutDetails(self::$param);
+		$result = $query->GetCheckoutDetails([
+			'KEY1' => self::getParams()->KEY1,
+			'KEY2' => self::getParams()->KEY2,
+		]);
 		debug($result);
 	}
 	private function getResult($search){
 		$query = self::getSoap('GetSearch');
 		if (!$query) return false;
-		$param = self::$param;
+		$param = [
+			'KEY1' => self::getParams()->KEY1,
+			'KEY2' => self::getParams()->KEY2,
+		];
 		$param['text'] = $search;
 		$param['delivery_id'] = self::$delivery_id;
 		$result = $query->GetSearch($param);
@@ -190,7 +202,10 @@ class Rossko extends Provider{
 		$soap  = self::getSoap('GetCheckoutDetails');
 		if (!$soap) return false;
 		try{
-			$query = $soap->GetCheckoutDetails(self::$param);
+			$query = $soap->GetCheckoutDetails([
+				'KEY1' => self::getParams()->KEY1,
+				'KEY2' => self::getParams()->KEY2,
+			]);
 		}catch(\SoapFault $e){
 			Log::insertThroughException($e);
 			return false;
@@ -198,7 +213,7 @@ class Rossko extends Provider{
 		return $query;
 	}
 	private static function getPartsForSending(){
-		$providerBasket = parent::getProviderBasket(self::$provider_id, '');
+		$providerBasket = parent::getProviderBasket(self::getParams()->provider_id, '');
 		if (!$providerBasket->num_rows) return false;
 		$items = array();
 		while ($item = $providerBasket->fetch_assoc()){
@@ -262,8 +277,8 @@ class Rossko extends Provider{
 		}
 
 		$param = array(
-			'KEY1' => self::$param['KEY1'],
-			'KEY2' => self::$param['KEY2'],
+			'KEY1' => self::getParams()->KEY1,
+			'KEY2' => self::getParams()->KEY2,
 			'delivery' => array(
 				'delivery_id' => '000000001',
 				'city' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->city,
@@ -357,6 +372,7 @@ class Rossko extends Provider{
 	}
 	public function getSearch($search){
 		if (!parent::getIsEnabledApiSearch($this->provider_id)) return false;
+		if (!parent::isActive($this->provider_id)) return false;
 		$result = $this->getResult($search);
 		// debug($result); exit();
 		if (!$result) return false;
@@ -379,7 +395,10 @@ class Rossko extends Provider{
 		if (!$query) return false;
 		$storeInfo = parent::getStoreInfo($params['store_id']);
 		
-		$param = self::$param;
+		$param = [
+			'KEY1' => self::getParams()->KEY1,
+			'KEY2' => self::getParams()->KEY2,
+		];
 		$param['text'] = "{$params['brend']} {$params['article']}";
 		$param['delivery_id'] = self::$delivery_id;
 
@@ -427,7 +446,8 @@ class Rossko extends Provider{
 		return false;
 	}
 	public function execute($search){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$result = $this->getResult($search);
 		if (!$result) return false;
 		if (!$result->SearchResult->success) return false;

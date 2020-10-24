@@ -9,14 +9,24 @@ abstract class Provider{
 	protected abstract static function getItemsToOrder(int $provider_id);
 
 	public static function getProviderTitle($provider_id){
-		return self::getInstanceDataBase()->getField('providers', 'title', 'id', $provider_id);
+		$providers = self::get();
+		return $providers[$provider_id]['title'];
 	}
 	public static function getProviderAPITitle($provider_id){
-		return self::getInstanceDataBase()->getField('providers', 'api_title', 'id', $provider_id);
+		$providers = self::get();
+		return $providers[$provider_id]['api_title'];
 	}
 	public static function get(){
-		$res = self::getInstanceDataBase()->select('providers', 'id,title', '', 'title');
-		return $res;
+		static $providers;
+		if (!$providers) {
+			$result = self::getInstanceDataBase()->select('providers', '*', '', 'title');
+			foreach($result as $value) $providers[$value['id']] = $value;
+		}
+		return $providers;
+	}
+	protected static function isActive($provider_id){
+		$providers = self::get();
+		return $providers[$provider_id]['is_active'];
 	}
 	public static function getEmailPrices(){
 		static $emailPrices;

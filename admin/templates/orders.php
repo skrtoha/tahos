@@ -65,7 +65,7 @@ switch ($act) {
 					core\Provider\Autokontinent::addToBasket($ov);
 					if (isset($_GET['automaticOrder'])) core\Provider\Autokontinent::sendOrder();
 					break;
-				case core\Provider\Autopiter::$provider_id:
+				case core\Provider\Autopiter::getParams()->provider_id:
 					core\Provider\Autopiter::addToBasket($ov); 
 					if (isset($_GET['automaticOrder'])) core\Provider\Autopiter::sendOrder();
 					break;

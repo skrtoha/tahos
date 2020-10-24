@@ -5,49 +5,13 @@ use core\Brend;
 use core\Log;
 use core\OrderValue;
 use core\Item;
+use core\Setting;
 
 if ($_SERVER['DOCUMENT_ROOT']) $path = $_SERVER['DOCUMENT_ROOT'].'/';
 else $path = '';
 require_once $path.'vendor/autoload.php';
 
 class Abcp extends Provider{
-	public static $params = [
-		6 => [
-			'title' => 'Восход',
-			'cronOrder' => 'Voshod',
-			'url' => 'http://autorus.public.api.abcp.ru',
-			'userlogin' => 'info@tahos.ru',
-			'userpsw' => 'vk640431',
-			'provider_id' => 6,
-			'paymentMethod' => [
-				'entity' => 1062,
-				'private' => 1061
-			],
-			'shipmentAddress' => 659625,
-			'getAnalogies' => true,
-			'providerStores' => array()
-		],
-		13 => [
-			'title' => 'МПартс',
-			'cronOrder' => 'Mparts',
-			'url' => 'http://v01.ru/api/devinsight',
-			'private' => [
-				'userlogin' => 'info@tahos.ru',
-				'userpsw' => '1031786'
-			],
-			'entity' => [
-				'userlogin' => 'info@tahos.ru',
-				'userpsw' => '1031786',
-			],
-			'provider_id' => 13,
-			'shipmentMethod' => 1,
-			'paymentMethod' => 6,
-			'shipmentOffice' => 13146,
-			'shipmentAddress' => 'a3f75dfd-5b5b-11e9-8f43-0050568f12a5',
-			'getAnalogies' => false,
-			'providerStores' => array()
-		]
-	];
 	private $providerStores = [];
 	public function __construct($item_id = NULL, $db = NULL){
 		// if (!$_SESSION['user']) return false;
@@ -105,7 +69,8 @@ class Abcp extends Provider{
 		if (!$basketProvider->num_rows) return false;
 		$output = array();
 		foreach($basketProvider as $bp){
-			$provider = self::$params[$bp['provider_id']]['cronOrder'] ? self::$params[$bp['provider_id']]['cronOrder'] : $bp['api_title'];
+			$param = self::getParam($bp['provider_id']);
+			$provider = $param['cronOrder'] ? $param['cronOrder'] : $bp['api_title'];
 			$output[] = [
 				'provider_id' => $bp['provider_id'],
 				'provider' => $provider,
@@ -132,17 +97,20 @@ class Abcp extends Provider{
 				si.item_id = $item_id AND ps.provider_id = $provider_id
 		"; 
 	}
-	private static function getParam(int $provider_id, $user_type = 'private'){
-		$param = self::$params[$provider_id];
+	public static function getParam(int $provider_id, $user_type = 'private'){
+		static $params;
+		if (isset($params[$provider_id])) return $params[$provider_id];
+		$param = json_decode(Setting::get('api_settings', $provider_id), true);
 		switch($provider_id){
 			case 6:
 				$param['paymentMethod'] = $param['paymentMethod'][$user_type];
 				break;
 			case 13:
-				$param['userlogin'] = self::$params[$provider_id][$user_type]['userlogin'];
-				$param['userpsw'] = self::$params[$provider_id][$user_type]['userpsw'];
+				$param['userlogin'] = $param[$user_type]['userlogin'];
+				$param['userpsw'] = $param[$user_type]['userpsw'];
 				break;
 		}
+		$params[$provider_id] = $param;
 		return $param;
 	}
 	private function insertProviderStore($provider_id, $item){
@@ -188,8 +156,13 @@ class Abcp extends Provider{
 	}
 	public function getSearch($search){
 		$coincidences = array();
-		foreach(self::$params as $provider_id => $value){
+		$params = [
+			6 => self::getParam(6), 
+			13 => self::getParam(13)
+		];
+		foreach($params as $provider_id => $value){
 			if (!parent::getIsEnabledApiSearch($provider_id)) continue;
+			if (!parent::isActive($provider_id)) continue;
 			$param = self::getParam($provider_id);
 			$url = "{$param['url']}/search/brands?".http_build_query([
 				'userlogin' => $param['userlogin'],
@@ -212,6 +185,7 @@ class Abcp extends Provider{
 	}
 	public function render($provider_id){
 		if(!parent::getIsEnabledApiSearch($provider_id)) return false;
+		if (!parent::isActive($provider_id)) return false;
 		//пока не понятно для чего эта строка
 		// if (!empty($providerStores) && !in_array($provider_id, $providerStores)) continue;
 
@@ -248,11 +222,12 @@ class Abcp extends Provider{
 			'provider_id' => $provider_id
 		], [], '');
 		if (!$brendsList->num_rows) {
+			$param = self::getParam($provider_id);
 			$this->db->insert(
 				'log_diff',
 				[
 					'type' => 'brends',
-					'from' => self::$params[$provider_id]['title'],
+					'from' => $param['title'],
 					'text' => "Бренд $brand отсутствует в базе",
 					'param1' => $brand,
 					'param2' => $brand
@@ -263,7 +238,8 @@ class Abcp extends Provider{
 		return Brend::getBrendIdFromList($brendsList);
 	}
 	public function insertItem($provider_id, $array, & $insertedItems = NULL){
-		$array['source'] = self::$params[$provider_id]['title'];
+		$param = self::getParam($provider_id);
+		$array['source'] = $param['title'];
 		$res = $this->db->insert('items', $array, ['print_query' => false]);
 		$last_query = $this->db->last_query;
 		$last_res = $res;
@@ -284,6 +260,7 @@ class Abcp extends Provider{
 		return false;
 	}
 	public function insertAnalogies($provider_id, $item_id, $item){
+		$param = self::getParam($provider_id);
 		$res1 = $this->db->insert('analogies', ['item_id' => $this->item_id, 'item_diff' => $item_id], ['print_query' => false]);
 		$last_query1 = $this->db->last_query;
 		$res2 = $this->db->insert('analogies', ['item_id' => $item_id, 'item_diff' => $this->item_id], ['print_query' => false]);
@@ -292,7 +269,7 @@ class Abcp extends Provider{
 			'log_diff',
 			[
 				'type' => 'analogies',
-				'from' => self::$params[$provider_id]['title'],
+				'from' => $param['title'],
 				'text' => "
 					к {$this->item['brand']} - {$this->item['article']} - {$this->item['title_full']} добавлено 
 					{$item['brand']} - {$item['numberFix']} - {$item['description']}

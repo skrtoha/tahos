@@ -306,9 +306,10 @@ function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');
 	$search = $_POST['search'] ? $_POST['search'] : $_GET['search'];
+	$where = 'is_active = 1';
 	if ($search){
-		$where = "`title` LIKE '%$search%' OR `cipher` LIKE '%$search%'";
-		$page_title = 'Поиск по названию или шифру';
+		$where .= " AND `title` LIKE '%$search%'";
+		$page_title = 'Поиск по названию';
 		$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
 	}
 	else{
@@ -336,14 +337,12 @@ function view(){
 		<tr class="head">
 			<td>Название</td>
 			<td>Регион</td>
-			<td></td>
 		</tr>
 		<?if (count($providers)){
 			foreach($providers as $id => $provider){?>
 				<tr provider_id="<?=$id?>" class="providers_box" href="?view=providers&id=<?=$id?>&act=stores">
 					<td><?=$provider['title']?></td>
 					<td><?=$provider['legal_region']?></td>
-					<td><a  class="provider_change" href="?view=providers&act=provider&id=<?=$id?>">Изменить</a></td>
 				</tr>
 			<?}
 		}
@@ -403,25 +402,16 @@ function provider(){
 		$array = $_POST;
 		$page_title = 'Добавление поставщика';
 	} 
-	// debug($array);
-	$page_title = $array['title'];
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=providers'>Поставщики</a> > $page_title";
+	$page_title = 'Редактирование';
+	$status = "<a href='/admin'>Главная</a> > Настройки > ";
+	$status .= "<a href='?view=settings&act=providers'>Настройки поставщиков</a> > $page_title";
 	if ($_GET['id']){?>
 		<a href="?view=providers&id=<?=$_GET['id']?>&act=provider_delete" class="delete_item">Удалить</a>
 		<a href="?view=providers&act=calendar&provider_id=<?=$_GET['id']?>">График поставок</a>
-		<div style="width: 100%; height: 10px"></div>
-		<?if (!empty($stores)){?>
-			<form method="post" enctype="multipart/form-data">
-				<input type="hidden" name="items_submit" value="1"> 
-				<input type="file" name="items">
-				<input type="radio" id="parse_1" name="parse" value="full" checked>
-				<label for="parse_1">Полностью</label>
-				<input type="radio" id="parse_2" name="parse" value="particulary">
-				<label for="parse_2">Частично</label>
-				<input disabled type="submit" value="Загрузить">
-			</form>
-			<div style="width: 100%; height: 10px"></div>
+		<?if (core\Provider::getProviderAPITitle($_GET['id'])){?>
+			<a href="?view=settings&act=api_settings&provider_id=<?=$_GET['id']?>">Настройки API</a>
 		<?}?>
+		<div style="width: 100%; height: 10px"></div>
 	<?}?>
 	<div class="t_form">
 		<div class="bg">
@@ -512,6 +502,12 @@ function provider(){
 								<option <?=$m == $array['cron_minutes'] ? 'selected' : ''?> value="<?=$m?>"><?=$m?></option>
 							<?}?>
 						</select>
+					</div>
+				</div>
+				<div class="field">
+					<div class="title">Активирован</div>
+					<div class="value">
+						<input <?=$array['is_active'] ? 'checked' : ''?> type="checkbox" name="is_active" value="1">
 					</div>
 				</div>
 				<div class="field">

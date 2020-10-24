@@ -8,7 +8,6 @@ use Exception;
 
 class Mikado extends Provider{
 	private $db;
-	public static $provider_id = 8;
 	private $armtek;
 	private $brends;
 	public static $stocks = [
@@ -16,16 +15,11 @@ class Mikado extends Provider{
 		10 => 13, //MIPE
 		35 => 12 //MIVO
 	];
-	public static $clientData  = [
-		'entity' => [
-			'ClientID' => 33773,
-			'Password' =>  'tahos2bz'
-		],
-		'private' => [
-			'ClientID' => 28221, 
-			'Password' => 'Vadim888'
-		]
-	];
+	public static function getParams(){
+		static $params;
+		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 8));
+		return $params;
+	}
 	public static function getPrice(array $params){
 		$clientData = self::getClientData();
 		$xml = self::getUrlData(
@@ -93,7 +87,16 @@ class Mikado extends Provider{
 	}
 	public static function getItemsToOrder(int $provider_id = null, $order_id = null, $fullList = false){
 		if ($order_id) $clientData = [0 => self::getClientData($order_id)];
-		else $clientData = self::$clientData;
+		else $clientData = [
+			0 => [
+				'ClientID' => self::getParams()->entity->ClientID,
+				'Password' => self::getParams()->entity->Password
+			],
+			1 => [
+				'ClientID' => self::getParams()->private->ClientID,
+				'Password' => self::getParams()->private->Password
+			]
+		];
 
 		$output = [];
 		foreach($clientData as $cd){
@@ -141,7 +144,7 @@ class Mikado extends Provider{
 		$osi = explode('-', $basketItem->Notes);
 		return [
 			'provider' => 'Mikado',
-			'provider_id' => self::$provider_id,
+			'provider_id' => self::getParams()->provider_id,
 			'order_id' => $osi[0],
 			'store_id' => $osi[1],
 			'item_id' => $osi[2],
@@ -164,7 +167,8 @@ class Mikado extends Provider{
 		$this->armtek = new Armtek($this->db);
 	}
 	public function getCoincidences($text){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
@@ -219,7 +223,8 @@ class Mikado extends Provider{
 		return true;
 	}
 	public function setArticle($brend, $article, $getZakazCode = false){
-		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$clientData = self::getClientData();
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
@@ -368,9 +373,15 @@ class Mikado extends Provider{
 	}
 	private function getClientData(int $order_id = null): array
 	{
-		if (!$order_id) return self::$clientData['entity'];
+		if (!$order_id) return [
+			'ClientID' => self::getParams()->entity->ClientID,
+			'Password' => self::getParams()->entity->Password
+		];
 		$user_type = parent::getUserTypeByOrderID($order_id);
-		return self::$clientData[$user_type];
+		return[
+			'ClientID' => self::getParams()->{$user_type}->ClientID,
+			'Password' => self::getParams()->{$user_type}->Password
+		];
 	}
 	public function Basket_Add($ov){
 		// debug($ov); exit();

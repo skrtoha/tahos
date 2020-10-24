@@ -48,6 +48,25 @@ switch($_GET['act']){
 		foreach($array as $value) $settings[$value['name']] = $value['value'];
 		organization($settings);
 		break;
+	case 'providers':
+		$page_title = 'Настройки поставщиков';
+		$status .= $page_title;
+		providers(core\Provider::get());
+		break;
+	case 'api_settings':
+		$providerTitle = core\Provider::getProviderTitle($_GET['provider_id']);
+		$page_title = 'Настройки API ' . $providerTitle;
+		$status .= $page_title;
+		if (!empty($_POST)){
+			core\Setting::update('api_settings', $_GET['provider_id'], json_encode($_POST));
+			api_settings($_POST);
+			message('Успешно обновлено!');
+		} 
+		else{
+			$api_settings = json_decode(core\Setting::get('api_settings', $_GET['provider_id']), true);
+			api_settings($api_settings);
+		}
+		break;
 }
 function storesForSubscribe($res_mainStores, $currentStoresForSubscribe){?>
 	<div class="t_form">
@@ -137,4 +156,52 @@ function organization($organization = array()){?>
 				<input type="submit" value="Сохранить">
 			</form>
 		</div>
-<?}?>
+<?}
+function providers($providers){?>
+	<table id="providers" class="t_table" cellspacing="1">
+		<thead>
+			<tr class="head">
+				<th>Название</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?foreach($providers as $provider_id => $provider){?>
+				<tr class="<?=$provider['is_active'] ? 'active': ''?>" provider_id="<?=$provider_id?>">
+					<td><?=$provider['title']?></td>
+				</tr>
+			<?}?>
+		</tbody>
+	</table>
+<?}
+function api_settings($settings){?>
+	<table id="api_settings">
+		<form method="post">
+			<?foreach($settings as $title => $value){?>
+				<tr>
+					<td><?=$title?></td>
+					<td>
+						<?if (is_array($value)){?>
+							<table>
+								<?foreach($value as $t => $v){?>
+									<tr>
+										<td><?=$t?></td>
+										<td><input type="text" name="<?=$title?>[<?=$t?>]" value="<?=$v?>"></td>
+									</tr>
+								<?}?>
+							</table>
+						<?}
+						else{?>
+							<input type="text" name="<?=$title?>" value="<?=$value?>">
+						<?}?>
+					</td>
+				</tr>
+			<?}?>
+			<tr>
+				<td colspan="2">
+					<input type="submit" value="Сохранить">
+				</td>
+			</tr>
+		</form>
+	</table>
+
+<?}

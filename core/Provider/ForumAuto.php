@@ -9,24 +9,27 @@ use core\Exceptions\ForumAuto as EForumAuto;
 
 class ForumAuto extends Provider{
 	public static $params = [
-		'title' => 'Автофорум',
-		'url' => 'https://api.forum-auto.ru/v2/',
-		'provider_id' => 17,
-		'login' => '469670_baranov',
-		'pass' => 'rTHQvkJkEO',
-		'storePrefix' => 'FRA'
+		
 	];
+	public static function getParams(){
+		static $params;
+		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 17));
+
+		return $params;
+	}
 	public static function getItemsToOrder(int $provider_id){}
 	private static function getStringQuery($method, $params = []){
-		$output = self::$params['url'];
+		$output = self::getParams()->url;
 		$output .= "$method";
-		$output .= '?login=' . self::$params['login'] . '&pass=' . self::$params['pass'];
+		$output .= '?login=' . self::getParams()->login . '&pass=' . self::getParams()->pass;
 		if (!empty($params)){
 			foreach($params as $key => $value) $output .= "&$key=$value";
 		}
 		return $output;
 	}
 	public static function getCoincidences($search){
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$output = [];
 		$queryString = self::getStringQuery('listGoods', ['art' => $search]);
 		$json = Provider::getUrlData($queryString);
@@ -41,7 +44,7 @@ class ForumAuto extends Provider{
 		if (isset($brends[$brand_name]) && $brends[$brand_name]) return $brends[$brand_name];
 		$res_brend = Brend::get([
 			'title' => $brand_name, 
-			'provider_id' => self::$params['provider_id']
+			'provider_id' => self::getParams()->provider_id
 		], [], '');
 		if (!$res_brend->num_rows){
 			$brends[$brand_name] = NULL;
@@ -74,7 +77,7 @@ class ForumAuto extends Provider{
 				'article_cat' => $part->art,
 				'title' => $part->name,
 				'title_full' => $part->name,
-				'source' => self::$params['title']
+				'source' => self::getParams()->title
 			]/*, ['print' => true]*/);
 			if ($res === true){
 				$item_id = parent::getInstanceDataBase()->last_id();
@@ -102,10 +105,10 @@ class ForumAuto extends Provider{
 		// debug($item);
 		static $stores = [];
 		if (empty($stores)){
-			$storesList = parent::getInstanceDataBase()->select('provider_stores', 'id,cipher', '`provider_id` = ' . self::$params['provider_id']);
+			$storesList = parent::getInstanceDataBase()->select('provider_stores', 'id,cipher', '`provider_id` = ' . self::getParams()->provider_id);
 			foreach($storesList as $store) $stores[$store['cipher']] = $store['id'];
 		} 
-		$key = self::$params['storePrefix'] . $item->d_deliv;
+		$key = self::getParams()->storePrefix . $item->d_deliv;
 		if(!isset($stores[$key])) throw new EForumAuto\ErrorStoreID('Ошибка получения strore_id');
 		return $stores[$key];
 	}
@@ -123,11 +126,12 @@ class ForumAuto extends Provider{
 		return $response;
 	}
 	public static function setArticle($mainItemID, $brend, $article){
-		if(!parent::getIsEnabledApiSearch(self::$params['provider_id'])) return false;
+		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		
 		$item_id = NULL;
 
-		// Provider::clearStoresItemsByProviderID(self::$params['provider_id'], ['item_id' => $mainItemID]);
+		// Provider::clearStoresItemsByProviderID(self::getParams()->provider_id, ['item_id' => $mainItemID]);
 
 		$response = self::getItemsByBrendAndArticle($brend, $article);
 
@@ -163,7 +167,7 @@ class ForumAuto extends Provider{
 		try{
 			$itemsList = self::getItemsByBrendAndArticle($params['brend'], $params['article']);
 			$cipher = parent::getInstanceDataBase()->getField('provider_stores', 'cipher', 'id', $params['store_id']);
-			$delivery = str_replace(self::$params['storePrefix'], '', $cipher);
+			$delivery = str_replace(self::getParams()->storePrefix, '', $cipher);
 			foreach($itemsList as $item){
 				if ($item->d_deliv != $delivery) continue;
 				if (Provider::getComparableString($item->brand) != Provider::getComparableString($params['brend'])) continue;
@@ -187,12 +191,12 @@ class ForumAuto extends Provider{
 		return Armtek::removeFromBasket($ov);
 	}
 	public static function sendOrder(){
-		$providerBasket = parent::getProviderBasket(self::$params['provider_id'], '');
+		$providerBasket = parent::getProviderBasket(self::getParams()->provider_id, '');
 		if (!$providerBasket->num_rows) return false;
 		foreach($providerBasket as $pb){
 			// debug($pb);
 			$itemsList = self::getItemsByBrendAndArticle($pb['brend'], $pb['article']);
-			$delivery = str_replace(self::$params['storePrefix'], '', $pb['cipher']);
+			$delivery = str_replace(self::getParams()->storePrefix, '', $pb['cipher']);
 			$requiredItem = NULL;
 			try{
 				foreach($itemsList as $item){

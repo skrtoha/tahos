@@ -4,6 +4,7 @@ use core\Provider;
 use core\OrderValue;
 use core\Log;
 use core\Item;
+use core\Setting;
 use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException; 
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
@@ -18,10 +19,6 @@ require_once $path.'vendor/autoload.php';
 
 class Armtek extends Provider{
 	public static $provider_id = 2;
-	private static $config = [
-		'user_login' => 'price@tahos.ru',
-		'user_password' => 'tahos10317'
-	];
 	public static $keyzak = array();
 	private $mainItemId;
 	private static $params = [
@@ -36,22 +33,24 @@ class Armtek extends Provider{
 		'DBTYP' => 3,
 		'format' => 'json'
 	];
-	private static $KUNNR_RG = [
-		'private' => '43233624',
-		'entity' => '43232305'
-	];
+	private function getConfig(){
+		static $config;
+		if ($config) return $config;
+		else return json_decode(Setting::get('api_settings', 2), true);
+	}
 	public function __construct($db = NULL){
 		if ($db){
 			$this->db = $db;
 			$this->armtek_client = self::getClientArmtek();
 		} 
 	}
-	public static function getPrice(array $fields){
+	public static function getPrice(array $fieds){
 		$params = self::$params;
+		$config = self::getConfig();
 		$params['PIN'] = $fields['article'];
 		$params['BRAND']	 = $fields['brend'];
 		$params['QUERY_TYPE']	= 1;
-		$params['KUNNR_RG'] = self::$KUNNR_RG['entity'];
+		$params['KUNNR_RG'] = $config['KUNNR_RG']['entity'];
 		$request_params = [
 			'url' => 'search/search',
 			'params' => $params
@@ -71,7 +70,7 @@ class Armtek extends Provider{
 		return false;
 	}
 	private static function getClientArmtek(){
-		$armtek_client_config = new ArmtekRestClientConfig(self::$config);
+		$armtek_client_config = new ArmtekRestClientConfig(self::getConfig());
 		return new ArmtekRestClient($armtek_client_config);
 	}
 	public static function getItemsToOrder(int $provider_id){
@@ -214,30 +213,35 @@ class Armtek extends Provider{
 	}
 	public function setArticle($brand, $article){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		if (!parent::isActive(self::$provider_id)) return false;
+		$config = self::getConfig();
 		$params = self::$params;
 		$params['PIN'] = $article;
 		$params['BRAND']	 = $brand;
 		$params['QUERY_TYPE']	= 1;
-		$params['KUNNR_RG'] = self::$KUNNR_RG['entity'];
+		$params['KUNNR_RG'] = $config['KUNNR_RG']['entity'];
 		$request_params = [
 			'url' => 'search/search',
 			'params' => $params
 		];
-		$response = $this->armtek_client->post($request_params);
+		$response = self::getClientArmtek()->post($request_params);
 		$data = $response->json();
 		$this->render($data->RESP);
 	}
 	private function getKUNNR_RG(int $order_id = NULL): string
 	{
-		if (!$order_id) return self::$KUNNR_RG['entity'];
+		$config = self::getConfig();
+		if (!$order_id) return $config['KUNNR_RG']['entity'];
 		$user_type = parent::getUserTypeByOrderID($order_id);
-		return self::$KUNNR_RG[$user_type];
+		return $config[$user_type];
 	}
 	public function getSearch($search){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+		if (!parent::isActive(self::$provider_id)) return false;
+		$config = self::getConfig();
 		$params = self::$params;
 		$params['PIN'] = $search;
-		$params['KUNNR_RG'] = self::$KUNNR_RG['entity'];
+		$params['KUNNR_RG'] = $config['KUNNR_RG']['entity'];
 		$request_params = [
 			'url' => 'search/search',
 			'params' => $params
@@ -407,8 +411,9 @@ class Armtek extends Provider{
 	 */
 	public static function executeSendOrder($items, $user_type){
 		$params = self::$params;
+		$config = self::getConfig();
 		$params['VKORG'] = self::$params['VKORG'];
-		$params['KUNRG'] = self::$KUNNR_RG[$user_type];
+		$params['KUNRG'] = $config[$user_type];
 		if (empty($items)){
 			Log::insert([
 				'url' => $_SERVER['REQUEST_URI'],

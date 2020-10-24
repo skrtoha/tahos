@@ -8,19 +8,24 @@ use core\OrderValue;
 use core\Exceptions\Autokontinent as EAuto;
 
 class Autokontinent extends Provider{
-	public static $params = [
-		'title' => 'Автоконтинент',
-		'url' => 'http://api.autokontinent.ru/v1/',
-		'provider_id' => 20
-	];
 
 	private static $mainStores = [
 		'Череповец' => 7,
 		'Петербург' => 1
 	];
 
-	//в скрипте данные авторизации вставляются напрямую, т.к. при использовании self::$auth не срабатывает
-	private static $auth = ['username' => '010345', 'password' => '​7373366'];
+	public static function getParams(){
+		static $params;
+		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 20));
+		return $params;
+	}
+
+	private static function getAuthData(){
+		return [
+			'username' => self::getParams()->username, 
+			'password' => self::getParams()->password
+		];
+	}
 
 	public static function getItemsToOrder(int $provider_id){
 		if (!parent::getIsEnabledApiOrder($provider_id)) return false;
@@ -66,14 +71,16 @@ class Autokontinent extends Provider{
 
 	private static function getItemsByArticle($article){
 		$response = Provider::getCurlUrlData(
-			self::$params['url'].'search/part.json?part_code=' . $article, 
-			['username' => '010345', 'password' => '7373366']
+			self::getParams()->url . 'search/part.json?part_code=' . $article, 
+			self::getAuthData()
 		);
 		$items = json_decode($response);
 		if (empty($items)) return false;
 		return $items;
 	}
 	public static function getCoincidences($search){
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$coincidences = [];
 		$items = self::getItemsByArticle($search);
 		foreach($items as $item){
@@ -87,7 +94,7 @@ class Autokontinent extends Provider{
 		if (isset($brends[$brand_name]) && $brends[$brand_name]) return $brends[$brand_name];
 		$res_brend = Brend::get([
 			'title' => $brand_name, 
-			'provider_id' => self::$params['provider_id']
+			'provider_id' => self::getParams()->provider_id
 		], [], '');
 		if (!$res_brend->num_rows){
 			$brends[$brand_name] = NULL;
@@ -107,8 +114,8 @@ class Autokontinent extends Provider{
 	}
 	private static function getItemsByPartID($part_id){
 		$response = Provider::getCurlUrlData(
-			self::$params['url'].'search/price.json?part_id=' . $part_id, 
-			['username' => '010345', 'password' => '7373366']
+			self::getParams()->url . 'search/price.json?part_id=' . $part_id, 
+			self::getAuthData()
 		);
 		return json_decode($response);
 	}
@@ -134,7 +141,7 @@ class Autokontinent extends Provider{
 				'article_cat' => $part->part_code,
 				'title' => $part->part_name ? $part->part_name : $part->part_comment,
 				'title_full' => $part->part_comment,
-				'source' => self::$params['title']
+				'source' => self::getParams()->title
 			]);
 			if ($res === true){
 				$item_id = parent::getInstanceDataBase()->last_id();
@@ -174,7 +181,7 @@ class Autokontinent extends Provider{
 				'title' => $part->warehouse_name,
 				'cipher' =>  strtoupper(Provider::getRandomString(4)),
 				'currency_id' => 1,
-				'provider_id' => self::$params['provider_id'],
+				'provider_id' => self::getParams()->provider_id,
 				'percent' => 10,
 				'delivery' => self::getDaysDelivery($part->dt_delivery)
 			]);
@@ -184,7 +191,7 @@ class Autokontinent extends Provider{
 				return $store_id;
 			}
 			else{
-				$store = parent::getInstanceDataBase()->select_one('provider_stores', '*', "`title` = '{$part->warehouse_name}' AND `provider_id` = " . self::$params['provider_id']);
+				$store = parent::getInstanceDataBase()->select_one('provider_stores', '*', "`title` = '{$part->warehouse_name}' AND `provider_id` = " . self::getParams()->provider_id);
 				$store_id = $store['id'];
 			}
 			if (!$store_id) throw new EAuto\ErrorStoreID('Ошибка получения store_id');
@@ -199,14 +206,14 @@ class Autokontinent extends Provider{
 		parent::getInstanceDataBase()->query("
 			DELETE si FROM #store_items si
 			LEFT JOIN #provider_stores ps ON ps.id = si.store_id
-			WHERE si.item_id = $item_id AND ps.provider_id = " . self::$params['provider_id'] 
+			WHERE si.item_id = $item_id AND ps.provider_id = " . self::getParams()->provider_id
 		, '');
 	}
 	private static function getPartIdByBrandAndArticle($brand, $article, $params = []){
 		$items = self::getItemsByArticle($article);
 		if (!$items) return false;
 
-		$providerBrend = Provider::getProviderBrend(self::$params['provider_id'], $brand);
+		$providerBrend = Provider::getProviderBrend(self::getParams()->provider_id, $brand);
 		$brand =  $providerBrend ? $providerBrend : $brand;
 
 		try{
@@ -219,7 +226,8 @@ class Autokontinent extends Provider{
 		return $part_id;
 	}
 	public static function setArticle(string $brand, string $article){
-		if(!parent::getIsEnabledApiSearch(self::$params['provider_id'])) return false;
+		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		
 		$part_id = self::getPartIdByBrandAndArticle($brand, $article);
 		if (!$part_id) return false;
@@ -257,16 +265,16 @@ class Autokontinent extends Provider{
 		}
 
 		Provider::getCurlUrlData(
-			self::$params['url']."basket/del.json?basket_id=$basket_id&version=$version", 
-			['username' => '010345', 'password' => '7373366']
+			self::getParams()->url . "basket/del.json?basket_id=$basket_id&version=$version", 
+			self::getAuthData()
 		);
 
 		OrderValue::changeStatus(5, $ov);
 	}
 	private static function getBasket(){
 		$json = Provider::getCurlUrlData(
-			self::$params['url']."basket/get.json", 
-			['username' => '010345', 'password' => '7373366']
+			self::getParams()->url."basket/get.json", 
+			self::getAuthData()
 		);
 		return json_decode($json);
 	}
@@ -286,8 +294,8 @@ class Autokontinent extends Provider{
 		if (!$part_id) return false;
 		try{
 			$json = Provider::getCurlUrlData(
-				self::$params['url']."basket/add.json?part_id=$part_id&warehouse_id=$warehouse_id&quantity={$ov['quan']}&comment={$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}", 
-				['username' => '010345', 'password' => '7373366']
+				self::getParams()->url . "basket/add.json?part_id=$part_id&warehouse_id=$warehouse_id&quantity={$ov['quan']}&comment={$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}", 
+				self::getAuthData()
 			);
 			$response = json_decode($json);
 			if ($response->status != 'OK') throw new EAuto\ErrorAddingToBasket('Ошибка добавления товара в корзину');
@@ -304,8 +312,8 @@ class Autokontinent extends Provider{
 		if (empty($basket)) return false;
 		try{
 			$json = Provider::getCurlUrlData(
-				self::$params['url'].'/basket/order.json', 
-				['username' => '010345', 'password' => '7373366']
+				self::getParams()->url . '/basket/order.json', 
+				self::getAuthData()
 			);
 			$response = json_decode($json);
 			if ($response->status != 'OK') throw new EAuto\ErrorSendOrder('Ошибка отправления заказа');

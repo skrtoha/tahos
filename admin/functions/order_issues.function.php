@@ -29,6 +29,7 @@ class Issues{
 		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id], ['print_query' => false]);
 		if ($insert_order_issue !== true) die("Ошибка: $this->last_query | $insert_order_issue");
 		$issue_id = $this->db->last_id();
+		$totalSumm = 0;
 		foreach($_POST['income'] as $key => $issued){
 			$a = explode(':', $key);
 			$insert_order_issue_values = $this->db->insert(
@@ -41,23 +42,36 @@ class Issues{
 					'issued' => $issued,
 					'comment' => $_POST['comment'][$key]
 				],
-			'');
-			if ($insert_order_issue_values === true){
-				core\OrderValue::changeStatus(1, [
-					'order_id' => $a[0],
-					'store_id' => $a[2],
-					'item_id' => $a[1], 
-					'issued' => $issued
-				]);
+			''/*, ['print' => true]*/);
+
+			if ($insert_order_issue_values !== true){
+				die("Ошибка: $this->db->$last_query | $insert_order_issue_values");
 			}
-			else die("Ошибка: $this->db->$last_query | $insert_order_issue_values");
+			
+			$res_orderValue = core\OrderValue::get([
+				'order_id' => $a[0],
+				'store_id' => $a[2],
+				'item_id' => $a[1],
+			]);
+			$orderValue = $res_orderValue->fetch_assoc();
+			$totalSumm += $issued * $orderValue['price'];
 		}
+
+		core\OrderValue::changeStatus(1, [
+			'order_id' => $a[0],
+			'store_id' => $a[2],
+			'item_id' => $a[1], 
+			'issue_id' => $issue_id,
+			'totalSumm' => $totalSumm,
+			'issued' => $issued
+		]);
+		
 		if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			echo $issue_id;
 			exit();
 		}
-		message('Успешно сохранено');
-		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
+
+		return $issue_id;
 	}
 	protected function getOrderIssues(){
 		if ($_GET['user_id']) $where = "WHERE oi.user_id={$_GET['user_id']}";

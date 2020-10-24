@@ -1,3 +1,6 @@
 #div_form{
 	margin-bottom: 10px;
 }
+div.radio {
+    display: inline-block;
+}

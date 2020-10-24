@@ -57,7 +57,7 @@
 				pageSize: oi.pageSize,
 				ajax: {
 					beforeSend: function(){
-						showGiff();
+						showGif();
 					}
 				},
 				callback: function(data, pagination){
@@ -73,7 +73,7 @@
 							'</tr>'
 					};
 					$('#common_list').html(str);
-					showGiff(false);
+					showGif(false);
 					// console.log(data, pagination);
 				}
 			})

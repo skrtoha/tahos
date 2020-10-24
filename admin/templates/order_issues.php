@@ -1,5 +1,4 @@
 <?php
-// debug($_GET);
 require_once("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
 $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
 $issues = new Issues($user_id, $db);
@@ -8,7 +7,12 @@ if (isset($_GET['ajax'])) $issues->getAjax();
 if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
 $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
-	if (!empty($_POST['income'])) $issues->setIncome();
+	if (!empty($_POST['income'])){
+		$issue_id = $issues->setIncome();
+		// message('Успешно сохранено');
+		// header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
+	} 
+
 	$res_user = core\User::get(['user_id' => $issues->user_id]);
 	if (is_object($res_user)) $user = $res_user->fetch_assoc();
 	else $user = $res_user;

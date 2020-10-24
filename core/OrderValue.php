@@ -12,7 +12,6 @@ class OrderValue{
 	 * @return [boolean] true if changed successfully
 	 */
 	public static function changeStatus($status_id, $params){
-		// print_r($params);
 		$values = ['status_id' => $status_id];
 		switch ($status_id){
 			//выдано
@@ -23,19 +22,32 @@ class OrderValue{
 				self::update($values, $params);
 				$res_user = User::get(['user_id' => $ov['user_id']]);
 				$user = $res_user->fetch_assoc();
-				$title = self::getTitleComment($params['item_id']);
+
+				if (isset($params['issue_id'])){
+					$title = "<a href=\"/admin/?view=order_issues&issue_id={$params['issue_id']}\">выдача №{$params['issue_id']}</a>";
+					$remainder = $user['bill'] - $params['totalSumm'];
+					$sum = $params['totalSumm'];
+				} 
+				else{
+					$title = self::getTitleComment($params['item_id']);
+					$remainder = $user['bill'] - $ov['price'] * $quan;
+					$sum = $ov['price'] * $quan;
+				} 
+
 				Fund::insert(2, [
-					'sum' => $ov['price'] * $quan,
-					'remainder' => $user['bill'] - $ov['price'] * $quan,
+					'sum' => $sum,
+					'remainder' => $remainder,
 					'user_id' => $ov['user_id'],
 					'comment' => addslashes('Списание средств на оплату "'.$title.'"')
 				]);
-				User::setBonusProgram($ov['user_id'], $params['item_id'], $quan * $ov['price']);
+
+				User::setBonusProgram($ov['user_id'], $params['item_id'], $sum);
+
 				User::update(
 					$ov['user_id'],
 					[
-						'reserved_funds' => "`reserved_funds` - ".$ov['price'] * $quan,
-						'bill' => "`bill` - ".$ov['price'] * $quan
+						'reserved_funds' => "`reserved_funds` - " .$sum,
+						'bill' => "`bill` - " . $sum
 					]
 				);
 				break;

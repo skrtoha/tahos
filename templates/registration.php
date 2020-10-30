@@ -1,4 +1,12 @@
 <?php 
+define('SITE_KEY', '6LcfUd0ZAAAAAP-DnIWD44bV79Q-tOtXy7DmEs95');
+define('SECRET_KEY', '6LcfUd0ZAAAAAMrCgklmnmhOVijPrjQi0BQYSAvd');
+function getCaptcha($SecretKey) {
+  $Response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".SECRET_KEY."&response={$SecretKey}");
+  $Return = json_decode($Response);
+  return $Return;
+}
+
 $title = "Регистрация";
 if ($_SESSION['user']) header("Location: /settings");
 if ($_POST['token']){
@@ -15,9 +23,14 @@ if ($_POST['token']){
 	header('Location: '.$_SERVER['HTTP_REFERER']);
 }
 if ($_POST['form_submit']){
-	debug($_POST);
-	// exit();
 	$b_registration = true;
+
+	$Return = getCaptcha($_POST['g-recaptcha-response']);
+	if($Return->success != true || $Return->score < 0.5){
+		message('Подвердите, что вы не робот');
+		$b_registration = false;
+	}
+	
 	if (!$_POST['accept_checkbox']){
 		message('Ознакомтесь с пользовательским соглашением!', false);
 		$b_registration = false;
@@ -211,6 +224,16 @@ $res_issues = $db->query("
 			<input type="checkbox" id="accept_checkbox" name="accept_checkbox">
 			<label for="accept_checkbox">С <a target="_blank" href="/page/agreement">пользовательским соглашением</a> ознакомлен и согласен</label>
 		</div>
+		<input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
+		<script src="https://www.google.com/recaptcha/api.js?render=<?=SITE_KEY?>"></script>
+		 <script>
+			  grecaptcha.ready(function() {
+					grecaptcha.execute('<?php echo SITE_KEY;?>', {action: 'homepage'}).then(function(token) {
+						 console.log(token);
+						 document.getElementById('g-recaptcha-response').value=token;
+					});
+			  });
+	  </script>
 		<button>Зарегистрироваться</button>
 	</form>
 </div>

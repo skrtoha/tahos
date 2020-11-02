@@ -69,6 +69,8 @@ switch ($_POST['act']){
 		break;
 	case 'removeFromOrder':
 		$db->delete('orders_values', core\Provider::getWhere($_POST));
+		$countOrderValues = $db->getCount('orders_values', "`order_id` = {$_POST['order_id']}");
+		if (!$countOrderValues) $db->delete('orders', "`id` = {$_POST['order_id']}");
 		break;
 	case 'undoReturn':
 		$db->update('returns', ['status_id' => 5], "`id` = {$_POST['return_id']}");

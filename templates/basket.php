@@ -33,7 +33,6 @@ if ($_GET['act'] == 'to_offer'){
 
 	foreach ($res_basket as $value){
 		if (!$value['isToOrder']) continue;
-
 		$body .= "
 			<tr>
 				<td style='border: 1px solid black'>{$value['brend']}</td>
@@ -45,7 +44,6 @@ if ($_GET['act'] == 'to_offer'){
 				<td style='border: 1px solid black'>{$value['comment']}</td>
 			</tr>
 		";
-
 		$res = $db->insert(
 			'orders_values', 
 			[
@@ -57,7 +55,6 @@ if ($_GET['act'] == 'to_offer'){
 				'quan' => $value['quan'],
 				'comment' => $value['comment']
 		 	]
-		 	// ,['print_query' => 1]
 	 	);
 
 	 	//закоментирована эта строка, т.к. очень часто появлялся пустой заказ
@@ -74,7 +71,7 @@ if ($_GET['act'] == 'to_offer'){
 		'body' => $body
 	]);
 	
- 	if ($user['isAutomaticOrder']){
+ 	if ($user['isAutomaticOrder'] && core\User::noOverdue($user_id)){
 		header("Location: /admin/?view=orders&id=$order_id&act=allInWork&automaticOrder=1");
 		exit();
 	}

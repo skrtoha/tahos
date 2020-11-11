@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ALTER TABLE `tahos_providers` ADD `is_active` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `cron_minutes`;
 -- phpMyAdmin SQL Dump
 -- version 4.9.0.1
@@ -32,6 +33,11 @@ INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES ('api_settings', '
 INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES ('api_settings', '18', '{\"email\":\"info@tahos.ru\",\"password\":\"VGpS5DxFrslpgx046vVFb8dh\",\"apiKey\":\"w84dWVnWf0fahzrMQhALbEVflzGrazSQgmMoSZWHmd5oHarZvJR0ULlLzjjh\",\"url\":\"https:\\/\\/api.autoeuro.ru\\/api\\/v-1.0\\/shop\\/\",\"delivery_key\":\"Zid3sPWIUfEZXeXVuy8e46Zr1MwD704huFO0nxypa7DxUyB%2BlF1Vh4dMAnAa3qxhhI272D8npAC0Gl%2FUWNynsfbWxSyjqG9S9fQ%2Bk1GeP1xCjg5J470ZnoZeTHsZICym%2BEUUZ0wYVPCUbjbnHwTR3c227AGXDBbI4gwxzixWriUj2dc%2FC5nUdYyeuRFAg5bQBbnx5eqCyWlfs9lJdoUqRCzT7mJ230xoZrOGKYkb%2Bsak752366%2FSmFCKUy%2F4FtqlHAeLbNkJtNkZF%2F9ra6Rggg%3D%3D\",\"subdivision_key\":\"ogeRtaAVTbn%2FgjvNpHEZxi0FXtlvnXv8GaUON7FfMMbY4DF3brfW6H1mxYDjkR7wNHIqYZrxHMMzutXD%2FsOKHGey%2Fz2NAQSA8MudmokeGJKbkysLvH99q7C257zSxsOYnhH2iiGgyeuK2I7X3FcMcUY8DBVv2LhSrviyKC1Sg5UImARZeRFLy2gLnycQa6ooEQs4gviFLLkqoAGEKBj5LupIhMwMI7mzHWVZSzMQFmQshZqiaI5ck%2BA5djEzmSoV53%2B8QSe89ndE9E6BGE87Nclu%2B9kKr2VTPYUDMcCRDYI%3D\",\"provider_id\":18,\"mainStoreID\":22657,\"minPriceStoreID\":23617,\"minDeliveryStoreID\":23618}');
 
 INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES ('api_settings', '20', '{\"username\":\"010345\",\"password\":\"7373366\",\"title\":\"\\u0410\\u0432\\u0442\\u043e\\u043a\\u043e\\u043d\\u0442\\u0438\\u043d\\u0435\\u043d\\u0442\",\"url\":\"http:\\/\\/api.autokontinent.ru\\/v1\\/\",\"provider_id\":20}');
+=======
+ALTER TABLE `tahos_users` ADD `defermentOfPayment` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `markupSettings`;
+ALTER TABLE `tahos_funds` ADD `is_payed` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `transfered`;
+
+>>>>>>> new_funds
 =======
 ALTER TABLE `tahos_users` ADD `defermentOfPayment` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `markupSettings`;
 ALTER TABLE `tahos_funds` ADD `is_payed` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `transfered`;

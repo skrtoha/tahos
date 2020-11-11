@@ -1,9 +1,10 @@
 <?
-// $str = "";
-// foreach ($_POST as $key => $value){
-// 	$str .="&$key=$value";
-// }
-// $db->insert('received',  array('date' => date('d.m.Y H:i', time()), 'text' => $str));
+require_once('core/DataBase.php');
+require_once('core/functions.php');
+require_once('vendor/autoload.php');
+
+$db = new core\DataBase();
+
 $secret_key = 'RMoTDr8+TgrVFTyKv2AK/AC4';
 $sha1 = sha1(
 	$_POST['notification_type'].'&'.
@@ -16,12 +17,9 @@ $sha1 = sha1(
 	$secret_key.'&'.
 	$_POST['label']
 );
-// $db->insert('received',  array('date' => date('d.m.Y H:i', time()), 'text' => $sha1));
-// $db->insert('received',  array('date' => date('d.m.Y H:i', time()), 'text' => $_POST['sha1_hash']));
 if ($sha1 != $_POST['sha1_hash']) exit();
 if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Яндекс.Деньги';
 else $comment = 'Пополнение банковской картой';
-// $db->insert('received', array('text' => $comment));
 $bill = $db->getFieldOnID('users', $_POST['label'], 'bill') + $_POST['withdraw_amount'];
 $db->insert(
 	'funds',
@@ -34,4 +32,5 @@ $db->insert(
 	]
 );
 $db->update('users', array('bill' => $bill), '`id`='.$_POST['label']);
+core\User::checkOverdue($_POST['label'], $_POST['withdraw_amount']);
 ?>

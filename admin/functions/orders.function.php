@@ -198,7 +198,7 @@ function get_order_statuses($status){
 		case 1: $in = array(2); break;
 		// case 2: $in = array(9); break;
 		case 2: $in = array(); break;
-		case 3: $in = array(1); break;
+		case 3: $in = array(); break;
 		case 4: $in = array(2); break;
 		case 5: $in = array(7); break;
 		case 6: $in = array(); break;

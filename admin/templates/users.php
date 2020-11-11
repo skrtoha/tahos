@@ -441,8 +441,6 @@ function form_operations($act){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];
 	$user = $db->select('users', 'name_1,name_2,name_3,bill', '`id`='.$id);
-	debug($user, 'user');
-	debug($_POST, 'post');
 	if ($_POST['form_operations_submit']){
 		$_POST['sum'] = str_replace(array(' ', ','), '', $_POST['sum']);
 		$curr_bill = $user[0]['bill'] + $_POST['sum'];
@@ -453,8 +451,9 @@ function form_operations($act){
 			'user_id' => $id, 
 			'comment' => 'Пополнение '.$_POST['replenishment']
 		);
-		$db->insert('funds', $array, ['print_query' => false]);
+		$db->insert('funds', $array);
 		$db->update('users', array('bill' => $curr_bill), '`id`='.$id);
+		core\User::checkOverdue($id, $_POST['sum']);
 		message('Счет успешно пополнен!');
 		header('Location: ?view=users&act=funds&id='.$id);
 	}

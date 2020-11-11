@@ -2,6 +2,37 @@
 namespace core;
 class OrderValue{
 
+	public static function setFunds($params){
+		$res_user = User::get(['user_id' => $params['user_id']]);
+		$user = $res_user->fetch_assoc();
+
+		$remainder = $user['bill'] - $params['totalSumm'];
+
+		//вычисление задолженности
+		$overdue = 0;
+		if ($user['bill'] < $params['totalSumm']){
+			if ($user['bill'] > 0) $overdue = $params['totalSumm'] - $user['bill'];
+			else $overdue = $params['totalSumm'];
+		} 
+		else $overdue = 0;
+
+		Fund::insert(2, [
+			'sum' => $params['totalSumm'],
+			'remainder' => $remainder,
+			'user_id' => $params['user_id'],
+			'overdue' => $overdue,
+			'comment' => addslashes('Списание средств за покупку ' . implode(', ', $params['titles']))
+		]);
+
+		User::update(
+			$params['user_id'],
+			[
+				'reserved_funds' => "`reserved_funds` - " .$params['totalSumm'],
+				'bill' => "`bill` - " . $params['totalSumm']
+			]
+		);
+	}
+
 	/**
 	 * changes status
 	 * @param  [integer] $status_id 1, 2, 3, 6, 10, 11
@@ -16,40 +47,9 @@ class OrderValue{
 		switch ($status_id){
 			//выдано
 			case 1:
-				$ov = $GLOBALS['db']->select_one('orders_values', '*', Provider::getWhere($params));
 				$quan = $params['issued'];
 				$values['issued'] = "`issued` + $quan";
-				self::update($values, $params);
-				$res_user = User::get(['user_id' => $ov['user_id']]);
-				$user = $res_user->fetch_assoc();
-
-				if (isset($params['issue_id'])){
-					$title = "<a href=\"/admin/?view=order_issues&issue_id={$params['issue_id']}\">выдача №{$params['issue_id']}</a>";
-					$remainder = $user['bill'] - $params['totalSumm'];
-					$sum = $params['totalSumm'];
-				} 
-				else{
-					$title = self::getTitleComment($params['item_id']);
-					$remainder = $user['bill'] - $ov['price'] * $quan;
-					$sum = $ov['price'] * $quan;
-				} 
-
-				Fund::insert(2, [
-					'sum' => $sum,
-					'remainder' => $remainder,
-					'user_id' => $ov['user_id'],
-					'comment' => addslashes('Списание средств на оплату "'.$title.'"')
-				]);
-
-				User::setBonusProgram($ov['user_id'], $params['item_id'], $sum);
-
-				User::update(
-					$ov['user_id'],
-					[
-						'reserved_funds' => "`reserved_funds` - " .$sum,
-						'bill' => "`bill` - " . $sum
-					]
-				);
+				self::update($values, $params);				
 				break;
 			//возврат
 			case 2:
@@ -242,7 +242,7 @@ class OrderValue{
 				ov.comment,
 				ov.store_id,
 				o.id AS order_id,
-				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') as created,
+				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') AS created,
 				os.title AS status,
 				os.class AS class
 			FROM

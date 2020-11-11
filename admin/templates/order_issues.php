@@ -9,8 +9,8 @@ $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
 	if (!empty($_POST['income'])){
 		$issue_id = $issues->setIncome();
-		// message('Успешно сохранено');
-		// header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
+		message('Успешно сохранено');
+		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
 	} 
 
 	$res_user = core\User::get(['user_id' => $issues->user_id]);

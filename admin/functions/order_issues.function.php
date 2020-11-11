@@ -26,9 +26,11 @@ class Issues{
 	}
 	function setIncome(){
 		// debug($_POST); exit();
-		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id], ['print_query' => false]);
+		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id]);
 		if ($insert_order_issue !== true) die("Ошибка: $this->last_query | $insert_order_issue");
 		$issue_id = $this->db->last_id();
+
+		$titles = [];
 		$totalSumm = 0;
 		foreach($_POST['income'] as $key => $issued){
 			$a = explode(':', $key);
@@ -41,8 +43,9 @@ class Issues{
 					'item_id' => $a[1],
 					'issued' => $issued,
 					'comment' => $_POST['comment'][$key]
-				],
-			''/*, ['print' => true]*/);
+				]/*,
+				['print' => true]*/
+			);
 
 			if ($insert_order_issue_values !== true){
 				die("Ошибка: $this->db->$last_query | $insert_order_issue_values");
@@ -54,16 +57,24 @@ class Issues{
 				'item_id' => $a[1],
 			]);
 			$orderValue = $res_orderValue->fetch_assoc();
+			$titles[] = "<b>{$orderValue['brend']} {$orderValue['article']}</b>";
 			$totalSumm += $issued * $orderValue['price'];
+			
+			core\OrderValue::changeStatus(1, [
+				'order_id' => $a[0],
+				'store_id' => $a[2],
+				'item_id' => $a[1], 
+				'issued' => $issued
+			]);
 		}
+		
+		core\User::setBonusProgram($_GET['user_id'], $titles, $totalSumm);
 
-		core\OrderValue::changeStatus(1, [
-			'order_id' => $a[0],
-			'store_id' => $a[2],
-			'item_id' => $a[1], 
+		core\OrderValue::setFunds([
+			'user_id' => $_GET['user_id'],
 			'issue_id' => $issue_id,
-			'totalSumm' => $totalSumm,
-			'issued' => $issued
+			'titles' => $titles,
+			'totalSumm' => $totalSumm
 		]);
 		
 		if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){

@@ -1,6 +1,30 @@
 <?php
 namespace core;
 class User{
+	public static function noOverdue($user_id){
+		$query = Fund::getQueryListFunds(
+			"f.user_id = $user_id AND f.overdue > 0",
+			'date_payment > CURRENT_DATE'
+		);
+		$res_funds = $GLOBALS['db']->query($query, '');
+		if ($res_funds->num_rows) return false;
+		return true;
+	}
+	public static function checkOverdue($user_id, $creditedAmount){
+		$query = Fund::getQueryListFunds("f.user_id = $user_id AND f.overdue > 0", '', 'f.created');
+		$res = $GLOBALS['db']->query($query, '');
+		if (!$res->num_rows) return;
+		
+		$remain = $creditedAmount;
+		foreach($res as $fund){
+			$remain = $remain - $fund['overdue'];
+			if ($remain > 0) $GLOBALS['db']->update('funds', ['overdue' => 0], "`id` = {$fund['id']}");
+			else{
+				$GLOBALS['db']->update('funds', ['overdue' => abs($remain)], "`id` = {$fund['id']}");
+				break;
+			}
+		}
+	}
 	/**
 	 * size bonus, percents
 	 * @var integer
@@ -87,18 +111,17 @@ class User{
 	 * @param [integer] $sum summ from where calculating bonus count
 	 * @return [boolean] true is updated successfully, false - if no user bonus program
 	 */
-	public static function setBonusProgram($user_id, $item_id, $sum){
+	public static function setBonusProgram($user_id, $titles, $sum){
 		$db = $GLOBALS['db'];
 		$res_user = self::get(['user_id' => $user_id]);
 		$user = $res_user->fetch_assoc();
 		if (!$user['bonus_program']) return false;
 		$current_bonus_count = floor($sum * self::$bonus_size / 100);
-		$title = orderValue::getTitleComment($item_id);
 		Fund::insert(3, [
 			'sum' => $current_bonus_count,
 			'remainder' => $user['bonus_count'] + $current_bonus_count,
 			'user_id' => $user_id,
-			'comment' => 'Начисление бонусов за заказ "'.$title.'"'
+			'comment' => 'Начисление бонусов за покупку ' . implode(', ', $titles)
 		]);
 		return true;
 	}

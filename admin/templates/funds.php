@@ -36,7 +36,8 @@ function funds(){
 	} 
 
 	if (isset($_GET['is_payed']) && strlen($_GET['is_payed'])){
-		$where .= "f.is_payed = {$_GET['is_payed']} AND ";
+		if ($_GET['is_payed'] == 1) $where .= "f.overdue = 0 AND ";
+		if ($_GET['is_payed'] == 0) $where .= "f.overdue > 0 AND ";
 	}
 	if (isset($_GET['search']) && $_GET['search']){
 		$having = "HAVING full_name LIKE '%{$_GET['search']}%'";
@@ -117,13 +118,7 @@ function funds(){
 					</td>
 					<td>
 						<?if ($fund['type_operation'] == 2){?>
-							<form method="post">
-								<input type="hidden" name="fund_id" value="<?=$fund['id']?>">
-								<select name="is_payed">
-									<option <?=$fund['is_payed'] == 0 ? 'selected' : ''?> value="0">нет</option>
-									<option <?=$fund['is_payed'] == 1 ? 'selected' : ''?> value="1">да</option>
-								</select>
-							</form>
+							<?=(int) $fund['overdue'] > 0 ? 'Нет' : 'Да'?>
 						<?}?>
 					</td>
 					<td label="Комментарий"><?=stripslashes($fund['comment'])?></td>

@@ -40,7 +40,7 @@ function funds(){
 		if ($_GET['is_payed'] == 0) $where .= "f.overdue > 0 AND ";
 	}
 	if (isset($_GET['search']) && $_GET['search']){
-		$having = "HAVING full_name LIKE '%{$_GET['search']}%'";
+		$having = "full_name LIKE '%{$_GET['search']}%'";
 	};
 	if ($where) $where = substr($where, 0, -5);
 

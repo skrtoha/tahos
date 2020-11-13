@@ -63,6 +63,7 @@ class LeftMenu{
 		'Отчеты',
 		'Тест API поставщиков',
 		'Рассылки прайсов',
+		'Блокировка сайта',
 		'Настройки'
 	];
 
@@ -91,7 +92,8 @@ class LeftMenu{
 		'Отчеты' => ['reports'],
 		'Настройки' => ['settings'],
 		'Тест API поставщиков' => ['test_api_providers'],
-		'Рассылки прайсов' => ['subscribePrices']
+		'Рассылки прайсов' => ['subscribePrices'],
+		'Блокировка сайта' => ['blockSite']
 	];
 
 	public static $defaultPermissions = [
@@ -108,7 +110,8 @@ class LeftMenu{
 			'Файлы' => 'files',
 			'Соединения' => 'connections',
 			'Тест API поставщиков' => 'test_api_providers',
-			'Рассылки прайсов' => 'subscribePrices'
+			'Рассылки прайсов' => 'subscribePrices',
+			'Блокировка сайта' => 'blockSite'
 		],
 		'Финансовые операции' => 'funds',
 		'Отчеты' => [

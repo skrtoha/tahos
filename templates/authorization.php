@@ -41,5 +41,5 @@ else{
 	setcookie('message', 'Неверный логин или пароль!');
 	setcookie('message_type', 'error');	
 }
-header("Location: /");
+header("Location: {$_SERVER['HTTP_REFERER']}");
 ?>

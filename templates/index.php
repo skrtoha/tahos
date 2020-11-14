@@ -34,7 +34,7 @@ foreach($res_categories as $row){
 		'href' => $row['subcategory_href']
 	];
 }
-// debug($categories);
+
 ?>
 <div id="selection">
 	<div class="selection">

@@ -1,5 +1,5 @@
 <?
-// debug($_GET);
+debug($_GET);
 if ($_GET['to_garage'] && $user['id'] && $_GET['modification_id']){
 	$res = $db->insert(
 		'garage',
@@ -71,122 +71,115 @@ if ($res_brends->num_rows){
 		$brend_titles[$row['brend_id']]['href'] = $row['href'];
 	}
 }
-$res_models = $db->query("
-	SELECT
-		m.id,
-		m.title,
-		m.href,
-		CONCAT(m.vin, '00000000') AS vin
-	FROM
-		#models AS m
-	LEFT JOIN #vehicles v ON m.vehicle_id=v.id
-	LEFT JOIN #brends b ON m.brend_id=b.id
-	WHERE
-		b.href='{$_GET['brend']}' AND v.href='{$_GET['vehicle']}'
-	ORDER BY m.title
-", '');
-if ($res_models->num_rows){
-	while($row = $res_models->fetch_assoc()){
-		$letter = mb_strtoupper(mb_substr($row['title'], 0 , 1, 'UTF-8'), 'UTF-8');
-		$models[$letter][$row['id']] = [
-			'title' => $row['title'],
-			'href' => $row['href'],
-			'vin' => $row['vin']
-		];
-	}
+$models = core\OriginalCatalog\OriginalCatalog::getCommonListModels($_GET['vehicle'], $_GET['brend']);
+if (preg_match('/^pc_/', $_GET['model_id'])){
+	$carsAndFilters = core\OriginalCatalog\PartsCatalogs::getCarsByModelIdWithFilters($_GET['brend'], $_GET['href']);
+	$carsPartsCatalogs = $carsAndFilters['cars'];
+	debug($carsPartsCatalogs);
+	$filtersPartsCatalogs = $carsAndFilters['filtersCommonList'];
 }
-$res_filters = $db->query("
-	SELECT
-		f.id,
-		f.title,
-		fv.id AS fv_id,
-		fv.title AS fv_title,
-		CAST(fv.title as UNSIGNED) as fv_title_2
-	FROM
-		#vehicle_filters f
-	LEFT JOIN #vehicle_filter_values fv ON fv.filter_id=f.id
-	LEFT JOIN #vehicles v ON f.vehicle_id=v.id
-	LEFT JOIN #brends b ON f.brend_id=b.id
-	WHERE
-		b.href='{$_GET['brend']}' AND v.href='{$_GET['vehicle']}'
-	ORDER BY
-		f.id, fv_title_2, fv.title
-", '');
-if ($res_filters->num_rows){
-	$filter_year_id = false;
-	while($row = $res_filters->fetch_assoc()){
-		if ($row['title'] == 'Год') $filter_year_id = $row['id'];
-		$filters_str[$row['title']] = '';
-		$filters[$row['id']]['title'] = $row['title'];
-		if ($row['fv_id']) $filters[$row['id']]['filter_values'][$row['fv_id']] = $row['fv_title'];
-	}
-	$filters_str = array_keys($filters_str);
-	if ($filter_year_id){
-		$years_sort = array();
-		uasort($filters[$filter_year_id]['filter_values'], function($a, $b){
-			return $b - $a;
-		});
-		// array_multisort($years_sort, SORT_DESC, $filters[$filter_year_id]['filter_values']);
-	}
-}
-$res_modifications = $db->query("
-	SELECT
-		mf.id,
-		mf.title,
-		GROUP_CONCAT(
-			CONCAT(f.id, ':', fv.id)
-		) AS fvs
-	FROM
-		#modifications mf
-	LEFT JOIN #vehicle_model_fvs fvs ON fvs.modification_id=mf.id
-	LEFT JOIN #vehicle_filter_values fv ON fv.id=fvs.fv_id
-	LEFT JOIN #vehicle_filters f ON f.id=fv.filter_id
-	WHERE
-		mf.model_id={$_GET['model_id']} 
-	GROUP BY mf.id
-", '');
-// debug($filters); 
-$needable_filters = array();
-if ($res_modifications->num_rows){
-	$years = array();
-	while ($row = $res_modifications->fetch_assoc()){
-		// debug($row);
-		$modifications[$row['id']]['id'] = $row['id'];
-		$modifications[$row['id']]['title'] = $row['title'];
-		$filter_values = array();
-		$array = array();
-		if ($row['fvs']){
-			$fvs = explode(',', $row['fvs']);
-			foreach($fvs as $value){
-				$fv = explode(':', $value);
-				$array[$filters[$fv[0]]['title']] = $filters[$fv[0]]['filter_values'][$fv[1]];
-			} 
-			foreach ($filters as $id => $filter){
-				$filter_values[$filter['title']] = $array[$filter['title']];
-				$needable_filters[$filter['title']][] = $array[$filter['title']];
-				if ($filter['title'] == 'Год') $years[] = $array[$filter['title']];
-			} 
-			$modifications[$row['id']]['filter_values'] = $filter_values;
+else{
+	$res_filters = $db->query("
+		SELECT
+			f.id,
+			f.title,
+			fv.id AS fv_id,
+			fv.title AS fv_title,
+			CAST(fv.title as UNSIGNED) as fv_title_2
+		FROM
+			#vehicle_filters f
+		LEFT JOIN #vehicle_filter_values fv ON fv.filter_id=f.id
+		LEFT JOIN #vehicles v ON f.vehicle_id=v.id
+		LEFT JOIN #brends b ON f.brend_id=b.id
+		WHERE
+			b.href='{$_GET['brend']}' AND v.href='{$_GET['vehicle']}'
+		ORDER BY
+			f.id, fv_title_2, fv.title
+	", '');
+	if ($res_filters->num_rows){
+		$filter_year_id = false;
+		while($row = $res_filters->fetch_assoc()){
+			if ($row['title'] == 'Год') $filter_year_id = $row['id'];
+			$filters_str[$row['title']] = '';
+			$filters[$row['id']]['title'] = $row['title'];
+			if ($row['fv_id']) $filters[$row['id']]['filter_values'][$row['fv_id']] = $row['fv_title'];
+		}
+		$filters_str = array_keys($filters_str);
+		if ($filter_year_id){
+			$years_sort = array();
+			uasort($filters[$filter_year_id]['filter_values'], function($a, $b){
+				return $b - $a;
+			});
+			// array_multisort($years_sort, SORT_DESC, $filters[$filter_year_id]['filter_values']);
 		}
 	}
-	//exclude reduntant values of filters
-	foreach ($needable_filters as $key => $value) $needable_filters[$key] = array_unique($needable_filters[$key]);
-	$temp_filters = array();
-	foreach($filters as $key => $value){
-		if (!array_key_exists($value['title'], $needable_filters)) continue;
-		$ft = & $temp_filters[$key];
-		$ft['title'] = $value['title'];
-		foreach($value['filter_values'] as $k => $v){
-			// debug($needable_filters[$value['title']]); continue;
-			if (is_numeric(array_search($v, $needable_filters[$value['title']]))) $ft['filter_values'][$k] = $v;
+	$res_modifications = $db->query("
+		SELECT
+			mf.id,
+			mf.title,
+			GROUP_CONCAT(
+				CONCAT(f.id, ':', fv.id)
+			) AS fvs
+		FROM
+			#modifications mf
+		LEFT JOIN #vehicle_model_fvs fvs ON fvs.modification_id=mf.id
+		LEFT JOIN #vehicle_filter_values fv ON fv.id=fvs.fv_id
+		LEFT JOIN #vehicle_filters f ON f.id=fv.filter_id
+		WHERE
+			mf.model_id={$_GET['model_id']} 
+		GROUP BY mf.id
+	", '');
+	// debug($filters); 
+	$needable_filters = array();
+	if ($res_modifications->num_rows){
+		$years = array();
+		while ($row = $res_modifications->fetch_assoc()){
+			// debug($row);
+			$modifications[$row['id']]['id'] = $row['id'];
+			$modifications[$row['id']]['title'] = $row['title'];
+			$filter_values = array();
+			$array = array();
+			if ($row['fvs']){
+				$fvs = explode(',', $row['fvs']);
+				foreach($fvs as $value){
+					$fv = explode(':', $value);
+					$array[$filters[$fv[0]]['title']] = $filters[$fv[0]]['filter_values'][$fv[1]];
+				} 
+				foreach ($filters as $id => $filter){
+					$filter_values[$filter['title']] = $array[$filter['title']];
+					$needable_filters[$filter['title']][] = $array[$filter['title']];
+					if ($filter['title'] == 'Год') $years[] = $array[$filter['title']];
+				} 
+				$modifications[$row['id']]['filter_values'] = $filter_values;
+			}
 		}
+		//exclude reduntant values of filters
+		foreach ($needable_filters as $key => $value) $needable_filters[$key] = array_unique($needable_filters[$key]);
+		$temp_filters = array();
+		foreach($filters as $key => $value){
+			if (!array_key_exists($value['title'], $needable_filters)) continue;
+			$ft = & $temp_filters[$key];
+			$ft['title'] = $value['title'];
+			foreach($value['filter_values'] as $k => $v){
+				// debug($needable_filters[$value['title']]); continue;
+				if (is_numeric(array_search($v, $needable_filters[$value['title']]))) $ft['filter_values'][$k] = $v;
+			}
+		}
+		$filters = $temp_filters;
+		array_multisort($years, SORT_DESC, $modifications);
+		// debug($filters);
 	}
-	$filters = $temp_filters;
-	array_multisort($years, SORT_DESC, $modifications);
-	// debug($filters);
 }
 $title = 'Выбор модификации';
 ?>
+<form id="formPartsCatalogs">
+	<input type="hidden" name="view" value="<?=$_GET['view']?>">
+	<input type="hidden" name="vehicle" value="<?=$_GET['vehicle']?>">
+	<input type="hidden" name="brend" value="<?=$_GET['brend']?>">
+	<input type="hidden" name="model_id" value="<?=$_GET['model_id']?>">
+	<input type="hidden" name="href" value="<?=$_GET['href']?>">
+	<input type="hidden" name="vin" value="<?=$_GET['vin']?>">
+</form>
 <div class="auto-types">
 	<?if ($_GET['to_garage']){
 		$to_garage = "/to_garage";?>
@@ -316,6 +309,11 @@ $title = 'Выбор модификации';
 								<th><?=$value['title']?></th>
 							<?}	
 						}?>
+						<?if (!empty($filtersPartsCatalogs)){
+							foreach($filtersPartsCatalogs as $title){?>
+								<th><?=$title?></th>
+							<?}
+						}?>
 					</tr>
 					<?
 					if (preg_match('/\/\d{4}$/', $_SERVER['REQUEST_URI'])) $uri = preg_replace('/\/\d{4}$/', '', $_SERVER['REQUEST_URI']);
@@ -336,6 +334,20 @@ $title = 'Выбор модификации';
 							}?>
 						</tr>
 					<?}?>
+					<?if (!empty($carsPartsCatalogs)){
+						foreach($carsPartsCatalogs as $carId => $m){?>
+							<tr class="" carid="<?=$carId?>">
+								<td class="name-col">
+									<a href="<?=$_SERVER['REQUEST_URI']?>/<?=$carId?>">
+										<?=$m['title']?>
+									</a>
+								</td>
+								<?foreach($filtersPartsCatalogs as $title){?>
+									<td><?=$m['parameters'][$title]?></td>
+								<?}?>
+							</tr>
+						<?}
+					}?>
 				</tbody>
 			</table>
 		</div>

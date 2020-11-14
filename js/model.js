@@ -108,4 +108,19 @@ $(function(){
 	$(document).on('click', 'tr.clickable', function(){
 		document.location.href = $(this).find('td:first-child a').attr('href');
 	})
+	$('tr[carid]').on('click', function(){
+		let url = '/original-catalogs';
+		let formData = {};
+		$('#formPartsCatalogs input').each(function(){
+			let th = $(this);
+			formData[th.attr('name')] = th.val();
+		})
+		url += formData.vehicle + '/';
+		url += formData.brend + '/';
+		url += formData.model_id + '/';
+		url += formData.href + '/';
+		url += formData.vin;
+		alert(url);
+		console.log(url);
+	})
 });

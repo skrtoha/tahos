@@ -1,6 +1,6 @@
-<?$title = 'Оригинальные каталоги';
+<?
+$title = 'Оригинальные каталоги';
 error_reporting(E_ERROR);
-// debug($_GET);
 $res_vehicels = $db->query("
 	SELECT
 		v.id,
@@ -26,6 +26,7 @@ while($row = $res_vehicels->fetch_assoc()){
 }
 // debug($vehicles_mosaic);
 if ($_GET['vehicle']){
+	$commonListOfBrends = [];
 	$res_brends = $db->query("
 		SELECT
 			fv.brend_id,
@@ -43,14 +44,27 @@ if ($_GET['vehicle']){
 	", '');
 	if ($res_brends->num_rows){
 		while ($row = $res_brends->fetch_assoc()) {
-			$letter = mb_strtoupper(substr($row['title'], 0 , 1));
-			$brend_letters[$letter][$row['brend_id']]['brend_id'] = $row['brend_id'];
-			$brend_letters[$letter][$row['brend_id']]['title'] = $row['title'];
-			$brend_letters[$letter][$row['brend_id']]['href'] = $row['href'];
-			$brend_titles[$row['brend_id']]['brend_id'] = $row['brend_id'];
-			$brend_titles[$row['brend_id']]['title'] = $row['title'];
-			$brend_titles[$row['brend_id']]['href'] = $row['href'];
+			$commonListOfBrends[$row['brend_id']]['title'] = $row['title'];
+			$commonListOfBrends[$row['brend_id']]['href'] = $row['href'];
 		}
+	}
+
+	$brends = core\OriginalCatalog\PartsCatalogs::getAvailableBrends();
+	foreach($brends as $brend_id => $obj){
+		$commonListOfBrends[$brend_id]['title'] = $obj->name;
+		$commonListOfBrends[$brend_id]['href'] = $obj->href;
+	}
+
+	$brend_letters = [];
+	$brend_titles = [];
+	foreach($commonListOfBrends as $brend_id => $row){
+		$letter = mb_strtoupper(substr($row['title'], 0 , 1));
+		$brend_letters[$letter][$brend_id]['brend_id'] = $brend_id;
+		$brend_letters[$letter][$brend_id]['title'] = $row['title'];
+		$brend_letters[$letter][$brend_id]['href'] = $row['href'];
+		$brend_titles[$brend_id]['brend_id'] = $brend_id;
+		$brend_titles[$brend_id]['title'] = $row['title'];
+		$brend_titles[$brend_id]['href'] = $row['href'];
 	}
 }
 if ($_GET['vehicle'] && $_GET['brend']){
@@ -85,31 +99,10 @@ if ($_GET['vehicle'] && $_GET['brend']){
 		", '');
 	}
 	else{
-		$res_models = $db->query("
-			SELECT
-				m.id,
-				m.title,
-				m.href
-			FROM
-				#models AS m
-			LEFT JOIN #vehicles v ON m.vehicle_id=v.id
-			LEFT JOIN #brends b ON m.brend_id=b.id
-			WHERE
-				b.href='{$_GET['brend']}' AND v.href='{$_GET['vehicle']}'
-			ORDER BY m.title
-		", '');
+		$models = core\OriginalCatalog\OriginalCatalog::getCommonListModels($_GET['vehicle'], $_GET['brend']);
 	}
-	if ($res_models->num_rows){
-		while($row = $res_models->fetch_assoc()){
-			$letter = mb_strtoupper(mb_substr($row['title'], 0 , 1, 'UTF-8'), 'UTF-8');
-			$models[$letter][$row['id']] = [
-				'title' => $row['title'],
-				'href' => $row['href']
-			];
-		}
-		if (!empty($years)) $years = array_keys($years);
-		// debug($years);
-	}
+	if (!empty($years)) $years = array_keys($years);
+
 	$res_years = $db->query("
 		SELECT
 			fv.id,
@@ -169,7 +162,9 @@ if ($_GET['vehicle'] && $_GET['brend']){
 										<option selected></option>
 										<?foreach($brend_titles as $key => $value){
 											$selected = $_GET['brend'] == strtolower($value['title']) ? 'selected' : '';?>
-											<option <?=$selected?> value="<?=$value['href']?>"><?=$value['title']?></option>
+											<option <?=$selected?> value="<?=$value['href']?>">
+												<?=$value['title']?>
+											</option>
 										<?}?>
 									</select>
 								</div>

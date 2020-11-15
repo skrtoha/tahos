@@ -43,6 +43,14 @@ if ($res_user->num_rows) $user = $res_user->fetch_assoc();
 else $user = $res_user;
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
 
+//blockSite
+if (
+	core\Setting::get('blockSite', 'is_blocked') 
+	&& !in_array($_SERVER['REMOTE_ADDR'], core\Config::$allowedIpForAuthorization)
+){
+	die("На сайте проводятся регламентные работы");
+}
+
 core\UserIPS::registerIP([
 	'user_id' => $_SESSION['user'] ? $_SESSION['user'] : null,
 	'ip' => $_SERVER['REMOTE_ADDR'],

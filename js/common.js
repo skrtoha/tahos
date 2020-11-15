@@ -19,6 +19,10 @@ function show_popup_basket(){
 	$(".cart .arrow_up").show();
 	$(".h_overlay, .overlay").show();
 }
+function showGif(hide = true){
+	let display = hide ? 'flex' : 'none';
+	$('#popup').css('display', display);
+}
 function price_format(){
 	// $('.price_format').priceFormat({
 	// 	allowNegative: true,

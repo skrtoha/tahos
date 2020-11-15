@@ -130,4 +130,51 @@ class PartsCatalogs extends OriginalCatalog{
 			'filtersCommonList' => array_unique($filtersCommonList)
 		];
 	}
+
+	public static function getGroupInfo($brendHref, $carId, $groupId){
+		$idOfBrend = self::getIdOfBrend($brendHref);
+		if (!$idOfBrend) return false;
+
+		$json = Provider::getCurlUrlData(self::getParams()->url . 'catalogs/' . $idOfBrend . '/groups2/?carId=' . $carId . '&groupId=' . $groupId, [], [
+			'Accept-Language: ru',
+			'Authorization: ' . self::getParams()->ApiKey,
+			'accept: application/json'
+		]);
+		return json_decode($json);
+	}
+
+	public static function getNodes($brendHref, $carId){
+		$idOfBrend = self::getIdOfBrend($brendHref);
+		if (!$idOfBrend) return false;
+
+		$nodes = [];
+
+		$json = Provider::getCurlUrlData(self::getParams()->url . 'catalogs/' . $idOfBrend . '/groups2/?carId=' . $carId, [], [
+			'Accept-Language: ru',
+			'Authorization: ' . self::getParams()->ApiKey,
+			'accept: application/json'
+		]);
+
+		return json_decode($json);
+	}
+
+	public static function getModelInfoByModelID($brendHref, $modelid){
+		$models = self::getModels($brendHref);
+		foreach($models as $model){
+			if ($model->id == $modelid) return $model;
+		}
+		return false;
+	}
+
+	public static function getNode($brendHref, $carId, $groupId){
+		$idOfBrend = self::getIdOfBrend($brendHref);
+		if (!$idOfBrend) return false;
+		$json = Provider::getCurlUrlData(self::getParams()->url . 'catalogs/' . $idOfBrend . '/parts2/' . '?carId=' . $carId . '&groupId=' . $groupId, [], [
+			'Authorization: ' . self::getParams()->ApiKey,
+			'accept: application/json',
+			'Accept-Language: ru'
+		]);
+		$result = json_decode($json);
+		return $result;
+	}
 }

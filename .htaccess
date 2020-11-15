@@ -71,22 +71,32 @@ RewriteRule ^original-catalogs$ index.php?view=original-catalogs [L]
 RewriteRule ^original-catalogs/([\w-]+)$ index.php?view=original-catalogs&vehicle=$1 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)$ index.php?view=original-catalogs&vehicle=$1&brend=$2 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/(\d{4})$ index.php?view=original-catalogs&vehicle=$1&brend=$2&year=$3 [L]
-RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\w]+)/([\w-]+)/vin$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\w-]+)/([\w-]+)/vin$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/to_garage$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&to_garage=1 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/(\d{4})$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5 [L]
-RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\w]+)/([\w-]+)/vin/(\w+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&carid=$5 [L]
+
+#RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\w]+)/([\w-]+)/vin/(\w+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&carid=$5 [L]
+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/(\d{4})/to_garage$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5&to_garage=1 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/(\d{4})/to_garage/(\d+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5&to_garage=1&modification_id=$6 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/to_garage$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&year=$5&to_garage=1 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/to_garage/(\d+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=vin&to_garage=1&modification_id=$5 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/to_garage/(\d+)$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&to_garage=1&modification_id=$5 [L]
+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\w{17})?$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&vin=$5 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})?$ index.php?view=model&vehicle=$1&brend=$2&model_id=$3&href=$4&year=$5 [L]
+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/([\d]+)$ index.php?view=modification&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$5&vin=vin [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\w]+)/([\w-]+)/vin/([\w-]+)$ index.php?view=modification&vehicle=$1&brend=$2&model_id=$3&href=$4&carid=$5&vin=vin [L]
+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\w{17})/([\d]+)$ index.php?view=modification&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&vin=$5 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})/([\d]+)$ index.php?view=modification&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&year=$5 [L]
+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\w{17})/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&node_id=$7&vin=$5 [L]
+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$5&node_id=$6&vin=vin [L]
+RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\w]+)/([\w-]+)/vin/([\w-]+)/([\w-]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$5&node_id=$6&vin=vin [L]
+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&node_id=$7&year=$5 [L]
 #RewriteRule ^/$ index.php?view=index [L]
 #RewriteRule ^/$ index.php [L]

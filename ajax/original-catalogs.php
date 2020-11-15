@@ -444,6 +444,25 @@ switch($_POST['act']){
 		$filters = modification_get_filters();
 		echo json_encode($filters);
 		break;
+	case 'getGroupsPartsCatalogs':
+		ob_start();
+		ini_set('error_reporting', E_ERROR | E_PARSE);
+		$groups = core\OriginalCatalog\PartsCatalogs::getGroupInfo(
+			$_POST['brend'],
+			$_POST['carId'],
+			$_POST['groupId']
+		);
+		foreach($groups as $node){?>
+			<div class="item">
+				<a class="itemPartsCatalogs" groupid="<?=$node->id?>" hasParts="<?=$node->hasParts?>" parentId="<?=$node->parentId?>" href=""></a>
+				<p><?=$node->name?></p>
+				<div class="img">
+					<img src="<?=$node->img?>" alt="<?=$node->name?>">
+				</div>
+			</div>
+		<?}
+		echo ob_get_clean();
+		break;
 }
 function modification_get_filters(){
 	global $db;

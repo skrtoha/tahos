@@ -120,7 +120,5 @@ $(function(){
 		url += formData.model_id + '/';
 		url += formData.href + '/';
 		url += formData.vin;
-		alert(url);
-		console.log(url);
 	})
 });

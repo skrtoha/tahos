@@ -7178,7 +7178,7 @@ span.delete-btn:hover {
   padding: 0;
   margin: 0;
   width: 100%;
-  min-height: 280px;;
+  /*min-height: 280px;;*/
 }
 .catalogue-original .items .content .item .img img {
   width: 100%;

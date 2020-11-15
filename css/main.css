@@ -371,7 +371,6 @@ div.gif, tr.gif td{
   align-items: center;
   justify-content: center; 
   z-index: 1000;
-  background: rgba(228, 238, 244, 0.75);
 }
 #popup img{
   width: 75px;

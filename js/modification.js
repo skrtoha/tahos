@@ -89,4 +89,31 @@ $(function(){
 			}
 		})
 	})
+	$(document).on('click', 'a.itemPartsCatalogs', function(e){
+		e.preventDefault();
+		let th = $(this);
+		let hasParts = th.attr('hasparts');
+		if (!hasParts){
+			$.ajax({
+				type: 'post',
+				url: '/ajax/original-catalogs.php',
+				data: {
+					act: 'getGroupsPartsCatalogs',
+					groupId: th.attr('groupid'),
+					brend: $('input[name=brend]').val(),
+					carId: $('input[name=carid]').val()
+				},
+				beforeSend: function(){
+					showGif();
+				},
+				success: function(response){
+					showGif(false);
+					$('div.mosaic-view.clearfix').html(response);
+				}
+			})
+		}
+		else{
+			document.location.href = document.location.href + '/' + th.attr('groupid');
+		}
+	})
 });

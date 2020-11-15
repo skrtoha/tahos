@@ -1,5 +1,5 @@
 <?
-debug($_GET);
+// debug($_GET);
 if ($_GET['to_garage'] && $user['id'] && $_GET['modification_id']){
 	$res = $db->insert(
 		'garage',
@@ -34,15 +34,15 @@ $res_vehicels = $db->query("
 ", '');
 // debug($user);
 while($row = $res_vehicels->fetch_assoc()){
-		$vehicles_category[$row['category']][$row['id']] = [
-			'title' => $row['title'],
-			'href' => $row['href']
-		];
-		$vehicles_title[$row['title']] = [
-			'id' => $row['id'],
-			'href' => $row['href'],
-			'category' => $row['category']
-		];
+	$vehicles_category[$row['category']][$row['id']] = [
+		'title' => $row['title'],
+		'href' => $row['href']
+	];
+	$vehicles_title[$row['title']] = [
+		'id' => $row['id'],
+		'href' => $row['href'],
+		'category' => $row['category']
+	];
 }
 $vt = & $vehicles_title;
 $res_brends = $db->query("
@@ -75,7 +75,6 @@ $models = core\OriginalCatalog\OriginalCatalog::getCommonListModels($_GET['vehic
 if (preg_match('/^pc_/', $_GET['model_id'])){
 	$carsAndFilters = core\OriginalCatalog\PartsCatalogs::getCarsByModelIdWithFilters($_GET['brend'], $_GET['href']);
 	$carsPartsCatalogs = $carsAndFilters['cars'];
-	debug($carsPartsCatalogs);
 	$filtersPartsCatalogs = $carsAndFilters['filtersCommonList'];
 }
 else{

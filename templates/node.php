@@ -140,7 +140,7 @@ else{
 						<td><?=$group->positionNumber?></td>
 						<td>
 							<a target="_blank" href="/search/article/<?=$group->number?>">
-								<?=$group->name?>
+								<?=$group->name ? $group->name : $group->number?>
 							</a>
 						</td>
 						<td><?=$group->description?></td>

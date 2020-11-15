@@ -10,7 +10,7 @@ class PartsCatalogs extends OriginalCatalog{
 	public static function getParams(){
 		static $params;
 		$params = new \stdClass();
-		$params->ApiKey = Setting::get('PartsCatalogs', 'ApiKey');
+		$params->ApiKey = 'OEM-API-C5AA077A-DC97-45B8-AE6A-6E5BB12E706E';
 		$params->url = 'https://api.parts-catalogs.com/v1/';
 		return $params;
 	}

@@ -154,6 +154,7 @@ function view(){
 			GROUP_CONCAT(ov.arrived) AS arrived,
 			GROUP_CONCAT(ov.issued) AS issued,
 			GROUP_CONCAT(ov.returned) AS returned,
+			GROUP_CONCAT(ov.declined) AS declined,
 			IF(
 				o.is_draft,
 				'Черновик',
@@ -235,7 +236,8 @@ function view(){
 							'ordered' => $order['ordered'],
 							'arrived' => $order['arrived'],
 							'issued' => $order['issued'],
-							'returned' => $order['returned']
+							'returned' => $order['returned'],
+							'declined' => $order['declined']
 						])?>
 					</td>
 					<td label="Пользователь"><a href="?view=orders&act=user_orders&id=<?=$order['user_id']?>"><?=$order['fio']?></a></td>
@@ -291,6 +293,7 @@ function show_form($act){
 				'ordered' => $order['ordered'],
 				'arrived' => $order['arrived'],
 				'issued' => $order['issued'],
+				'declined' => $order['declined'],
 				'returned' => $order['returned']
 			])?></td>
 			<td label="Статус"><?=$order['is_draft'] ? 'Черновик' : get_status($order['statuses'])?></td>

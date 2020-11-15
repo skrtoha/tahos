@@ -11,6 +11,7 @@ function get_order($flag = ''){
 			GROUP_CONCAT(ov.ordered) AS ordered,
 			GROUP_CONCAT(ov.arrived) AS arrived,
 			GROUP_CONCAT(ov.issued) AS issued,
+			GROUP_CONCAT(ov.declined) AS declined,
 			GROUP_CONCAT(ov.returned) AS returned,
 			IF(
 				u.organization_name != '',
@@ -178,6 +179,7 @@ function get_summ($order){
 	$arrived = explode(',', $order['arrived']);
 	$issued = explode(',', $order['issued']);
 	$returned = explode(',', $order['returned']);
+	$declined = explode(',', $order['declined']);
 	$count = count($prices);
 	for ($i = 0; $i < $count; $i++){
 		if (in_array($statuses[$i], [6, 8])) continue;
@@ -189,6 +191,7 @@ function get_summ($order){
 		
 		if ($issued[$i]) $summ -= ($arrived[$i] - $issued[$i]) * $prices[$i];
 		if ($returned[$i]) $summ -= $returned[$i] * $prices[$i];
+		if ($declined[$i]) $summ -= ($ordered[$i] - $arrived[$i]) * $prices[$i];
 	} 
 	return $summ;
 }

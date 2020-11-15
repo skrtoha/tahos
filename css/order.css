@@ -8,6 +8,20 @@
    .comment-block{
   display: none;
 }
+span.crossedout {
+    text-decoration: line-through;
+    display: block;
+    text-decoration-color: red;
+}
+span.crossedout {
+    text-decoration: line-through;
+    display: block;
+    text-decoration-color: #c37476;
+}
+span.new_price {
+    color: #c37476;
+    font-weight: 800;
+}
 .comment-block label input{
   height: auto;
 }

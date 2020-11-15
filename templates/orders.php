@@ -316,9 +316,40 @@ $orders = get_order_group($params, '');
 									</td>
 									<td>
 										<span class="price_format">
-											<?=$summ?>
+											<?switch($order['status']){
+												case 'Возврат':?>
+													<span class="crossedout"><?=$order['price'] * $order['returned']?></span>
+													<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
+													<?break;
+												case 'Выдано':?>
+														<?if ($order['declined']){?>
+															<span class="crossedout"><?=$order['ordered'] * $order['price']?></span>
+															<span class="new_price"><?=$order['issued'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+														<?}
+														elseif ($order['returned']){?>
+															<span class="crossedout"><?=$order['issued'] * $order['price']?></span>
+															<span class="new_price"><?=$order['returned'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+														<?}
+														else{?>
+															<?=$summ?>
+															<i class="fa fa-rub" aria-hidden="true"></i>
+														<?}?>
+													<?break;
+												case 'Заказано':?>
+													<?if ($order['ordered'] < $order['quan']){?>
+														<span class="crossedout"><?=$order['quan'] * $order['price']?></span>
+														<span class="new_price"><?=$order['ordered'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+													<?}
+													else{?>
+														<?=$summ?>
+														<i class="fa fa-rub" aria-hidden="true"></i>
+													<?}
+												break;
+												default:?>
+													<?=$summ?>
+													<i class="fa fa-rub" aria-hidden="true"></i>
+											<?}?>
 										</span>
-										<i class="fa fa-rub" aria-hidden="true"></i>
 										<?if ($order['is_return_available']){?>
 											<a days_from_purchase="<?=$order['days_from_purchase']?>" return_price="<?=$order['return_price']?>" packaging="<?=$order['packaging']?>" class="return" href="">Вернуть</a>
 										<?}?>

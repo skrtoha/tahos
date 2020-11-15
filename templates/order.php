@@ -91,7 +91,9 @@ $status_classes = [
 										<span class="status-col status-block status-return">Возврат - <?=$order['returned']?> шт.</span>
 									<?}
 									break;
-								case 'Возврат':?>
+								case 'Возврат':
+									$summ = 0;
+									?>
 									<span class="status-col status-block status-return">Возврат</span>
 									<?break;
 								case 'В работе':
@@ -154,9 +156,40 @@ $status_classes = [
 						<td>
 							<span class="price_format">
 								<?$total += $summ?>
-								<?=$summ?>
+								<?switch($order['status']){
+									case 'Возврат':?>
+										<span class="crossedout"><?=$order['price'] * $order['returned']?></span>
+										<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
+										<?break;
+									case 'Выдано':?>
+											<?if ($order['declined']){?>
+												<span class="crossedout"><?=$order['ordered'] * $order['price']?></span>
+												<span class="new_price"><?=$order['issued'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+											<?}
+											elseif ($order['returned']){?>
+												<span class="crossedout"><?=$order['issued'] * $order['price']?></span>
+												<span class="new_price"><?=$order['returned'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+											<?}
+											else{?>
+												<?=$summ?>
+												<i class="fa fa-rub" aria-hidden="true"></i>
+											<?}?>
+										<?break;
+									case 'Заказано':?>
+										<?if ($order['ordered'] < $order['quan']){?>
+											<span class="crossedout"><?=$order['quan'] * $order['price']?></span>
+											<span class="new_price"><?=$order['ordered'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+										<?}
+										else{?>
+											<?=$summ?>
+											<i class="fa fa-rub" aria-hidden="true"></i>
+										<?}
+									break;
+									default:?>
+										<?=$summ?>
+										<i class="fa fa-rub" aria-hidden="true"></i>
+								<?}?>
 							</span>
-							<i class="fa fa-rub" aria-hidden="true"></i>
 						</td>
 						<?if (isset($_GET['act'])){?>
 							<td style="width: 70px; position: relative">

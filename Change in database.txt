@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ALTER TABLE `tahos_providers` ADD `is_active` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `cron_minutes`;
 -- phpMyAdmin SQL Dump
 -- version 4.9.0.1
@@ -14,32 +15,40 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
-
---
--- Database: `tahos`
---
-
---
--- Dumping data for table `tahos_settings`
---
-
-INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES
-('api_settings', '13', '{\"title\":\"\\u041c\\u041f\\u0430\\u0440\\u0442\\u0441\",\"cronOrder\":\"Mparts\",\"url\":\"http:\\/\\/v01.ru\\/api\\/devinsight\",\"private\":{\"userlogin\":\"info@tahos.ru\",\"userpsw\":\"1031786\"},\"entity\":{\"userlogin\":\"info@tahos.ru\",\"userpsw\":\"1031786\"},\"provider_id\":\"13\",\"shipmentMethod\":\"1\",\"paymentMethod\":\"6\",\"shipmentOffice\":\"13146\",\"shipmentAddress\":\"a3f75dfd-5b5b-11e9-8f43-0050568f12a5\",\"getAnalogies\":\"\",\"providerStores\":\"\"}'),
-('api_settings', '6', '{\"title\":\"\\u0412\\u043e\\u0441\\u0445\\u043e\\u0434\",\"cronOrder\":\"Voshod111\",\"url\":\"http:\\/\\/autorus.public.api.abcp.ru\",\"userlogin\":\"info@tahos.ru\",\"userpsw\":\"vk640431\",\"provider_id\":\"6\",\"paymentMethod\":{\"entity\":\"1062\",\"private\":\"1061\"},\"shipmentAddress\":\"659625\",\"getAnalogies\":\"1\",\"providerStores\":\"\"}');
-COMMIT;
-
-INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES ('api_settings', '2', '{\"user_login\":\"price@tahos.ru\",\"user_password\":\"tahos10317\",\"KUNNR_RG\":{\"private\":\"43233624\",\"entity\":\"43232305\"},\"provider_id\":2}');
-
-INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES ('api_settings', '18', '{\"email\":\"info@tahos.ru\",\"password\":\"VGpS5DxFrslpgx046vVFb8dh\",\"apiKey\":\"w84dWVnWf0fahzrMQhALbEVflzGrazSQgmMoSZWHmd5oHarZvJR0ULlLzjjh\",\"url\":\"https:\\/\\/api.autoeuro.ru\\/api\\/v-1.0\\/shop\\/\",\"delivery_key\":\"Zid3sPWIUfEZXeXVuy8e46Zr1MwD704huFO0nxypa7DxUyB%2BlF1Vh4dMAnAa3qxhhI272D8npAC0Gl%2FUWNynsfbWxSyjqG9S9fQ%2Bk1GeP1xCjg5J470ZnoZeTHsZICym%2BEUUZ0wYVPCUbjbnHwTR3c227AGXDBbI4gwxzixWriUj2dc%2FC5nUdYyeuRFAg5bQBbnx5eqCyWlfs9lJdoUqRCzT7mJ230xoZrOGKYkb%2Bsak752366%2FSmFCKUy%2F4FtqlHAeLbNkJtNkZF%2F9ra6Rggg%3D%3D\",\"subdivision_key\":\"ogeRtaAVTbn%2FgjvNpHEZxi0FXtlvnXv8GaUON7FfMMbY4DF3brfW6H1mxYDjkR7wNHIqYZrxHMMzutXD%2FsOKHGey%2Fz2NAQSA8MudmokeGJKbkysLvH99q7C257zSxsOYnhH2iiGgyeuK2I7X3FcMcUY8DBVv2LhSrviyKC1Sg5UImARZeRFLy2gLnycQa6ooEQs4gviFLLkqoAGEKBj5LupIhMwMI7mzHWVZSzMQFmQshZqiaI5ck%2BA5djEzmSoV53%2B8QSe89ndE9E6BGE87Nclu%2B9kKr2VTPYUDMcCRDYI%3D\",\"provider_id\":18,\"mainStoreID\":22657,\"minPriceStoreID\":23617,\"minDeliveryStoreID\":23618}');
-
-INSERT INTO `tahos_settings` (`view`, `name`, `value`) VALUES ('api_settings', '20', '{\"username\":\"010345\",\"password\":\"7373366\",\"title\":\"\\u0410\\u0432\\u0442\\u043e\\u043a\\u043e\\u043d\\u0442\\u0438\\u043d\\u0435\\u043d\\u0442\",\"url\":\"http:\\/\\/api.autokontinent.ru\\/v1\\/\",\"provider_id\":20}');
 =======
-ALTER TABLE `tahos_users` ADD `defermentOfPayment` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `markupSettings`;
-ALTER TABLE `tahos_funds` ADD `is_payed` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `transfered`;
+CREATE TABLE `tahos_goods_arrival` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `provider_id` int(10) UNSIGNED NOT NULL,
+  `store_id` int(10) UNSIGNED NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+>>>>>>> goods_arrival
 
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `tahos_goods_arrival`
+--
+ALTER TABLE `tahos_goods_arrival`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+<<<<<<< HEAD
 >>>>>>> new_funds
 =======
 ALTER TABLE `tahos_users` ADD `defermentOfPayment` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `markupSettings`;
 ALTER TABLE `tahos_funds` ADD `is_payed` INT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `transfered`;
 
 >>>>>>> new_funds
+=======
+--
+-- AUTO_INCREMENT for table `tahos_goods_arrival`
+--
+ALTER TABLE `tahos_goods_arrival`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+>>>>>>> goods_arrival

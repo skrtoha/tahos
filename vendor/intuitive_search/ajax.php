@@ -127,5 +127,27 @@ switch($_GET['tableName']){
 				</li>";
 		}
 		break;
+		case 'provider_stores':
+			$res_provider_stores = $db->query("
+				SELECT
+					ps.id,
+					ps.cipher,
+					ps.title
+				FROM
+					#provider_stores ps
+				WHERE
+					ps.cipher LIKE '%{$_GET['value']}%' OR ps.title LIKE '%{$_GET['value']}%'
+				LIMIT
+					0, {$_GET['maxCountResults']}
+				", '');
+				foreach($res_provider_stores as $ps){
+					$output .= "
+						<li>
+							<a store_id=\"{$ps['id']}\" class=\"provider_store\" href=\"#\">
+								{$ps['cipher']} - {$ps['title']}
+							</a>
+						</li>";
+				}
+			break;
 }
 echo $output;

@@ -1,0 +1,18 @@
+#store, #goods{
+    overflow: visible;
+}
+.t_form .field, .t_form{
+    overflow: visible;
+}
+.icon-cross1:before {
+  content: "\ea0f";
+  font-size: 11px;
+}
+#added_goods{
+	margin-top: 10px;
+	display: none;
+
+}
+#commonList tbody tr{
+	cursor: pointer;
+}

@@ -145,7 +145,15 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['connections', 'index', 'brends'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
 		<?}?>
-		<?if (in_array($view, ['items', 'prices', 'test_api_providers', 'brends'])){?>
+		<?
+		$arrayIntuitiveSearch = [
+			'items', 
+			'prices', 
+			'test_api_providers', 
+			'brends',
+			'goods_arrival'
+		];
+		if (in_array($view, $arrayIntuitiveSearch)){?>
 			{"src" : "/vendor/intuitive_search/script.js", "async" : false},
 		<?}?>
 		<?if (file_exists("js/$view.js")){

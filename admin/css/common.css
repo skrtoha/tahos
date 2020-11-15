@@ -200,7 +200,7 @@ input[readonly]{
 	.t_form .delimiter {font-weight:bold;padding:10px;background:#e8e7e7;}
 	.t_form .field {overflow:hidden;}
 	.t_form .title {width:170px;float: left;padding:10px;font-weight:bold;display:block;overflow:hidden;line-height:0.9;}
-	.t_form .value {background:#ffffff;padding:10px;display:block;width:calc(100% - 170px);margin:1px 1px 0 0;overflow:hidden;align-items:center;}
+	.t_form .value {background:#ffffff;padding:10px;display:inline-block;width:calc(100% - 171px);margin:1px 1px 0 0;overflow:hidden;align-items:center;}
 
 .t_form .value input[type=text], .t_form .value input[type=password]{width: 100%;
 }

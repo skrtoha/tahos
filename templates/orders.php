@@ -344,7 +344,15 @@ $orders = get_order_group($params, '');
 														<?=$summ?>
 														<i class="fa fa-rub" aria-hidden="true"></i>
 													<?}
-												break;
+													break;
+												case 'Нет в наличии':?>
+													<span class="crossedout"><?=$order['price'] * $order['quan']?></span>
+													<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
+													<?break;
+												case 'Отменен':?>
+													<span class="crossedout"><?=$order['price'] * $order['quan']?></span>
+													<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
+													<?break;
 												default:?>
 													<?=$summ?>
 													<i class="fa fa-rub" aria-hidden="true"></i>

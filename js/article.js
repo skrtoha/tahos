@@ -1137,10 +1137,24 @@ function applyUserMarkup(){
 	}
 	$('#user_markup').hide();
 }
+function loadAvailabilityOtherStores(item_id){
+	$.ajax({
+		type: 'get',
+		url: document.location.href,
+		success: function(){
+			$.cookie('message', 'Проверка складов партнеров завершена!', cookieOptions);
+			$.cookie('message_type', 'ok', cookieOptions);
+			document.location.href = document.location.href + '/processed';
+		}
+	})
+}
 $(function(){
 	if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;
 	set_tabs();	
 	applyUserMarkup();
+	if (+$('input[name=isEmptyAvailabilityMainStores]').val()){
+		loadAvailabilityOtherStores();
+	}
 	$(document).on('click', '.cart-popup-table .delete-btn', function(){
 		let store_id = $(this).closest('tr').attr('store_id');
 		let item_id = $(this).closest('tr').attr('item_id');

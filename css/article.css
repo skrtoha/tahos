@@ -70,6 +70,14 @@ span.subprice {
     color: #00aafb;
     font-weight: 700;
 }
+div.emptyAvailabilityMainStores{
+	margin-top: 10px;
+}
+div.emptyAvailabilityMainStores img{
+	float: left;
+	width: 43px;
+	margin-right: 10px;
+}
 #user_markup{
   background: #f1f1f1;
     z-index: 53;

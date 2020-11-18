@@ -250,10 +250,12 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 	else $userDiscount = 0;
 	if (!$user['show_all_analogies'] && $search_type == 'analogies') $hide_analogies = true;
 	else $hide_analogies = false;
+
 	if ($search_type == 'analogies'){
 		$selectAnalogies = 'diff.checked, ';
 		$whereAnalogies = 'AND diff.hidden=0';
 	}
+
 	$q_item = "
 		SELECT
 			diff.item_diff as item_id,
@@ -318,15 +320,25 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 	if ($hide_analogies) $q_item .= ' AND si.item_id IS NOT NULL';
 	if (!empty($filters)){
 		if ($filters['in_stock']) $q_item .= ' AND si.in_stock>0';
-		$q_item .= "
-			HAVING
-				price BETWEEN {$filters['price_from']} AND {$filters['price_to']} AND
-				delivery BETWEEN {$filters['time_from']} AND {$filters['time_to']} 
-		";
+		if (isset($filters['is_main'])) $q_item .= " AND ps.is_main = {$filters['is_main']}";
+		if (isset($filters['price_from']) && isset($filters['time_from'])){
+			$q_item .= "
+				HAVING
+					price BETWEEN {$filters['price_from']} AND {$filters['price_to']} AND
+					delivery BETWEEN {$filters['time_from']} AND {$filters['time_to']} 
+			";
+
+		}
 	}
 	else $q_item .= " HAVING price>0";
-	if (!$hide_analogies) $q_item .= " OR price IS NULL";
-	$q_item .= ' ORDER BY price, delivery';
+
+	//строка закоментирована, т.к. затягивался поиск
+	/*if (!$hide_analogies){
+		if (empty($filters)) $q_item .= " OR price IS NULL";
+		else $q_item .= " OR si.price IS NULL";
+	} */
+
+	$q_item .= ' ORDER BY si.price, delivery';
 	return $q_item;
 }
 function article_store_items($item_id, $filters = [], $search_type = 'articles'){

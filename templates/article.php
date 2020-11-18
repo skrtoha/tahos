@@ -1,8 +1,8 @@
 <?
 use core\Provider\Autoeuro;
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
-// debug($abcp);
-if (core\Config::$isUseApiProviders){
+
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders){
 	$abcp->render(13); 
 	$abcp->render(6);
 
@@ -24,11 +24,16 @@ if (core\Config::$isUseApiProviders){
 	core\Provider\ForumAuto::setArticle($_GET['item_id'], $abcp->item['brand'], $abcp->item['article']);
 
 	core\Provider\Autopiter::setArticle($abcp->item['brand'], $abcp->item['article']);
+
+	exit();
 }
 
 $title = "Список предложений";
 
-$array = article_store_items($_GET['item_id'], [], 'articles');
+if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !isset($_GET['processed'])) $filters['is_main'] = 1;
+else $filters = [];
+
+$array = article_store_items($_GET['item_id'], $filters, 'articles');
 $store_items = array();
 foreach($array['store_items'] as $key => $value){
 	$store_items[] = [
@@ -60,6 +65,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 <input type="hidden" id="time_to" value="<?=$time_to?>">
 <input type="hidden" name="isCheckedFromAbcp" value="<?=$abcp->isCheckedFromAbcp?>">
 <input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
+<input type="hidden" name="isEmptyAvailabilityMainStores" value="<?=empty($array['prices']) && !isset($_GET['processed'])?>">
 <div class="search-result">
 	<h1>Список предложений</h1>
 	<form class="<?=$hide_form ? 'hidden' : ''?>" id="offers-filter-form" method="post">
@@ -175,6 +181,12 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 		<div class="ionTabs__body">
 			<div class="ionTabs__item" data-name="Tab_1">
 				<?require_once('core/article.php');?>
+				<?if (empty($array['prices']) && core\Config::$isUseApiProviders && !isset($_GET['processed'])){?>
+					<div class="emptyAvailabilityMainStores">
+						<img src="<?=core\Config::$imgUrl?>/preload.gif">
+						<p>Идет поиск по складам партнеров...</p>
+					</div>
+				<?}?>
 			</div>
 			<div class="ionTabs__item is_others" data-name="Tab_2">
 				<table class="articul-table"></table>
@@ -199,5 +211,5 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 		<?=Autoeuro::getParams()->mainStoreID?>,
 		<?=Autoeuro::getParams()->minPriceStoreID?>,
 		<?=Autoeuro::getParams()->minDeliveryStoreID?>
-	]
+	];
 </script>

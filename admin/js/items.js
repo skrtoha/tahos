@@ -1,12 +1,13 @@
 var reg_integer = /^\d+$/;
 function addItemDiffHtml(type, items){
+	console.log(items, type);
 	let htmlAnalogies = '';
 	let strHtml = '';
 	$.each(items, function(key, itemInfo){
 		itemInfo.barcode = itemInfo.barcode != null ? itemInfo.barcode : '';
 		itemInfo.categories = itemInfo.categories != null ? itemInfo.categories : '';
 		strHtml += `
-			<tr>
+			<tr class="analogyStatus_${itemInfo.status}">
 				<td label="Бренд">${itemInfo.brend}</td>
 				<td label="Артикул">
 					<a target="blank" href="?view=items&act=item&id=${itemInfo.item_id}">
@@ -19,13 +20,23 @@ function addItemDiffHtml(type, items){
 		if (type == 'analogies'){
 			let checkedHidden = itemInfo.hidden == '1' ? 'checked' : '';
 			let checkedChecked = itemInfo.checked == '1' ? 'checked' : '';
+			let selected0 = itemInfo.status == '0' ? 'selected' : '';
+			let selected1 = itemInfo.status == '1' ? 'selected' : '';
+			let selected2 = itemInfo.status == '2' ? 'selected' : '';
 			strHtml += `
-					<td label="Проверен">
-						<input ${checkedChecked} name="checked" type="checkbox" value="${itemInfo.item_id}">
-					</td>
-					<td label="Скрыть">
-						<input ${checkedHidden} name="hidden" type="checkbox" value="${itemInfo.item_id}">
-					</td>
+				<td label="Статус">
+					<form>
+						<input type="hidden" name="act" value="analogies">
+						<input type="hidden" name="view" value="items">
+						<input type="hidden" name="item_id" value="${$('#clearItemDiff').attr('item_id')}">
+						<input type="hidden" name="item_diff" value="${itemInfo.item_id}">
+						<select name="status">
+							<option ${selected0} value="0">не выбрано</option>
+							<option ${selected1} value="1">проверен</option>
+							<option ${selected2} value="2">скрыт</option>
+						</select>
+					</form>
+				</td>
 			`;
 		} 
 		strHtml += `
@@ -490,7 +501,7 @@ $(function(){
 			}
 		})
 	})
-	$('#itemDiff select[name=status]').on('change', function(){
+	$(document).on('change', '#itemDiff select[name=status]', function(){
 		$(this).closest('form').submit();
 	})
 })

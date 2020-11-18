@@ -722,7 +722,7 @@ function itemDiff($type){
 					<td label="Название"><?=$value['title_full']?></td>
 					<td label="Штрих-код"><?=$value['barcode']?></td>
 					<?if ($type == 'analogies'){?>
-						<td label="Проверен">
+						<td label="Статус">
 							<form>
 								<input type="hidden" name="act" value="analogies">
 								<input type="hidden" name="view" value="items">

@@ -394,10 +394,7 @@ class Item{
 	{
 		$analogiesFields = '';
 		if ($type == 'analogies'){
-			$analogiesFields = "
-				diff.hidden,
-				diff.checked,
-			";
+			$analogiesFields = "diff.status,";
 		}
 		$query = "
 			SELECT

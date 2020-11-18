@@ -69,27 +69,6 @@ switch($_POST['act']){
 			"`item_id`={$_POST['item_id']} AND `category_id`={$_POST['category_id']}"
 		);
 		break;
-	case 'analogy_hide':
-		print_r($_POST);
-		$db->update(
-			'analogies', 
-			['hidden' => $_POST['hidden']], 
-			"
-				(`item_id`={$_POST['item_id']} AND `item_diff`={$_POST['value']}) OR
-				(`item_id`={$_POST['value']} AND `item_diff`={$_POST['item_id']})
-			"
-		);
-		break;
-	case 'analogy_checked':
-		$db->update(
-			'analogies', 
-			['checked' => $_POST['checked']], 
-			"
-				(`item_id`={$_POST['item_id']} AND `item_diff`={$_POST['value']}) OR
-				(`item_id`={$_POST['value']} AND `item_diff`={$_POST['item_id']})
-			"
-		);
-		break;
 	case 'savePhoto':
 		// debug($_POST);
 		// debug($_FILES);

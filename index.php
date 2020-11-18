@@ -9,6 +9,16 @@ require_once('core/functions.php');
 require_once('vendor/autoload.php');
 
 $db = new core\DataBase();
+
+/*$res = $db->query("SELECT * FROM #analogies WHERE checked != 0 OR hidden != 0", '');
+foreach($res as $row) {
+	$update = [];
+	if ($row['checked'] == 1) $update['status'] = 1;
+	if ($row['hidden'] == 1) $update['status'] = 2;
+	$db->update('analogies', $update, "`item_id` = {$row['item_id']} AND `item_diff` = {$row['item_diff']}");
+}
+exit();*/
+
 session_start();
 $connection = new core\Connection($db);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');

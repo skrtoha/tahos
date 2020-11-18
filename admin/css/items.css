@@ -1,5 +1,11 @@
+tr.analogyStatus_2 {
+    background: #f9dfdf;
+}
 #need_similar a.red{
 	color: red;
+}
+tr.analogyStatus_1 {
+    background: #ebffeb;
 }
 ul{
 	padding: 0;

@@ -117,7 +117,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 				LEFT JOIN #store_items si ON si.item_id=diff.item_diff
 				WHERE 
 					diff.item_id={$_GET['item_id']} AND
-					diff.hidden=0
+					diff.status IN (0, 1)
 					$where_hide_analogies
 				GROUP BY diff.item_diff
 			", '');

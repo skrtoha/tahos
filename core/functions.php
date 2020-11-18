@@ -252,8 +252,8 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 	else $hide_analogies = false;
 
 	if ($search_type == 'analogies'){
-		$selectAnalogies = 'diff.checked, ';
-		$whereAnalogies = 'AND diff.hidden=0';
+		$selectAnalogies = 'diff.status, ';
+		$whereAnalogies = 'AND diff.status IN (0, 1)';
 	}
 
 	$q_item = "
@@ -396,7 +396,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 		$p['is_desc'] = $v['is_desc'];
 		$p['photo'] = $v['photo'];
 		$p['item_id'] = $v['item_id'];
-		$p['checked'] = $v['checked'];
+		$p['status'] = $v['status'];
 		$list['delivery_date'] = core\Provider::getDiliveryDate(
 			json_decode($v['workSchedule'], true), 
 			json_decode($v['calendar'], true),

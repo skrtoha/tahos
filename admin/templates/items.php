@@ -133,6 +133,10 @@ switch ($act) {
 	case 'complects': 
 	case 'analogies': 
 	case 'substitutes': 
+		if (isset($_GET['status'])){
+			$db->update($act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_id']} AND `item_diff` = {$_GET['item_diff']}");
+			header("Location: {$_SERVER['HTTP_REFERER']}");
+		}
 		itemDiff($act); 
 		break;
 	case 'delete_foto':
@@ -660,7 +664,7 @@ function itemDiff($type){
 	global $status, $page_title;
 	$itemMain = core\Item::getByID($_GET['id']);
 	$item_id = $_GET['id'];
-	$res_items = core\Item::getResItemDiff($type, $item_id);
+	$res_items = core\Item::getResItemDiff($type, $item_id, '');
 	switch($type){
 		case 'complects': $page_title = "Комплектность"; break;
 		case 'articles': $page_title = "Подобные"; break;
@@ -703,15 +707,14 @@ function itemDiff($type){
 			<td>Название</td>
 			<td>Штрих-код</td>
 			<?if ($type == 'analogies'){?>
-				<td>Проверен</td>
-				<td>Скрыть</td>
+				<td>Статус</td>
 			<?}?>
 			<td>Категории</td>
 			<td></td>
 		</tr>
 		<?if ($res_items->num_rows){
 			foreach($res_items as $value){?>
-				<tr>
+				<tr class="analogyStatus_<?=$value['status']?>">
 					<td label="Бренд"><?=$value['brend']?></td>
 					<td label="Артикул">
 						<a target="blank" href="?view=items&act=item&id=<?=$value['item_id']?>"><?=$value['article']?></a>
@@ -720,12 +723,19 @@ function itemDiff($type){
 					<td label="Штрих-код"><?=$value['barcode']?></td>
 					<?if ($type == 'analogies'){?>
 						<td label="Проверен">
-							<?$checked = $value['checked'] ? 'checked' : ''?>
-							<input <?=$checked?> name="checked" type="checkbox" value="<?=$value['item_id']?>">
-						</td>
-						<td label="Скрыть">
-							<?$checked = $value['hidden'] ? 'checked' : ''?>
-							<input <?=$checked?> name="hidden" type="checkbox" value="<?=$value['item_id']?>">
+							<form>
+								<input type="hidden" name="act" value="analogies">
+								<input type="hidden" name="view" value="items">
+								<input type="hidden" name="item_id" value="<?=$_GET['id']?>">
+								<input type="hidden" name="item_diff" value="<?=$value['item_id']?>">
+								<select name="status">
+									<option <?=$value['status'] == '0' ? 'selected' : ''?> value="0">не выбрано</option>
+									<option <?=$value['status'] == '1' ? 'selected' : ''?> value="1">проверен</option>
+									<option <?=$value['status'] == '2' ? 'selected' : ''?> value="2">скрыт</option>
+								</select>
+							</form>
+							<!-- <?$checked = $value['checked'] ? 'checked' : ''?>
+							<input <?=$checked?> name="checked" type="checkbox" value="<?=$value['item_id']?>"> -->
 						</td>
 					<?}?>
 					<td label="Категории"><?=$value['categories']?></td>

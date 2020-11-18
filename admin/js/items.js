@@ -490,4 +490,7 @@ $(function(){
 			}
 		})
 	})
+	$('#itemDiff select[name=status]').on('change', function(){
+		$(this).closest('form').submit();
+	})
 })

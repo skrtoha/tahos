@@ -44,7 +44,7 @@
 			$a = explode('-', $value['value']);
 			$this->db->update(
 				$value['name'],
-				['hidden' => 1],
+				['status' => 2],
 				"(`item_id`= {$a[0]} AND `item_diff`= {$a[1]}) OR 
 					(`item_id`= {$a[1]} AND `item_diff`= {$a[0]})"
 			);

@@ -512,7 +512,7 @@ function show_form($act){
 								<input type="hidden" name="article" value="<?=$ov['article']?>">
 								<input type="hidden" name="title" value="<?=$ov['title_full']?>">
 								<b><?=$ov['status']?></b>
-								<?$no_show = array(9, 6, 8, 10);
+								<?$no_show = array(9, 6, 8, 10, 12);
 								if (!in_array($ov['status_id'], $no_show)){
 									$orders_statuses = get_order_statuses($ov['status_id']);?>
 									<br>новый статус:

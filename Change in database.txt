@@ -1,1 +1,1 @@
-ALTER TABLE `tahos_analogies` CHANGE `hidden` `status` INT(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT '1-checked, 2 - hidden';
+UPDATE `tahos_orders_statuses` SET `title` = 'Отменен клиентом' WHERE `tahos_orders_statuses`.`id` = 8;

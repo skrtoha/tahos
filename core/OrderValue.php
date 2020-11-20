@@ -90,11 +90,23 @@ class OrderValue{
 				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price']);
 				self::changeInStockStoreItem($params['quan'], $params);
 				break;
-			//отменен
+			//отменен клиентом
+			case 12:
+			//отменен поставщиком
 			case 8:
-				User::updateReservedFunds($params['user_id'], $params['price'], 'minus');
+				$ov = $GLOBALS['db']->select_one('orders_values', '*', Provider::getWhere($params));
+				
+				//если предыдущий статус был заказано
+				if ($ov['status_id'] == 11){
+					User::updateReservedFunds($params['user_id'], $params['price'], 'minus');
+				}
+
+				//если отменено поставщиком
+				if ($status_id == 8){
+					$GLOBALS['db']->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
+				}
+
 				self::update($values, $params);
-				self::changeInStockStoreItem($params['quan'], $params, 'plus');
 				break;
 			//отменен
 			case 5:
@@ -103,6 +115,10 @@ class OrderValue{
 				$values['issued'] = 0;
 				$values['declined'] = 0;
 				$values['returned'] = 0;
+				self::update($values, $params);
+				break;
+			case 6:
+				$GLOBALS['db']->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
 				self::update($values, $params);
 				break;
 			default:

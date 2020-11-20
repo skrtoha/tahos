@@ -508,7 +508,7 @@ td.change_status{
 .status_3{background: #9fe4ab !important;}
 .status_4{background: #abbfab !important;}
 .status_5{background: #dcdca7 !important;}
-.status_6{background: rgb(255, 149, 149) !important;}
+.status_6, .status_12{background: rgb(255, 149, 149) !important;}
 .status_7{background: #dfdff9 !important;}
 .status_8{background: #d29292 !important;}
 #to_basket{float: right;margin-top: 10px;height: 34px;padding: 5px;}

@@ -135,7 +135,7 @@ class Autopiter extends Provider{
 	public static function setArticle($brend, $article){
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
-		
+
 		try{
 			$articleId = self::getArticleIdByBrendAndArticle($brend, $article);
 		}
@@ -147,8 +147,11 @@ class Autopiter extends Provider{
 			'ArticleId' => $articleId
 		]);
 		if (is_array($PriceIdResult->GetPriceIdResult->PriceSearchModel)){
+			$i = 0;
 			foreach($PriceIdResult->GetPriceIdResult->PriceSearchModel as $model){
+				if ($i > 4) break;
 				self::parseSearchModel($model);
+				$i++;
 			}
 		}
 		else self::parseSearchModel($PriceIdResult->GetPriceIdResult->PriceSearchModel);

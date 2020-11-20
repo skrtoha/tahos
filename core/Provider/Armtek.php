@@ -22,7 +22,7 @@ class Armtek extends Provider{
 	public static $keyzak = array();
 	private $mainItemId;
 	private static $params = [
-		'VKORG' => '5000',
+		'VKORG' => '4000',
 		'KUNWE' => '',
 		'KUNZA' => '',
 		'INCOTERMS' => '',

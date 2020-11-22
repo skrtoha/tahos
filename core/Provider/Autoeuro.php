@@ -360,7 +360,7 @@ class Autoeuro extends Provider{
 		// exit();
 		$basket_items = self::getBasket();
 		if (!isset($basket_items->DATA)) return false;
-		// debug($basket_items);
+		debug($basket_items);
 		$basket_item_keys = [];
 		foreach($basket_items->DATA as $b){
 			if (!$b->comment) continue;
@@ -375,9 +375,10 @@ class Autoeuro extends Provider{
 			]
 		);
 		$json = json_decode($response);
-		debug($GLOBALS['response_header']);
-		debug($json);
-		if (!$response){
+		debug($response);
+		
+		//закоментировано потому, что ответ был тупо пустой, хотя заказ отправляется
+		/*if (!$response){
 			foreach($basket_items->DATA as $b){
 				if (!$b->comment) continue;
 				Log::insert([
@@ -386,7 +387,8 @@ class Autoeuro extends Provider{
 				]);
 			}
 			return false;
-		}
+		}*/
+
 		foreach($basket_items->DATA as $b){
 			if (!$b->comment) continue;
 			$array = explode('-', $b->comment);

@@ -1,6 +1,11 @@
 .jq-radio {
     border-radius: 50%;
 }
+a.showAllResults {
+   color: #e01d1d;
+    margin-bottom: 15px;
+    display: block;
+}
 .jq-checkbox, .jq-radio {
     vertical-align: -4px;
     width: 18px;
@@ -71,11 +76,16 @@ span.subprice {
     font-weight: 700;
 }
 div.emptyAvailabilityMainStores{
-	margin-top: 10px;
+	text-align: left;
+	margin: 0 auto;
+   width: 323px;
+}
+div.emptyAvailabilityMainStores p {
+	padding: 10px 0;
 }
 div.emptyAvailabilityMainStores img{
 	float: left;
-	width: 43px;
+	width: 34px;
 	margin-right: 10px;
 }
 #user_markup{

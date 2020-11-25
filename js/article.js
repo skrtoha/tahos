@@ -1137,14 +1137,13 @@ function applyUserMarkup(){
 	}
 	$('#user_markup').hide();
 }
-function loadAvailabilityOtherStores(item_id){
+function checkThroughAPI(item_id){
 	$.ajax({
 		type: 'get',
 		url: document.location.href,
 		success: function(){
-			$.cookie('message', 'Проверка складов партнеров завершена!', cookieOptions);
-			$.cookie('message_type', 'ok', cookieOptions);
-			document.location.href = document.location.href + '/processed';
+			let href = document.location.href + '/noUseAPI';
+			document.location.href = href;
 		}
 	})
 }
@@ -1152,8 +1151,8 @@ $(function(){
 	if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;
 	set_tabs();	
 	applyUserMarkup();
-	if (+$('input[name=isEmptyAvailabilityMainStores]').val()){
-		loadAvailabilityOtherStores();
+	if ($('input[name=noUseAPI]').val() == '0'){
+		checkThroughAPI();
 	}
 	$(document).on('click', '.cart-popup-table .delete-btn', function(){
 		let store_id = $(this).closest('tr').attr('store_id');

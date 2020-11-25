@@ -395,7 +395,17 @@ use core\User;
 						<?}?>
 						<?=$si['title_full']?>
 					</td>
-					<td colspan="5" style="">Поставщиков не найдено</td>
+					<td colspan="5" style="">
+						<?if (!isset($_GET['noUseAPI'])){?>
+							<div class="emptyAvailabilityMainStores">
+								<img src="<?=core\Config::$imgUrl?>/preload.gif">
+								<p>Идет поиск по складам партнеров...</p>
+							</div>
+						<?}
+						else{?>
+							<p style="padding: 0">Поставщиков не найдено.</p>
+						<?}?>
+					</td>
 				</tr>
 			<?}
 		}?>
@@ -732,7 +742,17 @@ else{?>
 				}
 				else{?>
 					<tr class="shown first-mobile empty">
-						<td colspan="5">Поставщиков не найдено</td>
+						<td colspan="5">
+							<?if (!isset($_GET['noUseAPI'])){?>
+								<div class="emptyAvailabilityMainStores">
+									<img src="<?=core\Config::$imgUrl?>/preload.gif">
+									<p>Идет поиск по складам партнеров...</p>
+								</div>
+							<?}
+							else{?>
+								<p style="padding: 0">Поставщиков не найдено.</p>
+							<?}?>
+						</td>
 					</tr>
 				<?}?>
 			</table>

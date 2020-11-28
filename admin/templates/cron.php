@@ -346,7 +346,7 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::$clientData['entity']['ClientID'] . "&PSW=" . Mikado::$clientData['entity']['Password'];
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::getParams()->entity->ClientID . "&PSW=" . Mikado::getParams()->entity->Password;
 			$file = file_get_contents($url);
 			if (strlen($file) == 18){
 				$errorText = "Не удалось скачать $zipName в $url";
@@ -362,7 +362,7 @@ switch($_GET['act']){
 			
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$zipName}.zip");
-			$file = $zipArchive->getStream("mikado_price_{$value}_" . Mikado::$clientData['entity']['ClientID'] . ".csv");
+			$file = $zipArchive->getStream("mikado_price_{$value}_" . Mikado::getParams()->entity->ClientID . ".csv");
 
 			$db->delete('store_items', "`store_id`=" .Mikado::$stocks[$value]);
 			$i = 0;

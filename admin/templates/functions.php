@@ -158,13 +158,14 @@ function getStrFilters($strFilters){
 }
 function set_image($file, $id){
 	global $db;
-	error_reporting(E_ERROR | E_PARSE);
 	$array = [];
-	$name = $file['name'];
+
+	/*$name = $file['name'];
 	if (!$name) {
 		$array['error'] = '';
 		return $array;
-	}
+	}*/
+
 	$dir_big = core\Config::$imgPath . "/items/big/$id";
 	$dir_small = core\Config::$imgPath . "/items/small/$id";
 	require_once("{$_SERVER['DOCUMENT_ROOT']}/vendor/class.upload.php");

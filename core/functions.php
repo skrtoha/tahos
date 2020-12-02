@@ -365,6 +365,7 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 					1,
 					0
 				) as is_desc,
+				i.photo,
 				i.id as item_id
 			FROM #$search_type diff
 			LEFT JOIN #items i ON i.id=diff.item_diff

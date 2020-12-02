@@ -1082,6 +1082,9 @@ header .catalog_btn {
   cursor: pointer;
   position: relative
 }
+.LBwU-_BE0gM5pPfAuH72E {
+  padding-bottom: 0px !important
+}
 header .search {
   float: left;
   width: 869px;
@@ -1094,8 +1097,7 @@ header .search.show {
 }
 header .search form {
   float: left;
-  width: -webkit-calc(100% - 96px);
-  width: calc(100% - 96px);
+  width: calc(100% - 35px);
   height: 75px
 }
 header .search input[type=text] {

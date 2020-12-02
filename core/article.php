@@ -36,7 +36,7 @@ use core\User;
 					<!-- наименование с фотоаппаратом -->
 					<td class="name-col" style="padding-top: 20px;text-align:left">
 						<?$class = '';
-							if($si['is_desc'] || $si['foto']){
+							if($si['is_desc'] || $si['photo']){
 								if ($si['is_desc']) $class ='fa-cog';
 								if ($si['photo']) $class = 'fa-camera';?>
 								<a href="#">
@@ -386,9 +386,9 @@ use core\User;
 					</td>
 					<td class="name-col">
 					<?$class = '';
-						if($si['is_desc'] || $si['foto']){
+						if($si['is_desc'] || $si['photo']){
 							if($si['is_desc']) $class ='fa-cog';
-							if ($si['foto']) $class = 'fa-camera';?>
+							if ($si['photo']) $class = 'fa-camera';?>
 							<a href="#">
 								<i item_id="<?=$si['item_id']?>" class="fa <?=$class?> product-popup-link" aria-hidden="true"></i>
 							</a>

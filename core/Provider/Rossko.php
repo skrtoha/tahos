@@ -26,6 +26,20 @@ class Rossko extends Provider{
 		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 15));
 		return $params;
 	}
+
+	/**
+	 * wrote for admin/scripts/parse_images.php
+	 * @param  [type] $brend   [description]
+	 * @param  [type] $article [description]
+	 * @return [type]          [description]
+	 */
+	public function getPartTitleByBrendAndArticle($brend, $article){
+		return false;
+		$result = $this->getResult("$article $brend");
+		if (!isset($result->SearchResult->PartsList)) return false;
+		return $result->SearchResult->PartsList->Part->name;
+	}
+
 	/**
 	 * [getItemsToOrder description]
 	 * @param  int $provider_id provider_id
@@ -186,7 +200,7 @@ class Rossko extends Provider{
 		]);
 		debug($result);
 	}
-	private function getResult($search){
+	public function getResult($search){
 		$query = self::getSoap('GetSearch');
 		if (!$query) return false;
 		$param = [

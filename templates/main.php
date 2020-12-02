@@ -76,9 +76,6 @@
 					</div>
 					<button class="search_btn"></button>
 				</form>
-				<div class="settings_btn">
-					<div class="arrow_up"></div>
-				</div>
 				<div class="hints"></div>
 			</div>
 			<div class="search_btn search_btn_2"></div>

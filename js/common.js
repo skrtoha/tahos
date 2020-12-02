@@ -349,12 +349,22 @@ $(function() {
 	$("button.search_btn").click(function(e){
 		e.preventDefault();
 		var search_text = $('.search_input').val() ? $('.search_input').val() : "9091901122";
-		var type_search = $('input[name=type]:checked').val();
-		console.log(search_text, type_search);
+		console.log(search_text);
+		let type_search;
+		switch(search_text.length){
+			case 13: type_search = 'barcode'; break;
+			case 17: type_search = 'vin'; break;
+			default: type_search = 'article';
+		}
 		if (type_search == 'vin' && search_text.match(/^[\w\d]{17}$/gi) === null){
 			return show_message('VIN-номер введен неккоректно!', 'error')
 		}
-		window.location.href = "/search/" + type_search + '/' + search_text + '/yes';
+		if (type_search == 'vin'){
+			window.location.href = "/original-catalogs#/carInfo?q=" + search_text;
+		}
+		else{
+			window.location.href = "/search/" + type_search + '/' + search_text + '/yes';
+		}
 	});
 	$(".login_btn").click(function(){
 		$('.overlay').click();

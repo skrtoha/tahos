@@ -24,7 +24,7 @@ class Item{
 		$db = self::getInstanceDataBase();
 		$barcode = $fields['barcode'] ? $fields['barcode'] : false;
 		unset($fields['barcode']);
-		$resItems = $db->insert('items', $fields);
+		$resItems = $db->insert('items', $fields/*, ['print' => true]*/);
 		if ($resItems !== true) return $resItems;
 		$last_id = $db->last_id();
 		$db->insert('articles', ['item_id' => $last_id, 'item_diff' => $last_id]);

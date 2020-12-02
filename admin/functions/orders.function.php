@@ -229,7 +229,7 @@ function get_status($s){
 		if ($value == 5) return 'Ожидает';
 	}
 	$done = true;
-	$done_statuses = array(1, 2, 3, 4, 6, 8, 9);
+	$done_statuses = array(1, 2, 3, 4, 6, 8, 12);
 	foreach($statuses as $value){
 		if (!in_array($value, $done_statuses)){
 			$done = false;

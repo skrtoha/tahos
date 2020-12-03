@@ -360,7 +360,7 @@ $(function() {
 			return show_message('VIN-номер введен неккоректно!', 'error')
 		}
 		if (type_search == 'vin'){
-			window.location.href = "/original-catalogs#/carInfo?q=" + search_text;
+			window.location.href = "/original-catalogs/legkovie-avtomobili#/carInfo?q=" + search_text;
 		}
 		else{
 			window.location.href = "/search/" + type_search + '/' + search_text + '/yes';

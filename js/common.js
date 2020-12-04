@@ -349,10 +349,12 @@ $(function() {
 	$("button.search_btn").click(function(e){
 		e.preventDefault();
 		var search_text = $('.search_input').val() ? $('.search_input').val() : "9091901122";
-		console.log(search_text);
 		let type_search;
 		switch(search_text.length){
-			case 13: type_search = 'barcode'; break;
+			case 13: 
+				if (/\d+/.test(search_text)) type_search = 'barcode'; 
+				else type_search = 'article';
+				break;
 			case 17: type_search = 'vin'; break;
 			default: type_search = 'article';
 		}

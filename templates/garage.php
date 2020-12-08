@@ -1,6 +1,5 @@
 <?
 if (empty($user)) header("Location: /");
-// debug($_GET);
 if ($_GET['modification_id']) modification();
 else garage();
 function garage(){
@@ -43,15 +42,16 @@ function garage(){
 		LEFT JOIN
 			#brends b ON b.id=md.brend_id
 		WHERE
-			g.user_id={$user['id']} AND f.title IS NOT NULL
+			g.user_id={$user['id']}
 	", '');
 	$modifications = array();
 	if ($res_modifications->num_rows){
 		while($row = $res_modifications->fetch_assoc()){
+			$isFromPartsCatalogs = is_numeric($row['modification_id']);
 			$array = [
 				'modification_id' => $row['modification_id'],
 				'title_garage' => $row['title_garage'],
-				'title_modification' => $row['title_modification'],
+				'title_modification' => $isFromPartsCatalogs ? $row['title'] : $row['title_garage'],
 				'model_id' => $row['model_id'],
 				'vehicle_id' => $row['vehicle_id'],
 				'title_brend' => $row['title_brend'],
@@ -63,6 +63,16 @@ function garage(){
 			else $modifications['non_active'][] = $array;
 		}
 	}
+
+	//модификации с parts-catalogs
+	/*$res_modifications = $db->query("
+		SELECT
+			g.*
+		FROM
+			#garage g
+		WHERE
+			g.user_id = {$user}
+	")*/
 	// debug($modifications);
 	?>
 	<div class="garage">
@@ -145,16 +155,19 @@ function garage(){
 						else{
 							foreach($modifications['active'] as $value){?>
 								<div class="item" modification_id="<?=$value['modification_id']?>">
-									<a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
+									<a class="model-name" href="#">
+										<?=$value['title_brend']?> <?=$value['title_model']?> <?=$value['title_modification'] ? "{$value['title_modification']}" : ''?>
+									</a>
 									<div class="clearfix"></div>
 									<?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
 										<div class="img">
 											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}
-									else{?>
+									else{
+										$vehicle_id = is_numeric($value['modification_id']) ? $value['vehicle_id'] : 11;?>
 										<div class="img">
-											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$value['vehicle_id']?>.jpg" alt="<?=$value['title']?>">
+											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}?>
 									<div class="description">
@@ -185,9 +198,10 @@ function garage(){
 											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}
-									else{?>
+									else{
+										$vehicle_id = is_numeric($value['modification_id']) ? $value['vehicle_id'] : 11;?>
 										<div class="img">
-											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$value['vehicle_id']?>.jpg" alt="<?=$value['title']?>">
+											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$value['title']?>">
 										</div>
 									<?}?>
 									<div class="description">
@@ -350,33 +364,46 @@ function garage(){
 function modification(){
 	global $db, $title, $user;
 	// error_reporting(E_ALL);
-	$m = $db->select_unique("
-		SELECT
-			mf.id AS modification_id,
-			mf.title AS modification_title,
-			mf.model_id,
-			md.title AS model_title,
-			md.href AS model_href,
-			md.vehicle_id,
-			b.href AS brend_href,
-			b.title AS brend,
-			g.title AS garage_title,
-			g.comment,
-			v.href AS vehicle_href
-		FROM
-			#modifications mf
-		LEFT JOIN
-			#models md ON md.id=mf.model_id
-		LEFT JOIN
-			#brends b ON b.id=md.brend_id
-		LEFT JOIN
-			#garage g ON g.user_id={$user['id']} AND g.modification_id={$_GET['modification_id']}
-		LEFT JOIN
-			#vehicles v ON v.id=md.vehicle_id
-		WHERE
-			mf.id={$_GET['modification_id']} 
-	", '');
-	$m = $m[0];
+	if (is_numeric($_GET['modification_id'])){
+		$m = $db->select_unique("
+			SELECT
+				mf.id AS modification_id,
+				mf.title AS modification_title,
+				mf.model_id,
+				md.title AS model_title,
+				md.href AS model_href,
+				md.vehicle_id,
+				b.href AS brend_href,
+				b.title AS brend,
+				g.title AS garage_title,
+				g.comment,
+				v.href AS vehicle_href
+			FROM
+				#modifications mf
+			LEFT JOIN
+				#models md ON md.id=mf.model_id
+			LEFT JOIN
+				#brends b ON b.id=md.brend_id
+			LEFT JOIN
+				#garage g ON g.user_id={$user['id']} AND g.modification_id='{$_GET['modification_id']}'
+			LEFT JOIN
+				#vehicles v ON v.id=md.vehicle_id
+			WHERE
+				mf.id='{$_GET['modification_id']}' 
+		", '');
+		$m = $m[0];
+		$title = "Гараж | {$m['model_title']}";
+	}
+	else{
+		$garage = $db->select_one('garage', '*', "`user_id` = {$user['id']} AND `modification_id` = '{$_GET['modification_id']}'");
+		$m = [];
+		$m['modification_title'] = $garage['title'];
+		$m['comment'] = $garage['comment'];
+		$title = "Гараж | {$m['modification_title']}";
+		preg_match('/^[\w а-яА-Я-]+,/', $_GET['modification_id'], $coincidences);
+		$m['brend'] = strtoupper(substr($coincidences[0], 0, -1));
+	}
+	
 	$res_categories = $db->query("
 		SELECT
 			c.href,
@@ -386,7 +413,6 @@ function modification(){
 		WHERE
 			c.parent_id=0
 	", '');
-	$title = "Гараж | {$m['model_title']}";
 	?>
 	<script src="/js/garage-selected-ts.js"></script>
 	<input type="hidden" name="modification_id" value="<?=$_GET['modification_id']?>">
@@ -400,10 +426,13 @@ function modification(){
 						<img src="<?=core\Config::$imgUrl?>/models/<?=$m['model_id']?>.jpg" alt="<?=$m['modification_title']?>">
 					<?}
 					else{?>
-						<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$m['vehicle_id']?>.jpg" alt="<?=$m['modification_title']?>">
+						<?$vehicle_id = is_numeric($_GET['modification_id']) ? $m['vehicle_id'] : 11?>
+						<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$m['modification_title']?>">
 					<?}?>
 				</div>
-				<label for="ts-name">Имя: <input type="text" name="modification_title" value="<?=$m['garage_title']?>"></label>
+				<?if (is_numeric($_GET['modification_id'])){?>
+					<label for="ts-name">Имя: <input type="text" name="modification_title" value="<?=$m['garage_title']?>"></label>
+				<?}?>
 			</div>
 			<div class="note">
 				<textarea placeholder="Начните свою запись в блокноте"><?=$m['comment']?></textarea>
@@ -420,7 +449,24 @@ function modification(){
 			<div class="ionTabs__body">
 				<div class="ionTabs__item" data-name="Tab_1_name">
 					<ul>
-						<li><a href="/original-catalogs/<?=$m['vehicle_href']?>/<?=$m['brend_href']?>/<?=$m['model_id']?>/<?=$m['model_href']?>/vin/<?=$_GET['modification_id']?>">Оригинальный каталог</a></li>
+						<li>
+							<?if (is_numeric($_GET['modification_id'])){?>
+								<a href="/original-catalogs/<?=$m['vehicle_href']?>/<?=$m['brend_href']?>/<?=$m['model_id']?>/<?=$m['model_href']?>/vin/<?=$_GET['modification_id']?>">
+									Оригинальный каталог
+								</a>
+							<?}
+							else{
+								$data = explode(',', $_GET['modification_id']);
+								$href = "/original-catalogs/legkovie-avtomobili#/groups?catalogId={$data[0]}";
+								if ($data[1]) $href .= "&modelId={$data[1]}";
+								if ($data[2]) $href .= "&carId={$data['2']}";
+								if ($data[3]) $href .= "&q={$data[3]}";
+								?>
+								<a href="<?=$href?>">
+									Оригинальный каталог
+								</a>
+							<?}?>
+						</li>
 						<?if ($res_categories->num_rows){
 							while($row = $res_categories->fetch_assoc()){?>
 								<li><a href="/category/<?=$row['href']?>"><?=$row['title']?></a></li>

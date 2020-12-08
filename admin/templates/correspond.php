@@ -8,6 +8,7 @@ if ($_POST['image_submit']){
 		message('Недопустимый формат файла!', false);
 		$bool = false;
 	}
+	//исправлен баг с переписками
 	if ($bool){
 		$target_dir = core\Config::$imgPath . "/temp/";
 		$image_name = microtime().".jpg";

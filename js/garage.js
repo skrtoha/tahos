@@ -146,41 +146,169 @@ $(function(){
 	$(document).on('click', 'div.active-tab a.remove-item', function(e){
 		e.preventDefault();
 		var th = $(this).closest('[modification_id]');
+		var img = th.find('div.img').html();
+		var model_name = th.find('a.model-name').html();
 		if(!confirm('Вы действительно хотите удалить?')) return false;
-		let modification_id = th.attr('modification_id');
+		var modification_id = th.attr('modification_id');
 		$.ajax({
 			type: 'post',
 			url: '/ajax/garage.php',
 			data: 'act=modification_delete&modification_id=' + modification_id,
 			success: function(response){
-				$('div.not-active-tab .removable').remove();
-				th.find('.remove-item').remove();
-				th.find('div.clearfix:last-child').after(`
-					<a href="#" class="remove-item">Удалить из гаража</a>
-					<a href="#" class="restore-item">Восстановить</a>
-				`);
-				th.clone().prependTo('div.not-active-tab');
-				th.remove();
+				// console.log(response); return false;
+				var m = JSON.parse(response);
+				// console.log(m);
+				$('[modification_id=' + modification_id + ']').each(function(){
+					$(this).remove();
+				})
+				$('.not-active-tab .removable').remove();
+				if (!$('div.mosaic-view > div.active-tab [modification_id]').size()){
+					$('div.mosaic-view > div.active-tab div.clearfix').before(
+						'<p class="removable">Активных моделей не найдено</p>'
+					);
+				};
+				if (!$('div.list-view div.active-tab .wide-view [modification_id]').size()){
+					$('div.list-view div.active-tab .wide-view').append(
+						'<tr class="removable"><td colspan="4">Активных моделей не найдено</td></tr>'
+					)
+				};
+				if (!$('div.list-view div.active-tab .middle-view [modification_id]').size()){
+					$('div.list-view div.active-tab .middle-view').append(
+						'<tr class="removable"><td colspan="2">Активных моделей не найдено</td></tr>'
+					)
+				};
+				if (!$('div.list-view div.active-tab .small-view [modification_id]').size()){
+					$('div.list-view div.active-tab .small-view').append(
+						'<tr class="removable"><td colspan="2">Активных моделей не задано</td></tr>'
+					)
+				};
+				$('div.mosaic-view > div.not-active-tab > div.clearfix').before(
+					'<div class="item" modification_id="' + m.modification_id + '" style="">' +
+						'<a class="model-name" href="#">' + model_name + '</a>' +
+						'<div class="clearfix"></div>' +
+						'<div class="img" style="">' + img + '</div>' +
+						'<div class="description">' +
+							'<div class="parametrs">' +
+								'<p>Имя: ' + m.title_garage + '</p>' +
+								'<p>VIN: ' + m.vin + '</p>' +
+								'<p>Год выпуска: ' + m.year + '</p>' +
+							'</div>' +
+						'</div>' +
+						'<div class="clearfix"></div>' +
+						'<a href="#" class="remove-item">Удалить из гаража</a>' +
+						'<a href="#" class="restore-item">Восстановить</a>' +
+					'</div>'
+				);
+				$('div.list-view > div.not-active-tab > table.wide-view').append(
+					'<tr modification_id="' + m.modification_id + '">' +
+						'<td><a href="#">' + m.title_modification + '</a></td>' +
+						'<td><p>' + m.vin + ' </p></td>' +
+						'<td><p>' + m.year + '</p></td>' +
+						'<td><a href="#" class="restore-item">Восстановить</a></td>' +
+						'<td><a href="#" class="remove-item">Удалить</a></td>' +
+					'</tr>'
+				);
+				$('div.list-view > div.not-active-tab > table.middle-view').append(
+					'<tr modification_id="' + m.modification_id + '">' +
+						'<td><p>' +
+							'<a href="#">' + m.title_modification + '</a> ' + m.year + ' г.в. </p></td>' +
+						'<td><a href="#" class="restore-item">Восстановить</a></td>' +
+						'<td><a href="#" class="remove-item">Удалить</a></td>' +
+					'</tr>'
+				);
+				$('div.list-view > div.not-active-tab > table.small-view').append(
+					'<tr modification_id="' + m.modification_id + '">' +
+						'<td>' +
+							'<p>' +
+								'<a href="#">' + m.title_modification + '</a> ' + m.year + ' г.в. </p>' +
+							'<a href="#" class="restore-item">Восстановить</a>' +
+							'<a href="#" class="remove-item">Удалить</a>' +
+						'</td>' +
+					'</tr>'
+				);
+				show_message('Успешно удалено!');
 			}
 		})
 	})
 	$(document).on('click', 'a.restore-item', function(e){
 		e.preventDefault();
 		var th = $(this).closest('[modification_id]');
+		var img = th.find('div.img').html();
+		var model_name = th.find('a.model-name').html();
 		var modification_id = th.attr('modification_id');
 		$.ajax({
 			type: 'post',
 			url: '/ajax/garage.php',
 			data: 'act=modification_restore&modification_id=' + modification_id,
 			success: function(response){
-				$('div.active-tab .removable').remove();
-				th.find('.remove-item').remove();
-				th.find('.restore-item').remove();
-				th.find('div.clearfix:last-child').after(`
-					<a href="" class="remove-item">Удалить</a>
-				`);
-				th.clone().prependTo('div.active-tab');
-				th.remove();
+				// console.log(response); return false;
+				var m = JSON.parse(response);
+				// console.log(m);
+				$('[modification_id=' + modification_id + ']').each(function(){
+					$(this).remove();
+				})
+				$('.active-tab .removable').remove();
+				if (!$('div.mosaic-view > div.not-active-tab [modification_id]').size()){
+					$('div.mosaic-view > div.not-active-tab div.clearfix').before(
+						'<p class="removable">Неактивных моделей не найдено</p>'
+					);
+				};
+				if (!$('div.list-view div.not-active-tab .wide-view [modification_id]').size()){
+					$('div.list-view div.not-active-tab .wide-view').append(
+						'<tr class="removable"><td colspan="4">Неактивных моделей не найдено</td></tr>'
+					)
+				};
+				if (!$('div.list-view div.not-active-tab .middle-view [modification_id]').size()){
+					$('div.list-view div.not-active-tab .middle-view').append(
+						'<tr class="removable"><td colspan="2">Неактивных моделей не найдено</td></tr>'
+					)
+				};
+				if (!$('div.list-view div.not-active-tab .small-view [modification_id]').size()){
+					$('div.list-view div.not-active-tab .small-view').append(
+						'<tr class="removable"><td colspan="2">Неактивных моделей не задано</td></tr>'
+					)
+				};
+				$('div.mosaic-view > div.active-tab > div.clearfix').before(
+					'<div class="item" modification_id="' + m.modification_id + '" style="">' +
+						'<a class="model-name" href="#">' + model_name + '</a>' +
+						'<div class="clearfix"></div>' +
+						'<div class="img" style="">' + img + '</div>' +
+						'<div class="description">' +
+							'<div class="parametrs">' +
+								'<p>Имя: ' + m.title_garage + '</p>' +
+								'<p>VIN: ' + m.vin + '</p>' +
+								'<p>Год выпуска: ' + m.year + '</p>' +
+							'</div>' +
+						'</div>' +
+						'<div class="clearfix"></div>' +
+						'<a href="" class="remove-item">Удалить</a>' +
+					'</div>'
+				);
+				$('div.list-view > div.active-tab > table.wide-view').append(
+					'<tr modification_id="' + m.modification_id + '">' +
+						'<td><a href="#">' + m.title_modification + '</a></td>' +
+						'<td><p>' + m.vin + ' </p></td>' +
+						'<td><p>' + m.year + '</p></td>' +
+						'<td><a href="#" class="remove-item">Удалить</a></td>' +
+					'</tr>'
+				);
+				$('div.list-view > div.active-tab > table.middle-view').append(
+					'<tr modification_id="' + m.modification_id + '">' +
+						'<td><p>' +
+							'<a href="#">' + m.title_modification + '</a> ' + m.year + ' г.в. </p></td>' +
+						'<td><a href="#" class="remove-item">Удалить</a></td>' +
+					'</tr>'
+				);
+				$('div.list-view > div.not-active-tab > table.small-view').append(
+					'<tr modification_id="' + m.modification_id + '">' +
+						'<td>' +
+							'<p>' +
+								'<a href="#">' + m.title_modification + '</a> ' + m.year + ' г.в. </p>' +
+							'<a href="#" class="remove-item">Удалить</a>' +
+						'</td>' +
+					'</tr>'
+				);
+				show_message('Успешно восстановлено!');
 			}
 		})
 	})
@@ -195,7 +323,7 @@ $(function(){
 			data: 'act=modification_delete_fully&modification_id=' + modification_id,
 			success: function(response){
 				// console.log(response); return;
-				th.remove();
+				$('div.not-active-tab [modification_id=' + modification_id + ']').remove();
 				show_message('Успешно удалено из гаража');
 			}
 		})

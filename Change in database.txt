@@ -1,2 +1,17 @@
-ALTER TABLE tahos.tahos_garage DROP FOREIGN KEY tahos_garage_ibfk_2;
-ALTER TABLE `tahos_garage` CHANGE `modification_id` `modification_id` VARCHAR(255) NOT NULL;
+CREATE TABLE `tahos_parse_images_brends` (
+  `brend_title` varchar(255) NOT NULL,
+  `identifier` int(10) UNSIGNED NOT NULL,
+  `is_missed` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `processed` int(1) UNSIGNED NOT NULL DEFAULT '0',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `tahos_parse_images_brends`
+--
+ALTER TABLE `tahos_parse_images_brends`
+  ADD PRIMARY KEY (`brend_title`);

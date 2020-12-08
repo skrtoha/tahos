@@ -1,16 +1,6 @@
 var cookieOptions = {path: '/'};
 var cp_api = false;
 var h_win = $(window).height();
-function getParams(url = ''){
-	let str = url ? url : window.location.search;
-	if (!str) return false;
-	const urlParams = new URLSearchParams(str);
-	let output = new Object();
-	for(const[name, value] of urlParams){
-		output[name] = value;
-	}
-	return output;
-};
 function show_popup_basket(){
 	event.preventDefault();
 	var cart = $(".cart-popup");

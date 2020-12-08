@@ -1,6 +1,7 @@
 <?$title = 'Оригинальные каталоги';
 if ($_GET['vehicle'] == 'legkovie-avtomobili'){
 	$title = 'Легковые автомобили';?>
+	<input type="hidden" name="user_id" value="<?=$_SESSION['user'] ? $_SESSION['user'] : ''?>">
 	<div id="parts-catalog"
 	  data-key="TWS-4F5CE688-B8A5-4903-9E1C-0E125922134F"
 	  data-target="new_window"

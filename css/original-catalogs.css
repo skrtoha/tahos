@@ -8,6 +8,25 @@
 .L8voRdGros5ODIRccNwN-{
   display: none;
 }
+.NwmhI9JCaIQ_ffRS2xDnD{
+  margin-bottom: 10px;
+}
+#to_garage {
+    float: left;
+    position: relative;
+    z-index: 1;
+    margin-right: 10px;
+}
+#to_garage button {
+    background: url(/img/icons/garage_open.png) no-repeat center, #0069a0;
+    width: 35px;
+    height: 35px;
+    background-size: 80%;
+}
+#to_garage button.is_garaged {
+    background: url(/img/icons/garage_closed.png) no-repeat center, #0081bc;
+    background-size: 80%;
+}
 .content .item_brends {
   padding-top: 20px;
 }

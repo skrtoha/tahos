@@ -24,9 +24,7 @@ function replace_winword_chars($val){
 }
 function uppercase_first_letter($str){
 	$left = substr($str, 0, 1);
-	echo "<p>$left</p>";
 	$right = substr($str, 1, strlen($str) - 1);
-	echo "<p>$right</p>";
 	return mb_strtoupper($left).$right;
 }
 function translite($var){

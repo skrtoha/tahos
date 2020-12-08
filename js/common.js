@@ -349,6 +349,8 @@ $(function() {
 	$("button.search_btn").click(function(e){
 		e.preventDefault();
 		var search_text = $('.search_input').val() ? $('.search_input').val() : "9091901122";
+		search_text = search_text.replace(/\W+/g, '');
+		console.log(search_text);
 		let type_search;
 		switch(search_text.length){
 			case 13: 

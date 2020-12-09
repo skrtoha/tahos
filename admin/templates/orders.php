@@ -312,6 +312,7 @@ function show_form($act){
 			<td>Цена</td>
 			<td>Кол-во</td>
 			<td>Сумма</td>
+			<td>Сумма<br>закупки</td>
 			<td>
 				Доставка<br>
 				Выдача
@@ -458,6 +459,9 @@ function show_form($act){
 						else{?>
 							<?=$ov['sum']?>
 						<?}?>
+					</td>
+					<td label="Сумма закупки">
+						<?=$ov['priceWithoutMarkup']?>
 					</td>
 					<td label="Доставка">
 						<?if ($ov['status_id'] == 1){

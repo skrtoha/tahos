@@ -104,7 +104,7 @@ switch($_POST['act']){
 		$res = $db->update(
 			'garage',
 			['is_active' => 0],
-			"`modification_id`={$_POST['modification_id']} AND `user_id`={$_SESSION['user']}"
+			"`modification_id`='{$_POST['modification_id']}' AND `user_id`={$_SESSION['user']}"
 		);
 		if ($res !== true) break;
 		$modifications = get_modifications();
@@ -113,10 +113,8 @@ switch($_POST['act']){
 	case 'modification_restore':
 		$res = $db->update(
 			'garage',
-
-
 			['is_active' => 1],
-			"`modification_id`={$_POST['modification_id']} AND `user_id`={$_SESSION['user']}"
+			"`modification_id`='{$_POST['modification_id']}' AND `user_id`={$_SESSION['user']}"
 		);
 		if ($res !== true) break;
 		$modifications = get_modifications();
@@ -129,13 +127,13 @@ switch($_POST['act']){
 		break;
 	case 'change_garage':
 		// print_r($_POST);
-		$res = $db->update(
+		$res = $db->update_query(
 			"garage",
 			[
 				'title' => $_POST['modification_title'],
 				'comment' => $_POST['comment']
 			],
-			"`user_id`={$_SESSION['user']} AND `modification_id`={$_POST['modification_id']}"
+			"`user_id`={$_SESSION['user']} AND `modification_id`='{$_POST['modification_id']}'"
 		);
 		if ($res === true) echo true;
 		else echo $res;
@@ -146,7 +144,7 @@ switch($_POST['act']){
 		break;
 	case 'from_modification_to_garage':
 		$db->delete('garage', "`user_id`={$_POST['user_id']} AND `modification_id`={$_POST['modification_id']}");
-		$db->insert('garage', ['user_id' => $_POST['user_id'], 'modification_id' => $_POST['modification_id']]);
+		$db->insert('garage', ['user_id' => $_POST['user_id'], 'modification_id' => $_POST['modification_id']]/*, ['print' => true]*/);
 		break;
 	case 'request_delete_item':
 		$db->insert('user_request_delete_item', ['user_id' => $_POST['user_id'], 'item_id' => $_POST['item_id']]);
@@ -175,7 +173,7 @@ function get_modifications(){
 			LEFT JOIN
 				#vehicle_filters f ON f.id=fv.filter_id 
 			WHERE
-				mf.id={$_POST['modification_id']} AND f.title='Год'
+				mf.id='{$_POST['modification_id']}' AND f.title='Год'
 		", '');
 }
 ?> 

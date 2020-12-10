@@ -8,17 +8,16 @@ class Fund{
 	 * @return [boolean] true if inserted successfully 
 	 */
 	public static function insert($type_operation, $fields){
-		return $GLOBALS['db']->insert(
-			'funds',
-			[
-				'type_operation' => $type_operation,
-				'sum' => $fields['sum'],
-				'remainder' => $fields['remainder'],
-				'user_id' => $fields['user_id'],
-				'overdue' => isset($fields['overdue']) ? $fields['overdue'] : 0,
-				'comment' => $fields['comment']
-			]
-		/*, ['print' => true]*/);
+		$insert = [
+			'type_operation' => $type_operation,
+			'sum' => $fields['sum'],
+			'remainder' => $fields['remainder'],
+			'user_id' => $fields['user_id'],
+			'overdue' => isset($fields['overdue']) ? $fields['overdue'] : 0,
+			'comment' => $fields['comment']
+		];
+		if ($type_operation == 1) $insert['is_new'] = 1;
+		return $GLOBALS['db']->insert('funds', $insert);
 	}
 
 	public static function getQueryListFunds($where = '', $having = '', $order = ''){

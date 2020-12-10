@@ -441,12 +441,12 @@ function form_operations($act){
 		$_POST['sum'] = str_replace(array(' ', ','), '', $_POST['sum']);
 		$curr_bill = $user[0]['bill'] + $_POST['sum'];
 		$array = array(
-			'type_operation' => 1, 
 			'sum' => $_POST['sum'], 
 			'remainder' => $curr_bill, 
 			'user_id' => $id, 
 			'comment' => 'Пополнение '.$_POST['replenishment']
 		);
+		core\Fund::insert(1, $array);
 		$db->insert('funds', $array);
 		$db->update('users', array('bill' => $curr_bill), '`id`='.$id);
 		core\User::checkOverdue($id, $_POST['sum']);

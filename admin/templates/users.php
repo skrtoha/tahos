@@ -289,10 +289,6 @@ function show_form($act){
 					<div class="value"><input type=text name="markup_handle_order" value="<?=$array['markup_handle_order']?>"></div>
 				</div>
 				<div class="field">
-					<div class="title">Отсрочка платежа</div>
-					<div class="value"><input type=text name="deferment_of_payment" value="<?=$array['deferment_of_payment']?>"></div>
-				</div>
-				<div class="field">
 					<div class="title">Скидка</div>
 					<div class="value"><input type=text name="discount" value="<?=$array['discount']?>"></div>
 				</div>

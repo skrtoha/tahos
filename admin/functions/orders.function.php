@@ -23,7 +23,7 @@ function get_order($flag = ''){
 			o.user_id,
 			u.bill,
 			u.reserved_funds,
-			u.deferment_of_payment,
+			u.defermentOfPayment,
 			u.pay_type,
 			o.is_new,
 			o.is_draft
@@ -164,7 +164,7 @@ function order_print($order, $res_orders_values){
 			<span><?=$order['fio']?></span>
 		</p>
 		<p>Тип оплаты: <?=$order['pay_type']?></p>
-		<p>Отсрочка платежа: <?=$order['deferment_of_payment']?> дней.</p>
+		<p>Отсрочка платежа: <?=$order['defermentOfPayment']?> дней.</p>
 		<p><strong>Подбор номенклатуры произведен в моем присутствии по данным, предоставленным мною.</strong></p>
 		<p>______________________________</p>
 	</div>

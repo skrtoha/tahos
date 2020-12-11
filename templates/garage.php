@@ -447,7 +447,24 @@ function modification(){
 			<div class="ionTabs__body">
 				<div class="ionTabs__item" data-name="Tab_1_name">
 					<ul>
-						<li><a href="/original-catalogs/<?=$m['vehicle_href']?>/<?=$m['brend_href']?>/<?=$m['model_id']?>/<?=$m['model_href']?>/vin/<?=$_GET['modification_id']?>">Оригинальный каталог</a></li>
+						<li>
+							<?if (is_numeric($_GET['modification_id'])){?>
+								<a href="/original-catalogs/<?=$m['vehicle_href']?>/<?=$m['brend_href']?>/<?=$m['model_id']?>/<?=$m['model_href']?>/vin/<?=$_GET['modification_id']?>">
+									Оригинальный каталог
+								</a>
+							<?}
+							else{
+								$data = explode(',', $_GET['modification_id']);
+								$href = "/original-catalogs/legkovie-avtomobili#/groups?catalogId={$data[0]}";
+								if ($data[1]) $href .= "&modelId={$data[1]}";
+								if ($data[2]) $href .= "&carId={$data['2']}";
+								if ($data[3]) $href .= "&q={$data[3]}";
+								?>
+								<a href="<?=$href?>">
+									Оригинальный каталог
+								</a>
+							<?}?>
+						</li>
 						<?if ($res_categories->num_rows){
 							while($row = $res_categories->fetch_assoc()){?>
 								<li><a href="/category/<?=$row['href']?>"><?=$row['title']?></a></li>

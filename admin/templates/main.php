@@ -151,7 +151,8 @@ use admin\functions\LeftMenu;
 			'prices', 
 			'test_api_providers', 
 			'brends',
-			'goods_arrival'
+			'goods_arrival',
+			'users'
 		];
 		if (in_array($view, $arrayIntuitiveSearch)){?>
 			{"src" : "/vendor/intuitive_search/script.js", "async" : false},

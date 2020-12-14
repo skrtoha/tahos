@@ -53,6 +53,35 @@ switch ($_POST['column']) {
 			);
 		}
 		break;
+	case 'getStoreItemsByItemID':
+		$query = core\StoreItem::getQueryStoreItem();
+		$query .= "
+			WHERE si.item_id = {$_POST['item_id']}
+		";
+		$res = $db->query($query, '');
+		if (!$res->num_rows){
+			$query = core\Item::getQueryItemInfo();
+			$query .= "
+				WHERE i.id = {$_POST['item_id']}
+			";
+			$res = $db->query($query, '');
+			echo json_encode($res->fetch_assoc());
+			break;
+		} 
+		$item = [];
+		foreach($res as $row){
+			$item['item_id'] = $row['item_id'];
+			$item['brend'] = $row['brend'];
+			$item['article'] = $row['article'];
+			$item['title_full'] = $row['title_full'];
+			$item['stores'][$row['store_id']]['price'] = $row['price'];
+			$item['stores'][$row['store_id']]['packaging'] = $row['packaging'];
+			$item['stores'][$row['store_id']]['in_stock'] = $row['in_stock'];
+			$item['stores'][$row['store_id']]['cipher'] = $row['cipher'];
+			$item['stores'][$row['store_id']]['provider'] = $row['provider'];
+		}
+		echo json_encode($item);
+		break;
 }
 $price_updated = $db->query("
 	UPDATE

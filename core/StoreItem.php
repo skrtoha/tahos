@@ -7,7 +7,8 @@ class StoreItem{
 			SELECT
 				si.item_id,
 				si.store_id,
-				si.price,
+				si.price AS priceWithoutMarkup,
+				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) AS price,
 				si.packaging,
 				si.in_stock,
 				ps.cipher,
@@ -21,6 +22,8 @@ class StoreItem{
 				#store_items si
 			LEFT JOIN
 				#provider_stores ps ON ps.id = si.store_id
+			LEFT JOIN
+				#currencies c ON c.id = ps.currency_id
 			LEFT JOIN
 				#providers p ON p.id = ps.provider_id
 			LEFT JOIN

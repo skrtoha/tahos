@@ -4,48 +4,16 @@
 		mainSelector: '#user_order_add ',
 		response: this.mainSelector + 'div.response',
 		reg_int: /^\d+$/,
-		items: null,
+		items: new Object,
 		init: function(){
-			var uoa = this;
+			let uoa = this;
 			$(uoa.getSelector('a.show_form_search')).on('click', function(e){
 				e.preventDefault();
 				$(this).nextAll('div.item_search').toggleClass('active');
 			})
-			$(uoa.getSelector('form[name=search_items]')).on('submit', function(e){
+			$(document).on('click', uoa.getSelector('li a.resultItem'), function(e){
 				e.preventDefault();
-				$(uoa.getSelector('#found_items')).empty();
-				var th = $(this);
-				$.ajax({
-					method: 'post',
-					url: uoa.ajaxUrl,
-					data: th.serialize() + '&act=item_search',
-					success: function(response){
-						// console.log(response); return false;
-						if (!response) {
-							$(uoa.response).html('Поиск не дал результатов');
-							return false;
-						}
-						uoa.items = JSON.parse(response);
-						var str = ''
-						for (id in uoa.items){
-							var i = uoa.items[id];
-							str +=
-								'<li>' +
-									'<a item_id="' + id + '" class="item" title="Кликните для применения">' +
-										i.brend + ' - ' + i.article + ' - ' + i.title_full +
-									'</a>' +
-								'</li>';
-						}
-						$(uoa.getSelector('ul.found_items')).html(str);
-					}
-				});
-			}),
-			$(document).on('click', uoa.getSelector('li a.item'), function(e){
-				var item_id = $(this).attr('item_id');
-				$(uoa.getSelector('tr[item_id=' + item_id + ']')).remove();
-				$(uoa.getSelector('form.added_items table tr.hiddable'))
-					.hide()
-					.after(uoa.getTableRow($(this).attr('item_id')));
+				uoa.getHtmlStores($(this).attr('item_id'));
 			})
 			$(uoa.getSelector('input[type=submit]')).on('click', function(){
 				if ($(this).attr('is_draft')) $('input[name=is_draft]').val(1);
@@ -93,11 +61,13 @@
 				if (!uoa.reg_int.test($(this).val())) return show_message('Значение количества задано неккоректно!', 'error');
 				uoa.setTotal();
 			})
-			$(document).on('click', uoa.getSelector('a.delete'), function(e){
+			$(document).on('click', uoa.getSelector('span.icon-cancel-circle1'), function(e){
 				e.preventDefault();
 				if (!confirm('Вы действительно хотите удалить?')) return false;
-				else $(this).closest('tr').remove();
+				let item_id = $(this).closest('tr').attr('item_id');
+				$(this).closest('tr').remove();
 				if (!$(uoa.getSelector('tr.item')).size()) $(uoa.getSelector('tr.hiddable')).show();
+				delete uoa.items[item_id];
 				uoa.setTotal();
 			})
 			$('.users_box').on('click', function(){
@@ -124,38 +94,81 @@
 					}
 				})
 			})
+			$('input.intuitive_search').on('keyup focus', function(e){
+				e.preventDefault();
+				let val = $(this).val();
+				let minLength = 1;
+				val = val.replace(/[^\wа-яА-Я]+/gi, '');
+				intuitive_search.getResults({
+					event: e,
+					value: val,
+					minLength: minLength,
+					additionalConditions: {
+						act: 'items'
+					},
+					tableName: 'items',
+				});
+			});
 		},
 		getSelector: function(str){
 			return this.mainSelector + str;
 		},
-		getTableRow: function(item_id){
-			var count = $(this.getSelector('form.added_items tr.item')).size();
-			var i = this.items[item_id];
+		getTableRow: function(item_id, htmlStores){
+			let item = this.items[item_id];
 			str =
 				'<tr class="item" item_id="' + item_id + '">' +
-					'<td label="Поставищик">' + this.getHtmlStores(item_id) +  '</td>' +
-					'<td label="Бренд">' + i.brend + '</td>' +
-					'<td label="Артикул">' + i.article + '</td>' +
-					'<td label="Наименование">' + i.title_full + '</td>' +
-					'<td label="Цена"><input value="0" type="text" name="price[' + item_id + ']"</td>' +
-					'<td label="Количество"><input value="1" type="text" name="quan[' + item_id + ']"</td>' +
+					'<td label="Поставищик">' + htmlStores +  '</td>' +
+					'<td label="Бренд">' + item.brend + '</td>' +
+					'<td label="Артикул">' + item.article + '</td>' +
+					'<td label="Наименование">' + item.title_full + '</td>' +
+					'<td label="Цена"><input value="0" type="text" name="price[' + item_id + ']"></td>' +
+					'<td label="Количество"><input value="1" type="text" name="quan[' + item_id + ']"></td>' +
 					'<td label="Сумма"><span value="0" class="summ">0</span></td>' +
 					'<td label="Комментарий"><textarea name="comment[' + item_id + ']"></textarea></td>' +
-					'<td><a href="#" class="delete">Удалить</a></td>' +
+					`<td>
+						<span class="icon-cancel-circle1 delete"></span>
+					</td>` +
 				'</tr>';
 			return str;
 		},
 		getHtmlStores: function(item_id){
-			if (typeof this.items[item_id].stores === undefined) return;
-			str = '<select name="store_id[' + item_id + ']">';
-			str += '<option value="0">без поставщика</option>'
-			for (var id in this.items[item_id].stores){
-				var store = this.items[item_id].stores[id];
-				str +=
-					'<option value="' + id + '">' + store.title + '</option>';
-			} 
-			str += '</select>';
-			return str;
+			let uoa = this;
+			if (uoa.items[item_id] != undefined) return false;
+			$.ajax({
+				type: 'post',
+				url: '/admin/ajax/store_item.php',
+				data: {
+					column: 'getStoreItemsByItemID',
+					item_id: item_id
+				},
+				beforeSend: function(){
+					showGif();
+				},
+				success: function(response){
+					showGif(false);
+					if (!response) return false;
+					
+					uoa.items[item_id] = JSON.parse(response);
+
+					let htmlStores = '';
+					if (uoa.items[item_id].stores != undefined){
+						htmlStores = '<select name="store_id[' + item_id + ']">';
+						htmlStores += '<option value="0">без поставщика</option>';
+						$.each(uoa.items[item_id].stores, function(i, store){
+							htmlStores += `<option value="${i}">${store.cipher} - (${store.price}р.)</option>`;
+						})
+						htmlStores += '</select>';
+					}
+
+					$('.added_items table .hiddable').hide();
+					$('.added_items table tbody').append(uoa.getTableRow(item_id, htmlStores));
+					$('#user_order_add .searchResult_list').hide();
+					setTimeout(function(){
+						console.log($('.added_items table tr:last-child input[name^=price]').size());
+						$('.added_items table tr:last-child input[name^=price]').focus();
+					}, 100);
+				}
+			})
 		},
 		setTotal: function(){
 			var total = 0;

@@ -562,35 +562,28 @@ function user_order_add(){
 			<div class="value" id="user_order_add">
 				<a href="#" class="show_form_search">Добавить</a>
 				Наценка: <input style="width: 30px" type="text" readonly name="markup" value="<?=$db->getFieldOnID('users', $_GET['id'], 'markup_handle_order')?>">
-				<div class="item_search">	
-					<form name="search_items" method="post">
-						<input type="text" value="" name="search" placeholder="Поиск по артикулу или каталожному номеру">
-						<label>
-							<input type="checkbox" name="exact_match" checked>
-							Точное совпадение
-						</label>
-						<input type="submit" value="Поиск">
-					</form>
-					<div class="response"></div>
-					<ul class="found_items"></ul>
-				</div>
+				<input class="intuitive_search" style="width: 264px;" type="text" name="items" value="<?=$_GET['items']?>" placeholder="Поиск по артикулу, vid и названию" required>
 				<form class="added_items" method="post">
 					<p><strong>Добавленные товары:</strong></p>
 					<table class="t_table">
-						<tr class="head">
-							<th>Поставщик</th>
-							<th>Бренд</th>
-							<th>Артикул</th>
-							<th>Название</th>
-							<th>Цена</th>
-							<th>Количество</th>
-							<th>Сумма</th>
-							<th>Комментарий</th>
-							<th></th>
-						</tr>
-						<tr class="hiddable">
-							<td colspan="9">Товары не добавлены</td>
-						</tr>
+						<thead>
+							<tr class="head">
+								<th>Поставщик</th>
+								<th>Бренд</th>
+								<th>Артикул</th>
+								<th>Название</th>
+								<th>Цена</th>
+								<th>Количество</th>
+								<th>Сумма</th>
+								<th>Комментарий</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="hiddable">
+								<td colspan="9">Товары не добавлены</td>
+							</tr>
+						</tbody>
 					</table>
 					<p>Итого: <span class="total">0</span> руб.</p>
 					<div class="value">

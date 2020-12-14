@@ -155,7 +155,7 @@ $(function(){
 			success: function(response){
 				$('div.not-active-tab .removable').remove();
 				th.find('.remove-item').remove();
-				th.find('div.clearfix').after(`
+				th.find('div.clearfix:last-child').after(`
 					<a href="#" class="remove-item">Удалить из гаража</a>
 					<a href="#" class="restore-item">Восстановить</a>
 				`);
@@ -176,7 +176,7 @@ $(function(){
 				$('div.active-tab .removable').remove();
 				th.find('.remove-item').remove();
 				th.find('.restore-item').remove();
-				th.find('div.clearfix').after(`
+				th.find('div.clearfix:last-child').after(`
 					<a href="" class="remove-item">Удалить</a>
 				`);
 				th.clone().prependTo('div.active-tab');
@@ -195,7 +195,7 @@ $(function(){
 			data: 'act=modification_delete_fully&modification_id=' + modification_id,
 			success: function(response){
 				// console.log(response); return;
-				$('div.not-active-tab [modification_id=' + modification_id + ']').remove();
+				th.remove();
 				show_message('Успешно удалено из гаража');
 			}
 		})

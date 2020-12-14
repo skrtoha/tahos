@@ -398,6 +398,7 @@ function modification(){
 		$garage = $db->select_one('garage', '*', "`user_id` = {$user['id']} AND `modification_id` = '{$_GET['modification_id']}'");
 		$m = [];
 		$m['modification_title'] = $garage['title'];
+		$m['comment'] = $garage['comment'];
 		$title = "Гараж | {$m['modification_title']}";
 		preg_match('/^[\w а-яА-Я-]+,/', $_GET['modification_id'], $coincidences);
 		$m['brend'] = strtoupper(substr($coincidences[0], 0, -1));
@@ -412,7 +413,6 @@ function modification(){
 		WHERE
 			c.parent_id=0
 	", '');
-	
 	?>
 	<script src="/js/garage-selected-ts.js"></script>
 	<input type="hidden" name="modification_id" value="<?=$_GET['modification_id']?>">
@@ -430,7 +430,9 @@ function modification(){
 						<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$m['modification_title']?>">
 					<?}?>
 				</div>
-				<label for="ts-name">Имя: <input type="text" name="modification_title" value="<?=$m['garage_title']?>"></label>
+				<?if (is_numeric($_GET['modification_id'])){?>
+					<label for="ts-name">Имя: <input type="text" name="modification_title" value="<?=$m['garage_title']?>"></label>
+				<?}?>
 			</div>
 			<div class="note">
 				<textarea placeholder="Начните свою запись в блокноте"><?=$m['comment']?></textarea>

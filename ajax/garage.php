@@ -121,18 +121,18 @@ switch($_POST['act']){
 		echo json_encode($modifications[0]);
 		break;
 	case 'modification_delete_fully':
-		$res = $db->delete('garage', "`user_id`={$_SESSION['user']} AND `modification_id`={$_POST['modification_id']}");
+		$res = $db->delete('garage', "`user_id`={$_SESSION['user']} AND `modification_id`='{$_POST['modification_id']}'");
 		if ($res !== true) break;
 		echo true;
 		break;
 	case 'change_garage':
 		// print_r($_POST);
-		$res = $db->update_query(
+		$array = [];
+		if (isset($_POST['modification_title'])) $array['title'] = $_POST['modification_title'];
+		if (isset($_POST['comment'])) $array['comment'] = $_POST['comment'];
+		$res = $db->update(
 			"garage",
-			[
-				'title' => $_POST['modification_title'],
-				'comment' => $_POST['comment']
-			],
+			$array,
 			"`user_id`={$_SESSION['user']} AND `modification_id`='{$_POST['modification_id']}'"
 		);
 		if ($res === true) echo true;

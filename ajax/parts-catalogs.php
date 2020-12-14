@@ -26,5 +26,5 @@ switch($_POST['act']){
 		break;
 }
 function getEntitiesPartsCatalogs(){
-	return "{$_POST['catalogId']},{$_POST['modelId']},{$_POST['carId']}";
+	return "{$_POST['catalogId']},{$_POST['modelId']},{$_POST['carId']},{$_POST['q']}";
 }

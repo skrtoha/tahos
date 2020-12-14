@@ -96,51 +96,60 @@ $('.slider').each(function(){
 			}
 		});
 	})
-let intervalID = setInterval(function(){
-	let user_id = + $('input[name=user_id]').val();
-	if (!user_id){
-		clearInterval(intervalID);
-		return false;
-	} 
-	if($('div._1WlWlHOl9uqtdaoVxShALG').html()){
-		let href = document.location.href;
-		href = href.replace(/.*\?/, '');
-		let selectorH1 = '#app > div:nth-child(1) > div._1WlWlHOl9uqtdaoVxShALG > h1';
-		const urlParams = new URLSearchParams(href);
-		let data = {
-			'user_id': user_id,
-			'title': $(selectorH1).text(),
-			'catalogId': urlParams.get('catalogId'),
-			'modelId': urlParams.get('modelId'),
-			'carId': urlParams.get('carId')
-		};
-		data.act = 'isGaraged';
-		$.ajax({
-			type: 'post',
-			url: '/ajax/parts-catalogs.php',
-			data: data,
-			success: function(res){
-				$(selectorH1).prepend(`
-					<div id="to_garage">
-						<button class="${res}" title="Добавить / Удалить в гараж"></button>
-					</div>
-				`);
-				$('#to_garage button').on('click', function(){
-					let th = $(this);
-					if (th.hasClass('is_garaged')) data.act = 'removeFromGarage';
-					else data.act = 'addToGarage';
-					$.ajax({
-						type: 'post',
-						url: '/ajax/parts-catalogs.php',
-						data: data,
-						success: function(response){
-							if (data.act == 'addToGarage') $('#to_garage button').addClass('is_garaged');
-							else $('#to_garage button').removeClass('is_garaged');
-						}
+$(function(){
+	let intervalID = setInterval(function(){
+		let user_id = + $('input[name=user_id]').val();
+		if (!user_id){
+			clearInterval(intervalID);
+			return false;
+		} 
+		let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
+		if($partsCatalogsNodes.size()){
+			let href = document.location.href;
+			href = href.replace(/.*\?/, '');
+			let $h1 = $partsCatalogsNodes.find('h1');
+			let title = $h1.html();
+			title = title.replace(/[^\w ]+/g, '');
+			title = title.replace(/^ +/g, '');
+			title = title.replace(/ +$/g, '');
+			const urlParams = new URLSearchParams(href);
+			let data = {
+				'user_id': user_id,
+				'title': title,
+				'catalogId': urlParams.get('catalogId'),
+				'modelId': urlParams.get('modelId'),
+				'carId': urlParams.get('carId'),
+				'q': urlParams.get('q')
+			};
+			data.act = 'isGaraged';
+			$.ajax({
+				type: 'post',
+				url: '/ajax/parts-catalogs.php',
+				data: data,
+				success: function(res){
+					$h1.prepend(`
+						<div id="to_garage">
+							<button class="${res}" title="Добавить / Удалить в гараж"></button>
+						</div>
+					`);
+					$('#to_garage button').on('click', function(){
+						let th = $(this);
+						if (th.hasClass('is_garaged')) data.act = 'removeFromGarage';
+						else data.act = 'addToGarage';
+						$.ajax({
+							type: 'post',
+							url: '/ajax/parts-catalogs.php',
+							data: data,
+							success: function(response){
+								if (data.act == 'addToGarage') $('#to_garage button').addClass('is_garaged');
+								else $('#to_garage button').removeClass('is_garaged');
+							}
+						})
 					})
-				})
-			}
-		})
-		clearInterval(intervalID);
-	}
-}, 1000);
+				}
+			})
+			clearInterval(intervalID);
+		}
+	}, 2000);
+})
+	

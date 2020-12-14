@@ -10,6 +10,8 @@ $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
+$attempt = 2;
+
 $identifier = time();
 $basePath = $_SERVER['DOCUMENT_ROOT'] . '/Картинки';
 $insertedItems = 0;
@@ -18,7 +20,7 @@ $updatedTitles = 0;
 $missedProcessedBrends = 0;
 $totalItemsProcessed = 0;
 
-$db->delete('parse_images_brends', "`is_missed` = 1");
+$db->delete('parse_images_brends', "`is_missed` = 1 AND attempt = $attempt");
 
 $rossko = new core\Provider\Rossko($db);
 
@@ -26,7 +28,7 @@ $brendsList = scandir($basePath);
 foreach($brendsList as $brend){
 	if ($brend == '.' || $brend == '..') continue;
 
-	$isProcessedBrend = $db->getCount('parse_images_brends', "`brend_title` = '$brend'");
+	$isProcessedBrend = $db->getCount('parse_images_brends', "`brend_title` = '$brend' AND attempt = $attempt");
 	if ($isProcessedBrend){
 		$missedProcessedBrends++;
 		continue;
@@ -38,7 +40,8 @@ foreach($brendsList as $brend){
 		'brend_title' => $brend,
 		'processed' => 0,
 		'is_missed' => 0,
-		'identifier' => $identifier
+		'identifier' => $identifier,
+		'attempt' => $attempt
 	];
 	if (!$brend_id){
 		$dbArrayInsert['is_missed'] = 1;
@@ -110,11 +113,6 @@ foreach($brendsList as $brend){
 	}
 	$dbArrayInsert['processed'] = 1;
 	$db->insert('parse_images_brends', $dbArrayInsert/*, ['print' => true]*/);
-	core\Mailer::send([
-		'emails' => ['skrtoha@gmail.com'],
-		'subject' => "Обработка бренда $brend закончена",
-		'body' => ''
-	]);
 }
 ob_start();
 echo "Всего обработано: $totalItemsProcessed<br>";
@@ -122,8 +120,8 @@ echo "Обновлено названий номенклатуры: $updatedTitl
 echo "Добавлено новой номенклатуры: $insertedItems<br>";
 echo "Не найдено номенклатуры: $missedItems<br>";
 echo "Пропущено уже обработанных брендов: $missedProcessedBrends<br>";
-echo "Обработано брендов: " . $db->getCount('parse_images_brends', "`identifier` = $identifier AND `processed` = 1") . "<br>";
-$missedBrends = $db->select('parse_images_brends', '*', "`identifier` = $identifier AND `is_missed` = 1");
+echo "Обработано брендов: " . $db->getCount('parse_images_brends', "`identifier` = $identifier AND `processed` = 1 AND `attempt` = $attempt") . "<br>";
+$missedBrends = $db->select('parse_images_brends', '*', "`identifier` = $identifier AND `is_missed` = 1 AND attempt = $attempt");
 if ($missedBrends){
 	echo "Не найденные бренды: <br>";
 	foreach($missedBrends as $brendInfo){

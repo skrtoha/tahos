@@ -24,7 +24,7 @@ if ($_POST['form_submit']){
 	//удаляем отсутствующие фото
 	$filesBig = glob(core\Config::$imgPath . '/items/big/' . $_GET['id'] . '/*');
 	$filesSmall = glob(core\Config::$imgPath . '/items/small/' . $_GET['id'] . '/*');
-	if ($filesBig){
+	if (!empty($filesBig)){
 		foreach($filesBig as $existingFile){
 			$isForDeleting = true;
 			if (isset($_POST['photos'])){
@@ -38,7 +38,7 @@ if ($_POST['form_submit']){
 			if ($isForDeleting) unlink($existingFile);
 		}
 	}
-	if ($filesSmall){
+	if (!empty($filesSmall)){
 		foreach($filesSmall as $existingFile){
 			$isForDeleting = true;
 			if (isset($_POST['photos'])){

@@ -309,9 +309,9 @@ function show_form($act){
 			<td>Бренд</td>
 			<td>Артикул</td>
 			<td>Наименование</td>
+			<td>Цена<br>закупки</td>
 			<td>Цена</td>
 			<td>Кол-во</td>
-			<td>Сумма<br>закупки</td>
 			<td>Сумма</td>
 			<td>
 				Доставка<br>
@@ -378,6 +378,9 @@ function show_form($act){
 					<td label="Бренд"><?=$ov['brend']?></td>
 					<td label="Артикул"><a href="/admin/?view=items&act=item&id=<?=$ov['item_id']?>"><?=$ov['article']?></a></td>
 					<td label="Наименование"><?=$ov['title_full']?></td>
+					<td label="Цена закупки">
+						<?=$ov['priceWithoutMarkup']?>
+					</td>
 					<td label="Цена" class="price_format">
 						<?if (!$order['is_draft']){?>
 							<?=$ov['price']?>
@@ -452,9 +455,6 @@ function show_form($act){
 							<br>Отказ - <?=$declined?> шт.
 						<?}?>
 					</td>
-					<td label="Сумма закупки">
-						<?=$ov['priceWithoutMarkup']?>
-					</td>
 					<td label="Сумма" class="price_format sum">
 						<?if (!$order['is_draft']){?>
 							<?=$summ?>
@@ -463,6 +463,7 @@ function show_form($act){
 							<?=$ov['sum']?>
 						<?}?>
 					</td>
+					
 					<td label="Доставка">
 						<?if ($ov['status_id'] == 1){
 							$res_order_issues_values = $db->query("

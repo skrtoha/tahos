@@ -31,7 +31,6 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 if ($connection->denyAccess) die('Доступ запрещен!');
 if ($_GET['type'] == 'armtek') get_items_armtek($_GET['item_id']);
 // debug($_GET); exit();
-// 56992-PDE-505
 $title = "Список совпадений";
 $search_count_user = 10;
 if ($_GET['type'] == 'vin'){
@@ -209,7 +208,7 @@ function search_items($flag = ''){
 			$type_search = 1;
 			break;
 		case 'barcode':
-			$where =  "ib.`barcode`='$for_search'";
+			$where =  "ib.`barcode`='$for_search' OR i.article = '$for_search'";
 			$type_search = 2;
 			break;
 	}

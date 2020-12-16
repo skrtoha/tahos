@@ -130,7 +130,7 @@ use admin\functions\LeftMenu;
 		{"src" : "/js/jquery.form.js", "async" : false},
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
-		<?if (in_array($view, ['connections', 'reports', 'returns'])){?>
+		<?if (in_array($view, ['connections', 'reports', 'returns', 'index'])){?>
 			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['items', 'orders', 'returns', 'brends'])){?>

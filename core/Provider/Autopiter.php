@@ -8,8 +8,14 @@ use core\Exceptions\Autopiter as EAutopiter;
 class Autopiter extends Provider{
 
 	private static function getClient(){
-		$client = new \SoapClient(self::getParams()->url);
-		if (!($client->IsAuthorization()->IsAuthorizationResult)){
+		try{
+			$client = new \SoapClient(self::getParams()->url);
+			$authorization = $client->IsAuthorization()->IsAuthorizationResult;
+		} 
+		catch(\SoapFault $e){
+			
+		}
+		if (!($authorization)){
 			$client->Authorization(array(
 				"UserID"=>self::getParams()->UserID, "Password" => self::getParams()->Password, "Save"=> "true"));
 		}

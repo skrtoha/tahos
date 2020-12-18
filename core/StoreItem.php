@@ -7,7 +7,7 @@ class StoreItem{
 			SELECT
 				si.item_id,
 				si.store_id,
-				si.price AS priceWithoutMarkup,
+				(si.price * c.rate) AS priceWithoutMarkup,
 				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) AS price,
 				si.packaging,
 				si.in_stock,

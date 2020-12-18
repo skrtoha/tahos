@@ -27,9 +27,16 @@ input[name^=price]{
 	padding: 0;
 	cursor: pointer;
 }
-#user_order_add form.added_items{
+#user_order_add #added_items{
 	background: #d6ffd6;
 	padding: 10px;
+}
+#added_items{
+	display: block;
+}
+#added_items > p:nth-child(3){
+	margin-bottom: 10px;
+	margin-top: 10px;
 }
 #user_order_add p:first-child{
 	margin-bottom: 10px;

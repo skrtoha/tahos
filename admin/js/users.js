@@ -19,7 +19,7 @@
 				if ($(this).attr('is_draft')) $('input[name=is_draft]').val(1);
 				else $('input[name=is_draft]').val(0);
 			})
-			$(uoa.getSelector('form.added_items')).on('submit', function(e){
+			$(uoa.getSelector('#added_items')).on('submit', function(e){
 				var is_valid = true;
 				$(this).find('input[name^=price]').each(function(){
 					var val = $(this).val();
@@ -41,8 +41,12 @@
 				var store_id = $(this).val();
 				var store = uoa.items[item_id].stores[store_id];
 				if (typeof store !== 'undefined'){
+					let markup = + $('input[name=markup]').val();
+					let price = + store.price;
+					price += Math.round(price * markup / 100);
+					tr.find('input[name^=withoutMarkup]').val(store.price);
 					tr.find('input[name^=price]')
-						.val(store.price)
+						.val(price)
 						.prop('disabled', true);
 				}
 				else{
@@ -53,7 +57,6 @@
 				uoa.setTotal();
 			})
 			$(document).on('change', uoa.getSelector('input[name^=price]'), function(){
-				// console.log(uoa.reg_int, $(this).val(), uoa.reg_int.test($(this).val()));
 				if (!uoa.reg_int.test($(this).val())) return show_message('Значение цены задано неккоректно!', 'error');
 				uoa.setTotal();
 			})
@@ -121,7 +124,10 @@
 					'<td label="Бренд">' + item.brend + '</td>' +
 					'<td label="Артикул">' + item.article + '</td>' +
 					'<td label="Наименование">' + item.title_full + '</td>' +
-					'<td label="Цена"><input value="0" type="text" name="price[' + item_id + ']"></td>' +
+					`<td label="Цена">
+						<input value="0" type="hidden" name="withoutMarkup[${item_id}]">
+						<input value="0" type="text" name="price[${item_id}]">
+					</td>` +
 					'<td label="Количество"><input value="1" type="text" name="quan[' + item_id + ']"></td>' +
 					'<td label="Сумма"><span value="0" class="summ">0</span></td>' +
 					'<td label="Комментарий"><textarea name="comment[' + item_id + ']"></textarea></td>' +
@@ -160,12 +166,11 @@
 						htmlStores += '</select>';
 					}
 
-					$('.added_items table .hiddable').hide();
-					$('.added_items table tbody').append(uoa.getTableRow(item_id, htmlStores));
+					$('#added_items table .hiddable').hide();
+					$('#added_items table tbody').append(uoa.getTableRow(item_id, htmlStores));
 					$('#user_order_add .searchResult_list').hide();
 					setTimeout(function(){
-						console.log($('.added_items table tr:last-child input[name^=price]').size());
-						$('.added_items table tr:last-child input[name^=price]').focus();
+						$('#added_items table tr:last-child input[name^=price]').focus();
 					}, 100);
 				}
 			})

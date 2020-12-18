@@ -87,7 +87,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			ov.issued,
 			ov.declined,
 			ov.returned,
-			si.price AS priceWithoutMarkup,
+			ov.withoutMarkup,
 			(ov.price * ov.quan) AS sum,
 			ov.comment,
 			os.id AS status_id,

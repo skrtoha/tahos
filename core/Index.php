@@ -32,9 +32,9 @@ class Index{
 		$res = $GLOBALS['db']->query("
 			SELECT
 				SUM(ov.price * ov.issued) AS common,
-				ROUND(SUM((ov.price - ov.price * ps.percent / 100) * ov.issued)) AS spent,
-				ROUND(SUM(ov.price * ov.issued) - SUM((ov.price - ov.price * ps.percent / 100) * ov.issued)) AS difference,
-				ROUND((SUM(ov.price * ov.issued) - SUM((ov.price - ov.price * ps.percent / 100) * ov.issued)) / (SUM(ov.price * ov.issued)) * 100, 2) AS percent
+				ROUND(SUM(ov.withoutMarkup * ov.issued)) AS spent,
+				ROUND(SUM(ov.price * ov.issued) - SUM(ov.withoutMarkup * ov.issued)) AS difference,
+				ROUND((SUM(ov.price * ov.issued) - SUM(ov.withoutMarkup * ov.issued)) / SUM(ov.withoutMarkup * ov.issued) * 100, 2) AS percent
 			FROM
 				#orders_values ov
 			LEFT JOIN

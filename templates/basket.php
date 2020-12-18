@@ -44,6 +44,14 @@ if ($_GET['act'] == 'to_offer'){
 				<td style='border: 1px solid black'>{$value['comment']}</td>
 			</tr>
 		";
+		
+		$query = core\StoreItem::getQueryStoreItem();
+		$query .= "
+			WHERE si.store_id = {$value['store_id']} AND si.item_id = {$value['item_id']}
+		";
+		$result = $db->query($query, '');
+		$storeItemInfo = $result->fetch_assoc();
+
 		$res = $db->insert(
 			'orders_values', 
 			[
@@ -51,6 +59,7 @@ if ($_GET['act'] == 'to_offer'){
 				'order_id' => $order_id,
 				'store_id' => $value['store_id'],
 				'item_id' => $value['item_id'],
+				'withoutMarkup' => $storeItemInfo['priceWithoutMarkup'],
 				'price' => $value['price'],
 				'quan' => $value['quan'],
 				'comment' => $value['comment']

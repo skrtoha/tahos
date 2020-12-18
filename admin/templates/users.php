@@ -33,7 +33,7 @@ if ($_POST['form_submit']){
 	if (!isset($array['bonus_program'])) $array['bonus_program'] = 0;
 	if (!isset($array['allow_request_delete_item'])) $array['allow_request_delete_item'] = 0;
 	if (!isset($array['showProvider'])) $array['showProvider'] = 0;
-	// debug($array, 'array'); //exit();
+	// debug($array, 'array'); exit();
 	if ($array['user_type'] == 'entity' and !$array['organization_name']){
 		message('Введите название организации!', false);
 		$saveble = false;
@@ -45,11 +45,11 @@ if ($_POST['form_submit']){
 	if ($saveble) {
 		if ($_POST['form_submit'] == 1){
 			if (core\User::update($id, $array)) message('Изменения успешно сохранены!');
-			// header("Location: ?view=users&id=$id&act=change");
+			header("Location: ?view=users&id=$id&act=change");
 		}
 		else{
 			if ($db->insert('users', $array)) message('Пользователь успешно добавлен!');
-			// header("Location: ?view=users&id={$db->last_id()}&act=change");
+			header("Location: ?view=users&id={$db->last_id()}&act=change");
 		}
 	}
 }
@@ -561,9 +561,9 @@ function user_order_add(){
 		<div class="field">
 			<div class="value" id="user_order_add">
 				<a href="#" class="show_form_search">Добавить</a>
-				Наценка: <input style="width: 30px" type="text" readonly name="markup" value="<?=$db->getFieldOnID('users', $_GET['id'], 'markup_handle_order')?>">
+				Наценка: <input form="added_items" style="width: 38px" type="text" readonly name="markup" value="<?=$db->getFieldOnID('users', $_GET['id'], 'markup_handle_order')?>">
 				<input class="intuitive_search" style="width: 264px;" type="text" name="items" value="<?=$_GET['items']?>" placeholder="Поиск по артикулу, vid и названию" required>
-				<form class="added_items" method="post">
+				<form id="added_items" method="post">
 					<p><strong>Добавленные товары:</strong></p>
 					<table class="t_table">
 						<thead>
@@ -598,7 +598,7 @@ function user_order_add(){
 <?}
 function setUserOrder(){
 	global $db;
-	// debug($_POST); exit();
+	//debug($_POST); exit();
 	foreach($_POST as $name => $value){
 		foreach($value as $item_id => $v){
 			$array[$item_id][$name] = $v;
@@ -616,6 +616,7 @@ function setUserOrder(){
 			'store_id' => $value['store_id'],
 			'item_id' => $item_id,
 			'user_id' => $_GET['id'],
+			'withoutMarkup' => $value['withoutMarkup'],
 			'price' => $value['price'],
 			'quan' => $value['quan'],
 			'comment' => $value['comment']

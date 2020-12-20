@@ -354,7 +354,8 @@ abstract class Provider{
 	 */
 	public static function getPrice(array $params){
 		if (!$params['provider_id']) return false;
-		if (!$params['store_id']) throw new Exception\InvalidStoreIDException;
+		if (!$params['store_id']) return false;
+
 		$provider = self::getInstanceProvider($params['provider_id']);
 		if (!$provider || !self::getIsEnabledApiOrder($params['provider_id'])){
 			return self::getStoreItem($params['store_id'], $params['item_id']);

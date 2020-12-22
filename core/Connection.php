@@ -18,6 +18,9 @@ class Connection{
 	public function __construct($db){
 		$remoteAddr = $_SERVER['REMOTE_ADDR'];
 		$this->db = $db;
+
+		if (preg_match('/.*ajax.*/', $_SERVER['REQUEST_URI'])) return false;
+
 		// debug($_SERVER); exit();
 		// var_dump($this->isDeniedIP($remoteAddr));
 		// var_dump($this->isDeniedPage($_SERVER['REQUEST_URI']));

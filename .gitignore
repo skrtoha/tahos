@@ -7,5 +7,6 @@ phpAdmin/
 *.jpg
 *.txt
 *.txt
+tahos.sql
 class/config_class.php
 core/Config.php

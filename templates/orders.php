@@ -276,6 +276,10 @@ $orders = get_order_group($params, '');
 												$summ = 0;?>
 												Отменен
 												<?break;
+											case 'Отменен поставщиком':
+												$summ = 0;?>
+												Отменен поставщиком
+												<?break;
 											case 'Приостановлено':
 												$summ = $order['quan'] * $order['price']?>
 												Приостановлено
@@ -350,6 +354,10 @@ $orders = get_order_group($params, '');
 													<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
 													<?break;
 												case 'Отменен':?>
+													<span class="crossedout"><?=$order['price'] * $order['quan']?></span>
+													<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
+													<?break;
+												case 'Отменен поставщиком':?>
 													<span class="crossedout"><?=$order['price'] * $order['quan']?></span>
 													<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
 													<?break;

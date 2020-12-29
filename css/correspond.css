@@ -24,6 +24,13 @@
 	height: 200px;
 	position: relative;
 }
+.attachment .img-wrap > a{
+	display: block;
+    width: 100%;
+}
+.attachment .img-wrap > a > img{
+	width: 100%;
+}
 #fotos li:hover:before{
 	 content: " ";
     background: rgba(58, 56, 56, 0.41) url(/images/no_foto_2.png) no-repeat;

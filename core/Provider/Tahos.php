@@ -70,7 +70,7 @@ class Tahos extends Provider{
 		}
 
 		$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-		$file = $_SERVER['DOCUMENT_ROOT'] . "/tmp/$fileName.xlsx";
+		$file = core\Config::$tmpFolderPath . "/$fileName.xlsx";
 		$writer->save($file);
 		return $file;
 	}

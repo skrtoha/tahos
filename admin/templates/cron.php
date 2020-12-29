@@ -194,7 +194,6 @@ switch($_GET['act']){
 		} 
 		
 		$zipArchive = new ZipArchive();
-		// $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/rossko_price.zip");
 		$res = $zipArchive->open($filename);
 
 		$numFiles = $zipArchive->numFiles;
@@ -283,7 +282,6 @@ switch($_GET['act']){
 		if (!$filename) die("<br>Не удалось получить файл из почты.");
 		
 		$zipArchive = new ZipArchive();
-		// $res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/Voshod.zip");
 		$res = $zipArchive->open($filename);
 		$file = $zipArchive->getStream('Voshod.csv');
 
@@ -355,13 +353,13 @@ switch($_GET['act']){
 			} 
 			$resDownload = (
 				file_put_contents(
-					"{$_SERVER['DOCUMENT_ROOT']}/tmp/{$zipName}.zip", 
+					core\Config::$tmpFolderPath . "/{$zipName}.zip", 
 					$file
 				)
 			);
 			
 			$zipArchive = new ZipArchive();
-			$res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$zipName}.zip");
+			$res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$zipName}.zip");
 			$file = $zipArchive->getStream("mikado_price_{$value}_" . Mikado::getParams()->entity->ClientID . ".csv");
 
 			$db->delete('store_items', "`store_id`=" .Mikado::$stocks[$value]);
@@ -514,19 +512,18 @@ switch($_GET['act']){
 					ps.provider_id = 2 AND si.store_id != 4
 			", '');
 			
-			// $res = $zipArchive->open("{$_SERVER['DOCUMENT_ROOT']}/tmp/{$fileName}.zip");
 			$res = $zipArchive->open($fileImap);
 			if (!$res){
 				echo "<br>Ошибка чтения файла $fileName.zip";
 				continue;
 			};
-			$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", ["{$fileName}.xlsx"]);
+			$res = $zipArchive->extractTo(core\Config::$tmpFolderPath . "/", ["{$fileName}.xlsx"]);
 			if (!$res){
 				echo "<br>Ошибка извлечения файла $fileName.xlsx";
 				continue;
 			};
 
-			$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load("{$_SERVER['DOCUMENT_ROOT']}/tmp/$fileName.xlsx");
+			$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load(core\Config::$tmpFolderPath . "/$fileName.xlsx");
 			$xls->setActiveSheetIndex(0);
 			$sheet = $xls->getActiveSheet();
 			$rowIterator = $sheet->getRowIterator();
@@ -677,7 +674,6 @@ switch($_GET['act']){
 			echo "<br>$errorText";
 			throw new \Exception($errorText);
 		} 
-		// $fileImap = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.zip";
 
 		$db->query("
 			DELETE si FROM
@@ -694,13 +690,13 @@ switch($_GET['act']){
 			echo "<br>Ошибка чтения файла Forum-Auto_Price.zip";
 			break;
 		};
-		$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", ["Forum-Auto_Price.xlsx"]);
+		$res = $zipArchive->extractTo(core\Config::$tmpFolderPath . "/", ["Forum-Auto_Price.xlsx"]);
 		if (!$res){
 			echo "<br>Ошибка извлечения файла Forum-Auto_Price.xlsx";
 			break;
 		};
 
-		$filePath = "{$_SERVER['DOCUMENT_ROOT']}/tmp/Forum-Auto_Price.xlsx";
+		$filePath = core\Config::$tmpFolderPath . "/Forum-Auto_Price.xlsx";
 		$reader = ReaderEntityFactory::createReaderFromFile($filePath);
 		$reader->open($filePath);
 		foreach ($reader->getSheetIterator() as $sheet) {
@@ -826,14 +822,14 @@ switch($_GET['act']){
 			} 
 			try{
 				$nameInArchive = $emailPrice['nameInArchive'];
-				$res = $zipArchive->extractTo("{$_SERVER['DOCUMENT_ROOT']}/tmp/", [$nameInArchive]);
+				$res = $zipArchive->extractTo(core\Config::$tmpFolderPath . "/", [$nameInArchive]);
 				if (!$res) throw new Exception ("Ошибка извлечения файла {$emailPrice['nameInArchive']}. Попытка использовать альтернативный способ.");
 			} catch(Exception $e){
 				echo "<br>" . $e->getMessage(); 
 				if ($emailPrice['indexInArchive'] == '0' || $emailPrice['indexInArchive']){
 					echo "<br>обработка через indexInArchive";
 					$nameInArchive = $zipArchive->getNameIndex($emailPrice['indexInArchive']);
-					$bites = file_put_contents("{$_SERVER['DOCUMENT_ROOT']}/tmp/$nameInArchive", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
+					$bites = file_put_contents(core\Config::$tmpFolderPath . "/$nameInArchive", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
 					if (!$bites) throw new Exception("Возникла ошибка. Ни один из способов извлечь архив не сработали");
 				}
 				else{
@@ -845,7 +841,7 @@ switch($_GET['act']){
 					echo "<br>Укажите настройках в поле \"Индекс файла в архиве\" необходимый индекс.";
 				}
 			}
-			if ($emailPrice['fileType'] == 'excel') $workingFile = "{$_SERVER['DOCUMENT_ROOT']}/tmp/$nameInArchive";
+			if ($emailPrice['fileType'] == 'excel') $workingFile = core\Config::$tmpFolderPath . "/$nameInArchive";
 			else $workingFile = $zipArchive->getStream($nameInArchive);
 		}
 		else $workingFile = $fileImap;
@@ -939,7 +935,7 @@ switch($_GET['act']){
 					$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price', $user['discount']);
 					break;
 				case 'csv':
-					$file = $_SERVER['DOCUMENT_ROOT'] . '/tmp/price.csv';
+					$file = core\Config::$tmpFolderPath . '/price.csv';
 					$fp = fopen($file, 'w');
 					foreach($res_store_items as $si){
 						$si['price'] = ceil($si['price'] - $si['price'] * $user['discount'] / 100); 

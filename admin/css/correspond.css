@@ -10,7 +10,11 @@
   height: 200px;
   width: 200px;
   overflow: hidden;
+   margin-right: 10px;
 }
 .attachment .img-wrap img{
 	width: 100%;
+}
+p.message {
+    margin-bottom: 10px;
 }

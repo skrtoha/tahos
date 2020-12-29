@@ -1,4 +1,6 @@
 <?if ($_POST['image_submit']){
+	// debug($_POST);
+	// debug($_FILES);
 	$bool = true;
 	$name = $_FILES['image']['name'];
 	$type = $_FILES['image']['type'];
@@ -8,11 +10,11 @@
 		$bool = false;
 	}
 	if ($bool){
-		$target_dir = core\Config::$imgPath . "/temp/";
+		$target_dir = core\Config::$tmpFolderPath;
 		$image_name = microtime().".jpg";
-		if (move_uploaded_file($tmp_name, $target_dir.$image_name)){
+		if (move_uploaded_file($tmp_name, "$target_dir/$image_name")){
 			message('Фото успешно загружено!');?>
-			<li foto_name="<?=$image_name?>"><img src="/<?=$target_dir.$image_name?>" alt=""></li>
+			<li foto_name="<?=$image_name?>"><img src="<?=core\Config::$tmpFolderUrl?>/<?=$image_name?>" alt=""></li>
 		<?}
 	}
 	exit();
@@ -180,7 +182,11 @@ $title = $messages[0]['theme'];
 					$fotos = explode(',', $message['fotos']);?>
 					<div class="attachment">
 						<?foreach ($fotos as $foto){?>
-							<div class="img-wrap"><a href="<?=core\Config::$imgUrl?>/temp/<?=$foto?>"><img src="<?=core\Config::$imgUrl?>/temp/<?=$foto?>" alt=""></a></div>
+							<div class="img-wrap">
+								<a href="<?=core\Config::$tmpFolderUrl?>/<?=$foto?>">
+									<img src="<?=core\Config::$tmpFolderUrl?>/<?=$foto?>" alt="">
+								</a>
+							</div>
 						<?}?>
 					</div>
 					<?}?>

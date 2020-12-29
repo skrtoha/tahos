@@ -73,14 +73,15 @@ switch($_POST['act']){
 		// debug($_POST);
 		// debug($_FILES);
 		$name = time();
-		$pathBig = "/tmp/big_$name.jpg";
-		$pathSmall = "/tmp/small_$name.jpg";
-		copy($_FILES['croppedImage']['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . "$pathSmall");
+		$pathBig = "/big_$name.jpg";
+		$pathSmall = "/small_$name.jpg";
 
-		copy($_SERVER['DOCUMENT_ROOT'] . $_POST['initial'], $_SERVER['DOCUMENT_ROOT'] . "$pathBig");
+		copy($_FILES['croppedImage']['tmp_name'], core\Config::$tmpFolderPath . $pathSmall);
+		copy($_SERVER['DOCUMENT_ROOT'] . $_POST['initial'], core\Config::$tmpFolderPath . $pathBig);
+
 		echo json_encode([
-			'small' => $pathSmall,
-			'big' => $pathBig
+			'small' => core\Config::$tmpFolderUrl . $pathSmall,
+			'big' => core\Config::$tmpFolderUrl . $pathBig
 		]);
 		break;
 	case 'applyCategory':

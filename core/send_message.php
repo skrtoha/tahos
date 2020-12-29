@@ -1,8 +1,8 @@
 <?require_once ("../core/DataBase.php");
 require_once ("../core/functions.php");
 session_start();
-// debug($_POST);
-// exit();
+/*debug($_POST);
+exit();*/
 $db = new core\DataBase();
 if ($_POST['message_send']){
 	if (!$_POST['correspond_id']){

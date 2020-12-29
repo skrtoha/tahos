@@ -10,11 +10,13 @@ if ($_POST['image_submit']){
 	}
 	//исправлен баг с переписками
 	if ($bool){
-		$target_dir = core\Config::$imgPath . "/temp/";
+		$target_dir = core\Config::$tmpFolderPath;
 		$image_name = microtime().".jpg";
-		if (move_uploaded_file($tmp_name, $target_dir.$image_name)){
+		if (move_uploaded_file($tmp_name, "$target_dir/$image_name")){
 			message('Фото успешно загружено!');?>
-			<li style="padding: 0" foto_name="<?=$image_name?>"><img src="/<?=$target_dir.$image_name?>" alt=""></li>
+			<li style="padding: 0" foto_name="<?=$image_name?>">
+				<img src="<?=core\Config::$tmpFolderUrl?>/<?=$image_name?>" alt="">
+			</li>
 		<?}
 	}
 	exit();
@@ -186,7 +188,11 @@ if (!empty($messages)){
 				if (count($msg_fotos)){?>
 					<div class="attachment">
 					<?foreach ($msg_fotos as $msg_foto){?>
-						<div class="img-wrap"><a href="<?=core\Config::$imgUrl?>/temp/<?=$msg_foto['title']?>"><img style="width: 200px" src="/images/temp/<?=$msg_foto['title']?>" alt=""></a></div>
+						<div class="img-wrap">
+							<a href="<?=core\Config::$tmpFolderUrl?>/<?=$msg_foto['title']?>">
+								<img style="width: 200px" src="<?=core\Config::$tmpFolderUrl?>/<?=$msg_foto['title']?>" alt="">
+							</a>
+						</div>
 					<?}?>
 					</div>
 				<?}?>

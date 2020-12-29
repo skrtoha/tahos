@@ -154,7 +154,7 @@ switch($_POST['act']){
 			$res_store_items = core\StoreItem::getStoreItemsByStoreID($mainStores);
 			$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'main_stores');
 		}
-		else $file = $_SERVER['DOCUMENT_ROOT'] . "/tmp/main_stores.xlsx";
+		else $file = core\Config::$tmpFolderPath . "/main_stores.xlsx";
 
 		$res = core\Mailer::send([
 			'emails' => [$_POST['email']],

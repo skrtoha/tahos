@@ -283,8 +283,11 @@ $(function(){
 	$(document).on('change', '#loadPhoto', function(){
 		$(this).closest('form').ajaxForm({
 			target: '#modal_content',
-			beforeSubmit: function(){},
+			beforeSubmit: function(){
+				showGif();
+			},
 			success: function(response){
+				showGif(false);
 				let image = document.getElementById('uploadedPhoto');
 				let item_id = $('#item_id').val();
 				let cropper = new Cropper(image, {
@@ -303,6 +306,7 @@ $(function(){
 					} 
 				})
 				$('#savePhoto').on('click', function(){
+					showGif();
 					cropper
 						.getCroppedCanvas({
 							'fillColor': '#fff',
@@ -321,6 +325,7 @@ $(function(){
 								processData: false,
 								contentType: false,
 								success(response) {
+									showGif(false);
 									let images = JSON.parse(response);
 									let count = $('#photos li').size();
 									$('#photos').append(

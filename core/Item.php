@@ -426,4 +426,20 @@ class Item{
 		";
 		return $GLOBALS['db']->query($query, $flag);
 	}
+	public static function deleteMissingPhoto($files, $photos, $type){
+		if (empty($files)) return;
+		foreach($files as $existingFile){
+			$isForDeleting = true;
+			$fileName = preg_replace('/.*\//', '', $existingFile);
+			if (!empty($photos)){
+				foreach($photos as $photo){
+					if (strpos($photo[$type], $fileName) !== false){
+						$isForDeleting = false;
+						break;
+					} 
+				}
+			}
+			if ($isForDeleting) unlink($existingFile);
+		}
+	}
 }

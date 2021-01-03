@@ -3,16 +3,15 @@ use core\Managers;
 use core\Item;
 
 if (isset($_FILES['photo'])){
-	copy($_FILES['photo']['tmp_name'], core\Config::$tmpFolderPath . '/'.$_FILES['photo']['name']);?>
-		<img id="uploadedPhoto" src="<?=core\Config::$tmpFolderUrl?>/<?=$_FILES['photo']['name']?>">
+	$name = preg_replace('/[а-яА-Я]+/u', "", $_FILES['photo']['name']);
+	copy($_FILES['photo']['tmp_name'], core\Config::$tmpFolderPath . '/' . $name);?>
+		<img id="uploadedPhoto" src="<?=core\Config::$tmpFolderUrl?>/<?=$name?>">
 		<button id="savePhoto">Сохранить</button>
 	<?
 	exit();
 }
 $act = $_GET['act'];
-// debug($_POST); exit();
 if ($_POST['form_submit']){
-	
 	//если товар заблокирован и пользователь не является администртором
 	if (
 			$_SESSION['manager']['group_id'] != Managers::$administratorGroupID && 
@@ -21,44 +20,23 @@ if ($_POST['form_submit']){
 		Managers::handlerAccessNotAllowed();
 	}
 
-	//удаляем отсутствующие фото
-	$filesBig = glob(core\Config::$imgPath . '/items/big/' . $_GET['id'] . '/*');
-	$filesSmall = glob(core\Config::$imgPath . '/items/small/' . $_GET['id'] . '/*');
-	if (!empty($filesBig)){
-		foreach($filesBig as $existingFile){
-			$isForDeleting = true;
-			if (isset($_POST['photos'])){
-				foreach($_POST['photos'] as $photo){
-					if (strpos($existingFile, $photo['big'])){
-						$isForDeleting = false;
-						break;
-					} 
-				}
-			}
-			if ($isForDeleting) unlink($existingFile);
-		}
-	}
-	if (!empty($filesSmall)){
-		foreach($filesSmall as $existingFile){
-			$isForDeleting = true;
-			if (isset($_POST['photos'])){
-				foreach($_POST['photos'] as $photo){
-					if (strpos($existingFile, $photo['small'])){
-						$isForDeleting = false;
-						break;
-					} 
-				}
-			}
-			if ($isForDeleting) unlink($existingFile);
-		}
-	}
-	$db->update('items', ['photo' => NULL], "'id' = {$_GET['id']}");
-
-
-	$db->delete('items_values', "`item_id` = {$_GET['id']}");
+	//если доступ не разрешен
 	if (Managers::isActionForbidden('Номенклатура', 'Изменение')){
 		Managers::handlerAccessNotAllowed();
 	} 
+
+	//удаляем отсутствующие фото
+	$filesBig = glob(core\Config::$imgPath . '/items/big/' . $_GET['id'] . '/*');
+	$filesSmall = glob(core\Config::$imgPath . '/items/small/' . $_GET['id'] . '/*');
+
+	core\Item::deleteMissingPhoto($filesBig, $_POST['photos'], 'big');
+	core\Item::deleteMissingPhoto($filesSmall, $_POST['photos'], 'small');
+	// exit();
+
+	$db->update('items', ['photo' => NULL], "'id' = {$_GET['id']}");
+
+	$db->delete('items_values', "`item_id` = {$_GET['id']}");
+	
 	if (isset($_POST['fv'])){
 		foreach($_POST['fv'] as $fv){
 			$db->insert('items_values', [
@@ -98,12 +76,21 @@ if ($_POST['form_submit']){
 			$time = time();
 
 			foreach($_POST['photos'] as $photo){
+				
+
+				//если файл не является новым
+				if (!preg_match('/tmp/', $photo['big'])){
+					if ($photo['is_main']){
+						$fileName = preg_replace('/.*\//', '', $photo['big']);
+						Item::update(['photo' => $fileName], ['id' => $last_id]);
+					} 
+					continue;
+				} 
+
 				$nameBody = $time . $i;
-				copy($_SERVER['DOCUMENT_ROOT'] . $photo['big'], "$dir_big/$nameBody.jpg");
-				copy($_SERVER['DOCUMENT_ROOT'] . $photo['small'], "$dir_small/$nameBody.jpg");
+				copy($photo['big'], "$dir_big/$nameBody.jpg");
+				copy($photo['small'], "$dir_small/$nameBody.jpg");
 				if ($photo['is_main']) Item::update(['photo' => "$nameBody.jpg"], ['id' => $last_id]);
-				unlink($_SERVER['DOCUMENT_ROOT'] . $photo['big']);
-				unlink($_SERVER['DOCUMENT_ROOT'] . $photo['small']);
 				$i++;
 			}
 		} 
@@ -382,8 +369,8 @@ function item($act){
 											<span class="main-photo <?=$name == $item['photo'] ? 'icon-lock' : 'icon-unlocked'?>"></span>
 										</div>
 										<img src="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$name?>" alt="">
-										<input type="hidden" name="photos[<?=$i?>][small]" value="<?=core\Config::$imgUrl?>/items/small/<?=$item['id']?>/<?=$name?>">
-										<input type="hidden" name="photos[<?=$i?>][big]" value="<?=core\Config::$imgUrl?>/items/big/<?=$item['id']?>/<?=$name?>">
+										<input type="hidden" name="photos[<?=$i?>][small]" value="<?=core\Config::$imgPath?>/items/small/<?=$item['id']?>/<?=$name?>">
+										<input type="hidden" name="photos[<?=$i?>][big]" value="<?=core\Config::$imgPath?>/items/big/<?=$item['id']?>/<?=$name?>">
 										<input type="hidden" name="photos[<?=$i?>][is_main]" value="<?=$name == $item['photo'] ? '1' : '0'?>">
 									</li>
 								<?}?>

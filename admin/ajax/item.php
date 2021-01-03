@@ -77,7 +77,7 @@ switch($_POST['act']){
 		$pathSmall = "/small_$name.jpg";
 
 		copy($_FILES['croppedImage']['tmp_name'], core\Config::$tmpFolderPath . $pathSmall);
-		copy($_SERVER['DOCUMENT_ROOT'] . $_POST['initial'], core\Config::$tmpFolderPath . $pathBig);
+		copy($_POST['initial'], core\Config::$tmpFolderPath . $pathBig);
 
 		echo json_encode([
 			'small' => core\Config::$tmpFolderUrl . $pathSmall,

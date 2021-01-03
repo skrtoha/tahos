@@ -72,8 +72,8 @@ class Imap{
 						if ($d["attachs"][$j]["type"] == 'VND.MS-EXCEL') $filename = 'file.xls';
 						else $filename = 'file.zip';
 					} 
-					file_put_contents(core\Config::$tmpFolderPath . "/$filename", $d["attachs"][$j]["file"]);
-					return core\Config::$tmpFolderPath . "/$filename";
+					file_put_contents(Config::$tmpFolderPath . "/$filename", $d["attachs"][$j]["file"]);
+					return Config::$tmpFolderPath . "/$filename";
 				}
 			}
 		}

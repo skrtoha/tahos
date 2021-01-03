@@ -1,6 +1,8 @@
 <?
 namespace core\Provider;
 use core\Provider;
+use core\Config;
+
 class Tahos extends Provider{
 	public static $store_id = 23;
 	public static $provider_id = 14;
@@ -70,7 +72,7 @@ class Tahos extends Provider{
 		}
 
 		$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-		$file = core\Config::$tmpFolderPath . "/$fileName.xlsx";
+		$file = Config::$tmpFolderPath . "/$fileName.xlsx";
 		$writer->save($file);
 		return $file;
 	}

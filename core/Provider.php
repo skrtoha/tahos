@@ -17,6 +17,21 @@ abstract class Provider{
 		$providers = self::get();
 		return $providers[$provider_id]['api_title'];
 	}
+	private static function getProviderIDByAPITitle($api_title){
+		$providers = self::get();
+		foreach($providers as $provider){
+			if ($provider['api_title'] == $api_title) return $provider['id'];
+		}
+		return false; 
+	}
+	public static function getApiParams($api_title, $typeOrganization = 'entity'){
+		static $params;
+		$provider_id = self::getProviderIDByAPITitle($api_title);
+		if (!$provider_id) return false;
+		if ($params[$api_title]->$typeOrganization) return $params[$api_title]->$typeOrganization;
+		$params[$api_title] = json_decode(\core\Setting::get('api_settings', $provider_id));
+		return $params[$api_title]->$typeOrganization;
+	}
 	public static function get(){
 		static $providers;
 		if (!$providers) {

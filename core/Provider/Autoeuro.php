@@ -11,13 +11,9 @@ class Autoeuro extends Provider{
 		return self::getParams()->url . "$action/json/" . self::getParams()->apiKey;
 	}
 
-	public static function getParams(){
-		static $params;
-		if ($params) return $params;
-		$params = json_decode(\core\Setting::get('api_settings', 18));
-		return $params;
+	public static function getParams($typeOrganization = 'entity'){
+		return parent::getApiParams('Autoeuro', $typeOrganization);
 	}
-
 	public static function getBrends(){
 		$response = parent::getUrlData(self::getUrlString('brends'));
 		return json_decode($response);

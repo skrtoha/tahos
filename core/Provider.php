@@ -1,5 +1,6 @@
 <?php
 namespace core;
+use core\Provider;
 abstract class Provider{
 	private static $ignoreProvidersForMarkups = [18, 14];
 	private static $counterDaysDelivery;
@@ -489,5 +490,19 @@ abstract class Provider{
 		$count = 0;
 		foreach($items as $providerTitle => $item) $count += count($item);
 		return $count;
+	}
+
+	public static function prepareSettingsAPI($provider_id){
+		$provider = self::getInstanceProvider($provider_id);
+		$fieldsForSettings = $provider::$fieldsForSettings;
+		$output = [
+			'private' => [],
+			'entity' => []
+		];
+		foreach($fieldsForSettings as $field){
+			$output['private'][$field] = '';
+			$output['entity'][$field] = '';
+		}
+		return $output;
 	}
 }

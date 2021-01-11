@@ -31,6 +31,11 @@ class Setting{
 			$name = $param1;
 			$value = $param2;
 		}
-		return $GLOBALS['db']->update(self::$tableName, ['value' => $value], "`view` = '$view' AND `name` = '$name'");
+		return $GLOBALS['db']->query("
+			INSERT INTO #". self::$tableName. " (`view`, `name`, `value`) VALUES (
+				'$view', '$name', '$value'
+			) ON DUPLICATE KEY UPDATE `value` = '$value'
+		", '');
+		// return $GLOBALS['db']->update_query(self::$tableName, ['value' => $value], "`view` = '$view' AND `name` = '$name'");
 	}
 }

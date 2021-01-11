@@ -58,12 +58,14 @@ switch($_GET['act']){
 		$page_title = 'Настройки API ' . $providerTitle;
 		$status .= $page_title;
 		if (!empty($_POST)){
+			debug($_POST); //exit();
 			core\Setting::update('api_settings', $_GET['provider_id'], json_encode($_POST));
 			api_settings($_POST);
 			message('Успешно обновлено!');
 		} 
 		else{
 			$api_settings = json_decode(core\Setting::get('api_settings', $_GET['provider_id']), true);
+			if (empty($api_settings)) $api_settings = core\Provider::prepareSettingsAPI($_GET['provider_id']);
 			api_settings($api_settings);
 		}
 		break;
@@ -173,19 +175,40 @@ function providers($providers){?>
 		</tbody>
 	</table>
 <?}
-function api_settings($settings){?>
+function api_settings($settings){
+
+	?>
 	<table id="api_settings">
 		<form method="post">
 			<?foreach($settings as $title => $value){?>
-				<tr>
-					<td><?=$title?></td>
+				<tr class="wrap">
+					<td>
+						<b>
+							<?switch ($title){
+								case 'private': echo "Физ. лицо"; break;
+								case 'entity': echo 'Юр. лицо'; break;
+								default: echo $title;
+							}?>
+						</b>
+					</td>
 					<td>
 						<?if (is_array($value)){?>
 							<table>
 								<?foreach($value as $t => $v){?>
 									<tr>
-										<td><?=$t?></td>
-										<td><input type="text" name="<?=$title?>[<?=$t?>]" value="<?=$v?>"></td>
+										<td><?=$t == 'isActive' ? "<b>активен</b>" : $t?></td>
+										<td>
+											<?if ($t == 'isActive'){
+												?>
+												<select name="<?=$title?>[<?=$t?>]">
+													<option <?=$v == '0' ? 'selected' : ''?> value="0">нет</option>
+													<option <?=$v == '1' ? 'selected' : ''?> value="1">да</option>
+												</select>
+											<?}
+											else{?>
+												<input type="text" name="<?=$title?>[<?=$t?>]" value="<?=$v?>">
+											<?}?>
+										</td>
 									</tr>
 								<?}?>
 							</table>

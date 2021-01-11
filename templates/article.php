@@ -4,7 +4,7 @@ $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders){
 
-	$abcp->render(13); 
+	/*$abcp->render(13); 
 	$abcp->render(6);
 
 	core\Provider\Impex::getData(['article' => $abcp->item['article']]);
@@ -16,16 +16,16 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
 	$armtek->setArticle($abcp->item['brand'], $abcp->item['article']);
 
 	$rossko = new core\Provider\Rossko($db);
-	$rossko->execute("{$abcp->item['brand']} {$abcp->item['article']}");
+	$rossko->execute("{$abcp->item['brand']} {$abcp->item['article']}");*/
 
 	core\Provider\Autoeuro::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
-	core\Provider\Autokontinent::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+	/*core\Provider\Autokontinent::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
 	core\Provider\ForumAuto::setArticle($_GET['item_id'], $abcp->item['brand'], $abcp->item['article']);
 
 	core\Provider\Autopiter::setArticle($abcp->item['brand'], $abcp->item['article']);
-
+*/
 	exit();
 }
 

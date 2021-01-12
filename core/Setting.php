@@ -1,7 +1,7 @@
 <?php
 namespace core;
 class Setting{
-	private static $tableName = 'settings';
+	private static $tableName = 'settings_test';
 	public static function get($param1, $param2 = ''){
 		static $defaultSettingsOfView;
 		if ($param2){

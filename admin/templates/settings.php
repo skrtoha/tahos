@@ -72,7 +72,7 @@ switch($_GET['act']){
 function storesForSubscribe($res_mainStores, $currentStoresForSubscribe){?>
 	<div class="t_form">
 		<div class="bg">
-			<form id="storesForSubscribe" method="post" enctype="multipart/form-data">
+			<form class="defaultSubmit" id="storesForSubscribe" method="post" enctype="multipart/form-data">
 				<div class="field">
 					<div class="title">Склады для рассылки</div>
 					<div class="value">
@@ -93,7 +93,7 @@ function storesForSubscribe($res_mainStores, $currentStoresForSubscribe){?>
 function organization($organization = array()){?>
 	<div class="t_form">
 		<div class="bg">
-			<form id="storesForSubscribe" method="post" enctype="multipart/form-data">
+			<form class="defaultSubmit" id="storesForSubscribe" method="post" enctype="multipart/form-data">
 				<div class="field">
 					<div class="title">Короткое название</div>
 					<div class="value">
@@ -178,7 +178,7 @@ function api_settings($settings){
 
 	?>
 	<table id="api_settings">
-		<form method="post">
+		<form class="defaultSubmit" method="post">
 			<?foreach($settings as $title => $value){?>
 				<tr class="wrap">
 					<td>

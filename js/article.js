@@ -1143,7 +1143,7 @@ function checkThroughAPI(item_id){
 		url: document.location.href,
 		success: function(){
 			let href = document.location.href + '/noUseAPI';
-			// document.location.href = href;
+			document.location.href = href;
 		}
 	})
 }

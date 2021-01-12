@@ -26,10 +26,20 @@ abstract class Provider{
 	}
 	public static function getApiParams($api_title, $typeOrganization = 'entity'){
 		static $params;
+		
 		$provider_id = self::getProviderIDByAPITitle($api_title);
 		if (!$provider_id) return false;
 		if ($params[$api_title]->$typeOrganization) return $params[$api_title]->$typeOrganization;
+		
 		$params[$api_title] = json_decode(\core\Setting::get('api_settings', $provider_id));
+
+		//если private отключен то возращаем entity
+		if (
+			!$params[$api_title]->$typeOrganization->isActive &&
+			$typeOrganization == 'private'
+		) return $params[$api_title]->entity;
+
+
 		return $params[$api_title]->$typeOrganization;
 	}
 	public static function get(){

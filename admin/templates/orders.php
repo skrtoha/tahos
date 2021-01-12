@@ -15,7 +15,6 @@ switch ($act) {
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	case 'allInWork':
-		// debug($_GET); exit();
 		$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
 		while($ov = $res_order_values->fetch_assoc()){
 			if (!in_array($ov['status_id'], [5])) continue;

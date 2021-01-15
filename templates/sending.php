@@ -54,7 +54,6 @@ if (!$_GET['id']){
 	$quan = 0;
 	echo "$device";
 	?>
-	<input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
 	<div class="sending-page">
 		<h1>Формирование отправки</h1>
 		<?if (!$items->num_rows){?>
@@ -236,7 +235,6 @@ else{
 	$sending = $sending[0];
 	$sending_values = $sendings->getSendingValues($sending['issue_id']);
 	?>
-	<input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
 	<div class="sending-page">
 		<h1>Отправка №<?=$_GET['id']?></h1>
 		<h3>Общие данные</h3>

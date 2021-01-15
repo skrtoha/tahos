@@ -64,7 +64,6 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 <input type="hidden" id="time_from" value="<?=$time_from?>">
 <input type="hidden" id="time_to" value="<?=$time_to?>">
 <input type="hidden" name="isCheckedFromAbcp" value="<?=$abcp->isCheckedFromAbcp?>">
-<input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
 <input type="hidden" name="noUseAPI" value="<?=isset($_GET['noUseAPI']) ? 1 : 0?>">
 <div class="search-result">
 	<h1>Список предложений</h1>

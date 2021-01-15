@@ -46,7 +46,6 @@ $designation = $db->getFieldOnID('currencies', $user['currency_id'], 'designatio
 			<p>Бонусы: <span class="account-bonus"><?=$user['bonus_count']?><?=$designation?></span></p>
 		<?}?>
 	</div>
-	<input type="hidden" id="user_id" value="<?=$_SESSION['user']?>">
 	<div class="pay-methods-wrap">
 		<div class="pay-methods">
 			<div class="method selected" data-target="visa-master">

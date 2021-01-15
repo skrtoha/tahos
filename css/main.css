@@ -1467,8 +1467,10 @@ header .profile li:nth-child(3) a span {
   top: 75px;
   left: 0;
   overflow: hidden;
-  padding: 0 20px 0 0;
   box-sizing: border-box;
+}
+.hints table tr.active{
+  background: #d8f4fd;
 }
 #news a, #news img{
   display: block
@@ -1476,26 +1478,28 @@ header .profile li:nth-child(3) a span {
 .hints a {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  /*width: 100%;*/
-  height: 37px;
   font-size: 18px;
-  line-height: 37px;
+  line-height: 32px;
   color: #0069a3;
   text-decoration: none;
   outline: 0;
   display: block;
+  white-space: nowrap;
 }
 .hints table td{;
-  text-align: left;;
-  padding: 0 0 0 20px;;
+  text-align: left;
+  padding: 0 0 0 10px;
   cursor: pointer;
 }
 .hints table{
-  width: auto;
+  width: 100%;
   padding: 0 20px;;
 }
 .hints table tr{
   border: none;
+}
+.hints table.previous_search, .hints table.coincidences{
+  display: none;
 }
 #news {
   float: left;

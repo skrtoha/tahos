@@ -25,17 +25,42 @@ switch($_POST['act']){
 			$brend_id = $db->last_id();
 		}
 		$article = preg_replace('/[\W_]+/', '', $_POST['article']);
-		$res = $db->insert('items', [
+		$res = core\Item::insert([
 			'brend_id' => $brend_id,
 			'article' => $article,
 			'article_cat' => $_POST['article'],
 			'title' => $_POST['title'],
 			'title_full' => $_POST['title'],
 			'source' => 'страницы поиска'
-		]/*, ['print' => true]*/);
-		$item_id = $db->last_id();
-		$db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+		]);
+		$item_id = core\Item::$lastInsertedItemID;
 		echo $item_id;
+		break;
+	case 'searchArticles':
+		$output = '';
+		$query = core\Item::getQueryItemInfo();
+		$article = core\Item::articleClear($_POST['value']);
+		$query .= "
+			WHERE
+				i.article LIKE '$article%'
+			LIMIT
+				0, {$_POST['maxCountResults']}
+		";
+		$res_items = $db->query($query);
+		if (!$res_items->num_rows) break;
+		foreach($res_items as $item){
+			$output .= "
+				<tr item_id=\"{$item['id']}\" class=\"item\">
+					<td>
+						<a href=\"/article/{$item['id']}-{$item['article']}\">{$item['brend']} - {$item['article']}</a>
+					</td>
+					<td>{$item['title_full']}</td>
+				</tr>";
+		}
+		echo $output;
+		break;
+	case 'rememberUserSearch':
+		core\User::saveUserSearch($_POST);
 		break;
 }
 ?>

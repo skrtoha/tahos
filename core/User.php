@@ -144,4 +144,21 @@ class User{
 		<?
 		return ob_get_clean();
 	}
+
+	/**
+	 * sets search user
+	 * @param  array $item ['text', 'title', 'user_id'] 
+	 * @return int
+	 		1 - added a new record,
+	 		2 - updated last record
+	 */
+	public static function saveUserSearch($array)
+	{
+		return $GLOBALS['db']->query("
+			INSERT INTO #search (`user_id`, `item_id`) VALUES 
+			({$array['user_id']}, '{$array['item_id']}') 
+			ON DUPLICATE KEY UPDATE 
+				`date` = CURRENT_TIMESTAMP
+		", '');
+	}
 }

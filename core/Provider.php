@@ -24,10 +24,17 @@ abstract class Provider{
 		}
 		return false; 
 	}
-	public static function getApiParams($api_title, $typeOrganization = 'entity'){
+	public static function getApiParams($inputData){
 		static $params;
-		
-		$provider_id = self::getProviderIDByAPITitle($api_title);
+
+		if (!$inputData['api_title']) $api_title = self::getProviderAPITitle($inputData['provider_id']);
+		else $api_title = $inputData['api_title'];
+
+		if (!isset($inputData['provider_id'])) $provider_id = self::getProviderIDByAPITitle($api_title);
+		else $provider_id = $inputData['provider_id'];
+
+		$typeOrganization = $inputData['typeOrganization'];
+
 		if (!$provider_id) return false;
 		if ($params[$api_title]->$typeOrganization) return $params[$api_title]->$typeOrganization;
 		

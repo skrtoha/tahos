@@ -46,7 +46,6 @@ abstract class Provider{
 			$typeOrganization == 'private'
 		) return $params[$api_title]->entity;
 
-
 		return $params[$api_title]->$typeOrganization;
 	}
 	public static function get(){

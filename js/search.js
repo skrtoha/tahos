@@ -1,3 +1,10 @@
+function locateAfterSearch(th){
+	let item_id = th.attr('item_id');
+	let article = th.attr('article');
+	let href = "/article/" + item_id + "-" + article;
+	if (th.attr('is_armtek')) document.location.href = '/search/armtek/' + item_id;
+	else document.location.href = href;
+}
 $(function(){
 	$("#in_stock_only").styler();
 	$('#offers-filter-form button').on('click', function(e){
@@ -100,11 +107,9 @@ $(function(){
 	});
 	$(document).on('click', '.hit-list-table tr:not(.notFound):not(.searchFromOtherProviders):nth-child(n + 2)', function(e){
 		if (e.target.className == 'icon-bin') return false;
-		var item_id = $(this).attr('item_id');
-		var article = $(this).attr('article');
-		var href = "/article/" + item_id + "-" + article;
-		if ($(this).attr('is_armtek')) document.location.href = '/search/armtek/' + item_id;
-		else document.location.href = href;
+		let tr = $(this);
+		rememberUserSearch(tr.attr('item_id'));
+		document.location.href = '/article/' + tr.attr('item_id') + '-' + tr.attr('article');
 	})
 	if ($('tr.notFound.removable').size()){
 		$.ajax({
@@ -152,6 +157,7 @@ $(function(){
 				title: th.find('td:nth-child(3)').html()
 			},
 			success: function(response){
+				rememberUserSearch(response);
 				document.location.href = '/article/' + response + '-' + $('input[name=search]').val();
 			}
 		})

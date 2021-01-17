@@ -31,7 +31,6 @@ $messages = $db->select('messages', '*', "`order_id`=$order_id AND `hidden`=0", 
 	<input type="hidden" name="message_send" value="1">
 		<input type="hidden" name="json_fotos">
 		<input type="hidden" name="order_id" value="<?=$order_id?>">
-		<input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
 		<input type="hidden" name="user_sender" value="1">
 		<?if (!count($messages)){?>
 			<div class="input-wrap">

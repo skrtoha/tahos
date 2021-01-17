@@ -77,6 +77,12 @@ $(document).ready(function(e){
 	//     clearOnEmpty: true,
 	// });
 	// 
+	// 
+	$(document).on('keyup', function(e){
+		if (!e.ctrlKey) return false;
+		if (e.keyCode != 13) return false;
+		$('form.defaultSubmit').submit();
+	})
 	$("[tooltip]").on('mouseover', function (eventObject) {
        let data_tooltip = $(this).attr("tooltip");
        $("#tooltip").html(data_tooltip)

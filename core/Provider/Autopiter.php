@@ -84,6 +84,7 @@ class Autopiter extends Provider{
 		return $output;
 	}
 	private static function parseBasketForItemToOrder($model){
+		if (!$model) return false;
 		$osi = explode('-', $model->Comment);
 		$resOrderValue = OrderValue::get([
 			'order_id' => $osi[0],

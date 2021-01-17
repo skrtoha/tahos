@@ -75,7 +75,6 @@ $(function(){
 	})
 	$('.categories .category .left').each(function(){
 		let ul = $(this);
-		console.log(ul.height());
 		if (ul.height() > 250){
 			let i = ul.find('li').size();
 			while(ul.height() > 240){

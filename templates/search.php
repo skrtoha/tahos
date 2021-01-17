@@ -1,5 +1,9 @@
 <?
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
+	if (!core\Config::$isUseApiProviders){
+		echo json_encode([]);
+		exit();
+	}
 	$coincidences = array();
 
 	/*$mikado = new core\Provider\Mikado($db);
@@ -68,18 +72,22 @@ if ($_GET['type'] == 'vin'){
 else{
 	core\Provider\Impex::setSearch($_GET);
 	$items = search_items('');
-	if (!empty($items) && $_SESSION['user']){
-		foreach($items as $id => $item) break;
-		save_search($item['title_full']);
-	} 
 	if (!empty($items) && count($items) == 1){
 		foreach($items as $id => $item) break;
 		// debug($item, $id); exit();
 		if ($item['is_armtek']) header("Location: /search/armtek/$id");
-		else header("Location: /article/$id-{$item['article']}");
+		else{
+			if ($_SESSION['user']){
+				core\User::saveUserSearch([
+					'user_id' => $_SESSION['user'],
+					'item_id' => $id
+				]);
+			}
+			header("Location: /article/$id-{$item['article']}");
+			exit();
+		} 
 	}?>
 	<input type="hidden" name="search" value="<?=$_GET['search']?>">
-	<input type="hidden" name="user_id" value="<?=$user['id']?>">
 	<div class="hit-list">
 		<h1>Список совпадений</h1>
 		<table class="hit-list-table">
@@ -130,55 +138,6 @@ else{
 		</table>
 	</div>
 <?}
-function save_search($title){
-	global $db, $search_count_user;
-	if (!$_SESSION['user']) return false;
-	switch($_GET['type']){
-		case 'article': $search_type = 1; break;
-		case 'barcode': $search_type = 2; break;
-		case 'vin': $search_type = 3; break;
-	}
-	$db->query("
-		UPDATE #search SET `date`=CURRENT_TIMESTAMP
-		WHERE
-		`user_id`={$_SESSION['user']} AND
-		`type`=$search_type AND
-		`text`='{$_GET['search']}'
-	", '');
-	if (!$db->rows_affected()){
-		$userSearch = $db->select(
-			'search',
-			'*',
-			"`user_id` = {$_SESSION['user']} AND `type` = $search_type",
-			'date',
-			true,
-			"0, $search_count_user"
-		);
-		if (count($userSearch) == $search_count_user){
-			$db->query("
-				UPDATE
-					#search
-				SET
-					`text`='{$_GET['search']}',
-					`title`='$title',
-					`date` = CURRENT_TIMESTAMP
-				WHERE
-					`user_id`={$_SESSION['user']} AND
-					`type`= $search_type AND
-					`text` = '{$userSearch[0]['text']}'
-			", '');
-		}
-		else $db->insert(
-			'search',
-			[
-				'user_id' => $_SESSION['user'],
-				'type' => $search_type,
-				'text' => $_GET['search'],
-				'title' => $title,
-			]
-		);
-	}
-}
 function get_brend($title){
 	global $db;
 	$brend = $db->select_one('brends', 'id,parent_id', "`title`='$title'");
@@ -203,12 +162,11 @@ function search_items($flag = ''){
 	// print_r($_GET);
 	switch ($_GET['type']){
 		case 'article': 
-			if (mb_strlen($for_search) == 13) $where = "(i.`article`='$for_search' OR ib.`barcode`='$for_search')";
-			else $where = "i.`article`='$for_search'";
+			$where = "i.`article`='$for_search'";
 			$type_search = 1;
 			break;
 		case 'barcode':
-			$where =  "ib.`barcode`='$for_search' OR i.article = '$for_search'";
+			$where =  "ib.`barcode`='$for_search'";
 			$type_search = 2;
 			break;
 	}

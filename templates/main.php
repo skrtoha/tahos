@@ -26,6 +26,7 @@
 <body>
 	<input type="hidden" name="device" value="<?=$device?>">
 	<input type="hidden" name="imgUrl" value="<?=core\Config::$imgUrl?>">
+	<input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
 	<div id="popup" style="display: none"><img src="/images/preload.gif" alt=""></div>
 	<div id="message">
 		<div><div></div></div>
@@ -63,7 +64,7 @@
 				if ($type != 'article' && $type != 'barcode' && $type != 'vin') $type = '';
 				?>
 				<form action="/search/" method="get">
-					<input class="search_input" value="<?=$_GET['search']?>" name="search" type="text" placeholder="Поиск детали, например: 9091901122" autocomplete="off">
+					<input class="search_input" value="" name="search_input" type="text" placeholder="Поиск детали, например: 9091901122" autocomplete="off">
 					<div class="settings">
 						<input type="radio" <?=$type == 'article' || !$type ? "checked" : ""?> value="article" name="type" id="radio1">
 						<label for="radio1" data-placeholder="Введите номер детали">Искать по номеру детали</label>
@@ -76,7 +77,10 @@
 					</div>
 					<button class="search_btn"></button>
 				</form>
-				<div class="hints"></div>
+				<div class="hints">
+					<table class="previous_search"></table>
+					<table class="coincidences"></table>
+				</div>
 			</div>
 			<div class="search_btn search_btn_2"></div>
 			<a href="#" class="cart">

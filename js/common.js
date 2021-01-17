@@ -1,5 +1,6 @@
 var cookieOptions = {path: '/'};
 var cp_api = false;
+let countCharactersForSearch = 3;
 var h_win = $(window).height();
 function getParams(url = ''){
 	let str = url ? url : window.location.search;
@@ -121,10 +122,55 @@ function cp_init(){
 function getImgUrl(){
 	return $('input[name=imgUrl]').val()
 }
+
+function rememberUserSearch(item_id){
+	let user_id = $('input[name=user_id]').val();
+	if (!user_id.length) return false;
+	$.ajax({
+		type: 'post',
+		url: '/ajax/common.php',
+		data: {
+			act: 'rememberUserSearch',
+			item_id: item_id,
+			user_id: user_id
+		},
+		success: function(){}
+	})
+}
+
+function handlePressedEnterSearch(){
+	let $elem = $('div.search tr.active');
+	if ($elem.size()){
+		rememberUserSearch($elem.attr('item_id'));
+		return document.location.href = $elem.find('a').attr('href');
+	} 
+	else return document.location.href = '/search/article/' + $('input[name=search_input]').val();
+}
+function selectItemByKey(event){
+	let $input = $(event.target);
+	let tableClass;
+	if ($input.val().length < countCharactersForSearch) tableClass = 'previous_search';
+	else tableClass = 'coincidences';
+
+	let activeTable = $('.hints table.' + tableClass);
+	let activeTr = activeTable.find('tr.active');
+
+	if (event.keyCode == 40){
+		if (activeTr.length == 0) return activeTable.find('tr:first-child').addClass('active');
+
+		if (activeTr.next().size() == 0) return false;
+		$('.hints').find('tr').removeClass('active');
+		activeTr.next().addClass('active');
+	} 
+	if (event.keyCode == 38){
+		if (activeTr.prev().size() == 0) return false;
+		$('.hints').find('tr').removeClass('active');
+		activeTr.prev().addClass('active');
+	} 
+}
 $(function() {
 	cp_init();
 	price_format();
-	// $("input[name=telephone]").mask("+7 (999) 999-99-99");
 	$('#driving_direction').on('click', function(event) {
 		event.preventDefault();
 		th = $(this);
@@ -322,63 +368,114 @@ $(function() {
 			$('.page-wrap').css('position', 'relative');
 		}
 	});
-	// var hints_count = $(".hints li").length;
-	// if (hints_count > 6) hints_height = 300;
-	// else hints_height = hints_count*50;
 	$('.search_input').on('focus', function(e){
-		var search_text = $('.search_input').val();
-		// $('#popup').css('display', 'flex');
-		// alert();
-		var data = "type_search=" + $('.settings input:checked').val();
-		// console.log(data);
-		$.ajax({
-			type: "POST",
-			url: "/ajax/search.php",
-			data: data,
-			success: function(msg){
-				// console.log(msg); return;
-				if (msg == '0') return false;
-				else $('.hints').html(msg);
-				$(".hints").show();
-				// $(".hints").jScrollPane({
-				// 	showArrows: true,
-				// 	verticalGutter: 0
-				// });
-				// $('#popup').css('display', 'none');
-			} 
-		});
+		let text = $('input.search_input').val();
+		let user_id = $('input[name=user_id]').val();
+
+		if (text.length < countCharactersForSearch){
+			if ($('.hints .previous_search').is(':empty') && user_id.length){
+				$.ajax({
+					type: "POST",
+					url: "/ajax/search.php",
+					data: {
+						user_id: $('input[name=user_id]').val()
+					},
+					success: function(msg){
+						$('.hints')
+							.find('table.previous_search')
+							.show()
+							.html(msg);
+					} 
+				});
+			}
+
+			$('.hints table.previous_search').show();
+			$('.hints table.coincidences').hide();
+		}
+		else{
+			$('.hints table.previous_search').hide();
+			$('.hints table.coincidences').show();
+		}
+		$('.hints').show();
 	})
-	$(document).on('click', '.hints table tr', function(){
-		document.location.href = $(this).find('a').attr('href');
+	$('.search_input').on('keyup input', function(event){
+		if (event.keyCode == 38 || event.keyCode == 40){
+			return selectItemByKey(event);
+		}
+		if (event.keyCode == 13){
+			return handlePressedEnterSearch(event);
+		}
+		let inputValue = $(this).val();
+		
+		if (inputValue.length < countCharactersForSearch){
+			$('.hints .previous_search').show();
+			if (!$('.hints .previous_search tr.active').size()){
+				$('.hints .previous_search tr:first-child').addClass('active');
+			}
+			$('.hints .coincidences').hide();
+			return false;
+		} 
+		else{
+			$('.hints .previous_search').hide();
+			$('.hints .previous_search tr').removeClass('active');
+			$('.hints .coincidences').show();
+		} 
+
+		let htmlArticleBarcole = '';
+		if (inputValue.length == 13 || inputValue.length == 17){
+			htmlArticleBarcole += `
+				<tr class="active">
+					<td colspan="2">
+						<a href="/search/article/${inputValue}">${inputValue} - искать артикул</a>
+					</td>
+				</tr>
+			`;
+			if (inputValue.length == 13) htmlArticleBarcole += `
+				<tr>
+					<td colspan="2">
+						<a href="/search/barcode/${inputValue}">${inputValue} - искать штрихкод</a>
+					</td>
+				</tr>
+			`;
+			if (inputValue.length == 17) htmlArticleBarcole += `
+				<tr>
+					<td colspan="2">
+						<a href="/original-catalogs/legkovie-avtomobili#/carInfo?q=${inputValue}">${inputValue} - искать VIN</a>
+					</td>
+				</tr>
+			`;
+		}
+
+		$('.hints table.coincidences').html(htmlArticleBarcole);
+		$.ajax({
+			type: 'post',
+			url: '/ajax/common.php',
+			data: {
+				act: 'searchArticles',
+				value: inputValue,
+				maxCountResults: 5
+			},
+			success: function(response){
+				$('table.coincidences tr.item').remove();
+				$('table.coincidences').append(response);
+			}
+		})
+	})
+	$(document).on('click', '.hints table tr', function(e){
+		let tr = $(this);
+		rememberUserSearch(tr.attr('item_id'));
+		document.location.href = tr.find('a').attr('href');
 	})
 	$("div.search_btn").click(function(){
 		$(".overlay").addClass("none_bg");
 		$(".h_overlay, .overlay").show();
 		$("header .search").addClass("show");
 	})
-	$("button.search_btn").click(function(e){
+	$('div.search > form').on('submit', function(e){
 		e.preventDefault();
-		var search_text = $('.search_input').val() ? $('.search_input').val() : "9091901122";
-		search_text = search_text.replace(/\W+/g, '');
-		console.log(search_text);
-		let type_search;
-		switch(search_text.length){
-			case 13: 
-				if (/\d+/.test(search_text)) type_search = 'barcode'; 
-				else type_search = 'article';
-				break;
-			case 17: type_search = 'vin'; break;
-			default: type_search = 'article';
-		}
-		if (type_search == 'vin' && search_text.match(/^[\w\d]{17}$/gi) === null){
-			return show_message('VIN-номер введен неккоректно!', 'error')
-		}
-		if (type_search == 'vin'){
-			window.location.href = "/original-catalogs/legkovie-avtomobili#/carInfo?q=" + search_text;
-		}
-		else{
-			window.location.href = "/search/" + type_search + '/' + search_text + '/yes';
-		}
+	})
+	$("button.search_btn").click(function(e){
+		return handlePressedEnterSearch();
 	});
 	$(".login_btn").click(function(){
 		$('.overlay').click();
@@ -429,7 +526,7 @@ $(function() {
 		$('.comment-block').hide();
 	});
 	$(document).mouseup(function(e) {
-		var $target = $(e.target);
+		let $target = $(e.target);
 		if ($target.closest(".hints").length === 0 && !$target.hasClass("search_input")) {
 		    $(".hints").hide();
 		}

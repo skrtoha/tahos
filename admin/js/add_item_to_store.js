@@ -35,7 +35,7 @@
 				 		'<tr>' +
 						 	'<td>Цена:</td>' +
 						 	'<td>' +
-						 		'<input name="price" value="' + storeInfo.price + '" type="text">' +
+						 		'<input name="price" value="' + storeInfo.priceWithoutMarkup + '" type="text">' +
 						 	 '</td>' +
 					 	'</tr>' +
 					 	'<tr>' +

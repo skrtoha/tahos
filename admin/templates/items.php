@@ -251,7 +251,7 @@ function item($act){
 	<?}?>
 	<div class="t_form">
 		<div class="bg">
-			<form method="post" enctype="multipart/form-data">
+			<form class="defaultSubmit" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="form_submit" value=<?=$act == 's_change' ? 1 : 2?>>
 				<input type="hidden" name="is_stay" value="">
 				<div class="field">

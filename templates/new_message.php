@@ -25,7 +25,6 @@ $messages_themes = $db->select('messages_themes', '*', '', '`id`<=5', '', '', tr
 	<input type="hidden" name="message_send" value="1">
 		<input type="hidden" name="json_fotos">
 		<input type="hidden" name="order_id" value="<?=$order_id?>">
-		<input type="hidden" name="user_id" value="<?=$_SESSION['user']?>">
 		<input type="hidden" name="sender" value="user">
 			<div class="input-wrap">
 				<label for="department">Тема сообщения: </label>

@@ -160,11 +160,7 @@ function view(){
 				'Черновик',
 				getOrderStatus(GROUP_CONCAT(ov.status_id))
 			) AS status,
-			IF(
-				u.organization_name <> '',
-				CONCAT_WS (' ', ot.title, u.organization_name),
-				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-			) AS fio,
+			" . core\User::getUserFullNameForQuery() . " AS fio,
 			o.user_id,
 			o.is_draft,
 			o.is_new

@@ -11,11 +11,7 @@ $page_title = 'Главная';
 		$res_users = $db->query("
 			SELECT
 				u.id,
-				IF(
-					u.organization_name <> '',
-					CONCAT_WS (' ', u.organization_name, ot.title),
-					CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-				) AS name
+				" . core\User::getUserFullNameForQuery() . " AS name
 			FROM 
 				#users u
 			LEFT JOIN 

@@ -27,11 +27,7 @@ class Fund{
 		return  "
 			SELECT
 				f.*,
-				IF(
-					u.organization_name <> '',
-					CONCAT_WS (' ', u.organization_name, ot.title),
-					CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-				) AS full_name,
+				" . User::getUserFullNameForQuery() . " AS full_name,
 				DATE_FORMAT(
 					DATE_ADD(
 						f.created, Interval u.defermentOfPayment DAY

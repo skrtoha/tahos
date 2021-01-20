@@ -36,11 +36,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$values = $db->query("
 				SELECT
 					urdi.user_id,
-					IF(
-						u.organization_name <> '',
-						CONCAT_WS (' ', u.organization_name, ot.title),
-						CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-					) AS name,
+					" . core\User::getUserFullNameForQuery() . " AS name,
 					urdi.item_id,
 					b.title AS brend,
 					i.title_full,

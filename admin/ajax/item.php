@@ -101,19 +101,19 @@ switch($_POST['act']){
 		echo json_encode(core\Item::getByID($_POST['item_id']));
 		break;
 	case 'addItem':
-		// debug($_POST); //exit;
-		$db->insert($_POST['type'], ['item_id' => $_POST['item_id'], 'item_diff' => $_POST['item_diff']]);
+		$res = $db->query("
+			SELECT * FROM #analogies WHERE item_id={$_POST['item_diff']}
+		", '');
+
+		$db->insert($_POST['type'], ['item_id' => $_POST['item_id'], 'item_diff' => $_POST['item_diff']]/*, ['print' => true]*/);
 		if (in_array($_POST['type'], ['articles', 'analogies', 'substitutes'])){
-			$db->insert($_POST['type'], ['item_id' => $_POST['item_diff'], 'item_diff' => $_POST['item_id']]);
+			$db->insert($_POST['type'], ['item_id' => $_POST['item_diff'], 'item_diff' => $_POST['item_id']]/*, ['print' => true]*/);
 		}
 		if ($_POST['addAllAnalogies']){
-			$res = $db->query("
-				SELECT * FROM #analogies WHERE item_id={$_POST['item_id']}
-			", '');
 			if ($res->num_rows){
 				while($row = $res->fetch_assoc()){
-					$db->insert('analogies', ['item_id' => $_POST['item_diff'], 'item_diff' => $row['item_diff']]);
-					$db->insert('analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_diff']]);
+					$db->insert('analogies', ['item_id' => $_POST['item_id'], 'item_diff' => $row['item_diff']]/*, ['print' => true]*/);
+					$db->insert('analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_id']]/*, ['print' => true]*/);
 				} 
 			}
 		}

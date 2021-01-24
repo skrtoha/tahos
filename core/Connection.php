@@ -20,10 +20,7 @@ class Connection{
 		$this->db = $db;
 
 		if (preg_match('/.*ajax.*/', $_SERVER['REQUEST_URI'])) return false;
-
-		// debug($_SERVER); exit();
-		// var_dump($this->isDeniedIP($remoteAddr));
-		// var_dump($this->isDeniedPage($_SERVER['REQUEST_URI']));
+	
 		if (isset($_SESSION['manager']['id']) || isset($_SESSION['user'])) $this->add([
 			'ip' => $remoteAddr,
 			'url' => $_SERVER['REQUEST_URI'],
@@ -84,8 +81,8 @@ class Connection{
 				'manager_id' => isset($params['manager_id']) ? $params['manager_id'] : null,
 				'isDeniedAccess' => isset($params['isDeniedAccess']) ? $params['isDeniedAccess'] : null,
 				'comment' => isset($params['comment']) ? $params['comment'] : null
-			],
-			['print_query' => false]
+			]/*,
+			['print' => false]*/
 		);
 		$this->connection_id = $this->db->last_id();
 	}

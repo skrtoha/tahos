@@ -122,6 +122,7 @@ switch ($act) {
 	case 'substitutes': 
 		if (isset($_GET['status'])){
 			$db->update($act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_id']} AND `item_diff` = {$_GET['item_diff']}");
+			$db->update($act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_diff']} AND `item_diff` = {$_GET['item_id']}");
 			header("Location: {$_SERVER['HTTP_REFERER']}");
 		}
 		itemDiff($act); 

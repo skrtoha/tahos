@@ -139,7 +139,7 @@ class Connection{
 				IF(
 					c.manager_id IS NOT NULL,
 					CONCAT_WS(' ', m.first_name, m.last_name),
-					" . User::getUserFullNameForQuery() . " AS name,
+					" . User::getUserFullNameForQuery() . ") AS name,
 				c.comment,
 				DATE_FORMAT(c.created, '%d.%m.%Y %H:%i:%s') AS created
 			FROM

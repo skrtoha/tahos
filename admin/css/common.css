@@ -2148,7 +2148,7 @@ span.icon-menu{
 	float: left;
 	margin-right: 10px;
 }
-@media screen and (max-width: 550px){
+@media screen and (max-width: 800px){
 	#userInfo{
 		display: none;
 	}

@@ -18,6 +18,13 @@ require_once $path.'vendor/autoload.php';
 
 
 class Armtek extends Provider{
+	public static $fieldsForSettings = [
+		"isActive",	// is required	
+		'user_login',
+		'user_password',
+		'KUNNR_RG',
+		'provider_id'
+	];
 	public static $provider_id = 2;
 	public static $keyzak = array();
 	private $mainItemId;
@@ -33,10 +40,11 @@ class Armtek extends Provider{
 		'DBTYP' => 3,
 		'format' => 'json'
 	];
-	private function getConfig(){
-		static $config;
-		if ($config) return $config;
-		else return json_decode(Setting::get('api_settings', 2), true);
+	private function getConfig($typeOrganization = 'entity'){
+		return (array) parent::getApiParams([
+			'api_title' => 'Armtek',
+			'typeOrganization' => $typeOrganization
+		]);
 	}
 	public function __construct($db = NULL){
 		if ($db){
@@ -241,7 +249,7 @@ class Armtek extends Provider{
 		$config = self::getConfig();
 		$params = self::$params;
 		$params['PIN'] = $search;
-		$params['KUNNR_RG'] = $config['KUNNR_RG']['entity'];
+		$params['KUNNR_RG'] = $config['KUNNR_RG'];
 		$request_params = [
 			'url' => 'search/search',
 			'params' => $params

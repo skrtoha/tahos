@@ -6,12 +6,19 @@ use core\OrderValue;
 use core\Log;
 
 class FavoriteParts extends Provider{
+	public static $fieldsForSettings = [
+		"isActive",	// is required	
+		'key',
+		'developerKey',
+		'provider_id'
+	];
 	public static $error;
 
-	public static function getParams(){
-		static $params;
-		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 19));
-		return $params;
+	public static function getParams($typeOrganization = 'entity'){
+		return parent::getApiParams([
+			'api_title' => 'FavoriteParts',
+			'typeOrganization' => $typeOrganization
+		]);
 	}
 
 	private static function getCodesByCipher($cipher): array
@@ -139,13 +146,15 @@ class FavoriteParts extends Provider{
 			$ov['quan'] = 0;
 		} 
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/add/";
-		$url .= "?key=".self::getParams()->key;
-		$url .= '&developerKey='.self::getParams()->developerKey;
+		$url .= "?key=".self::getParams('private')->key;
+		$url .= '&developerKey='.self::getParams('private')->developerKey;
 		$url .= "&goods={$item['goodsID']}";
 		$url .= "&warehouseGroup=$warehouseGroup";
 		$url .= "&comment={$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 		$url .= "&count={$ov['quan']}";
 		parent::getUrlData($url);
+		debug($url);
+		debug($GLOBALS['response_header']);
 		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK'){
 			Log::insert([
 				'text' => 'Произошла ошибка добавления в корзину. Ответ сервера: ' . $GLOBALS['response_header'][0],
@@ -210,8 +219,8 @@ class FavoriteParts extends Provider{
 	private static function getBasket(){
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/";
 		$res = self::getUrlData($url, null, [
-			"X-Favorit-DeveloperKey: ".self::getParams()->developerKey,
-			'X-Favorit-ClientKey: '.self::getParams()->key
+			"X-Favorit-DeveloperKey: ".self::getParams('entity')->developerKey,
+			'X-Favorit-ClientKey: '.self::getParams('entity')->key
 		]);
 		return json_decode($res, true);
 	}
@@ -221,13 +230,13 @@ class FavoriteParts extends Provider{
 	 */
 	public static function toOrder(){
 		$basket = self::getBasket();
-		// debug($basket);
+		debug($basket);
 		$dateShipments = [];
 		foreach($basket['cart'] as $value) $dateShipments[$value['dateShipment']][] = $value;
 		foreach($dateShipments as $date => $dateShipment){
 			$GoodsList = self::getGoodsForBasket($dateShipment);
 			if (empty($GoodsList)) return false;
-			$user = self::getUser();
+			$user = self::getUser('private');
 			$array = [
 				'WarehouseShipping' => self::getWarehouseShipping($basket),
 				'ShippingDate' => $date,
@@ -244,8 +253,8 @@ class FavoriteParts extends Provider{
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curl, CURLOPT_HTTPHEADER, [
 			   "Content-type: application/json", 
-				"X-Favorit-DeveloperKey: ".self::getParams()->developerKey,
-				'X-Favorit-ClientKey: '.self::getParams()->key
+				"X-Favorit-DeveloperKey: ".self::getParams('private')->developerKey,
+				'X-Favorit-ClientKey: '.self::getParams('private')->key
 			]);
 			$result = curl_exec($curl);
 			curl_close($curl);
@@ -320,11 +329,11 @@ class FavoriteParts extends Provider{
 	 * gets user info in Favorite Parts
 	 * @return $array array with user info
 	 */
-	private static function getUser(){
+	private static function getUser($typeOrganization = 'entity'){
 		$url = "http://api.favorit-parts.ru//ws/v1/references/profile/";
 		$res = self::getUrlData($url, null, [
-			"X-Favorit-DeveloperKey: ".self::getParams()->developerKey,
-			'X-Favorit-ClientKey: '.self::getParams()->key
+			"X-Favorit-DeveloperKey: ".self::getParams($typeOrganization)->developerKey,
+			'X-Favorit-ClientKey: '.self::getParams($typeOrganization)->key
 		]);
 		return json_decode($res, true);
 	}

@@ -73,11 +73,7 @@ class User{
 				i.google AS issue_google,
 				i.ok AS issue_ok,
 				i.coords AS issue_coords,
-				IF(
-					u.organization_name <> '',
-					CONCAT_WS (' ', u.organization_name, ot.title),
-					CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-				) AS full_name
+				" . User::getUserFullNameForQuery() . " AS full_name
 			FROM #users u
 			LEFT JOIN 
 				#currencies c ON c.id=u.currency_id
@@ -160,5 +156,15 @@ class User{
 			ON DUPLICATE KEY UPDATE 
 				`date` = CURRENT_TIMESTAMP
 		", '');
+	}
+
+	public static function getUserFullNameForQuery(){
+		return "
+			IF(
+				u.organization_name <> '',
+				CONCAT_WS (' ', ot.title, u.organization_name),
+				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
+			)
+		";
 	}
 }

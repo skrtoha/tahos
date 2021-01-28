@@ -58,7 +58,7 @@ switch($_GET['act']){
 		$page_title = 'Настройки API ' . $providerTitle;
 		$status .= $page_title;
 		if (!empty($_POST)){
-			core\Setting::update('api_settings', $_GET['provider_id'], json_encode($_POST));
+			core\Setting::update('api_settings', $_GET['provider_id'], json_encode($_POST, JSON_UNESCAPED_UNICODE));
 			api_settings($_POST);
 			message('Успешно обновлено!');
 		} 

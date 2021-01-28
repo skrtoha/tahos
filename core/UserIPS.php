@@ -6,6 +6,8 @@ class UserIPS{
 	private const MaxNonAuthorizatedConnections = 100;
 	private const MaxPeriodHours = 24;
 
+	public static $isBlockedUser;
+
 	public static function getHoursBetweenTwoDays($start, $end){
 		$first = new \DateTime($start);
 		$last = new \DateTime($end);
@@ -14,18 +16,29 @@ class UserIPS{
 	}
 
 	public static function registerIP($params){
-		if ($params['view'] == 'exceeded_connections') return false;
+		$IPInfo = self::getIPInfo($params['ip']);
 		if (!$params['user_id']){
 			$params['user_id'] = 'DEFAULT';
 			$maxConnections = self::MaxNonAuthorizatedConnections;
 		} 
 		else $maxConnections = self::MaxAuthorizatedConnections;
-		$apiInfo = self::getApiInfo($params['ip']);
-		if (!$apiInfo) return self::insert($params);
-		if (!$apiInfo['last']) return self::insert($params);
-		$hours = self::getHoursBetweenTwoDays($apiInfo['first'], $apiInfo['last']);
-		if ($hours > self::MaxPeriodHours) return self::resetFirstDate($params['ip']);
-		if ($apiInfo['count_connections'] > $maxConnections) return self::handleRefuseAccess();
+		
+		self::$isBlockedUser = $IPInfo['count_connections'] > $maxConnections;
+		
+		$hours = self::getHoursBetweenTwoDays($IPInfo['first'], $IPInfo['last']);
+		if ($hours > self::MaxPeriodHours){
+			self::$isBlockedUser = false;
+			self::resetFirstDate($params['ip']);
+		}
+
+		if ($params['view'] == 'exceeded_connections' && self::$isBlockedUser) return false;
+
+		if (!$IPInfo) return self::insert($params);
+		if (!$IPInfo['last']) return self::insert($params);
+
+
+		if (self::$isBlockedUser) return self::handleRefuseAccess();
+
 		return self::insert($params);
 	}
 
@@ -42,11 +55,12 @@ class UserIPS{
 		", '');
 	}
 
-	public static function getApiInfo($ip){
+	public static function getIPInfo($ip){
 		return $GLOBALS['db']->select_one('user_ips', '*', "`ip` = '$ip'");
 	}
 
 	private static function handleRefuseAccess(){
+
 		message("Превышено количество запросов. Авторизуйтесь для продолжения", false);
 		header("Location: /exceeded_connections");
 	}

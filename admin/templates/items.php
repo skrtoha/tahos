@@ -544,11 +544,7 @@ function history(){
 			ov.store_id,
 			ov.price,
 			DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS date,
-			IF(
-				u.organization_name <> '',
-				CONCAT_WS (' ', ot.title, u.organization_name),
-				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-			) AS name,
+			" . core\User::getUserFullNameForQuery() . " AS name,
 			ov.user_id,
 			ps.cipher
 		FROM

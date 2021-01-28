@@ -12,6 +12,19 @@ else $path = '';
 require_once $path.'vendor/autoload.php';
 
 class Abcp extends Provider{
+	public static $fieldsForSettings = [
+		"isActive",	// is required	
+		'title',
+		'cronOrder',
+		'url',
+		'userlogin',
+		'userpsw',
+		'provider_id',
+		'paymentMethod',
+		'shipmentMethod',
+		'shipmentAddress',
+		'getAnalogies'
+	];
 	private $providerStores = [];
 	public function __construct($item_id = NULL, $db = NULL){
 		// if (!$_SESSION['user']) return false;
@@ -97,21 +110,12 @@ class Abcp extends Provider{
 				si.item_id = $item_id AND ps.provider_id = $provider_id
 		"; 
 	}
-	public static function getParam(int $provider_id, $user_type = 'private'){
-		static $params;
-		if (isset($params[$provider_id])) return $params[$provider_id];
-		$param = json_decode(Setting::get('api_settings', $provider_id), true);
-		switch($provider_id){
-			case 6:
-				$param['paymentMethod'] = $param['paymentMethod'][$user_type];
-				break;
-			case 13:
-				$param['userlogin'] = $param[$user_type]['userlogin'];
-				$param['userpsw'] = $param[$user_type]['userpsw'];
-				break;
-		}
-		$params[$provider_id] = $param;
-		return $param;
+	public static function getParam(int $provider_id, $typeOrganization = 'entity'){
+		$param = parent::getApiParams([
+			'provider_id' => $provider_id,
+			'typeOrganization' => $typeOrganization
+		]);
+		return (array) $param;
 	}
 	private function insertProviderStore($provider_id, $item){
 		if (!$item['distributorId']) return false;
@@ -134,10 +138,9 @@ class Abcp extends Provider{
 				'delivery' => ceil($item['deliveryPeriod'] / 24),
 				'delivery_max' => ceil($item['deliveryPeriod'] / 24),
 				'under_order' => ceil ($item['deliveryPeriod'] / 24),
-				'prevail' => 0,
 				'noReturn' => $item['noReturn']
 			],
-			['print_query' => false, 'deincrement_duplicate' => 1]
+			['print' => false, 'deincrement_duplicate' => 1]
 		);
 		if ($res === true){
 			$store_id = $this->db->last_id();
@@ -157,13 +160,13 @@ class Abcp extends Provider{
 	public function getSearch($search){
 		$coincidences = array();
 		$params = [
-			6 => self::getParam(6), 
-			13 => self::getParam(13)
+			6 => self::getParam(6)/*, 
+			13 => self::getParam(13)*/
 		];
 		foreach($params as $provider_id => $value){
 			if (!parent::getIsEnabledApiSearch($provider_id)) continue;
 			if (!parent::isActive($provider_id)) continue;
-			$param = self::getParam($provider_id);
+			$param = (array) $params[$provider_id];
 			$url = "{$param['url']}/search/brands?".http_build_query([
 				'userlogin' => $param['userlogin'],
 				'userpsw' => md5($param['userpsw']),
@@ -292,8 +295,7 @@ class Abcp extends Provider{
 				'duplicate' => [
 					'price' => ceil($item['price']),
 					'in_stock' => $item['availability']
-				],
-				'print_query' => false
+				]
 			]
 		);
 	}
@@ -345,11 +347,10 @@ class Abcp extends Provider{
 		return json_decode($response, true);
 	}
 	public static function sendOrder(int $provider_id){
-		$param = self::getParam($provider_id);
-		$providerBasket = parent::getProviderBasket($provider_id, '');
+		$param = self::getParam($provider_id, 'private');
+		$providerBasket = parent::getProviderBasket($provider_id, 'result');
+		$items = [];
 		if (!$providerBasket->num_rows) return false;
-		$private = [];
-		$entity = [];
 		foreach($providerBasket as $value){
 			if (!parent::getIsEnabledApiOrder($provider_id)){
 				Log::insert([
@@ -358,24 +359,15 @@ class Abcp extends Provider{
 				]);
 				continue;
 			}
-			switch($value['user_type']){
-				case 'entity': $entity["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value; break;
-				case 'private': $private["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value; break;
-			}
+			$items["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value;
 		}
-		if (!empty($private)){
-			$responseAddToBasket = self::addToBasket($private, $provider_id, 'private');
-			self::parseResponseAddToBasket($responseAddToBasket, $private);
-			self::sendBasketToOrder($provider_id, 'private');
-		}
-		if (!empty($entity)){
-			$responseAddToBasket = self::addToBasket($entity, $provider_id, 'entity');
-			self::parseResponseAddToBasket($responseAddToBasket, $entity);
-			self::sendBasketToOrder($provider_id, 'entity');
-		}
+		$responseAddToBasket = self::addToBasket($items, $provider_id);
+		debug($responseAddToBasket);
+		self::parseResponseAddToBasket($responseAddToBasket, $items);
+		self::sendBasketToOrder($provider_id, 'private');
 	}
-	private static function addToBasket($items, $provider_id, $user_type = 'private'){
-		$param = self::getParam($provider_id, $user_type);
+	private static function addToBasket($items, $provider_id){
+		$param = self::getParam($provider_id, 'private');
 		$positions = [];
 		foreach($items as $item){
 			$item['provider_id'] = $provider_id;

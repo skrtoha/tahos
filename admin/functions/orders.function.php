@@ -13,11 +13,7 @@ function get_order($flag = ''){
 			GROUP_CONCAT(ov.issued) AS issued,
 			GROUP_CONCAT(ov.declined) AS declined,
 			GROUP_CONCAT(ov.returned) AS returned,
-			IF(
-				u.organization_name != '',
-				CONCAT_WS(' ', ot.title, u.organization_name),
-				CONCAT_WS(' ', u.name_1, u.name_2, u.name_3) 
-			) AS organization,
+			" . core\User::getUserFullNameForQuery() . " AS organization,
 			CONCAT_WS(' ', u.name_1, u.name_2, u.name_3) AS fio,
 			if (u.delivery_type = 'Самовывоз', u.issue_id, 1) as user_issue,
 			o.user_id,

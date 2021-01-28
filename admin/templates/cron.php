@@ -344,7 +344,8 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::getParams()->entity->ClientID . "&PSW=" . Mikado::getParams()->entity->Password;
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::getParams('private')->ClientID . "&PSW=" . Mikado::getParams('private')->Password;
+			echo $url;
 			$file = file_get_contents($url);
 			if (strlen($file) == 18){
 				$errorText = "Не удалось скачать $zipName в $url";
@@ -360,9 +361,11 @@ switch($_GET['act']){
 			
 			$zipArchive = new ZipArchive();
 			$res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$zipName}.zip");
-			$file = $zipArchive->getStream("mikado_price_{$value}_" . Mikado::getParams()->entity->ClientID . ".csv");
+			$file = $zipArchive->getStream("mikado_price_{$value}_" . Mikado::getParams()->ClientID . ".csv");
 
-			$db->delete('store_items', "`store_id`=" .Mikado::$stocks[$value]);
+			$stocks = Mikado::getStocks();
+			$db->delete('store_items', "`store_id`=" .$stocks[$value]);
+
 			$i = 0;
 			while ($data = fgetcsv($file, 1000, "\n")) {
 				$row = iconv('windows-1251', 'utf-8', $data[0]);
@@ -394,7 +397,7 @@ switch($_GET['act']){
 				]);
 			}
 
-			Provider::updatePriceUpdated(['store_id' => Mikado::$stocks[$value]]);
+			Provider::updatePriceUpdated(['store_id' => $stocks[$value]]);
 
 			$price->log->alert("Обработано $i строк");
 			$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");

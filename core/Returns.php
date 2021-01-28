@@ -57,11 +57,7 @@ class Returns{
 				r.status_id,
 				rs.title AS status,
 				rr.title AS reason,
-				IF(
-					u.organization_name <> '',
-					CONCAT_WS (' ', ot.title, u.organization_name),
-					CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-				) AS fio,
+				" . User::getUserFullNameForQuery() . " AS fio,
 				DATE_FORMAT(r.created, '%d.%m.%Y') AS created
 			FROM
 				#returns r

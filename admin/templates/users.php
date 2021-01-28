@@ -136,11 +136,7 @@ function view(){
 	$query = "
 		SELECT SQL_CALC_FOUND_ROWS
 			u.id,
-			IF(
-				u.organization_name <> '',
-				CONCAT_WS (' ', u.organization_name, ot.title),
-				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
-			) AS name,
+			" . core\User::getUserFullNameForQuery() . " AS name,
 			u.telefon,
 			u.email
 		FROM 

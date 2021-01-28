@@ -20,7 +20,10 @@ class Mikado extends Provider{
 		"MIVO"
 	];
 	public static function getParams($typeOrganization = 'entity'){
-		return Provider::getApiParams('Mikado', $typeOrganization);
+		return Provider::getApiParams([
+			'api_title' => 'Mikado', 
+			'typeOrganization' => $typeOrganization
+		]);
 	}
 	public static function getPrice(array $params){
 		$clientData = self::getClientData();

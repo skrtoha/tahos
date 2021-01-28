@@ -6,19 +6,36 @@ use core\OrderValue;
 use core\Item;
 
 class Autoeuro extends Provider{
+	public static $fieldsForSettings = [
+		"isActive",	// is required	
+		"email",
+		"password",
+		"apiKey",
+		"url",
+		"delivery_key",
+		"subdivision_key",
+		"provider_id",
+		"mainStoreID",
+		"minPriceStoreID",
+		"minDeliveryStoreID"
+	];
 	
-	public static function getUrlString($action){
-		return self::getParams()->url . "$action/json/" . self::getParams()->apiKey;
+	public static function getUrlString($action, $typeOrganization = 'entity'){
+		return self::getParams()->url . "$action/json/" . self::getParams($typeOrganization)->apiKey;
 	}
 
+
 	public static function getParams($typeOrganization = 'entity'){
-		return parent::getApiParams('Autoeuro', $typeOrganization);
+		return parent::getApiParams([
+			'api_title' => 'Autoeuro', 
+			'typeOrganization' => $typeOrganization
+		]);
 	}
 	public static function getBrends(){
 		$response = parent::getUrlData(self::getUrlString('brends'));
 		return json_decode($response);
 	}
-	private static function getStockItems($brend, $article, $with_crosses = 0){
+	private static function getStockItems($brend, $article, $with_crosses = 0, $typeOrganization = 'entity'){
 		return parent::getUrlData(self::getUrlString('stock_items'), [
 			'brand' => $brend, 
 			'code' => $article, 
@@ -30,9 +47,9 @@ class Autoeuro extends Provider{
 	 * @param array $params store_id, item_id
 	 * @return string order_key
 	 */
-	public static function getOrderKey($params){
-		if ($params['store_id'] == self::getParams()->mainStoreID){
-			$response = self::getStockItems(strtoupper($params['brend']), $params['article'], 0);
+	public static function getOrderKey($params, $typeOrganization = 'entity'){
+		if ($params['store_id'] == self::getParams($typeOrganization)->mainStoreID){
+			$response = self::getStockItems(strtoupper($params['brend']), $params['article'], 0, $typeOrganization);
 			if (!$response || $response == 'Пустой ключ покупателя'){
 				$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $params['brend']);
 				$response = self::getStockItems(strtoupper($providerBrend), $params['article']);
@@ -177,6 +194,7 @@ class Autoeuro extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$response = self::getStockItems(strtoupper($brend), $article, 1);
+		debug($response);
 		if (!$response || $response == 'Пустой ключ покупателя'){
 			$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
 			$response = self::getStockItems(strtoupper($providerBrend), $article);
@@ -264,8 +282,8 @@ class Autoeuro extends Provider{
 		);
 	}
 	public static function getSearch($code){
-		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
-		if (!parent::isActive(self::getParams()->provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams('entity')->provider_id)) return false;
+		if (!parent::isActive(self::getParams('entity')->provider_id)) return false;
 		$response = parent::getUrlData(self::getUrlString('stock_items'), ['code' => $code]);
 		if (!$response) return false;
 		$itemsList = json_decode($response);
@@ -317,7 +335,7 @@ class Autoeuro extends Provider{
 	 * @return [type]         [description]
 	 */
 	public static function putBusket($params){
-		$order_key = self::getOrderKey($params);
+		$order_key = self::getOrderKey($params, 'private');
 		if (!$order_key){
 			Log::insert([
 				'text' => 'АвтоЕвро ошибка получения order_key',
@@ -329,7 +347,7 @@ class Autoeuro extends Provider{
 			self::removeBasket($basket_item_key);
 		}
 		$response = parent::getUrlData(
-			self::getUrlString('basket_put'),
+			self::getUrlString('basket_put', 'private'),
 			[
 				'order_key' => $order_key,
 				'quantity' => $params['quan'],
@@ -348,12 +366,10 @@ class Autoeuro extends Provider{
 		else return false;
 	}
 	public static function getBasket(){
-		$response = parent::getUrlData(self::getUrlString('basket_items'));
+		$response = parent::getUrlData(self::getUrlString('basket_items'), 'private');
 		return json_decode($response);
 	}
 	public static function sendOrder(){
-		// debug(json_decode(parent::getUrlData(self::getUrlString('subdivisions'))));
-		// exit();
 		$basket_items = self::getBasket();
 		if (!isset($basket_items->DATA)) return false;
 		debug($basket_items);
@@ -363,10 +379,10 @@ class Autoeuro extends Provider{
 			$basket_item_keys[] = $b->basket_item_key;
 		}
 		$response = parent::getCurlUrlData(
-			self::getUrlString('order_basket'),
+			self::getUrlString('order_basket', 'private'),
 			[
-				'delivery_key' => self::getParams()->delivery_key,
-				'subdivision_key' => self::getParams()->subdivision_key,
+				'delivery_key' => self::getParams('private')->delivery_key,
+				'subdivision_key' => self::getParams('private')->subdivision_key,
 				'basket_item_keys' => json_encode($basket_item_keys)
 			]
 		);

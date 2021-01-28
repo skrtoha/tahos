@@ -12,8 +12,6 @@ class Autokontinent extends Provider{
 		'isActive',
 		'username',
 		'password',
-		'title',
-		'url',
 		'provider_id'
 	];
 
@@ -23,10 +21,13 @@ class Autokontinent extends Provider{
 	];
 
 	public static function getParams($typeOrganization = 'entity'){
-		return parent::getApiParams([
+		$params = parent::getApiParams([
 			'api_title' => 'Autokontinent',
 			'typeOrganization' => $typeOrganization
 		]);
+		$params->title = "Автоконтинент";
+		$params->url = 'http://api.autokontinent.ru/v1/';
+		return $params;
 	}
 
 	private static function getAuthData($typeOrganization = 'entity'){

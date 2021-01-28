@@ -24,7 +24,7 @@ function items_submit(){
 				LEFT JOIN
 					#provider_stores ps ON ps.id = si.store_id
 				WHERE
-					ps.provider_id = $armtek->provider_id
+					ps.provider_id = ". core\Provider\Armtek::getConfig('entity', true)->provider_id ."
 			";
 			if ($_POST['store_id'] == 3) $query .= " AND ps.id != 4";
 			if ($_POST['store_id'] == 4) $query .= " AND ps.id != 3";

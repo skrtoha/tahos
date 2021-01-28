@@ -6,10 +6,15 @@ use core\OrderValue;
 use core\Exceptions\Autopiter as EAutopiter;
 
 class Autopiter extends Provider{
+	public static $fieldsForSettings = [
+		'UserID',
+		'Password',
+		'provider_id'
+	];
 
-	private static function getClient(){
+	private static function getClient($typeOrganization = 'entity'){
 		try{
-			$client = new \SoapClient(self::getParams()->url);
+			$client = new \SoapClient(self::getParams($typeOrganization)->url);
 			$authorization = $client->IsAuthorization()->IsAuthorizationResult;
 		} 
 		catch(\SoapFault $e){
@@ -17,16 +22,17 @@ class Autopiter extends Provider{
 		}
 		if (!($authorization)){
 			$client->Authorization(array(
-				"UserID"=>self::getParams()->UserID, "Password" => self::getParams()->Password, "Save"=> "true"));
+				"UserID"=>self::getParams($typeOrganization)->UserID, "Password" => self::getParams($typeOrganization)->Password, "Save"=> "true"));
 		}
 		return $client;
 	}
 
-	public static function getParams(){
-		static $params;
-		if (!$params){
-			$params = json_decode(\core\Setting::get('api_settings', 24));
-		} 
+	public static function getParams($typeOrganization = 'entity'){
+		$params = parent::getApiParams([
+			'api_title' => 'Autopiter',
+			'typeOrganization' => $typeOrganization
+		]);
+		$params->url = "http://service.autopiter.ru/v2/price?WSDL";
 		return $params;
 	}
 
@@ -236,13 +242,14 @@ class Autopiter extends Provider{
 			]);
 			return false;
 		}
+		debug($model);
 		$item = [
 			'DetailUid' => $model->DetailUid,
 			'Comment' => Autoeuro::getStringBasketComment($params),
 			'SalePrice' => $model->SalePrice,
 			'Quantity' => $params['quan']
 		];
-		$resInsertToBasket = self::getClient()->InsertToBasket(['Items' => [
+		$resInsertToBasket = self::getClient('private')->InsertToBasket(['Items' => [
 			0 => $item 
 		]]);
 		if ($resInsertToBasket->InsertToBasketResult->ResponseCodeItemCart->Code->ResponseCode != '0'){
@@ -257,7 +264,7 @@ class Autopiter extends Provider{
 		return true;
 	}
 	public static function sendOrder(){
-		$res = self::getClient()->MakeOrderFromBasket();
+		$res = self::getClient('private')->MakeOrderFromBasket();
 		$itemCart = & $res->Items->ResponseCodeItemCart;
 		if (!$itemCart) return false;
 		if (is_array($itemCart)){

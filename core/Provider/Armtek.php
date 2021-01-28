@@ -40,11 +40,13 @@ class Armtek extends Provider{
 		'DBTYP' => 3,
 		'format' => 'json'
 	];
-	private function getConfig($typeOrganization = 'entity'){
-		return (array) parent::getApiParams([
+	public function getConfig($typeOrganization = 'entity', $isReturnObject = false){
+		$config = parent::getApiParams([
 			'api_title' => 'Armtek',
 			'typeOrganization' => $typeOrganization
 		]);
+		if ($isReturnObject) return $config;
+		else return (array) $config;
 	}
 	public function __construct($db = NULL){
 		if ($db){
@@ -52,13 +54,13 @@ class Armtek extends Provider{
 			$this->armtek_client = self::getClientArmtek();
 		} 
 	}
-	public static function getPrice(array $fieds){
+	public static function getPrice(array $fields){
 		$params = self::$params;
 		$config = self::getConfig();
 		$params['PIN'] = $fields['article'];
 		$params['BRAND']	 = $fields['brend'];
 		$params['QUERY_TYPE']	= 1;
-		$params['KUNNR_RG'] = $config['KUNNR_RG']['entity'];
+		$params['KUNNR_RG'] = $config['KUNNR_RG'];
 		$request_params = [
 			'url' => 'search/search',
 			'params' => $params
@@ -227,7 +229,7 @@ class Armtek extends Provider{
 		$params['PIN'] = $article;
 		$params['BRAND']	 = $brand;
 		$params['QUERY_TYPE']	= 1;
-		$params['KUNNR_RG'] = $config['KUNNR_RG']['entity'];
+		$params['KUNNR_RG'] = $config['KUNNR_RG'];
 		$request_params = [
 			'url' => 'search/search',
 			'params' => $params
@@ -235,13 +237,6 @@ class Armtek extends Provider{
 		$response = self::getClientArmtek()->post($request_params);
 		$data = $response->json();
 		$this->render($data->RESP);
-	}
-	private function getKUNNR_RG(int $order_id = NULL): string
-	{
-		$config = self::getConfig();
-		if (!$order_id) return $config['KUNNR_RG']['entity'];
-		$user_type = parent::getUserTypeByOrderID($order_id);
-		return $config[$user_type];
 	}
 	public function getSearch($search){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
@@ -374,20 +369,6 @@ class Armtek extends Provider{
 		} 
 		return false;
 	}
-	public function toOrder($value, $type = 'armtek'){
-		$this->db->insert(
-			'other_orders',
-			[
-				'order_id' => $value['order_id'],
-				'store_id' => $value['store_id'],
-				'item_id' => $value['item_id'],
-				'type' => $type
-			],
-			['print_query' => false]
-		);
-		$orderValue = new OrderValue();
-		$orderValue->changeStatus(7, $value);
-	}
 	private static function getKeyzakByStoreId($store_id){
 		if ($temp = array_search($store_id, self::$keyzak)) return $temp;
 		$array = parent::getInstanceDataBase()->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
@@ -417,11 +398,11 @@ class Armtek extends Provider{
 	 * @param  [type] $user_type [description]
 	 * @return [type]            [description]
 	 */
-	public static function executeSendOrder($items, $user_type){
+	public static function executeSendOrder($items){
 		$params = self::$params;
-		$config = self::getConfig();
+		$config = self::getConfig('private');
 		$params['VKORG'] = self::$params['VKORG'];
-		$params['KUNRG'] = $config[$user_type];
+		$params['KUNRG'] = $config['KUNNR_RG'];
 		if (empty($items)){
 			Log::insert([
 				'url' => $_SERVER['REQUEST_URI'],
@@ -517,21 +498,13 @@ class Armtek extends Provider{
 	 * @return void
 	 */
 	public static function sendOrder(){
-		$private = [];
-		$entity = [];
-		$output = [];
+		$items = [];
 		$providerBasket = parent::getProviderBasket(self::$provider_id);
 		if (!$providerBasket->num_rows) return false;
 		foreach($providerBasket as $pb){
-			switch($pb['user_type']){
-				case 'private': $private[] = $pb; break;
-				case 'entity': $entity[] = $pb; break;
-			}
+			$items[] = $pb;
 		}
-		$resultPrivate = self::executeSendOrder($private, 'private');
-		$resParseOrderResponsePrivate = self::parseOrderResponse($resultPrivate);
-
-		$resultEntity = self::executeSendOrder($entity, 'entity');
+		$resultEntity = self::executeSendOrder($items);
 		$resParseOrderResponseEntity = self::parseOrderResponse($resultEntity);
 	}
 	public static function isInBasket($ov){

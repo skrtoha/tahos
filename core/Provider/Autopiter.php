@@ -78,7 +78,15 @@ class Autopiter extends Provider{
 	}
 	public static function getItemsToOrder($provider_id){
 		$output = [];
-		$basket = self::getClient()->GetBasket();
+		$client = self::getClient('private');
+		
+		try{
+			$basket = $client->GetBasket();
+		}
+		catch(\SoapFault $e){
+			return false;
+		}
+		
 		$br = & $basket->GetBasketResult->ItemCartModel;
 		if (!$br) return $output;
 		if (is_array($br)){

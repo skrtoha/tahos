@@ -36,17 +36,17 @@ abstract class Provider{
 		$typeOrganization = $inputData['typeOrganization'];
 
 		if (!$provider_id) return false;
-		if ($params[$api_title]->$typeOrganization) return $params[$api_title]->$typeOrganization;
+		if ($params[$provider_id]->$typeOrganization) return $params[$provider_id]->$typeOrganization;
 		
-		$params[$api_title] = json_decode(\core\Setting::get('api_settings', $provider_id));
+		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
 
 		//если private отключен то возращаем entity
 		if (
-			!$params[$api_title]->$typeOrganization->isActive &&
+			!$params[$provider_id]->$typeOrganization->isActive &&
 			$typeOrganization == 'private'
-		) return $params[$api_title]->entity;
+		) return $params[$provider_id]->entity;
 
-		return $params[$api_title]->$typeOrganization;
+		return $params[$provider_id]->$typeOrganization;
 	}
 	public static function get(){
 		static $providers;
@@ -86,7 +86,7 @@ abstract class Provider{
 				u.id AS user_id,
 				p.title AS provider,
 				p.api_title,
-				u.user_type
+				u.user_type as typeOrganization
 			FROM
 				#provider_basket pb
 			LEFT JOIN

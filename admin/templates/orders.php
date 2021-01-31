@@ -81,7 +81,7 @@ switch ($act) {
 			exit();
 		} 
 
-		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
+		// header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
 		$order = get_order('');

@@ -90,8 +90,8 @@ class Mikado extends Provider{
 			}
 		} 
 	}
-	public static function getItemsToOrder(int $provider_id = null, $order_id = null, $fullList = false){
-		$clientData = self::getClientData('private');
+	public static function getItemsToOrder(int $provider_id = null, $ov = []){
+		$clientData = self::getClientData($ov['typeOrganization']);
 
 		$output = [];
 		$xml = self::getUrlData(
@@ -407,7 +407,7 @@ class Mikado extends Provider{
 			}
 		} 
 		else $DeliveryType = 0;
-		$clientData = self::getClientData('private');
+		$clientData = self::getClientData($ov['typeOrganization']);
 		$params = [
 			'ZakazCode' => $ZakazCode,
 			'QTY' => $ov['quan'],
@@ -440,39 +440,15 @@ class Mikado extends Provider{
 			'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
 		]);
 	}
-	public function isOrdered($ov){
-		$array = $this->db->select_one('mikado_basket', '*', self::getWhere($ov));
-		if (empty($array)) return false;
-		return $array['Message'];
-	}
-	public function deleteFromOrder($ov){
-		$res = OrderValue::get($ov);
-		$ov = $res->fetch_assoc();
-		$array = $this->db->select_one('mikado_basket', '*', self::getWhere($ov));
-		$xml = self::getUrlData(
-			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Delete',
-			[
-				'ItemID' => $array['ItemID'],
-				'ClientID' => $this->ClientID,
-				'Password' => $this->Password,
-			]
-		);
-		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
-		$result = json_decode(json_encode($result));
-		$this->db->delete('mikado_basket', self::getWhere($ov));
-
-		OrderValue::update(['status_id' => 5, 'ordered' => 0], $ov);
-		User::updateReservedFunds($ov['user_id'], $ov['price'], 'minus');
-	}
 	public static function isInBasket($ov){
-		$items = self::getItemsToOrder(null, $ov['order_id']);
+		$items = self::getItemsToOrder(null, $ov);
 		foreach($items as $value){
 			if ($value['ZakazCode'] == $ov['ZakazCode']) return true;
 		}
 		return false;
 	}
 	public static function removeFromBasket($ov){
-		$items = self::getItemsToOrder(null, $ov['order_id']);
+		$items = self::getItemsToOrder(null, $ov);
 		$clientData = self::getClientData($ov['order_id']);
 		$isParsed = false;
 		foreach($items as $value){

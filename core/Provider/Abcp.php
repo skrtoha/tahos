@@ -361,16 +361,16 @@ class Abcp extends Provider{
 			}
 			$items["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value;
 		}
-		$responseAddToBasket = self::addToBasket($items, $provider_id);
+		$responseAddToBasket = self::addToBasket($items, $value);
 		debug($responseAddToBasket);
 		self::parseResponseAddToBasket($responseAddToBasket, $items);
-		self::sendBasketToOrder($provider_id, 'private');
+		self::sendBasketToOrder($provider_id, $value['typeOrganization']);
 	}
-	private static function addToBasket($items, $provider_id){
-		$param = self::getParam($provider_id, 'private');
+	private static function addToBasket($items, $ov){
+		$param = self::getParam($ov['provider_id'], $ov['typeOrganization']);
 		$positions = [];
 		foreach($items as $item){
-			$item['provider_id'] = $provider_id;
+			$item['provider_id'] = $ov['provider_id'];
 			$itemInfo = self::getItemInfoByArticleAndBrend($item);
 			if (!$itemInfo){
 				Log::insert([

@@ -24,6 +24,11 @@ abstract class Provider{
 		}
 		return false; 
 	}
+	
+	/**
+	 * @param  array provider_id | api_title, typeOrganization
+	 * @return [type]
+	 */
 	public static function getApiParams($inputData){
 		static $params;
 

@@ -346,9 +346,9 @@ class Abcp extends Provider{
 		$response = self::getUrlData($url);
 		return json_decode($response, true);
 	}
-	public static function sendOrder(int $provider_id){
-		$param = self::getParam($provider_id, 'private');
-		$providerBasket = parent::getProviderBasket($provider_id, 'result');
+	public static function sendOrder($provider_id){
+		$providerBasket = parent::getProviderBasket($provider_id, '');
+		$param = self::getParam($provider_id);
 		$items = [];
 		if (!$providerBasket->num_rows) return false;
 		foreach($providerBasket as $value){

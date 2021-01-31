@@ -10,8 +10,7 @@ class FavoriteParts extends Provider{
 		"isActive",	// is required	
 		'key',
 		'developerKey',
-		'provider_id',
-		''
+		'provider_id'
 	];
 	public static $error;
 

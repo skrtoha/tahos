@@ -79,8 +79,8 @@ class Armtek extends Provider{
 		}
 		return false;
 	}
-	private static function getClientArmtek(){
-		$armtek_client_config = new ArmtekRestClientConfig(self::getConfig());
+	private static function getClientArmtek($typeOrganization = 'entity'){
+		$armtek_client_config = new ArmtekRestClientConfig(self::getConfig($typeOrganization));
 		return new ArmtekRestClient($armtek_client_config);
 	}
 	public static function getItemsToOrder(int $provider_id){
@@ -400,7 +400,7 @@ class Armtek extends Provider{
 	 */
 	public static function executeSendOrder($items){
 		$params = self::$params;
-		$config = self::getConfig('private');
+		$config = self::getConfig($items['typeOrganization']);
 		$params['VKORG'] = self::$params['VKORG'];
 		$params['KUNRG'] = $config['KUNNR_RG'];
 		if (empty($items)){
@@ -430,7 +430,7 @@ class Armtek extends Provider{
 			'url' => 'order/createOrder',
 			'params' => $params
 		];
-		$response = self::getClientArmtek()->post($request_params);
+		$response = self::getClientArmtek($items['typeOrganization'])->post($request_params);
 		$json_responce_data = $response->json();
 		return [
 			'itemsForSending' => $itemsForSending,
@@ -499,7 +499,8 @@ class Armtek extends Provider{
 	 */
 	public static function sendOrder(){
 		$items = [];
-		$providerBasket = parent::getProviderBasket(self::$provider_id);
+		$config = self::getConfig();
+		$providerBasket = parent::getProviderBasket($config['provider_id'], '');
 		if (!$providerBasket->num_rows) return false;
 		foreach($providerBasket as $pb){
 			$items[] = $pb;

@@ -10,7 +10,8 @@ class FavoriteParts extends Provider{
 		"isActive",	// is required	
 		'key',
 		'developerKey',
-		'provider_id'
+		'provider_id',
+		''
 	];
 	public static $error;
 
@@ -81,25 +82,31 @@ class FavoriteParts extends Provider{
 	}
 
 	public static function getItemsToOrder(int $provider_id){
-		$basket = self::getBasket();
-		if (!$basket) return false;
+		$baskets = [
+			'entity' => self::getBasket('entity'),
+			'private' => self::getBasket('private')
+		];
 		$output = [];
-		foreach($basket['cart'] as $c){
-			$osi = explode('-', $c['comment']);
-			$output[] = [
-				'provider' => 'FavoriteParts',
-				'provider_id' => self::getParams()->provider_id,
-				'order_id' => $osi[0],
-				'store_id' => $osi[1],
-				'item_id' => $osi[2],
-				'store' => self::getStoreByWarehouseGroup($basket, $c['warehouseGroup']),
-				'brend' => $basket['goods'][$c['goods']]['Brand'],
-				'article' => $basket['goods'][$c['goods']]['Number'],
-				'title_full' => $basket['goods'][$c['goods']]['Name'],
-				'price' => $c['price'],
-				'count' => $c['count']
-			];
-		} 
+		foreach($baskets as $basket){
+			if (!$basket) continue;
+			foreach($basket['cart'] as $c){
+				$osi = explode('-', $c['comment']);
+				$output[$c['comment']] = [
+					'provider' => 'FavoriteParts',
+					'provider_id' => self::getParams()->provider_id,
+					'order_id' => $osi[0],
+					'store_id' => $osi[1],
+					'item_id' => $osi[2],
+					'store' => self::getStoreByWarehouseGroup($basket, $c['warehouseGroup']),
+					'brend' => $basket['goods'][$c['goods']]['Brand'],
+					'article' => $basket['goods'][$c['goods']]['Number'],
+					'title_full' => $basket['goods'][$c['goods']]['Name'],
+					'price' => $c['price'],
+					'count' => $c['count'],
+					'typeOrganization' => parent::getUserTypeByOrderID($osi[0])
+				];
+			} 
+		}
 		return $output;
 	}
 
@@ -124,6 +131,7 @@ class FavoriteParts extends Provider{
 	 * @return boolean true if successfully added, false if failed
 	 */
 	public static function addToBasket($ov){
+		debug($ov);
 		if (!parent::getIsEnabledApiOrder(self::getParams()->provider_id)) return false;
 		if (isset($ov['quan']) && $ov['quan']){
 			$item = self::getItem($ov['brend'], $ov['article']);
@@ -145,15 +153,15 @@ class FavoriteParts extends Provider{
 			$warehouseGroup = $ov['warehouseGroup'];
 			$ov['quan'] = 0;
 		} 
+		debug(self::getParams($ov['typeOrganization']));
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/add/";
-		$url .= "?key=".self::getParams('private')->key;
-		$url .= '&developerKey='.self::getParams('private')->developerKey;
+		$url .= "?key=".self::getParams($ov['typeOrganization'])->key;
+		$url .= '&developerKey='.self::getParams($ov['typeOrganization'])->developerKey;
 		$url .= "&goods={$item['goodsID']}";
 		$url .= "&warehouseGroup=$warehouseGroup";
 		$url .= "&comment={$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 		$url .= "&count={$ov['quan']}";
 		parent::getUrlData($url);
-		debug($url);
 		debug($GLOBALS['response_header']);
 		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK'){
 			Log::insert([
@@ -168,10 +176,13 @@ class FavoriteParts extends Provider{
 	}
 
 	public static function removeFromBasket($ov){
-		$basket = self::getBasket();
+		$basket = self::getBasket($ov['typeOrganization']);
 		$osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 		foreach($basket['cart'] as $basket){
-			if ($basket['comment'] == $osi) return self::addToBasket($basket);
+			if ($basket['comment'] == $osi){
+				$basket['typeOrganization'] = $ov['typeOrganization'];
+				return self::addToBasket($basket);
+			} 
 		}
 	}
 
@@ -216,11 +227,11 @@ class FavoriteParts extends Provider{
 	 * gets favorite basket
 	 * @return array favorite basket
 	 */
-	private static function getBasket(){
+	private static function getBasket($typeOrganization = 'entity'){
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/";
 		$res = self::getUrlData($url, null, [
-			"X-Favorit-DeveloperKey: ".self::getParams('entity')->developerKey,
-			'X-Favorit-ClientKey: '.self::getParams('entity')->key
+			"X-Favorit-DeveloperKey: ".self::getParams($typeOrganization)->developerKey,
+			'X-Favorit-ClientKey: '.self::getParams($typeOrganization)->key
 		]);
 		return json_decode($res, true);
 	}
@@ -229,36 +240,49 @@ class FavoriteParts extends Provider{
 	 * @return mixed false - no goods for order, true - successfully sent, string - error
 	 */
 	public static function toOrder(){
-		$basket = self::getBasket();
-		debug($basket);
-		$dateShipments = [];
-		foreach($basket['cart'] as $value) $dateShipments[$value['dateShipment']][] = $value;
-		foreach($dateShipments as $date => $dateShipment){
-			$GoodsList = self::getGoodsForBasket($dateShipment);
-			if (empty($GoodsList)) return false;
-			$user = self::getUser('private');
-			$array = [
-				'WarehouseShipping' => self::getWarehouseShipping($basket),
-				'ShippingDate' => $date,
-				'TradePoint' => 'B26463A0-021B-11EA-A2FB-005056802F4C',
-				'PaymentType' => $user['paymentType'],
-				'DeliveryType' => $user['deliveryType'],
-				'TransportType' => $user['transportType'],
-				'Comment' => '',
-				'GoodsList' => $GoodsList 
-			];
-			$curl = curl_init('http://api.favorit-parts.ru/ws/v1/order/');
-			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-			curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($array));
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($curl, CURLOPT_HTTPHEADER, [
-			   "Content-type: application/json", 
-				"X-Favorit-DeveloperKey: ".self::getParams('private')->developerKey,
-				'X-Favorit-ClientKey: '.self::getParams('private')->key
-			]);
-			$result = curl_exec($curl);
-			curl_close($curl);
-			self::setStatusOrdered($GoodsList);
+		$baskets = [
+			'entity' => self::getBasket('entity'),
+			'private' => self::getBasket('private')
+		];
+		foreach($baskets as $typeOrganization => $basket){
+			$dateShipments = [];
+			$PaymentType = $typeOrganization == 'entity' ? 2 : 1;
+			foreach($basket['cart'] as $value) $dateShipments[$value['dateShipment']][] = $value;
+			foreach($dateShipments as $date => $dateShipment){
+				$GoodsList = self::getGoodsForBasket($dateShipment, $typeOrganization);
+				if (empty($GoodsList)) continue;
+				$user = self::getUser($typeOrganization);
+				// debug($user);
+				$array = [
+					'WarehouseShipping' => self::getWarehouseShipping($basket),
+					'ShippingDate' => $date,
+					'TradePoint' => '070C5324-32F6-11EB-A33B-005056802F4C',
+					'PaymentType' => $PaymentType,
+					'DeliveryType' => $user['deliveryType'],
+					'TransportType' => $user['transportType'],
+					'Comment' => '',
+					'GoodsList' => $GoodsList 
+				];
+				// debug($array); exit();
+				$curl = curl_init('http://api.favorit-parts.ru/ws/v1/order/');
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+				curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($array));
+				curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($curl, CURLOPT_HTTPHEADER, [
+				   "Content-type: application/json", 
+					"X-Favorit-DeveloperKey: ".self::getParams($typeOrganization)->developerKey,
+					'X-Favorit-ClientKey: '.self::getParams($typeOrganization)->key
+				]);
+				$result = curl_exec($curl);
+				if (!parent::isJSON($result)){
+					foreach($GoodsList as $good) Log::insert([
+						'text' => $result,
+						'additional' => "osi: " . $good['Comment']
+					]);
+				}
+				curl_close($curl);
+				self::setStatusOrdered($GoodsList);
+			}
 		}
 	}
 	/**
@@ -288,14 +312,20 @@ class FavoriteParts extends Provider{
 	 * @param  array $basket received by getBasket
 	 * @return [type]         [description]
 	 */
-	private static function getGoodsForBasket($cart){
+	private static function getGoodsForBasket($cart, $inputTypeOrganization){
 		$output = array();
-		foreach($cart as $b) $output[] = [
-			'Goods' => $b['goods'],
-			'WarehouseGroup' => $b['warehouseGroup'],
-			'Count' => $b['count'],
-			'Comment' => $b['comment']
-		];
+		foreach($cart as $b){
+			$osi = explode('-', $b['comment']);
+			$typeOrganization = parent::getUserTypeByOrderID($osi[0]);
+			if ($typeOrganization != $inputTypeOrganization) continue;
+			$output[] = [
+				'Goods' => $b['goods'],
+				'WarehouseGroup' => $b['warehouseGroup'],
+				'Count' => $b['count'],
+				'Comment' => $b['comment'],
+				'PaymentType' => $typeOrganization == 'private' ? 1 : 2 
+			];
+		} 
 		return $output;
 	}
 	/**

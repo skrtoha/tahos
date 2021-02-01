@@ -76,10 +76,8 @@ class Autopiter extends Provider{
 		}
 		throw new EAutopiter\ErrorGetModel("Ошибка получение model");
 	}
-	public static function getItemsToOrder($provider_id){
-		$output = [];
-		$client = self::getClient('private');
-		
+	private static function getBasket($typeOrganization){
+		$client = self::getClient($typeOrganization);
 		try{
 			$basket = $client->GetBasket();
 		}

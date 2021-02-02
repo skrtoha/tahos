@@ -20,6 +20,7 @@ switch($request['act']){
 			$o['userName'] = $ov['userName'];
 			$o['created'] = $ov['created'];
 			$output[$ov['order_id']]['values'][] = [
+				'status_id' => $ov['status_id'],
 				'provider_id' => $ov['provider_id'],
 				'provider' => $ov['provider'],
 				'cipher' => $ov['cipher'],

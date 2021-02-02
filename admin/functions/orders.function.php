@@ -45,6 +45,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 				case 'order_id':
 				case 'item_id':
 				case 'status_id':
+				case 'is_synchronized':
 					$where .= "ov.$key = '$value' AND ";
 					break;
 				case 'limit':
@@ -90,6 +91,8 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			os.title AS status,
 			os.class AS status_class,
 			o.user_id,
+			DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS created,
+			" . core\User::getUserFullNameForQuery() . " AS userName,
 			u.bill,
 			u.reserved_funds,
 			u.user_type AS typeOrganization,
@@ -129,6 +132,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			c.item_id=ov.item_id
 		LEFT JOIN
 			#mikado_zakazcode mzc ON mzc.item_id = ov.item_id 
+		LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
 		$where
 		ORDER BY o.created DESC
 		$limit

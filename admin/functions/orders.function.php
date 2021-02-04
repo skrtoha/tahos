@@ -87,6 +87,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			ov.withoutMarkup,
 			(ov.price * ov.quan) AS sum,
 			ov.comment,
+			DATE_FORMAT(ov.updated, '%d.%m.%Y %H:%i:%s') AS updated, 
 			os.id AS status_id,
 			os.title AS status,
 			os.class AS status_class,

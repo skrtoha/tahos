@@ -38,6 +38,7 @@ switch($request['act']){
 				'arrived' => $ov['arrived'],
 				'issued' => $ov['issued'],
 				'returned' => $ov['returned'],
+				'updated' => $ov['updated'],
 				'withoutMarkup' => $ov['withoutMarkup'],
 			];
 		}

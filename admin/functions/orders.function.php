@@ -99,6 +99,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			u.user_type AS typeOrganization,
 			ps.delivery,
 			p.api_title,
+			p.title AS provider,
 			ps.title AS providerStore,
 			ps.provider_id,
 			mzc.ZakazCode,

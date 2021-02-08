@@ -289,7 +289,7 @@ abstract class Provider{
 		} 
 		else{
 			$array['http']['method'] = 'POST';
-			$array['http']['content'] = http_build_query($data);
+			$array['http']['content'] = json_encode($data, JSON_UNESCAPED_UNICODE);
 		}
 		$context = stream_context_create($array);
 		try{

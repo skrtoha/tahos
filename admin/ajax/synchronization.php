@@ -42,8 +42,13 @@ switch($request['act']){
 				'withoutMarkup' => $ov['withoutMarkup'],
 			];
 		}
+		core\Provider::getUrlData('http://faststart/fastStart/hs/test', $output);
+		// $curl = curl_init('http://faststart/fastStart/hs/test');
+		// curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+		// curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($output));
+		// curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		// debug($output);
-		echo json_encode($output);
+		// echo json_encode($output);
 		break;
 }
 

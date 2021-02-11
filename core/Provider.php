@@ -289,7 +289,8 @@ abstract class Provider{
 		} 
 		else{
 			$array['http']['method'] = 'POST';
-			$array['http']['content'] = json_encode($data, JSON_UNESCAPED_UNICODE);
+			if (is_array($data)) $array['http']['content'] = http_build_query($data);
+			if (self::isJSON($data)) $array['http']['content'] = json_encode($data, JSON_UNESCAPED_UNICODE);
 		}
 		$context = stream_context_create($array);
 		try{
@@ -542,7 +543,7 @@ abstract class Provider{
 		return $output;
 	}
 
-	function isJSON($string){
+	public static function isJSON($string){
 		return is_string($string) && is_array(json_decode($string, true)) ? true : false;
 	}
 }

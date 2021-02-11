@@ -85,6 +85,9 @@ if ($_GET['act'] == 'to_offer'){
 		exit();
 	}
 
+	$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
+	var_dump(core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders));
+
 	message('Успешно отправлено в заказы!');
 	header('Location: /orders');
 }
@@ -119,16 +122,18 @@ $noReturnIsExists = false;
 			$basketResult = [];
 			foreach ($res_basket as $key => $val) {
 				$checkbox = '';
-				$val['pp'] = core\Provider::getPrice([
-					'provider_id' => $val['provider_id'],
-					'store_id' => $val['store_id'],
-					'item_id' => $val['item_id'],
-					'price' => $val['price'],
-					'article' => $val['article'],
-					'brend' => $val['provider_brend'],
-					'in_stock' => $val['in_stock'],
-					'user_id' => $_SESSION['user'],
-				]);
+				if (core\Config::$isUseApiProviders){
+					$val['pp'] = core\Provider::getPrice([
+						'provider_id' => $val['provider_id'],
+						'store_id' => $val['store_id'],
+						'item_id' => $val['item_id'],
+						'price' => $val['price'],
+						'article' => $val['article'],
+						'brend' => $val['provider_brend'],
+						'in_stock' => $val['in_stock'],
+						'user_id' => $_SESSION['user'],
+					]);
+				}
 				if ($val['pp']){
 					if (
 						$val['pp']['available'] == -1 ||
@@ -209,7 +214,7 @@ $noReturnIsExists = false;
 						<?}?>
 					</td>
 					<td class="price-col">
-						<?if ($val['pp']['price'] > 0 && $val['pp']['price'] > $val['price']){?>
+						<?if ($val['pp']['price'] > 0 && $val['pp']['price'] > $val['price'] && core\Config::$isUseApiProviders){?>
 							<span class="important" style="margin-bottom: 5px; display: block">Цена изменилась</span>
 							<span class="price_format"><?=$val['price']?></span>
 							<i class="fa fa-rub" aria-hidden="true"></i>

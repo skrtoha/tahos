@@ -8,20 +8,26 @@ use core\OrderValue;
 use core\Exceptions\ForumAuto as EForumAuto;
 
 class ForumAuto extends Provider{
-	public static $params = [
-		
+	public static $fieldsForSettings = [
+		'provider_id',
+		'login',
+		'pass',
+		'storePrefix'
 	];
-	public static function getParams(){
-		static $params;
-		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 17));
-
+	public static function getParams($typeOrganization = 'entity'){
+		$params = parent::getApiParams([
+			'api_title' => 'ForumAuto',
+			'typeOrganization' => $typeOrganization
+		]);
+		$params->title = 'ФорумАвто';
+		$params->url = "https://api.forum-auto.ru/v2/";
 		return $params;
 	}
 	public static function getItemsToOrder(int $provider_id){}
-	private static function getStringQuery($method, $params = []){
-		$output = self::getParams()->url;
+	private static function getStringQuery($method, $params = [], $typeOrganization = 'entity'){
+		$output = self::getParams($typeOrganization)->url;
 		$output .= "$method";
-		$output .= '?login=' . self::getParams()->login . '&pass=' . self::getParams()->pass;
+		$output .= '?login=' . self::getParams($typeOrganization)->login . '&pass=' . self::getParams($typeOrganization)->pass;
 		if (!empty($params)){
 			foreach($params as $key => $value) $output .= "&$key=$value";
 		}
@@ -194,13 +200,13 @@ class ForumAuto extends Provider{
 		$providerBasket = parent::getProviderBasket(self::getParams()->provider_id, '');
 		if (!$providerBasket->num_rows) return false;
 		foreach($providerBasket as $pb){
-			// debug($pb);
 			$itemsList = self::getItemsByBrendAndArticle($pb['brend'], $pb['article']);
-			$delivery = str_replace(self::getParams()->storePrefix, '', $pb['cipher']);
+			$delivery = str_replace(self::getParams('private')->storePrefix, '', $pb['cipher']);
 			$requiredItem = NULL;
 			try{
+				debug($pb, 'pb');
 				foreach($itemsList as $item){
-					// debug($item);
+					debug($item, 'item');
 					if ($item->d_deliv != $delivery) continue;
 					if (Provider::getComparableString($item->brand) != Provider::getComparableString($pb['brend'])) continue;
 					if (Provider::getComparableString($item->art) != Provider::getComparableString($pb['article'])) continue;
@@ -213,11 +219,12 @@ class ForumAuto extends Provider{
 				$e->process($pb);
 				continue;
 			}
+			var_dump($requiredItem);
 			$queryString = self::getStringQuery('addGoodsToOrder', [
 				'tid' => $requiredItem->gid,
 				'num' => $pb['quan'],
 				'eoid' => "{$pb['order_id']}{$pb['store_id']}{$pb['item_id']}"
-			]);
+			], 'private');
 			try{
 				$json = Provider::getUrlData($queryString);
 				$response = json_decode($json);

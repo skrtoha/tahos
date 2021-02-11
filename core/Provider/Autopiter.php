@@ -6,10 +6,15 @@ use core\OrderValue;
 use core\Exceptions\Autopiter as EAutopiter;
 
 class Autopiter extends Provider{
+	public static $fieldsForSettings = [
+		'UserID',
+		'Password',
+		'provider_id'
+	];
 
-	private static function getClient(){
+	private static function getClient($typeOrganization = 'entity'){
 		try{
-			$client = new \SoapClient(self::getParams()->url);
+			$client = new \SoapClient(self::getParams($typeOrganization)->url);
 			$authorization = $client->IsAuthorization()->IsAuthorizationResult;
 		} 
 		catch(\SoapFault $e){
@@ -17,16 +22,17 @@ class Autopiter extends Provider{
 		}
 		if (!($authorization)){
 			$client->Authorization(array(
-				"UserID"=>self::getParams()->UserID, "Password" => self::getParams()->Password, "Save"=> "true"));
+				"UserID"=>self::getParams($typeOrganization)->UserID, "Password" => self::getParams($typeOrganization)->Password, "Save"=> "true"));
 		}
 		return $client;
 	}
 
-	public static function getParams(){
-		static $params;
-		if (!$params){
-			$params = json_decode(\core\Setting::get('api_settings', 24));
-		} 
+	public static function getParams($typeOrganization = 'entity'){
+		$params = parent::getApiParams([
+			'api_title' => 'Autopiter',
+			'typeOrganization' => $typeOrganization
+		]);
+		$params->url = "http://service.autopiter.ru/v2/price?WSDL";
 		return $params;
 	}
 
@@ -70,17 +76,33 @@ class Autopiter extends Provider{
 		}
 		throw new EAutopiter\ErrorGetModel("Ошибка получение model");
 	}
-	public static function getItemsToOrder($provider_id){
-		$output = [];
-		$basket = self::getClient()->GetBasket();
+	private static function getBasket($typeOrganization){
+		$client = self::getClient($typeOrganization);
+		try{
+			$basket = $client->GetBasket();
+		}
+		catch(\SoapFault $e){
+			return false;
+		}
 		$br = & $basket->GetBasketResult->ItemCartModel;
-		if (!$br) return $output;
-		if (is_array($br)){
-			foreach($br as $cartModel){
-				$output[] = self::parseBasketForItemToOrder($cartModel);
+		if (!$br) return false;
+		return $br;
+	}
+	private static function setOutputItemsToOrder(& $output, $basket){
+		if (!$basket) return;
+		if (is_array($basket)){
+			foreach($basket as $cartModel){
+				$output[$basket->Comment] = self::parseBasketForItemToOrder($cartModel);
 			}
 		}
-		else $output[] = self::parseBasketForItemToOrder($br);
+		else $output[$basket->Comment] = self::parseBasketForItemToOrder($basket);
+	}
+	public static function getItemsToOrder($provider_id){
+		$output = [];
+		$basket = self::getBasket('entity');
+		self::setOutputItemsToOrder($output, $basket);
+		$basket = self::getBasket('private');
+		self::setOutputItemsToOrder($output, $basket);
 		return $output;
 	}
 	private static function parseBasketForItemToOrder($model){
@@ -236,13 +258,14 @@ class Autopiter extends Provider{
 			]);
 			return false;
 		}
+		debug($model);
 		$item = [
 			'DetailUid' => $model->DetailUid,
 			'Comment' => Autoeuro::getStringBasketComment($params),
 			'SalePrice' => $model->SalePrice,
 			'Quantity' => $params['quan']
 		];
-		$resInsertToBasket = self::getClient()->InsertToBasket(['Items' => [
+		$resInsertToBasket = self::getClient($params['typeOrganization'])->InsertToBasket(['Items' => [
 			0 => $item 
 		]]);
 		if ($resInsertToBasket->InsertToBasketResult->ResponseCodeItemCart->Code->ResponseCode != '0'){
@@ -257,13 +280,19 @@ class Autopiter extends Provider{
 		return true;
 	}
 	public static function sendOrder(){
-		$res = self::getClient()->MakeOrderFromBasket();
-		$itemCart = & $res->Items->ResponseCodeItemCart;
-		if (!$itemCart) return false;
-		if (is_array($itemCart)){
-			foreach($itemCart as $ic) self::parseSendOrderItemCart($ic);
+		$clients = [
+			'entity' => self::getClient('entity'),
+			'private' => self::getClient('private')
+		];
+		foreach($clients as $client){
+			$res = $client->MakeOrderFromBasket();
+			$itemCart = & $res->Items->ResponseCodeItemCart;
+			if (!$itemCart) return false;
+			if (is_array($itemCart)){
+				foreach($itemCart as $ic) self::parseSendOrderItemCart($ic);
+			}
+			else self::parseSendOrderItemCart($itemCart);
 		}
-		else self::parseSendOrderItemCart($itemCart);
 	}
 	private static function parseSendOrderItemCart($model){
 		$osi = explode('-', $model->Item->Comment);

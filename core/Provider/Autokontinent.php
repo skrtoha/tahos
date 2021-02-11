@@ -8,30 +8,45 @@ use core\OrderValue;
 use core\Exceptions\Autokontinent as EAuto;
 
 class Autokontinent extends Provider{
+	public static $fieldsForSettings = [
+		'isActive',
+		'username',
+		'password',
+		'provider_id'
+	];
 
 	private static $mainStores = [
 		'Череповец' => 7,
 		'Петербург' => 1
 	];
 
-	public static function getParams(){
-		static $params;
-		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 20));
+	public static function getParams($typeOrganization = 'entity'){
+		$params = parent::getApiParams([
+			'api_title' => 'Autokontinent',
+			'typeOrganization' => $typeOrganization
+		]);
+		$params->title = "Автоконтинент";
+		$params->url = 'http://api.autokontinent.ru/v1/';
 		return $params;
 	}
 
-	private static function getAuthData(){
+	private static function getAuthData($typeOrganization = 'entity'){
 		return [
-			'username' => self::getParams()->username, 
-			'password' => self::getParams()->password
+			'username' => self::getParams($typeOrganization)->username, 
+			'password' => self::getParams($typeOrganization)->password
 		];
 	}
 
 	public static function getItemsToOrder(int $provider_id){
 		if (!parent::getIsEnabledApiOrder($provider_id)) return false;
-		$basketList = self::getBasket();
-		if (empty($basketList)) return [];
 		$output = [];
+		$basketList = self::getBasket('private');
+		self::parseBasketList($output, $basketList);
+		$basketList = self::getBasket('entity');
+		self::parseBasketList($output, $basketList);
+		return $output;
+	}
+	private static function parseBasketList(& $output, $basketList){
 		foreach($basketList as $basket){
 			if (!$basket->comment) continue;
 			$osi = explode('-', $basket->comment);
@@ -41,7 +56,7 @@ class Autokontinent extends Provider{
 				'item_id' => $osi[2]
 			]);
 			$orderValue = $resOrderValue->fetch_assoc();
-			$output[] = [
+			$output[$basket->basket_id] = [
 				'provider_id' => $orderValue['provider_id'],
 				'provider' => 'Autokontinent',
 				'store' => $orderValue['cipher'],
@@ -69,10 +84,10 @@ class Autokontinent extends Provider{
 		}
 	}
 
-	private static function getItemsByArticle($article){
+	private static function getItemsByArticle($article, $typeOrganization = 'entity'){
 		$response = Provider::getCurlUrlData(
-			self::getParams()->url . 'search/part.json?part_code=' . $article, 
-			self::getAuthData()
+			self::getParams($typeOrganization)->url . 'search/part.json?part_code=' . $article, 
+			self::getAuthData($typeOrganization)
 		);
 		$items = json_decode($response);
 		if (empty($items)) return false;
@@ -268,10 +283,10 @@ class Autokontinent extends Provider{
 
 		OrderValue::changeStatus(5, $ov);
 	}
-	private static function getBasket(){
+	private static function getBasket($typeOrganization){
 		$json = Provider::getCurlUrlData(
-			self::getParams()->url."basket/get.json", 
-			self::getAuthData()
+			self::getParams($typeOrganization)->url."basket/get.json", 
+			self::getAuthData($typeOrganization)
 		);
 		return json_decode($json);
 	}
@@ -291,11 +306,12 @@ class Autokontinent extends Provider{
 		if (!$part_id) return false;
 		try{
 			$json = Provider::getCurlUrlData(
-				self::getParams()->url . "basket/add.json?part_id=$part_id&warehouse_id=$warehouse_id&quantity={$ov['quan']}&comment={$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}", 
-				self::getAuthData()
+				self::getParams($ov['typeOrganization'])->url . "basket/add.json?part_id=$part_id&warehouse_id=$warehouse_id&quantity={$ov['quan']}&comment={$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}", 
+				self::getAuthData($ov['typeOrganization'])
 			);
 			$response = json_decode($json);
-			if ($response->status != 'OK') throw new EAuto\ErrorAddingToBasket('Ошибка добавления товара в корзину');
+			// debug($response); exit();
+			if ($response->status != 'OK') throw new EAuto\ErrorAddingToBasket("Ответ Автоевро: $response->error_message");
 		}
 		catch(EAuto\ErrorAddingToBasket $e){
 			$e->process($ov);
@@ -305,12 +321,19 @@ class Autokontinent extends Provider{
 		return true;
 	}
 	public static function sendOrder(){
-		$basket = self::getBasket();
-		if (empty($basket)) return false;
+		$basket = self::getBasket('private');
+		self::executeSendOrder('private', $basket);
+
+		$basket = self::getBasket('entity');
+		self::executeSendOrder('entity', $basket);
+	}
+	private static function executeSendOrder($typeOrganization, $basket){
+		if (empty($basket)) return;
+		
 		try{
 			$json = Provider::getCurlUrlData(
-				self::getParams()->url . '/basket/order.json', 
-				self::getAuthData()
+				self::getParams($typeOrganization)->url . '/basket/order.json', 
+				self::getAuthData($typeOrganization)
 			);
 			$response = json_decode($json);
 			if ($response->status != 'OK') throw new EAuto\ErrorSendOrder('Ошибка отправления заказа');
@@ -329,5 +352,6 @@ class Autokontinent extends Provider{
 			]);
 			OrderValue::changeStatus(11, $resOrderValue->fetch_assoc());
 		}
+
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 namespace core;
 class Setting{
-	private static $tableName = 'settings';
+	private static $tableName = 'settings_test';
 	public static function get($param1, $param2 = ''){
 		static $defaultSettingsOfView;
 		if ($param2){
@@ -31,6 +31,11 @@ class Setting{
 			$name = $param1;
 			$value = $param2;
 		}
-		return $GLOBALS['db']->update(self::$tableName, ['value' => $value], "`view` = '$view' AND `name` = '$name'");
+		return $GLOBALS['db']->query("
+			INSERT INTO #". self::$tableName. " (`view`, `name`, `value`) VALUES (
+				'$view', '$name', '$value'
+			) ON DUPLICATE KEY UPDATE `value` = '$value'
+		", '');
+		// return $GLOBALS['db']->update_query(self::$tableName, ['value' => $value], "`view` = '$view' AND `name` = '$name'");
 	}
 }

@@ -17,6 +17,7 @@ $category = $db->select('categories', '*', "`id`=$id");
 $category = $category[0];
 $parent_id = $category['parent_id'];
 $title = $db->getFieldOnID('categories', $parent_id, 'title');
+
 switch($_POST['table']){
 	case 'href':
 		$where = "`id`!=$id AND `parent_id`=$parent_id AND `href`='$new_value'";
@@ -55,18 +56,19 @@ switch($_POST['table']){
 			'href' => str_replace(' ', '-', translite($new_value)),
 			'parent_id' => $parent_id
 		];
-		$where = "`parent_id`=$parent_id AND `href`='{$array['href']}'";
-		if ($db->getCount('categories', $where)) $res['error'] = 'Ошибка формирования ссылки!';
-		end_exit();
-		$where = "`parent_id`=$parent_id AND `title`='$new_value'";
-		if ($db->getCount('categories', $where)){
-			$res['error'] = "Подкатегория '$new_value' в категории '$title' уже присутствует!";
+		$res_insert = $db->insert('categories', $array/*, ['print' => true]*/);
+		if ($res_insert !== true){
+			echo json_encode(['error' => $res_insert]);
+			break;
 		}
-		end_exit();
-		$res['error'] = false;
-		$db->insert('categories', $array);
-		$array['id'] = $db->getMax('categories', 'id');
-		$res = array_merge($res, $array);
+		$category_id = $db->last_id();
+		$res_insert = $db->insert('filters', [
+			'title' => 'Производитель',
+			'category_id' => $category_id
+		]);
+		$res = $array;
+		$res['category_id'] = $category_id;
+		$res['error']= false;
 		break;
 	case 'favorite':
 		$array = [

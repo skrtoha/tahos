@@ -67,6 +67,24 @@ switch($_GET['tableName']){
 				break;
 		}
 		break;
+	case 'brends':
+		$res_brends = core\Brend::get(
+			[
+				'title' => $_GET['value'],
+				'parent_id' => 0,
+				'limit' => $_GET['maxCountResults']
+			], 
+			[], '');
+		if (!$res_brends->num_rows) break;
+		foreach($res_brends as $brend){
+			$output .= "
+				<li>
+					<a brend_id=\"{$brend['id']}\" class=\"resultBrend\">
+						{$brend['title']}
+					</a>
+				</li>";
+		}
+		break;
 	case 'store_items':
 		$query = core\StoreItem::getQueryStoreItem();
 		$query .= "

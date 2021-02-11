@@ -6,23 +6,36 @@ use core\OrderValue;
 use core\Item;
 
 class Autoeuro extends Provider{
+	public static $fieldsForSettings = [
+		"isActive",	// is required	
+		"email",
+		"password",
+		"apiKey",
+		"url",
+		"delivery_key",
+		"subdivision_key",
+		"provider_id",
+		"mainStoreID",
+		"minPriceStoreID",
+		"minDeliveryStoreID"
+	];
 	
-	public static function getUrlString($action){
-		return self::getParams()->url . "$action/json/" . self::getParams()->apiKey;
+	public static function getUrlString($action, $typeOrganization = 'entity'){
+		return self::getParams()->url . "$action/json/" . self::getParams($typeOrganization)->apiKey;
 	}
 
-	public static function getParams(){
-		static $params;
-		if ($params) return $params;
-		$params = json_decode(\core\Setting::get('api_settings', 18));
-		return $params;
-	}
 
+	public static function getParams($typeOrganization = 'entity'){
+		return parent::getApiParams([
+			'api_title' => 'Autoeuro', 
+			'typeOrganization' => $typeOrganization
+		]);
+	}
 	public static function getBrends(){
 		$response = parent::getUrlData(self::getUrlString('brends'));
 		return json_decode($response);
 	}
-	private static function getStockItems($brend, $article, $with_crosses = 0){
+	private static function getStockItems($brend, $article, $with_crosses = 0, $typeOrganization = 'entity'){
 		return parent::getUrlData(self::getUrlString('stock_items'), [
 			'brand' => $brend, 
 			'code' => $article, 
@@ -34,9 +47,9 @@ class Autoeuro extends Provider{
 	 * @param array $params store_id, item_id
 	 * @return string order_key
 	 */
-	public static function getOrderKey($params){
-		if ($params['store_id'] == self::getParams()->mainStoreID){
-			$response = self::getStockItems(strtoupper($params['brend']), $params['article'], 0);
+	public static function getOrderKey($params, $typeOrganization = 'entity'){
+		if ($params['store_id'] == self::getParams($typeOrganization)->mainStoreID){
+			$response = self::getStockItems(strtoupper($params['brend']), $params['article'], 0, $typeOrganization);
 			if (!$response || $response == 'Пустой ключ покупателя'){
 				$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $params['brend']);
 				$response = self::getStockItems(strtoupper($providerBrend), $params['article']);
@@ -181,6 +194,7 @@ class Autoeuro extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$response = self::getStockItems(strtoupper($brend), $article, 1);
+		debug($response);
 		if (!$response || $response == 'Пустой ключ покупателя'){
 			$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
 			$response = self::getStockItems(strtoupper($providerBrend), $article);
@@ -268,8 +282,8 @@ class Autoeuro extends Provider{
 		);
 	}
 	public static function getSearch($code){
-		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
-		if (!parent::isActive(self::getParams()->provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams('entity')->provider_id)) return false;
+		if (!parent::isActive(self::getParams('entity')->provider_id)) return false;
 		$response = parent::getUrlData(self::getUrlString('stock_items'), ['code' => $code]);
 		if (!$response) return false;
 		$itemsList = json_decode($response);
@@ -293,7 +307,7 @@ class Autoeuro extends Provider{
 	 * @return mixed basket_item_key if is in basket,  false if not
 	 */
 	public static function isInBasket($params){
-		$basket_items = self::getBasket();
+		$basket_items = self::getBasket($params['typeOrganization']);
 		if (!isset($basket_items->DATA)) return false;
 		foreach($basket_items->DATA as $data){
 			if ($data->comment == self::getStringBasketComment($params)) return $data->basket_item_key;
@@ -309,9 +323,9 @@ class Autoeuro extends Provider{
 		self::removeBasket($basket_item_key);
 		return true;
 	}
-	public static function removeBasket($basket_item_key)
+	public static function removeBasket($basket_item_key, $typeOrganization)
 	{
-		return json_decode(parent::getUrlData(self::getUrlString('basket_del'), [
+		return json_decode(parent::getUrlData(self::getUrlString('basket_del', $typeOrganization), [
 			'basket_item_key' => $basket_item_key
 		]));
 	}
@@ -321,7 +335,7 @@ class Autoeuro extends Provider{
 	 * @return [type]         [description]
 	 */
 	public static function putBusket($params){
-		$order_key = self::getOrderKey($params);
+		$order_key = self::getOrderKey($params, 'private');
 		if (!$order_key){
 			Log::insert([
 				'text' => 'АвтоЕвро ошибка получения order_key',
@@ -330,10 +344,10 @@ class Autoeuro extends Provider{
 			return false;
 		}
 		if ($basket_item_key = self::isInBasket($params)){
-			self::removeBasket($basket_item_key);
+			self::removeBasket($basket_item_key, $params['typeOrganization']);
 		}
 		$response = parent::getUrlData(
-			self::getUrlString('basket_put'),
+			self::getUrlString('basket_put', $params['typeOrganization']),
 			[
 				'order_key' => $order_key,
 				'quantity' => $params['quan'],
@@ -351,31 +365,37 @@ class Autoeuro extends Provider{
 		if ($response) return true;
 		else return false;
 	}
-	public static function getBasket(){
-		$response = parent::getUrlData(self::getUrlString('basket_items'));
+	public static function getBasket($typeOrganization = 'entity'){
+		$response = parent::getUrlData(self::getUrlString('basket_items'), $typeOrganization);
 		return json_decode($response);
 	}
 	public static function sendOrder(){
-		// debug(json_decode(parent::getUrlData(self::getUrlString('subdivisions'))));
-		// exit();
-		$basket_items = self::getBasket();
+		// self::sendOrderOrganization('entity');
+		self::sendOrderOrganization('private');
+	}
+
+	private static function sendOrderOrganization($typeOrganization){
+		$basket_items = self::getBasket($typeOrganization);
 		if (!isset($basket_items->DATA)) return false;
-		debug($basket_items);
 		$basket_item_keys = [];
+		$comments = [];
 		foreach($basket_items->DATA as $b){
 			if (!$b->comment) continue;
 			$basket_item_keys[] = $b->basket_item_key;
+			$comments[] = $b->comment;
 		}
 		$response = parent::getCurlUrlData(
-			self::getUrlString('order_basket'),
+			self::getUrlString('order_basket', $typeOrganization),
 			[
-				'delivery_key' => self::getParams()->delivery_key,
-				'subdivision_key' => self::getParams()->subdivision_key,
+				'delivery_key' => self::getParams($typeOrganization)->delivery_key,
+				'subdivision_key' => self::getParams($typeOrganization)->subdivision_key,
+				'wait_all_goods' => 1,
+				'comment' => implode($comments),
 				'basket_item_keys' => json_encode($basket_item_keys)
 			]
 		);
 		$json = json_decode($response);
-		debug($response);
+		debug($json);
 		
 		//закоментировано потому, что ответ был тупо пустой, хотя заказ отправляется
 		/*if (!$response){
@@ -409,3 +429,4 @@ class Autoeuro extends Provider{
 		}
 	}
 }
+

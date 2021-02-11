@@ -16,6 +16,7 @@ class Brend{
 		if (isset($conditions['provider_id'])) self::$additionalFields[] = 'provider_id';
 		$fields = array_merge(self::$defaultFields, self::$additionalFields);
 		$where = '';
+		$limit = '';
 		$joins = array();
 		if (!empty($conditions)){
 			foreach ($conditions as $field => $value){
@@ -26,13 +27,18 @@ class Brend{
 						}
 						else  $where .= "b.id = {$value} AND "; 
 					break;
+					case 'parent_id':
+						$where .= "b.parent_id = $value AND ";
+						break;
 					case 'title': 
 						if (isset($conditions['provider_id'])) $where .= "(b.title = '$value' OR (pb.title = '$value' AND pb.provider_id = {$conditions['provider_id']})) AND ";
-						else $where .= "b.title = '$value' AND ";
+						else $where .= "b.title LIKE '$value%' AND ";
 						break;
 					case 'provider_id':
 						$joins[] = "LEFT JOIN #provider_brends pb ON pb.brend_id = b.id";
 						break;
+					case 'limit':
+						$limit .= "LIMIT 0, $value";
 				}
 			}
 		}
@@ -47,6 +53,7 @@ class Brend{
 				#brends b
 			".implode(' ', $joins)."
 			$where
+			$limit
 		", $flag);
 		if ($res->num_rows) return $res;
 		else return false;

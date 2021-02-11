@@ -4,8 +4,12 @@ use core\Provider;
 use core\OrderValue;
 use core\Log;
 use core\Item;
-
 class Rossko extends Provider{
+	public static $fieldsForSettings = [
+		'KEY1',
+		'KEY2',
+		'provider_id'
+	];
 	private $db, $result;
 	private static $delivery_id = '000000001';
 	private static $connect = array(
@@ -15,16 +19,11 @@ class Rossko extends Provider{
 			'trace' => true
 		)
 	);
-	private static $param = array(
-		'KEY1' => '41d4a2a141970dfe8da7aa9e0b7396e8',
-		'KEY2' => '1955025ec3f636dc345b85fdd5c525cc',
-	);
-	public static $provider_id = 15;
-
-	public static function getParams(){
-		static $params;
-		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 15));
-		return $params;
+	public static function getParams($typeOrganization = 'entity'){
+		return Provider::getApiParams([
+			'api_title' => 'Rossko',
+			'typeOrganization' => $typeOrganization
+		]);
 	}
 
 	/**
@@ -212,13 +211,13 @@ class Rossko extends Provider{
 		$result = $query->GetSearch($param);
 		return $result;
 	}
-	public static function getCheckoutDetails(){
+	public static function getCheckoutDetails($typeOrganization = 'entity'){
 		$soap  = self::getSoap('GetCheckoutDetails');
 		if (!$soap) return false;
 		try{
 			$query = $soap->GetCheckoutDetails([
-				'KEY1' => self::getParams()->KEY1,
-				'KEY2' => self::getParams()->KEY2,
+				'KEY1' => self::getParams($typeOrganization)->KEY1,
+				'KEY2' => self::getParams($typeOrganization)->KEY2,
 			]);
 		}catch(\SoapFault $e){
 			Log::insertThroughException($e);
@@ -240,7 +239,7 @@ class Rossko extends Provider{
 				'comment' => "{$item['order_id']}-{$item['store_id']}-{$item['item_id']}",
 				'price' => $item['price'],
 				'user_id' => $item['user_id'],
-				'user_type' => $item['user_type']
+				'user_type' => $item['typeOrganization']
 			];
 		}
 		return $items;
@@ -248,9 +247,7 @@ class Rossko extends Provider{
 	public static function sendOrder($store_id = NULL){
 		if ($store_id) $stock = parent::getInstanceDataBase()->getFieldOnID('provider_stores', $store_id, 'title');
 		$partsList = self::getPartsForSending();
-		debug($partsList, 'partsList'); //exit();
-		$entity = [];
-		$private = [];
+		$items = [];
 		if (!$partsList){
 			if (!empty($ov)) $additional = "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 			else $additional = NULL;
@@ -260,26 +257,28 @@ class Rossko extends Provider{
 			]);
 			return false;
 		}
+		$privateParts = [];
+		$entityParts = [];
 		foreach($partsList as $part){
 			if (isset($stock) && $part['stock'] != $stock) continue;
-			if ($part['user_type'] == 'private') $private[] = $part;
-			if ($part['user_type'] == 'entity') $entity[] = $part;
+			if ($part['user_type'] == 'entity') $entityParts[] = $part;
+			if ($part['user_type'] == 'private') $privateParts[] = $part;
 		}
 
-		$resultEntity = self::executeSendOrder($entity, 'entity');
-		self::parseSendOrderResponse($resultEntity, $entity);
+		$resultPrivate = self::executeSendOrder($privateParts, 'private');
+		self::parseSendOrderResponse($resultPrivate, $privateParts);
 
-		$resultPrivate = self::executeSendOrder($private, 'private');
-		self::parseSendOrderResponse($resultPrivate, $private);
+		$resultEntity = self::executeSendOrder($entityParts, 'entity');
+		self::parseSendOrderResponse($resultEntity, $entityParts);
 	}
-	private static function executeSendOrder(array $parts, $user_type){
+	private static function executeSendOrder(array $parts, $typeOrganization){
 		static $checkoutDetails;
 		if (empty($parts)) return false;
 		if (!$checkoutDetails){
-			$checkoutDetails = self::getCheckoutDetails();
+			$checkoutDetails = self::getCheckoutDetails('private');
 			if (!$checkoutDetails) die("Ошибка получения checkoutDetails. Подробности в логе.");
 		} 
-		$payment_id = $user_type == 'private' ? 2 : 1;
+		$payment_id = $typeOrganization == 'private' ? 2 : 1;
 		
 		$soap  = self::getSoap('GetCheckout');
 		if (!$soap){
@@ -291,8 +290,8 @@ class Rossko extends Provider{
 		}
 
 		$param = array(
-			'KEY1' => self::getParams()->KEY1,
-			'KEY2' => self::getParams()->KEY2,
+			'KEY1' => self::getParams('private')->KEY1,
+			'KEY2' => self::getParams('private')->KEY2,
 			'delivery' => array(
 				'delivery_id' => '000000001',
 				'city' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->city,
@@ -385,10 +384,9 @@ class Rossko extends Provider{
 		}
 	}
 	public function getSearch($search){
-		if (!parent::getIsEnabledApiSearch($this->provider_id)) return false;
-		if (!parent::isActive($this->provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$result = $this->getResult($search);
-		// debug($result); exit();
 		if (!$result) return false;
 		if (!$result->SearchResult->success) return false;
 		$coincidences = array();

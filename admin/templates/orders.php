@@ -15,8 +15,7 @@ switch ($act) {
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	case 'allInWork':
-		// debug($_GET); exit();
-		$res_order_values = get_order_values(['order_id' => $_GET['id']]);
+		$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
 		while($ov = $res_order_values->fetch_assoc()){
 			if (!in_array($ov['status_id'], [5])) continue;
 			if (!Provider::getIsEnabledApiOrder($ov['provider_id']) && $ov['api_title']){
@@ -82,7 +81,7 @@ switch ($act) {
 			exit();
 		} 
 
-		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
+		// header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
 		$order = get_order('');
@@ -354,8 +353,16 @@ function show_form($act){
 				<tr <?=$selector?> class="status_<?=$order['is_draft'] ? '' : $ov['status_id']?>">
 					<td class="storeInfo" label="Поставщик">
 						<a class="store" store_id="<?=$ov['store_id']?>"><?=$ov['cipher']?></a>
-						<?if ($ov['provider_id'] && core\Provider::isInBasket($ov)){?>
-							<a class="removeFromBasket" href="?view=orders&act=removeFromBasket&<?=http_build_query($ov)?>">
+						<?if ($ov['provider_id'] && core\Provider::isInBasket($ov)){
+							$builtQuery = http_build_query([
+								'provider_id' => $ov['provider_id'],
+								'order_id' => $ov['order_id'],
+								'store_id' => $ov['store_id'],
+								'item_id' => $ov['item_id'],
+								'typeOrganization' => $ov['typeOrganization']
+							]);
+							?>
+							<a class="removeFromBasket" href="?view=orders&act=removeFromBasket&<?=$builtQuery?>">
 								Удалить из корзины
 							</a>
 						<?}?>

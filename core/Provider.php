@@ -1,5 +1,6 @@
 <?php
 namespace core;
+use core\Provider;
 abstract class Provider{
 	private static $ignoreProvidersForMarkups = [18, 14];
 	private static $counterDaysDelivery;
@@ -15,6 +16,42 @@ abstract class Provider{
 	public static function getProviderAPITitle($provider_id){
 		$providers = self::get();
 		return $providers[$provider_id]['api_title'];
+	}
+	private static function getProviderIDByAPITitle($api_title){
+		$providers = self::get();
+		foreach($providers as $provider){
+			if ($provider['api_title'] == $api_title) return $provider['id'];
+		}
+		return false; 
+	}
+	
+	/**
+	 * @param  array provider_id | api_title, typeOrganization
+	 * @return [type]
+	 */
+	public static function getApiParams($inputData){
+		static $params;
+
+		if (!$inputData['api_title']) $api_title = self::getProviderAPITitle($inputData['provider_id']);
+		else $api_title = $inputData['api_title'];
+
+		if (!isset($inputData['provider_id'])) $provider_id = self::getProviderIDByAPITitle($api_title);
+		else $provider_id = $inputData['provider_id'];
+
+		$typeOrganization = $inputData['typeOrganization'];
+
+		if (!$provider_id) return false;
+		if ($params[$provider_id]->$typeOrganization) return $params[$provider_id]->$typeOrganization;
+		
+		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
+
+		//если private отключен то возращаем entity
+		if (
+			!$params[$provider_id]->$typeOrganization->isActive &&
+			$typeOrganization == 'private'
+		) return $params[$provider_id]->entity;
+
+		return $params[$provider_id]->$typeOrganization;
 	}
 	public static function get(){
 		static $providers;
@@ -54,7 +91,7 @@ abstract class Provider{
 				u.id AS user_id,
 				p.title AS provider,
 				p.api_title,
-				u.user_type
+				u.user_type as typeOrganization
 			FROM
 				#provider_basket pb
 			LEFT JOIN
@@ -489,5 +526,23 @@ abstract class Provider{
 		$count = 0;
 		foreach($items as $providerTitle => $item) $count += count($item);
 		return $count;
+	}
+
+	public static function prepareSettingsAPI($provider_id){
+		$provider = self::getInstanceProvider($provider_id);
+		$fieldsForSettings = $provider::$fieldsForSettings;
+		$output = [
+			'private' => [],
+			'entity' => []
+		];
+		foreach($fieldsForSettings as $field){
+			$output['private'][$field] = '';
+			$output['entity'][$field] = '';
+		}
+		return $output;
+	}
+
+	function isJSON($string){
+		return is_string($string) && is_array(json_decode($string, true)) ? true : false;
 	}
 }

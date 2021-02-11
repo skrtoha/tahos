@@ -52,7 +52,21 @@ switch ($act){
 			} 
 			else brend_set_image($f);
 		}
+
+		//добавлена для получения старого названия для изменения в фильтрах
+		$oldTitle = $db->select_one('brends', 'title', "`id` = {$_GET['id']}");
+		// debug($_POST); exit();
+
 		if ($db->update('brends', $_POST, "`id`=".$_GET['id'])){
+			$db->query("
+				UPDATE #filters_values fv
+				LEFT JOIN
+					#filters f ON f.id = fv.filter_id
+				SET
+					fv.title = '{$_POST['title']}'
+				WHERE
+					f.title = 'Производитель' AND fv.title = '{$oldTitle['title']}'
+			", '');
 			message('Бренд успешно изменен!');
 			// echo get_from_uri($_GET['from']);
 			// debug($_GET);

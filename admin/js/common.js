@@ -486,60 +486,6 @@ $(document).ready(function(e){
 			})
 		}
 	})
-	$('#add_filter_value').on('click', function(e){
-		e.preventDefault();
-		var title = prompt('Введите название нового свойства:');
-		if (!title) return false;
-		var elem = $(this);
-		$.ajax({
-			type: "POST",
-			url: "/ajax/add_filter_value.php",
-			data: 'filter_id=' + elem.attr('filter_id') + '&title=' + title,
-			success: function(msg){
-				if (!msg) document.location.reload();
-				else show_message(msg, 'error');
-			}
-		})
-	})
-	$('.change_filter_value').on('click', function(e){
-		e.preventDefault();
-		elem = $(this);
-		var current_value = elem.parent().parent().find('td:first-child').html();
-		var new_value = prompt('Введите новое название значения фильтра:', current_value);
-		if (current_value == new_value) return false;
-		if (!new_value) return false;
-		$.ajax({
-			type: "POST",
-			url: "/ajax/change_filter_value.php",
-			data: 'filter_value_id=' + $(this).attr('filter_value_id') + '&title=' + new_value,
-			success: function(msg){
-				if (msg) return show_message(msg, 'error');
-				else{
-					elem.closest('tr').find('td:first-child').html(new_value);
-					show_message('Успешно изменено!');
-				} 
-			}
-		})
-	})
-	$('.delete_filter_value').on('click', function(e){
-		e.preventDefault();
-		if (confirm('Вы действительно хотите удалить данное значение фильтра?')){
-			$('#popup').css('display', 'flex');
-			elem = $(this);
-			$.ajax({
-				type: "POST",
-				url: "/ajax/delete_filter_value.php",
-				data: 'filter_value_id=' + $(this).attr('filter_value_id'),
-				success: function(msg){
-					if (msg == "ok"){
-						show_message('Свойство фильтра успешно удалено!');
-						$('#popup').css('display', 'none');
-						elem.parent().parent().remove();
-					}
-				}
-			})
-		}
-	})
 	$('.items_box').on('click', function(){
 		document.location.href = "?view=items&act=item&id=" + $(this).attr('item_id');
 	})

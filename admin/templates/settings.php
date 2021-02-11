@@ -58,12 +58,13 @@ switch($_GET['act']){
 		$page_title = 'Настройки API ' . $providerTitle;
 		$status .= $page_title;
 		if (!empty($_POST)){
-			core\Setting::update('api_settings', $_GET['provider_id'], json_encode($_POST));
+			core\Setting::update('api_settings', $_GET['provider_id'], json_encode($_POST, JSON_UNESCAPED_UNICODE));
 			api_settings($_POST);
 			message('Успешно обновлено!');
 		} 
 		else{
 			$api_settings = json_decode(core\Setting::get('api_settings', $_GET['provider_id']), true);
+			if (empty($api_settings)) $api_settings = core\Provider::prepareSettingsAPI($_GET['provider_id']);
 			api_settings($api_settings);
 		}
 		break;
@@ -71,7 +72,7 @@ switch($_GET['act']){
 function storesForSubscribe($res_mainStores, $currentStoresForSubscribe){?>
 	<div class="t_form">
 		<div class="bg">
-			<form id="storesForSubscribe" method="post" enctype="multipart/form-data">
+			<form class="defaultSubmit" id="storesForSubscribe" method="post" enctype="multipart/form-data">
 				<div class="field">
 					<div class="title">Склады для рассылки</div>
 					<div class="value">
@@ -92,7 +93,7 @@ function storesForSubscribe($res_mainStores, $currentStoresForSubscribe){?>
 function organization($organization = array()){?>
 	<div class="t_form">
 		<div class="bg">
-			<form id="storesForSubscribe" method="post" enctype="multipart/form-data">
+			<form class="defaultSubmit" id="storesForSubscribe" method="post" enctype="multipart/form-data">
 				<div class="field">
 					<div class="title">Короткое название</div>
 					<div class="value">
@@ -173,19 +174,40 @@ function providers($providers){?>
 		</tbody>
 	</table>
 <?}
-function api_settings($settings){?>
+function api_settings($settings){
+
+	?>
 	<table id="api_settings">
-		<form method="post">
+		<form class="defaultSubmit" method="post">
 			<?foreach($settings as $title => $value){?>
-				<tr>
-					<td><?=$title?></td>
+				<tr class="wrap">
+					<td>
+						<b>
+							<?switch ($title){
+								case 'private': echo "Физ. лицо"; break;
+								case 'entity': echo 'Юр. лицо'; break;
+								default: echo $title;
+							}?>
+						</b>
+					</td>
 					<td>
 						<?if (is_array($value)){?>
 							<table>
 								<?foreach($value as $t => $v){?>
 									<tr>
-										<td><?=$t?></td>
-										<td><input type="text" name="<?=$title?>[<?=$t?>]" value="<?=$v?>"></td>
+										<td><?=$t == 'isActive' ? "<b>активен</b>" : $t?></td>
+										<td>
+											<?if ($t == 'isActive'){
+												?>
+												<select name="<?=$title?>[<?=$t?>]">
+													<option <?=$v == '0' ? 'selected' : ''?> value="0">нет</option>
+													<option <?=$v == '1' ? 'selected' : ''?> value="1">да</option>
+												</select>
+											<?}
+											else{?>
+												<input type="text" name="<?=$title?>[<?=$t?>]" value="<?=$v?>">
+											<?}?>
+										</td>
 									</tr>
 								<?}?>
 							</table>

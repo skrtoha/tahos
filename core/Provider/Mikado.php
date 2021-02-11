@@ -10,15 +10,20 @@ class Mikado extends Provider{
 	private $db;
 	private $armtek;
 	private $brends;
-	public static $stocks = [
-		1 => 14, // MIPI
-		10 => 13, //MIPE
-		35 => 12 //MIVO
+	public static $fieldsForSettings = [
+		"isActive",	// is required	
+		"ClientID",
+		"Password",
+		"provider_id",
+		"MIPI",
+		"MIPE",
+		"MIVO"
 	];
-	public static function getParams(){
-		static $params;
-		if (!$params) $params = json_decode(\core\Setting::get('api_settings', 8));
-		return $params;
+	public static function getParams($typeOrganization = 'entity'){
+		return Provider::getApiParams([
+			'api_title' => 'Mikado', 
+			'typeOrganization' => $typeOrganization
+		]);
 	}
 	public static function getPrice(array $params){
 		$clientData = self::getClientData();
@@ -85,36 +90,24 @@ class Mikado extends Provider{
 			}
 		} 
 	}
-	public static function getItemsToOrder(int $provider_id = null, $order_id = null, $fullList = false){
-		if ($order_id) $clientData = [0 => self::getClientData($order_id)];
-		else $clientData = [
-			0 => [
-				'ClientID' => self::getParams()->entity->ClientID,
-				'Password' => self::getParams()->entity->Password
-			],
-			1 => [
-				'ClientID' => self::getParams()->private->ClientID,
-				'Password' => self::getParams()->private->Password
-			]
-		];
+	public static function getItemsToOrder(int $provider_id = null, $ov = []){
+		$clientData = self::getClientData($ov['typeOrganization']);
 
 		$output = [];
-		foreach($clientData as $cd){
-			$xml = self::getUrlData(
-				'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
-				$cd
-			);
-			if (!$xml) continue;
-			$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
-			$result = json_decode(json_encode($result));
-			$basketItem = & $result->List->BasketItem;
-			if (is_object($basketItem)){
-				$output[] = self::parseBasketItem($basketItem);
-				continue;
-			} 
-			foreach($basketItem as $value){
-				$output[] = self::parseBasketItem($value);
-			}
+		$xml = self::getUrlData(
+			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
+			$clientData
+		);
+		if (!$xml) return;
+		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
+		$result = json_decode(json_encode($result));
+		$basketItem = & $result->List->BasketItem;
+		if (is_object($basketItem)){
+			$output[] = self::parseBasketItem($basketItem);
+			return;
+		} 
+		foreach($basketItem as $value){
+			$output[] = self::parseBasketItem($value);
 		}
 		return $output;
 	}
@@ -169,18 +162,18 @@ class Mikado extends Provider{
 	public function getCoincidences($text){
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
+		$clientData = self::getClientData();
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
 			[
 				'Search_Code' => $text,
-				'ClientID' => $this->ClientID,
-				'Password' => $this->Password,
+				'ClientID' => $clientData['ClientID'],
+				'Password' => $clientData['Password'],
 				'FromStockOnly' => 'FromStockOnly'  			
 			]
 		);
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
-		// debug($result, 'result'); exit();
 		if (empty($result->List)) return false;
 		$brendTitle = array();
 		if (is_array($result->List->Code_List_Row)){
@@ -304,8 +297,23 @@ class Mikado extends Provider{
 			else $this->parseStockLine($row->OnStocks->StockLine, $item_id, $row);
 		}
 	}
+	private static function getStoreID($StockID){
+		$stocks = self::getStocks();
+		return $stocks[$StockID];
+	}
+	public static function getStocks(){
+		static $stocks;
+		if (!$stocks){
+			$stocks = [
+				1 => self::getParams()->MIPI, // MIPI
+				10 => self::getParams()->MIPE, //MIPE
+				35 => self::getParams()->MIVO //MIVO
+			];
+		}
+		return $stocks;
+	}
 	private function parseStockLine($stock, $item_id, $row){
-		$store_id = self::$stocks[$stock->StokID];
+		$store_id = self::getStoreID($stock->StokID);
 		// debug($stock, "store_id = $store_id"); return;
 		if (!$store_id) return false;
 		$this->db->insert(
@@ -317,7 +325,6 @@ class Mikado extends Provider{
 				'in_stock' => preg_replace('/\D+/', '', $stock->StockQTY)
 			],
 			[
-				'print_query' => false,
 				'duplicate' => [
 					'in_stock' => preg_replace('/\D+/', '', $stock->StockQTY),
 					'price' => ceil($row->PriceRUR)
@@ -326,18 +333,18 @@ class Mikado extends Provider{
 		);
 	}
 	public function isStoreMikado($store_id){
-		if (array_search($store_id, self::$stocks)) return true;
+		if (array_search($store_id, self::getStoreID)) return true;
 		return false;
 	}
 	protected static function getStockId($store_id){
-		foreach(self::$stocks as $key => $value){
+		foreach(self::getStocks() as $key => $value){
 			if ($value == $store_id) return $key;
 		}
 		throw new \Exception("Не удалось получить StockID по store_id = $store_id");
 		return false;
 	}
 	public function getDeliveryType($ZakazCode, $store_id){
-		$clientData = $this->getClientData();
+		$clientData = self::getClientData('private');
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Info',
 			[
@@ -371,16 +378,11 @@ class Mikado extends Provider{
 		}
 		return false;
 	}
-	private function getClientData(int $order_id = null): array
+	private static function getClientData($typeOrganization = 'entity'): array
 	{
-		if (!$order_id) return [
-			'ClientID' => self::getParams()->entity->ClientID,
-			'Password' => self::getParams()->entity->Password
-		];
-		$user_type = parent::getUserTypeByOrderID($order_id);
-		return[
-			'ClientID' => self::getParams()->{$user_type}->ClientID,
-			'Password' => self::getParams()->{$user_type}->Password
+		return [
+			'ClientID' => self::getParams($typeOrganization)->ClientID,
+			'Password' => self::getParams($typeOrganization)->Password
 		];
 	}
 	public function Basket_Add($ov){
@@ -405,7 +407,7 @@ class Mikado extends Provider{
 			}
 		} 
 		else $DeliveryType = 0;
-		$clientData = $this->getClientData($ov['order_id']);
+		$clientData = self::getClientData($ov['typeOrganization']);
 		$params = [
 			'ZakazCode' => $ZakazCode,
 			'QTY' => $ov['quan'],
@@ -438,39 +440,15 @@ class Mikado extends Provider{
 			'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
 		]);
 	}
-	public function isOrdered($ov){
-		$array = $this->db->select_one('mikado_basket', '*', self::getWhere($ov));
-		if (empty($array)) return false;
-		return $array['Message'];
-	}
-	public function deleteFromOrder($ov){
-		$res = OrderValue::get($ov);
-		$ov = $res->fetch_assoc();
-		$array = $this->db->select_one('mikado_basket', '*', self::getWhere($ov));
-		$xml = self::getUrlData(
-			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_Delete',
-			[
-				'ItemID' => $array['ItemID'],
-				'ClientID' => $this->ClientID,
-				'Password' => $this->Password,
-			]
-		);
-		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
-		$result = json_decode(json_encode($result));
-		$this->db->delete('mikado_basket', self::getWhere($ov));
-
-		OrderValue::update(['status_id' => 5, 'ordered' => 0], $ov);
-		User::updateReservedFunds($ov['user_id'], $ov['price'], 'minus');
-	}
 	public static function isInBasket($ov){
-		$items = self::getItemsToOrder(null, $ov['order_id']);
+		$items = self::getItemsToOrder(null, $ov);
 		foreach($items as $value){
 			if ($value['ZakazCode'] == $ov['ZakazCode']) return true;
 		}
 		return false;
 	}
 	public static function removeFromBasket($ov){
-		$items = self::getItemsToOrder(null, $ov['order_id']);
+		$items = self::getItemsToOrder(null, $ov);
 		$clientData = self::getClientData($ov['order_id']);
 		$isParsed = false;
 		foreach($items as $value){

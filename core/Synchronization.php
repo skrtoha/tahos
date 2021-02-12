@@ -7,7 +7,7 @@ class Synchronization{
 	public static function getNoneSynchronizedOrders(){
 		return self::getOrders(['is_synchronized' => 0], '');
 	}
-	private static function getOrders($params, $flag = ''){
+	public static function getOrders($params, $flag = ''){
 		$output = [];
 		$res_order_values = get_order_values($params, $flag);
 		foreach($res_order_values as $ov){
@@ -20,6 +20,8 @@ class Synchronization{
 				'provider_id' => $ov['provider_id'],
 				'provider' => $ov['provider'],
 				'cipher' => $ov['cipher'],
+				'order_id' => $ov['order_id'],
+				'user_id' => $ov['user_id'],
 				'store_id' => $ov['store_id'],
 				'providerStore' => $ov['providerStore'],
 				'brend' => $ov['brend'],

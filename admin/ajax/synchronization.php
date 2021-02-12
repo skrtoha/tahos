@@ -23,6 +23,17 @@ switch($request['act']){
 	case 'setSynchronizedOrders':
 		Synchronization::setOrdersSynchronized($request['orders']);
 		break;
+	//в 1С создает заказ поставщику и отправляет в "Заказано"
+	case 'createOrderAndSendOrdered':
+		$orders = Synchronization::getOrders(['order_id' => $request['order_id']], '');
+		$order = array_shift($orders);
+		foreach($order['values'] as $ov){
+			$ov['quan'] = $ov['ordered'];
+			core\OrderValue::changeStatus(11, $ov);
+		}
+		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
+		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
+		break;
 }
 
 ?>

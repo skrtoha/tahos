@@ -139,7 +139,12 @@ class Autopiter extends Provider{
 	}
 	private static function getArticleIdByBrendAndArticle($brend, $article){
 		$client = self::getClient();
-		$result = $client->FindCatalog(["Number" => $article]);
+		try{
+			$result = $client->FindCatalog(["Number" => $article]);
+		}
+		catch(\SoapFault $e){
+			return false;
+		}
 		$items = $result->FindCatalogResult->SearchCatalogModel;
 		$brend = self::getBrend($brend);
 		if (is_array($items)){

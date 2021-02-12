@@ -3,7 +3,7 @@ namespace core;
 require_once($_SERVER['DOCUMENT_ROOT'] . '/admin/functions/orders.function.php');
 
 class Synchronization{
-	private static $url = 'http://localhost/trade/hs';
+	private static $url = 'http://134.249.158.237/trade/hs';
 	public static function getNoneSynchronizedOrders(){
 		return self::getOrders(['is_synchronized' => 0], '');
 	}

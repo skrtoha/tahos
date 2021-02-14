@@ -218,7 +218,12 @@ class Autopiter extends Provider{
 		]/*, ['print' => true]*/);
 	}
 	public static function isInBasket($params){
-		$basket = self::getClient()->GetBasket();
+		try{
+			$basket = self::getClient()->GetBasket();
+		}
+		catch(\SoapFault $e){
+			return false;
+		}
 		if (empty($basket->GetBasketResult)) return false;
 		$br = & $basket->GetBasketResult->ItemCartModel;
 		if (is_array($br)){

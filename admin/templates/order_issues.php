@@ -8,7 +8,7 @@ if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
 $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
 	if (!empty($_POST['income'])){
-		$issue_id = $issues->setIncome();
+		$issue_id = $issues->setIncome($_POST['income']);
 		message('Успешно сохранено');
 		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
 	} 

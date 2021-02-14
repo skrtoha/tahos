@@ -556,7 +556,7 @@ function show_form($act){
 <?}
 function user_orders(){
 	global $status, $db, $page_title;
-	if (!empty($_POST['income'])) setIncome();
+	if (!empty($_POST['income'])) setIncome($_POST['income']);
 	$id = $_GET['id'];
 	$user = $db->select_one('users', ['name_1', 'name_2', 'name_3'], "`id`=$id");
 	$status = "

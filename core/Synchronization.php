@@ -53,4 +53,12 @@ class Synchronization{
 			UPDATE #orders_values SET is_synchronized = 1 WHERE order_id IN ($orders)
 		", '');
 	}
+	public static function getArrayOSIFromString($osi){
+		$array = explode('-', $osi);
+		return [
+			'order_id' => $array[0],
+			'store_id' => $array[1],
+			'item_id' => $array[2]
+		]; 
+	}
 }

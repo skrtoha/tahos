@@ -1,13 +1,15 @@
 <?php
+ini_set('error_reporting', E_ERROR);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 use core\Synchronization;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/order_issues.function.php");
 
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 
 $db = new core\DataBase();
 $connection = new core\Connection($db);
@@ -25,14 +27,41 @@ switch($request['act']){
 		break;
 	//в 1С создает заказ поставщику и отправляет в "Заказано"
 	case 'createOrderAndSendOrdered':
-		$orders = Synchronization::getOrders(['order_id' => $request['order_id']], '');
-		$order = array_shift($orders);
-		foreach($order['values'] as $ov){
-			$ov['quan'] = $ov['ordered'];
-			core\OrderValue::changeStatus(11, $ov);
+		$osiArray = explode(',', $request['osi']);
+		foreach($osiArray as $osiString){
+			$osi = Synchronization::getArrayOSIFromString($osiString);
+			$ov_result = core\OrderValue::get($osi);
+			core\OrderValue::changeStatus(11, $ov_result->fetch_assoc());
 		}
 		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
 		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
+		break;
+	case 'setStatusArrived':
+		$orders = Synchronization::getOrders(Synchronization::getArrayOSIFromString($request['osi']));
+		$order = array_shift($orders);
+		foreach($order['values'] as $ov){
+			if ($ov['arrived']) $ov['quan'] = $ov['arrived'];
+			core\OrderValue::changeStatus(3, $ov);
+		}
+		break;
+	case 'setStatusIssued':
+		$issues = new \Issues($request['user_id'], $db);
+		$income = [];
+
+		for ($i = 0; $i < count($request['osi']); $i++) { 
+			$osi = Synchronization::getArrayOSIFromString($request['osi'][$i]);
+			$income["{$osi['order_id']}:{$osi['item_id']}:{$osi['store_id']}"] = $request['quan'][$i];
+		}
+		var_dump($issues->setIncome($income, true));
+		break;
+	case 'cancelItemsFromOrder':
+		$osiArray = explode(',', $request['osi']);
+		foreach($osiArray as $osiString){
+			$osi = Synchronization::getArrayOSIFromString($osiString);
+			$ov_result = core\OrderValue::get($osi);
+			$ov = $ov_result->fetch_assoc();
+			core\OrderValue::changeStatus(6, $ov);
+		}
 		break;
 }
 

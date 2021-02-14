@@ -44,6 +44,7 @@ function get_order_values(array $params = [], string $flag = ''): mysqli_result
 			switch($key){
 				case 'order_id':
 				case 'item_id':
+				case 'store_id':
 				case 'status_id':
 				case 'is_synchronized':
 					$where .= "ov.$key = '$value' AND ";

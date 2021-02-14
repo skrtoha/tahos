@@ -9,6 +9,7 @@ use core\Exceptions\ForumAuto as EForumAuto;
 
 class ForumAuto extends Provider{
 	public static $fieldsForSettings = [
+		'isActive',
 		'provider_id',
 		'login',
 		'pass',

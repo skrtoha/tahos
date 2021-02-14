@@ -7,6 +7,7 @@ use core\Exceptions\Autopiter as EAutopiter;
 
 class Autopiter extends Provider{
 	public static $fieldsForSettings = [
+		'isActive',
 		'UserID',
 		'Password',
 		'provider_id'

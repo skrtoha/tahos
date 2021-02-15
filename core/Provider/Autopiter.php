@@ -7,6 +7,7 @@ use core\Exceptions\Autopiter as EAutopiter;
 
 class Autopiter extends Provider{
 	public static $fieldsForSettings = [
+		'isActive',
 		'UserID',
 		'Password',
 		'provider_id'
@@ -139,7 +140,12 @@ class Autopiter extends Provider{
 	}
 	private static function getArticleIdByBrendAndArticle($brend, $article){
 		$client = self::getClient();
-		$result = $client->FindCatalog(["Number" => $article]);
+		try{
+			$result = $client->FindCatalog(["Number" => $article]);
+		}
+		catch(\SoapFault $e){
+			return false;
+		}
 		$items = $result->FindCatalogResult->SearchCatalogModel;
 		$brend = self::getBrend($brend);
 		if (is_array($items)){
@@ -212,7 +218,12 @@ class Autopiter extends Provider{
 		]/*, ['print' => true]*/);
 	}
 	public static function isInBasket($params){
-		$basket = self::getClient()->GetBasket();
+		try{
+			$basket = self::getClient()->GetBasket();
+		}
+		catch(\SoapFault $e){
+			return false;
+		}
 		if (empty($basket->GetBasketResult)) return false;
 		$br = & $basket->GetBasketResult->ItemCartModel;
 		if (is_array($br)){

@@ -40,7 +40,7 @@ switch($request['act']){
 		$orders = Synchronization::getOrders(Synchronization::getArrayOSIFromString($request['osi']));
 		$order = array_shift($orders);
 		foreach($order['values'] as $ov){
-			if ($ov['arrived']) $ov['quan'] = $ov['arrived'];
+			$ov['quan'] = $request['quan'];
 			core\OrderValue::changeStatus(3, $ov);
 		}
 		break;
@@ -61,6 +61,15 @@ switch($request['act']){
 			$ov_result = core\OrderValue::get($osi);
 			$ov = $ov_result->fetch_assoc();
 			core\OrderValue::changeStatus(6, $ov);
+		}
+		break;
+	case 'returnOrderValues':
+		for ($i = 0; $i < count($request['osi']); $i++) { 
+			$osi = Synchronization::getArrayOSIFromString($request['osi'][$i]);
+			$ov_result = core\OrderValue::get($osi);
+			$ov = $ov_result->fetch_assoc();
+			$ov['quan'] = $request['quan'][$i];
+			core\OrderValue::changeStatus(2, $ov);
 		}
 		break;
 }

@@ -81,7 +81,7 @@ switch ($act) {
 			exit();
 		} 
 
-		// header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
+		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
 		$order = get_order('');
@@ -359,7 +359,8 @@ function show_form($act){
 								'order_id' => $ov['order_id'],
 								'store_id' => $ov['store_id'],
 								'item_id' => $ov['item_id'],
-								'typeOrganization' => $ov['typeOrganization']
+								'typeOrganization' => $ov['typeOrganization'],
+								'ZakazCode' => $ov['ZakazCode']
 							]);
 							?>
 							<a class="removeFromBasket" href="?view=orders&act=removeFromBasket&<?=$builtQuery?>">

@@ -45,12 +45,11 @@ abstract class Provider{
 		
 		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
 
+		
 		//если private отключен то возращаем entity
-		if (
-			!$params[$provider_id]->$typeOrganization->isActive &&
-			$typeOrganization == 'private'
-		) return $params[$provider_id]->entity;
-
+		if (!$params[$provider_id]->$typeOrganization->isActive){
+			$params[$provider_id]->private = $params[$provider_id]->entity; 
+		} 
 		return $params[$provider_id]->$typeOrganization;
 	}
 	public static function get(){

@@ -209,7 +209,7 @@ switch($_GET['act']){
 			LEFT JOIN
 				#provider_stores ps ON ps.id=si.store_id
 			WHERE 
-				ps.provider_id = ".$rossko::$provider_id."
+				ps.provider_id = " . core\Provider\Rossko::getParams()->provider_id . "
 		", '');
 		for ($num = 0; $num < $numFiles; $num++){
 			$zipFile = $zipArchive->statIndex($num);
@@ -271,7 +271,7 @@ switch($_GET['act']){
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
 			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		}
-		Provider::updatePriceUpdated(['provider_id' => $rossko::$provider_id]);
+		Provider::updatePriceUpdated(['provider_id' => core\Provider\Rossko::getParams()->provider_id]);
 		break;
 	case 'priceVoshod':
 		echo "<h2>Прайс Восход</h2>";
@@ -388,7 +388,7 @@ switch($_GET['act']){
 				if (!$item_id) continue;
 				// $db->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $row[0]], ['print_query' => false]);
 				$price->insertStoreItem([
-					'store_id' => Mikado::$stocks[$value],
+					'store_id' => $stocks[$value],
 					'item_id' => $item_id,
 					'price' => $row[4],
 					'in_stock' => $row[5],

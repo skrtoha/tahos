@@ -344,7 +344,7 @@ switch($_GET['act']){
 		];
 		foreach($files as $zipName => $value){
 			$price = new core\Price($db, $zipName);
-			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::getParams('private')->ClientID . "&PSW=" . Mikado::getParams('private')->Password;
+			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::getParams('entity')->ClientID . "&PSW=" . Mikado::getParams('entity')->Password;
 			echo $url;
 			$file = file_get_contents($url);
 			if (strlen($file) == 18){

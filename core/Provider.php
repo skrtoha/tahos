@@ -29,8 +29,10 @@ abstract class Provider{
 	 * @param  array provider_id | api_title, typeOrganization
 	 * @return [type]
 	 */
-	public static function getApiParams($inputData){
+	public static function getApiParams($inputData, $debugMode = false){
 		static $params;
+
+		if ($debugMode) debug($inputData);
 
 		if (!$inputData['api_title']) $api_title = self::getProviderAPITitle($inputData['provider_id']);
 		else $api_title = $inputData['api_title'];
@@ -38,17 +40,28 @@ abstract class Provider{
 		if (!isset($inputData['provider_id'])) $provider_id = self::getProviderIDByAPITitle($api_title);
 		else $provider_id = $inputData['provider_id'];
 
+		if ($debugMode){
+			debug($provider_id, 'provider_id');
+		}
+
 		$typeOrganization = $inputData['typeOrganization'];
 
 		if (!$provider_id) return false;
 		
-		//если private отключен то возращаем entity
-		if (!$params[$provider_id]->$typeOrganization->isActive){
+		if ($debugMode){
+			debug($params, 'params');
+		}
+
+		if (isset($params[$provider_id]->$typeOrganization) && $params[$provider_id]->$typeOrganization){
+			return $params[$provider_id]->$typeOrganization;
+		} 
+		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
+		
+		//если private отключен то ставим в него entity
+		if (isset($params[$provider_id]) && !$params[$provider_id]->$typeOrganization->isActive){
 			$params[$provider_id]->private = $params[$provider_id]->entity; 
 		}
 
-		if ($params[$provider_id]->$typeOrganization) return $params[$provider_id]->$typeOrganization;
-		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
 		return $params[$provider_id]->$typeOrganization;
 	}
 	public static function get(){

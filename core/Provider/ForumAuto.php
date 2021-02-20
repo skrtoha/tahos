@@ -225,7 +225,7 @@ class ForumAuto extends Provider{
 				'tid' => $requiredItem->gid,
 				'num' => $pb['quan'],
 				'eoid' => "{$pb['order_id']}{$pb['store_id']}{$pb['item_id']}"
-			], 'private');
+			], $pb['typeOrganization']);
 			try{
 				$json = Provider::getUrlData($queryString);
 				$response = json_decode($json);

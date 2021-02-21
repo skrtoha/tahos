@@ -283,7 +283,7 @@ class Autokontinent extends Provider{
 
 		OrderValue::changeStatus(5, $ov);
 	}
-	private static function getBasket($typeOrganization){
+	private static function getBasket($typeOrganization = 'entity'){
 		$json = Provider::getCurlUrlData(
 			self::getParams($typeOrganization)->url."basket/get.json", 
 			self::getAuthData($typeOrganization)

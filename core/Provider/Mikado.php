@@ -92,7 +92,6 @@ class Mikado extends Provider{
 	}
 	public static function getItemsToOrder(int $provider_id = null, $ov = []){
 		$clientData = self::getClientData($ov['typeOrganization']);
-
 		$output = [];
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/basket.asmx/Basket_List',
@@ -104,7 +103,7 @@ class Mikado extends Provider{
 		$basketItem = & $result->List->BasketItem;
 		if (is_object($basketItem)){
 			$output[] = self::parseBasketItem($basketItem);
-			return;
+			return $output;
 		} 
 		foreach($basketItem as $value){
 			$output[] = self::parseBasketItem($value);
@@ -343,8 +342,8 @@ class Mikado extends Provider{
 		throw new \Exception("Не удалось получить StockID по store_id = $store_id");
 		return false;
 	}
-	public function getDeliveryType($ZakazCode, $store_id){
-		$clientData = self::getClientData('private');
+	public function getDeliveryType($ZakazCode, $store_id, $typeOrganization){
+		$clientData = self::getClientData($typeOrganization);
 		$xml = self::getUrlData(
 			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Info',
 			[
@@ -399,7 +398,7 @@ class Mikado extends Provider{
 		} 
 		if (preg_match('/^g/', $ZakazCode)){
 			try{
-				$DeliveryType = $this->getDeliveryType($ZakazCode, $ov['store_id']);
+				$DeliveryType = $this->getDeliveryType($ZakazCode, $ov['store_id'], $ov['typeOrganization']);
 				if (!$DeliveryType) throw new Exception("Ошибка получения DeliveryType по $ZakazCode");
 			} catch(Exception $e){
 				Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
@@ -449,7 +448,7 @@ class Mikado extends Provider{
 	}
 	public static function removeFromBasket($ov){
 		$items = self::getItemsToOrder(null, $ov);
-		$clientData = self::getClientData($ov['order_id']);
+		$clientData = self::getClientData($ov['typeOrganization']);
 		$isParsed = false;
 		foreach($items as $value){
 			if ($value['ZakazCode'] == $ov['ZakazCode']){
@@ -464,7 +463,6 @@ class Mikado extends Provider{
 				if (!$xml) return false;
 				$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 				$result = json_decode(json_encode($result), true);
-				debug($result);
 				if ($result[0] != 'OK'){
 					Log::insert([
 						'url' => $_SERVER['REQUEST_URI'],

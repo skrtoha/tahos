@@ -33,6 +33,10 @@ if ($_GET['act'] == 'to_offer'){
 
 	foreach ($res_basket as $value){
 		if (!$value['isToOrder']) continue;
+		
+		//если товара уже нету в прайсах, то тоже пропускаем
+		if (!$value['cipher']) continue;
+
 		$body .= "
 			<tr>
 				<td style='border: 1px solid black'>{$value['brend']}</td>
@@ -68,11 +72,11 @@ if ($_GET['act'] == 'to_offer'){
 
 	 	//закоментирована эта строка, т.к. очень часто появлялся пустой заказ
 		// if ($res !== true) die("$res | $last_query");
-		
+	 	
+	 	$db->delete('basket', "`user_id`={$_SESSION['user']} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
 	} 
 	$body .= "</table>";
 
- 	$db->delete('basket', "`user_id`={$_SESSION['user']} AND `isToOrder`=1");
 
 	core\Mailer::send([
 		'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
@@ -197,7 +201,11 @@ $noReturnIsExists = false;
 						<span class="title"><?=$val['title']?></span>
 					</td>
 					<td <?=$val['noReturn']?>><?=$val['cipher']?></td>
-					<td class="delivery-time"><?=$val['delivery']?> дн.</td>
+					<td class="delivery-time">
+						<?if ($val['delivery']){?>
+							<?=$val['delivery']?> дн.
+						<?}?>
+					</td>
 					<td>
 						<div store_id="<?=$val['store_id']?>" item_id="<?=$val['item_id']?>" packaging="<?=$val['packaging']?>" class="count-block" summand="<?=$val['price']?>">
 							<span class="minus">-</span>

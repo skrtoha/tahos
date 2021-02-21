@@ -13,6 +13,9 @@
 						type: "POST",
 						url: "/ajax/category.php",
 						data: 'table=add&parent_id=' + parent_id + '&new_value=' + new_value,
+						beforeSend: function(){
+							showGif();
+			  			},
 						success: function(msg){
 							// console.log(msg);
 							var res = JSON.parse(msg);
@@ -39,8 +42,8 @@
 									</form>
 								</td>` +
 								'<td>' + 
-									'<a href="?view=category&act=items&id=' + res.id + '">Товаров (0)</a> ' + 
-									'<a href="?view=category&act=filters&id=' + res.id + '">Фильров (0)</a>' +
+									'<a href="?view=category&act=items&id=' + res.category_id + '">Товаров (0)</a> ' + 
+									'<a href="?view=category&act=filters&id=' + res.category_id + '">Фильров (1)</a>' +
 								'</td>' +
 								'<td>' + 
 									'<a class="delete_item" href="?view=category&act=delete&id=' + res.id + '&parent_id=' + parent_id + '">Удалить</a>' + 
@@ -49,6 +52,7 @@
 								$('.t_table').append(str);
 								show_message("Подкатегория '" + new_value + "' успешно добавлена!");
 							}
+							showGif(false);
 						}
 					})
 				}
@@ -80,6 +84,85 @@
 						}
 					}
 				})
+			})
+			$('#add_filter_value').on('click', function(e){
+				e.preventDefault();
+				var title = prompt('Введите название нового свойства:');
+				if (!title) return false;
+				var elem = $(this);
+				category.sendAjaxAddFilterValue({
+					filter_id: $('input[name=filter_id]').val(),
+					title: title
+				})
+			})
+			$('.change_filter_value').on('click', function(e){
+				e.preventDefault();
+				elem = $(this);
+				var current_value = elem.parent().parent().find('td:first-child').html();
+				var new_value = prompt('Введите новое название значения фильтра:', current_value);
+				if (current_value == new_value) return false;
+				if (!new_value) return false;
+				$.ajax({
+					type: "POST",
+					url: "/ajax/change_filter_value.php",
+					data: 'filter_value_id=' + $(this).attr('filter_value_id') + '&title=' + new_value,
+					success: function(msg){
+						if (msg) return show_message(msg, 'error');
+						else{
+							elem.closest('tr').find('td:first-child').html(new_value);
+							show_message('Успешно изменено!');
+						} 
+					}
+				})
+			})
+			$('.delete_filter_value').on('click', function(e){
+				e.preventDefault();
+				if (confirm('Вы действительно хотите удалить данное значение фильтра?')){
+					$('#popup').css('display', 'flex');
+					elem = $(this);
+					$.ajax({
+						type: "POST",
+						url: "/ajax/delete_filter_value.php",
+						data: 'filter_value_id=' + $(this).attr('filter_value_id'),
+						success: function(msg){
+							if (msg == "ok"){
+								show_message('Свойство фильтра успешно удалено!');
+								$('#popup').css('display', 'none');
+								elem.parent().parent().remove();
+							}
+						}
+					})
+				}
+			})
+			$('input.intuitive_search').on('keyup focus', function(e){
+				e.preventDefault();
+				let val = $(this).val();
+				let minLength = 1;
+				intuitive_search.getResults({
+					event: e,
+					value: val,
+					minLength: minLength,
+					tableName: 'brends',
+				});
+			});
+			$(document).on('click', 'a.resultBrend', function(){
+				let th = $(this);
+				let title = th.text();
+				category.sendAjaxAddFilterValue({
+					filter_id: $('input[name=filter_id]').val(),
+					title: title.trim()
+				});
+			})
+		},
+		sendAjaxAddFilterValue: function(obj){
+			$.ajax({
+				type: "POST",
+				url: "/ajax/add_filter_value.php",
+				data: 'filter_id=' + obj.filter_id + '&title=' + obj.title,
+				success: function(msg){
+					if (!msg) document.location.reload();
+					else show_message(msg, 'error');
+				}
 			})
 		}
 	}

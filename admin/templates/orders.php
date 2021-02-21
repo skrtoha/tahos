@@ -302,7 +302,8 @@ function show_form($act){
 								'order_id' => $ov['order_id'],
 								'store_id' => $ov['store_id'],
 								'item_id' => $ov['item_id'],
-								'typeOrganization' => $ov['typeOrganization']
+								'typeOrganization' => $ov['typeOrganization'],
+								'ZakazCode' => $ov['ZakazCode']
 							]);
 							?>
 							<a class="removeFromBasket" href="?view=orders&act=removeFromBasket&<?=$builtQuery?>">

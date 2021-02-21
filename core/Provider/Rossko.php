@@ -239,7 +239,7 @@ class Rossko extends Provider{
 				'comment' => "{$item['order_id']}-{$item['store_id']}-{$item['item_id']}",
 				'price' => $item['price'],
 				'user_id' => $item['user_id'],
-				'user_type' => $item['user_type']
+				'user_type' => $item['typeOrganization']
 			];
 		}
 		return $items;
@@ -257,22 +257,18 @@ class Rossko extends Provider{
 			]);
 			return false;
 		}
+		$privateParts = [];
+		$entityParts = [];
 		foreach($partsList as $part){
 			if (isset($stock) && $part['stock'] != $stock) continue;
-			$items[] = $part;
-		}
 
-		$resultEntity = self::executeSendOrder($items);
-		self::parseSendOrderResponse($resultEntity, $items);
-	}
-	private static function executeSendOrder(array $parts){
 		static $checkoutDetails;
 		if (empty($parts)) return false;
 		if (!$checkoutDetails){
 			$checkoutDetails = self::getCheckoutDetails('private');
 			if (!$checkoutDetails) die("Ошибка получения checkoutDetails. Подробности в логе.");
 		} 
-		$payment_id = 2;
+		$payment_id = $typeOrganization == 'private' ? 2 : 1;
 		
 		$soap  = self::getSoap('GetCheckout');
 		if (!$soap){
@@ -381,7 +377,6 @@ class Rossko extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$result = $this->getResult($search);
-		debug($result);
 		if (!$result) return false;
 		if (!$result->SearchResult->success) return false;
 		$coincidences = array();

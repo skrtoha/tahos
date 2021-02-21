@@ -436,8 +436,16 @@ function filters_values(){
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=categories'>Категории товаров</a> > ";
 	$status .= "<a href='?view=category&id=".$category[0]['parent_id']."'>".$db->getFieldOnID('categories', $category[0]['parent_id'], 'title')."</a> > ";
 	$status .= "<a href='?view=category&act=filters&id=".$category[0]['id']."'>".$db->getFieldOnID('filters', $filter[0]['id'], 'title')." - фильтры</a> > $page_title";?>
+	<input type="hidden" name="filter_id" value="<?=$id?>">
 	<div id="total" style="margin: 0">Всего: <?=count($filters_values)?></div>
-	<div class="actions"><a id="add_filter_value" filter_id=<?=$id?> href="">Добавить</a></div>
+	<div class="actions">
+		<?if ($filter[0]['title'] == 'Производитель'){?>
+			<input class="intuitive_search" placeholder="Поиск для добавления" type="text" name="brends">
+		<?}
+		else{?>
+			<a filter_title="<?=$filter[0]['title']?>" id="add_filter_value" href="">Добавить</a>
+		<?}?>
+	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Заголовок</td>
@@ -450,7 +458,9 @@ function filters_values(){
 				<td>
 					<?$count_filter_value = $db->getCount('items_values', "`value_id`=".$filter_value['id'])?>
 					<a href="?view=category&act=items_filters_values&id=<?=$filter_value['id']?>">Товаров(<?=$count_filter_value?>)</a>
-					<a class="change_filter_value" href="" filter_value_id="<?=$filter_value['id']?>">Изменить</a>
+					<?if ($filter[0]['title'] != 'Производитель'){?>
+						<a class="change_filter_value" href="" filter_value_id="<?=$filter_value['id']?>">Изменить</a>
+					<?}?>
 					<a class="delete_filter_value" href="" filter_value_id="<?=$filter_value['id']?>">Удалить</a>
 				</td>
 			</tr>

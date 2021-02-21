@@ -625,18 +625,21 @@ function search_history(){
 	global $db, $status, $page_title;
 	$res_search = $db->query("
 		SELECT
-			CASE
-				WHEN s.type = 1 THEN \"article\"
-				WHEN s.type = 2 THEN \"barcode\"
-				WHEN s.type = 3 THEN \"VIN\"
-			END as type,
-			s.text,
-			s.title,
-			DATE_FORMAT(`date`, '%d.%m.%Y %H:%i:%s') as date
+			i.id,
+			b.title AS brend,
+			i.article,
+			i.title_full,
+			DATE_FORMAT(s.date, '%d.%m.%Y %H:%i:%s') as date
 		FROM
 			#search s
+		LEFT JOIN
+			#items i ON i.id = s.item_id
+		LEFT JOIN
+			#brends b ON b.id = i.brend_id
 		WHERE
 			user_id = {$_GET['id']}
+		ORDER BY
+			s.date DESC
 	", '');
 	$res_user = core\User::get(['user_id' => $_GET['id']]);
 	if (is_object($res_user)) $user = $res_user->fetch_assoc();
@@ -647,17 +650,17 @@ function search_history(){
 	?>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
-			<td>Тип</td>
-			<td>Текст</td>
-			<td>Название</td>
+			<td>Бренд</td>
+			<td>Артикул</td>
+			<td>Наименование</td>
 			<td>Дата</td>
 		</tr>
 		<?if ($res_search->num_rows){
 			foreach($res_search as $value){?>
 				<tr>
-					<td><?=$value['type']?></td>
-					<td><?=$value['text']?></td>
-					<td><?=$value['title']?></td>
+					<td><?=$value['brend']?></td>
+					<td><?=$value['article']?></td>
+					<td><?=$value['title_full']?></td>
 					<td><?=$value['date']?></td>
 				</tr>
 			<?}

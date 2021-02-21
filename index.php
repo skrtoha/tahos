@@ -65,6 +65,5 @@ if (file_exists($path)){
 	$content = ob_get_contents();
 	ob_clean();
 }
-// debug($user);
 require_once('templates/main.php');
 ?>

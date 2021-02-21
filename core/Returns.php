@@ -99,4 +99,43 @@ class Returns{
 	{
 		return $GLOBALS['db']->select('return_statuses', '*'); 
 	}
+	public static function createReturnRequest($items){
+		$emailPrices = Provider::getEmailPrices();
+		foreach($items as $value){
+			if (in_array($value['store_id'], $emailPrices)) $status_id = 2;
+			else $status_id = 1;
+			$GLOBALS['db']->query("
+				INSERT INTO #returns (`order_id`,`store_id`,`item_id`,`reason_id`,`quan`,`status_id`) 
+				VALUES ({$value['order_id']}, {$value['store_id']}, {$value['item_id']}, {$value['reason_id']}, {$value['quan']}, $status_id) 
+				ON DUPLICATE KEY UPDATE `status_id` = $status_id,`created` = CURRENT_TIMESTAMP, `updated` = NULL
+			", '');
+		}
+	}
+
+	public static function processReturn($params, $return){
+		$GLOBALS['db']->update(
+			'returns',
+			[
+				'return_price' => $params['return_price'],
+				'quan' => $params['quan'],
+				'status_id' => $params['status_id'],
+				'comment' => $params['comment']
+			],
+			Provider::getWhere([
+				'order_id' => $return['order_id'],
+				'store_id' => $return['store_id'],
+				'item_id' => $return['item_id']
+			])
+		);
+		if ($params['status_id'] == 3){
+			OrderValue::changeStatus(2, [
+				'order_id' => $return['order_id'],
+				'store_id' => $return['store_id'],
+				'item_id' => $return['item_id'],
+				'price' => $params['return_price'],
+				'quan' => $params['quan'],
+				'user_id' => $return['user_id'],
+			]);
+		}
+	}
 }

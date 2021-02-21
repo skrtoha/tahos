@@ -1,4 +1,8 @@
 <?php 
+ini_set('error_reporting', E_PARSE);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 use core\Log;
 use core\Managers;
 
@@ -9,9 +13,6 @@ use core\Managers;
 // }
 
 
-ini_set('error_reporting', E_PARSE | E_ERROR);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 
 
 require_once('../core/DataBase.php');

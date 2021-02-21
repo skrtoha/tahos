@@ -381,6 +381,7 @@ class Rossko extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$result = $this->getResult($search);
+		debug($result);
 		if (!$result) return false;
 		if (!$result->SearchResult->success) return false;
 		$coincidences = array();

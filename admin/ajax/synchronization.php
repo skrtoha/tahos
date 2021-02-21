@@ -1,5 +1,5 @@
 <?php
-ini_set('error_reporting', E_ERROR);
+ini_set('error_reporting', E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -31,7 +31,7 @@ switch($request['act']){
 		foreach($osiArray as $osiString){
 			$osi = Synchronization::getArrayOSIFromString($osiString);
 			$ov_result = core\OrderValue::get($osi);
-			core\OrderValue::changeStatus(11, $ov_result->fetch_assoc());
+			core\OrderValue::setStatusInWork($ov_result->fetch_assoc());
 		}
 		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
 		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
@@ -65,11 +65,33 @@ switch($request['act']){
 		break;
 	case 'returnOrderValues':
 		for ($i = 0; $i < count($request['osi']); $i++) { 
+			$items = [];
 			$osi = Synchronization::getArrayOSIFromString($request['osi'][$i]);
 			$ov_result = core\OrderValue::get($osi);
 			$ov = $ov_result->fetch_assoc();
-			$ov['quan'] = $request['quan'][$i];
-			core\OrderValue::changeStatus(2, $ov);
+			$items[] = [
+				'order_id' => $ov['order_id'],
+				'store_id' => $ov['store_id'],
+				'item_id' => $ov['item_id'],
+				'title' => "<b class=\"brend_info\" brend_id=\"{$ov['brend_id']}\">{$ov['brend']}</b> 
+					<a href=\"/search/article/{$ov['article']}\" class=\"articul\">{$ov['article']}</a> 
+					{$ov['title_full']}",									
+				'summ' => $ov['quan'] * $ov['price'],
+				'return_price' => $request['return_price'][$i],
+				'days_from_purchase' => 14,
+				'packaging' => $ov['packaging'],
+				'reason_id' => 1,
+				'quan' => $request['quan'][$i]
+			];
+			core\Returns::createReturnRequest($items);
+			$paramsReturn = [
+				'return_price' => $request['return_price'][$i],
+				'quan' => $request['quan'][$i],
+				'status_id' => 3
+			];
+			$res_return = core\Returns::get($osi);
+			$return = $res_return->fetch_assoc();
+			core\Returns::processReturn($paramsReturn, $return);
 		}
 		break;
 }

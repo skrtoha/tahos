@@ -34,6 +34,7 @@ class ForumAuto extends Provider{
 		return $output;
 	}
 	public static function getCoincidences($search){
+		debug(self::getParams()->provider_id);
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$output = [];

@@ -258,6 +258,7 @@ class OrderValue{
 				ov.comment,
 				ov.store_id,
 				o.id AS order_id,
+				si.packaging,
 				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') AS created,
 				os.title AS status,
 				os.class AS class
@@ -266,6 +267,7 @@ class OrderValue{
 			LEFT JOIN #orders o ON o.id=ov.order_id
 			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
 			LEFT JOIN #items i ON i.id=ov.item_id
+			LEFT JOIN #store_items si ON si.item_id = ov.item_id AND si.store_id = ov.store_id
 			LEFT JOIN #brends b ON i.brend_id=b.id
 			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
 			$where
@@ -276,5 +278,65 @@ class OrderValue{
 	public static function getStatuses(): \mysqli_result
 	{
 		return $GLOBALS['db']->query("SELECT * FROM #orders_statuses ORDER BY title");
+	}
+
+	public static function setStatusInWork($ov, $automaticOrder){
+		if (!in_array($ov['status_id'], [5])) return;
+		if (!Provider::getIsEnabledApiOrder($ov['provider_id']) && $ov['api_title']){
+			try{
+				throw new Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");
+			} catch(Exception $e){
+				Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
+				return;
+			}
+		} 
+		
+		switch($ov['provider_id']){
+			case 8: //Микадо
+				$mikado = new Provider\Mikado($db);
+				$mikado->Basket_Add($ov);
+				break;
+			case 2: //Армтек
+				Provider::addToProviderBasket($ov);
+				if ($automaticOrder) Provider\Armtek::sendOrder();
+				break;
+			case 6: //Восход
+				Provider::addToProviderBasket($ov);
+				if ($automaticOrder) Provider\Abcp::sendOrder(6);
+				break;
+			case 13: //МПартс
+				Provider::addToProviderBasket($ov);
+				if ($automaticOrder) Provider\Abcp::sendOrder(13);
+				break;
+			case 15: //Росско
+				Provider::addToProviderBasket($ov);
+				if ($ov['store_id'] == 24 || $automaticOrder) Provider\Rossko::sendOrder($ov['store_id']);
+				break;
+			case 17://ForumAuto
+				Provider::addToProviderBasket($ov);
+				Provider\ForumAuto::sendOrder();
+				break;
+			case 18: //Autoeuro
+				Provider\Autoeuro::putBusket($ov);
+				if ($automaticOrder) Provider\Autoeuro::sendOrder();
+				break;
+			case 19://Favorit
+				Provider\FavoriteParts::addToBasket($ov);
+				if ($automaticOrder) Provider\FavoriteParts::toOrder();
+				break;
+			case 20://Autokontinent
+				Provider\Autokontinent::addToBasket($ov);
+				if ($automaticOrder) Provider\Autokontinent::sendOrder();
+				break;
+			case Provider\Autopiter::getParams()->provider_id:
+				Provider\Autopiter::addToBasket($ov); 
+				if ($automaticOrder) Provider\Autopiter::sendOrder();
+				break;
+		case Provider\Tahos::$provider_id:
+				OrderValue::changeStatus(11, $ov);
+				break;
+			default:
+				OrderValue::changeStatus(7, $ov);
+		}
 	}
 }

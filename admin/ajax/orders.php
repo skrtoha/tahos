@@ -192,7 +192,7 @@ switch($_POST['status_id']){
 		core\OrderValue::changeStatus($_POST['status_id'], $_POST);
 }
 
-switch($_POST['status_id']){
+/*switch($_POST['status_id']){
 	case 2://возврат
 	case 3://пришло
 	case 6://нет в наличии
@@ -201,6 +201,6 @@ switch($_POST['status_id']){
 		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
 		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);	
 		break;
-}
+}*/
 
 ?>

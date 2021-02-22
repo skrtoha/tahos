@@ -48,11 +48,8 @@ class Armtek extends Provider{
 		if ($isReturnObject) return $config;
 		else return (array) $config;
 	}
-	public function __construct($db = NULL){
-		if ($db){
-			$this->db = $db;
-			$this->armtek_client = self::getClientArmtek();
-		} 
+	public function __construct(){
+		$this->armtek_client = self::getClientArmtek();
 	}
 	public static function getPrice(array $fields){
 		$params = self::$params;
@@ -102,7 +99,7 @@ class Armtek extends Provider{
 	private function getStoreId($object){
 		if (!$object->KEYZAK) return false;
 		if (array_key_exists($object->KEYZAK, $this->keyzak)) return $this->keyzak[$object->KEYZAK];
-		$array = $this->db->select_one('provider_stores', 'id,delivery', "`provider_id`= " . self::$provider_id . " AND `title`='{$object->KEYZAK}'");
+		$array = $GLOBALS['db']->select_one('provider_stores', 'id,delivery', "`provider_id`= " . self::$provider_id . " AND `title`='{$object->KEYZAK}'");
 		if (!empty($array)){
 			$this->keyzak[$object->KEYZAK] = $array['id'];
 			if ($array['delivery'] == 1){
@@ -110,13 +107,13 @@ class Armtek extends Provider{
 				$days = self::getDaysDelivery($delivery);
 				//добавлено условие из-за того, что для ARMC количество дней доставки было равно нулю
 				if ($days){
-					$this->db->update('provider_stores', ['delivery' => $days], "`id`={$array['id']}");
+					$GLOBALS['db']->update('provider_stores', ['delivery' => $days], "`id`={$array['id']}");
 				}
 			} 
 			return $array['id'];
 		} 
 		else{
-			$res = $this->db->insert('provider_stores',[
+			$res = $GLOBALS['db']->insert('provider_stores',[
 				'provider_id' => self::$provider_id,
 				'title' => $object->KEYZAK,
 				'cipher' => strtoupper(self::getRandomString(4)),
@@ -129,13 +126,13 @@ class Armtek extends Provider{
 			], 
 			['print_query' => false]);
 			if ($res === true){
-				$this->keyzak[$object->KEYZAK] = $this->db->last_id();
-				return $this->db->last_id();
+				$this->keyzak[$object->KEYZAK] = $GLOBALS['db']->last_id();
+				return $GLOBALS['db']->last_id();
 			} 
 			else{
 				Log::insert([
 					'text' => "Ошибка Армтек: $res",
-					'query' => $this->db->last_query
+					'query' => $GLOBALS['db']->last_query
 				]);
 				return false;
 			}
@@ -172,9 +169,9 @@ class Armtek extends Provider{
 		else $brend_id = $this->getBrendId($object->BRAND, $from);
 		if (!$brend_id) return false;
 		$article = preg_replace('/[\W_]+/', '', $object->PIN);
-		$item = $this->db->select('items', 'id', "`article`='{$article}' AND `brend_id`= $brend_id");
+		$item = $GLOBALS['db']->select('items', 'id', "`article`='{$article}' AND `brend_id`= $brend_id");
 		if (empty($item)){
-			$res = $this->db->insert('items', [
+			$res = $GLOBALS['db']->insert('items', [
 				'brend_id' => $brend_id,
 				'article' => $article,
 				'article_cat' => $object->PIN,
@@ -183,15 +180,15 @@ class Armtek extends Provider{
 				'source' => 'Армтек'
 			], ['print_query' => false]);
 			if ($res === true){
-				$item_id = $this->db->last_id();
-				$this->db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
-				if ($from == 'mikado') $this->db->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $object->ZakazCode]);
+				$item_id = $GLOBALS['db']->last_id();
+				$GLOBALS['db']->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+				if ($from == 'mikado') $GLOBALS['db']->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $object->ZakazCode]);
 				return $item_id;
 			} 
 			else return false;
 		}
 		else{
-			if ($from == 'mikado') $this->db->insert('mikado_zakazcode', ['item_id' => $item[0]['id'], 'ZakazCode' => $object->ZakazCode]);
+			if ($from == 'mikado') $GLOBALS['db']->insert('mikado_zakazcode', ['item_id' => $item[0]['id'], 'ZakazCode' => $object->ZakazCode]);
 			return $item[0]['id'];
 		} 
 	}
@@ -202,10 +199,10 @@ class Armtek extends Provider{
 			$item_id = $this->getItemId($value);
 			if (!$value->ANALOG) $this->mainItemId = $item_id;
 			else{
-				$this->db->insert('analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
-				$this->db->insert('analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
+				$GLOBALS['db']->insert('analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
+				$GLOBALS['db']->insert('analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
 			}
-			$this->db->insert('store_items', [
+			$GLOBALS['db']->insert('store_items', [
 				'store_id' => $store_id,
 				'item_id' => $item_id,
 				'price' => $value->PRICE,
@@ -293,7 +290,7 @@ class Armtek extends Provider{
 		if (empty($keyzak)) return false;
 		foreach($keyzak as $key => $value){
 			if (empty($value['KEYZAK'])) continue;
-			$res_brend_insert = $this->db->insert(
+			$res_brend_insert = $GLOBALS['db']->insert(
 				'brends', 
 				[
 					'title' => $key,
@@ -301,12 +298,12 @@ class Armtek extends Provider{
 				], 
 				['print_query' => false]
 			);
-			if ($res_brend_insert === true) $brend_id = $this->db->last_id();
+			if ($res_brend_insert === true) $brend_id = $GLOBALS['db']->last_id();
 			else{
-				$array = $this->db->select_one('brends', 'id,parent_id', "`title`='$key'");
+				$array = $GLOBALS['db']->select_one('brends', 'id,parent_id', "`title`='$key'");
 				$brend_id = $array['parent_id'] ? $array['parent_id'] : $array['id'];
 			} 
-			$res_items_insert = $this->db->insert(
+			$res_items_insert = $GLOBALS['db']->insert(
 				'items',
 				[
 					'title_full' => $value['NAME'],
@@ -318,19 +315,19 @@ class Armtek extends Provider{
 				['print_query' => false]
 			);
 			if ($res_items_insert === true){
-				$item_id = $this->db->last_id();
-				$this->db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+				$item_id = $GLOBALS['db']->last_id();
+				$GLOBALS['db']->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			} 
 			else {
-				$array = $this->db->select_one('items', 'id', "`brend_id`=$brend_id AND `article`='".Item::articleClear($value['PIN'])."'");
+				$array = $GLOBALS['db']->select_one('items', 'id', "`brend_id`=$brend_id AND `article`='".Item::articleClear($value['PIN'])."'");
 				$item_id = $array['id'];
 			}
 			if ($value['ANALOG']){
-				$this->db->insert('analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id]);
-				$this->db->insert('analogies', ['item_diff' => $_GET['item_id'], 'item_id' => $item_id]);
+				$GLOBALS['db']->insert('analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id]);
+				$GLOBALS['db']->insert('analogies', ['item_diff' => $_GET['item_id'], 'item_id' => $item_id]);
 			}
 			foreach($value['KEYZAK'] as $k => $v){
-				$res_store_items_insert = $this->db->insert(
+				$res_store_items_insert = $GLOBALS['db']->insert(
 					'store_items',
 					[
 						'store_id' => $this->getStoreIdByKeyzak($k),
@@ -341,7 +338,7 @@ class Armtek extends Provider{
 					]
 					// ,['print_query' => true]
 				);
-				if ($res_store_items_insert !== true) $this->db->update(
+				if ($res_store_items_insert !== true) $GLOBALS['db']->update(
 					'store_items',
 					[
 						'price' => $v['PRICE'],
@@ -354,14 +351,14 @@ class Armtek extends Provider{
 	}
 	private function getStoreIdByKeyzak($keyzak){
 		if (array_key_exists($keyzak, self::$keyzak)) return self::$keyzak[$keyzak];
-		$array = $this->db->select_one('provider_stores', 'id', "`title`='$keyzak` AND `provider_id`= " . self::$provider_id);
+		$array = $GLOBALS['db']->select_one('provider_stores', 'id', "`title`='$keyzak` AND `provider_id`= " . self::$provider_id);
 		if (empty($array)) return false;
 		self::$keyzak[$keyzak] = $array['id'];
 		return $array['id'];
 	}
 	public function isKeyzak($store_id){
 		if ($temp = array_search($store_id, $this->keyzak)) return $temp;
-		$array = $this->db->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
+		$array = $GLOBALS['db']->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
 		if (empty($array)) return false;
 		if ($array['provider_id'] == self::$provider_id){
 			$this->keyzak[$array['title']] = $array['id'];
@@ -379,13 +376,13 @@ class Armtek extends Provider{
 	public function isOrdered($value, $type = 'armtek'){
 		$where = self::getWhere($value);
 		$where .= " AND `type`='$type'";
-		$ov = $this->db->select_one('other_orders', '*', $where);
+		$ov = $GLOBALS['db']->select_one('other_orders', '*', $where);
 		if (!empty($ov)) return $ov;
 		else return false;
 	}
 	public function deleteFromOrder($value, $type = 'armtek'){
 		$where = self::getWhere($value);
-		$this->db->delete('other_orders', "$where AND `type`='$type'");
+		$GLOBALS['db']->delete('other_orders', "$where AND `type`='$type'");
 		OrderValue::changeStatus(5, $value);
 	}
 	public static function clearString($str){

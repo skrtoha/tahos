@@ -154,9 +154,8 @@ class Mikado extends Provider{
 		$array = explode('-', $str);
 		return Provider::getInstanceDataBase()->getField('provider_stores', 'cipher', 'id', $array[1]);
 	}
-	public function __construct($db = NULL){
-		if ($db) $this->db = $db;	
-		$this->armtek = new Armtek($this->db);
+	public function __construct(){
+		$this->armtek = new Armtek($GLOBALS['db']);
 	}
 	public function getCoincidences($text){
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
@@ -193,7 +192,7 @@ class Mikado extends Provider{
 			$brend_id = $this->armtek->getBrendId($key, 'mikado');
 			if (!$brend_id) continue;
 			$article = preg_replace('/[\W_]+/', '', $text);
-			$res = $this->db->insert(
+			$res = $GLOBALS['db']->insert(
 				'items',
 				[
 					'brend_id' => $brend_id,
@@ -205,8 +204,8 @@ class Mikado extends Provider{
 				['print_query' => true]
 			);
 			if ($res === true){
-				$item_id = $this->db->last_id();
-				$this->db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+				$item_id = $GLOBALS['db']->last_id();
+				$GLOBALS['db']->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			}
 		}
 	}
@@ -255,7 +254,7 @@ class Mikado extends Provider{
 		if (!isset($this->brends[$b2])) $in .= "'$b2',";
 		if ($in){
 			$in = substr($in, 0, -1);
-			$res = $this->db->query("
+			$res = $GLOBALS['db']->query("
 				SELECT
 					id, title, parent_id
 				FROM
@@ -284,10 +283,10 @@ class Mikado extends Provider{
 		$object->ZakazCode = $row->ZakazCode;
 		$item_id = $this->armtek->getItemId($object, 'mikado');
 		if (!$item_id) return false;
-		$this->db->query(Abcp::getQueryDeleteByProviderId($item_id, 8), ''); 
+		$GLOBALS['db']->query(Abcp::getQueryDeleteByProviderId($item_id, 8), ''); 
 		if ($row->CodeType == 'Analog' || $row->CodeType == 'AnalogOEM'){
-			$this->db->insert('analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id], ['print_query' => false]);
-			$this->db->insert('analogies', ['item_id' => $item_id, 'item_diff' => $_GET['item_id']], ['print_query' => false]);
+			$GLOBALS['db']->insert('analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id], ['print_query' => false]);
+			$GLOBALS['db']->insert('analogies', ['item_id' => $item_id, 'item_diff' => $_GET['item_id']], ['print_query' => false]);
 		}
 		if (!empty($row->OnStocks)){
 			if (is_array($row->OnStocks->StockLine)){
@@ -315,7 +314,7 @@ class Mikado extends Provider{
 		$store_id = self::getStoreID($stock->StokID);
 		// debug($stock, "store_id = $store_id"); return;
 		if (!$store_id) return false;
-		$this->db->insert(
+		$GLOBALS['db']->insert(
 			'store_items',
 			[
 				'store_id' => $store_id,
@@ -390,15 +389,14 @@ class Mikado extends Provider{
 		return $array;
 	}
 	public function Basket_Add($ov){
-		// debug($ov); exit();
 		/**
 		 * Можно обойтись и без записи в базу данных ZakazCode, но это крайне необходимо, когда нужно
 		 * получить по ZakazCode item_id и brend_id
 		 */
-		$ZakazCode = $this->db->getField('mikado_zakazcode', 'ZakazCode', 'item_id', $ov['item_id']);
+		$ZakazCode = $GLOBALS['db']->getField('mikado_zakazcode', 'ZakazCode', 'item_id', $ov['item_id']);
 		if (!$ZakazCode){
 			$ZakazCode = $this->setArticle($ov['brend'], $ov['article'], true);
-			$this->db->insert('mikado_zakazcode', ['item_id' => $ov['item_id'], 'ZakazCode' => $ZakazCode], ['print_query' => false]); 
+			$GLOBALS['db']->insert('mikado_zakazcode', ['item_id' => $ov['item_id'], 'ZakazCode' => $ZakazCode], ['print_query' => false]); 
 			// exit();
 		} 
 		if (preg_match('/^g/', $ZakazCode)){

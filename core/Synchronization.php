@@ -1,6 +1,5 @@
 <?php
 namespace core;
-require_once($_SERVER['DOCUMENT_ROOT'] . '/admin/functions/orders.function.php');
 
 class Synchronization{
 	private static $url = 'http://134.249.158.237/trade/hs';
@@ -9,7 +8,7 @@ class Synchronization{
 	}
 	public static function getOrders($params, $flag = ''){
 		$output = [];
-		$res_order_values = get_order_values($params, $flag);
+		$res_order_values = OrderValue::get($params, $flag);
 		foreach($res_order_values as $ov){
 			$o = & $output[$ov['order_id']];
 			$o['user_id'] = $ov['user_id'];
@@ -37,6 +36,7 @@ class Synchronization{
 				'issued' => $ov['issued'],
 				'returned' => $ov['returned'],
 				'updated' => $ov['updated'] ? $ov['updated'] : $ov['created'],
+				'typeOrganization' => $ov['typeOrganization'],
 				'withoutMarkup' => $ov['withoutMarkup'],
 			];
 		}

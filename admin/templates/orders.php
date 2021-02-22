@@ -15,7 +15,7 @@ switch ($act) {
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	case 'allInWork':
-		$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
+		$res_order_values = OrderValue::get(['order_id' => $_GET['id']], '');
 		while($ov = $res_order_values->fetch_assoc()){
 			$automaticOrder = isset($_GET['automaticOrder']) ? true : false;
 			OrderValue::setStatusInWork($ov, $automaticOrder);
@@ -28,7 +28,7 @@ switch ($act) {
 		break;
 	case 'print':
 		$order = get_order('');
-		$res_order_values = get_order_values(['order_id' => $_GET['id']]);
+		$res_order_values = OrderValue::get(['order_id' => $_GET['id']]);
 		order_print($order, $res_order_values);
 		break;
 	case 'items_status':
@@ -43,7 +43,7 @@ switch ($act) {
 		$page = $_GET['page'] ? $_GET['page'] : 1;
 		$chank = getChank($all, $perPage, $linkLimit, $page);
 		$start = $chank[$page] ? $chank[$page] : 0;
-		$res_order_values = get_order_values([
+		$res_order_values = OrderValue::get([
 			'status_id' => $_GET['status_id'],
 			'limit' => "$start, $perPage"
 		], '');
@@ -195,7 +195,7 @@ function show_form($act){
 	switch($act){
 		case 's_change':
 			$order = get_order('');
-			$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
+			$res_order_values = core\OrderValue::get(['order_id' => $_GET['id']], '');
 			$page_title = "Просмотр заказа";
 			break;
 		case 's_add':

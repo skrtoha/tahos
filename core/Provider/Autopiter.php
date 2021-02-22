@@ -326,8 +326,13 @@ class Autopiter extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$client = self::getClient();
-		$result = $client->FindCatalog(["Number" => $search]);
-		$items = $result->FindCatalogResult->SearchCatalogModel;
+		try{
+			$result = $client->FindCatalog(["Number" => $search]);
+			$items = $result->FindCatalogResult->SearchCatalogModel;
+		}
+		catch(\SoapFault $e){
+			return false;
+		}
 		if (!$items) return false;
 		if (is_array($items)){
 			foreach($items as $item){

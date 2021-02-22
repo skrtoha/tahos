@@ -6,6 +6,7 @@ use core\Log;
 use core\Item;
 class Rossko extends Provider{
 	public static $fieldsForSettings = [
+		'isActive',
 		'KEY1',
 		'KEY2',
 		'provider_id'
@@ -19,6 +20,14 @@ class Rossko extends Provider{
 			'trace' => true
 		)
 	);
+
+
+	private static function isActivatedPrivate(){
+		$params = json_decode(\core\Setting::get('api_settings', self::getParams()->provider_id));
+		if ($params->private->isActive) return true;
+		else return false;
+	}
+
 	public static function getParams($typeOrganization = 'entity'){
 		return Provider::getApiParams([
 			'api_title' => 'Rossko',
@@ -244,6 +253,7 @@ class Rossko extends Provider{
 		}
 		return $items;
 	}
+
 	public static function sendOrder($store_id = NULL){
 		if ($store_id) $stock = parent::getInstanceDataBase()->getFieldOnID('provider_stores', $store_id, 'title');
 		$partsList = self::getPartsForSending();
@@ -257,11 +267,32 @@ class Rossko extends Provider{
 			]);
 			return false;
 		}
-		$privateParts = [];
-		$entityParts = [];
-		foreach($partsList as $part){
-			if (isset($stock) && $part['stock'] != $stock) continue;
 
+		if(self::isActivatedPrivate()){
+			$privateParts = [];
+			$entityParts = [];
+			foreach($partsList as $part){
+				if (isset($stock) && $part['stock'] != $stock) continue;
+				if ($part['user_type'] == 'entity') $entityParts[] = $part;
+				if ($part['user_type'] == 'private') $privateParts[] = $part;
+			}
+			$resultPrivate = self::executeSendOrder($privateParts, 'private');
+			self::parseSendOrderResponse($resultPrivate, $privateParts);
+			$resultEntity = self::executeSendOrder($entityParts, 'entity');
+			self::parseSendOrderResponse($resultEntity, $entityParts);
+		}
+		else{
+			$parts = [];
+			foreach($partsList as $part){
+				if (isset($stock) && $part['stock'] != $stock) continue;
+				$parts[] = $part;
+			}
+			$result = self::executeSendOrder($parts, 'entity');
+			self::parseSendOrderResponse($result, $parts);
+		}
+
+	}
+	private static function executeSendOrder(array $parts, $typeOrganization){
 		static $checkoutDetails;
 		if (empty($parts)) return false;
 		if (!$checkoutDetails){

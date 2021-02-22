@@ -35,7 +35,6 @@ class ForumAuto extends Provider{
 		return $output;
 	}
 	public static function getCoincidences($search){
-		debug(self::getParams()->provider_id);
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$output = [];
@@ -226,7 +225,7 @@ class ForumAuto extends Provider{
 				'tid' => $requiredItem->gid,
 				'num' => $pb['quan'],
 				'eoid' => "{$pb['order_id']}{$pb['store_id']}{$pb['item_id']}"
-			], 'private');
+			], $pb['typeOrganization']);
 			try{
 				$json = Provider::getUrlData($queryString);
 				$response = json_decode($json);

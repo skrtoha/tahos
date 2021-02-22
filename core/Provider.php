@@ -202,7 +202,7 @@ abstract class Provider{
 		if ($counter > 7) $counter = 1;
 		return $output;
 	}
-	public function addToProviderBasket($ov){
+	public static function addToProviderBasket($ov){
 		self::getInstanceDataBase()->insert('provider_basket', [
 			'order_id' => $ov['order_id'],
 			'store_id' => $ov['store_id'],

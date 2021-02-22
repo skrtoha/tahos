@@ -1,5 +1,5 @@
 <?php
-ini_set('error_reporting', E_PARSE);
+ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -31,10 +31,10 @@ switch($request['act']){
 		foreach($osiArray as $osiString){
 			$osi = Synchronization::getArrayOSIFromString($osiString);
 			$ov_result = core\OrderValue::get($osi);
-			core\OrderValue::setStatusInWork($ov_result->fetch_assoc());
+			core\OrderValue::setStatusInWork($ov_result->fetch_assoc(), true);
 		}
 		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
-		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
+		debug(core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders));
 		break;
 	case 'setStatusArrived':
 		$orders = Synchronization::getOrders(Synchronization::getArrayOSIFromString($request['osi']));

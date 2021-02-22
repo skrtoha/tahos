@@ -379,10 +379,15 @@ class Mikado extends Provider{
 	}
 	private static function getClientData($typeOrganization = 'entity'): array
 	{
-		return [
-			'ClientID' => self::getParams($typeOrganization)->ClientID,
-			'Password' => self::getParams($typeOrganization)->Password
+		$params = Provider::getApiParams([
+			'api_title' => 'Mikado', 
+			'typeOrganization' => $typeOrganization
+		]);
+		$array = [
+			'ClientID' => $params->ClientID,
+			'Password' => $params->Password
 		];
+		return $array;
 	}
 	public function Basket_Add($ov){
 		// debug($ov); exit();

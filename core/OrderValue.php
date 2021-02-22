@@ -246,6 +246,7 @@ class OrderValue{
 				i.article,
 				i.id AS item_id,
 				IF (i.title_full<>'', i.title_full, i.title) AS title_full,
+				ov.status_id,
 				ov.user_id,
 				ov.issued,
 				ov.price,
@@ -282,6 +283,7 @@ class OrderValue{
 
 	public static function setStatusInWork($ov, $automaticOrder){
 		if (!in_array($ov['status_id'], [5])) return;
+		debug($ov);
 		if (!Provider::getIsEnabledApiOrder($ov['provider_id']) && $ov['api_title']){
 			try{
 				throw new Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");

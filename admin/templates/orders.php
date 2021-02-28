@@ -15,7 +15,7 @@ switch ($act) {
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	case 'allInWork':
-		$res_order_values = OrderValue::get(['order_id' => $_GET['id']], '');
+		$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
 		while($ov = $res_order_values->fetch_assoc()){
 			$automaticOrder = isset($_GET['automaticOrder']) ? true : false;
 			OrderValue::setStatusInWork($ov, $automaticOrder);

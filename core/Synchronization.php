@@ -50,7 +50,7 @@ class Synchronization{
 	}
 	public static function setOrdersSynchronized($orders){
 		return $GLOBALS['db']->query("
-			UPDATE #orders_values SET is_synchronized = 1 WHERE order_id IN ($orders)
+			UPDATE #orders_values SET is_synchronized = 1 WHERE order_id IN ($orders) AND is_synchronized = 0
 		", '');
 	}
 	public static function getArrayOSIFromString($osi){

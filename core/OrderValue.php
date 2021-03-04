@@ -278,7 +278,7 @@ class OrderValue{
 				ov.issued,
 				ov.declined,
 				ov.returned,
-				ov.withoutMarkup,
+				IF(ov.withoutMarkup > 0, ov.withoutMarkup, ov.price * 0.1 + ov.price) as withoutMarkup,
 				(ov.price * ov.quan) AS sum,
 				ov.comment,
 				DATE_FORMAT(ov.updated, '%d.%m.%Y %H:%i:%s') AS updated, 

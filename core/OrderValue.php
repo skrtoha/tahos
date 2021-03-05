@@ -242,6 +242,9 @@ class OrderValue{
 					case 'is_synchronized':
 						$where .= "ov.$key = '$value' AND ";
 						break;
+					case 'user_id':
+						$where .= "o.user_id = $value AND ";
+						break;
 					case 'limit':
 						$limit = "LIMIT $value";
 						break;

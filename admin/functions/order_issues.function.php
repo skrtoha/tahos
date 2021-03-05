@@ -80,11 +80,11 @@ class Issues{
 			exit();
 		}
 
-		//если запрос пришел с 1С тогда проводить товар там не нужно
+	/*	//если запрос пришел с 1С тогда проводить товар там не нужно
 		if (!$isRequestFrom1C){
 			$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
 			core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);	
-		}
+		}*/
 
 		return $issue_id;
 	}

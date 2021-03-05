@@ -21,7 +21,7 @@ class Autoeuro extends Provider{
 	];
 	
 	public static function getUrlString($action, $typeOrganization = 'entity'){
-		return self::getParams()->url . "$action/json/" . self::getParams($typeOrganization)->apiKey;
+		return self::getParams($typeOrganization)->url . "$action/json/" . self::getParams($typeOrganization)->apiKey;
 	}
 
 
@@ -335,7 +335,7 @@ class Autoeuro extends Provider{
 	 * @return [type]         [description]
 	 */
 	public static function putBusket($params){
-		$order_key = self::getOrderKey($params, 'private');
+		$order_key = self::getOrderKey($params, $params['typeOrganization']);
 		if (!$order_key){
 			Log::insert([
 				'text' => 'АвтоЕвро ошибка получения order_key',

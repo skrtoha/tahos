@@ -17,7 +17,7 @@ if ($_GET['user_id'] && !$_GET['issued']){
 	if (is_object($res_user)) $user = $res_user->fetch_assoc();
 	else $user = $res_user;
 	$page_title = "Выдача товара";
-	$res_orders_values = core\OrderValue::get(['user_id' => $issues->user_id, 'status_id' => 3]);
+	$res_orders_values = core\OrderValue::get(['user_id' => $issues->user_id, 'status_id' => 3], '');
 	$status .= "
 		<a href='?view=users'>Пользователи</a> >
 		<a href='?view=users&act=change&id={$_GET['user_id']}'>

@@ -225,7 +225,7 @@ class Autokontinent extends Provider{
 		$items = self::getItemsByArticle($article);
 		if (!$items) return false;
 
-		$providerBrend = Provider::getProviderBrend(self::getParams()->provider_id, $brand);
+		$providerBrend = Provider::getProviderBrend(self::getParams($params['type'])->provider_id, $brand);
 		$brand =  $providerBrend ? $providerBrend : $brand;
 
 		try{
@@ -310,7 +310,6 @@ class Autokontinent extends Provider{
 				self::getAuthData($ov['typeOrganization'])
 			);
 			$response = json_decode($json);
-			// debug($response); exit();
 			if ($response->status != 'OK') throw new EAuto\ErrorAddingToBasket("Ответ Автоевро: $response->error_message");
 		}
 		catch(EAuto\ErrorAddingToBasket $e){
@@ -321,7 +320,7 @@ class Autokontinent extends Provider{
 		return true;
 	}
 	public static function sendOrder(){
-		$basket = self::getBasket('private');
+		$basket = self::getBasket();
 		self::executeSendOrder('private', $basket);
 
 		$basket = self::getBasket('entity');

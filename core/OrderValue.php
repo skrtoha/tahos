@@ -229,11 +229,26 @@ class OrderValue{
 	 */
 	public static function get($fields = array()){
 		$where = '';
-		if (isset($fields['user_id'])) $where .= "o.user_id = {$fields['user_id']} AND ";
-		if (isset($fields['status_id'])) $where .= "ov.status_id = {$fields['status_id']} AND ";
-		if (isset($fields['order_id'])) $where .= "ov.order_id = {$fields['order_id']} AND ";
-		if (isset($fields['store_id'])) $where .= "ov.store_id = {$fields['store_id']} AND ";
-		if (isset($fields['item_id'])) $where .= "ov.item_id = {$fields['item_id']} AND ";
+		$limit = '';
+		if (!empty($params)){
+			foreach($params as $key => $value){
+				switch($key){
+					case 'order_id':
+					case 'item_id':
+					case 'store_id':
+					case 'status_id':
+					case 'is_synchronized':
+						$where .= "ov.$key = '$value' AND ";
+						break;
+					case 'user_id':
+						$where .= "o.user_id = $value AND ";
+						break;
+					case 'limit':
+						$limit = "LIMIT $value";
+						break;
+				}
+			}
+		}
 		if ($where){
 			$where = substr($where, 0, -4);
 			$where = "WHERE $where";

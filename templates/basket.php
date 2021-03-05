@@ -89,6 +89,9 @@ if ($_GET['act'] == 'to_offer'){
 		exit();
 	}
 
+	/*$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
+	var_dump(core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders));*/
+
 	message('Успешно отправлено в заказы!');
 	header('Location: /orders');
 }

@@ -15,7 +15,7 @@ switch ($act) {
 		header("Location: ?view=orders&id={$_GET['order_id']}&act=change");
 		break;
 	case 'allInWork':
-		$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
+		$res_order_values = OrderValue::get(['order_id' => $_GET['id']], '');
 		while($ov = $res_order_values->fetch_assoc()){
 			if (!in_array($ov['status_id'], [5])) continue;
 			if (!Provider::getIsEnabledApiOrder($ov['provider_id']) && $ov['api_title']){

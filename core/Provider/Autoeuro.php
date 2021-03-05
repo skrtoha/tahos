@@ -21,7 +21,7 @@ class Autoeuro extends Provider{
 	];
 	
 	public static function getUrlString($action, $typeOrganization = 'entity'){
-		return self::getParams()->url . "$action/json/" . self::getParams($typeOrganization)->apiKey;
+		return self::getParams($typeOrganization)->url . "$action/json/" . self::getParams($typeOrganization)->apiKey;
 	}
 
 
@@ -36,6 +36,11 @@ class Autoeuro extends Provider{
 		return json_decode($response);
 	}
 	private static function getStockItems($brend, $article, $with_crosses = 0, $typeOrganization = 'entity'){
+		debug(parent::getCurlUrlData(self::getUrlString('stock_items'), [
+			'brand' => $brend, 
+			'code' => $article, 
+			'with_crosses' => $with_crosses
+		]));
 		return parent::getUrlData(self::getUrlString('stock_items'), [
 			'brand' => $brend, 
 			'code' => $article, 
@@ -49,6 +54,7 @@ class Autoeuro extends Provider{
 	 */
 	public static function getOrderKey($params, $typeOrganization = 'entity'){
 		if ($params['store_id'] == self::getParams($typeOrganization)->mainStoreID){
+			debug(self::getParams($typeOrganization));
 			$response = self::getStockItems(strtoupper($params['brend']), $params['article'], 0, $typeOrganization);
 			if (!$response || $response == 'Пустой ключ покупателя'){
 				$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $params['brend']);
@@ -335,7 +341,8 @@ class Autoeuro extends Provider{
 	 * @return [type]         [description]
 	 */
 	public static function putBusket($params){
-		$order_key = self::getOrderKey($params, 'private');
+		$order_key = self::getOrderKey($params, $params['typeOrganization']);
+		debug($order_key); exit();
 		if (!$order_key){
 			Log::insert([
 				'text' => 'АвтоЕвро ошибка получения order_key',

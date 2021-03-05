@@ -225,7 +225,7 @@ class Autokontinent extends Provider{
 		$items = self::getItemsByArticle($article);
 		if (!$items) return false;
 
-		$providerBrend = Provider::getProviderBrend(self::getParams($params['type'])->provider_id, $brand);
+		$providerBrend = Provider::getProviderBrend(self::getParams($params['typeOrganization'])->provider_id, $brand);
 		$brand =  $providerBrend ? $providerBrend : $brand;
 
 		try{

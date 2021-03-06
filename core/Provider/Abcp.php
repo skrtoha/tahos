@@ -139,8 +139,8 @@ class Abcp extends Provider{
 				'delivery_max' => ceil($item['deliveryPeriod'] / 24),
 				'under_order' => ceil ($item['deliveryPeriod'] / 24),
 				'noReturn' => $item['noReturn']
-			],
-			['print' => false, 'deincrement_duplicate' => 1]
+			]/*,
+			['print' => false, 'deincrement_duplicate' => 1]*/
 		);
 		if ($res === true){
 			$store_id = $this->db->last_id();

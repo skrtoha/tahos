@@ -370,12 +370,13 @@ class Autoeuro extends Provider{
 		return json_decode($response);
 	}
 	public static function sendOrder(){
-		// self::sendOrderOrganization('entity');
+		self::sendOrderOrganization('entity');
 		self::sendOrderOrganization('private');
 	}
 
 	private static function sendOrderOrganization($typeOrganization){
 		$basket_items = self::getBasket($typeOrganization);
+		// debug($basket_items, $typeOrganization); exit();
 		if (!isset($basket_items->DATA)) return false;
 		$basket_item_keys = [];
 		$comments = [];
@@ -394,8 +395,14 @@ class Autoeuro extends Provider{
 				'basket_item_keys' => json_encode($basket_item_keys)
 			]
 		);
+		debug([
+				'delivery_key' => self::getParams($typeOrganization)->delivery_key,
+				'subdivision_key' => self::getParams($typeOrganization)->subdivision_key,
+				'wait_all_goods' => 1,
+				'comment' => implode(',', $comments),
+				'basket_item_keys' => json_encode($basket_item_keys)
+			]);
 		$json = json_decode($response);
-		debug($json);
 		
 		//закоментировано потому, что ответ был тупо пустой, хотя заказ отправляется
 		/*if (!$response){

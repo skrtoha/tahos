@@ -32,7 +32,7 @@ abstract class Provider{
 	public static function getApiParams($inputData, $debugMode = false){
 		static $params;
 
-		if ($debugMode) debug($inputData);
+		if ($debugMode) debug($inputData, 'inputData');
 
 		if (!$inputData['api_title']) $api_title = self::getProviderAPITitle($inputData['provider_id']);
 		else $api_title = $inputData['api_title'];
@@ -52,9 +52,6 @@ abstract class Provider{
 			debug($params, 'params');
 		}
 
-		if (isset($params[$provider_id]->$typeOrganization) && $params[$provider_id]->$typeOrganization){
-			return $params[$provider_id]->$typeOrganization;
-		} 
 		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
 		
 		//если private отключен то ставим в него entity

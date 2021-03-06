@@ -202,7 +202,7 @@ class ForumAuto extends Provider{
 		if (!$providerBasket->num_rows) return false;
 		foreach($providerBasket as $pb){
 			$itemsList = self::getItemsByBrendAndArticle($pb['brend'], $pb['article']);
-			$delivery = str_replace(self::getParams('private')->storePrefix, '', $pb['cipher']);
+			$delivery = str_replace(self::getParams($pb['typeOrganization'])->storePrefix, '', $pb['cipher']);
 			$requiredItem = NULL;
 			try{
 				debug($pb, 'pb');

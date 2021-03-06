@@ -92,7 +92,7 @@ class Autoeuro extends Provider{
 				'order_id' => $osi[0],
 				'store_id' => $osi[1],
 				'item_id' => $osi[2]
-			]);
+			], '');
 			if (!$storeItem->num_rows) return [];
 			foreach($storeItem as $si){
 				$output[] = [
@@ -380,29 +380,34 @@ class Autoeuro extends Provider{
 		if (!isset($basket_items->DATA)) return false;
 		$basket_item_keys = [];
 		$comments = [];
+		debug($basket_items, 'basket_items');
 		foreach($basket_items->DATA as $b){
 			if (!$b->comment) continue;
 			$basket_item_keys[] = $b->basket_item_key;
 			$comments[] = $b->comment;
 		}
-		$response = parent::getCurlUrlData(
-			self::getUrlString('order_basket', $typeOrganization),
-			[
-				'delivery_key' => self::getParams($typeOrganization)->delivery_key,
-				'subdivision_key' => self::getParams($typeOrganization)->subdivision_key,
-				'wait_all_goods' => 1,
-				'comment' => implode($comments),
-				'basket_item_keys' => json_encode($basket_item_keys)
-			]
-		);
 		debug([
 				'delivery_key' => self::getParams($typeOrganization)->delivery_key,
 				'subdivision_key' => self::getParams($typeOrganization)->subdivision_key,
 				'wait_all_goods' => 1,
 				'comment' => implode(',', $comments),
 				'basket_item_keys' => json_encode($basket_item_keys)
-			]);
+			], self::getUrlString('order_basket', $typeOrganization));
+		$response = parent::getCurlUrlData(
+			self::getUrlString('order_basket', $typeOrganization),
+			[
+				'delivery_key' => self::getParams($typeOrganization)->delivery_key,
+				'subdivision_key' => self::getParams($typeOrganization)->subdivision_key,
+				'wait_all_goods' => 1,
+				'comment' => implode(',', $comments),
+				'basket_item_keys' => json_encode($basket_item_keys)
+			],
+			['Content-Type' => 'application/x-www-form-urlencoded']
+		);
+		debug($http_response_header);
+		debug($response, 'response');
 		$json = json_decode($response);
+		debug($json, 'json'); exit();
 		
 		//закоментировано потому, что ответ был тупо пустой, хотя заказ отправляется
 		/*if (!$response){

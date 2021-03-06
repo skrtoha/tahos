@@ -227,9 +227,7 @@ class OrderValue{
 	 * @param  array  $fields user_id|status_id|order_id|store_id|item_id
 	 * @return object mysqli object
 	 */
-	public static function get(array $params = [], string $flag = ''): \mysqli_result
-	{
-		global $db;
+	public static function get($params = array(), $flag = ''){
 		$where = '';
 		$limit = '';
 		if (!empty($params)){

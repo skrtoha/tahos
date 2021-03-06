@@ -402,15 +402,12 @@ class Autoeuro extends Provider{
 				'comment' => implode(',', $comments),
 				'basket_item_keys' => json_encode($basket_item_keys)
 			],
-			['Content-Type' => 'application/x-www-form-urlencoded']
+			['Content-Type' => 'application/json']
 		);
-		debug($http_response_header);
-		debug($response, 'response');
-		$json = json_decode($response);
-		debug($json, 'json'); exit();
+		var_dump($response);
 		
 		//закоментировано потому, что ответ был тупо пустой, хотя заказ отправляется
-		/*if (!$response){
+		if (!$response){
 			foreach($basket_items->DATA as $b){
 				if (!$b->comment) continue;
 				Log::insert([
@@ -419,7 +416,7 @@ class Autoeuro extends Provider{
 				]);
 			}
 			return false;
-		}*/
+		}
 
 		foreach($basket_items->DATA as $b){
 			if (!$b->comment) continue;

@@ -25,30 +25,11 @@ switch ($_GET['act']){
 				message('Количество указано неккоректно!', false);
 			}
 			if ($is_validated){
-				$db->update(
-					'returns',
-					[
-						'return_price' => $_POST['return_price'],
-						'quan' => $_POST['quan'],
-						'status_id' => $_POST['status_id'],
-						'comment' => $_POST['comment']
-					],
-					core\Provider::getWhere($osi)
-				);
-				if ($_POST['status_id'] == 3){
-					core\OrderValue::changeStatus(2, [
-						'order_id' => $return['order_id'],
-						'store_id' => $return['store_id'],
-						'item_id' => $return['item_id'],
-						'price' => $_POST['return_price'],
-						'quan' => $_POST['quan'],
-						'user_id' => $return['user_id'],
-					]);
-				}
-				message('Успешно сохранено!');
-				if (isset($_GET['is_stay'])) header("Location: ?view=returns&act=form&osi={$_GET['osi']}");
-				else header("Location: ?view=returns");
-			} 
+				Returns::processReturn($_POST, $return);
+			}
+			message('Успешно сохранено!');
+			if (isset($_GET['is_stay'])) header("Location: ?view=returns&act=form&osi={$_GET['osi']}");
+			else header("Location: ?view=returns");
 		}
 		$return = array_merge($return, $_POST);
 		form($return, Returns::getStatuses()); 

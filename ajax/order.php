@@ -1,6 +1,11 @@
 <?php  
+ini_set('error_reporting', E_ERROR | E_PARSE);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 require_once ("../core/DataBase.php");
 session_start();
+
 
 $db = new core\DataBase();
 $connection = new core\Connection($db);
@@ -43,16 +48,7 @@ switch ($_POST['act']){
 		// print_r($_POST);
 		break;
 	case 'to_return':
-		$emailPrices = core\Provider::getEmailPrices();
-		foreach($_POST['items'] as $value){
-			if (in_array($value['store_id'], $emailPrices)) $status_id = 2;
-			else $status_id = 1;
-			$db->query("
-				INSERT INTO #returns (`order_id`,`store_id`,`item_id`,`reason_id`,`quan`,`status_id`) 
-				VALUES ({$value['order_id']}, {$value['store_id']}, {$value['item_id']}, {$value['reason_id']}, {$value['quan']}, $status_id) 
-				ON DUPLICATE KEY UPDATE `status_id` = $status_id,`created` = CURRENT_TIMESTAMP, `updated` = NULL
-			", '');
-		}
+		core\OrderValue::createReturnRequest($_POST['items']);
 		break;
 	case 'get_returns':
 		$res_returns = core\Returns::get(['user_id' => $_SESSION['user']]);

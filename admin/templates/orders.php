@@ -17,75 +17,18 @@ switch ($act) {
 	case 'allInWork':
 		$res_order_values = OrderValue::get(['order_id' => $_GET['id']], '');
 		while($ov = $res_order_values->fetch_assoc()){
-			if (!in_array($ov['status_id'], [5])) continue;
-			if (!Provider::getIsEnabledApiOrder($ov['provider_id']) && $ov['api_title']){
-				try{
-					throw new Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");
-				} catch(Exception $e){
-					core\Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
-					continue;
-				}
-			} 
-			
-			switch($ov['provider_id']){
-				case 8: //Микадо
-					$mikado = new core\Provider\Mikado($db);
-					$mikado->Basket_Add($ov);
-					break;
-				case 2: //Армтек
-					Provider::addToProviderBasket($ov);
-					if (isset($_GET['automaticOrder'])) core\Provider\Armtek::sendOrder();
-					break;
-				case 6: //Восход
-					Provider::addToProviderBasket($ov);
-					if (isset($_GET['automaticOrder'])) core\Provider\Abcp::sendOrder(6);
-					break;
-				case 13: //МПартс
-					Provider::addToProviderBasket($ov);
-					if (isset($_GET['automaticOrder'])) core\Provider\Abcp::sendOrder(13);
-					break;
-				case 15: //Росско
-					Provider::addToProviderBasket($ov);
-					if ($ov['store_id'] == 24 || isset($_GET['automaticOrder'])) Provider\Rossko::sendOrder($ov['store_id']);
-					break;
-				case 17://ForumAuto
-					Provider::addToProviderBasket($ov);
-					core\Provider\ForumAuto::sendOrder();
-					break;
-				case 18: //Autoeuro
-					core\Provider\Autoeuro::putBusket($ov);
-					if (isset($_GET['automaticOrder'])) core\Provider\Autoeuro::sendOrder();
-					break;
-				case 19://Favorit
-					core\Provider\FavoriteParts::addToBasket($ov);
-					if (isset($_GET['automaticOrder'])) core\Provider\FavoriteParts::toOrder();
-					break;
-				case 20://Autokontinent
-					core\Provider\Autokontinent::addToBasket($ov);
-					if (isset($_GET['automaticOrder'])) core\Provider\Autokontinent::sendOrder();
-					break;
-				case core\Provider\Autopiter::getParams()->provider_id:
-					core\Provider\Autopiter::addToBasket($ov); 
-					if (isset($_GET['automaticOrder'])) core\Provider\Autopiter::sendOrder();
-					break;
-			case core\Provider\Tahos::$provider_id:
-					core\OrderValue::changeStatus(11, $ov);
-					break;
-				default:
-					core\OrderValue::changeStatus(7, $ov);
-			}
+			$automaticOrder = isset($_GET['automaticOrder']) ? true : false;
+			OrderValue::setStatusInWork($ov, $automaticOrder);
 		}
-
 		if (isset($_GET['automaticOrder'])){
 			header("Location: /orders");
 			exit();
 		} 
-
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
 		$order = get_order('');
-		$res_order_values = get_order_values(['order_id' => $_GET['id']]);
+		$res_order_values = OrderValue::get(['order_id' => $_GET['id']]);
 		order_print($order, $res_order_values);
 		break;
 	case 'items_status':
@@ -100,7 +43,7 @@ switch ($act) {
 		$page = $_GET['page'] ? $_GET['page'] : 1;
 		$chank = getChank($all, $perPage, $linkLimit, $page);
 		$start = $chank[$page] ? $chank[$page] : 0;
-		$res_order_values = get_order_values([
+		$res_order_values = OrderValue::get([
 			'status_id' => $_GET['status_id'],
 			'limit' => "$start, $perPage"
 		], '');
@@ -252,7 +195,7 @@ function show_form($act){
 	switch($act){
 		case 's_change':
 			$order = get_order('');
-			$res_order_values = get_order_values(['order_id' => $_GET['id']], '');
+			$res_order_values = core\OrderValue::get(['order_id' => $_GET['id']], '');
 			$page_title = "Просмотр заказа";
 			break;
 		case 's_add':
@@ -557,7 +500,7 @@ function show_form($act){
 <?}
 function user_orders(){
 	global $status, $db, $page_title;
-	if (!empty($_POST['income'])) setIncome();
+	if (!empty($_POST['income'])) setIncome($_POST['income']);
 	$id = $_GET['id'];
 	$user = $db->select_one('users', ['name_1', 'name_2', 'name_3'], "`id`=$id");
 	$status = "

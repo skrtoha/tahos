@@ -1,4 +1,8 @@
 <?
+ini_set('error_reporting', E_PARSE);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 session_start();
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");

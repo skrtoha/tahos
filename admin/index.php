@@ -1,4 +1,8 @@
 <?php 
+ini_set('error_reporting', E_PARSE);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 use core\Log;
 use core\Managers;
 
@@ -8,9 +12,7 @@ use core\Managers;
 // 	Log::insertThroughException($e);
 // }
 
-ini_set('error_reporting', E_PARSE | E_ERROR);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+
 
 
 require_once('../core/DataBase.php');
@@ -20,6 +22,7 @@ $view = $_GET['view'];
 if (!$view) header("Location: /admin/?view=index");
 
 $db = new core\DataBase();
+
 $connection = new core\Connection($db);
 $db->setProfiling($connection->connection_id);
 // $settings = $db->select('settings', '*'); $settings = $settings[0];

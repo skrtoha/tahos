@@ -222,7 +222,7 @@ $noReturnIsExists = false;
 						<?}?>
 					</td>
 					<td class="price-col">
-						<?if ($val['pp']['price'] > 0 && $val['pp']['price'] > $val['price']){?>
+						<?if ($val['pp']['price'] > 0 && $val['pp']['price'] > $val['price'] && core\Config::$isUseApiProviders){?>
 							<span class="important" style="margin-bottom: 5px; display: block">Цена изменилась</span>
 							<span class="price_format"><?=$val['price']?></span>
 							<i class="fa fa-rub" aria-hidden="true"></i>

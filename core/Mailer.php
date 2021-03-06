@@ -20,6 +20,7 @@ class Mailer{
 	 * @return [mixed] true в случае удачной отправки либо сообщение об ошибке  
 	 */
 	public static function send($params, $attachments = []){
+		if (!Config::$isSendEmails) return true;
 		$mail = new PHPMailer();
 		$mail->isSMTP();
 		$mail->isHTML(true);  

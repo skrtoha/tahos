@@ -158,6 +158,10 @@ class User{
 		", '');
 	}
 
+	/**
+	 * необходимо добавить 
+	 * LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
+	 */
 	public static function getUserFullNameForQuery(){
 		return "
 			IF(

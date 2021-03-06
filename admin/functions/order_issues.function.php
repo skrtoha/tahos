@@ -24,15 +24,14 @@ class Issues{
 	protected function getOrderValue($order_id, $item_id){
 		return $this->db->select_one('orders_values', '*', "`order_id`={$order_id} AND `item_id`={$item_id}");
 	}
-	function setIncome(){
-		// debug($_POST); exit();
+	function setIncome($income, $isRequestFrom1C = false){
 		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id]);
 		if ($insert_order_issue !== true) die("Ошибка: $this->last_query | $insert_order_issue");
 		$issue_id = $this->db->last_id();
 
 		$titles = [];
 		$totalSumm = 0;
-		foreach($_POST['income'] as $key => $issued){
+		foreach($income as $key => $issued){
 			$a = explode(':', $key);
 			$insert_order_issue_values = $this->db->insert(
 				'order_issue_values',
@@ -41,8 +40,7 @@ class Issues{
 					'order_id' => $a[0],
 					'store_id' => $a[2],
 					'item_id' => $a[1],
-					'issued' => $issued,
-					'comment' => $_POST['comment'][$key]
+					'issued' => $issued
 				]/*,
 				['print' => true]*/
 			);
@@ -68,10 +66,10 @@ class Issues{
 			]);
 		}
 		
-		core\User::setBonusProgram($_GET['user_id'], $titles, $totalSumm);
+		core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
 
 		core\OrderValue::setFunds([
-			'user_id' => $_GET['user_id'],
+			'user_id' => $this->user_id,
 			'issue_id' => $issue_id,
 			'titles' => $titles,
 			'totalSumm' => $totalSumm

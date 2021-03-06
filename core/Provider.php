@@ -214,7 +214,7 @@ abstract class Provider{
 		if ($counter > 7) $counter = 1;
 		return $output;
 	}
-	public function addToProviderBasket($ov){
+	public static function addToProviderBasket($ov){
 		self::getInstanceDataBase()->insert('provider_basket', [
 			'order_id' => $ov['order_id'],
 			'store_id' => $ov['store_id'],
@@ -300,7 +300,8 @@ abstract class Provider{
 		} 
 		else{
 			$array['http']['method'] = 'POST';
-			$array['http']['content'] = http_build_query($data);
+			if (is_array($data)) $array['http']['content'] = http_build_query($data);
+			if (self::isJSON($data)) $array['http']['content'] = json_encode($data, JSON_UNESCAPED_UNICODE);
 		}
 		$context = stream_context_create($array);
 		try{
@@ -311,7 +312,7 @@ abstract class Provider{
 		return $res;
 	}
 	public static function getCurlUrlData($url, $data = [], $header = null){
-		$curl = curl_init($url);
+		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, empty($data) ? 'GET' : 'POST');
 		if (isset($data['username']) && isset($data['password'])){
@@ -320,12 +321,19 @@ abstract class Provider{
 		}
 		if (!empty($data)){
 			curl_setopt($curl, CURLOPT_POST, true);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+			if (is_array($data)) curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+			else curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 		} 
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		if ($header){
 			curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 		}
+
+		$fileOut = fopen(Config::$tmpFolderPath . '/curl_out.txt', "w");
+		curl_setopt ($curl, CURLOPT_VERBOSE, 1);
+		curl_setopt ($curl, CURLOPT_STDERR, $fileOut);
+		
 		$result = curl_exec($curl);
 		curl_close($curl);
 		return $result;
@@ -553,7 +561,7 @@ abstract class Provider{
 		return $output;
 	}
 
-	function isJSON($string){
+	public static function isJSON($string){
 		return is_string($string) && is_array(json_decode($string, true)) ? true : false;
 	}
 }

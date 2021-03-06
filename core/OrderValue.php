@@ -227,7 +227,7 @@ class OrderValue{
 	 * @param  array  $fields user_id|status_id|order_id|store_id|item_id
 	 * @return object mysqli object
 	 */
-	public static function get($fields = array()){
+	public static function get($params = array(), $flag = ''){
 		$where = '';
 		$limit = '';
 		if (!empty($params)){
@@ -250,46 +250,153 @@ class OrderValue{
 			}
 		}
 		if ($where){
-			$where = substr($where, 0, -4);
+			$where = substr($where, 0, -5);
 			$where = "WHERE $where";
 		}
-		$query = "
+		return $GLOBALS['db']->query("
 			SELECT
 				ps.cipher,
-				ps.provider_id,
+				i.brend_id,
 				b.title AS brend,
-				i.article,
-				i.id AS item_id,
-				IF (i.title_full<>'', i.title_full, i.title) AS title_full,
-				ov.user_id,
-				ov.issued,
+				IF (i.title_full != '', i.title_full, i.title) AS title_full,
+				IF (
+					i.article_cat != '', 
+					i.article_cat, 
+					IF (
+						i.article !='',
+						i.article,
+						ib.barcode
+					)
+				) AS article,
+				IF (si.packaging IS NOT NULL, si.packaging, 1) AS packaging,
+				ov.order_id,
+				ov.store_id,
+				ov.item_id,
 				ov.price,
+				ov.quan,
 				ov.ordered,
 				ov.arrived,
 				ov.issued,
 				ov.declined,
 				ov.returned,
-				ov.quan,
+				IF(ov.withoutMarkup > 0, ov.withoutMarkup, ov.price + ov.price * 0.1) AS withoutMarkup,
+				(ov.price * ov.quan) AS sum,
 				ov.comment,
-				ov.store_id,
-				o.id AS order_id,
-				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') AS created,
+				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS updated, 
+				os.id AS status_id,
 				os.title AS status,
-				os.class AS class
+				os.class AS status_class,
+				o.user_id,
+				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS created,
+				" . User::getUserFullNameForQuery() . " AS userName,
+				u.bill,
+				u.reserved_funds,
+				u.user_type AS typeOrganization,
+				ps.delivery,
+				p.api_title,
+				p.title AS provider,
+				ps.title AS providerStore,
+				ps.provider_id,
+				mzc.ZakazCode,
+				IF(r.item_id IS NOT NULL, 1, 0) return_ordered,
+				IF (ps.noReturn, 'class=\"noReturn\" title=\"Возврат поставщику невозможен!\"', '') AS noReturn,
+				c.id AS correspond_id,
+				IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
+				IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
+				(
+					SELECT 
+						COUNT(id)
+					FROM 
+						#messages
+					WHERE correspond_id=c.id
+				) as count
 			FROM
 				#orders_values ov
-			LEFT JOIN #orders o ON o.id=ov.order_id
 			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
+			LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
+			LEFT JOIN #returns r ON r.order_id = ov.order_id AND r.store_id=ov.store_id AND r.item_id=ov.item_id
+			LEFT JOIN #providers p ON p.id=ps.provider_id
 			LEFT JOIN #items i ON i.id=ov.item_id
-			LEFT JOIN #brends b ON i.brend_id=b.id
+			LEFT JOIN #brends b ON b.id=i.brend_id
+			LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
+			LEFT JOIN #orders o ON ov.order_id=o.id
+			LEFT JOIN #users u ON u.id=o.user_id
+			LEFT JOIN #corresponds c 
+			ON
+				c.order_id=ov.order_id AND
+				c.store_id=ov.store_id AND
+				c.item_id=ov.item_id
+			LEFT JOIN
+				#mikado_zakazcode mzc ON mzc.item_id = ov.item_id 
+			LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
 			$where
 			ORDER BY o.created DESC
-		";
-		return $GLOBALS['db']->query($query, '');
+			$limit
+		", $flag);
 	}
 	public static function getStatuses(): \mysqli_result
 	{
 		return $GLOBALS['db']->query("SELECT * FROM #orders_statuses ORDER BY title");
+	}
+
+	public static function setStatusInWork($ov, $automaticOrder){
+		if (!in_array($ov['status_id'], [5])) return;
+		if (!Provider::getIsEnabledApiOrder($ov['provider_id']) && $ov['api_title']){
+			try{
+				throw new Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");
+			} catch(Exception $e){
+				Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
+				return;
+			}
+		} 
+		
+		switch($ov['provider_id']){
+			case 8: //Микадо
+				$mikado = new Provider\Mikado();
+				$mikado->Basket_Add($ov);
+				break;
+			case 2: //Армтек
+				Provider::addToProviderBasket($ov);
+				if ($automaticOrder) Provider\Armtek::sendOrder();
+				break;
+			case 6: //Восход
+				Provider::addToProviderBasket($ov);
+				if ($automaticOrder) Provider\Abcp::sendOrder(6);
+				break;
+			case 13: //МПартс
+				Provider::addToProviderBasket($ov);
+				if ($automaticOrder) Provider\Abcp::sendOrder(13);
+				break;
+			case 15: //Росско
+				Provider::addToProviderBasket($ov);
+				if ($ov['store_id'] == 24 || $automaticOrder) Provider\Rossko::sendOrder($ov['store_id']);
+				break;
+			case 17://ForumAuto
+				Provider::addToProviderBasket($ov);
+				Provider\ForumAuto::sendOrder();
+				break;
+			case 18: //Autoeuro
+				Provider\Autoeuro::putBusket($ov);
+				if ($automaticOrder) Provider\Autoeuro::sendOrder();
+				break;
+			case 19://Favorit
+				Provider\FavoriteParts::addToBasket($ov);
+				if ($automaticOrder) Provider\FavoriteParts::toOrder();
+				break;
+			case 20://Autokontinent
+				Provider\Autokontinent::addToBasket($ov);
+				if ($automaticOrder) Provider\Autokontinent::sendOrder();
+				break;
+			case Provider\Autopiter::getParams()->provider_id:
+				Provider\Autopiter::addToBasket($ov); 
+				if ($automaticOrder) Provider\Autopiter::sendOrder();
+				break;
+		case Provider\Tahos::$provider_id:
+				OrderValue::changeStatus(11, $ov);
+				break;
+			default:
+				OrderValue::changeStatus(7, $ov);
+		}
 	}
 }

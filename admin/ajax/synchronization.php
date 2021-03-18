@@ -27,14 +27,17 @@ switch($request['act']){
 		break;
 	//в 1С создает заказ поставщику и отправляет в "Заказано"
 	case 'createOrderAndSendOrdered':
+		$countOrdered = 0;
 		$osiArray = explode(',', $request['osi']);
 		foreach($osiArray as $osiString){
 			$osi = Synchronization::getArrayOSIFromString($osiString);
 			$ov_result = core\OrderValue::get($osi, '');
 			core\OrderValue::setStatusInWork($ov_result->fetch_assoc(), true);
+			$countOrdered = core\OrderValue::$countOrdered;
 		}
 		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
-		debug(core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders));
+		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
+		echo $countOrdered;
 		break;
 	case 'setStatusArrived':
 		$orders = Synchronization::getOrders(Synchronization::getArrayOSIFromString($request['osi']));

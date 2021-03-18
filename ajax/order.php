@@ -48,7 +48,7 @@ switch ($_POST['act']){
 		// print_r($_POST);
 		break;
 	case 'to_return':
-		core\OrderValue::createReturnRequest($_POST['items']);
+		core\Returns::createReturnRequest($_POST['items']);
 		break;
 	case 'get_returns':
 		$res_returns = core\Returns::get(['user_id' => $_SESSION['user']]);

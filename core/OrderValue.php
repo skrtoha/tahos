@@ -1,7 +1,7 @@
 <?php
 namespace core;
 class OrderValue{
-
+	public static $countOrdered = 0;
 	public static function setFunds($params){
 		$res_user = User::get(['user_id' => $params['user_id']]);
 		$user = $res_user->fetch_assoc();
@@ -358,42 +358,45 @@ class OrderValue{
 				break;
 			case 2: //Армтек
 				Provider::addToProviderBasket($ov);
-				if ($automaticOrder) Provider\Armtek::sendOrder();
+				if ($automaticOrder) self::$countOrdered = Provider\Armtek::sendOrder();
 				break;
 			case 6: //Восход
 				Provider::addToProviderBasket($ov);
-				if ($automaticOrder) Provider\Abcp::sendOrder(6);
+				if ($automaticOrder) self::$countOrdered = Provider\Abcp::sendOrder(6);
 				break;
 			case 13: //МПартс
 				Provider::addToProviderBasket($ov);
-				if ($automaticOrder) Provider\Abcp::sendOrder(13);
+				if ($automaticOrder) self::$countOrdered = Provider\Abcp::sendOrder(13);
 				break;
 			case 15: //Росско
 				Provider::addToProviderBasket($ov);
-				if ($ov['store_id'] == 24 || $automaticOrder) Provider\Rossko::sendOrder($ov['store_id']);
+				if ($ov['store_id'] == 24 || $automaticOrder){
+					self::$countOrdered = Provider\Rossko::sendOrder($ov['store_id']);
+				} 
 				break;
 			case 17://ForumAuto
 				Provider::addToProviderBasket($ov);
-				Provider\ForumAuto::sendOrder();
+				self::$countOrdered = Provider\ForumAuto::sendOrder();
 				break;
 			case 18: //Autoeuro
 				Provider\Autoeuro::putBusket($ov);
-				if ($automaticOrder) Provider\Autoeuro::sendOrder();
+				if ($automaticOrder) self::$countOrdered = Provider\Autoeuro::sendOrder();
 				break;
 			case 19://Favorit
 				Provider\FavoriteParts::addToBasket($ov);
-				if ($automaticOrder) Provider\FavoriteParts::toOrder();
+				if ($automaticOrder) self::$countOrdered = Provider\FavoriteParts::toOrder();
 				break;
 			case 20://Autokontinent
 				Provider\Autokontinent::addToBasket($ov);
-				if ($automaticOrder) Provider\Autokontinent::sendOrder();
+				if ($automaticOrder) self::$countOrdered = Provider\Autokontinent::sendOrder();
 				break;
 			case Provider\Autopiter::getParams()->provider_id:
 				Provider\Autopiter::addToBasket($ov); 
-				if ($automaticOrder) Provider\Autopiter::sendOrder();
+				if ($automaticOrder) self::$countOrdered = Provider\Autopiter::sendOrder();
 				break;
 		case Provider\Tahos::$provider_id:
 				OrderValue::changeStatus(11, $ov);
+				self::$countOrdered += 1; 
 				break;
 			default:
 				OrderValue::changeStatus(7, $ov);

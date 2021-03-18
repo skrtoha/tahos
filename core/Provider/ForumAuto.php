@@ -205,9 +205,7 @@ class ForumAuto extends Provider{
 			$delivery = str_replace(self::getParams($pb['typeOrganization'])->storePrefix, '', $pb['cipher']);
 			$requiredItem = NULL;
 			try{
-				debug($pb, 'pb');
 				foreach($itemsList as $item){
-					debug($item, 'item');
 					if ($item->d_deliv != $delivery) continue;
 					if (Provider::getComparableString($item->brand) != Provider::getComparableString($pb['brend'])) continue;
 					if (Provider::getComparableString($item->art) != Provider::getComparableString($pb['article'])) continue;
@@ -229,7 +227,6 @@ class ForumAuto extends Provider{
 			try{
 				$json = Provider::getUrlData($queryString);
 				$response = json_decode($json);
-				debug($response);
 				if (isset($response->errors)) throw new EForumAuto\ErrorSendingOrder('Ошибка отправки заказа');
 			}
 			catch(EForumAuto\ErrorSendingOrder $e){

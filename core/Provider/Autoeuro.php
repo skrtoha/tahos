@@ -85,7 +85,7 @@ class Autoeuro extends Provider{
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$basket_items = self::getBasket();
 		$output = [];
-		foreach($basket_items->DATA as $bi){
+		foreach($basket_items as $bi){
 			if (!$bi->comment) continue;
 			$osi = explode('-', $bi->comment);
 			$storeItem = OrderValue::get([
@@ -307,9 +307,9 @@ class Autoeuro extends Provider{
 	 * @return mixed basket_item_key if is in basket,  false if not
 	 */
 	public static function isInBasket($params){
-		$basket_items = self::getBasket($params['typeOrganization']);
-		if (!isset($basket_items->DATA)) return false;
-		foreach($basket_items->DATA as $data){
+		$basket_items = self::getBasket();
+		if (empty($basket_items)) return false;
+		foreach($basket_items as $data){
 			if ($data->comment == self::getStringBasketComment($params)) return $data->basket_item_key;
 		}
 		return false;
@@ -354,9 +354,13 @@ class Autoeuro extends Provider{
 				'item_note' => self::getStringBasketComment($params)
 			]
 		);
-		if ($GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK'){
+		$response = json_decode($response);
+		if (
+			$GLOBALS['response_header'][0] != 'HTTP/1.1 200 OK' ||
+			isset($response->ERROR)
+		){
 			Log::insert([
-				'text' => 'Произошла ошибка добавления в корзину',
+				'text' => 'Произошла ошибка добавления в корзину. Текст ошибки: ' . $response->ERROR->description,
 				'additional' => "osi: ".self::getStringBasketComment($params)
 			]);
 			return;
@@ -365,9 +369,22 @@ class Autoeuro extends Provider{
 		if ($response) return true;
 		else return false;
 	}
-	public static function getBasket($typeOrganization = 'entity'){
+	public static function getBasket($typeOrganization = false): array
+	{
+		$output = [];
 		$response = parent::getUrlData(self::getUrlString('basket_items'), $typeOrganization);
-		return json_decode($response);
+		$response = json_decode($response);
+		if (!isset($response->DATA)) return [];
+		foreach($response->DATA as $basket_item){
+			if ($typeOrganization){
+				$osi = explode('-', $basket_item->comment);
+				$order_id = $osi[0];
+				$userTypeOrganization = parent::getUserTypeByOrderID($order_id);
+				if ($userTypeOrganization != $typeOrganization) continue;
+			} 
+			$output[] = $basket_item;
+		}
+		return $output;
 	}
 	public static function sendOrder(){
 		self::sendOrderOrganization('entity');
@@ -376,21 +393,14 @@ class Autoeuro extends Provider{
 
 	private static function sendOrderOrganization($typeOrganization){
 		$basket_items = self::getBasket($typeOrganization);
-		if (!isset($basket_items->DATA)) return false;
+		if (empty($basket_items)) return false;
 		$basket_item_keys = [];
 		$comments = [];
-		foreach($basket_items->DATA as $b){
+		foreach($basket_items as $b){
 			if (!$b->comment) continue;
 			$basket_item_keys[] = $b->basket_item_key;
 			$comments[] = $b->comment;
 		}
-		debug([
-				'delivery_key' => self::getParams($typeOrganization)->delivery_key,
-				'subdivision_key' => self::getParams($typeOrganization)->subdivision_key,
-				'wait_all_goods' => 1,
-				'comment' => implode(',', $comments),
-				'basket_item_keys' => json_encode($basket_item_keys)
-			], self::getUrlString('order_basket', $typeOrganization));
 		$response = parent::getCurlUrlData(
 			self::getUrlString('order_basket', $typeOrganization),
 			[
@@ -416,7 +426,7 @@ class Autoeuro extends Provider{
 			return false;
 		}
 
-		foreach($basket_items->DATA as $b){
+		foreach($basket_items as $b){
 			if (!$b->comment) continue;
 			$array = explode('-', $b->comment);
 			$resOrderValue = OrderValue::get([

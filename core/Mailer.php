@@ -1,16 +1,17 @@
 <?php
 namespace core;
-require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 /**
  * Класс реализует оповещение на сайте
  */
 class Mailer{
 	public static $config = [
-		'email' => 'sale@tahos.ru',
-		'username' => 'sale@tahos.ru',
+		'email' => 'mail@tahos.ru',
+		'username' => 'mail@tahos.ru',
 		'password' => 'Anton12345',
 		'host' => 'smtp.mail.ru',
 	];

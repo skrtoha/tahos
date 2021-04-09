@@ -2,7 +2,7 @@
 namespace core;
 
 class Synchronization{
-	private static $url = 'http://134.249.158.237/trade/hs';
+	private static $url = 'http://localhost/trade/hs';
 	public static function getNoneSynchronizedOrders(){
 		return self::getOrders(['is_synchronized' => 0], '');
 	}

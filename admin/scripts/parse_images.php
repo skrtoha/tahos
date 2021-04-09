@@ -10,10 +10,10 @@ $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
-$attempt = 2;
+$attempt = 3;
 
 $identifier = time();
-$basePath = $_SERVER['DOCUMENT_ROOT'] . '/Картинки';
+$basePath = 'E:/Пропущенные картинки 2';
 $insertedItems = 0;
 $missedItems = 0;
 $updatedTitles = 0;

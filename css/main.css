@@ -606,9 +606,11 @@ a.articul {
   text-align: left;
   border: 1px solid #0082BF;
   box-sizing: border-box;
-  -webkit-transition: all ease .5;
-  transition: all ease .5;
-  position: relative
+  -webkit-transition: all ease;
+  transition: all ease;
+  position: relative;
+    height: 18px;
+    width: 18px;
 }
 .jq-checkbox.checked:after {
   position: absolute;

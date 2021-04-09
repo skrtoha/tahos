@@ -1,11 +1,10 @@
 $(function(){
-	$("select").styler();
-	$('#insure, #save-template, input[type=checkbox].item').styler();
+	$('input[type=checkbox]').styler();
 	$("#phone").mask("+7 (999) 999-99-99");
 	$("#pasport").mask("9999 №999999");
 	$(document).on('change', "select[name='delivery_way']", function(){
 		var id = parseInt($(this).val());
-		var bl_pasport = (id == 2 || id == 9) ? true : false;
+		var bl_pasport = (id === 2 || id === 9);
 		$.ajax({
 			type: "POST",
 			url: "/ajax/delivery.php",
@@ -13,21 +12,20 @@ $(function(){
 			success: function(msg){
 				// console.log(msg);
 				if (msg){
-					$('#sub_delivery').empty();
 					$('#sub_delivery')
+                        .empty()
 						.html('<select name="sub_delivery" id=""></select>')
 						.removeClass('hidden');
 					$('[name=sub_delivery]').html(msg).styler();
 				} 
 				else{
-					$('[name=sub_delivery]').parent().parent().addClass('hidden');
-					$('[name=sub_delivery]').html('');
+					$('[name=sub_delivery]').parent().parent().addClass('hidden').html('');
 				}
 			} 
 		});
 		if (bl_pasport) $('#pasport').parent().removeClass('for-tk');
 		else $('#pasport').parent().addClass('for-tk');
-		if ($(this).val() == '1') $('select[name=speed]').parent().parent().removeClass('hidden');
+		if ($(this).val() === '1') $('select[name=speed]').parent().parent().removeClass('hidden');
 		else $('select[name=speed]').parent().parent().addClass('hidden');
 	});
 	$('[name=entity]').on('change keydown keyup', function(){
@@ -66,13 +64,14 @@ $(function(){
 		$('span.goods-count').text(quan);
 		$('span.amount-total span').text(price);
 	})
-	$('#delivery-form').on('submit', function(e){
+	$('#delivery-form button').on('click', function(e){
+	    let th = $(this).closest('form');
 		var name_1 = $('input[name=name_1]').val();
 		var name_2 = $('input[name=name_2]').val();
 		var name_3 = $('input[name=name_3]').val();
 		var entity = $('input[name=entity]').val();
 		var delivery_way = $('[name=delivery_way]').val();
-		var bl_pasport = (delivery_way == 2 || delivery_way == 9) ? true : false;
+		var bl_pasport = (delivery_way == 2 || delivery_way == 9);
 		var speed = $('input[name=speed]').val();
 		var index = $('input[name=index]').val();
 		var city = $('input[name=city]').val();
@@ -118,7 +117,7 @@ $(function(){
 			is_valid = false;
 			show_message('Укажите номер телефона!', 'error');
 		}
-		if (!$('[name=delivery_way]').val()){
+		if (!delivery_way){
 			is_valid = false;
 			show_message('Выберите способ доставки!', 'error');
 		}
@@ -142,13 +141,12 @@ $(function(){
 			type: 'post',
 			url: '/admin/index.php?view=order_issues&user_id=' + $('input[name=user_id]').val(),
 			data: {income: income},
-			async: false,
 			success: function(response){
-				// console.log(response); return false;
+				// console.log(response); //return false;
 				$('input[name=issue_id]').val(response);
+				th.submit();
 			}
 		})
-		// e.preventDefault();
 	})
 	$('.delete_template').on('click', function(){
 		if (!confirm('Вы действительно хотите удалить?')) return false;

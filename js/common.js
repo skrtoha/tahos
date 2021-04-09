@@ -6,7 +6,7 @@ function getParams(url = ''){
 	let str = url ? url : window.location.search;
 	if (!str) return false;
 	const urlParams = new URLSearchParams(str);
-	let output = new Object();
+	let output = {};
 	for(const[name, value] of urlParams){
 		output[name] = value;
 	}
@@ -15,7 +15,7 @@ function getParams(url = ''){
 function show_popup_basket(){
 	event.preventDefault();
 	var cart = $(".cart-popup");
-	var left = 0 +  ($('header').outerWidth(true) - $('.wrapper').outerWidth(true)) / 2 +
+	var left = ($('header').outerWidth(true) - $('.wrapper').outerWidth(true)) / 2 +
 						$('.logo').outerWidth(true) + 
 						$('.catalog_btn').outerWidth(true) + 
 						$('.search_btn_2').outerWidth(true) + 

@@ -26,7 +26,7 @@ class Issues{
 	}
 	function setIncome($income, $isRequestFrom1C = false){
 		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id]);
-		if ($insert_order_issue !== true) die("Ошибка: $this->last_query | $insert_order_issue");
+		if ($insert_order_issue !== true) die("Ошибка: {$this->db->last_query} | $insert_order_issue");
 		$issue_id = $this->db->last_id();
 
 		$titles = [];

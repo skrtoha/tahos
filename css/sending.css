@@ -16,6 +16,10 @@
   top: 9px;
   position: absolute;
 }
+div.jq-checkbox {
+    position: relative;
+    top: 4px;
+}
 .jspContainer {
   overflow: hidden;
   position: relative;
@@ -24,7 +28,11 @@
 .jspPane {
   position: absolute;
   width: 100%; }
-
+label.switch {
+    /* margin-top: 5px; */
+    position: relative;
+    top: 5px;
+}
 .jspVerticalBar {
   position: absolute;
   top: 0;

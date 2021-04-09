@@ -23,7 +23,7 @@ if (!$_GET['id']){
 			else $db->update('templates', $templates_insert, "`id`={$templates[0]['id']}");
 			// exit();
 		}
-		$res = $db->insert('sendings', $array, ['print_query' => false]); 
+		$res = $db->insert('sendings', $array/*, ['print' => true]*/);
 		if ($res !== true) die("$res | $db->last_query");
 		message('Доставка успешно сформирована!');
 		header('Location: /orders#tabs|orders:sendings');
@@ -52,7 +52,6 @@ if (!$_GET['id']){
 	$weight = 0;
 	$sum = 0;
 	$quan = 0;
-	echo "$device";
 	?>
 	<div class="sending-page">
 		<h1>Формирование отправки</h1>
@@ -91,7 +90,7 @@ if (!$_GET['id']){
 								<input 
 									type="checkbox"
 									checked
-									name="<?=$item['order_id']?>:<?=$item['item_id']?>"
+									name="<?=$item['order_id']?>:<?=$item['item_id']?>:<?=$item['store_id']?>"
 									value="<?=$item['quan']?>"
 									class="item" 
 								>
@@ -126,7 +125,7 @@ if (!$_GET['id']){
 								<input 
 									type="checkbox"
 									checked 
-									name="<?=$item['order_id']?>:<?=$item['item_id']?>"
+									name="<?=$item['order_id']?>:<?=$item['item_id']?>:<?=$item['store_id']?>"
 									value="<?=$item['quan']?>"
 									class="item" 
 								>
@@ -228,7 +227,6 @@ if (!$_GET['id']){
 <?}
 else{
 	$title = "Отправка №{$_GET['id']}";
-	echo $device;
 	require_once "admin/functions/sendings.function.php";
 	$sendings = new Sendings($_SESSION['user'], $db);
 	$sending = $sendings->getSendings();
@@ -351,4 +349,5 @@ else{
 					<p><strong>Комментарий</strong> <span><?=$sv['comment']?></span></p>
 				</div>
 			<?}
-		}?>
+		}
+}?>

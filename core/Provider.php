@@ -1,6 +1,5 @@
 <?php
 namespace core;
-use core\Provider;
 abstract class Provider{
 	private static $ignoreProvidersForMarkups = [18, 14];
 	private static $counterDaysDelivery;

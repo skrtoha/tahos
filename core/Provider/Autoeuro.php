@@ -320,7 +320,7 @@ class Autoeuro extends Provider{
 	}
 	public static function removeFromBasket($ov){
 		$basket_item_key = self::isInBasket($ov);
-		self::removeBasket($basket_item_key);
+		self::removeBasket($basket_item_key, $ov['typeOrganization']);
 		return true;
 	}
 	public static function removeBasket($basket_item_key, $typeOrganization)

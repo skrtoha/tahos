@@ -1,12 +1,12 @@
 images/
-Картинки/
 tmp/
 admin/logs
 phpAdmin/
 *.config
 *.jpg
 *.txt
-*.txt
-tahos.sql
-class/config_class.php
 core/Config.php
+Accounting/
+trade/
+.idea/
+

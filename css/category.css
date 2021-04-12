@@ -24,7 +24,7 @@ span.filter_value:not(:last-child)::after {
     margin-top: 10px;
 }
 #perPage a.perPage {
-    padding: 0 0px;
+    padding: 0 0;
     line-height: 20px;
 }  
 div#perPage {
@@ -6938,8 +6938,11 @@ span.delete-btn:hover {
      .catalogue .option-panel {
         display: none;
     }
+    #main > div > div.items > div.content > div.list-view{
+        display: none !important;
+    }
     .list-view{
-        display: block !important;
+        display: block;
     }
      .listlist{
         /*display: block !important;*/

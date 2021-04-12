@@ -12,6 +12,7 @@ $status_classes = [
 	'В работе' => 'status-sended'
 ];
 ?>
+
 <h1><?=$title?></h1>
 <div class="clearfix"></div>
 <div class="orders">
@@ -218,10 +219,17 @@ $status_classes = [
 			<?}
 			else{
 				while($order = $res_orders_values->fetch_assoc()){
-					$blocked = !in_array($order['status_id'], [7, 5]) || (!isset($_GET['act'])) ? 'blocked' : '';?>
+                    $blocked = !in_array($order['status_id'], [7, 5]) || (!isset($_GET['act'])) ? 'blocked' : '';?>
 					<tr order_id="<?=$order['order_id']?>" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" class="<?=$blocked?>">
 						<td>
-							<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> <br> <a href="<?=getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> <br> <?=$order['title_full']?> <br><br>
+							<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b>
+                            <br>
+                            <a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul">
+                                <?=$order['article']?>
+                            </a>
+                            <br>
+                            <?=$order['title_full']?>
+                            <br><br>
 							Поставщик: <strong <?=$order['noReturn']?>><?=$order['cipher']?></strong> <br>
 							Количество: 
 								<?if (!$blocked){?>

@@ -17,14 +17,17 @@ class Autopiter extends Provider{
 		try{
 			$client = new \SoapClient(self::getParams($typeOrganization)->url);
 			$authorization = $client->IsAuthorization()->IsAuthorizationResult;
-		} 
+		}
 		catch(\SoapFault $e){
 			
 		}
-		if (!($authorization)){
-			$client->Authorization(array(
-				"UserID"=>self::getParams($typeOrganization)->UserID, "Password" => self::getParams($typeOrganization)->Password, "Save"=> "true"));
-		}
+        if (!($authorization)){
+            $client->Authorization(array(
+				"UserID" => self::getParams($typeOrganization)->UserID,
+                "Password" => self::getParams($typeOrganization)->Password,
+                "Save" => false)
+            );
+        }
 		return $client;
 	}
 
@@ -326,10 +329,10 @@ class Autopiter extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 		$client = self::getClient();
-		try{
-			$result = $client->FindCatalog(["Number" => $search]);
-			$items = $result->FindCatalogResult->SearchCatalogModel;
-		}
+        try{
+            $result = $client->FindCatalog(["Number" => $search]);
+            $items = $result->FindCatalogResult->SearchCatalogModel;
+        }
 		catch(\SoapFault $e){
 			return false;
 		}

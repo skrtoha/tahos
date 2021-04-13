@@ -1,4 +1,5 @@
-<?if (!$_SESSION['user']) header('Location: /');
+<?php
+if (!$_SESSION['user']) header('Location: /');
 $title = "Корзина";
 $user_id = $_SESSION['user'];
 if ($_GET['act'] == 'to_offer'){

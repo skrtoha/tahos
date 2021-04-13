@@ -28,7 +28,7 @@ if ($_POST['items_submit']){
 		$value = array();
 		foreach($cellIterator as $cell){
 			$value[] = $cell->getCalculatedValue();
-		} 
+		}
 		$r++;//счетчик строк в файле
 		if (!$value[1] && !$value[2] && !$value[3]){
 			$log->error("В стоке $r ошибочные данные.");

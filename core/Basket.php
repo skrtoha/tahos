@@ -1,9 +1,9 @@
 <?php
 namespace core;
 class Basket{
-	function get($user_id, $isToOrder = false): \mysqli_result
+	public static function get($user_id, $isToOrder = false): \mysqli_result
 	{
-		if ($isToOrder) $whereIsToOrder = "AND b.isToOrder = 1";
+		if ($isToOrder) $whereIsToOrder = "AND b.isToOrder = 1 AND si.price IS NOT NULL";
 		return $GLOBALS['db']->query("
 			SELECT 
 			b.*,

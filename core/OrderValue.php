@@ -344,8 +344,8 @@ class OrderValue{
 		if (!in_array($ov['status_id'], [5])) return;
 		if (!Provider::getIsEnabledApiOrder($ov['provider_id']) && $ov['api_title']){
 			try{
-				throw new Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");
-			} catch(Exception $e){
+				throw new \Exception("API заказов " . Provider::getProviderTitle($ov['provider_id']) . " отключено");
+			} catch(\Exception $e){
 				Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
 				return;
 			}

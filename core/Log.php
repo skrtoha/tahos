@@ -20,7 +20,7 @@ class Log{
 	}
 	/**
 	 * insert into log, if there is an Exception
-	 * @param  Exception $e 
+	 * @param  \Exception $e 
 	 * @param  string $additional additional information about log
 	 * @return boolean true if inserted successfully
 	 */

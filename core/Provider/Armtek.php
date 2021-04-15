@@ -40,7 +40,7 @@ class Armtek extends Provider{
 		'DBTYP' => 3,
 		'format' => 'json'
 	];
-	public function getConfig($typeOrganization = 'entity', $isReturnObject = false){
+	public static function getConfig($typeOrganization = 'entity', $isReturnObject = false){
 		$config = parent::getApiParams([
 			'api_title' => 'Armtek',
 			'typeOrganization' => $typeOrganization
@@ -395,9 +395,10 @@ class Armtek extends Provider{
 	 * @param  [type] $user_type [description]
 	 * @return [type]            [description]
 	 */
-	public static function executeSendOrder($items){
+	public static function executeSendOrder($items, $typeOrganization){
+	    if (empty($items)) return false;
 		$params = self::$params;
-		$config = self::getConfig($items['typeOrganization']);
+		$config = self::getConfig($typeOrganization);
 		$params['VKORG'] = self::$params['VKORG'];
 		$params['KUNRG'] = $config['KUNNR_RG'];
 		if (empty($items)){
@@ -409,7 +410,8 @@ class Armtek extends Provider{
 		} 
 		$itemsForSending = array();
 		foreach($items as $i){
-			$itemsForSending[strtoupper($i['brend']) . ":" . strtoupper($i['article']) . ":" .strtoupper($i['store'])] = [
+		    $key = strtoupper($i['brend']) . ":" . strtoupper($i['article']) . ":" .strtoupper($i['store']);
+			$itemsForSending[$key] = [
 				'order_id' => $i['order_id'],
 				'item_id' => $i['item_id'],
 				'store_id' => $i['store_id'],
@@ -427,13 +429,21 @@ class Armtek extends Provider{
 			'url' => 'order/createOrder',
 			'params' => $params
 		];
-		$response = self::getClientArmtek($items['typeOrganization'])->post($request_params);
-		$json_responce_data = $response->json();
-		return [
+        $response = self::getClientArmtek($typeOrganization)->post($request_params);
+        $json_responce_data = $response->json();
+        return [
 			'itemsForSending' => $itemsForSending,
 			'responseData' => $json_responce_data
 		];
 	}
+	
+	private static function getUserInfo(){
+        $params = self::$params;
+	    $response = self::getClientArmtek('private')->post([
+	        'VKORG' => $params['VKORG']
+        ]);
+        return $response->json();
+    }
 	private static function parseOrderResponse($input){
 		$items = $input['itemsForSending'];
 		$response = $input['responseData'];
@@ -498,12 +508,16 @@ class Armtek extends Provider{
 		$items = [];
 		$config = self::getConfig();
 		$providerBasket = parent::getProviderBasket($config['provider_id'], '');
-		if (!$providerBasket->num_rows) return false;
+		if (!$providerBasket->num_rows) return;
 		foreach($providerBasket as $pb){
-			$items[] = $pb;
+			$items[$pb['typeOrganization']][] = $pb;
 		}
-		$resultEntity = self::executeSendOrder($items);
-		$resParseOrderResponseEntity = self::parseOrderResponse($resultEntity);
+		
+		$resultEntity = self::executeSendOrder($items['entity'], 'entity');
+		if ($resultEntity) self::parseOrderResponse($resultEntity);
+        
+        $resultPrivate = self::executeSendOrder($items['private'], 'private');
+        if ($resultPrivate) self::parseOrderResponse($resultPrivate);
 	}
 	public static function isInBasket($ov){
 		return parent::getInstanceDataBase()->getCount('provider_basket', parent::getWhere($ov));

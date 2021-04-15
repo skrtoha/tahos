@@ -1,4 +1,4 @@
-<?
+<?php
 namespace core\Provider;
 use core\Provider;
 use core\Config;
@@ -10,18 +10,19 @@ class Tahos extends Provider{
 
 	public static function parseResItem(\mysqli_result $res_items): array
 	{
-		$priceTahos = NULL;	
 		$items = [];
 		$tahosPrices = [];
 		foreach($res_items as $v){
 			$items[] = $v;
-			if ($v['store_id'] == self::$store_id) $tahosPrices[$v['item_id']] = $v['price'];
+			if ($v['store_id'] == self::$store_id && $v['in_stock'] > 0){
+                $tahosPrices[$v['item_id']] = $v['price'];
+            }
 		}
 		$output = [];
 		foreach($items as $v){
 			if (
 				isset($tahosPrices[$v['item_id']]) &&
-				 $v['price'] < $tahosPrices[$v['item_id']]
+                $v['price'] < $tahosPrices[$v['item_id']]
 			) continue;
 			$output[] = $v;
 		}

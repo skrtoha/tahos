@@ -5,7 +5,9 @@
     "require": {
         "katzgrau/klogger": "dev-master",
         "phpoffice/phpspreadsheet": "^1.11",
-        "box/spout": "^3.1"
+        "box/spout": "^3.1",
+        "ext-soap": "*",
+        "ext-mysqli": "*"
     },
     "autoload": {
         "psr-4": {

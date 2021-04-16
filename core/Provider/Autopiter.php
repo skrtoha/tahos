@@ -96,10 +96,15 @@ class Autopiter extends Provider{
 		if (!$basket) return;
 		if (is_array($basket)){
 			foreach($basket as $cartModel){
+			    if (!$basket->Comment) continue;
 				$output[$basket->Comment] = self::parseBasketForItemToOrder($cartModel);
 			}
 		}
-		else $output[$basket->Comment] = self::parseBasketForItemToOrder($basket);
+		else{
+            if ($basket->Comment){
+                $output[$basket->Comment] = self::parseBasketForItemToOrder($basket);
+            }
+        }
 	}
 	public static function getItemsToOrder($provider_id){
 		$output = [];

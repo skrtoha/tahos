@@ -755,7 +755,7 @@ switch($_GET['act']){
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
-
+		
 		if ($debuggingMode) debug($emailPrice, 'emailPrice');
 		$store = $db->select_unique("
 			SELECT
@@ -774,9 +774,7 @@ switch($_GET['act']){
 		
 		echo "<h2>Прайс {$emailPrice['title']}</h2>";
 
-		$price = new core\Price($db, $emailPrice['title']);
-		if ($emailPrice['isAddItem']) $price->isInsertItem = true;
-		if ($emailPrice['isAddBrend']) $price->isInsertBrend = true;
+		$price = new core\Price($db, $emailPrice);
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$fileImap = $imap->getLastMailFrom([
@@ -820,7 +818,6 @@ switch($_GET['act']){
 			if (!$res){
 				$errorText = "Ошибка чтения файла {$emailPrice['name']}";
 				throw new Exception($errorText);
-				echo "<br>$errorText";
 				break;
 			} 
 			try{
@@ -859,7 +856,8 @@ switch($_GET['act']){
 		switch($emailPrice['fileType']){
 			case 'excel':
 				try{
-					$reader = ReaderEntityFactory::createReaderFromFile($workingFile);
+				    require_once ($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
+				    $reader = ReaderEntityFactory::createReaderFromFile($workingFile);
 				}
 				catch(\Box\Spout\Common\Exception\UnsupportedTypeException $e){
 					echo "<br>" . $e->getMessage();
@@ -886,7 +884,6 @@ switch($_GET['act']){
 							debug($row);
 							if ($stringNumber > 100) die("Обработка прошла");
 						}
-
 						parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 					}
 				}

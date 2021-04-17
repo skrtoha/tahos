@@ -20,9 +20,12 @@ class Price{
 	 */
 	public $isInsertItem = false;
 	public $brendErrors = [];
-	public function __construct($db, $type){
+	
+	public function __construct($db, $emailPrice){
 		$this->db = $db;
-		$this->type = $type;
+		$this->isInsertBrend = $emailPrice['isAddBrend'];
+		$this->isInsertItem = $emailPrice['isAddItem'];
+		$this->type = $emailPrice['title'];
 		$this->nameFileLog = $this->type.'_'.date('d.m.Y_H-i-s').'.txt';
 		$this->log = new \Katzgrau\KLogger\Logger('logs', \Psr\Log\LogLevel::WARNING, array(
 			'filename' => $this->nameFileLog,
@@ -83,7 +86,7 @@ class Price{
 	 * @param  [type] $array [description]
 	 * @return [type]        [description]
 	 */
-	public function getItemId($array){
+	public function getItemId($array, $isAddItem = true){
 		$article = self::articleClear($array['article']);
 		$item = $this->db->select_one('items', 'id', "`brend_id`={$array['brend_id']} AND `article`='$article'");
 		if (empty($item) && !$this->isInsertItem){
@@ -91,19 +94,17 @@ class Price{
 			return false;
 		} 
 		if (empty($item)){
-			$res = $this->db->insert('items', [
+			$res = Item::insert([
 				'brend_id' => $array['brend_id'],
 				'article' => $article,
 				'article_cat' => $array['article'],
 				'title' => $array['title'] ? $array['title'] : 'Деталь',
 				'title_full' => $array['title'] ? $array['title'] : 'Деталь',
 				'source' => $this->type
-			], ['print_query' => false]);
+			]);
 			if ($res === true){
-				$item_id = $this->db->last_id();
-				$this->db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
-				$this->insertedItems++;
-				return $item_id;
+                $this->insertedItems++;
+				return Item::$lastInsertedItemID;
 			} 
 			else{
 				if (isset($array['row'])){
@@ -123,8 +124,7 @@ class Price{
 				'price' => str_replace([' ', ','], ['', '.'], $array['price']),
 				'in_stock' => preg_replace('/\D+/', '', $array['in_stock']),
 				'packaging' => $array['packaging'] ? $array['packaging'] : 1
-			],
-			['print_query' => false]
+			]
 		);
 		if ($res === true) $this->insertedStoreItems++;
 		else $this->log->error("Строка {$array['row']}: {$this->db->last_query} | $res");

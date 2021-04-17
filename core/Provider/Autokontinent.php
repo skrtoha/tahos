@@ -103,7 +103,7 @@ class Autokontinent extends Provider{
 		}
 		return $coincidences;
 	}
-	private static function getBrendID($brand_name){
+	public static function getBrendID($brand_name){
 		static $brends;
 		$brend_id = NULL;
 		if (isset($brends[$brand_name]) && $brends[$brand_name]) return $brends[$brand_name];

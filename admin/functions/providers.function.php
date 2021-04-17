@@ -192,23 +192,24 @@ function provider_save(){
  * @param  [type] $fields Номера полей 
  * @param  [type] $price Класс
  * @param  [type] $stringNumber Номер строки файла
- * @return Никакие переменные не возвращаются
+ * @return void
  */
 function parse_row($row, $fields, core\Price $price, $stringNumber){
 	$fieldBrend = $fields['brend'] - 1;
 	$fieldPrice = $fields['price'] - 1;
 	$fieldTitle = $fields['title'] - 1;
-	$fieldArticle = $fields['article'] - 1;
 	$filedArticle_cat = $fields['article_cat'] - 1;
 	$fieldInStock = $fields['inStock'] - 1;
 	$fieldPackaging = $fields['packaging'] - 1;
 
 	if (!$row[$filedArticle_cat] || !$row[$fieldBrend]){
 		$price->log->error("В строке $stringNumber произошла ошибка.");
-		return false;
+		return;
 	}
+	
 	$brend_id = $price->getBrendId($row[$fieldBrend]);
-	if (!$brend_id) return false;
+	if (!$brend_id) return;
+	
 	$item_id = $price->getItemId([
 		'brend_id' => $brend_id,
 		'brend' => $row[$fieldBrend],
@@ -216,7 +217,8 @@ function parse_row($row, $fields, core\Price $price, $stringNumber){
 		'title' => $row[$fieldTitle],
 		'row' => $stringNumber
 	]);
-	if (!$item_id) return false;
+	if (!$item_id) return;
+	
 	$price->insertStoreItem([
 		'store_id' => $_GET['store_id'],
 		'item_id' => $item_id,

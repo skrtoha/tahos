@@ -7,8 +7,10 @@
         "phpoffice/phpspreadsheet": "^1.11",
         "box/spout": "^3.1",
         "ext-soap": "*",
-        "ext-mysqli": "*"
-    },
+        "ext-mysqli": "*",
+        "ext-zip": "*",
+        "ext-iconv": "*"
+      },
     "autoload": {
         "psr-4": {
             "core\\": "core"

@@ -121,16 +121,20 @@ abstract class Provider{
 				p.id = $provider_id AND pb.response IS NULL
 		", $flag);
 	}
-	/**
-	 * updates field price_updated in provider_stores
-	 * @param $params store_id|provider_id
-	 * @return boolean
-	 */
-	public function updatePriceUpdated($params){
-		if (isset($params['store_id'])) return 
-			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE id = {$params['store_id']}", '');
+    /**
+     * @param $params
+     * @return array|bool|\mysqli_result|string|string[]
+     */
+	public static function updatePriceUpdated($params){
+		if (isset($params['store_id']))
+            return self::getInstanceDataBase()->query(
+			    "UPDATE #provider_stores
+                    SET `price_updated` = CURRENT_TIMESTAMP
+                    WHERE id = {$params['store_id']}", ''
+            );
 		if (isset($params['provider_id'])) return 
 			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE provider_id = {$params['provider_id']}", '');
+	    return false;
 	}
 	public static function getDiliveryDate($workSchedule, $calendar, $deliveryDays){
 		$dateTimeOut = new \DateTime();

@@ -4,13 +4,14 @@
     },
     "require": {
         "katzgrau/klogger": "dev-master",
-        "phpoffice/phpspreadsheet": "^1.11",
+        "phpoffice/phpspreadsheet": "^1.17",
         "box/spout": "^3.1",
         "ext-soap": "*",
         "ext-mysqli": "*",
         "ext-zip": "*",
-        "ext-iconv": "*"
-      },
+        "ext-iconv": "*",
+      "ext-curl": "*"
+    },
     "autoload": {
         "psr-4": {
             "core\\": "core"

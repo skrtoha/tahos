@@ -755,9 +755,10 @@ switch($_GET['act']){
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");
 		$emailPrice = json_decode($emailPrice['settings'], true);
-		
-		if ($debuggingMode) debug($emailPrice, 'emailPrice');
-		$store = $db->select_unique("
+        $price = new core\Price($db, $emailPrice);
+        
+        if ($debuggingMode) debug($emailPrice, 'emailPrice');
+        $store = $db->select_unique("
 			SELECT
 				ps.id AS store_id,
 				ps.title AS store,
@@ -770,13 +771,12 @@ switch($_GET['act']){
 			WHERE
 				ps.id = {$_GET['store_id']}
 		");
-		$store = $store[0];
-		
-		echo "<h2>Прайс {$emailPrice['title']}</h2>";
-
-		$price = new core\Price($db, $emailPrice);
-
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $store = $store[0];
+        
+        echo "<h2>Прайс {$emailPrice['title']}</h2>";
+        
+        
+        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$fileImap = $imap->getLastMailFrom([
 			'from' => $emailPrice['from'],
 			'name' => $emailPrice['name']
@@ -847,7 +847,7 @@ switch($_GET['act']){
 		else $workingFile = $fileImap;
 
 		if ($debuggingMode) debug($workingFile, 'workingFile');
-
+        
 		/**
 		 * [$stringNumber counter for strings in file]
 		 * @var integer
@@ -867,6 +867,7 @@ switch($_GET['act']){
 				}
 				try{
 					$reader->open($workingFile);
+					debug($reder); exit();
 				} catch(\Box\Spout\Common\Exception\IOException $e){
 					echo "<br>Ошибка: <b>" . $e->getMessage() . "</b>";
 					echo "<br>Попытка обработки файла другим способом....";

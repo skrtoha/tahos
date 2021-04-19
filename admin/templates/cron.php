@@ -751,6 +751,7 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 	case 'emailPrice':
+        ini_set('memory_limit', '2048M');
 		$debuggingMode = false;
 		require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
 		$emailPrice = $db->select_one('email_prices', '*', "`store_id`={$_GET['store_id']}");

@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '89d74182a41dca490eb97e77f333483ecdd1170e',
+    'reference' => '6fe16b244475bc86d3c7a38217200097058f765b',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '89d74182a41dca490eb97e77f333483ecdd1170e',
+      'reference' => '6fe16b244475bc86d3c7a38217200097058f765b',
     ),
     'box/spout' => 
     array (
@@ -83,6 +83,15 @@
       array (
       ),
       'reference' => '361c0f545c3172ee26c3d596a0aa03f0cef65e6a',
+    ),
+    'mobiledetect/mobiledetectlib' => 
+    array (
+      'pretty_version' => '2.8.37',
+      'version' => '2.8.37.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '9841e3c46f5bd0739b53aed8ac677fa712943df7',
     ),
     'myclabs/deep-copy' => 
     array (

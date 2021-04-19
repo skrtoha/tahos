@@ -10,7 +10,9 @@
         "ext-mysqli": "*",
         "ext-zip": "*",
         "ext-iconv": "*",
-      "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-json": "*",
+        "mobiledetect/mobiledetectlib": "^2.8"
     },
     "autoload": {
         "psr-4": {

@@ -12,7 +12,8 @@
         "ext-iconv": "*",
         "ext-curl": "*",
         "ext-json": "*",
-        "mobiledetect/mobiledetectlib": "^2.8"
+        "mobiledetect/mobiledetectlib": "^2.8",
+        "phpmailer/phpmailer": "^6.4"
     },
     "autoload": {
         "psr-4": {

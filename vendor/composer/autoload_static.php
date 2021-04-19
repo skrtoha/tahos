@@ -103,6 +103,7 @@ class ComposerStaticInit32177a424f59751f8425db67467ac785
             'Prophecy\\' => 9,
             'PhpParser\\' => 10,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'M' => 
         array (
@@ -183,6 +184,10 @@ class ComposerStaticInit32177a424f59751f8425db67467ac785
         'PhpOffice\\PhpSpreadsheet\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'MyCLabs\\Enum\\' => 
         array (

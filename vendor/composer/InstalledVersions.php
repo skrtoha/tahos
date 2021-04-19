@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '6fe16b244475bc86d3c7a38217200097058f765b',
+    'reference' => '1a655ba46e198892de3d59e286703e476c770fc1',
     'name' => '__root__',
   ),
   'versions' => 
@@ -42,7 +42,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '6fe16b244475bc86d3c7a38217200097058f765b',
+      'reference' => '1a655ba46e198892de3d59e286703e476c770fc1',
     ),
     'box/spout' => 
     array (
@@ -192,6 +192,15 @@ private static $installed = array (
       array (
       ),
       'reference' => '6a467b8989322d92aa1c8bf2bebcc6e5c2ba55c0',
+    ),
+    'phpmailer/phpmailer' => 
+    array (
+      'pretty_version' => 'v6.4.0',
+      'version' => '6.4.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '050d430203105c27c30efd1dce7aa421ad882d01',
     ),
     'phpoffice/phpspreadsheet' => 
     array (

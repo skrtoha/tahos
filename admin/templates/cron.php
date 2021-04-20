@@ -111,7 +111,7 @@ switch($_GET['act']){
 		$abcp = new core\Provider\Abcp(NULL, $db);
 		$countTransaction = 50;
 		$seconds = 21600;
-		// $seconds = 20;
+        break;
 	case 'BERG_MSK':
 	case 'BERG_Yar':
 		echo "<h2>Прайс {$_GET['act']}</h2>";

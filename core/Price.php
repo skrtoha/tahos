@@ -9,6 +9,9 @@ class Price{
 	public $insertedItems = 0;
 	public $insertedStoreItems = 0;
 	public $nameFileLog;
+	
+	public $isLogging;
+	
 	/**
 	 * [$isInsertBrend insert brend if not found]
 	 * @var boolean
@@ -27,11 +30,19 @@ class Price{
 		$this->isInsertItem = $emailPrice['isAddItem'];
 		$this->type = $emailPrice['title'];
 		$this->nameFileLog = $this->type.'_'.date('d.m.Y_H-i-s').'.txt';
-		$this->log = new \Katzgrau\KLogger\Logger('logs', \Psr\Log\LogLevel::WARNING, array(
-			'filename' => $this->nameFileLog,
-			'dateFormat' => 'G:i:s'
-		));
+		$this->isLogging = isset($emailPrice['isLogging']) ? $emailPrice['isLogging'] : false;
+		
+		if ($this->isLogging){
+            $this->log = new \Katzgrau\KLogger\Logger('logs', \Psr\Log\LogLevel::WARNING, array(
+                'filename' => $this->nameFileLog,
+                'dateFormat' => 'G:i:s'
+            ));
+        }
 	}
+	private function setLog($type, $message){
+	    if (!$this->isLogging) return;
+	    $this->log->$type($message);
+    }
 	public function getBrendId($brendTitle, $row = null){
 		if (!$this->brends[$brendTitle]) {
 			$brend = $this->db->select_one('brends', ['id', 'title', 'parent_id'], "`title`='{$brendTitle}'");
@@ -41,7 +52,7 @@ class Price{
 		else $brend_id = $this->brends[$brendTitle];
 		if (!$brend_id && !$this->isInsertBrend){
 			if (!in_array($brendTitle, $this->brendErrors)){
-				$this->log->error("Бренд $brendTitle в $row не найден");
+			    $this->setLog('error',"Бренд $brendTitle в $row не найден");
 				$this->brendErrors[] = $brendTitle;
 			}
 			return false;
@@ -72,7 +83,7 @@ class Price{
 				return $brend_id;
 			} 
 			else{
-				$this->log->error("В строке $i: {$this->db->last_query} | $res");
+				$this->setLog('error',"В строке $i: {$this->db->last_query} | $res");
 				return false;
 			}
 		}
@@ -90,7 +101,7 @@ class Price{
 		$article = self::articleClear($array['article']);
 		$item = $this->db->select_one('items', 'id', "`brend_id`={$array['brend_id']} AND `article`='$article'");
 		if (empty($item) && !$this->isInsertItem){
-			$this->log->error("В строке {$array['row']} не найдено {$array['brend']} - {$array['article']}");
+			$this->setLog('error', "В строке {$array['row']} не найдено {$array['brend']} - {$array['article']}");
 			return false;
 		} 
 		if (empty($item)){
@@ -108,7 +119,7 @@ class Price{
 			} 
 			else{
 				if (isset($array['row'])){
-					$this->log->error("В строке {$array['row']}: {$this->db->last_query} | $res");
+					$this->setLog('error', "В строке {$array['row']}: {$this->db->last_query} | $res");
 				}
 				return false;
 			}
@@ -127,6 +138,6 @@ class Price{
 			]
 		);
 		if ($res === true) $this->insertedStoreItems++;
-		else $this->log->error("Строка {$array['row']}: {$this->db->last_query} | $res");
+		else $this->setLog('error',"Строка {$array['row']}: {$this->db->last_query} | $res");
 	}
 }

@@ -31,7 +31,7 @@ class DataBaseTest extends \PHPUnit\Framework\TestCase{
             // $this->returnValue(true)
             // $this->returnArgument(0)
             $this->returnValueMap($map)
-        )
+        );
         $this->assertTrue($db->setProfiling(10));
     }
 }

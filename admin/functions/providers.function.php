@@ -228,7 +228,7 @@ function parse_row($row, $fields, core\Price $price, $stringNumber){
 		'row' => $stringNumber
 	]);
 }
-function endSuccessfullyProccessing(){
+function endSuccessfullyProccessing($isLogging){
 	global $db, $price, $stringNumber;
 	$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_GET['store_id']}", '');
 
@@ -241,7 +241,10 @@ function endSuccessfullyProccessing(){
 		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		
+		if ($isLogging){
+            echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+        }
 }
 function parseWithPhpOffice($workingFile, $debuggingMode){
 	global $emailPrice, $price, $stringNumber;

@@ -868,12 +868,10 @@ switch($_GET['act']){
 				}
 				try{
 					$reader->open($workingFile);
-					debug($reder); exit();
 				} catch(\Box\Spout\Common\Exception\IOException $e){
 					echo "<br>Ошибка: <b>" . $e->getMessage() . "</b>";
 					echo "<br>Попытка обработки файла другим способом....";
 					parseWithPhpOffice($workingFile, $debuggingMode);
-					break;
 				}
 				foreach ($reader->getSheetIterator() as $sheet) {
 				   foreach ($sheet->getRowIterator() as $iterator) {

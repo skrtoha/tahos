@@ -695,6 +695,19 @@ function priceEmail(){
 						</label>
 					</div>
 				</div>
+                <div class="field">
+                    <div class="title">Вести лог</div>
+                    <div class="value">
+                        <label>
+                            <input <?=$array['isLogging'] == 1 ? 'checked' : ''?> type="radio" name="isLogging" value="1">
+                            Да
+                        </label>
+                        <label>
+                            <input <?=$array['isLogging'] == 0 ? 'checked' : ''?> type="radio" name="isLogging" value="0">
+                            Нет
+                        </label>
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Добавлять отсутствующую номенклатуру</div>
 					<div class="value">

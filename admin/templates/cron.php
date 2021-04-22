@@ -114,6 +114,7 @@ switch($_GET['act']){
         break;
 	case 'BERG_MSK':
 	case 'BERG_Yar':
+        ini_set('memory_limit', '2048M');
 		echo "<h2>Прайс {$_GET['act']}</h2>";
         $emailPrice = [
             'isAddBrend' => 0,
@@ -181,7 +182,7 @@ switch($_GET['act']){
 		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
 		break;
 	case 'priceRossko':
-
+        ini_set('memory_limit', '2048M');
 		echo "<h2>Прайс Росско</h2>";
 		$fileNames = [
 			'77769_91489D6DA76B9D7A99061B9F7B18F3CE.csv' => 24,
@@ -289,6 +290,7 @@ switch($_GET['act']){
 		Provider::updatePriceUpdated(['provider_id' => core\Provider\Rossko::getParams()->provider_id]);
 		break;
 	case 'priceVoshod':
+        ini_set('memory_limit', '2048M');
 		echo "<h2>Прайс Восход</h2>";
         $emailPrice = [
             'isAddBrend' => 0,
@@ -360,7 +362,8 @@ switch($_GET['act']){
         }
 		break;
 	case 'priceMikado':
-		$mikado = new core\Provider\Mikado();
+        ini_set('memory_limit', '2048M');
+	    $mikado = new core\Provider\Mikado();
 		$files = [
 			'MikadoStock' => 1,
 			'MikadoStockReg' => 35
@@ -445,7 +448,8 @@ switch($_GET['act']){
 		}
 		break;
 	case 'priceSportAvto':
-		echo "<h2>Прайс Спорт-Авто</h2>";
+        ini_set('memory_limit', '2048M');
+	    echo "<h2>Прайс Спорт-Авто</h2>";
         $emailPrice = [
             'isAddBrend' => 0,
             'isAddItem' => 0,
@@ -517,7 +521,8 @@ switch($_GET['act']){
         }
 		break;
 	case 'priceArmtek':
-		echo "<h2>Прайс Армтек</h2>";
+        ini_set('memory_limit', '2048M');
+	    echo "<h2>Прайс Армтек</h2>";
 		$fileNames = [
 			'Armtek_msk_40068974' => 3
 			// ,'Armtek_CRS_40068974' => 4
@@ -630,7 +635,8 @@ switch($_GET['act']){
 		}
 		break;
 	case 'priceMparts':
-		echo "<h2>Прайс МПартс</h2>";
+        ini_set('memory_limit', '2048M');
+	    echo "<h2>Прайс МПартс</h2>";
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		if (isset($imap->error)){
 			echo "<br>$imap->error";
@@ -719,6 +725,7 @@ switch($_GET['act']){
         }
 		break;
 	case 'priceForumAuto':
+        ini_set('memory_limit', '2048M');
 		echo "<h2>Прайс Forum-Auto</h2>";
         $emailPrice = [
             'isAddBrend' => 0,

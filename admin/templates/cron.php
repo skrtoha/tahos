@@ -115,7 +115,14 @@ switch($_GET['act']){
 	case 'BERG_MSK':
 	case 'BERG_Yar':
 		echo "<h2>Прайс {$_GET['act']}</h2>";
-		$price = new core\Price($db, $_GET['act']);
+        $emailPrice = [
+            'isAddBrend' => 0,
+            'isAddItem' => 0,
+            'title' => $_GET['act'],
+            'isLogging' => true
+        ];
+		
+		$price = new core\Price($db, $emailPrice);
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$filename = $imap->getLastMailFrom(['from' => 'noreply@berg.ru', 'name' => $_GET['act']]);
@@ -138,7 +145,7 @@ switch($_GET['act']){
 			// if ($i > 200) break;
 			// debug($row); continue;
 			if (!$row[0] || !$row[2]){
-				$price->log->error("В строке $i произошла ошибка.");
+				$price->setLog('error', "В строке $i произошла ошибка.");
 				continue;
 			}
 			$brend_id = $price->getBrendId($row[2]);
@@ -162,10 +169,10 @@ switch($_GET['act']){
 		}
 		Provider::updatePriceUpdated(['store_id' => $store_id]);
 
-		$price->log->alert("Обработано $i строк");
-		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->log->alert("Вставлено: $price->insertedBrends брендов");
-		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+		$price->setLog('alert', "Обработано $i строк");
+        $price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
+        $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
+        $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
 
 		echo "<br>Обработано <b>$i</b> строк";
 		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
@@ -220,7 +227,13 @@ switch($_GET['act']){
 				throw new Exception($errorText);
 				continue;
 			}
-			$price = new core\Price($db, 'price_'.$ciphers[$store_id]);
+            $emailPrice = [
+                'isAddBrend' => 0,
+                'isAddItem' => 0,
+                'title' => 'price_'.$ciphers[$store_id],
+                'isLogging' => true
+            ];
+			$price = new core\Price($db, $emailPrice);
 			// $price->isInsertBrend = true;
 			// $price->isInsertItem = true;
 			$file = $zipArchive->getStream($zipFile['name']);
@@ -236,7 +249,7 @@ switch($_GET['act']){
 				// continue;
 
 				if (!$row[1] || !$row[2]){
-					$price->log->error("В строке $i произошла ошибка.");
+					$price->setLog('error', "В строке $i произошла ошибка.");
 					continue;
 				}
 				$brend_id = $price->getBrendId($row[1]);
@@ -259,23 +272,31 @@ switch($_GET['act']){
 				]);
 			}
 
-			$price->log->alert("Обработано $i строк");
-			$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-			$price->log->alert("Вставлено: $price->insertedBrends брендов");
-			$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+			$price->setLog('alert',"Обработано $i строк");
+			$price->setLog('alert',"Добавлено в прайс: $price->insertedStoreItems записей");
+            $price->setLog('alert',"Вставлено: $price->insertedBrends брендов");
+            $price->setLog('alert',"Вставлено: $price->insertedItems номенклатуры");
 			
 			echo "<br><b>{$ciphers[$store_id]}:</b>";
 			echo "<br>Обработано <b>$i</b> строк";
 			echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 			echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+			if ($price->isLogging){
+                echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+            }
 		}
 		Provider::updatePriceUpdated(['provider_id' => core\Provider\Rossko::getParams()->provider_id]);
 		break;
 	case 'priceVoshod':
 		echo "<h2>Прайс Восход</h2>";
-		$price = new core\Price($db, 'priceVoshod');
+        $emailPrice = [
+            'isAddBrend' => 0,
+            'isAddItem' => 0,
+            'title' => 'priceVoshod',
+            'isLogging' => true
+        ];
+		$price = new core\Price($db, $emailPrice);
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$filename = $imap->getLastMailFrom(['from' => 'price@voshod-avto.ru', 'name' => 'Voshod.zip']);
@@ -300,7 +321,7 @@ switch($_GET['act']){
 			if ($row[0] == 'НаименованиеПолное') continue;
 			// if ($i > 200) break;
 			if (!$row[1] || !$row[2]){
-				$price->log->error("В строке $i произошла ошибка.");
+				$price->setLog('error', "В строке $i произошла ошибка.");
 				continue;
 			}
 			$brend_id = $price->getBrendId($row[2]);
@@ -325,25 +346,34 @@ switch($_GET['act']){
 
 		Provider::updatePriceUpdated(['store_id' => 8]);
 
-		$price->log->alert("Обработано $i строк");
-		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->log->alert("Вставлено: $price->insertedBrends брендов");
-		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+		$price->setLog('alert',"Обработано $i строк");
+        $price->setLog('alert',"Добавлено в прайс: $price->insertedStoreItems записей");
+        $price->setLog('alert',"Вставлено: $price->insertedBrends брендов");
+        $price->setLog('alert',"Вставлено: $price->insertedItems номенклатуры");
 		
 		echo "<br>Обработано <b>$i</b> строк";
 		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		if ($price->isLogging){
+            echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+        }
 		break;
 	case 'priceMikado':
-		$mikado = new core\Provider\Mikado($db);
+		$mikado = new core\Provider\Mikado();
 		$files = [
 			'MikadoStock' => 1,
 			'MikadoStockReg' => 35
 		];
-		foreach($files as $zipName => $value){
-			$price = new core\Price($db, $zipName);
+        
+        foreach($files as $zipName => $value){
+            $emailPrice = [
+                'isAddBrend' => 0,
+                'isAddItem' => 0,
+                'title' => $zipName,
+                'isLogging' => true
+            ];
+            $price = new core\Price($db, $emailPrice);
 			$url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Mikado::getParams('entity')->ClientID . "&PSW=" . Mikado::getParams('entity')->Password;
 			echo $url;
 			$file = file_get_contents($url);
@@ -372,7 +402,7 @@ switch($_GET['act']){
 				$row = explode(';', str_replace('"', '', $row));
 				$i++;
 				if (!$row[1] || !$row[2]){
-					$price->log->error("В строке $i произошла ошибка.");
+					$price->setLog('error', "В строке $i произошла ошибка.");
 					continue;
 				}
 				if (preg_match('/УЦЕНКА/ui', $row[3])) continue;
@@ -399,25 +429,31 @@ switch($_GET['act']){
 
 			Provider::updatePriceUpdated(['store_id' => $stocks[$value]]);
 
-			$price->log->alert("Обработано $i строк");
-			$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-			$price->log->alert("Вставлено: $price->insertedBrends брендов");
-			$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+			$price->setLog('alert', "Обработано $i строк");
+            $price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
+            $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
+            $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
 			
 			echo "<br><b>$zipName</b>:";
 			echo "<br>Обработано <b>$i</b> строк";
 			echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 			echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
-
+			if ($price->isLogging){
+                echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+            }
 		}
 		break;
 	case 'priceSportAvto':
 		echo "<h2>Прайс Спорт-Авто</h2>";
-		$price = new core\Price($db, 'priceSportAvto');
-		// $price->isInsertBrend = true;
-		// $price->isInsertItem = true;
+        $emailPrice = [
+            'isAddBrend' => 0,
+            'isAddItem' => 0,
+            'title' => 'priceSportAvto',
+            'isLogging' => true
+        ];
+		
+		$price = new core\Price($db, $emailPrice);
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		if ($imap->error) die("Подключение не удалось");
@@ -442,7 +478,7 @@ switch($_GET['act']){
 			// if ($i > 200) break;
 			// debug($row); continue;
 			if (!$row[0] || !$row[1]){
-				$price->log->error("В строке $i произошла ошибка.");
+				$price->setLog('error', "В строке $i произошла ошибка.");
 				continue;
 			}
 			$brend_id = $price->getBrendId($row[1]);
@@ -467,16 +503,18 @@ switch($_GET['act']){
 
 		Provider::updatePriceUpdated(['store_id' => 7]);
 
-		$price->log->alert("Обработано $i строк");
-		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->log->alert("Вставлено: $price->insertedBrends брендов");
-		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+		$price->setLog('alert', "Обработано $i строк");
+        $price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
+        $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
+        $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
 		
 		echo "<br>Обработано <b>$i</b> строк";
 		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		if ($price->isLogging){
+            echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+        }
 		break;
 	case 'priceArmtek':
 		echo "<h2>Прайс Армтек</h2>";
@@ -497,7 +535,13 @@ switch($_GET['act']){
 		$zipArchive = new ZipArchive();
 
 		foreach($fileNames as $fileName => $store_id){
-			$price = new core\Price($db, 'price_'.$ciphers[$store_id]);
+            $emailPrice = [
+                'isAddBrend' => 0,
+                'isAddItem' => 0,
+                'title' => 'price_'.$ciphers[$store_id],
+                'isLogging' => true
+            ];
+			$price = new core\Price($db, $emailPrice);
 			
 			$fileImap = $imap->getLastMailFrom(['from' => 'price@armtek.ru', 'name' => $fileName]);
 			if (!$fileImap){
@@ -545,7 +589,7 @@ switch($_GET['act']){
 
 				if ($row[0] == 'Бренд') continue;
 				if (!$row[0] || !$row[1]){
-					$price->log->error("В строке $i произошла ошибка.");
+					$price->setLog('error', "В строке $i произошла ошибка.");
 					continue;
 				}
 				$brend_id = $price->getBrendId($row[0]);
@@ -570,17 +614,19 @@ switch($_GET['act']){
 
 			Provider::updatePriceUpdated(['store_id' => $store_id]);
 
-			$price->log->alert("Обработано $i строк");
-			$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-			$price->log->alert("Вставлено: $price->insertedBrends брендов");
-			$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+			$price->setLog('alert',"Обработано $i строк");
+            $price->setLog('alert',"Добавлено в прайс: $price->insertedStoreItems записей");
+            $price->setLog('alert',"Вставлено: $price->insertedBrends брендов");
+            $price->setLog('alert',"Вставлено: $price->insertedItems номенклатуры");
 			
 			echo "<br><b>{$ciphers[$store_id]}:</b>";
 			echo "<br>Обработано <b>$i</b> строк";
 			echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 			echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 			echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-			echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+			if ($price->isLogging){
+                echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+            }
 		}
 		break;
 	case 'priceMparts':
@@ -590,7 +636,13 @@ switch($_GET['act']){
 			echo "<br>$imap->error";
 			break;
 		}
-		$price = new core\Price($db, 'priceMparts');
+		$emailPrice = [
+		    'isAddBrend' => 0,
+            'isAddItem' => 0,
+            'title' => 'priceMparts',
+            'isLogging' => true
+        ];
+		$price = new core\Price($db, $emailPrice);
 
 		$fileImap = $imap->getLastMailFrom(['from' => 'price@v01.ru', 'name' => 'MPartsPrice.XLSX']);
 		if (!$fileImap){
@@ -628,7 +680,7 @@ switch($_GET['act']){
 
 			if ($row[0] == 'Производитель') continue;
 			if (!$row[0] || !$row[1]){
-				$price->log->error("В строке $i произошла ошибка.");
+				$price->setLog('error', "В строке $i произошла ошибка.");
 				continue;
 			}
 			$brend_id = $price->getBrendId($row[0]);
@@ -653,22 +705,28 @@ switch($_GET['act']){
 
 		Provider::updatePriceUpdated(['provider_id' => 13]);
 
-		$price->log->alert("Обработано $i строк");
-		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->log->alert("Вставлено: $price->insertedBrends брендов");
-		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+		$price->setLog('alert',"Обработано $i строк");
+        $price->setLog('alert',"Добавлено в прайс: $price->insertedStoreItems записей");
+        $price->setLog('alert',"Вставлено: $price->insertedBrends брендов");
+        $price->setLog('alert',"Вставлено: $price->insertedItems номенклатуры");
 		
 		echo "<br>Обработано <b>$i</b> строк";
 		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		if ($price->isLogging){
+            echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+        }
 		break;
 	case 'priceForumAuto':
 		echo "<h2>Прайс Forum-Auto</h2>";
+        $emailPrice = [
+            'isAddBrend' => 0,
+            'isAddItem' => 0,
+            'title' => 'priceForumAuto',
+            'isLogging' => true
+        ];
 		$price = new core\Price($db, 'priceForumAuto');
-		$price->isInsertItem = false;
-		$price->isInsertBrend = false;
 
 		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
 		$fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
@@ -713,7 +771,7 @@ switch($_GET['act']){
 				if (!$row[0]) continue;
 				if ($row[0] == 'ГРУППА') continue;
 				if (!$row[0] || !$row[1]){
-					$price->log->error("В строке $i произошла ошибка.");
+					$price->setLog('error', "В строке $i произошла ошибка.");
 					continue;
 				}
 				$brend_id = $price->getBrendId($row[0]);
@@ -739,16 +797,18 @@ switch($_GET['act']){
 
 		Provider::updatePriceUpdated(['provider_id' => 17]);
 
-		$price->log->alert("Обработано $i строк");
-		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->log->alert("Вставлено: $price->insertedBrends брендов");
-		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+		$price->setLog('alert', "Обработано $i строк");
+        $price->setLog('alert',"Добавлено в прайс: $price->insertedStoreItems записей");
+        $price->setLog('alert',"Вставлено: $price->insertedBrends брендов");
+        $price->setLog('alert',"Вставлено: $price->insertedItems номенклатуры");
 		
 		echo "<br>Обработано <b>$i</b> строк";
 		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
 		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
 		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
-		echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		if ($price->isLogging){
+            echo "<br><a target='_blank' href='/admin/logs/{$price->nameFileLog}'>Лог</a>";
+        }
 		break;
 	case 'emailPrice':
         ini_set('memory_limit', '2048M');
@@ -908,7 +968,7 @@ switch($_GET['act']){
 			break;
 		}
 
-		endSuccessfullyProccessing();
+		endSuccessfullyProccessing($price->isLogging);
 
 		break;
 	case 'subscribeUserPrices':

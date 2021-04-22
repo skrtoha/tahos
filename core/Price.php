@@ -3,7 +3,7 @@ namespace core;
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 require_once ('templates/functions.php');
 class Price{
-	public $log;
+	private $log;
 	public $brends = array();
 	public $insertedBrends = 0;
 	public $insertedItems = 0;
@@ -39,7 +39,7 @@ class Price{
             ));
         }
 	}
-	private function setLog($type, $message){
+	public function setLog($type, $message){
 	    if (!$this->isLogging) return;
 	    $this->log->$type($message);
     }

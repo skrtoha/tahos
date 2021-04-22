@@ -203,7 +203,7 @@ function parse_row($row, $fields, core\Price $price, $stringNumber){
 	$fieldPackaging = $fields['packaging'] - 1;
 
 	if (!$row[$filedArticle_cat] || !$row[$fieldBrend]){
-		$price->log->error("В строке $stringNumber произошла ошибка.");
+		$price->setLog('error', "В строке $stringNumber произошла ошибка.");
 		return;
 	}
 	
@@ -232,10 +232,10 @@ function endSuccessfullyProccessing($isLogging){
 	global $db, $price, $stringNumber;
 	$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_GET['store_id']}", '');
 
-		$price->log->alert("Обработано $stringNumber строк");
-		$price->log->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->log->alert("Вставлено: $price->insertedBrends брендов");
-		$price->log->alert("Вставлено: $price->insertedItems номенклатуры");
+		$price->setLog('alert', "Обработано $stringNumber строк");
+		$price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
+		$price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
+        $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
 		
 		echo "<br>Обработано <b>$stringNumber</b> строк";
 		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";

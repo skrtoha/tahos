@@ -62,7 +62,7 @@ class Imap{
 					if (!preg_match('/'.quotemeta($params["name"]).'/iu', $d["attachs"][$j]["name"])) continue;
 					$d["attachs"][$j]["file"] = $this->structure_encoding(
 						$msg_structure->parts[$j]->encoding,
-						imateamp_fetchbody($this->connection, $i, $f)
+						imap_fetchbody($this->connection, $i, $f)
 					);
 					if (preg_match('/^[ \w\.-]+$/u', $d["attachs"][$j]["name"])) $filename = $d["attachs"][$j]["name"];
 					else{

@@ -931,6 +931,7 @@ switch($_GET['act']){
 					echo "<br>" . $e->getMessage();
 					echo "<br>Обработка с помощью PhpOffice...";
 					parseWithPhpOffice($workingFile, $debuggingMode);
+                    endSuccessfullyProccessing($price->isLogging);
 					break;
 				}
 				try{
@@ -939,6 +940,7 @@ switch($_GET['act']){
 					echo "<br>Ошибка: <b>" . $e->getMessage() . "</b>";
 					echo "<br>Попытка обработки файла другим способом....";
 					parseWithPhpOffice($workingFile, $debuggingMode);
+                    endSuccessfullyProccessing($price->isLogging);
 				}
 				foreach ($reader->getSheetIterator() as $sheet) {
 				   foreach ($sheet->getRowIterator() as $iterator) {

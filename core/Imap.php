@@ -57,12 +57,14 @@ class Imap{
 					$d["attachs"][$j]["type"] = $type;
 					$d["attachs"][$j]["size"] = $msg_structure->parts[$j]->bytes;
 					$d["attachs"][$j]["name"] = $this->getNameFromParameters($msg_structure->parts[$j]->parameters, $msg_structure->parts[$j]->encoding);
+					$d["attachs"][$j]["name"] = iconv_mime_decode($d["attachs"][$j]["name"], 0, 'utf-8');
+
 					if ($debuggingMode) debug([
 						'type' => $d["attachs"][$j]["type"],
 						'size' => $d["attachs"][$j]["size"],
 						'name' => $d["attachs"][$j]["name"]
 					], 'email');
-					if (!preg_match('/'.quotemeta($params['name']).'/u', $d["attachs"][$j]["name"])) continue;
+					if (!preg_match('/'.quotemeta($currentFilename).'/iu', $d["attachs"][$j]["name"])) continue;
 					$d["attachs"][$j]["file"] = $this->structure_encoding(
 						$msg_structure->parts[$j]->encoding,
 						imap_fetchbody($this->connection, $i, $f)

@@ -41,6 +41,7 @@ class Imap{
 				$body = $this->structure_encoding($recursive_data["encoding"], $msg_body);
 			}
 			if($recursive_data["encoding"] == 3){
+			 
 				$body = $this->structure_encoding($recursive_data["encoding"], $msg_body);
 			}
 			if($recursive_data["encoding"] == 2){
@@ -64,13 +65,8 @@ class Imap{
 						$msg_structure->parts[$j]->encoding,
 						imap_fetchbody($this->connection, $i, $f)
 					);
-					if (preg_match('/^[ \w\.-]+$/u', $d["attachs"][$j]["name"])) $filename = $d["attachs"][$j]["name"];
-					else{
-						if ($d["attachs"][$j]["type"] == 'VND.MS-EXCEL') $filename = 'file.xls';
-						else $filename = 'file.zip';
-					} 
-					file_put_contents(Config::$tmpFolderPath . "/$filename", $d["attachs"][$j]["file"]);
-					return Config::$tmpFolderPath . "/$filename";
+					file_put_contents(Config::$tmpFolderPath . "/{$d["attachs"][$j]["name"]}", $d["attachs"][$j]["file"]);
+					return Config::$tmpFolderPath . "/{$d["attachs"][$j]["name"]}";
 				}
 			}
 		}

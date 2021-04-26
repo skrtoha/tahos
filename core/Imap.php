@@ -58,7 +58,10 @@ class Imap{
 					$d["attachs"][$j]["type"] = $type;
 					$d["attachs"][$j]["size"] = $msg_structure->parts[$j]->bytes;
 					$d["attachs"][$j]["name"] = $this->getNameFromParameters($msg_structure->parts[$j]->parameters, $msg_structure->parts[$j]->encoding);
-					$d["attachs"][$j]["name"] = iconv_mime_decode($d["attachs"][$j]["name"], 0, 'utf-8');
+					
+					if (mb_detect_encoding($d["attachs"][$j]["name"]) == 'ASCII'){
+                        $d["attachs"][$j]["name"] = iconv_mime_decode($d["attachs"][$j]["name"], 0, 'utf-8');
+                    }
 
 					if (!preg_match('/'.quotemeta($params["name"]).'/iu', $d["attachs"][$j]["name"])) continue;
 					$d["attachs"][$j]["file"] = $this->structure_encoding(

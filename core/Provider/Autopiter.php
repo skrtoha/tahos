@@ -86,6 +86,7 @@ class Autopiter extends Provider{
 			$basket = $client->GetBasket();
 		}
 		catch(\SoapFault $e){
+		    echo $e->getMessage();
 			return false;
 		}
 		$br = & $basket->GetBasketResult->ItemCartModel;
@@ -93,11 +94,11 @@ class Autopiter extends Provider{
 		return $br;
 	}
 	private static function setOutputItemsToOrder(& $output, $basket){
-		if (!$basket) return;
-		if (is_array($basket)){
-			foreach($basket as $cartModel){
-			    if (!$basket->Comment) continue;
-				$output[$basket->Comment] = self::parseBasketForItemToOrder($cartModel);
+        if (!$basket) return;
+        if (is_array($basket)){
+            foreach($basket as $cartModel){
+                if (!$cartModel->Comment) continue;
+                $output[$cartModel->Comment] = self::parseBasketForItemToOrder($cartModel);
 			}
 		}
 		else{
@@ -109,10 +110,10 @@ class Autopiter extends Provider{
 	public static function getItemsToOrder($provider_id){
 		$output = [];
 		$basket = self::getBasket('entity');
-		self::setOutputItemsToOrder($output, $basket);
-		$basket = self::getBasket('private');
-		self::setOutputItemsToOrder($output, $basket);
-		return $output;
+        self::setOutputItemsToOrder($output, $basket);
+        $basket = self::getBasket('private');
+        self::setOutputItemsToOrder($output, $basket);
+        return $output;
 	}
 	private static function parseBasketForItemToOrder($model){
 		if (!$model) return false;

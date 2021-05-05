@@ -424,11 +424,15 @@ function article_store_items($item_id, $filters = [], $search_type = 'articles')
 			$deliveries[] = $v['delivery'];
 			continue;
 		}
-		else $p['list'][$v['store_id']] = $list;
+		else{
+            if (isset($filters['in_stock']) && $filters['in_stock']) continue;
+            $p['list'][$v['store_id']] = $list;
+        }
 		$p['deliveries'][] = $v['delivery'];
 		$prices[] = $v['price'];
 		$deliveries[] = $v['delivery'];
 	}
+	
 	foreach($store_items as $key => $value){
 		$p = & $store_items[$key];
 		if (!empty($p['list'])) $p['list'] = array_merge($p['list']);

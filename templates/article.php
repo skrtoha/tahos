@@ -85,7 +85,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 			<input type="checkbox" id="in_stock_only" <?=$in_stock ? "checked" : ""?> name="in_stock_only">
 			<label for="in_stock_only">Только в наличии</label>
 		</div>
-		<button item_id="<?=$_GET['item_id']?>" search_type="article">Применить</button>
+		<button item_id="<?=$_GET['item_id']?>" search_type="analogies">Применить</button>
 	</form>
 	<div class="ionTabs" id="search-result-tabs" data-name="search-result-tabs">
 		<ul class="ionTabs__head">
@@ -107,7 +107,8 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 			if (!$user['show_all_analogies']) $where_hide_analogies = "
 				AND si.store_id IS NOT NULL
 			";
-			$res_analogies = $db->query("
+			/*закоментировано т.к. аналоги перенесены во вкладку артикулы
+			 * $res_analogies = $db->query("
 				SELECT 
 					diff.item_diff,
 					si.store_id
@@ -121,7 +122,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 				GROUP BY diff.item_diff
 			", '');
 			if (!$res_analogies->num_rows) $analogies = '';
-			else $analogies = "<span>{$res_analogies->num_rows}</span>";
+			else $analogies = "<span>{$res_analogies->num_rows}</span>";*/
 			?>
 			<li class="ionTabs__tab" search_type="articles" data-target="Tab_1">Артикул</li>
 			<?if ($substitutes){?>
@@ -131,10 +132,10 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 				</li>
 			<?}?>
 			<?if ($analogies){?>
-				<li class="ionTabs__tab" search_type="analogies" data-target="Tab_3">
+				<!--<li class="ionTabs__tab" search_type="analogies" data-target="Tab_3">
 					<span>Аналоги</span>
-					<?=$analogies?>
-				</li>
+					<?/*=$analogies*/?>
+				</li>-->
 			<?}?>
 			<?if ($complects){?>
 				<li class="ionTabs__tab" search_type="complects" data-target="Tab_4">
@@ -178,18 +179,14 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 			</li>
 		</ul>
 		<div class="ionTabs__body">
-			<div class="ionTabs__item" data-name="Tab_1">
+			<div class="ionTabs__item itemInsertable" data-name="Tab_1">
 				<?require_once('core/article.php');?>
 			</div>
-			<div class="ionTabs__item is_others" data-name="Tab_2">
+			<div class="ionTabs__item is_others itemInsertable" data-name="Tab_2">
 				<table class="articul-table"></table>
 				<div class="mobile-layout"></div>
 			</div>
-			<div class="ionTabs__item is_others" data-name="Tab_3">
-				<table class="articul-table"></table>
-				<div class="mobile-layout"></div>
-			</div>
-			<div class="ionTabs__item is_others" data-name="Tab_4">
+			<div class="ionTabs__item is_others itemInsertable" data-name="Tab_4">
 				<table class="articul-table"></table>
 				<div class="mobile-layout"></div>
 			</div>

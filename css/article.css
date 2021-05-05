@@ -1,6 +1,12 @@
 .jq-radio {
     border-radius: 50%;
 }
+h3.title_analogies{
+    margin-top: 40px;
+}
+#analogies{
+    display: none;
+}
 a.showAllResults {
    color: #e01d1d;
     margin-bottom: 15px;

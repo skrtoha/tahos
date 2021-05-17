@@ -10,7 +10,8 @@ var store = {
 	delivery_max: '',
 	under_order: '',
 	workSchedule: '',
-	noReturn: 0
+	noReturn: 0,
+    block: 0
 };
 var reg_interger = /^\d+$/;
 function set_store(store_id){
@@ -24,6 +25,7 @@ function set_store(store_id){
 			store = JSON.parse(response);
 			store.noReturn = +store.noReturn ? 'checked' : '';
 			store.is_main = +store.is_main ? 'checked' : '';
+			store.block = +store.block ? 'checked' : '';
 		}
 	})
 }
@@ -107,6 +109,10 @@ function get_str_form(){
 				 	'<td>Без возврата</td>' +
 				 	'<td><input type="checkbox" name="noReturn" ' + store.noReturn + ' value="1"></td>' +
 			 	'</tr>' +
+                '<tr>' +
+                    '<td>Заблокировать</td>' +
+                    '<td><input type="checkbox" name="block" ' + store.block + ' value="1"></td>' +
+                '</tr>' +
 			 	'<tr>' + form_bottom + '</tr>' +
 	 		'</table>' +
 		'</form>';
@@ -192,8 +198,10 @@ $(function(){
 				// console.log(response); return false;
 				if (reg_interger.test(response)){
 					if (response == 1){
+					    let now = new Date();
 						$('tr[store_id=' + store.id + '] td:nth-child(1)').html(th.find('input[name=title]').val());
-						$('tr[store_id=' + store.id + '] td:nth-child(2)').html(th.find('input[name=cipher]').val().toUpperCase());
+						$('tr[store_id=' + store.id + '] td:nth-child(2)').html(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
+						$('tr[store_id=' + store.id + '] td:nth-child(3)').html(th.find('input[name=cipher]').val().toUpperCase());
 						show_message('Успешно изменено!', 'ok');
 					}
 					else{

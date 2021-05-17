@@ -305,7 +305,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 			) as is_desc
 		FROM #$search_type diff
 		RIGHT JOIN #store_items si ON si.item_id=diff.item_diff
-		LEFT JOIN #provider_stores ps ON ps.id=si.store_id
+		LEFT JOIN #provider_stores ps ON ps.id=si.store_id AND ps.block = 0
 		LEFT JOIN #providers p ON p.id = ps.provider_id
 		LEFT JOIN #currencies c ON c.id=ps.currency_id
 		LEFT JOIN #items i ON diff.item_diff=i.id

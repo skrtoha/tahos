@@ -30,6 +30,7 @@ switch($_POST['act']){
 			'daysForReturn' => $_POST['daysForReturn'],
 			'noReturn' => $_POST['noReturn'] ? 1 : 0,
 			'is_main' => $_POST['is_main'] ? 1 : 0,
+			'block' => $_POST['block'] ? 1 : 0
 		];
 		if ($_POST['store_id']) $res = $db->update(
 			'provider_stores',

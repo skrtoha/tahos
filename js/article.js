@@ -13,6 +13,11 @@ function removeWithoutProviders(){
             let th = $(this);
             if (th.text() === 'Поставщиков не найдено') th.closest('tr').remove()
         })
+        $.each($('#analogies div.mobile-layout div.goods-header'), function(i, item){
+            let th = $(this);
+            let table = th.next('table');
+            if (!table.find('tr td').size()) th.remove();  
+        })
     }
 }
 

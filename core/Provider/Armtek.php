@@ -119,8 +119,8 @@ class Armtek extends Provider{
 				'cipher' => strtoupper(self::getRandomString(4)),
 				'percent' => 11,
 				'currency_id' => 1,
-				'delivery' => 1,
-				'delivery_max' => 2,
+				'delivery' => self::getCountDelivery($object->DLVDT),
+				'delivery_max' => self::getCountDelivery($object->WRNTDT),
 				'under_order' => 2,
 				'noReturn' => 0,
 			], 
@@ -138,6 +138,19 @@ class Armtek extends Provider{
 			}
 		}
 	}
+	
+	private static function getCountDelivery($sting){
+	    $currentDate = new \DateTime();
+	    $targetDate = \DateTime::createFromFormat('YmdHis', $sting);
+	    $totalDays = $targetDate->diff($currentDate)->d;
+	    $days = 0;
+	    for($i = 1; $i <= $totalDays; $i++){
+	        $dayWeek = $currentDate->add(new \DateInterval('P1D'))->format('l');
+	        if ($dayWeek != 'Sunday') $days++;
+        }
+	    return $days;
+    }
+	
 	public static function getBrendId($brand, $from = 'armtek'){
 		/**
 		 * ['brend' => brend_id]

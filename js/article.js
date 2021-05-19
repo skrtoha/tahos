@@ -1244,6 +1244,8 @@ $(function(){
                 $(tabSelector + ' .articul-table').html(pi.full);
                 $(tabSelector + ' .mobile-layout').html(pi.mobile);
 
+                $('a.sortable.brend').addClass('asc');
+
                 price_format();
                 applyUserMarkup();
 

@@ -336,7 +336,7 @@ function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 		else $q_item .= " OR si.price IS NULL";
 	} */
 
-	$q_item .= ' ORDER BY si.price, delivery';
+	$q_item .= ' ORDER BY b.title, si.price, delivery';
 	return $q_item;
 }
 function article_store_items($item_id, $filters = [], $search_type = 'articles'){

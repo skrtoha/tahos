@@ -64,10 +64,10 @@
 				if ($type != 'article' && $type != 'barcode' && $type != 'vin') $type = '';
 				?>
 				<form action="/search/" method="get">
-					<input class="search_input" value="" name="search_input" type="text" placeholder="Поиск детали, например: 9091901122" autocomplete="off">
+					<input class="search_input" value="" name="search_input" type="text" placeholder="Введите VIN или артикул, например: 9091901122" autocomplete="off">
 					<div class="settings">
 						<input type="radio" <?=$type == 'article' || !$type ? "checked" : ""?> value="article" name="type" id="radio1">
-						<label for="radio1" data-placeholder="Введите номер детали">Искать по номеру детали</label>
+						<label for="radio1" data-placeholder="Введите номер детали">Искать по VIN или номеру детали</label>
 						
 						<input type="radio" <?=$type == 'barcode' ? "checked" : ""?> name="type" id="radio2" value="barcode">
 						<label  for="radio2" data-placeholder="Введите штрих-код">Поиск по штрих-коду</label>

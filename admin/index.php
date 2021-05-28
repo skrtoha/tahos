@@ -21,7 +21,7 @@ session_start();
 $view = $_GET['view'];
 if (!$view) header("Location: /admin/?view=index");
 
-$db = new core\DataBase();
+$db = new core\Database();
 
 $connection = new core\Connection($db);
 $db->setProfiling($connection->connection_id);

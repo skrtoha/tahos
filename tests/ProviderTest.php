@@ -2,13 +2,13 @@
 use core\Provider\FavoriteParts;
 use core\Provider\Impex;
 use core\Provider\Rossko;
-use core\DataBase;
+use core\Database;
 use core\Provider\Abcp;
 use core\Provider;
 
 class ProviderTest extends \PHPUnit\Framework\TestCase{
     public function testRossko(){
-        $rossko = new Rossko(new DataBase());
+        $rossko = new Rossko(new Database());
         $this->assertTrue(Provider::getIsEnabledApiSearch($rossko->provider_id), 'api поиска отключено');
         $this->assertTrue(Provider::getIsEnabledApiSearch($rossko->provider_id), 'api заказов отключено');
         $result = $rossko->getSearch('VKMV 7PK1749');

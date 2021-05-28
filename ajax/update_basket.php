@@ -3,7 +3,7 @@ require_once ("../core/DataBase.php");
 session_start();
 require_once ("../core/functions.php");
 
-$db = new core\DataBase();
+$db = new core\Database();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();

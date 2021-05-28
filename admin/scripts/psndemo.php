@@ -8,7 +8,7 @@ $log = new Katzgrau\KLogger\Logger(__DIR__.'/logs', Psr\Log\LogLevel::INFO, arra
 	'filename' => 'psndemo',
 	'extension' => 'txt'
 ));
-$db = new core\DataBase();
+$db = new core\Database();
 
 $db->query("SET foreign_key_checks = 0");
 $db->query("TRUNCATE tahos_models");

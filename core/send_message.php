@@ -3,7 +3,7 @@ require_once ("../core/functions.php");
 session_start();
 /*debug($_POST);
 exit();*/
-$db = new core\DataBase();
+$db = new core\Database();
 if ($_POST['message_send']){
 	if (!$_POST['correspond_id']){
 		$db->insert(

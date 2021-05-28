@@ -11,7 +11,7 @@ require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php")
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/order_issues.function.php");
 
 
-$db = new core\DataBase();
+$db = new core\Database();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();

@@ -274,7 +274,7 @@ abstract class Provider{
 	}
 	public static function getInstanceDataBase(){
 		if (isset($GLOBALS['db'])) return $GLOBALS['db'];
-		else return new DataBase();
+		else return new Database();
 	}
 	public static function getWhere($array){
 		return "`order_id`={$array['order_id']} AND `store_id`={$array['store_id']} AND `item_id`={$array['item_id']}";

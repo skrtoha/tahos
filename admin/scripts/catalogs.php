@@ -4,7 +4,7 @@ require_once('../core/DataBase.php');
 require_once('templates/functions.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 
-$db = new core\DataBase();
+$db = new core\Database();
 
 // $db->query("SET foreign_key_checks = 0");
 // $db->delete('nodes', "`id`=1174291");

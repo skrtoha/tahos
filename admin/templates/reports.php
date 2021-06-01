@@ -5,6 +5,9 @@ $tab = isset($_GET['tab']) ? 'nomenclature' : $_GET['tab'];
 $reports = new Reports($tab, $db);
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	switch($_POST['tab']){
+        case 'logs':
+            
+            break;
 		case 'nomenclature': 
 			switch($_POST['act']){
 				case 'clear':

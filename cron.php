@@ -121,5 +121,16 @@ switch ($_SERVER['argv'][1]){
         if (!$res->num_rows) return true;
         foreach($res as $item) $db->insert('prices', $item);
         break;
+    case 'clearStores':
+        $db->query("
+			DELETE si FROM #store_items si
+			LEFT JOIN
+				#provider_stores ps ON ps.id = si.store_id
+			WHERE
+				ps.is_main = 0
+		",'');
+        $mysqli = $db->get_mysqli();
+        $logger->info("Удалено {$mysqli->affected_rows} строк.");
+        break;
 }
 $logger->alert('Обработка '.$_SERVER['argv'][1].' закончена');

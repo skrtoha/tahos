@@ -1,7 +1,7 @@
 <?php  
 namespace core;
 use core\Exceptions\DataBaseNoConnectException;
-class DataBase {
+class Database {
 	public $config;
 	public $mysqli;
 	public $last_query;

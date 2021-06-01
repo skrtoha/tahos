@@ -3,7 +3,7 @@ class DataBaseTest extends \PHPUnit\Framework\TestCase{
 	public static $db;
 	public static function setUpBeforeClass(): void
 	{
-		self::$db = new core\DataBase();
+		self::$db = new core\Database();
 	}
    /* public function testDatabaseIsWorking(){
         $this->assertObjectHasAttribute('mysqli', self::$db);
@@ -19,7 +19,7 @@ class DataBaseTest extends \PHPUnit\Framework\TestCase{
     	self::$db = null;
     }
     public function testSetProfiling(){
-        $db = $this->createMock(core\DataBase::class);
+        $db = $this->createMock(core\Database::class);
         $db->method('setConnectionID')->willReturn(true);
         $db->method('setProfiling')->willReturn(true);
         //тоже самое

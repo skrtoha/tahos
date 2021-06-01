@@ -8,7 +8,7 @@ $log = new Katzgrau\KLogger\Logger('../logs', Psr\Log\LogLevel::WARNING, array(
 	'dateFormat' => 'G:i:s'
 ));
 set_time_limit(0);
-$db = new core\DataBase();
+$db = new core\Database();
 $start = 0;
 $step = 500;
 $db->query('TRUNCATE TABLE `tahos_prices`');

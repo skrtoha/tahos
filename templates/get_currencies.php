@@ -1,6 +1,6 @@
 <?php
   require_once ("../core/DataBase.php");
-  $db = new core\DataBase();
+  $db = new core\Database();
   $date = date("d/m/Y"); // Сегодняшняя дата в необходимом формате
   $link = "http://www.cbr.ru/scripts/XML_daily.asp?date_req=$date"; // Ссылка на XML-файл с курсами валют
   $content = file_get_contents($link); // Скачиваем содержимое страницы

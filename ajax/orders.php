@@ -4,7 +4,7 @@ require_once('../core/functions.php');
 session_start();
 $user_id = $_SESSION['user'];
 
-$db = new core\DataBase();
+$db = new core\Database();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();

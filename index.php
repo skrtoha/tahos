@@ -8,7 +8,7 @@ require_once('core/DataBase.php');
 require_once('core/functions.php');
 require_once('vendor/autoload.php');
 
-$db = new core\DataBase();
+$db = new core\Database();
 
 session_start();
 $connection = new core\Connection($db);

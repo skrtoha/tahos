@@ -1,7 +1,7 @@
 <?php
   if ($view) require_once ("../core/DataBase.php");
   require_once('functions.php');
-  $db = new core\DataBase();
+  $db = new core\Database();
   $date = date("d/m/Y");
   $link = "http://www.cbr.ru/scripts/XML_daily.asp?date_req=$date"; 
   echo "$link";

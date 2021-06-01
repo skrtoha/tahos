@@ -3,7 +3,7 @@ require_once('core/DataBase.php');
 require_once('core/functions.php');
 require_once('vendor/autoload.php');
 
-$db = new core\DataBase();
+$db = new core\Database();
 
 $secret_key = 'RMoTDr8+TgrVFTyKv2AK/AC4';
 $sha1 = sha1(

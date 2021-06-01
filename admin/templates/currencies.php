@@ -14,7 +14,7 @@ function view(){
 	$page_title = "Валюта";
 	$status = "<a href='/admin'>Главная</a> > $page_title"?>
 	<a href="?view=get_currencies">Обновить курс валют</a>
-	<span>Обновлено: <?=date('d.m.Y H:i', $db->getFieldOnID('settings', 1, 'currencies_update'))?></span>
+	<span>Обновлено: <?=\core\Setting::get('currency', 'dateUpdate')?></span>
 	<div style="height: 10px"></div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

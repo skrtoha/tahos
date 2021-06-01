@@ -228,6 +228,8 @@ class FavoriteParts extends Provider{
 	 */
 	private static function getBasket($typeOrganization = 'entity'){
 		$url = "http://api.favorit-parts.ru/ws/v1/cart/";
+        $params = json_decode(\core\Setting::get('api_settings', 19));
+        if (!$params->$typeOrganization->isActive) return [];
 		$res = self::getUrlData($url, null, [
 			"X-Favorit-DeveloperKey: ".self::getParams($typeOrganization)->developerKey,
 			'X-Favorit-ClientKey: '.self::getParams($typeOrganization)->key
@@ -244,6 +246,7 @@ class FavoriteParts extends Provider{
 			'private' => self::getBasket('private')
 		];
 		foreach($baskets as $typeOrganization => $basket){
+		    if (empty($basket)) continue;
 			$dateShipments = [];
 			$PaymentType = $typeOrganization == 'entity' ? 2 : 1;
 			foreach($basket['cart'] as $value) $dateShipments[$value['dateShipment']][] = $value;

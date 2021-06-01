@@ -15,7 +15,7 @@ $db = new core\Database();
 $date = new DateTime();
 $logger = new \Katzgrau\KLogger\Logger(
     $_SERVER['DOCUMENT_ROOT'].'/admin/logs',
-    \Psr\Log\LogLevel::ALERT,
+    \Psr\Log\LogLevel::DEBUG,
     [
         'filename' => 'common_'.$date->format('d.m.Y'),
         'dateFormat' => 'G:i:s'

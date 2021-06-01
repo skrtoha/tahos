@@ -97,5 +97,29 @@ switch ($_SERVER['argv'][1]){
             $db->update('currencies', array('rate' => $val), "`charcode`='$charcode'");
         }
         break;
+    case 'updatePrices':
+        $logger->alert('Обновление цен');
+        $db->delete('prices', "item_id > 0");
+        $res = $db->query("
+			SELECT
+				ci.item_id,
+				MIN(
+					FLOOR (si.price + si.price * ps.percent / 100)
+				) AS price,
+				MIN(ps.delivery) AS delivery
+			FROM
+				#categories_items ci
+			LEFT JOIN
+				#store_items si ON si.item_id = ci.item_id
+			LEFT JOIN
+				#provider_stores ps ON ps.id = si.store_id
+			WHERE
+				si.price IS NOT null
+			GROUP BY
+				ci.item_id
+		", '');
+        if (!$res->num_rows) return true;
+        foreach($res as $item) $db->insert('prices', $item);
+        break;
 }
 $logger->alert('Обработка '.$_SERVER['argv'][1].' закончена');

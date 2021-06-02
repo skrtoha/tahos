@@ -228,7 +228,7 @@ function parse_row($row, $fields, core\Price $price, $stringNumber){
 		'row' => $stringNumber
 	]);
 }
-function endSuccessfullyProccessing($isLogging){
+function endSuccessfullyProccessing($isLogging, \Katzgrau\KLogger\Logger $logger){
 	global $db, $price, $stringNumber;
 	$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_GET['store_id']}", '');
 
@@ -237,16 +237,16 @@ function endSuccessfullyProccessing($isLogging){
 		$price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
         $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
 		
-		echo "<br>Обработано <b>$stringNumber</b> строк";
-		echo "<br>Добавлено в прайс: <b>$price->insertedStoreItems</b> записей";
-		echo "<br>Вставлено: <b>$price->insertedBrends</b> брендов";
-		echo "<br>Вставлено: <b>$price->insertedItems</b> номенклатуры";
+		$logger->alert("Обработано $stringNumber строк");
+		$logger->alert("Добавлено в прайс: {$price->insertedStoreItems} записей");
+		$logger->alert("Вставлено: $price->insertedBrends брендов");
+		$logger->alert("Вставлено: $price->insertedItems номенклатуры");
 		
 		if ($isLogging){
-            echo "<br><a target='_blank' href='/admin/logs/$price->nameFileLog'>Лог</a>";
+		    $logger->info("Полный лог: $price->nameFileLog");
         }
 }
-function parseWithPhpOffice($workingFile, $debuggingMode){
+function parseWithPhpOffice($workingFile, $debuggingMode, \Katzgrau\KLogger\Logger $logger){
 	global $emailPrice, $price, $stringNumber;
 	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
 	$xls->setActiveSheetIndex(0);
@@ -261,12 +261,15 @@ function parseWithPhpOffice($workingFile, $debuggingMode){
 		$stringNumber++;
 
 		if ($debuggingMode){
-			debug($row);
-			if ($stringNumber > 100) die("Обработка прошла");
+			$logger->debug('', $row);
+			if ($stringNumber > 100){
+                $logger->alert("Обработка прошла");
+                die();
+            }
 		}
 
 		parse_row($row, $emailPrice['fields'], $price, $stringNumber);
 	}
-	echo "<br>Обрабока с помощью PhpOffice закончена";
+	$logger->alert("Обрабока с помощью PhpOffice закончена");
 }
 ?>

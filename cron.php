@@ -1,6 +1,6 @@
 <?php
 use core\Setting;
-ini_set('error_reporting', E_ERROR);
+ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -23,7 +23,23 @@ $logger = new \Katzgrau\KLogger\Logger(
     ]
 );
 
-switch ($_SERVER['argv'][1]){
+$params = [];
+$counter = 0;
+if (!empty($_GET)){
+    foreach($_GET as $value){
+        $params[$counter] = $value;
+        $counter++;
+    }
+}
+else{
+    for($i = 0; $i < count($_SERVER['argv']); $i++){
+        if ($i == 0) continue;
+        $params[$counter] = $_SERVER['argv'][$i];
+        $counter++;
+    }
+}
+
+switch ($params[0]){
     case 'orderRossko':
         $logger->alert('Отправка заказа в Росско');
         core\Provider\Rossko::sendOrder();
@@ -134,6 +150,182 @@ switch ($_SERVER['argv'][1]){
 		",'');
         $mysqli = $db->get_mysqli();
         $logger->info("Удалено {$mysqli->affected_rows} строк.");
+        break;
+    case 'emailPrice':
+        ini_set('memory_limit', '2048M');
+        $store_id = $params[1];
+        $debuggingMode = false;
+        require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/providers.function.php');
+        $emailPrice = $db->select_one('email_prices', '*', "`store_id`={$store_id}");
+        $emailPrice = json_decode($emailPrice['settings'], true);
+        $price = new core\Price($db, $emailPrice);
+    
+        if ($debuggingMode) debug($emailPrice, 'emailPrice');
+        $store = $db->select_unique("
+			SELECT
+				ps.id AS store_id,
+				ps.title AS store,
+				ps.provider_id,
+				p.title AS provider
+			FROM
+				#provider_stores ps
+			LEFT JOIN
+				#providers p ON p.id = ps.provider_id
+			WHERE
+				ps.id = {$store_id}
+		");
+        $store = $store[0];
+    
+        $logger->alert("Прайс {$emailPrice['title']}");
+    
+        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $fileImap = $imap->getLastMailFrom([
+            'from' => $emailPrice['from'],
+            'name' => $emailPrice['name']
+        ], $debuggingMode);
+        if ($debuggingMode) debug($fileImap, 'fileImap');
+        if (!$fileImap){
+            $errorText = "Не удалось скачать {$emailPrice['name']} из почты.";
+            $logger->error($errorText);
+            die();
+        }
+    
+        switch($emailPrice['clearPrice']){
+            case 'onlyStore': $db->delete('store_items', "`store_id`={$store_id}"); break;
+            case 'provider': $db->query("
+				DELETE si FROM
+					#store_items si
+				LEFT JOIN
+					#provider_stores ps ON ps.id=si.store_id
+				WHERE
+					ps.provider_id = {$store['provider_id']}
+			", '');
+                break;
+        }
+    
+        //добавлено специально для Армтек, чтобы если грузится ARMK, то очищаются
+        //все склады, кроме ARMC
+        if ($store['id'] == 4) $db->query("
+				DELETE si FROM
+					#store_items si
+				LEFT JOIN
+					#provider_stores ps ON ps.id = si.store_id
+				WHERE
+					ps.provider_id = 2 AND si.store_id != 3
+			", '');
+    
+        if ($emailPrice['isArchive']){
+            $zipArchive = new ZipArchive();
+            $res = $zipArchive->open($fileImap);
+            if (!$res){
+                $errorText = "Ошибка чтения файла {$emailPrice['name']}";
+                $logger->error($errorText);
+                break;
+            }
+            try{
+                $nameInArchive = $emailPrice['nameInArchive'];
+                $res = $zipArchive->extractTo(core\Config::$tmpFolderPath . "/", [$nameInArchive]);
+                if (!$res){
+                    throw new Exception ("Ошибка извлечения файла {$emailPrice['nameInArchive']}. Попытка использовать альтернативный способ.");
+                }
+            } catch(Exception $e){
+                $logger->warning($e->getMessage());
+                if ($emailPrice['indexInArchive'] == '0' || $emailPrice['indexInArchive']){
+                    $logger->info("обработка через indexInArchive");
+                    $nameInArchive = $zipArchive->getNameIndex($emailPrice['indexInArchive']);
+                    $bites = file_put_contents(core\Config::$tmpFolderPath . "/$nameInArchive", $zipArchive->getFromIndex($emailPrice['indexInArchive']));
+                    if (!$bites){
+                        $logger->error("Возникла ошибка. Ни один из способов извлечь архив не сработали");
+                        throw new Exception($logger->getLastLogLine());
+                    }
+                }
+                else{
+                    $zip_count = $zipArchive->count();
+                    if (!$zip_count){
+                        $logger->error("Альтернативный способ не сработал - ошибка получения количества файлов в архиве");
+                        throw new Exception($logger->getLastLogLine());
+                    }
+                    for ($i = 0; $i < $zip_count; $i++) {
+                        $logger->info("Индекс $i: ". $zipArchive->getNameIndex($i));
+                    };
+                    $logger->info("Укажите настройках в поле \"Индекс файла в архиве\" необходимый индекс.");
+                }
+            }
+            if ($emailPrice['fileType'] == 'excel') $workingFile = core\Config::$tmpFolderPath . "/$nameInArchive";
+            else $workingFile = $zipArchive->getStream($nameInArchive);
+        }
+        else $workingFile = $fileImap;
+    
+        if ($debuggingMode) debug($workingFile, 'workingFile');
+    
+        /**
+         * [$stringNumber counter for strings in file]
+         * @var integer
+         */
+        $stringNumber = 0;
+        switch($emailPrice['fileType']){
+            case 'excel':
+                try{
+                    require_once ($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
+                    $reader = \Box\Spout\Reader\Common\Creator\ReaderEntityFactory::createReaderFromFile($workingFile);
+                }
+                catch(\Box\Spout\Common\Exception\UnsupportedTypeException $e){
+                    $logger->warning($e->getMessage());
+                    $logger->info("Обработка с помощью PhpOffice...");
+                    parseWithPhpOffice($workingFile, $debuggingMode, $logger);
+                    endSuccessfullyProccessing($price->isLogging, $logger);
+                    break;
+                }
+                try{
+                    $reader->open($workingFile);
+                } catch(\Box\Spout\Common\Exception\IOException $e){
+                    $logger->warning("Ошибка:" . $e->getMessage());
+                    $logger->info("Попытка обработки файла другим способом....");
+                    parseWithPhpOffice($workingFile, $debuggingMode, $logger);
+                    endSuccessfullyProccessing($price->isLogging, $logger);
+                }
+                foreach ($reader->getSheetIterator() as $sheet) {
+                    foreach ($sheet->getRowIterator() as $iterator) {
+                        $cells = $iterator->getCells();
+                        $row = [];
+                        foreach($cells as $value) $row[] = $value->getValue();
+                        $stringNumber++;
+                    
+                        if ($debuggingMode){
+                            debug($row);
+                            if ($stringNumber > 100){
+                                $logger->alert("Обработка прошла");
+                                die();
+                            }
+                        }
+                        parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+                    }
+                }
+                break;
+            case 'csv':
+                while ($data = fgetcsv($workingFile, 1000, "\n")) {
+                    $row = iconv('windows-1251', 'utf-8', $data[0]);
+                    $row = explode(';', str_replace('"', '', $row));
+                    $stringNumber++;
+                    if ($debuggingMode){
+                        debug($row);
+                        if ($stringNumber > 100){
+                            $logger->alert("Обработка прошла");
+                            die();
+                        }
+                    }
+                    parse_row($row, $emailPrice['fields'], $price, $stringNumber);
+                }
+                break;
+        }
+    
+        switch($emailPrice['clearPrice']){
+            case 'onlyStore': Provider::updatePriceUpdated(['store_id' => $store_id]); break;
+            case 'provider': Provider::updatePriceUpdated(['provider_id' => $_GET['provider_id']]); break;
+                break;
+        }
+    
+        endSuccessfullyProccessing($price->isLogging);
         break;
 }
 $logger->alert('Обработка '.$_SERVER['argv'][1].' закончена');

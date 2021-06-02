@@ -1,5 +1,13 @@
 <?php
+
+use Box\Spout\Common\Exception\IOException;
+use Box\Spout\Common\Exception\UnsupportedTypeException;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use core\Provider;
 use core\Setting;
+use Katzgrau\KLogger\Logger;
+use Psr\Log\LogLevel;
+
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -14,9 +22,9 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 $db = new core\Database();
 
 $date = new DateTime();
-$logger = new \Katzgrau\KLogger\Logger(
+$logger = new Logger(
     $_SERVER['DOCUMENT_ROOT'].'/admin/logs',
-    \Psr\Log\LogLevel::DEBUG,
+    LogLevel::DEBUG,
     [
         'filename' => 'common_'.$date->format('d.m.Y'),
         'dateFormat' => 'G:i:s'
@@ -267,9 +275,9 @@ switch ($params[0]){
             case 'excel':
                 try{
                     require_once ($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
-                    $reader = \Box\Spout\Reader\Common\Creator\ReaderEntityFactory::createReaderFromFile($workingFile);
+                    $reader = ReaderEntityFactory::createReaderFromFile($workingFile);
                 }
-                catch(\Box\Spout\Common\Exception\UnsupportedTypeException $e){
+                catch(UnsupportedTypeException $e){
                     $logger->warning($e->getMessage());
                     $logger->info("Обработка с помощью PhpOffice...");
                     parseWithPhpOffice($workingFile, $debuggingMode, $logger);
@@ -278,7 +286,7 @@ switch ($params[0]){
                 }
                 try{
                     $reader->open($workingFile);
-                } catch(\Box\Spout\Common\Exception\IOException $e){
+                } catch(IOException $e){
                     $logger->warning("Ошибка:" . $e->getMessage());
                     $logger->info("Попытка обработки файла другим способом....");
                     parseWithPhpOffice($workingFile, $debuggingMode, $logger);
@@ -325,7 +333,7 @@ switch ($params[0]){
                 break;
         }
     
-        endSuccessfullyProccessing($price->isLogging);
+        endSuccessfullyProccessing($price->isLogging, $logger);
         break;
 }
 $logger->alert('Обработка '.$_SERVER['argv'][1].' закончена');

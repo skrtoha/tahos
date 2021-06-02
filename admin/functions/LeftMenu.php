@@ -31,6 +31,7 @@ class LeftMenu{
 		],
 		'Сообщения',
 		'Валюта',
+        'Логи крон',
 		'Прайсы',
 		'Поставщики' => [
 			'Добавление',
@@ -81,6 +82,7 @@ class LeftMenu{
 		'Бренды товаров' => ['brends'],
 		'Сообщения' => ['messages', 'correspond'],
 		'Валюта' => ['currencies', 'get_currencies'],
+        'Логи крон' => ['cron_logs'],
 		'Прайсы' => ['prices'],
 		'Поставщики' => ['providers'],
 		'Точки выдачи' => ['issues'],
@@ -110,6 +112,7 @@ class LeftMenu{
 			'Точки выдачи' => 'issues',
 			'Тексты' => 'texts',
 			'Файлы' => 'files',
+            'Логи крон' => 'cron_logs',
 			'Соединения' => 'connections',
 			'Тест API поставщиков' => 'test_api_providers',
 			'Рассылки прайсов' => 'subscribePrices',

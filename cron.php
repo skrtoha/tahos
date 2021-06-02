@@ -1,5 +1,6 @@
-<?php 
-ini_set('error_reporting', E_ALL);
+<?php
+use core\Setting;
+ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -96,6 +97,8 @@ switch ($_SERVER['argv'][1]){
             }
             $db->update('currencies', array('rate' => $val), "`charcode`='$charcode'");
         }
+        $dateTime = new DateTime();
+        Setting::update('currency', 'dateUpdate', $dateTime->format('d.m.Y H:i:s'));
         break;
     case 'updatePrices':
         $logger->alert('Обновление цен');

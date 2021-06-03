@@ -45,7 +45,7 @@ $logger = new Logger(
     [
         'filename' => 'common_'.$date->format('d.m.Y'),
         'dateFormat' => 'G:i:s',
-        'logFormat' => '[{date}] [{level}] '.$params[0].': {message}'
+        'logFormat' => '[{date}] '.$params[0].' {message}'
     ]
 );
 

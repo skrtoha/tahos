@@ -1,5 +1,7 @@
 <?php
 use core\Provider;
+use Katzgrau\KLogger\Logger;
+
 function items_submit(){
 	global $db;
 	$profiling = $db->isProfiling;
@@ -227,8 +229,9 @@ function parse_row($row, $fields, core\Price $price, $stringNumber){
 		'packaging' => $row[$fieldPackaging],
 		'row' => $stringNumber
 	]);
+	$price->insertedStoreItems++;
 }
-function endSuccessfullyProccessing($isLogging, \Katzgrau\KLogger\Logger $logger){
+function endSuccessfullyProccessing($isLogging, Logger $logger){
 	global $db, $price, $stringNumber;
 	$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_GET['store_id']}", '');
 
@@ -246,7 +249,7 @@ function endSuccessfullyProccessing($isLogging, \Katzgrau\KLogger\Logger $logger
 		    $logger->info("Полный лог: $price->nameFileLog");
         }
 }
-function parseWithPhpOffice($workingFile, $debuggingMode, \Katzgrau\KLogger\Logger $logger){
+function parseWithPhpOffice($workingFile, $debuggingMode, Logger $logger){
 	global $emailPrice, $price, $stringNumber;
 	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
 	$xls->setActiveSheetIndex(0);

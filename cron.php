@@ -285,7 +285,7 @@ switch ($params[0]){
                     $logger->info("Обработка с помощью PhpOffice...");
                     parseWithPhpOffice($workingFile, $debuggingMode, $logger);
                     endSuccessfullyProccessing($price->isLogging, $logger);
-                    break;
+                    break 2;
                 }
                 try{
                     $reader->open($workingFile);
@@ -294,6 +294,7 @@ switch ($params[0]){
                     $logger->info("Попытка обработки файла другим способом....");
                     parseWithPhpOffice($workingFile, $debuggingMode, $logger);
                     endSuccessfullyProccessing($price->isLogging, $logger);
+                    break 2;
                 }
                 foreach ($reader->getSheetIterator() as $sheet) {
                     foreach ($sheet->getRowIterator() as $iterator) {
@@ -339,5 +340,4 @@ switch ($params[0]){
         endSuccessfullyProccessing($price->isLogging, $logger);
         break;
 }
-$logger->alert('Обработка '.$params[0].' закончена');
 $logger->alert('----------КОНЕЦ-------------');

@@ -336,4 +336,4 @@ switch ($params[0]){
         endSuccessfullyProccessing($price->isLogging, $logger);
         break;
 }
-$logger->alert('Обработка '.$_SERVER['argv'][1].' закончена');
+$logger->alert('Обработка '.$params[0].' закончена');

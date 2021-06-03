@@ -339,5 +339,102 @@ switch ($params[0]){
     
         endSuccessfullyProccessing($price->isLogging, $logger);
         break;
+    case 'priceRossko':
+        ini_set('memory_limit', '2048M');
+        $logger->alert("Прайс Росско");
+        $fileNames = [
+            '77769_91489D6DA76B9D7A99061B9F7B18F3CE.csv' => 24,
+            '77769_D27310FF6AA0D63D3D6B4B25EACB6C46.csv' => 25
+        ];
+        $ciphers = [
+            24 => 'ROSV',
+            25 => 'ROSM'
+        ];
+        $rossko = new core\Provider\Rossko($db);
+        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $filename = $imap->getLastMailFrom(['from' => 'price@rossko.ru', 'name' => 'rossko_price.zip']);
+        if (!$filename){
+            $logger->error("Не удалось получить файл из почты.");
+            throw new Exception($logger->getLastLogLine());
+        }
+        
+        $zipArchive = new ZipArchive();
+        $res = $zipArchive->open($filename);
+        
+        $numFiles = $zipArchive->numFiles;
+        if (!$numFiles){
+            $logger->error("Ошибка скачивания файла с почты");
+            throw new Exception($logger->getLastLogLine());
+        }
+        $db->query("
+			DELETE si FROM
+				#store_items si
+			LEFT JOIN
+				#provider_stores ps ON ps.id=si.store_id
+			WHERE
+				ps.provider_id = " . core\Provider\Rossko::getParams()->provider_id . "
+		", '');
+        for ($num = 0; $num < $numFiles; $num++){
+            $zipFile = $zipArchive->statIndex($num);
+            $store_id = $fileNames[$zipFile['name']];
+            if (!$store_id) {
+                $logger->error("Неизвестное имя файла {$zipFile['name']}");
+                throw new Exception($logger->getLastLogLine());
+            }
+            $emailPrice = [
+                'isAddBrend' => 0,
+                'isAddItem' => 0,
+                'title' => 'price_'.$ciphers[$store_id],
+                'isLogging' => true
+            ];
+            $price = new core\Price($db, $emailPrice);
+            $file = $zipArchive->getStream($zipFile['name']);
+            $i = 0;
+            while ($data = fgetcsv($file, 1000, "\n")) {
+                $row = iconv('windows-1251', 'utf-8', $data[0]);
+                $row = explode(';', str_replace('"', '', $row));
+                $i++;
+                if (substr($row[0], 0, 3) != 'NSI') continue;
+                
+                if (!$row[1] || !$row[2]){
+                    $price->setLog('error', "В строке $i произошла ошибка.");
+                    continue;
+                }
+                $brend_id = $price->getBrendId($row[1]);
+                if (!$brend_id) continue;
+                $item_id = $price->getItemId([
+                    'brend_id' => $brend_id,
+                    'brend' => $row[1],
+                    'article' => $row[10] ? $row[10] : $row[2],
+                    'title' => $row[3],
+                    'row' => $i
+                ]);
+                if (!$item_id) continue;
+                $price->insertStoreItem([
+                    'store_id' => $store_id,
+                    'item_id' => $item_id,
+                    'price' => $row[6],
+                    'in_stock' => $row[8],
+                    'packaging' => $row[5],
+                    'row' => $i
+                ]);
+            }
+            
+            $price->setLog('alert',"Обработано $i строк");
+            $price->setLog('alert',"Добавлено в прайс: $price->insertedStoreItems записей");
+            $price->setLog('alert',"Вставлено: $price->insertedBrends брендов");
+            $price->setLog('alert',"Вставлено: $price->insertedItems номенклатуры");
+            
+            $logger->alert($ciphers[$store_id]);
+            $logger->alert("Обработано $i строк");
+            $logger->alert("Добавлено в прайс: $price->insertedStoreItems записей");
+            $logger->alert("Вставлено: $price->insertedBrends брендов");
+            $logger->alert("Вставлено: $price->insertedItems номенклатуры");
+            if ($price->isLogging){
+                $logger->alert("Полный лог: $price->nameFileLog");
+            }
+        }
+        Provider::updatePriceUpdated(['provider_id' => core\Provider\Rossko::getParams()->provider_id]);
+        break;
 }
 $logger->alert('----------КОНЕЦ-------------');

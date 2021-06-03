@@ -48,6 +48,7 @@ $logger = new Logger(
         'logFormat' => '[{date}] '.$params[0].' {message}'
     ]
 );
+$logger->alert('--------------------------------------');
 
 switch ($params[0]){
     case 'orderRossko':

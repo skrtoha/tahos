@@ -45,7 +45,7 @@ $logger = new Logger(
     [
         'filename' => 'common_'.$date->format('d.m.Y'),
         'dateFormat' => 'G:i:s',
-        'logFormat' => '[{date}] {message}'
+        'logFormat' => '---[{date}] {message}---'
     ]
 );
 $logger->alert('----------СТАРТ-------------');

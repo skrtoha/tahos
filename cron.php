@@ -515,6 +515,7 @@ switch ($params[0]){
         ];
         
         foreach($files as $zipName => $value){
+            $logger->alert("Прайс $zipName");
             $emailPrice = [
                 'isAddBrend' => 0,
                 'isAddItem' => 0,

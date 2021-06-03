@@ -21,15 +21,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/core/Database.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 $db = new core\Database();
 
-$date = new DateTime();
-$logger = new Logger(
-    $_SERVER['DOCUMENT_ROOT'].'/admin/logs',
-    LogLevel::DEBUG,
-    [
-        'filename' => 'common_'.$date->format('d.m.Y'),
-        'dateFormat' => 'G:i:s'
-    ]
-);
 
 $params = [];
 $counter = 0;
@@ -46,6 +37,17 @@ else{
         $counter++;
     }
 }
+
+$date = new DateTime();
+$logger = new Logger(
+    $_SERVER['DOCUMENT_ROOT'].'/admin/logs',
+    LogLevel::DEBUG,
+    [
+        'filename' => 'common_'.$date->format('d.m.Y'),
+        'dateFormat' => 'G:i:s',
+        'logFormat' => '[{date}] [{level}] '.$params[0].': {message}'
+    ]
+);
 
 switch ($params[0]){
     case 'orderRossko':

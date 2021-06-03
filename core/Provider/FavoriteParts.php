@@ -319,7 +319,6 @@ class FavoriteParts extends Provider{
 		foreach($cart as $b){
 			$osi = explode('-', $b['comment']);
 			$typeOrganization = parent::getUserTypeByOrderID($osi[0]);
-			if ($typeOrganization != $inputTypeOrganization) continue;
 			$output[] = [
 				'Goods' => $b['goods'],
 				'WarehouseGroup' => $b['warehouseGroup'],

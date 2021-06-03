@@ -222,14 +222,13 @@ function parse_row($row, $fields, core\Price $price, $stringNumber){
 	if (!$item_id) return;
 	
 	$price->insertStoreItem([
-		'store_id' => $_GET['store_id'],
+		'store_id' => $price->store_id,
 		'item_id' => $item_id,
 		'price' => $row[$fieldPrice],
 		'in_stock' => $row[$fieldInStock],
 		'packaging' => $row[$fieldPackaging],
 		'row' => $stringNumber
 	]);
-	$price->insertedStoreItems++;
 }
 function endSuccessfullyProccessing($isLogging, Logger $logger){
 	global $db, $price, $stringNumber;

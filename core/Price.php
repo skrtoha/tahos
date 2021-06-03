@@ -9,6 +9,7 @@ class Price{
 	public $insertedItems = 0;
 	public $insertedStoreItems = 0;
 	public $nameFileLog;
+	public $store_id;
 	
 	public $isLogging;
 	

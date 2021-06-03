@@ -167,7 +167,7 @@ switch ($params[0]){
         $emailPrice = $db->select_one('email_prices', '*', "`store_id`={$store_id}");
         $emailPrice = json_decode($emailPrice['settings'], true);
         $price = new core\Price($db, $emailPrice);
-    
+        $price->store_id = $store_id;
         if ($debuggingMode) debug($emailPrice, 'emailPrice');
         $store = $db->select_unique("
 			SELECT
@@ -180,7 +180,7 @@ switch ($params[0]){
 			LEFT JOIN
 				#providers p ON p.id = ps.provider_id
 			WHERE
-				ps.id = {$store_id}
+				ps.id = {$price->store_id}
 		");
         $store = $store[0];
     
@@ -199,7 +199,7 @@ switch ($params[0]){
         }
     
         switch($emailPrice['clearPrice']){
-            case 'onlyStore': $db->delete('store_items', "`store_id`={$store_id}"); break;
+            case 'onlyStore': $db->delete('store_items', "`store_id`={$price->store_id}"); break;
             case 'provider': $db->query("
 				DELETE si FROM
 					#store_items si
@@ -328,7 +328,7 @@ switch ($params[0]){
         }
     
         switch($emailPrice['clearPrice']){
-            case 'onlyStore': Provider::updatePriceUpdated(['store_id' => $store_id]); break;
+            case 'onlyStore': Provider::updatePriceUpdated(['store_id' => $price->store_id]); break;
             case 'provider': Provider::updatePriceUpdated(['provider_id' => $_GET['provider_id']]); break;
                 break;
         }

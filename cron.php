@@ -48,7 +48,7 @@ $logger = new Logger(
         'logFormat' => '[{date}] '.$params[0].' {message}'
     ]
 );
-$logger->alert('--------------------------------------');
+$logger->alert('----------СТАРТ-------------');
 
 switch ($params[0]){
     case 'orderRossko':
@@ -340,3 +340,4 @@ switch ($params[0]){
         break;
 }
 $logger->alert('Обработка '.$params[0].' закончена');
+$logger->alert('----------КОНЕЦ-------------');

@@ -45,7 +45,7 @@ $logger = new Logger(
     [
         'filename' => 'common_'.$date->format('d.m.Y'),
         'dateFormat' => 'G:i:s',
-        'logFormat' => '[{date}]--- {message}'
+        'logFormat' => '[{date}] {message}'
     ]
 );
 $logger->alert('----------СТАРТ-------------');
@@ -198,7 +198,7 @@ switch ($params[0]){
         if (!$fileImap){
             $errorText = "Не удалось скачать {$emailPrice['name']} из почты.";
             $logger->error($errorText);
-            die();
+            break;
         }
     
         switch($emailPrice['clearPrice']){
@@ -306,7 +306,7 @@ switch ($params[0]){
                             debug($row);
                             if ($stringNumber > 100){
                                 $logger->alert("Обработка прошла");
-                                die();
+                                break 3;
                             }
                         }
                         parse_row($row, $emailPrice['fields'], $price, $stringNumber);
@@ -322,7 +322,7 @@ switch ($params[0]){
                         debug($row);
                         if ($stringNumber > 100){
                             $logger->alert("Обработка прошла");
-                            die();
+                            break 3;
                         }
                     }
                     parse_row($row, $emailPrice['fields'], $price, $stringNumber);

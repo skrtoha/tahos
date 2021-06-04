@@ -636,5 +636,80 @@ switch ($params[0]){
         }
         $logger->alert("Всего отпрвлено $successedDelivery сообщений пользователям");
         break;
+    case 'priceSportAvto':
+        ini_set('memory_limit', '2048M');
+        $logger->alert("Прайс Спорт-Авто");
+        $emailPrice = [
+            'isAddBrend' => 0,
+            'isAddItem' => 0,
+            'title' => 'priceSportAvto',
+            'isLogging' => true
+        ];
+        
+        $price = new core\Price($db, $emailPrice);
+        
+        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        if ($imap->error) {
+            $logger->error("Подключение не удалось");
+            break;
+        }
+        $filename = $imap->getLastMailFrom(['from' => 'zakaz@sportavto.com', 'name' => 'price.zip']);
+        if (!$filename){
+            $textError = "Не удалось получить файл из почты.";
+            echo "<br>$textError";
+            throw new Exception($textError);
+        }
+        
+        $zipArchive = new ZipArchive();
+        $res = $zipArchive->open($filename);
+        $file = $zipArchive->getStream('price.csv');
+        
+        $db->delete('store_items', "`store_id`=7");
+        $i = 0;
+        while ($data = fgetcsv($file, 1000, "\n")) {
+            $row = iconv('windows-1251', 'utf-8', $data[0]);
+            $row = explode(';', str_replace('"', '', $row));
+            $i++;
+            if ($row[0] == 'Код') continue;
+            if (!$row[0] || !$row[1]){
+                $price->setLog('error', "В строке $i произошла ошибка.");
+                continue;
+            }
+            $brend_id = $price->getBrendId($row[1]);
+            if (!$brend_id) continue;
+            $item_id = $price->getItemId([
+                'brend_id' => $brend_id,
+                'brend' => $row[1],
+                'article' => $row[0],
+                'title' => $row[2],
+                'row' => $i
+            ]);
+            if (!$item_id) continue;
+            $price->insertStoreItem([
+                'store_id' => 7,
+                'item_id' => $item_id,
+                'price' => $row[3],
+                'in_stock' => $row[4],
+                'packaging' => 1,
+                'row' => $i
+            ]);
+        }
+        
+        Provider::updatePriceUpdated(['store_id' => 7]);
+        
+        $price->setLog('alert', "Обработано $i строк");
+        $price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
+        $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
+        $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
+    
+        $logger->alert("Обработано $i строк");
+        $logger->alert("Добавлено в прайс: $price->insertedStoreItems записей");
+        $logger->alert("Вставлено: $price->insertedBrends брендов");
+        $logger->alert("Вставлено: $price->insertedItems номенклатуры");
+        if ($price->isLogging){
+            $logger->alert("Полный лог: $price->nameFileLog");
+        }
+        
+        break;
 }
 $logger->alert('----------КОНЕЦ-------------');

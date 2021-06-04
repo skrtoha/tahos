@@ -590,5 +590,51 @@ switch ($params[0]){
             }
         }
         break;
+    case 'subscribeUserPrices':
+        $logger->alert('Рассылка прайсов');
+        $successedDelivery = 0;
+        $res_users = $db->query("
+			SELECT
+				u.id,
+				u.discount,
+				u.currency_id,
+				u.subscribe_type,
+				u.subscribe_email
+			FROM
+				#users u
+			WHERE
+				u.is_subscribe = 1
+		", '');
+        if (!$res_users->num_rows){
+            $logger->info('Не найдено пользователей для рассылки');
+            break;
+        }
+        
+        $res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
+        foreach($res_users as $user){
+            // debug($user); exit();
+            switch($user['subscribe_type']){
+                case 'xls':
+                    $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price', $user['discount']);
+                    break;
+                case 'csv':
+                    $file = core\Config::$tmpFolderPath . '/price.csv';
+                    $fp = fopen($file, 'w');
+                    foreach($res_store_items as $si){
+                        $si['price'] = ceil($si['price'] - $si['price'] * $user['discount'] / 100);
+                        fputcsv($fp, $si, ';');
+                    }
+                    fclose($fp);
+                    break;
+            }
+            $res = core\Mailer::send([
+                'emails' => $user['subscribe_email'],
+                'subject' => 'Прайс с tahos.ru',
+                'body' => 'Прайс с tahos.ru'
+            ], [$file]);
+            if ($res === true) $successedDelivery++;
+        }
+        $logger->alert("Всего отпрвлено $successedDelivery сообщений пользователям");
+        break;
 }
 $logger->alert('----------КОНЕЦ-------------');

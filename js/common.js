@@ -11,7 +11,7 @@ function getParams(url = ''){
 		output[name] = value;
 	}
 	return output;
-};
+}
 function show_popup_basket(){
 	event.preventDefault();
 	var cart = $(".cart-popup");

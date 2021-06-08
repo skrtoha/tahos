@@ -66,5 +66,13 @@ switch($_POST['act']){
 	case 'rememberUserSearch':
 		core\User::saveUserSearch($_POST);
 		break;
+    case 'saveVin':
+        $arrayInsert = [
+            'vin' => $_POST['vin'],
+            'title' => "{$_POST['brend']} {$_POST['model']} {$_POST['year']}",
+            'user_id' => $_POST['user_id']
+        ];
+        $db->insert('search_vin', $arrayInsert);
+        break;
 }
 ?>

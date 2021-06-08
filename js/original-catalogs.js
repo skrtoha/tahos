@@ -82,6 +82,7 @@ $('.select_model').on('change', function(){
 	document.location.href = $(this).val();
 	return false;
 })
+
 $('.slider').each(function(){
 		var e = $(this);
 		e.ionRangeSlider({
@@ -97,22 +98,27 @@ $('.slider').each(function(){
 		});
 	})
 $(function(){
-	let intervalID = setInterval(function(){
-		let user_id = + $('input[name=user_id]').val();
-		if (!user_id){
-			clearInterval(intervalID);
-			return false;
-		} 
-		let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
-		if($partsCatalogsNodes.size()){
-			let href = document.location.href;
-			href = href.replace(/.*\?/, '');
+    let isProccessedGarage = false;
+    let isProccessedVin = false;
+    let href = document.location.href;
+    let isPageVin = /carInfo\?q=/.test(href);
+    href = href.replace(/.*\?/, '');
+
+    const urlParams = new URLSearchParams(href);
+
+    let intervalID = setInterval(function(){
+        let user_id = + $('input[name=user_id]').val();
+        if (!user_id){
+            clearInterval(intervalID);
+            return false;
+        }
+        let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
+        if($partsCatalogsNodes.size() && !isProccessedGarage){
 			let $h1 = $partsCatalogsNodes.find('h1');
 			let title = $h1.html();
 			title = title.replace(/[^\w ]+/g, '');
 			title = title.replace(/^ +/g, '');
 			title = title.replace(/ +$/g, '');
-			const urlParams = new URLSearchParams(href);
 			let data = {
 				'user_id': user_id,
 				'title': title,
@@ -127,6 +133,7 @@ $(function(){
 				url: '/ajax/parts-catalogs.php',
 				data: data,
 				success: function(res){
+                    isProccessedGarage = true;
 					$h1.prepend(`
 						<div id="to_garage">
 							<button class="${res}" title="Добавить / Удалить в гараж"></button>
@@ -148,8 +155,31 @@ $(function(){
 					})
 				}
 			})
-			clearInterval(intervalID);
 		}
-	}, 2000);
+
+		if (isPageVin && !isProccessedVin){
+		    let data = {};
+            $tbody = $('div.LjoJ3TC3QBG0Gj1e1y18m tbody._2s4Zlis3TQ_ERIPo_5CYhW');
+            $tr = $tbody.find('tr._2ra47Mt1RDDKqGLLJbQWkG:first-child');
+            data.brend = $tr.find('td:nth-child(1)').html();
+            data.brend = data.brend.trim();
+            data.model = $tr.find('td:nth-child(2)').html();
+            data.model = data.model.trim();
+            data.year = $tr.find('td:nth-child(3)').html();
+            data.year = data.year.trim();
+            data.vin = urlParams.get('q');
+            data.act = "saveVin";
+            data.user_id = $('input[name=user_id]').val();
+            $.ajax({
+                "type": "post",
+                "url": "/ajax/common.php",
+                "data": data,
+                success: function(response){
+                    isProccessedVin = true;
+                }
+            })
+        }
+
+	}, 500);
 })
 	

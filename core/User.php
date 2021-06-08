@@ -151,7 +151,7 @@ class User{
 	public static function saveUserSearch($array)
 	{
 		return $GLOBALS['db']->query("
-			INSERT INTO #search (`user_id`, `item_id`) VALUES 
+			INSERT INTO #search_items (`user_id`, `item_id`) VALUES
 			({$array['user_id']}, '{$array['item_id']}') 
 			ON DUPLICATE KEY UPDATE 
 				`date` = CURRENT_TIMESTAMP

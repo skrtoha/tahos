@@ -161,8 +161,8 @@ $(function(){
 		    let data = {};
             $tbody = $('div.LjoJ3TC3QBG0Gj1e1y18m tbody._2s4Zlis3TQ_ERIPo_5CYhW');
             $tr = $tbody.find('tr._2ra47Mt1RDDKqGLLJbQWkG:first-child');
-            data.brend = $tr.find('td:nth-child(1)').html();
-            data.brend = data.brend.trim();
+            let brend = $tr.find('td:nth-child(1)').html();
+            data.brend = brend.trim();
             data.model = $tr.find('td:nth-child(2)').html();
             data.model = data.model.trim();
             data.year = $tr.find('td:nth-child(3)').html();

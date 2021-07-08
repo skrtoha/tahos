@@ -495,8 +495,9 @@ abstract class Provider{
 		return $array['title'];
 	}
 
-	public static function clearStoresItemsByProviderID(int $provider_id, array $params = []){
-		$where = "ps.provider_id = $provider_id AND ";
+	public static function clearStoresItems($provider_id, array $params = []){
+	    if ($provider_id) $where = "ps.provider_id = $provider_id AND ";
+	    else $where = '';
 		if (!empty($params)){
 			foreach($params as $key => $value){
 				switch($key){
@@ -506,16 +507,31 @@ abstract class Provider{
 				}
 			}
 		}
-		$where = substr($where, 0, -5);
-		return self::getInstanceDataBase()->query("
+		
+		if ($where){
+            $where = substr($where, 0, -5);
+            $where = "WHERE $where";
+        }
+		
+		self::getInstanceDataBase()->query("
 			DELETE si FROM #store_items si
 			LEFT JOIN
 				#provider_stores ps ON ps.id = si.store_id
 			LEFT JOIN
 				#analogies diff ON diff.item_diff = si.item_id
-			WHERE
-				$where
+			$where
 		", '');
+        
+        self::getInstanceDataBase()->query("
+		    UPDATE
+                tahos_provider_stores ps
+            left join
+                tahos_store_items si on ps.id = si.store_id
+            left join
+                tahos_analogies diff on diff.item_diff = si.item_id
+            set ps.price_updated = current_timestamp()
+            $where
+		");
 	}
 
 	public static function getCommonItemsToOrders(){

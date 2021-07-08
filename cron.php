@@ -51,6 +51,10 @@ $logger = new Logger(
 $logger->alert('----------СТАРТ-------------');
 
 switch ($params[0]){
+    case 'clearAllPrices':
+        $logger->alert('Полная очистка прайсов');
+        Provider::clearStoresItems(false);
+        break;
     case 'orderRossko':
         $logger->alert('Отправка заказа в Росско');
         core\Provider\Rossko::sendOrder();

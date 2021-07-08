@@ -41,3 +41,6 @@ form.add_item_to_store a.deleteStoreItem {
     float: right;
     margin-top: 15px;
 }
+div.actions a {
+    margin-left: 10px;
+}

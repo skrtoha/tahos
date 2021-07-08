@@ -157,9 +157,6 @@ switch ($act) {
 		message('Успешно удалено!');
 		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
-    case 'clearAllPrices':
-        Provider::clearStoresItems(false);
-        break;
     default:
 		view();
 }
@@ -336,7 +333,6 @@ function view(){
 		<a href="?view=providers&act=provider">Добавить</a>
 		<a href="?view=providers&act=itemsToOrder">Товары, ожидающие отправку в заказ</a>
 		<a href="?view=providers&act=mainStores">Основные склады</a>
-		<a href="?view=providers&act=clearAllPrices">Очистить все прайсы</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

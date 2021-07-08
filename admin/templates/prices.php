@@ -1,6 +1,9 @@
 <?php
 $act = $_GET['act'];
 switch ($act) {
+    case 'clearAllPrices':
+        \core\Provider::clearStoresItems(false);
+        break;
 	case 'delete':
 		if ($db->delete('providers', "`id`=".$_GET['id'])){
 			message('Поставщик успешно удален!');
@@ -79,6 +82,7 @@ function view(){
 			<input style="width: 264px;" type="text" name="search" value="<?=$search?>" placeholder="Поиск">
 			<input type="submit" value="Искать">
 		</form>
+        <a href="?view=prices&act=clearAllPrices">Очистить все прайсы</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

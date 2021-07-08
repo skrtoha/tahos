@@ -157,9 +157,6 @@ switch ($act) {
 		message('Успешно удалено!');
 		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
-    case 'clearAllPrices':
-        Provider::clearStoresItems(false);
-        break;
     default:
 		view();
 }

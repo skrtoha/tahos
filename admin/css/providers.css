@@ -19,6 +19,9 @@ label.workSchedule span {
 .hidden{
 	display: none;
 }
+td.storeInfo > a{
+    text-decoration: none;
+}
 #load_price{
 	    display: block !important;
     width: 100%;

@@ -133,7 +133,7 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['connections', 'reports', 'returns', 'index'])){?>
 			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
 		<?}?>
-		<?if (in_array($view, ['items', 'orders', 'returns', 'brends'])){?>
+		<?if (in_array($view, ['items', 'orders', 'returns', 'brends', 'providers'])){?>
 			{"src" : "/admin/js/show_store_info.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['items', 'categories'])){?>

@@ -123,17 +123,14 @@ switch ($act) {
 			14 => 'priceMikado',
 			13 => 'priceMikado',
 			35 => 'priceMikado',
-			7 => 'priceSportAvto',
-			22 => 'priceMparts',
-			22380 => 'priceForumAuto',
 			276 => 'BERG_Yar',
-			275 => 'BERG_MSK'
 		];
 		$res_main_stores = $db->query("
 			SELECT
 				ps.id,
 				ps.title,
 				ps.cipher,
+			    ps.id as store_id,
 				p.title AS provider,
 				p.api_title,
 				IF (ep.settings IS NOT NULL, 1, 0) AS isSetEmailPrice,
@@ -173,16 +170,20 @@ function mainStores($res_main_stores, $handlePrices){?>
 		<?if ($res_main_stores->num_rows){
 			foreach($res_main_stores as $row){?>
 				<tr>
-					<td><?=$row['cipher']?></td>
+					<td class="storeInfo" label="Шифр">
+                        <a href="#" class="store" store_id="<?=$row['store_id']?>">
+                            <?=$row['cipher']?>
+                        </a>
+                    </td>
 					<td><?=$row['title']?></td>
 					<td><?=$row['provider']?></td>
 					<td><?=$row['price_updated']?></td>
 					<td>
 						<?if ($row['isSetEmailPrice']){?>
-							<a href="/admin/?view=cron&act=emailPrice&store_id=<?=$row['id']?>">Обновить прайс</a>
+							<a href="/cron.php?act=emailPrice&store_id=<?=$row['id']?>">Обновить прайс</a>
 						<?}?>
 						<?if (isset($handlePrices[$row['id']])){?>
-							<a href="/admin/?view=cron&act=<?=$handlePrices[$row['id']]?>">Обновить прайс</a>
+							<a href="/cron.php?act=<?=$handlePrices[$row['id']]?>">Обновить прайс</a>
 						<?}?>
 					</td>
 				</tr>

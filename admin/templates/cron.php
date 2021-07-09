@@ -915,7 +915,6 @@ switch($_GET['act']){
 		echo "<h2>Рассылка прайсов</h2>";
 		echo "<br>Всего отпрвлено $successedDelivery сообщений пользователям";
 		break;
-	
 	case 'updatePrices':
 		$db->delete('prices', "item_id > 0");
 		$res = $db->query("

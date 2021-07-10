@@ -59,13 +59,13 @@ if (isset($_GET['ajax'])){
             $start = ($_GET['pageNumber'] - 1) * $_GET['pageSize'];
             $params = [
                 'fields_vin' => "
-                    'vin' AS type,
+                    'VIN' AS type,
                     NULL AS item_id,
                     CONCAT(sv.vin, '-', sv.title) AS search,
                     sv.date
                 ",
                 'fields_items' => "
-                    'item' AS type,
+                    'Номенклатура' AS type,
                     i.id AS item_id,
                     CONCAT(b.title, '-', i.article) AS search,
                     si.date
@@ -164,21 +164,25 @@ function usersWithWithdraw(mysqli_result $res_users){?>
 <?}
 function getWhere($type, $filters){
     $output = '';
+    switch($type){
+        case 'vin': $output .= "sv.user_id = {$filters['id']} AND "; break;
+        case 'items': $output .= "si.user_id = {$filters['id']} AND "; break;
+    }
     foreach($filters as $key => $value){
         switch($key){
             case 'search':
                 switch($type){
                     case 'vin':
-                        $output .= "CONCAT(sv.vin, '-', sv.title) LIKE '%$value%'";
+                        $output .= "CONCAT(sv.vin, '-', sv.title) LIKE '%$value%' AND ";
                         break;
                     case 'items':
-                        $output .= "CONCAT(b.title, '-', i.article) like '%$value%'";
+                        $output .= "CONCAT(b.title, '-', i.article) like '%$value%' AND ";
                         break;
                 }
                 break;
         }
     }
-    return $output;
+    return substr($output, 0, -5);
 }
 function getTotalCount($filters){
     global $db;
@@ -771,6 +775,11 @@ function search_history($totalCount){
     <input type="hidden" name="totalNumber" value="<?=$totalCount?>">
     <div id="actions">
         <form action="">
+            <select name="type">
+                <option value=""></option>
+                <option value="item">Номенклатура</option>
+                <option value="vin">VIN</option>
+            </select>
             <input type="text" name="search">
             <input type="submit" value="Искать">
         </form>

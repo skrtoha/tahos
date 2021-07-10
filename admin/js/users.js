@@ -4,9 +4,38 @@
 		mainSelector: '#user_order_add ',
 		response: this.mainSelector + 'div.response',
 		reg_int: /^\d+$/,
-		items: new Object,
+		items: {},
+        pageSize: 30,
+
+        head_common_list:
+            '<tr class="head">' +
+                '<th>Тип</th>' +
+                '<th>Поиск</th>' +
+                '<th>Дата</th>' +
+            '</tr>',
+        paginationContainer: $('#pagination-container'),
 		init: function(){
 			let uoa = this;
+			if ($('#history_search').size()) this.history_search();
+			$('#actions form').on('submit', function(e){
+			    e.preventDefault();
+			    let url = '/admin/?view=users&id=' + $('input[name=user_id]').val() + '&ajax=history_search_count';
+			    let params = {};
+			    let formData = $(this).serializeArray();
+			    $.each(formData, function (i, item){
+			        params[item.name] = item.value;
+			        url += '&' + item.name + '=' + item.value;
+                })
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    success: function(response){
+                        $('input[name=totalNumber]').val(response);
+                        user_order_add.history_search(params);
+                    }
+                })
+
+            });
 			$(uoa.getSelector('a.show_form_search')).on('click', function(e){
 				e.preventDefault();
 				$(this).nextAll('div.item_search').toggleClass('active');
@@ -113,6 +142,48 @@
 				});
 			});
 		},
+        history_search: function(params = {}){
+            let uoa = this;
+            let dataSource = '/admin/?view=users&id=' + $('input[name=user_id]').val() + '&ajax=history_search';
+            if (params){
+                for(let key in params){
+                    dataSource += '&' + key + '=' + params[key];
+                }
+            }
+            uoa.paginationContainer.pagination({
+                pageNumber: $('input[name=page]').val(),
+                dataSource: dataSource,
+                className: 'paginationjs-small',
+                locator: '',
+                totalNumber: $('input[name=totalNumber]').val(),
+                pageSize: uoa.pageSize,
+                ajax: {
+                    beforeSend: function(){
+                        showGif();
+                    }
+                },
+                callback: function(data, pagination){
+                    var str = uoa.head_common_list;
+                    let search;
+                    for(var key in data){
+                        var d = data[key];
+                        if (d.item_id){
+                            let href = '/admin/?view=items&act=item&id=' + d.item_id;
+                            search = '<a target="_blank" href="'+ href + '">' + d.search + '</a>';
+                        }
+                        else search = d.search;
+                        str +=
+                            '<tr>' +
+                                '<td>' + d.type + '</td>' +
+                                '<td>' + search + '</td>' +
+                                '<td>' + d.date + '</td>' +
+                            '</tr>'
+                    }
+                    $('#history_search').html(str);
+                    showGif(false);
+                }
+            })
+        },
 		getSelector: function(str){
 			return this.mainSelector + str;
 		},

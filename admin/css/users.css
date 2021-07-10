@@ -21,6 +21,11 @@ select[name^=store_id]{
 input[name^=price]{
 	width: 80px;
 }
+select[name=type] {
+    height: 25px;
+    border: 1px solid #c8c8c8;
+    border-radius: 4px;
+}
 #user_order_add div.item_search{
 	display: none;
 	background: #e8fff2;

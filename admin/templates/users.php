@@ -76,7 +76,8 @@ if (isset($_GET['ajax'])){
                 'having' => '',
                 'limit' => "$start, {$_GET['pageSize']}"
             ];
-            $resultDb = $db->query(buildQuery($params));
+            $type = $_GET['type'] ?? '';
+            $resultDb = $db->query(buildQuery($params, $type));
             $result = [];
             if (!$resultDb->num_rows) break;
             foreach($resultDb as $value){
@@ -195,7 +196,8 @@ function getTotalCount($filters){
         'having' => '',
         'limit' => ''
     ];
-    $resultCount = $db->query(buildQuery($params));
+    $type = isset($filters['type']) ? $filters['type'] : '';
+    $resultCount = $db->query(buildQuery($params, $type));
     $totalCount = 0;
     foreach($resultCount as $value) $totalCount += $value['cnt'];
     return $totalCount;
@@ -714,15 +716,14 @@ function setUserOrder(){
 	message('Заказ успешно сохранен!');
 	header("Location: /admin/?view=orders&act=change&id=$order_id");
 }
-function buildQuery($params){
-    $query = '
+function buildQuery($params, $type){
+    $queryVin = '
         SELECT
             {fields_vin}
         FROM #search_vin sv
         {where_vin}
-        
-        UNION
-
+    ';
+    $queryItems = '
         SELECT
             {fields_items}
         FROM
@@ -732,11 +733,21 @@ function buildQuery($params){
         LEFT JOIN
             #brends b ON i.brend_id = b.id
         {where_items}
-        
+    ';
+    if ($type){
+        if ($type == 'items') $query = $queryItems;
+        if ($type == 'vin') $query = $queryVin;
+    }
+    else $query = "
+        $queryVin
+        UNION
+        $queryItems
+    ";
+    $query .= "
         {order}
         {having}
         {limit}
-    ';
+    ";
     foreach($params as $key => $value){
         switch($key){
             case 'where_vin':
@@ -777,7 +788,7 @@ function search_history($totalCount){
         <form action="">
             <select name="type">
                 <option value=""></option>
-                <option value="item">Номенклатура</option>
+                <option value="items">Номенклатура</option>
                 <option value="vin">VIN</option>
             </select>
             <input type="text" name="search">

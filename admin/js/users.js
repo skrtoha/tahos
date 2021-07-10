@@ -23,6 +23,7 @@
 			    let params = {};
 			    let formData = $(this).serializeArray();
 			    $.each(formData, function (i, item){
+			        if (!item.value) return 1;
 			        params[item.name] = item.value;
 			        url += '&' + item.name + '=' + item.value;
                 })
@@ -147,6 +148,7 @@
             let dataSource = '/admin/?view=users&id=' + $('input[name=user_id]').val() + '&ajax=history_search';
             if (params){
                 for(let key in params){
+                    if (!params[key]) continue;
                     dataSource += '&' + key + '=' + params[key];
                 }
             }

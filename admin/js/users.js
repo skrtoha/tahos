@@ -170,10 +170,14 @@
                     for(var key in data){
                         var d = data[key];
                         if (d.item_id){
-                            let href = '/admin/?view=items&act=item&id=' + d.item_id;
+                            let href = `/admin/?view=items&act=item&id=${d.item_id}`;
                             search = '<a target="_blank" href="'+ href + '">' + d.search + '</a>';
                         }
-                        else search = d.search;
+                        else {
+                            let vin = d.search.slice(0, 17);
+                            let href = '/original-catalogs/legkovie-avtomobili#/carInfo?q=' + vin;
+                            search = '<a target="_blank" href="'+ href + '">' + d.search + '</a>'
+                        }
                         str +=
                             '<tr>' +
                                 '<td>' + d.type + '</td>' +

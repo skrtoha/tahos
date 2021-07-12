@@ -123,7 +123,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			", '');
 			if (!$res_search->num_rows) return;
 			foreach($res_search as $value) $output[] = [
-				'article' => urldecode($value['article']),
+				'article' => str_replace('/noUseAPI', '', urldecode($value['article'])),
 				'item_id' => $value['item_id'],
 				'count' => $value['cnt']
 			];

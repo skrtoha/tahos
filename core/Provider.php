@@ -312,7 +312,7 @@ abstract class Provider{
 		return $res;
 	}
 	public static function getCurlUrlData($url, $data = [], $header = null){
-		$curl = curl_init();
+		$curl = \curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, empty($data) ? 'GET' : 'POST');
 		if (isset($data['username']) && isset($data['password'])){

@@ -21,12 +21,23 @@ class Connection{
 
 		if (preg_match('/.*ajax.*/', $_SERVER['REQUEST_URI'])) return false;
 	
+		if (preg_match('/^\/article\/\d+-\w+/', $_SERVER['REQUEST_URI'])){
+		    if (!strpos($_SERVER['REQUEST_URI'], 'noUseAPI')) return false;
+		    
+		    $_SERVER['REQUEST_URI'] = str_replace('/noUseAPI', '', $_SERVER['REQUEST_URI']);
+		    
+		    preg_match_all('/\d+-/', $_SERVER['REQUEST_URI'], $matches);
+		    $item_id = substr($matches[0][0], 0, -1);
+		    $itemInfo = Item::getByID($item_id);
+            $brend_article = "{$itemInfo['brend']}-{$itemInfo['article']}";
+        }
 		if (isset($_SESSION['manager']['id']) || isset($_SESSION['user'])) $this->add([
 			'ip' => $remoteAddr,
 			'url' => $_SERVER['REQUEST_URI'],
 			'user_id' => $_SESSION['user'] ? $_SESSION['user'] : null,
 			'manager_id' => $_SESSION['manager']['id'] ? $_SESSION['manager']['id'] : null,
-			'comment' => $_SERVER['HTTP_USER_AGENT']
+			'comment' => $_SERVER['HTTP_USER_AGENT'],
+            'brend_article' => $brend_article ?? null
 		]);
 		elseif (
 			$this->isDeniedIP($remoteAddr) 
@@ -35,6 +46,7 @@ class Connection{
 			$this->add([
 				'ip' => $remoteAddr, 
 				'url' => $_SERVER['REQUEST_URI'],
+                'brend_article' => $brend_article ?? null,
 				'isDeniedAccess' => 1,
 				'comment' => $_SERVER['HTTP_USER_AGENT']
 			]);
@@ -42,6 +54,7 @@ class Connection{
 		}
 		else $this->add([
 			'ip' => $remoteAddr,
+            'brend_article' => $brend_article ?? null,
 			'url' => $_SERVER['REQUEST_URI'],
 			'comment' => $_SERVER['HTTP_USER_AGENT']
 		]);
@@ -77,6 +90,7 @@ class Connection{
 			[
 				'ip' => $params['ip'],
 				'url' => $params['url'],
+				'brend_article' => $params['brend_article'],
 				'user_id' => isset($params['user_id']) ? $params['user_id'] : null,
 				'manager_id' => isset($params['manager_id']) ? $params['manager_id'] : null,
 				'isDeniedAccess' => isset($params['isDeniedAccess']) ? $params['isDeniedAccess'] : null,

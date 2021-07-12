@@ -10,6 +10,36 @@ require_once('vendor/autoload.php');
 
 $db = new core\Database();
 
+$limit = 100;
+$count = 0;
+do{
+    $res_search = $db->query("
+        SELECT
+            c.id,
+            @temp := REPLACE(c.url, '/article/', '') as temp,
+            REGEXP_REPLACE (c.url, '^/article/.*?-', '') AS article,
+            @item_id := REGEXP_REPLACE(@temp, '-.*$', '') AS item_id
+        FROM
+            #connections c
+        WHERE
+            c.url REGEXP '^/article/[[:digit:]]+-[[:alnum:]]+'
+        LIMIT 0, $limit
+    ", '');
+    foreach($res_search as $value){
+        $itemInfo = \core\Item::getByID($value['item_id']);
+        if (!$itemInfo) continue;
+        $db->update(
+            'connections',
+            ['brend_article' => "{$itemInfo['brend']}-{$itemInfo['article']}"],
+            "`id` = {$value['id']}"
+        );
+    }
+    $count += $limit;
+    echo $count; echo "\n";
+}while($res_search->num_rows >= $limit);
+exit();
+
+
 session_start();
 $connection = new core\Connection($db);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');

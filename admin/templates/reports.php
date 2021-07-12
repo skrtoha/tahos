@@ -109,18 +109,18 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					@temp := REPLACE(c.url, '/article/', '') as temp,
 				   REGEXP_REPLACE (c.url, '^/article/.*?-', '') AS article,
 					@item_id := REGEXP_REPLACE(@temp, '-.*$', '') AS item_id,
-					c.url,
+				    c.brend_article,
 				   COUNT(c.url) AS cnt
 				FROM 
-					`tahos_connections` c 
-				WHERE 
+					#connections c
+				WHERE
 					c.created BETWEEN '$from' AND '$to' AND
-					c.url LIKE '/article/%'
+					c.url REGEXP '^/article/[[:digit:]]+-[[:alnum:]]+'
 				GROUP BY
 					c.url
 				ORDER BY
 					cnt DESC
-			", '');
+			", 'print');
 			if (!$res_search->num_rows) return;
 			foreach($res_search as $value) $output[] = [
 				'article' => str_replace('/noUseAPI', '', urldecode($value['article'])),

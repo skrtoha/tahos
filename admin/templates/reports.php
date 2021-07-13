@@ -6,7 +6,6 @@ $reports = new Reports($tab, $db);
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	switch($_POST['tab']){
         case 'logs':
-            
             break;
 		case 'nomenclature': 
 			switch($_POST['act']){
@@ -104,26 +103,31 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$output = [];
 			$from = core\Connection::getTimestamp($_POST['dateFrom']);
 			$to = core\Connection::getTimestamp($_POST['dateTo']);
+			$where = "
+			    c.created BETWEEN '$from' AND '$to' AND
+				c.brend_article IS NOT NULL
+			";
+			if ($_POST['search']) $where .= " AND c.brend_article LIKE '%{$_POST['search']}%'";
+			
 			$res_search = $db->query("
 				SELECT
-					@temp := REPLACE(c.url, '/article/', '') as temp,
-				   REGEXP_REPLACE (c.url, '^/article/.*?-', '') AS article,
+				    @temp := REPLACE(c.url, '/article/', '') as temp,
+				    REGEXP_REPLACE (c.url, '^/article/.*?-', '') AS article,
 					@item_id := REGEXP_REPLACE(@temp, '-.*$', '') AS item_id,
 				    c.brend_article,
 				   COUNT(c.url) AS cnt
 				FROM 
 					#connections c
 				WHERE
-					c.created BETWEEN '$from' AND '$to' AND
-					c.url REGEXP '^/article/[[:digit:]]+-[[:alnum:]]+'
+				    $where
 				GROUP BY
-					c.url
+					c.brend_article
 				ORDER BY
 					cnt DESC
-			", 'print');
+			", '');
 			if (!$res_search->num_rows) return;
 			foreach($res_search as $value) $output[] = [
-				'article' => str_replace('/noUseAPI', '', urldecode($value['article'])),
+				'brend_article' => $value['brend_article'],
 				'item_id' => $value['item_id'],
 				'count' => $value['cnt']
 			];
@@ -182,8 +186,11 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$dateFrom = new DateTime();
 			$dateFrom->sub(new DateInterval('P90D'));
 			?>
-			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
-			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+            <form action="/admin/?view=reports" class="filter-form">
+                <input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
+                <input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+                <input type="submit" value="Искать">
+            </form>
 			<table class="t_table">
 				<thead>
 					<tr class="head">
@@ -203,8 +210,12 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$dateFrom = new DateTime();
 			$dateFrom->sub(new DateInterval('P30D'));
 			?>
-			<input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
-			<input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+            <form action="/admin/?view=reports" class="filter-form">
+                <input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
+                <input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
+                <input type="text" name="search" placeholder="Поиск по бренду или артикулу">
+                <input type="submit" value="Искать">
+            </form>
 			<table class="t_table">
 				<thead>
 					<tr class="head">

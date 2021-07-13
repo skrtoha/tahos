@@ -99,30 +99,37 @@ $(function(){
 					}
 				})
 			})
+            $(document).on('submit', 'form.filter-form', function(e){
+                e.preventDefault();
+                let th = $(this);
+                tab = th.closest('[data-name]').attr('data-name');
+                reports.processAjaxQuery(tab);
+            })
 		},
+        processAjaxQuery: function(tab){
+		    const form = $('div[data-name=' + tab + ']').find('form.filter-form');
+		    let data = {};
+		    data.tab = tab;
+            $.each(form.serializeArray(), function(i, item){
+                if (!item.value) return 1;
+                data[item.name] = item.value;
+            })
+            $.ajax({
+                type: 'post',
+                url: reports.ajaxUrl,
+                data: data,
+                success: function(response){
+                    $('div[data-name=' + tab + '] table tbody').empty();
+                    if (!response) return false;
+                    var items = JSON.parse(response);
+                    reports.parsePurchaseability(items, tab);
+                }
+            });
+        },
 		setDateTimePicker: function(tab){
-			console.log(tab);			
 			$.datetimepicker.setLocale('ru');
 			$('[data-name=' + tab + '] .datetimepicker[name=dateFrom], [data-name=' + tab + '] .datetimepicker[name=dateTo]').datetimepicker({
 				format:'d.m.Y H:i',
-				onChangeDateTime: function(db, $input){
-					$.ajax({
-						type: 'post',
-						url: reports.ajaxUrl,
-						data: {
-							tab: tab,
-							dateFrom: $('div[data-name=' + tab + '] input[name=dateFrom]').val(),
-							dateTo: $('div[data-name=' + tab + '] input[name=dateTo]').val()
-						},
-						success: function(response){
-							$('div[data-name=' + tab + '] table tbody').empty();
-							if (!response) return false;
-							var items = JSON.parse(response);
-							reports.parsePurchaseability(items, tab);
-							reports.setDateTimePicker(tab);
-							}
-					});
-				},
 				closeOnDateSelect: true,
 				closeOnWithoutClick: true
 			});
@@ -132,27 +139,20 @@ $(function(){
 				type: "hash",
 				onChange: function(obj){
 					reports.tab = obj.tab;
-					var str = '/admin/?view=reports&tab=' + obj.tab;
-					str += '#tabs|reports:' + obj.tab;
+					reports.setDateTimePicker(reports.tab);
+					if (obj.tab == 'searchHistory' || obj.tab == 'purchaseability') return reports.processAjaxQuery(obj.tab);
+					let data = {
+                        tab: obj.tab,
+                        dateFrom: $('div[data-name=' + obj.tab + '] input[name=dateFrom]').val(),
+                        dateTo: $('div[data-name=' + obj.tab + '] input[name=dateTo]').val()
+                    }
 					$.ajax({
 						type: 'post',
 						url: reports.ajaxUrl,
-						data: {
-							tab: obj.tab,
-							dateFrom: $('div[data-name=' + obj.tab + '] input[name=dateFrom]').val(),
-							dateTo: $('div[data-name=' + obj.tab + '] input[name=dateTo]').val()
-						},
+						data: data,
 						success: function(response){
 							switch(obj.tab){
-								case 'purchaseability':
-								case 'searchHistory':
-									$('div[data-name=' + obj.tab + '] table tbody').empty();
-									if (!response) return false;
-									var items = JSON.parse(response);
-									reports.parsePurchaseability(items, obj.tab);
-									reports.setDateTimePicker(obj.tab);
-									break;
-								case 'remainsMainStore': 
+								case 'remainsMainStore':
 									let itemRemains = JSON.parse(response);
 									$('[data-name=' + obj.tab + '] table tbody').empty();
 									$.each(itemRemains, function(i, item){
@@ -192,12 +192,11 @@ $(function(){
 					}
 					break;
 				case 'searchHistory':
-					console.log(items, tab);
 					$.each(items, function(i, item){
 						$('[data-name=searchHistory] table tbody').append(`
 							<tr>
 								<td>
-									<a target="_blank" href="/admin/?view=items&id=${item.item_id}&act=item">${item.article}</a>
+									<a target="_blank" href="/admin/?view=items&id=${item.item_id}&act=item">${item.brend_article}</a>
 								</td>
 								<td>${item.count}</td>
 						`);

@@ -109,7 +109,7 @@ div[data-name=searchHistory] table
 div[data-name=purchaseability] input.datetimepicker,
 div[data-name=searchHistory] input.datetimepicker
 {
-    width: 115px;
+    width: 135px;
 }
 [data-name=remainsMainStore] table{
     margin-top: 10px;

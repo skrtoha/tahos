@@ -10,7 +10,7 @@ require_once('vendor/autoload.php');
 
 $db = new core\Database();
 
-$limit = 100;
+$limit = 1000;
 $count = 0;
 do{
     $res_search = $db->query("

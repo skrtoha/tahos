@@ -53,13 +53,56 @@ if ($_POST['form_submit']){
 		}
 	}
 }
+if (isset($_GET['ajax'])){
+    switch($_GET['ajax']){
+        case 'history_search':
+            $start = ($_GET['pageNumber'] - 1) * $_GET['pageSize'];
+            $params = [
+                'fields_vin' => "
+                    'VIN' AS type,
+                    NULL AS item_id,
+                    CONCAT(sv.vin, '-', sv.title) AS search,
+                    sv.date
+                ",
+                'fields_items' => "
+                    'Номенклатура' AS type,
+                    i.id AS item_id,
+                    CONCAT(b.title, '-', i.article) AS search,
+                    si.date
+                ",
+                'where_vin' => getWhere('vin', $_GET),
+                'where_items' => getWhere('items', $_GET),
+                'order' => 'date DESC',
+                'having' => '',
+                'limit' => "$start, {$_GET['pageSize']}"
+            ];
+            $type = $_GET['type'] ?? '';
+            $resultDb = $db->query(buildQuery($params, $type));
+            $result = [];
+            if (!$resultDb->num_rows) break;
+            foreach($resultDb as $value){
+                $dateTime = new DateTime($value['date']);
+                $value['date'] = $dateTime->format('d.m.Y H:i:s');
+                $result[] = $value;
+            }
+            break;
+        case 'history_search_count':
+            echo getTotalCount($_GET);
+            die();
+    }
+    echo json_encode($result);
+    exit();
+};
 switch ($act) {
 	case 'add': show_form('s_add'); break;
 	case 'change': show_form('s_change'); break;
 	case 'funds': funds(); break;
 	case 'user_order_add': user_order_add(); break;
 	case 'form_operations': form_operations('add'); break;
-	case 'search_history': search_history(); break;
+	case 'search_history':
+        $totalCount = getTotalCount($_GET);
+	    search_history($totalCount);
+	    break;
 	case 'basket': basket(); break;
 	case 'checkOrderedWithReserved':
 		$res = $db->query("
@@ -120,6 +163,58 @@ function usersWithWithdraw(mysqli_result $res_users){?>
 		<?}?>
 	</table>
 <?}
+function getWhere($type, $filters){
+    $output = '';
+    switch($type){
+        case 'vin': $output .= "sv.user_id = {$filters['id']} AND "; break;
+        case 'items': $output .= "si.user_id = {$filters['id']} AND "; break;
+    }
+    foreach($filters as $key => $value){
+        switch($key){
+            case 'search':
+                switch($type){
+                    case 'vin':
+                        $output .= "CONCAT(sv.vin, '-', sv.title) LIKE '%$value%' AND ";
+                        break;
+                    case 'items':
+                        $output .= "CONCAT(b.title, '-', i.article) like '%$value%' AND ";
+                        break;
+                }
+                break;
+        }
+    }
+    return substr($output, 0, -5);
+}
+function getTotalCount($filters){
+    global $db;
+    $params  = [
+        'fields_vin' => "COUNT(*) as cnt",
+        'fields_items' => "COUNT(*) as cnt",
+        'where_vin' => getWhere('vin', $_GET),
+        'where_items' => getWhere('items', $_GET),
+        'order' => '',
+        'having' => '',
+        'limit' => ''
+    ];
+    $type = isset($filters['type']) ? $filters['type'] : '';
+    $resultCount = $db->query(buildQuery($params, $type));
+    $totalCount = 0;
+    foreach($resultCount as $value) $totalCount += $value['cnt'];
+    return $totalCount;
+}
+function getSearchHistoryCountElements($params){
+    $params  = [
+        'fields_vin' => "COUNT(*) as cnt",
+        'fields_items' => "COUNT(*) as cnt",
+        'where' => '',
+        'order' => '',
+        'having' => getWhere($_GET),
+        'limit' => ''
+    ];
+    $resultCount = $db->query(buildQuery($params));
+    $totalCount = 0;
+    foreach($resultCount as $value) $totalCount += $value['cnt'];
+}
 function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');
@@ -621,54 +716,87 @@ function setUserOrder(){
 	message('Заказ успешно сохранен!');
 	header("Location: /admin/?view=orders&act=change&id=$order_id");
 }
-function search_history(){
-	global $db, $status, $page_title;
-	$res_search = $db->query("
-		SELECT
-			i.id,
-			b.title AS brend,
-			i.article,
-			i.title_full,
-			DATE_FORMAT(s.date, '%d.%m.%Y %H:%i:%s') as date
-		FROM
-			#search s
-		LEFT JOIN
-			#items i ON i.id = s.item_id
-		LEFT JOIN
-			#brends b ON b.id = i.brend_id
-		WHERE
-			user_id = {$_GET['id']}
-		ORDER BY
-			s.date DESC
-	", '');
+function buildQuery($params, $type){
+    $queryVin = '
+        SELECT
+            {fields_vin}
+        FROM #search_vin sv
+        {where_vin}
+    ';
+    $queryItems = '
+        SELECT
+            {fields_items}
+        FROM
+            #search_items si
+        LEFT JOIN
+            #items i ON si.item_id = i.id
+        LEFT JOIN
+            #brends b ON i.brend_id = b.id
+        {where_items}
+    ';
+    if ($type){
+        if ($type == 'items') $query = $queryItems;
+        if ($type == 'vin') $query = $queryVin;
+    }
+    else $query = "
+        $queryVin
+        UNION
+        $queryItems
+    ";
+    $query .= "
+        {order}
+        {having}
+        {limit}
+    ";
+    foreach($params as $key => $value){
+        switch($key){
+            case 'where_vin':
+            case 'where_items':
+                $replacement = $value ? "WHERE $value" : '';
+                break;
+            case 'having':
+                $replacement = $value ? "HAVING $value" : '';
+                break;
+            case 'order':
+                $replacement = $value ? "ORDER BY $value" : '';
+                break;
+            case 'limit':
+                $replacement = $value ? "LIMIT $value" : '';
+                break;
+            default:
+                $replacement = $value;
+        }
+        $query = str_replace('{'.$key.'}', $replacement, $query);
+    }
+    return $query;
+}
+function search_history($totalCount){
+	global $status, $page_title;
+	
 	$res_user = core\User::get(['user_id' => $_GET['id']]);
 	if (is_object($res_user)) $user = $res_user->fetch_assoc();
 	else $user = $res_user;
+	
 	$page_title = 'История поиска';
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
 	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
 	?>
-	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Наименование</td>
-			<td>Дата</td>
-		</tr>
-		<?if ($res_search->num_rows){
-			foreach($res_search as $value){?>
-				<tr>
-					<td><?=$value['brend']?></td>
-					<td><?=$value['article']?></td>
-					<td><?=$value['title_full']?></td>
-					<td><?=$value['date']?></td>
-				</tr>
-			<?}
-		}
-		else{?>
-			<tr><td colspan="4">Историю поиска не найдено</td></tr>
-		<?}?>
-	</table>
+    <input type="hidden" name="user_id" value="<?=$_GET['id']?>">
+    <input type="hidden" name="page" value="<?=isset($_GET['page']) ? $_GET['page'] : 1?>">
+    <input type="hidden" name="totalNumber" value="<?=$totalCount?>">
+    <div id="actions">
+        <form action="">
+            <select name="type">
+                <option value=""></option>
+                <option value="items">Номенклатура</option>
+                <option value="vin">VIN</option>
+            </select>
+            <input type="text" name="search">
+            <input type="submit" value="Искать">
+        </form>
+    </div>
+    <table id="history_search" class="t_table" cellspacing="1"></table>
+    <div id="pagination-container"></div>
 <?}
 function basket(){
 	global $db, $status, $page_title;

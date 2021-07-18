@@ -106,24 +106,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 			else $complects = '';
 			if (!$user['show_all_analogies']) $where_hide_analogies = "
 				AND si.store_id IS NOT NULL
-			";
-			/*закоментировано т.к. аналоги перенесены во вкладку артикулы
-			 * $res_analogies = $db->query("
-				SELECT 
-					diff.item_diff,
-					si.store_id
-				FROM
-					#analogies diff
-				LEFT JOIN #store_items si ON si.item_id=diff.item_diff
-				WHERE 
-					diff.item_id={$_GET['item_id']} AND
-					diff.status IN (0, 1)
-					$where_hide_analogies
-				GROUP BY diff.item_diff
-			", '');
-			if (!$res_analogies->num_rows) $analogies = '';
-			else $analogies = "<span>{$res_analogies->num_rows}</span>";*/
-			?>
+			";?>
 			<li class="ionTabs__tab" search_type="articles" data-target="Tab_1">Артикул</li>
 			<?if ($substitutes){?>
 				<li class="ionTabs__tab" search_type="substitutes" data-target="Tab_2">

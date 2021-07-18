@@ -6,7 +6,6 @@ function first_option(obj){
 	obj.find('option:first-child').prop('selected', true);
 }
 function set_items_to_order(){
-    alert();
     $.ajax({
         type: 'post',
         url: '/admin/ajax/orders.php',

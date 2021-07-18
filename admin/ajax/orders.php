@@ -1,4 +1,5 @@
 <?
+ini_set('error_reporting', E_PARSE | E_ERROR);
 use core\OrderValue;
 
 require_once('../../core/DataBase.php');

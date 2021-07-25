@@ -5,6 +5,14 @@ a.removeFromBasket{
 	display: none;
 	font-size: 13px;
 }
+#itemsToOrder {
+    display: inline-block;
+    height: 25px;
+    margin-left: 20px;
+}
+#itemsToOrder img{
+    height: 100%;
+}
 .stringLog.active{
 	display: block;
 }

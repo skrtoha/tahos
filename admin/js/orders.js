@@ -5,6 +5,18 @@ function first_option(obj){
 	obj.find('option').prop('selected', false);
 	obj.find('option:first-child').prop('selected', true);
 }
+function set_items_to_order(){
+    $.ajax({
+        type: 'post',
+        url: '/admin/ajax/orders.php',
+        data: {
+            status_id: 'getItemsToOrder'
+        },
+        success: function (response){
+            $('#itemsToOrder').html(response)
+        }
+    })
+}
 function arrived_new(obj){
 	var th = obj.closest('#arrived_change');
 	var type = th.find('input[name=new_value_radio]:checked').val();
@@ -92,6 +104,7 @@ function setTotalSumm(){
 	$('td.total').html(total);
 }
 $(function(){
+    set_items_to_order();
 	$('#changeStatus select[name=status_id]').on('change', function(){
 		$(this).closest('form').submit();
 	})

@@ -1,4 +1,5 @@
 <?
+ini_set('error_reporting', E_PARSE | E_ERROR);
 use core\OrderValue;
 
 require_once('../../core/DataBase.php');
@@ -188,6 +189,18 @@ switch($_POST['status_id']){
 		);
 		echo json_encode($_POST);
 		break;
+    case 'getItemsToOrder':
+        $commonItemsToOrders = core\Provider::getCommonItemsToOrders();
+		$countItemsToOrder = core\Provider::getCountItemsToOrders($commonItemsToOrders);
+		if ($countItemsToOrder){
+		    echo "
+                <a style=\"margin-left: 15px;\" href=\"?view=providers&act=itemsToOrder\">
+                    Товары ожидающие отправку в заказ
+                    <strong style=\"color: red\">($countItemsToOrder)</strong>
+                </a>
+		    ";
+		}
+        break;
 	default:
 		core\OrderValue::changeStatus($_POST['status_id'], $_POST);
 }

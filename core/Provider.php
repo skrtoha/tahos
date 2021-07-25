@@ -551,7 +551,7 @@ abstract class Provider{
 				default:
 					eval("\$output = core\\Provider\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
 			}
-			if (!count($output)) continue;
+			if (empty($output)) continue;
 			foreach($output as $value) $items[$value['provider']][] = $value;
 		}
 		return $items;

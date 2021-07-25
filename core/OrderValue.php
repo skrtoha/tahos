@@ -166,7 +166,20 @@ class OrderValue{
 	 * @return [boolean] true if updated successfully else error of update
 	 */
 	public static function update($values, $params){
-		return $GLOBALS['db']->update('orders_values', $values, Provider::getWhere([
+		if ($values['status_id'] == 6){
+		    $orderValuerResult = self::get(Provider::getWhere([
+                'order_id' => $params['order_id'],
+                'store_id' => $params['store_id'],
+                'item_id' => $params['item_id']
+            ]));
+		    $orderValue = $orderValuerResult->fetch_assoc();
+		    Mailer::send([
+		        'emails' => $orderValue['email'],
+                'subject' => 'Отказ поставщика',
+                'body' => "Поставщик отказал в поставке товара {$orderValue['brend']} {$orderValue['article']} {$orderValue['title_full']}"
+            ]);
+        }
+	    return $GLOBALS['db']->update('orders_values', $values, Provider::getWhere([
 			'order_id' => $params['order_id'],
 			'store_id' => $params['store_id'],
 			'item_id' => $params['item_id']
@@ -290,6 +303,7 @@ class OrderValue{
 				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS created,
 				" . User::getUserFullNameForQuery() . " AS userName,
 				u.bill,
+				u.email,
 				u.reserved_funds,
 				u.user_type AS typeOrganization,
 				ps.delivery,

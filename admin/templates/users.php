@@ -823,7 +823,11 @@ function basket(){
 			foreach($basket as $value){?>
 				<tr>
 					<td><?=$value['brend']?></td>
-					<td><?=$value['article']?></td>
+					<td>
+                        <a href="/admin/?view=items&act=item&id=<?=$value['item_id']?>">
+                            <?=$value['article']?>
+                        </a>
+                    </td>
 					<td><?=$value['title']?></td>
 					<td><?=$value['cipher']?></td>
 					<td><?=$value['delivery']?></td>

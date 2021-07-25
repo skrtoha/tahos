@@ -136,7 +136,11 @@ elseif($_GET['issue_id']){?>
 		<?foreach ($array['issue_values'] as $iv){?>
 			<tr>
 				<td><?=$iv['brend']?></td>
-				<td><?=$iv['article']?></td>
+				<td>
+                    <a href="/admin/?view=items&act=item&id=<?=$iv['item_id']?>">
+                        <?=$iv['article']?>
+                    </a>
+                </td>
 				<td><?=$iv['title_full']?></td>
 				<td class="price_format"><?=$iv['price']?></td>
 				<td><?=$iv['issued']?></td>

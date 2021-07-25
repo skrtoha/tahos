@@ -301,7 +301,7 @@ class Autopiter extends Provider{
 	}
 	public static function sendOrder(){
 		$clients = [
-			'entity' => self::getClient('entity'),
+			'entity' => self::getClient(),
 			'private' => self::getClient('private')
 		];
 		foreach($clients as $client){
@@ -316,20 +316,20 @@ class Autopiter extends Provider{
 	}
 	private static function parseSendOrderItemCart($model){
 		$osi = explode('-', $model->Item->Comment);
-		if ($model->Code->ResponseCode == 0){
+//		if ($model->Code->ResponseCode == 0){
 			$resOrderValue = $orderValue = OrderValue::get([
 				'order_id' => $osi[0],
 				'store_id' => $osi[1],
 				'item_id' => $osi[2]
 			]);
 			OrderValue::changeStatus(11, $resOrderValue->fetch_assoc());
-		}
-		else{
+//		}
+		/*else{
 			Log::insert([
 				'text' => 'Ошибка отправка заказа',
 				'additional' => "osi: " . $model->Item->Comment
 			]);
-		}
+		}*/
 	}
 	public static function getCoincidences($search){
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;

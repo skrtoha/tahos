@@ -21,6 +21,7 @@ function replace_winword_chars($val){
 			);
 	$val = strtr($val,$_r);
 	return $val;
+	debug();
 }
 function uppercase_first_letter($str){
 	$left = substr($str, 0, 1);
@@ -56,6 +57,14 @@ function debug($obj, $name = ''){?>
 	<?}?>
 	<pre><?print_r($obj)?></pre>
 <?}
+function print_d($ar, $isOnlyToConsole = true) {
+    if (!$isOnlyToConsole){
+        echo '<pre>';
+        print_r($ar);
+        echo '</pre>';
+    }
+    echo '<script>console.log('.json_encode($ar).');</script>';
+}
 function message($text, $type = true){
 	if (!$type) $type_message = "error";
 	else $type_message = 'ok';

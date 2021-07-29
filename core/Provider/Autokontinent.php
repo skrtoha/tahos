@@ -17,7 +17,8 @@ class Autokontinent extends Provider{
 
 	private static $mainStores = [
 		'Череповец' => 7,
-		'Петербург' => 1
+		'Петербург' => 1,
+        'Вологда' => 257630
 	];
 
 	public static function getParams($typeOrganization = 'entity'){
@@ -310,7 +311,7 @@ class Autokontinent extends Provider{
 				self::getAuthData($ov['typeOrganization'])
 			);
 			$response = json_decode($json);
-			if ($response->status != 'OK') throw new EAuto\ErrorAddingToBasket("Ответ Автоевро: $response->error_message");
+			if ($response->status != 'OK') throw new EAuto\ErrorAddingToBasket("Ответ Автоконтинент: $response->error_message");
 		}
 		catch(EAuto\ErrorAddingToBasket $e){
 			$e->process($ov);

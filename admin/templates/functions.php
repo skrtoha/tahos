@@ -15,6 +15,14 @@ function article_clear($article){
 function console($str){
 	echo "<script>console.log('$str')</script>";
 }
+function print_d($ar, $isOnlyToConsole = true) {
+    if (!$isOnlyToConsole){
+        echo '<pre>';
+        print_r($ar);
+        echo '</pre>';
+    }
+    echo '<script>console.log('.json_encode($ar).');</script>';
+}
 function accStr($length = 8){
   $chars = 'abcdefhiknoprstxyzABCDEFGHKNOPQRSTXYZ0123456789';
   $numChars = strlen($chars);

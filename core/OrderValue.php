@@ -364,7 +364,6 @@ class OrderValue{
 				return;
 			}
 		} 
-		
 		switch($ov['provider_id']){
 			case 8: //Микадо
 				$mikado = new Provider\Mikado();

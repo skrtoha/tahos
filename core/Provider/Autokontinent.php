@@ -18,7 +18,7 @@ class Autokontinent extends Provider{
 	private static $mainStores = [
 		'Череповец' => 7,
 		'Петербург' => 1,
-        'Вологда' => 257630
+        'Вологда' => 9
 	];
 
 	public static function getParams($typeOrganization = 'entity'){

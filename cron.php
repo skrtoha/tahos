@@ -51,6 +51,29 @@ $logger = new Logger(
 $logger->alert('----------СТАРТ-------------');
 
 switch ($params[0]){
+    case 'removeEmptyOrders':
+        $logger->alert('Удаление пустых заказов');
+        $result = $db->query("
+            SELECT
+                o.id,
+                COUNT(ov.order_id) as cnt
+            FROM
+                #orders o
+            LEFT JOIN
+                #orders_values ov ON ov.order_id = o.id
+            GROUP by
+                ov.order_id
+            HAVING
+                cnt = 0
+        ");
+        if(!$result->num_rows) break;
+        $counter = 0;
+        foreach($result as $row){
+            $db->delete('orders', "id = {$row['id']}");
+            $counter++;
+        }
+        $logger->alert("Удалено $counter записей");
+        break;
     case 'clearAllPrices':
         $logger->alert('Полная очистка прайсов');
         Provider::clearStoresItems(false);

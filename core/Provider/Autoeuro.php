@@ -17,7 +17,8 @@ class Autoeuro extends Provider{
 		"provider_id",
 		"mainStoreID",
 		"minPriceStoreID",
-		"minDeliveryStoreID"
+		"minDeliveryStoreID",
+        "priceYar"
 	];
 	
 	public static function getUrlString($action, $typeOrganization = 'entity'){
@@ -48,7 +49,10 @@ class Autoeuro extends Provider{
 	 * @return string order_key
 	 */
 	public static function getOrderKey($params, $typeOrganization = 'entity'){
-		if ($params['store_id'] == self::getParams($typeOrganization)->mainStoreID){
+		if (
+		    $params['store_id'] == self::getParams($typeOrganization)->mainStoreID ||
+            $params['store_id'] == self::getParams($typeOrganization)->priceYar
+        ){
 			$response = self::getStockItems(strtoupper($params['brend']), $params['article'], 0, $typeOrganization);
 			if (!$response || $response == 'Пустой ключ покупателя'){
 				$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $params['brend']);
@@ -56,11 +60,16 @@ class Autoeuro extends Provider{
 			}
 			$json = json_decode($response);
 			if (!isset($json->DATA->CODES)) return false;
-			foreach($json->DATA->CODES as $code){
-				if ($code->proposal == 'АвтоЕвро'){
-					return $code->order_key;
-				} 
-			}
+			foreach($json->DATA->CODES as $code) {
+                if (
+                    $code->order_time == 'в наличии (Москва ЦС (Новая Рига))' &&
+                    $params['store_id'] == self::getParams($typeOrganization)->mainStoreID
+                ) return $code->order_key;
+                if (
+                    $code->order_time == 'в наличии (Ярославль)' &&
+                    $params['store_id'] == self::getParams($typeOrganization)->priceYar
+                ) return $code->order_key;
+            }
 			return false;
 		}
 		$resAutoeuroOrderKeys = parent::getInstanceDataBase()->query("

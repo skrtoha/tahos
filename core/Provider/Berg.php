@@ -25,7 +25,7 @@ class Berg extends Provider{
         if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
         if (!parent::isActive(self::getParams()->provider_id)) return false;
         
-        $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
+        $providerBrend = $brend;
         
         $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]=$article&items[0][brand_name]=$providerBrend";
         $result = parent::getCurlUrlData($url);
@@ -33,8 +33,12 @@ class Berg extends Provider{
         
         if (empty($data->resources)) return $output;
         
+        //todo  сделано так из-за того, что если бренд не найден, то возвращается весь список совпадений
+        if (count($data->resources) > 1) return $output;
+        
         foreach($data->resources as $obj){
             if (empty($obj->offers)) continue;
+            
             foreach($obj->offers as $offer){
                 $GLOBALS['db']->insert('store_items', [
                     'store_id' => self::getStoreId($offer),

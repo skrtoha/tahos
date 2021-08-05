@@ -465,8 +465,9 @@ switch ($params[0]){
         }
         Provider::updatePriceUpdated(['provider_id' => core\Provider\Rossko::getParams()->provider_id]);
         break;
-    case 'BERG_MSK':
-    case 'BERG_Yar':
+    case 'BERG_GREB': //Прайс Москва
+    case 'BERG_GERY': //Прайс Ярославль
+    case 'BERG_2021': //Прайс Москва2
         ini_set('memory_limit', '2048M');
         $logger->alert("Прайс {$params[0]}");
         $emailPrice = [
@@ -479,15 +480,16 @@ switch ($params[0]){
         $price = new core\Price($db, $emailPrice);
         
         $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
-        $filename = $imap->getLastMailFrom(['from' => 'noreply@berg.ru', 'name' => $_GET['act']]);
+        $filename = $imap->getLastMailFrom(['from' => 'noreply@berg.ru', 'name' => $params[0]]);
         if (!$filename){
             $logger->alert("Не удалось получить файл из почты.");
             break;
         }
         $handle = fopen($filename, 'r');
         
-        if ($params[0] == 'BERG_Yar') $store_id = 276;
-        if ($params[0] == 'BERG_MSK') $store_id = 275;
+        if ($params[0] == 'BERG_GREB') $store_id = 275;
+        if ($params[0] == 'BERG_GERY') $store_id = 276;
+        if ($params[0] == 'BERG_2021') $store_id = 337952;
         $db->delete('store_items', "`store_id`=$store_id");
         $i = 0;
         while ($data = fgetcsv($handle, 1000, "\n")) {

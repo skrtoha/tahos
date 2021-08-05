@@ -490,7 +490,7 @@ abstract class Provider{
 			WHERE
 				b.title = '$brend' AND pb.provider_id = $provider_id
 		", '');
-		if (!$res->num_rows) return false;
+		if (!$res->num_rows) return $brend;
 		$array = $res->fetch_assoc();
 		return $array['title'];
 	}

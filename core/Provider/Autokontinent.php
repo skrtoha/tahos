@@ -225,9 +225,8 @@ class Autokontinent extends Provider{
 	private static function getPartIdByBrandAndArticle($brand, $article, $params = []){
 		$items = self::getItemsByArticle($article);
 		if (!$items) return false;
-
-		$providerBrend = Provider::getProviderBrend(self::getParams($params['typeOrganization'])->provider_id, $brand);
-		$brand =  $providerBrend ? $providerBrend : $brand;
+        
+        $brand = Provider::getProviderBrend(self::getParams($params['typeOrganization'])->provider_id, $brand);
 
 		try{
 			$part_id = self::getPartIdByBrendAndArrayOfItems($brand, $items);

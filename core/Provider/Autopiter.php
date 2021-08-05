@@ -140,10 +140,8 @@ class Autopiter extends Provider{
 	}
 	private static function getBrend($brend){
 		static $brends;
-		$output = '';
 		if (isset($brends[$brend])) return $brends[$brend];
-		$providerBrend = Provider::getProviderBrend(self::getParams()->provider_id, $brend);
-		$output = $providerBrend ? $providerBrend : $brend;
+        $output = Provider::getProviderBrend(self::getParams()->provider_id, $brend);
 		$brends[$brend] = $output;
 		return $output;
 	}

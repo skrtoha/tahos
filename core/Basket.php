@@ -21,6 +21,7 @@ class Basket{
 			END AS delivery,
 			ps.cipher,
 			ps.provider_id,
+            ps.title AS providerStore,
 			p.api_title,
 			si.packaging,
 			si.in_stock,

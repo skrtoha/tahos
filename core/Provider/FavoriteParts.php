@@ -202,7 +202,7 @@ class FavoriteParts extends Provider{
 	/**
 	 * checks if a item exists in the basket
 	 * @param  array  $ov brend, article
-	 * @return boolean     [description]
+	 * @return mixed     [description]
 	 */
 	public static function isInBasket($ov){
 		$basket = self::getBasket();

@@ -131,6 +131,7 @@ $noReturnIsExists = false;
 					$val['pp'] = core\Provider::getPrice([
 						'provider_id' => $val['provider_id'],
 						'store_id' => $val['store_id'],
+						'providerStore' => $val['providerStore'],
 						'item_id' => $val['item_id'],
 						'price' => $val['price'],
 						'article' => $val['article'],

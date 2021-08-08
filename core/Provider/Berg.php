@@ -1,6 +1,7 @@
 <?php
 namespace core\Provider;
-use core\Database;
+use core\Log;
+use core\OrderValue;
 use core\Provider;
 
 class Berg extends Provider{
@@ -40,6 +41,7 @@ class Berg extends Provider{
             if (empty($obj->offers)) continue;
             
             foreach($obj->offers as $offer){
+                $stores[$offer->warehouse->type][$offer->warehouse->name] = $offer->warehouse;
                 $GLOBALS['db']->insert('store_items', [
                     'store_id' => self::getStoreId($offer),
                     'item_id' => $item_id,
@@ -59,8 +61,14 @@ class Berg extends Provider{
 	}
     
     private static function getStoreId($offer){
-        if ($warehouse->type == 2) return self::getParams()->mainStoreId;
-        $res = $GLOBALS['db']->insert(
+        if ($warehouse->name == 'BERG MSK') return self::getParams()->mainStoreId;
+        if ($warehouse->name == 'BERG YAR') return self::getParams()->storeYar;
+        if ($warehouse->name == 'BERG MSK2') return self::getParams()->storeMsk2;
+    
+        $array = $GLOBALS['db']->select_one('provider_stores', 'id', $where);
+        if (!empty($array)) return $array['id'];
+        
+        $GLOBALS['db']->insert(
             'provider_stores',
             [
                 'title' => $offer->warehouse->name,
@@ -69,18 +77,7 @@ class Berg extends Provider{
                 'currency_id' => 1,
                 'delivery' => $offer->assured_period,
                 'percent' => 10
-            ],
-            [
-                'print_query' => false,
-                'deincrement_duplicate' => true
-            ]
-        );
-        if (parent::isDuplicate($res)){
-            $where = "`title`='{$offer->warehouse->name}' AND `provider_id` = " . self::getParams()->provider_id;
-            $GLOBALS['db']->update('provider_stores', ['delivery' => $offer->assured_period], $where);
-            $array = $GLOBALS['db']->select_one('provider_stores', 'id', $where);
-            return $array['id'];
-        }
+            ]);
         return $GLOBALS['db']->last_id();
     }
     
@@ -123,5 +120,81 @@ class Berg extends Provider{
         return false;
     }
     
+    public static function isInBasket($ov){
+        return Armtek::isInBasket($ov);
+    }
+    
+    public static function removeFromBasket($ov){
+	    return Armtek::removeFromBasket($ov);
+    }
+    
+    public static function sendOrder(){
+	    $providerBasket = parent::getProviderBasket(self::getParams()->provider_id);
+	    if (!$providerBasket->num_rows) return 0;
+	    
+	    $items = [];
+	    $ordered = 0;
+	    foreach($providerBasket as $row){
+	        $items['items'][] = [
+	            'resource_article' => $row['article'],
+                'brand_name' => $row['brend']
+            ];
+            $url = self::getUrlString('/ordering/get_stock').'&'.http_build_query($items);
+            $result = parent::getCurlUrlData($url);
+            $data = json_decode($result);
+            
+            if (empty($data->resources)) Log::insert([
+                'text' => "Берг: не удалось отправить в заказ",
+                'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+            ]);
+        
+            if (count($data->resources) > 1) Log::insert([
+                'text' => "Берг: слишком много совпадений, проверьте бренды",
+                'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+            ]);
+            
+            $order = [];
+            $order['force'] = 0;
+            $order['order']['payment_type'] = $row['typeOrganization'] == 'private' ? 1 : 2;
+            $order['order']['dispatch_type'] = 3;
+            $order['order']['dispatch_time'] = 2;
+            
+            //todo при развертывании закоментировать
+            //$order['order']['is_test'] = 1;
+            
+            foreach($data->resources[0]->offers as $offer){
+                if ($offer->warehouse->name != $row['store']) continue;
+                $order['order']['dispatch_at'] = self::getDateDispatch($offer->average_period);
+                $order['order']['items'][] = [
+                    'resource_id' => $data->resources[0]->id,
+                    'warehouse_id' => $offer->warehouse->id,
+                    'quantity' => $row['quan'],
+                    'comment' => "{$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                ];
+                break;
+            }
+            $url = self::getUrlString('/ordering/place_order');
+            $json = parent::getCurlUrlData($url, $order);
+            $result = json_decode($json);
+            
+            OrderValue::changeStatus(11, [
+                'order_id' => $row['order_id'],
+                'store_id' => $row['store_id'],
+                'item_id' => $row['item_id'],
+                'price' => $result->order->items[0]->price,
+                'quan' => $result->order->items[0]->quantity
+            ]);
+            
+            $ordered += $result->order->items[0]->quantity;
+	    }
+	    
+        return $ordered;
+    }
+    
+    public static function getDateDispatch($period){
+        $dateFrom = new \DateTime();
+        $dateFrom->add(new \DateInterval('P'.$period.'D'));
+        return $dateFrom->format('Y-m-d');
+    }
 }
 

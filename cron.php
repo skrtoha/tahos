@@ -78,6 +78,11 @@ switch ($params[0]){
         $logger->alert('Полная очистка прайсов');
         Provider::clearStoresItems(false);
         break;
+    case 'orderBerg':
+        $logger->alert('Отправка заказа в Берг');
+        $countSent = Provider\Berg::sendOrder();
+        $logger->alert("Отправлено $countSent товаров");
+        break;
     case 'orderRossko':
         $logger->alert('Отправка заказа в Росско');
         core\Provider\Rossko::sendOrder();

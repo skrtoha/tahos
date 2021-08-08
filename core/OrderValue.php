@@ -1,5 +1,7 @@
 <?php
 namespace core;
+use core\Provider\Berg;
+
 class OrderValue{
 	public static $countOrdered = 0;
 	public static function setFunds($params){
@@ -387,6 +389,9 @@ class OrderValue{
 					self::$countOrdered = Provider\Rossko::sendOrder($ov['store_id']);
 				} 
 				break;
+            case 16:
+                Provider::addToProviderBasket($ov);
+                if ($automaticOrder) self::$countOrdered = Berg::sendOrder();
 			case 17://ForumAuto
 				Provider::addToProviderBasket($ov);
 				self::$countOrdered = Provider\ForumAuto::sendOrder();

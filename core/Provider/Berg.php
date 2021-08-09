@@ -23,19 +23,19 @@ class Berg extends Provider{
 	}
 	
 	public static function setArticle($brend, $article, $item_id){
-        if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+         if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
         if (!parent::isActive(self::getParams()->provider_id)) return false;
         
-        $providerBrend = $brend;
+        $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
         
         $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]=$article&items[0][brand_name]=$providerBrend";
         $result = parent::getCurlUrlData($url);
         $data = json_decode($result);
         
-        if (empty($data->resources)) return $output;
+        if (empty($data->resources)) return true;
         
         //todo  сделано так из-за того, что если бренд не найден, то возвращается весь список совпадений
-        if (count($data->resources) > 1) return $output;
+        if (count($data->resources) > 1) return false;
         
         foreach($data->resources as $obj){
             if (empty($obj->offers)) continue;
@@ -61,11 +61,15 @@ class Berg extends Provider{
 	}
     
     private static function getStoreId($offer){
-        if ($warehouse->name == 'BERG MSK') return self::getParams()->mainStoreId;
-        if ($warehouse->name == 'BERG YAR') return self::getParams()->storeYar;
-        if ($warehouse->name == 'BERG MSK2') return self::getParams()->storeMsk2;
+        if ($offer->warehouse->name == 'BERG MSK') return self::getParams()->mainStoreId;
+        if ($offer->warehouse->name == 'BERG YAR') return self::getParams()->storeYar;
+        if ($offer->warehouse->name == 'BERG MSK2') return self::getParams()->storeMsk2;
     
-        $array = $GLOBALS['db']->select_one('provider_stores', 'id', $where);
+        $array = $GLOBALS['db']->select_one(
+            'provider_stores',
+            'id',
+            "`title` = '{$offer->warehouse->name}' AND `provider_id` = ".self::getParams()->provider_id
+        );
         if (!empty($array)) return $array['id'];
         
         $GLOBALS['db']->insert(

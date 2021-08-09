@@ -113,14 +113,17 @@ class Armtek extends Provider{
 			return $array['id'];
 		} 
 		else{
+		    $delivery = self::getCountDelivery($object->DLVDT);
+		    $delivery_max = $object->WRNTDT ? self::getCountDelivery($object->WRNTDT) : $delivery;
+		    
 			$res = $GLOBALS['db']->insert('provider_stores',[
 				'provider_id' => self::$provider_id,
 				'title' => $object->KEYZAK,
 				'cipher' => strtoupper(self::getRandomString(4)),
 				'percent' => 11,
 				'currency_id' => 1,
-				'delivery' => self::getCountDelivery($object->DLVDT),
-				'delivery_max' => self::getCountDelivery($object->WRNTDT),
+				'delivery' => $delivery,
+				'delivery_max' => $delivery_max,
 				'under_order' => 2,
 				'noReturn' => 0,
 			], 

@@ -5,7 +5,7 @@ use core\OrderValue;
 use core\Log;
 use core\Item;
 use core\Setting;
-use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException; 
+use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException;
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
 
@@ -97,55 +97,40 @@ class Armtek extends Provider{
 		* @return bool|mixed
 		*/
 	private function getStoreId($object){
-		if (!$object->KEYZAK) return false;
-		if (array_key_exists($object->KEYZAK, $this->keyzak)) return $this->keyzak[$object->KEYZAK];
-		$array = $GLOBALS['db']->select_one('provider_stores', 'id,delivery', "`provider_id`= " . self::$provider_id . " AND `title`='{$object->KEYZAK}'");
-		if (!empty($array)){
-			$this->keyzak[$object->KEYZAK] = $array['id'];
-			if ($array['delivery'] == 1){
-				$delivery = $object->WRNTDT ? $object->WRNTDT : $object->DLVDT;
-				$days = self::getDaysDelivery($delivery);
-				//добавлено условие из-за того, что для ARMC количество дней доставки было равно нулю
-				if ($days){
-					$GLOBALS['db']->update('provider_stores', ['delivery' => $days], "`id`={$array['id']}");
-				}
-			} 
-			return $array['id'];
-		} 
-		else{
-		    $delivery = self::getCountDelivery($object->DLVDT);
-		    $delivery_max = $object->WRNTDT ? self::getCountDelivery($object->WRNTDT) : $delivery;
-		    
-			$res = $GLOBALS['db']->insert('provider_stores',[
-				'provider_id' => self::$provider_id,
-				'title' => $object->KEYZAK,
-				'cipher' => strtoupper(self::getRandomString(4)),
-				'percent' => 11,
-				'currency_id' => 1,
-				'delivery' => $delivery,
-				'delivery_max' => $delivery_max,
-				'under_order' => 2,
-				'noReturn' => 0,
-			], 
-			['print_query' => false]);
-			if ($res === true){
-				$this->keyzak[$object->KEYZAK] = $GLOBALS['db']->last_id();
-				return $GLOBALS['db']->last_id();
-			} 
-			else{
-				Log::insert([
-					'text' => "Ошибка Армтек: $res",
-					'query' => $GLOBALS['db']->last_query
-				]);
-				return false;
-			}
-		}
+ 		if (!$object->KEYZAK) return false;
+		if (array_key_exists($object->KEYZAK, self::$keyzak)) return self::$keyzak[$object->KEYZAK];
+        
+        $deliveryDate = $object->WRNTDT ?: $object->DLVDT;
+        $delivery = self::getCountDelivery($deliveryDate);
+        $delivery_max = $object->WRNTDT ? self::getCountDelivery($object->WRNTDT) : $delivery;
+        
+        $GLOBALS['db']->insert(
+            'provider_stores',
+            [
+                'provider_id' => self::$provider_id,
+                'title' => $object->KEYZAK,
+                'cipher' => strtoupper(self::getRandomString(4)),
+                'percent' => 11,
+                'currency_id' => 1,
+                'delivery' => $delivery,
+                'delivery_max' => $delivery_max,
+                'under_order' => 2,
+                'noReturn' => 0,
+            ],
+            ['duplicate' => [
+                'delivery' => $delivery,
+                'delivery_max' => $delivery_max
+            ]]
+        );
+        $last_id = $GLOBALS['db']->last_id();
+        self::$keyzak[$object->KEYZAK] = $last_id;
+        return $last_id;
 	}
 	
 	private static function getCountDelivery($sting){
 	    $currentDate = new \DateTime();
 	    $targetDate = \DateTime::createFromFormat('YmdHis', $sting);
-	    $totalDays = $targetDate->diff($currentDate)->d;
+	    $totalDays = $targetDate->diff($currentDate)->days;
 	    $days = 0;
 	    for($i = 1; $i <= $totalDays; $i++){
 	        $dayWeek = $currentDate->add(new \DateInterval('P1D'))->format('l');
@@ -266,7 +251,7 @@ class Armtek extends Provider{
 		$data = $response->json();
 		if ($data->RESP->ERROR || $data->RESP->MSG){
 			$text = $data->RESP->ERROR ? $data->RESP->ERROR : $data->RESP->MSG;
-			$errorMessage .= "Артикул: $search";
+			$errorMessage = "Артикул: $search";
 			foreach($data->MESSAGES as $msg) $errorMessage .= "{$msg->TEXT}\n";
 			Log::insert([
 				'url' => $_SERVER['REQUEST_URI'],
@@ -283,87 +268,6 @@ class Armtek extends Provider{
 			}
 		}
 		return $coincidences;
-		// $this->render($data->RESP); return false;
-		// $this->renderRESP($data->RESP);
-	}
-	private function renderRESP($RESP){
-		foreach($RESP as $key => $value){
-			if (!$this->isKeyzakByTitle($value->KEYZAK)) continue;
-			//артикул
-			$keyzak[$value->BRAND]['PIN'] = $value->PIN;
-			$keyzak[$value->BRAND]['NAME'] = $value->NAME;
-			//минимальное количество
-			$keyzak[$value->BRAND]['MINBM'] = $value->MINBM;
-			//кратность
-			$keyzak[$value->BRAND]['RDPRF'] = $value->RDPRF;
-			$keyzak[$value->BRAND]['ANALOG'] = $value->ANALOG;
-			$keyzak[$value->BRAND]['KEYZAK'][$value->KEYZAK] = [
-				//остатки
-				'RVALUE' => preg_replace('/[^\d]+/', '', $value->RVALUE),
-				'PRICE' => $value->PRICE
-			];
-		}
-		if (empty($keyzak)) return false;
-		foreach($keyzak as $key => $value){
-			if (empty($value['KEYZAK'])) continue;
-			$res_brend_insert = $GLOBALS['db']->insert(
-				'brends', 
-				[
-					'title' => $key,
-					'href' => translite($key)
-				], 
-				['print_query' => false]
-			);
-			if ($res_brend_insert === true) $brend_id = $GLOBALS['db']->last_id();
-			else{
-				$array = $GLOBALS['db']->select_one('brends', 'id,parent_id', "`title`='$key'");
-				$brend_id = $array['parent_id'] ? $array['parent_id'] : $array['id'];
-			} 
-			$res_items_insert = $GLOBALS['db']->insert(
-				'items',
-				[
-					'title_full' => $value['NAME'],
-					'brend_id' => $brend_id,
-					'article' => Item::articleClear($value['PIN']),
-					'article_cat' => $value['PIN'],
-					'amount_package' => $value['RDPRF']
-				],
-				['print_query' => false]
-			);
-			if ($res_items_insert === true){
-				$item_id = $GLOBALS['db']->last_id();
-				$GLOBALS['db']->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
-			} 
-			else {
-				$array = $GLOBALS['db']->select_one('items', 'id', "`brend_id`=$brend_id AND `article`='".Item::articleClear($value['PIN'])."'");
-				$item_id = $array['id'];
-			}
-			if ($value['ANALOG']){
-				$GLOBALS['db']->insert('analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id]);
-				$GLOBALS['db']->insert('analogies', ['item_diff' => $_GET['item_id'], 'item_id' => $item_id]);
-			}
-			foreach($value['KEYZAK'] as $k => $v){
-				$res_store_items_insert = $GLOBALS['db']->insert(
-					'store_items',
-					[
-						'store_id' => $this->getStoreIdByKeyzak($k),
-						'item_id' => $item_id,
-						'price' => $v['PRICE'],
-						'in_stock' => $v['RVALUE'],
-						'packaging' => $value['RDPRF']
-					]
-					// ,['print_query' => true]
-				);
-				if ($res_store_items_insert !== true) $GLOBALS['db']->update(
-					'store_items',
-					[
-						'price' => $v['PRICE'],
-						'in_stock' => $v['RVALUE']
-					],
-					"`store_id`={$arr_keyzak[$k]['store_id']} AND `item_id`=$item_id"
-				);
-			}
-		}
 	}
 	private function getStoreIdByKeyzak($keyzak){
 		if (array_key_exists($keyzak, self::$keyzak)) return self::$keyzak[$keyzak];
@@ -373,11 +277,11 @@ class Armtek extends Provider{
 		return $array['id'];
 	}
 	public function isKeyzak($store_id){
-		if ($temp = array_search($store_id, $this->keyzak)) return $temp;
+		if ($temp = array_search($store_id, self::$keyzak)) return $temp;
 		$array = $GLOBALS['db']->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
 		if (empty($array)) return false;
 		if ($array['provider_id'] == self::$provider_id){
-			$this->keyzak[$array['title']] = $array['id'];
+			self::$keyzak[$array['title']] = $array['id'];
 			return true;
 		} 
 		return false;

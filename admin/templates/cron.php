@@ -86,6 +86,11 @@ switch($_GET['act']){
 		core\Provider\ForumAuto::sendOrder();
 		echo "<br>Обработка завершена.";
 		break;
+    case 'orderBerg':
+        echo "<h2>Отправка заказа в Берг</h2>";
+        $countSent = Provider\Berg::sendOrder();
+        echo "<br> Отправлено $countSent товаров";
+        break;
 	case 'orderVoshod':
 		core\Provider\Abcp::sendOrder(6);
 		break;

@@ -103,7 +103,7 @@ class Berg extends Provider{
     }
 	
 	public static function getItemsToOrder($provider_id){
-	    return false;
+	    return Abcp::getItemsToOrder($provider_id);
     }
     
     public static function getPrice(array $params)
@@ -188,6 +188,15 @@ class Berg extends Provider{
                 'price' => $result->order->items[0]->price,
                 'quan' => $result->order->items[0]->quantity
             ]);
+        
+            parent::updateProviderBasket(
+                [
+                    'order_id' => $row['order_id'],
+                    'store_id' => $row['store_id'],
+                    'item_id' => $row['item_id']
+                ],
+                ['response' => 'OK']
+            );
             
             $ordered += $result->order->items[0]->quantity;
 	    }

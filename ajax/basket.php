@@ -52,17 +52,15 @@ switch ($_POST['act']){
 		break;
 	case 'isToOrder':
 	case 'noToOrder':
-		// print_r($_POST);
-		$db->update(
-			'basket',
-			['isToOrder' => $_POST['act'] == 'isToOrder' ? 1 : 0],
-			"
-				`store_id`=$store_id AND
-				`item_id` = $item_id AND
-				`user_id`=$user_id
-			"
-		);
-		break;
+        foreach($_POST['items'] as $value) $db->update(
+            'basket',
+            ['isToOrder' => $_POST['act'] == 'isToOrder' ? 1 : 0],
+            "
+            `store_id` = {$value['store_id']} AND
+            `item_id` = {$value['item_id']} AND
+            `user_id` = $user_id
+        ");
+        break;
 }
 if ($res) echo true;
 else echo false;

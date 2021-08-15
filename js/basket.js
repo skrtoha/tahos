@@ -1,3 +1,16 @@
+function sendAjaxCheckbox(items, act){
+    $.ajax({
+        type: 'post',
+        url: "/ajax/basket.php",
+        data: {
+            act: act,
+            items: items
+        },
+        success: function(response){
+            // console.log(response); return false;
+        }
+    })
+}
 $(function(){
 	$('input[type=checkbox]').styler();
 	$(".count-block .minus, .count-block .plus").click(function(event) {
@@ -300,26 +313,46 @@ $(function(){
 		}
 	})
 	$('input[name=toOrder]').on('change', function(){
-		var e = $(this);
+		let e = $(this);
+		let elem;
+
 		if (e.closest('tr').find('input[name=available]').val() == '-1') return show_message('Данной позиции нет в наличии!', 'error');
-		if (e.attr('view_type') == 'mobile') var elem = e.closest('.good').find('.count-block');
-		else var elem = e.closest('tr').find('.count-block');
-		// console.log(elem);
+		if (e.attr('view_type') == 'mobile') elem = e.closest('.good').find('.count-block');
+		else elem = e.closest('tr').find('.count-block');
+
 		var quan = elem.find('input').val();
 		var summand = elem.attr('summand');
 		if (e.is(':checked')) $('#totalToOrder').html(+$('#totalToOrder').html() + quan * summand);
 		else $('#totalToOrder').html(+$('#totalToOrder').html() - quan * summand);
-		$.ajax({
-			type: 'post',
-			url: "/ajax/basket.php",
-			data: {
-				act: e.is(':checked') ? 'isToOrder' : 'noToOrder',
-				store_id: elem.attr('store_id'),
-				item_id: elem.attr('item_id')
-			},
-			success: function(response){
-				// console.log(response); return false;
-			}
-		})
+
+		let data = [];
+		let act = e.is(':checked') ? 'isToOrder' : 'noToOrder';
+		data.push({
+            store_id: elem.attr('store_id'),
+            item_id: elem.attr('item_id')
+        })
+        sendAjaxCheckbox(data, act);
+
 	})
+    $('input[name=checkAll]').on('change', function(){
+        let checkAll = $(this);
+        let items = [];
+        let act = checkAll.is(':checked') ? 'isToOrder' : 'noToOrder';
+        $.each($('td.checkbox input[type=checkbox]'), function(i, item){
+            let th = $(this);
+            if (th.prop('disabled')) return 1;
+            th.prop('checked', checkAll.is(':checked'));
+
+            let elem;
+            if (th.attr('view_type') == 'mobile') elem = th.closest('.good').find('.count-block');
+            else elem = th.closest('tr').find('.count-block');
+
+            items.push({
+                store_id: elem.attr('store_id'),
+                item_id: elem.attr('item_id')
+            });
+        })
+        sendAjaxCheckbox(items, act);
+        $('input[type=checkbox]').trigger('refresh');
+    })
 })

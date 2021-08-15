@@ -103,7 +103,9 @@ $noReturnIsExists = false;
 	<h1>Корзина</h1>
 	<table class="basket-table">
 		<tr>
-			<th></th>
+			<th class="checkbox">
+                <input type="checkbox" name="checkAll" value="">
+            </th>
 			<th>Бренд</th>
 			<th style="text-align: left;padding-left: 20px;">Наименование</th>
 			<th>Поставщик</th>
@@ -177,11 +179,6 @@ $noReturnIsExists = false;
 				if ($val['isToOrder']) $totalToOrder += $val['price'] * $val['quan'];
 				$basketResult[] = $val;
 				?>
-				<!-- <tr>
-					<td colspan="9">
-						<?debug($val, 'basket'); debug($val['pp'], 'providerPrice')?>
-					</td>
-				</tr> -->
 				<tr class="good">
 					<td class="checkbox">
 						<?$disabled = !$val['provider_id'] ? 'disabled'  : '';?>

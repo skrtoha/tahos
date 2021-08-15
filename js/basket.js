@@ -338,6 +338,9 @@ $(function(){
         let checkAll = $(this);
         let items = [];
         let act = checkAll.is(':checked') ? 'isToOrder' : 'noToOrder';
+        let totalToOrder = $('#totalToOrder');
+        let total = 0;
+
         $.each($('td.checkbox input[type=checkbox]'), function(i, item){
             let th = $(this);
             if (th.prop('disabled')) return 1;
@@ -347,11 +350,17 @@ $(function(){
             if (th.attr('view_type') == 'mobile') elem = th.closest('.good').find('.count-block');
             else elem = th.closest('tr').find('.count-block');
 
+            let quan = elem.find('input').val();
+            let summand = elem.attr('summand');
+            if (checkAll.is(':checked')) total += quan * summand;
+
             items.push({
                 store_id: elem.attr('store_id'),
                 item_id: elem.attr('item_id')
             });
         })
+
+        totalToOrder.html(total);
         sendAjaxCheckbox(items, act);
         $('input[type=checkbox]').trigger('refresh');
     })

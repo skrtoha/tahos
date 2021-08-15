@@ -27,6 +27,7 @@ if ($detect->isMobile() && !$detect->isTablet()) $device = 'mobile';
 $view = $_GET['view'] ? $_GET['view'] : 'index';
 if ($view == 'exit'){
 	session_destroy();
+	setcookie('jwt', '');
 	header("Location: ".$_SERVER['HTTP_REFERER']);
 }
 if($_GET['act'] == 'unbind'){
@@ -39,7 +40,12 @@ if($_GET['act'] == 'unbind'){
 }
 $path = "templates/$view.php";
 
-$res_user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] : false]);
+if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
+    $jwtInfo = \core\Authorize::getJWTInfo($_COOKIE['jwt']);
+    $_SESSION['user'] = $jwtInfo['user_id'];
+}
+
+$res_user = core\User::get(['user_id' => $_SESSION['user'] ?: false]);
 if ($res_user->num_rows) $user = $res_user->fetch_assoc();
 else $user = $res_user;
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);

@@ -9,6 +9,9 @@
   font-weight: normal;
   font-style: normal;
 }
+label[for=w_not_remember_checkbox] {
+    margin-right: 10px;
+}
 #providerInfo div.donut{
   position: relative;
   display: inline-block;
@@ -28,9 +31,6 @@
     width: -webkit-calc(100% - 582px);
     width: calc(100% - 582px);
   }
-}
-#providerInfo .information .row span.left{
-  font-size: bold;
 }
 #providerInfo .information .row span.right {
     font-weight: bold;
@@ -63,7 +63,7 @@
 }
 .information .row {
     font-size: 14px;
-    margin-bottom: 8px;8
+    margin-bottom: 8px;
 }
 #providerInfo{
   width: 360px;

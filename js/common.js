@@ -171,6 +171,7 @@ function selectItemByKey(event){
 $(function() {
 	cp_init();
 	price_format();
+	$('input[name=remember]').styler();
 	$('#driving_direction').on('click', function(event) {
 		event.preventDefault();
 		th = $(this);

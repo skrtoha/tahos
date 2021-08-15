@@ -114,6 +114,10 @@ class ComposerStaticInit32177a424f59751f8425db67467ac785
         array (
             'Katzgrau\\KLogger\\' => 17,
         ),
+        'F' => 
+        array (
+            'Firebase\\JWT\\' => 13,
+        ),
         'D' => 
         array (
             'Doctrine\\Instantiator\\' => 22,
@@ -200,6 +204,10 @@ class ComposerStaticInit32177a424f59751f8425db67467ac785
         'Katzgrau\\KLogger\\' => 
         array (
             0 => __DIR__ . '/..' . '/katzgrau/klogger/src',
+        ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Doctrine\\Instantiator\\' => 
         array (

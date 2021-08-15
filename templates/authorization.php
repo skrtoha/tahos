@@ -1,5 +1,7 @@
-<?php 
+<?php
+use core\Authorize;
 require_once('core/functions.php');
+
 if ($_POST['token']){
 	$s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
 	$user = json_decode($s, true);
@@ -28,18 +30,21 @@ if ($_POST['token']){
 $login = $_POST['login'];
 $password = md5($_POST['password']);
 if (!preg_match("/.+@.+/", $login)) $login = str_replace(array(' ', ')', '(', '-'), '', $login);
-$user = $db->select('users', "id", "(`email`='$login' OR `telefon`='$login') AND `password`='$password'");
-// print_r($_GET);
-if (count($user)){
-	// if ($login == 'skr_toha@list.ru') $_SESSION['user'] = 4;
-	// else 
-		$_SESSION['user'] = $user[0]['id'];
-	setcookie('message', 'Вы успешно авторизовались!');
-	setcookie('message_type', 'ok');
+$user = $db->select_one('users', "id,email", "(`email`='$login' OR `telefon`='$login') AND `password`='$password'");
+if (empty($user)){
+    setcookie('message', 'Неверный логин или пароль!');
+    setcookie('message_type', 'error');
 }
 else{
-	setcookie('message', 'Неверный логин или пароль!');
-	setcookie('message_type', 'error');	
+    $_SESSION['user'] = $user['id'];
+    if (isset($_POST['remember']) && $_POST['remember'] == 'on'){
+        $jwt = Authorize::getJWT([
+            'user_id' => $user['id'],
+            'login' => $user['email']
+        ]);
+        setcookie('jwt', $jwt, time()+60*60*24*30);
+    }
+    message('Вы успешно авторизовались!');
 }
 header("Location: {$_SERVER['HTTP_REFERER']}");
 ?>

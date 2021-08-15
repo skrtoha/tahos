@@ -162,8 +162,8 @@
 							<a href="#">Напомнить пароль</a>
 						</div>
 						<div class="not_remember">
-							<input id="w_not_remember_checkbox" type="checkbox">
-							<label for="w_not_remember_checkbox">Чужой компьютер</label>
+							<input id="w_not_remember_checkbox" type="checkbox" name="remember">
+							<label for="w_not_remember_checkbox">Запомнить</label>
 						</div>
 						<button>Войти</button>
 						<div class="registration_link">

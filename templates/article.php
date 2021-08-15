@@ -116,12 +116,6 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 					<?=$substitutes?>
 				</li>
 			<?}?>
-			<?if ($analogies){?>
-				<!--<li class="ionTabs__tab" search_type="analogies" data-target="Tab_3">
-					<span>Аналоги</span>
-					<?/*=$analogies*/?>
-				</li>-->
-			<?}?>
 			<?if ($complects){?>
 				<li class="ionTabs__tab" search_type="complects" data-target="Tab_4">
 					<span></span>

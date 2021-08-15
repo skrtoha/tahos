@@ -1,4 +1,8 @@
-<?//debug($store_items);
+<?
+/* @var string $device */
+/* @var array $store_items */
+/* @var array $basket */
+
 $hidden = isInBasketExists($store_items) ? '' : 'hidden';
 $inBasket = json_encode(getInBasket($basket));
 use core\User;
@@ -449,11 +453,11 @@ else{?>
 							<?}?>
 							<?if (!empty($si_price)){?>
 								<ul>
-									<li>
+									<li <?=$si_price['noReturn']?>>
 										<a href="" store_id="<?=$si_price['store_id']?>"><?=$si_price['cipher']?></a>
 									</li>
 									<?if (!empty($si_delivery)){?>
-										<li>
+										<li <?=$si_delivery['noReturn']?>>
 											<a href="" store_id="<?=$si_delivery['store_id']?>"><?=$si_delivery['cipher']?></a>
 										</li>
 									<?}?>
@@ -606,7 +610,7 @@ else{?>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
-										<li>
+										<li <?=$value['noReturn']?>>
 											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 										</li>
 									<?}?>
@@ -614,7 +618,7 @@ else{?>
 							<?}?>
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
-									<li>
+									<li <?=$value['noReturn']?>>
 										<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
 									</li>
 								<?}?>

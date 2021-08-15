@@ -196,25 +196,29 @@
 			</tr>
 			<?$total_basket = 0;
 			$total_quan = 0;
-			foreach ($basket as $value) {
-				$total_quan += $value['quan'];
-				$total_price += $value['price'] * $value['quan']?>
-				<tr store_id="<?=$value['store_id']?>" item_id="<?=$value['item_id']?>">
-					<td><?=$value['brend']?> <a class="articul" href="<?=$value['href']?>"><?=$value['article']?></a> <?=$value['title']?></td>
-					<td><?=$value['quan']?> шт.</td>
-					<td>
-						<input type="hidden" name="quan" value="<?=$value['quan']?>">
-						<input type="hidden" name="price" value="<?=$value['price']?>">
-						<span class="price_format"><?=$value['price'] * $value['quan']?></span> 
-						<i class="fa fa-rub" aria-hidden="true"></i>
-					</td>
-					<td>
-						<span division="<?=$value['price']?>" quan="<?=$value['quan']?>" class="delete-btn">
-							<i style="margin: 0" class="fa fa-times" aria-hidden="true"></i>
-						</span>
-					</td>
-				</tr>
-			<?}?>
+            foreach ($basket as $value) {
+                $total_quan += $value['quan'];
+                if ($user['markupSettings']['markup'] && $user['markupSettings']['showInBasket'] == 'on'){
+                    $price = floor($value['price'] * $user['markupSettings']['markup'] / 100 + $value['price']);
+                }
+                else $price = $value['price'];
+                $total_price += $price * $value['quan']?>
+                <tr store_id="<?=$value['store_id']?>" item_id="<?=$value['item_id']?>">
+                    <td><?=$value['brend']?> <a class="articul" href="<?=$value['href']?>"><?=$value['article']?></a> <?=$value['title']?></td>
+                    <td><?=$value['quan']?> шт.</td>
+                    <td>
+                        <input type="hidden" name="quan" value="<?=$value['quan']?>">
+                        <input type="hidden" name="price" value="<?=$value['price']?>">
+                        <span class="price_format"><?=$price * $value['quan']?></span>
+                        <i class="fa fa-rub" aria-hidden="true"></i>
+                    </td>
+                    <td>
+                        <span division="<?=$value['price']?>" quan="<?=$value['quan']?>" class="delete-btn">
+                            <i style="margin: 0" class="fa fa-times" aria-hidden="true"></i>
+                        </span>
+                    </td>
+                </tr>
+            <?}?>
 			<tr>
 				<th>Итого</th>
 				<th><span id="total_quan"><?=$total_quan?></span>&nbsp;шт.</th>

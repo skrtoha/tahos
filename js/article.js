@@ -1082,7 +1082,7 @@ function sortStoreItems(sortType){
     });
 }
 function applyAjaxUserMarkup(params){
-    let data = new Object();
+    let data = {};
     data.params = params;
     data.act = 'applyUserMarkup';
     data.user_id = $('input[name=user_id]').val();
@@ -1095,7 +1095,7 @@ function applyAjaxUserMarkup(params){
     })
 }
 function applyUserMarkup(){
-    let params = new Object();
+    let params = {};
     $('span.subprice').remove();
     $('li.withSubprice').removeClass('withSubprice');
     $.each($('#user_markup form').serializeArray(), function(i, item){
@@ -1104,17 +1104,17 @@ function applyUserMarkup(){
 
     applyAjaxUserMarkup(params);
 
-    if (params.withUserMarkup == 'on'){
+    if (params.withUserMarkup === 'on'){
         $('div.ionTabs__body span.price_format').each(function(){
             let th = $(this);
             let basePrice = + th.prev('input').val();
             let price =  Math.floor(basePrice + basePrice * params.markup / 100);
-            if (params.showType == 'double'){
+            if (params.showType === 'double'){
                 th.text(price);
                 th.closest('li').addClass('withSubprice');
                 th.next().after('<span class="subprice">' + Math.floor(basePrice) + '</span>');
             }
-            if (params.showType == 'single'){
+            if (params.showType === 'single'){
                 th.text(Math.floor(price));
             }
         })
@@ -1138,7 +1138,7 @@ function applyUserMarkup(){
         let th = $(this);
         let quan = th.prevAll('input[name=quan]').val();
         let price = th.prevAll('input[name=price]').val();
-        if (params.showInBasket == 'on'){
+        if (params.showInBasket === 'on'){
             let additionalPrice = Math.floor(price * quan + price * quan * params.markup / 100);
             totalInBasket += additionalPrice;
             th.text(additionalPrice);
@@ -1328,12 +1328,11 @@ $(function(){
         var packaging = +e.attr('packaging');
         var item_id = e.attr('item_id');
 
-        if ($('.login_btn span').html() == 'Войти'){
+        if ($('.login_btn span').html() === 'Войти'){
             $('.login_btn').click();
             show_message('Для добавления товара в корзину необходимо авторизоваться!', 'error');
             return false;
         }
-        $('.quan.hidden').removeClass('hidden');
         $('button[type=full]').closest('td').attr('colspan', 8);
         $('.quan.hidden').removeClass('hidden');
         $('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']').html('<input value="' + packaging + '">');

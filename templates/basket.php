@@ -10,7 +10,7 @@ if ($_GET['act'] == 'to_offer'){
 		header('Location: /basket');
 		exit();
 	}
-
+	
 	//проверяем превышение лимита
 	$available = $user['bill'] - $user['reserved_funds'];
 	$totalAmountBasket = 0;
@@ -19,15 +19,12 @@ if ($_GET['act'] == 'to_offer'){
 		header("Location: /basket");
 		exit();
 	}
-
-	$res = $db->insert('orders', [
-		'user_id' => $_SESSION['user'],
-		'is_draft' => 0
-	]);
-
-	//закоментирована эта строка, т.к. очень часто появлялся пустой заказ
-	// if ($res !== true) die ("$res | $db->last_query");
-
+    
+    $res = $db->insert('orders', [
+        'user_id' => $_SESSION['user'],
+        'is_draft' => 0
+    ]);
+    if ($res !== true) die ("$res | $db->last_query");
 	$order_id = $db->last_id();
 
 	$body = "<h1>Заказанные товары:</h1><table style='width: 100%;border-collapse: collapse;''>";
@@ -71,8 +68,7 @@ if ($_GET['act'] == 'to_offer'){
 		 	]
 	 	);
 
-	 	//закоментирована эта строка, т.к. очень часто появлялся пустой заказ
-		// if ($res !== true) die("$res | $last_query");
+		if ($res !== true) die("$res | $last_query");
 	 	
 	 	$db->delete('basket', "`user_id`={$_SESSION['user']} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
 	} 
@@ -89,9 +85,6 @@ if ($_GET['act'] == 'to_offer'){
 		header("Location: /admin/?view=orders&id=$order_id&act=allInWork&automaticOrder=1");
 		exit();
 	}
-
-	/*$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
-	var_dump(core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders));*/
 
 	message('Успешно отправлено в заказы!');
 	header('Location: /orders');

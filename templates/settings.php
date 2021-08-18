@@ -80,7 +80,8 @@ $res_user_socials = $db->query("
 					<option <?=$user['delivery_type'] == 'Самовывоз' ? 'selected' : ''?> value="pickup">Самовывоз</option>
 				</select>
 			</div>
-			<div class="input-wrap pickup-addreses">
+            <?$classHidden = $user['delivery_type'] == 'Доставка' ? 'hidden' : ''?>
+			<div class="input-wrap pickup-addreses <?=$classHidden?>">
 				<label for="pickup-address">
 					Пункт выдачи:
 				</label>
@@ -93,7 +94,11 @@ $res_user_socials = $db->query("
 				</select>
 				<button id="bt_show_map">Выбрать на карте</button>
 			</div>
-	</form>
+            <?$classHidden = $user['delivery_type'] == 'Самовывоз' ? 'hidden' : ''?>
+            <div class="input-wrap set-addresses <?=$classHidden?>">
+                <button>Адреса доставки</button>
+            </div>
+	    </form>
 	</div>
 	<div class="col">
 		<form id="additional">
@@ -219,8 +224,8 @@ $res_user_socials = $db->query("
 	</div>
 </div>
 <div id="overlay"></div>
-<div id="show_map">
-	<div id="show_map_2">
+<div id="show_map" class="popup">
+	<div>
 		<div id="div_issue" class="input_box issue_div clearfix" style="">
 				<p>Пункт выдачи</p>
 				<select name="issue_id">
@@ -234,4 +239,61 @@ $res_user_socials = $db->query("
 		<button title="Close (Esc)" type="button" class="bt_close">×</button>
 		<button id="apply">Применить</button>
 	</div>
+</div>
+<div id="set-address" class="popup">
+    <div>
+        <div id="address_multiple_fields" class="left">
+            <input type="hidden" name="address_id">
+            <form class="js-form-address">
+                <div class="flex">
+                    <div class="half">
+                        <div class="input">
+                            <label>Индекс</label>
+                            <input autocomplete="off" type="text" name="zip" placeholder="Будет определен автоматически">
+                        </div>
+                        <div class="input">
+                            <label>Область</label>
+                            <input autocomplete="off" type="text" name="region">
+                        </div>
+                        <div class="input">
+                            <label>Регион / район</label>
+                            <input autocomplete="off" type="text" name="district">
+                        </div>
+                    </div>
+                    <div class="half">
+                        <div class="input">
+                            <label>Город / населенный пункт</label>
+                            <input autocomplete="off" type="text" name="city">
+                        </div>
+                        <div class="input">
+                            <label>Улица</label>
+                            <input autocomplete="off" type="text" name="street">
+                        </div>
+                        <div class="input input_litl">
+                            <label>Дом</label>
+                            <input autocomplete="off" type="text" name="building">
+                        </div>
+                    </div>
+                </div>
+                <div class="input">
+                    <input type="button" value="Сохранить">
+                </div>
+            </form>
+        </div>
+        <div class="right">
+            <?$userAddresses = $db->select(
+                'user_addresses',
+                '*',
+                "`user_id` = {$_SESSION['user']}",
+                'created'
+            );
+            if (!empty($userAddresses)){
+                foreach($userAddresses as $row){
+                    $data = json_decode($row['json'], true);?>
+                    <?=\core\UserAddress::getHtmlString($row['id'], $data)?>
+                <?}
+            }?>
+        </div>
+        <button title="Close (Esc)" type="button" class="bt_close">×</button>
+    </div>
 </div>

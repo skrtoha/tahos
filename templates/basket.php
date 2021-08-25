@@ -433,7 +433,12 @@ $noReturnIsExists = false;
                 <?
                 $dateTimeObject = new DateTime();
                 $end = clone $dateTimeObject;
-                $begin = $dateTimeObject->add(new DateInterval("P{$minDelivery}D"));
+                
+                if ($minDelivery){
+                    $begin = $dateTimeObject->add(new DateInterval("P{$minDelivery}D"));
+                }
+                else $begin = $dateTimeObject;
+                
                 $end = $end->add(new DateInterval("P{$maxDelivery}D"));
                 ?>
                 <input type="hidden" name="min_date" value="<?=$begin->format('d.m.Y')?>">

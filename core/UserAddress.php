@@ -31,4 +31,11 @@ class UserAddress{
         return $output;
     }
     
+    public static function getString($address_id, array $data){
+        $output = "";
+        foreach($data as $row){
+            $output .= "{$row['value']}, ";
+        }
+        return substr($output, 0, -2);
+    }
 }

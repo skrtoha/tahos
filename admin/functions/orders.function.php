@@ -20,14 +20,20 @@ function get_order($flag = ''){
 			u.bill,
 			u.reserved_funds,
 			u.defermentOfPayment,
-			u.pay_type,
+			o.pay_type,
+			o.delivery,
+			o.address_id,
+			o.entire_order,
+			o.date_issue,
 			o.is_new,
-			o.is_draft
+			o.is_draft,
+			ua.json
 		FROM
 			#orders o
 		LEFT JOIN #orders_values ov ON ov.order_id=o.id
 		LEFT JOIN #users u ON u.id=o.user_id
 		LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
+		LEFT JOIN #user_addresses ua ON ua.id = o.address_id
 		WHERE o.id={$_GET['id']}
 	";
 	if ($flag) return $db->query($query, $flag);

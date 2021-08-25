@@ -356,6 +356,7 @@ $(function(){
 			});
 			return false;
 		}
+		else e.preventDefault();
 		if (!noReturn.length) showAdditionalOptions();
 	})
 	$('input[name=toOrder]').on('change', function(){

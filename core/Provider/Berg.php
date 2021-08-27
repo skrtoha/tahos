@@ -164,7 +164,7 @@ class Berg extends Provider{
             $order['order']['dispatch_time'] = 2;
             
             //todo при развертывании закоментировать
-            //$order['order']['is_test'] = 1;
+//            $order['order']['is_test'] = 1;
             
             foreach($data->resources[0]->offers as $offer){
                 if ($offer->warehouse->name != $row['store']) continue;
@@ -177,6 +177,15 @@ class Berg extends Provider{
                 ];
                 break;
             }
+            
+            if (empty($order['order']['items'])){
+                Log::insert([
+                    'text' => "Берг: товар не найден на складе",
+                    'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                ]);
+                continue;
+            }
+            
             $url = self::getUrlString('/ordering/place_order');
             $json = parent::getCurlUrlData($url, $order);
             $result = json_decode($json);

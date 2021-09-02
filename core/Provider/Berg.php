@@ -147,15 +147,21 @@ class Berg extends Provider{
             $result = parent::getCurlUrlData($url);
             $data = json_decode($result);
             
-            if (empty($data->resources)) Log::insert([
-                'text' => "Берг: не удалось отправить в заказ",
-                'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
-            ]);
+            if (empty($data->resources)){
+                Log::insert([
+                    'text' => "Берг: не удалось отправить в заказ",
+                    'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                ]);
+                continue;
+            }
         
-            if (count($data->resources) > 1) Log::insert([
-                'text' => "Берг: слишком много совпадений, проверьте бренды",
-                'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
-            ]);
+            if (count($data->resources) > 1){
+                Log::insert([
+                    'text' => "Берг: слишком много совпадений, проверьте бренды",
+                    'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                ]);
+                continue;
+            }
             
             $order = [];
             $order['force'] = 0;

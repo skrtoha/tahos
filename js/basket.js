@@ -11,8 +11,42 @@ function sendAjaxCheckbox(items, act){
         }
     })
 }
+function showAdditionalOptions(){
+    $.magnificPopup.open({
+        items: {
+            src: '#additional_options'
+        }
+    });
+}
+function setDateIssueDelivery(date){
+    const selector = 'input[name=date_issue]';
+    pickmeup.defaults.locales['ru'] = {
+        days: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        daysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        daysMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+    };
+    pickmeup(selector).destroy();
+    pickmeup('input[name=date_issue]', {
+        min: date,
+        date: date,
+        format: 'd.m.Y',
+        locale: 'ru',
+        hide_on_select: true
+    });
+}
 $(function(){
-	$('input[type=checkbox]').styler();
+	$('input[type=checkbox], input[type=radio]').styler();
+    setDateIssueDelivery($('input[name=min_date]').val());
+    $('.calendar-icon').on('click', function(){
+        $(this).prev().click();
+    })
+    $('input[name=entire_order]').on('change', function(){
+        const $th = $(this);
+        if ($th.is(':checked')) setDateIssueDelivery($('input[name=max_date]').val());
+        else setDateIssueDelivery($('input[name=min_date]').val())
+    })
 	$(".count-block .minus, .count-block .plus").click(function(event) {
 		var e = $(this);
 		var available = + e.closest('.good').find('input[name=available]').val();
@@ -256,6 +290,19 @@ $(function(){
 			}
 		})
 	})
+    $('input[name=delivery]').on('change', function(){
+        const $th = $(this);
+        let disabled;
+        disabled = $th.val() != 'Доставка';
+
+        $('select[name=address_id]').prop('disabled', disabled);
+        $('select').trigger('refresh');
+    })
+    $('#mgn_popup a[href="/basket/to_offer"]').on('click', function(e){
+        e.preventDefault();
+        showAdditionalOptions();
+        return false;
+    })
 	$('div.basket > a.button').on('click', function(e){
 		var noReturn = new Array();
 		if ($(document).width() >= 880){
@@ -280,8 +327,6 @@ $(function(){
 				});
 			});
 		}
-		// console.log(noReturn);
-		// return false;
 		if (noReturn.length){
 			$.magnificPopup.open({
 				type: 'inline',
@@ -290,10 +335,10 @@ $(function(){
 				callbacks: {
 					open: function(){
 						var str = '<tr>' +
-												'<th>Бренд</th>' +
-												'<th>Артикул</th>' +
-												'<th>Название</th>' +
-											'</tr>';
+                                    '<th>Бренд</th>' +
+                                    '<th>Артикул</th>' +
+                                    '<th>Название</th>' +
+                                '</tr>';
 						for(var k in noReturn){
 							str += 
 								'<tr>' +
@@ -311,6 +356,8 @@ $(function(){
 			});
 			return false;
 		}
+		else e.preventDefault();
+		if (!noReturn.length) showAdditionalOptions();
 	})
 	$('input[name=toOrder]').on('change', function(){
 		let e = $(this);
@@ -363,5 +410,14 @@ $(function(){
         totalToOrder.html(total);
         sendAjaxCheckbox(items, act);
         $('input[type=checkbox]').trigger('refresh');
+    })
+    $('#additional_options a.button').on('click', function(e){
+        const th = $(this);
+        const form = th.prev().find('form');
+        let formData = {};
+        $.each(form.serializeArray(), function(i, item){
+            formData[item.name] = item.value;
+        })
+        $.cookie('additional_options', JSON.stringify(formData));
     })
 })

@@ -1,5 +1,8 @@
-<?php 
+<?php
+use core\UserAddress;
 require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/DataBase.php");
+
+session_start();
 
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
@@ -182,6 +185,17 @@ switch($_POST['act']){
 			['bill' => "`bill` - ".$_POST['amount']]
 		);
 		break;
+    case 'changeAddress':
+        $id = UserAddress::edit([
+            'address_id' => $_POST['address_id'],
+            'user_id' => $_SESSION['user'],
+            'json' => $_POST['data']
+        ]);
+        echo UserAddress::getHtmlString($id, $_POST['data']);
+        break;
+    case 'deleteAddress':
+        $db->delete('user_addresses', "`id` = {$_POST['address_id']}");
+        break;
 }
 
 ?>

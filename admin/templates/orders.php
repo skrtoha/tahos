@@ -233,6 +233,35 @@ function show_form($act){
 			<td label="Дата заказа"><?=$order['date']?></td>
 		</tr>
 	</table>
+    <?if ($order['pay_type'] && $order['delivery']){?>
+        <h3 style="margin-top: 10px">Дополнительная информация о заказе</h3>
+        <table class="t_table" cellspacing="1">
+            <tr class="head">
+                <td>Тип оплаты</td>
+                <td>Доставка</td>
+                <td>Дата отгрузки</td>
+                <td>Адрес</td>
+                <td>Весь заказ</td>
+            </tr>
+            <tr>
+                <td label="Тип оплаты"><?=$order['pay_type']?></td>
+                <td label="Доставка"><?=$order['delivery']?></td>
+                <?$dateTimeObject = DateTime::createFromFormat('Y-m-d H:i:s', $order['date_issue'])?>
+                <td label="Дата отгрузки"><?=$dateTimeObject->format('d.m.Y')?></td>
+                <td label="Адрес">
+                    <?if ($order['address_id']){?>
+                        <?=\core\UserAddress::getString(
+                            $order['address_id'],
+                            json_decode($order['json'], true)
+                        )?>
+                    <?}?>
+                </td>
+                <td label="Весь заказ">
+                    <?=$order['entire_order'] == '1' ? 'Да' : 'Нет'?>
+                </td>
+            </tr>
+        </table>
+    <?}?>
 	<h3 style="margin-top: 10px">Товары в заказе</h3>
 	<a class="allInWork" href="/admin/?view=orders&id=<?=$_GET['id']?>&act=allInWork">В работе для всех</a>
 	<div style="clear: both"></div>

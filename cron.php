@@ -574,7 +574,7 @@ switch ($params[0]){
             
             $zipArchive = new ZipArchive();
             $res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$zipName}.zip");
-            $file = $zipArchive->getStream("mikado_price_{$value}_" . Provider\Mikado::getParams()->ClientID . ".csv");
+            $file = $zipArchive->getStream("mikado_price_{$value}.csv");
             
             $stocks = Provider\Mikado::getStocks();
             $db->delete('store_items', "`store_id`=" .$stocks[$value]);

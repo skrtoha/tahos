@@ -1,4 +1,6 @@
 <?php
+use core\UserAddress;
+
 if (!$_SESSION['user']) header('Location: /');
 $title = "Корзина";
 $user_id = $_SESSION['user'];
@@ -20,10 +22,18 @@ if ($_GET['act'] == 'to_offer'){
 		exit();
 	}
     
-    $res = $db->insert('orders', [
+    $additional_options = json_decode($_COOKIE['additional_options'], true);
+    $dateTimeObject = DateTime::createFromFormat('d.m.Y', $additional_options['date_issue']);
+	$insertOrder = [
         'user_id' => $_SESSION['user'],
-        'is_draft' => 0
-    ]);
+        'is_draft' => 0,
+        'delivery' => $additional_options['delivery'],
+        'address_id' => $additional_options['address_id'],
+        'pay_type' => $additional_options['pay_type'],
+        'date_issue' => $dateTimeObject->format('Y-m-d'),
+        'entire_order' => $additional_options['entire_order']
+    ];
+    $res = $db->insert('orders', $insertOrder);
     if ($res !== true) die ("$res | $db->last_query");
 	$order_id = $db->last_id();
 
@@ -120,6 +130,8 @@ $noReturnIsExists = false;
 			$totalToOrder = 0;
 			$bl_check = false;
 			$basketResult = [];
+			$minDelivery = 1000000;
+			$maxDelivery = 0;
 			foreach ($res_basket as $key => $val) {
 				$checkbox = '';
 				if (core\Config::$isUseApiProviders){
@@ -171,6 +183,9 @@ $noReturnIsExists = false;
 				$total_basket += $val['price'] * $val['quan'];
 				if ($val['isToOrder']) $totalToOrder += $val['price'] * $val['quan'];
 				$basketResult[] = $val;
+				
+				if ($val['delivery'] < $minDelivery) $minDelivery = $val['delivery'];
+				if ($val['delivery'] > $maxDelivery) $maxDelivery = $val['delivery'];
 				?>
 				<tr class="good">
 					<td class="checkbox">
@@ -364,3 +379,88 @@ $noReturnIsExists = false;
 		<div style="clear: both"></div>
 	</div>
 <?}?>
+<?//debug($user)?>
+<div id="additional_options" class="product-popup mfp-hide">
+    <h2>Дополнительные параметры заказа</h2>
+    <div class="content">
+        <form action="">
+            <div class="wrapper">
+                <div class="left">Выберите способ доставки</div>
+                <div class="right">
+                    <label>
+                        <?$checked = $user['delivery_type'] == 'Самовывоз' ? 'checked' : ''?>
+                        <input type="radio" name="delivery" value="Самовывоз" <?=$checked?>>
+                        <span>Самовывоз из <?=$user['issue_adres']?></span>
+                    </label>
+                    <label>
+                        <?$checked = $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
+                        <input type="radio" name="delivery" value="Доставка" <?=$checked?>>
+                        <span>Доставка в:</span>
+                    </label>
+                    <?$addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
+                    if (!empty($addresses)){
+                        $disabled = $user['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
+                        <select name="address_id" <?=$disabled?>>
+                            <?$counter = 0;
+                            foreach($addresses as $row){
+                                $counter++;
+                                $selected = $counter == 1 && $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
+                                <option value="<?=$row['id']?>">
+                                    <?=UserAddress::getString($row['id'], json_decode($row['json'], true))?>
+                                </option>
+                            <?}?>
+                        </select>
+                    <?}?>
+                </div>
+            </div>
+            <div class="wrapper">
+                <div class="left">Выберите способ оплаты</div>
+                <div class="right">
+                    <label>
+                        <?$checked = $user['pay_type'] == 'наличный' ? 'checked' : ''?>
+                        <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
+                        <span>Наличный</span>
+                    </label>
+                    <label>
+                        <?$checked = $user['pay_type'] == 'безналичный' ? 'checked' : ''?>
+                        <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
+                        <span>Безналичный</span>
+                    </label>
+                </div>
+            </div>
+            <div class="wrapper">
+                <div class="right">Выберите дату отгрузки</div>
+                <?
+                $dateTimeObject = new DateTime();
+                $end = clone $dateTimeObject;
+                
+                if ($minDelivery){
+                    $begin = $dateTimeObject->add(new DateInterval("P{$minDelivery}D"));
+                }
+                else $begin = $dateTimeObject;
+                
+                $end = $end->add(new DateInterval("P{$maxDelivery}D"));
+                ?>
+                <input type="hidden" name="min_date" value="<?=$begin->format('d.m.Y')?>">
+                <input type="hidden" name="max_date" value="<?=$end->format('d.m.Y')?>">
+                <div class="left">
+                    <input type="text" name="date_issue" value="">
+                    <div class="calendar-icon"></div>
+                </div>
+            </div>
+            <div class="wrapper">
+                <div class="right"></div>
+                <div class="left">
+                    <label>
+                        <input type="checkbox" name="entire_order" value="1">
+                        <span>
+                        Хочу получить заказ целиком
+                        (заказ будет отгружен после поступления всех позиций на склад)
+                    </span>
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <a class="button" href="/basket/to_offer">Оформить заказ</a>
+</div>

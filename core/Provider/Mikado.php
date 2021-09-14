@@ -339,7 +339,6 @@ class Mikado extends Provider{
 			if ($value == $store_id) return $key;
 		}
 		throw new \Exception("Не удалось получить StockID по store_id = $store_id");
-		return false;
 	}
 	public function getDeliveryType($ZakazCode, $store_id, $typeOrganization){
 		$clientData = self::getClientData($typeOrganization);

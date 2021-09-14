@@ -572,9 +572,10 @@ switch ($params[0]){
             )
             );
             
+            $counter = $zipName == 'MikadoStockReg' ? 0 : 1;
             $zipArchive = new ZipArchive();
             $res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$zipName}.zip");
-            $file = $zipArchive->getStream("mikado_price_{$value}.csv");
+            $file = $zipArchive->getStream("mikado_price_{$counter}.csv");
             
             $stocks = Provider\Mikado::getStocks();
             $db->delete('store_items', "`store_id`=" .$stocks[$value]);

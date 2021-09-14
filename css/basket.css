@@ -259,13 +259,7 @@ header .hints a.jspArrow:hover {
   cursor: progress; }
 
 .mfp-zoom-out-cur, .mfp-zoom-out-cur .mfp-image-holder .mfp-close {
-  cursor: -webkit-zoom-out;
   cursor: zoom-out; }
-
-.mfp-zoom {
-  cursor: pointer;
-  cursor: -webkit-zoom-in;
-  cursor: zoom-in; }
 
 .mfp-auto-cursor .mfp-content {
   cursor: auto; }
@@ -522,6 +516,13 @@ img.mfp-img {
 
 .mfp-gallery .mfp-image-holder .mfp-figure {
   cursor: pointer; }
+
+@media screen and (max-width: 600px) {
+    .jq-selectbox li{
+        height: auto;
+        white-space: normal;
+    }
+}
 
 @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
   /**
@@ -3480,8 +3481,6 @@ img.mfp-img {
 .jstree-default .jstree-animated,
 .jstree-default .jstree-wholerow {
   -webkit-transition: background-color 0.15s, -webkit-box-shadow 0.15s;
-  transition: background-color 0.15s, -webkit-box-shadow 0.15s;
-  transition: background-color 0.15s, box-shadow 0.15s;
   transition: background-color 0.15s, box-shadow 0.15s, -webkit-box-shadow 0.15s; }
 
 .jstree-default .jstree-hovered {
@@ -3522,9 +3521,7 @@ img.mfp-img {
 
 .jstree-default .jstree-disabled > .jstree-icon {
   opacity: 0.8;
-  filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
   /* Firefox 10+ */
-  filter: gray;
   /* IE6-9 */
   -webkit-filter: grayscale(100%);
   /* Chrome 19+ & Safari 6+ */ }
@@ -3667,9 +3664,7 @@ img.mfp-img {
 
 .jstree-default .jstree-checkbox-disabled {
   opacity: 0.8;
-  filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
   /* Firefox 10+ */
-  filter: gray;
   /* IE6-9 */
   -webkit-filter: grayscale(100%);
   /* Chrome 19+ & Safari 6+ */ }
@@ -3708,9 +3703,6 @@ img.mfp-img {
   background-color: transparent;
   background-image: none;
   background-position: 0 0; }
-
-.jstree-default > .jstree-container-ul .jstree-loading > .jstree-ocl {
-  background: url("throbber.gif") center center no-repeat; }
 
 .jstree-default .jstree-file {
   background: url("../img/jstree/32px.png") -100px -68px no-repeat; }
@@ -3855,7 +3847,6 @@ img.mfp-img {
   opacity: 0.8;
   filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
   /* Firefox 10+ */
-  filter: gray;
   /* IE6-9 */
   -webkit-filter: grayscale(100%);
   /* Chrome 19+ & Safari 6+ */ }
@@ -3894,9 +3885,6 @@ img.mfp-img {
   background-color: transparent;
   background-image: none;
   background-position: 0 0; }
-
-.jstree-default-small > .jstree-container-ul .jstree-loading > .jstree-ocl {
-  background: url("throbber.gif") center center no-repeat; }
 
 .jstree-default-small .jstree-file {
   background: url("../img/jstree/32px.png") -103px -71px no-repeat; }
@@ -3980,33 +3968,33 @@ img.mfp-img {
   background-image: url("../img/jstree/32px.png"); }
 
 .jstree-default-large .jstree-node {
-  background-position: -288px 0px;
+  background-position: -288px 0;
   background-repeat: repeat-y; }
 
 .jstree-default-large .jstree-last {
   background: transparent; }
 
 .jstree-default-large .jstree-open > .jstree-ocl {
-  background-position: -128px 0px; }
+  background-position: -128px 0; }
 
 .jstree-default-large .jstree-closed > .jstree-ocl {
-  background-position: -96px 0px; }
+  background-position: -96px 0; }
 
 .jstree-default-large .jstree-leaf > .jstree-ocl {
-  background-position: -64px 0px; }
+  background-position: -64px 0; }
 
 .jstree-default-large .jstree-themeicon {
-  background-position: -256px 0px; }
+  background-position: -256px 0; }
 
 .jstree-default-large > .jstree-no-dots .jstree-node,
 .jstree-default-large > .jstree-no-dots .jstree-leaf > .jstree-ocl {
   background: transparent; }
 
 .jstree-default-large > .jstree-no-dots .jstree-open > .jstree-ocl {
-  background-position: -32px 0px; }
+  background-position: -32px 0; }
 
 .jstree-default-large > .jstree-no-dots .jstree-closed > .jstree-ocl {
-  background-position: 0px 0px; }
+  background-position: 0 0; }
 
 .jstree-default-large .jstree-disabled {
   background: transparent; }
@@ -4018,21 +4006,21 @@ img.mfp-img {
   background: #efefef; }
 
 .jstree-default-large .jstree-checkbox {
-  background-position: -160px 0px; }
+  background-position: -160px 0; }
 
 .jstree-default-large .jstree-checkbox:hover {
   background-position: -160px -32px; }
 
 .jstree-default-large.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox,
 .jstree-default-large .jstree-checked > .jstree-checkbox {
-  background-position: -224px 0px; }
+  background-position: -224px 0; }
 
 .jstree-default-large.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox:hover,
 .jstree-default-large .jstree-checked > .jstree-checkbox:hover {
   background-position: -224px -32px; }
 
 .jstree-default-large .jstree-anchor > .jstree-undetermined {
-  background-position: -192px 0px; }
+  background-position: -192px 0; }
 
 .jstree-default-large .jstree-anchor > .jstree-undetermined:hover {
   background-position: -192px -32px; }
@@ -4041,7 +4029,6 @@ img.mfp-img {
   opacity: 0.8;
   filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
   /* Firefox 10+ */
-  filter: gray;
   /* IE6-9 */
   -webkit-filter: grayscale(100%);
   /* Chrome 19+ & Safari 6+ */ }
@@ -4074,21 +4061,18 @@ img.mfp-img {
   background-position: -32px -32px; }
 
 .jstree-default-large.jstree-rtl > .jstree-no-dots .jstree-closed > .jstree-ocl {
-  background-position: 0px -32px; }
+  background-position: 0 -32px; }
 
 .jstree-default-large .jstree-themeicon-custom {
   background-color: transparent;
   background-image: none;
   background-position: 0 0; }
 
-.jstree-default-large > .jstree-container-ul .jstree-loading > .jstree-ocl {
-  background: url("throbber.gif") center center no-repeat; }
-
 .jstree-default-large .jstree-file {
   background: url("../img/jstree/32px.png") -96px -64px no-repeat; }
 
 .jstree-default-large .jstree-folder {
-  background: url("../img/jstree/32px.png") -256px 0px no-repeat; }
+  background: url("../img/jstree/32px.png") -256px 0 no-repeat; }
 
 .jstree-default-large > .jstree-container-ul > .jstree-node {
   margin-left: 0;
@@ -4111,7 +4095,7 @@ img.mfp-img {
   line-height: 32px; }
 
 #jstree-dnd.jstree-default-large .jstree-ok {
-  background-position: 0px -64px; }
+  background-position: 0 -64px; }
 
 #jstree-dnd.jstree-default-large .jstree-er {
   background-position: -32px -64px; }
@@ -4200,11 +4184,11 @@ img.mfp-img {
   .jstree-default-responsive.jstree-rtl .jstree-leaf > .jstree-ocl {
     background: transparent; }
   .jstree-default-responsive .jstree-open > .jstree-ocl {
-    background-position: 0 0px !important; }
+    background-position: 0 0 !important; }
   .jstree-default-responsive .jstree-closed > .jstree-ocl {
     background-position: 0 -40px !important; }
   .jstree-default-responsive.jstree-rtl .jstree-closed > .jstree-ocl {
-    background-position: -40px 0px !important; }
+    background-position: -40px 0 !important; }
   .jstree-default-responsive .jstree-themeicon {
     background-position: -40px -40px; }
   .jstree-default-responsive .jstree-checkbox,
@@ -4437,7 +4421,7 @@ select {
       .login .social_buttons a:hover {
         opacity: 0.8; }
       .login .social_buttons a.tw {
-        background: url(../img/icons/login__social_icons.png) 0px top no-repeat; }
+        background: url(../img/icons/login__social_icons.png) 0 top no-repeat; }
       .login .social_buttons a.vk {
         background: url(../img/icons/login__social_icons.png) -50px top no-repeat; }
       .login .social_buttons a.fb {
@@ -4743,7 +4727,7 @@ header .login {
       .registration .fast_login a:hover {
         opacity: 0.8; }
       .registration .fast_login a.tw {
-        background: url(../img/icons/login__social_icons.png) 0px top no-repeat; }
+        background: url(../img/icons/login__social_icons.png) 0 top no-repeat; }
       .registration .fast_login a.vk {
         background: url(../img/icons/login__social_icons.png) -50px top no-repeat; }
       .registration .fast_login a.fb {
@@ -5326,7 +5310,6 @@ form#send-message .info_btn {
             line-height: 100%;
             color: #fff;
             font-size: 20px;
-            font-family: "FontAwesome";
             position: absolute;
             top: 50%;
             -webkit-transform: translateY(-50%);
@@ -5373,7 +5356,6 @@ form#send-message .info_btn {
   width: auto; }
 
 #sort-direction-mobile {
-  font-family: "fontAwesome";
   font-size: 20px;
   line-height: 30px;
   width: 30px;
@@ -5528,7 +5510,7 @@ span.delete-btn {
   white-space: nowrap;
   font-size: 18px; }
   .basket .total span {
-    padding-left: 0px;
+    padding-left: 0;
     padding-right: 20px; }
 .count-block ~ a{
   
@@ -5783,7 +5765,6 @@ span.delete-btn {
   float: left;
   margin-left: 30px; }
   .payment .pay-methods-wrap .pay-methods {
-    overflow: overlay;
     margin-bottom: 30px; }
     .payment .pay-methods-wrap .pay-methods .method {
       min-height: 123px;
@@ -7828,10 +7809,13 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
     border-radius: 6px;
 }
 #additional_options div.right label{
-    display: flex;
+    display: inline-block;
     justify-content: flex-start;
     align-items: center;
-    margin: 10px 0;
+    margin: 5px 0;
+}
+#additional_options form .wrapper {
+    min-width: auto;
 }
 .address > span {
     display: inline-block;
@@ -7849,7 +7833,6 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
     display: block;
     width: 128px;
     margin: 0 auto;
-}
 }
 .address i.delete_address{
     display: none;
@@ -7878,4 +7861,7 @@ input[name=date_issue] {
     position: absolute;
     background: url(/img/icons/calendar-icon.png) center center no-repeat, #0082BF;
     border-radius: 0 5px 5px 0;
+}
+.jq-selectbox__dropdown{
+    width: 100% !important;
 }

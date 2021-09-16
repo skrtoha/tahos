@@ -619,7 +619,6 @@ switch ($params[0]){
                 $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
                 $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
     
-                $logger->alert($stocks[$value]);
                 $logger->alert("Обработано $i строк");
                 $logger->alert("Добавлено в прайс: $price->insertedStoreItems записей");
                 $logger->alert("Вставлено: $price->insertedBrends брендов");

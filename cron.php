@@ -546,85 +546,90 @@ switch ($params[0]){
         ini_set('memory_limit', '2048M');
         $mikado = new core\Provider\Mikado();
         $files = [
-            'MikadoStock' => 1,
-            'MikadoStockReg' => 35
+            'MikadoStock' => [0],
+            'MikadoStockReg' => [10, 35, 135, 43, 51, 50]
         ];
-        
-        foreach($files as $zipName => $value){
-            $logger->alert("Прайс $zipName");
-            $emailPrice = [
-                'isAddBrend' => 0,
-                'isAddItem' => 0,
-                'title' => $zipName,
-                'isLogging' => true
-            ];
-            $price = new core\Price($db, $emailPrice);
-            $url = "http://www.mikado-parts.ru/OFFICE/GetFile.asp?File={$zipName}.zip&CLID=" . Provider\Mikado::getParams('entity')->ClientID . "&PSW=" . Provider\Mikado::getParams('entity')->Password;
-            $file = file_get_contents($url);
-            if (strlen($file) == 18){
-                $logger->error("Не удалось скачать $zipName в $url");
-                continue;
-            }
-            $resDownload = (
-            file_put_contents(
-                core\Config::$tmpFolderPath . "/{$zipName}.zip",
-                $file
-            )
-            );
-            
-            $counter = $zipName == 'MikadoStockReg' ? 0 : 1;
-            $zipArchive = new ZipArchive();
-            $res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$zipName}.zip");
-            $file = $zipArchive->getStream("mikado_price_{$counter}.csv");
-            
-            $stocks = Provider\Mikado::getStocks();
-            $db->delete('store_items', "`store_id`=" .$stocks[$value]);
-            
-            $i = 0;
-            while ($data = fgetcsv($file, 1000, "\n")) {
-                $row = iconv('windows-1251', 'utf-8', $data[0]);
-                $row = explode(';', str_replace('"', '', $row));
-                $i++;
-                if (!$row[1] || !$row[2]){
-                    $price->setLog('error', "В строке $i произошла ошибка.");
+        $stocks = Provider\Mikado::getStocks();
+        foreach($files as $zipName => $valuesList){
+            foreach($valuesList as $value){
+                $storeInfo = Provider::getStoreInfo($stocks[$value]);
+                $logger->alert("Прайс {$stocks[$value]}");
+                $emailPrice = [
+                    'isAddBrend' => 0,
+                    'isAddItem' => 0,
+                    'title' => $storeInfo['cipher'],
+                    'isLogging' => true
+                ];
+                $price = new core\Price($db, $emailPrice);
+                if ($value == 0) $url = 'https://mikado-parts.ru/office/GetFile.asp?File=MikadoStock.zip';
+                else $url = "https://mikado-parts.ru/office/GetFile.asp?File=MikadoStockReg.zip&regID=$value";
+                $url .= "&CLID=" . Provider\Mikado::getParams('entity')->ClientID . "&PSW=" . Provider\Mikado::getParams('entity')->Password;
+                $file = file_get_contents($url);
+                if (strlen($file) == 18){
+                    $logger->error("Не удалось скачать $zipName в $url");
                     continue;
                 }
-                if (preg_match('/УЦЕНКА/ui', $row[3])) continue;
-                $brend_id = $price->getBrendId($row[2]);
-                if (!$brend_id) continue;
-                $item_id = $price->getItemId([
-                    'brend_id' => $brend_id,
-                    'brend' => $row[2],
-                    'article' => $row[1],
-                    'title' => $row[3],
-                    'row' => $i
-                ]);
-                if (!$item_id) continue;
-                $price->insertStoreItem([
-                    'store_id' => $stocks[$value],
-                    'item_id' => $item_id,
-                    'price' => $row[4],
-                    'in_stock' => $row[5],
-                    'packaging' => 1,
-                    'row' => $i
-                ]);
-            }
-            
-            Provider::updatePriceUpdated(['store_id' => $stocks[$value]]);
-            
-            $price->setLog('alert', "Обработано $i строк");
-            $price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
-            $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
-            $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
+                $resDownload = (
+                file_put_contents(
+                    core\Config::$tmpFolderPath . "/{$stocks[$value]}.zip",
+                    $file
+                )
+                );
     
-            $logger->alert($zipName);
-            $logger->alert("Обработано $i строк");
-            $logger->alert("Добавлено в прайс: $price->insertedStoreItems записей");
-            $logger->alert("Вставлено: $price->insertedBrends брендов");
-            $logger->alert("Вставлено: $price->insertedItems номенклатуры");
-            if ($price->isLogging){
-                $logger->alert("Полный лог: $price->nameFileLog");
+                $zipArchive = new ZipArchive();
+                $res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$stocks[$value]}.zip");
+                $file = $zipArchive->getStream("mikado_price_{$value}.csv");
+    
+                
+                $db->delete('store_items', "`store_id`=" .$stocks[$value]);
+    
+                $i = 0;
+                while ($data = fgetcsv($file, 1000, "\n")) {
+                    $row = iconv('windows-1251', 'utf-8', $data[0]);
+                    $row = explode(';', str_replace('"', '', $row));
+                    $i++;
+                    if (!$row[1] || !$row[2]){
+                        $price->setLog('error', "В строке $i произошла ошибка.");
+                        continue;
+                    }
+                    if (preg_match('/УЦЕНКА/ui', $row[3])) continue;
+                    $brend_id = $price->getBrendId($row[2]);
+                    if (!$brend_id) continue;
+                    $item_id = $price->getItemId([
+                        'brend_id' => $brend_id,
+                        'brend' => $row[2],
+                        'article' => $row[1],
+                        'title' => $row[3],
+                        'row' => $i
+                    ]);
+                    if (!$item_id) continue;
+                    $price->insertStoreItem([
+                        'store_id' => $stocks[$value],
+                        'item_id' => $item_id,
+                        'price' => $row[4],
+                        'in_stock' => $row[5],
+                        'packaging' => 1,
+                        'row' => $i
+                    ]);
+                }
+    
+                Provider::updatePriceUpdated(['store_id' => $stocks[$value]]);
+    
+                $price->setLog('alert', "Обработано $i строк");
+                $price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
+                $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
+                $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
+    
+                $logger->alert($stocks[$value]);
+                $logger->alert("Обработано $i строк");
+                $logger->alert("Добавлено в прайс: $price->insertedStoreItems записей");
+                $logger->alert("Вставлено: $price->insertedBrends брендов");
+                $logger->alert("Вставлено: $price->insertedItems номенклатуры");
+                if ($price->isLogging){
+                    $logger->alert("Полный лог: $price->nameFileLog");
+                }
             }
+            
         }
         break;
     case 'subscribeUserPrices':

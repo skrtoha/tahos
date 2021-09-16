@@ -307,16 +307,19 @@ class Mikado extends Provider{
 		static $stocks;
 		if (!$stocks){
 			$stocks = [
-				1 => self::getParams()->MIPI, // MIPI
-				10 => self::getParams()->MIPE, //MIPE
-				35 => self::getParams()->MIVO //MIVO
+				0 => self::getParams()->MIPI,
+				10 => self::getParams()->MIPE,
+				35 => self::getParams()->MIVO,
+                135 => self::getParams()->MICH,
+                43 => self::getParams()->MIKI,
+                51 => self::getParams()->MIMU,
+                50 => self::getParams()->MIMO
 			];
 		}
 		return $stocks;
 	}
 	private function parseStockLine($stock, $item_id, $row){
 		$store_id = self::getStoreID($stock->StokID);
-		// debug($stock, "store_id = $store_id"); return;
 		if (!$store_id) return false;
 		$GLOBALS['db']->insert(
 			'store_items',

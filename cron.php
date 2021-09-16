@@ -546,14 +546,14 @@ switch ($params[0]){
         ini_set('memory_limit', '2048M');
         $mikado = new core\Provider\Mikado();
         $files = [
-            'MikadoStock' => [0],
+            'MikadoStock' => [1],
             'MikadoStockReg' => [10, 35, 135, 43, 51, 50]
         ];
         $stocks = Provider\Mikado::getStocks();
         foreach($files as $zipName => $valuesList){
             foreach($valuesList as $value){
                 $storeInfo = Provider::getStoreInfo($stocks[$value]);
-                $logger->alert("Прайс {$stocks[$value]}");
+                $logger->alert("Прайс {$storeInfo['cipher']}");
                 $emailPrice = [
                     'isAddBrend' => 0,
                     'isAddItem' => 0,
@@ -571,15 +571,14 @@ switch ($params[0]){
                 }
                 $resDownload = (
                 file_put_contents(
-                    core\Config::$tmpFolderPath . "/{$stocks[$value]}.zip",
+                    core\Config::$tmpFolderPath . "/{$storeInfo['cipher']}.zip",
                     $file
                 )
                 );
     
                 $zipArchive = new ZipArchive();
-                $res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$stocks[$value]}.zip");
+                $res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$storeInfo['cipher']}.zip");
                 $file = $zipArchive->getStream("mikado_price_{$value}.csv");
-    
                 
                 $db->delete('store_items', "`store_id`=" .$stocks[$value]);
     

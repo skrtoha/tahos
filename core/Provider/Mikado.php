@@ -307,7 +307,7 @@ class Mikado extends Provider{
 		static $stocks;
 		if (!$stocks){
 			$stocks = [
-				0 => self::getParams()->MIPI,
+				1 => self::getParams()->MIPI,
 				10 => self::getParams()->MIPE,
 				35 => self::getParams()->MIVO,
                 135 => self::getParams()->MICH,

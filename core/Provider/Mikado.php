@@ -17,7 +17,11 @@ class Mikado extends Provider{
 		"provider_id",
 		"MIPI",
 		"MIPE",
-		"MIVO"
+		"MIVO",
+        "MICH",
+        "MIKI",
+        "MIMU",
+        "MIMO"
 	];
 	public static function getParams($typeOrganization = 'entity'){
 		return Provider::getApiParams([

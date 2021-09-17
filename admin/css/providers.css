@@ -16,6 +16,9 @@ tr.dayOff {
 label.workSchedule span {
     display: block;
 }
+tr.store.bold {
+    font-weight: 800;
+}
 .hidden{
 	display: none;
 }

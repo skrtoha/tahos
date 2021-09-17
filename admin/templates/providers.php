@@ -365,11 +365,14 @@ function stores(){
 			ps.id,
 			ps.title,
 			ps.cipher,
+		    ps.is_main,
 			DATE_FORMAT(ps.price_updated, '%d.%m.%Y %H:%i:%s') AS price_updated
 		FROM
 			#provider_stores ps
 		WHERE
 			ps.provider_id={$_GET['id']}
+        ORDER BY
+            ps.is_main DESC
 	", '');?>
 	<div id="total">Всего: <?=$res_stores->num_rows?></div>
 	<div class="actions">
@@ -384,8 +387,9 @@ function stores(){
 			<td>Шифр</td>
 		</tr>
 		<?if ($res_stores->num_rows){
-			while($row = $res_stores->fetch_assoc()){?>
-				<tr id="someTr" class="store" store_id="<?=$row['id']?>">
+			while($row = $res_stores->fetch_assoc()){
+                $class = $row['is_main'] ? 'bold' : ''; ?>
+				<tr id="someTr" class="store <?=$class?>" store_id="<?=$row['id']?>">
 					<td><?=$row['title']?></td>
 					<td><?=$row['price_updated']?></td>
 					<td><?=$row['cipher']?></td>

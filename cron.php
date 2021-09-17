@@ -578,7 +578,8 @@ switch ($params[0]){
     
                 $zipArchive = new ZipArchive();
                 $res = $zipArchive->open(core\Config::$tmpFolderPath . "/{$storeInfo['cipher']}.zip");
-                $file = $zipArchive->getStream("mikado_price_{$value}.csv");
+                $nameInArchive = $zipArchive->getNameIndex(0);
+                $file = $zipArchive->getStream($nameInArchive);
                 
                 $db->delete('store_items', "`store_id`=" .$stocks[$value]);
     

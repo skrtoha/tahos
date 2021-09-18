@@ -147,7 +147,7 @@ $(function(){
 			},
 			{}
 		);
-	var itemsForReturn = new Array();
+	var itemsForReturn = [];
 	$(document).on('click', 'tr.first', function(){
 		$(this).toggleClass('active');
 	})
@@ -309,7 +309,7 @@ $(function(){
 			success: function(response){
 				$.cookie('message', 'Возврат успешно оформлен', cookieOptions);
 				$.cookie('message_type', 'ok', cookieOptions);
-				// document.location.reload();
+				document.location.reload();
 			}
 		})
 		return false;

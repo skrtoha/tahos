@@ -207,7 +207,7 @@
                 else $price = $value['price'];
                 $total_price += $price * $value['quan']?>
                 <tr store_id="<?=$value['store_id']?>" item_id="<?=$value['item_id']?>">
-                    <td><?=$value['brend']?> <a class="articul" href="<?=$value['href']?>"><?=$value['article']?></a> <?=$value['title']?></td>
+                    <td><?=$value['brend']?> <a class="articul" href="<?=$value['href']?>"><?=$value['article_cat']?></a> <?=$value['title']?></td>
                     <td><?=$value['quan']?> шт.</td>
                     <td>
                         <input type="hidden" name="quan" value="<?=$value['quan']?>">

@@ -485,7 +485,8 @@ function get_basket(){
 					i.article,
 					ib.barcode
 				)
-			) as article,
+			) as article_cat,
+            i.article,
 			br.title as brend,
 			IF (i.title_full != '', i.title_full, i.title) as title
 			FROM

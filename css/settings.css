@@ -87,6 +87,9 @@ input{
 .jq-radio__div {
     position: relative;
 }
+#set-address > div {
+    display: flex;
+}
 .jq-radio.checked .jq-radio__div::after {
     left: 3px;
     position: absolute;
@@ -174,12 +177,9 @@ form.js-form-address > div.input{
     color: #5f5f5f;
 }
 #set-address .right{
-    width: 50%;
-    float: right;
 }
 #set-address .left{
-    float: left;
-    width: 50%;
+
 }
 div#address_multiple_fields input[type=button] {
     float: left;
@@ -870,7 +870,42 @@ img.mfp-img {
 .mfp-gallery .mfp-image-holder .mfp-figure {
   cursor: pointer;
 }
-@media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
+@media screen and (max-width: 948px){
+    .address{
+        margin-right: 0;
+    }
+    #set-address > div{
+        padding-top: 20px
+    }
+    form.js-form-address > div.input{
+        margin-top: 15px;
+    }
+    #set-address > div{
+        flex-direction: column;
+    }
+    form.js-form-address input{
+        width: 100%;
+    }
+    input[name="zip"]{
+        width: calc(100% - 52px) !important;
+    }
+    form.js-form-address div.flex{
+        flex-direction: column;
+    }
+    form.js-form-address .half{
+        width: 100%;
+    }
+    div#address_multiple_fields input[type=button]{
+        float: none;
+    }
+    form.js-form-address .half .input label{
+        margin-bottom: 2px;
+    }
+    form.js-form-address .half .input{
+        margin-bottom: 0;
+    }
+}
+    @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
   /**
        * Remove all paddings around the image on small screen
        */

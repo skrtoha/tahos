@@ -123,7 +123,7 @@ switch ($act) {
 		if (isset($_GET['status'])){
 			$db->update($act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_id']} AND `item_diff` = {$_GET['item_diff']}");
 			$db->update($act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_diff']} AND `item_diff` = {$_GET['item_id']}");
-			header("Location: {$_SERVER['HTTP_REFERER']}");
+			die();
 		}
 		itemDiff($act); 
 		break;
@@ -707,7 +707,7 @@ function itemDiff($type){
 					<td label="Штрих-код"><?=$value['barcode']?></td>
 					<?if ($type == 'analogies'){?>
 						<td label="Статус">
-							<form>
+							<form class="status">
 								<input type="hidden" name="act" value="analogies">
 								<input type="hidden" name="view" value="items">
 								<input type="hidden" name="item_id" value="<?=$_GET['id']?>">

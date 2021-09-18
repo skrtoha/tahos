@@ -509,4 +509,16 @@ $(function(){
 	$(document).on('change', '#itemDiff select[name=status]', function(){
 		$(this).closest('form').submit();
 	})
+    $('form.status').on('submit', function(e){
+        e.preventDefault();
+        const $form = $(this).closest('form');
+        $.ajax({
+            url: document.location.href,
+            data: $form.serialize(),
+            success: function(){
+                $form.closest('tr').attr('class', 'analogyStatus_' + $form.find('select[name=status]').val());
+                show_message('Успешно созранено');
+            }
+        });
+    })
 })

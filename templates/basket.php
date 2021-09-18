@@ -405,7 +405,7 @@ $noReturnIsExists = false;
                             foreach($addresses as $row){
                                 $counter++;
                                 $selected = $counter == 1 && $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
-                                <option value="<?=$row['id']?>">
+                                <option value="<?=$row['id']?>" <?=$row['is_default'] == 1 ? 'selected' : ''?>>
                                     <?=UserAddress::getString($row['id'], json_decode($row['json'], true))?>
                                 </option>
                             <?}?>

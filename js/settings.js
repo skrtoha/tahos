@@ -103,6 +103,14 @@ function deleteAddress(obj){
         }
     })
 }
+function setDefault(address_id){
+    $.ajax({
+        url: '/ajax/settings.php',
+        type: 'post',
+        data: {set_default_address: address_id},
+        success: function(response){}
+    })
+}
 $(function() {
 	$("#same-address").styler();
 	$("input[name='delivery-select']").styler();
@@ -138,6 +146,7 @@ $(function() {
         e.preventDefault();
         $('#overlay').css('display', 'flex');
         $('#set-address').css('display', 'flex');
+        $('input[type=radio]').styler();
     })
 	$('.text_selected').on('click', function() {
 		$(this).next().toggleClass('opened');
@@ -240,6 +249,7 @@ $(function() {
     $(document).on('click', 'div.address', function(e){
         let th = $(e.target);
         if (th.hasClass('delete_address')) return deleteAddress(this);
+        if (th.hasClass('jq-radio')) return setDefault(th.find('input').val());
         let formData = {};
         th.closest('div.address').find('span').each(function(){
             let th = $(this);
@@ -287,6 +297,7 @@ $(function() {
                     $('.address[id=' + address_id + ']').remove()
                 }
                 $('#set-address .right').append(response);
+                $('#set-address input[type=radio]').styler();
             }
         })
 

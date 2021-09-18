@@ -78,6 +78,34 @@ ul[name=issue] li {
   padding: 5px 10px 6px;
   line-height: 20px;
 }
+input{
+    height: auto;
+}
+.jq-radio {
+    border-radius: 18px;
+}
+.jq-radio__div {
+    position: relative;
+}
+.jq-radio.checked .jq-radio__div::after {
+    left: 3px;
+    position: absolute;
+    top: 3px;
+    content: " ";
+    display: block;
+    width: 12px;
+    height: 12px;
+    background: #0082bf;
+    border-radius: 6px;
+}
+.jq-checkbox, .jq-radio {
+    vertical-align: -4px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #C3C3C3;
+    background: linear-gradient(#FFF, #E6E6E6);
+    cursor: pointer;
+}
 .text_selected {
   box-sizing: border-box;
   padding: 0 65px 0 10px;

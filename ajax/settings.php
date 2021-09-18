@@ -36,6 +36,10 @@ foreach ($_POST as $key => $value){
 			}
 			else $update['email'] = $value;
 			break;
+        case 'set_default_address':
+            $db->update('user_addresses', ['is_default' => 0], "`user_id` = $user_id");
+            $db->update('user_addresses', ['is_default' => 1], "`id` = $value");
+            break;
 		default: if ($key != 'new_password') $update[$key] = $value;
 	}
 }

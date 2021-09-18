@@ -21,8 +21,12 @@ class UserAddress{
         return $GLOBALS['db']->last_id();
     }
     
-    public static function getHtmlString($address_id, array $data){
-        $output = "<div class='address' id='{$address_id}'>";
+    public static function getHtmlString($address_id, array $data, $isDefault = 0){
+        $checked = $isDefault ? 'checked' : '';
+        $output = "
+            <div class='address' id='{$address_id}'>
+                <input $checked type='radio' name='isDefault' value='$address_id'>
+        ";
         foreach($data as $row){
             $output .= "<span kladr_id='{$row['kladr_id']}' name='{$row['name']}'>{$row['value']}</span>";
         }

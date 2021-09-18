@@ -290,7 +290,7 @@ $res_user_socials = $db->query("
             if (!empty($userAddresses)){
                 foreach($userAddresses as $row){
                     $data = json_decode($row['json'], true);?>
-                    <?=\core\UserAddress::getHtmlString($row['id'], $data)?>
+                    <?=\core\UserAddress::getHtmlString($row['id'], $data, $row['is_default'])?>
                 <?}
             }?>
         </div>

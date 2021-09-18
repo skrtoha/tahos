@@ -517,7 +517,7 @@ $(function(){
             data: $form.serialize(),
             success: function(){
                 $form.closest('tr').attr('class', 'analogyStatus_' + $form.find('select[name=status]').val());
-                show_message('Успешно созранено');
+                show_message('Успешно сохранено');
             }
         });
     })

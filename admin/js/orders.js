@@ -105,6 +105,15 @@ function setTotalSumm(){
 }
 $(function(){
     set_items_to_order();
+    $('select[name=delivery]').on('change', function(){
+        const $th = $(this);
+        let disabled
+        switch ($th.val()){
+            case 'Доставка': disabled = false; break;
+            case 'Самовывоз': disabled = true; break;
+        }
+        $('select[name=address_id]').prop('disabled', disabled);
+    })
 	$('#changeStatus select[name=status_id]').on('change', function(){
 		$(this).closest('form').submit();
 	})
@@ -121,6 +130,12 @@ $(function(){
 	$('a.allInWork').on('click', function(){
 		if (!confirm('Вы уверены?')) return false;
 	})
+    $('.datetimepicker[name=date_issue]').datetimepicker({
+        format:'d.m.Y',
+        closeOnDateSelect: true,
+        closeOnWithoutClick: true,
+        mask: true
+    });
 	$(document).on('submit', '#askForQuanAndPrice', function(e){
 		e.preventDefault();
 		var array = $(this).serializeArray();

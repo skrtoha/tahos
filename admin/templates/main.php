@@ -9,7 +9,7 @@ use admin\functions\LeftMenu;
 	<?if(file_exists("css/{$_GET['view']}.css")){?>
 		<link rel="stylesheet" type="text/css" href="css/<?=$_GET['view']?>.css">
 	<?}?>
-	<?if (in_array($_GET['view'], ['connections', 'reports', 'returns', 'index'])){?>
+	<?if (in_array($_GET['view'], ['connections', 'reports', 'returns', 'index', 'orders'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/datetimepicker/jquery.datetimepicker.min.css">
 	<?}?>
 	<?if (in_array($_GET['view'], ['items', 'categories'])){?>
@@ -130,7 +130,7 @@ use admin\functions\LeftMenu;
 		{"src" : "/js/jquery.form.js", "async" : false},
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
-		<?if (in_array($view, ['connections', 'reports', 'returns', 'index'])){?>
+		<?if (in_array($view, ['connections', 'reports', 'returns', 'index', 'orders'])){?>
 			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['items', 'orders', 'returns', 'brends', 'providers'])){?>

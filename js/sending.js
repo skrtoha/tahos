@@ -73,11 +73,6 @@ $(function(){
 		var delivery_way = $('[name=delivery_way]').val();
 		var bl_pasport = (delivery_way == 2 || delivery_way == 9);
 		var speed = $('input[name=speed]').val();
-		var index = $('input[name=index]').val();
-		var city = $('input[name=city]').val();
-		var street = $('input[name=street]').val();
-		var house = $('input[name=house]').val();
-		var flat = $('input[name=flat]').val();
 		var telefon = $('input[name=telefon]').val();
 		var pasport = $('#pasport').val();
 		var is_valid = true;
@@ -96,22 +91,6 @@ $(function(){
 		if (name_1 && !name_2){
 			is_valid = false;
 			show_message('Укажите имя!', 'error');
-		}
-		if (!index){
-			is_valid = false;
-			show_message('Введите индекс города!', 'error');
-		}
-		if (!city){
-			is_valid = false;
-			show_message('Введите наименование города!', 'error');
-		}
-		if (!street){
-			is_valid = false;
-			show_message('Укажите название улицы!', 'error');
-		}
-		if (!house){
-			is_valid = false;
-			show_message('Укажите номер дома!', 'error');
 		}
 		if (!telefon){
 			is_valid = false;
@@ -169,15 +148,11 @@ $(function(){
 	$('.templates-block li').on('click', function(){
 		$('#insure').attr('checked', false).parent().removeClass('checked');
 		$('[name=entity]').val('').attr('disabled', false);
-		$('[name=index]').val('').attr('disabled', false);
-		$('[name=city]').val('').attr('disabled', false);
-		$('[name=street]').val('').attr('disabled', false);
-		$('[name=house]').val('').attr('disabled', false);
 		$('[name=telefon]').val('').attr('disabled', false);
 		$('[name=name_1]').val('').attr('disabled', false);
 		$('[name=name_2]').val('').attr('disabled', false);
 		$('[name=name_3]').val('').attr('disabled', false);
-		$('[name=pasport').val('').parent().attr('class', 'input-wrap for-tk');
+		$('[name=pasport]').val('').parent().attr('class', 'input-wrap for-tk');
 		$(this).find('span').each(function(){
 			var key = $(this).attr('key');
 			var value = $(this).attr('value');
@@ -262,11 +237,12 @@ $(function(){
 						$('[name=name_2]').prop('disabled', true);
 						$('[name=name_3]').prop('disabled', true);
 						break;
-					case 'index': $('[name=index]').val(value); break;
-					case 'city': $('[name=city]').val(value); break;
-					case 'street': $('[name=street]').val(value); break;
-					case 'house': $('[name=house]').val(value); break;
 					case 'telefon': $('[name=telefon]').val(value); break;
+                    case 'address_id':
+                        $('select[name=address_id] option').prop('selected', false);
+                        $('select[name=address_id] option[value=' + value + ']').prop('selected', true);
+                        $('select[name=address_id]').trigger('refresh');
+                        break;
 					case 'pasport': 
 						if (value) $('[name=pasport]')
 												.val(value)

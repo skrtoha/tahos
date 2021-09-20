@@ -140,7 +140,7 @@ function get_price($provider_item){
 function getStrTemplate($template){
 	global $db, $deliveries;
 	$str = '';
-	$not = ['id', 'user_id', 'created', 'sub_delivery'];
+	$not = ['id', 'user_id', 'created', 'sub_delivery', 'json'];
 	if ($template['sub_delivery']) $template['delivery_way'] = $template['sub_delivery'];
 	foreach ($template as $key => $value){
 		if (in_array($key, $not)) continue;
@@ -154,6 +154,13 @@ function getStrTemplate($template){
 			case 'pasport':
 				$str .= "<span value='$value' key='$key'></span>";
 				break;
+            case 'address_id':
+                 $value = core\UserAddress::getString(
+                     $template['address_id'],
+                     json_decode($template['json'], true)
+                 );
+                 $str .= "<span value='{$template['address_id']}' key='address_id'>$value</span>";
+                break;
 			default:
 				$str .= "<span value='$value' key='$key'>$value</span>, ";
 		}

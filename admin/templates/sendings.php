@@ -61,11 +61,7 @@ function show_form(){
 		<tr class="head">
 			<td>Получатель</td>
 			<td>Способ доставки</td>
-			<td>Индекс</td>
-			<td>Город</td>
-			<td>Улица</td>
-			<td>Дом</td>
-			<td>Квартира</td>
+			<td>Адрес</td>
 			<td>Телефон</td>
 			<td>Паспорт</td>
 			<td>Страхование</td>
@@ -73,11 +69,12 @@ function show_form(){
 		<tr>
 			<td><?=$sending['fio'];?></td>
 			<td><?=$sending['sub_delivery']?></td>
-			<td><?=$sending['index']?></td>
-			<td><?=$sending['city']?></td>
-			<td><?=$sending['street']?></td>
-			<td><?=$sending['house']?></td>
-			<td><?=$sending['flat']?></td>
+			<td>
+                <?=\core\UserAddress::getString(
+                   $sending['address_id'],
+                   json_decode($sending['json'], true)
+                )?>
+            </td>
 			<td><?=$sending['telefon']?></td>
 			<td><?=$sending['pasport']?></td>
 			<td><?=$sending['insure'] ? 'Да' : 'Нет'?></td>

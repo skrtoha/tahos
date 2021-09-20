@@ -86,13 +86,16 @@ class Sendings{
 				SUM(ov.price * oiv.issued) AS sum,
 				IF (s.is_new, 'is_new', '') AS is_new,
 				d.title AS sub_delivery,
-				IF (s.is_sent, 'Отправлено', 'Ожидает') AS status
+				IF (s.is_sent, 'Отправлено', 'Ожидает') AS status,
+			    ua.json,
+                s.address_id
 			FROM
 				#sendings s
 			LEFT JOIN #order_issue_values oiv ON oiv.issue_id=s.issue_id
 			LEFT JOIN #orders_values ov ON ov.order_id=oiv.order_id AND ov.item_id=oiv.item_id
 			LEFT JOIN #users u ON s.user_id=u.id
 			LEFT JOIN #deliveries d ON d.id=s.sub_delivery
+			LEFT JOIN #user_addresses ua ON ua.id = s.address_id
 			$this->where
 			GROUP BY oiv.issue_id
 			$this->having

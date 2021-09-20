@@ -19,11 +19,11 @@ if (!$_GET['id']){
 				if ($key == 'issue_id') continue;
 				$templates_insert[$key] = $value;
 			}
-			if (count($templates) < $count_templates) $db->insert('templates', $templates_insert, ['print_query' => false]);
+			if (count($templates) < $count_templates) $db->insert('templates', $templates_insert);
 			else $db->update('templates', $templates_insert, "`id`={$templates[0]['id']}");
 			// exit();
 		}
-		$res = $db->insert('sendings', $array/*, ['print' => true]*/);
+		$res = $db->insert('sendings', $array);
 		if ($res !== true) die("$res | $db->last_query");
 		message('Доставка успешно сформирована!');
 		header('Location: /orders#tabs|orders:sendings');
@@ -45,9 +45,14 @@ if (!$_GET['id']){
 			#orders_values ov
 		LEFT JOIN #items i ON i.id=ov.item_id
 		LEFT JOIN #brends b ON b.id=i.brend_id
+		LEFT JOIN tahos_orders o ON o.id = ov.order_id
 		WHERE
 			ov.user_id={$_SESSION['user']} AND
-			ov.status_id=3
+			ov.status_id=3 AND o.delivery = 'Доставка' AND
+            (
+                (isCompletelyArrived(ov.order_id) = 1 AND o.entire_order = 1) OR
+                o.entire_order = 0
+            )
 	", '');
 	$weight = 0;
 	$sum = 0;
@@ -87,12 +92,12 @@ if (!$_GET['id']){
 							<td><span class="price"><?=$item['price']?></span> <i class="fa fa-rub" aria-hidden="true"></i></td>
 							<td><?=$item['comment']?></td>
 							<td>
-								<input 
+								<input
 									type="checkbox"
 									checked
 									name="<?=$item['order_id']?>:<?=$item['item_id']?>:<?=$item['store_id']?>"
 									value="<?=$item['quan']?>"
-									class="item" 
+									class="item"
 								>
 							</td>
 						</tr>
@@ -168,26 +173,23 @@ if (!$_GET['id']){
 					<label for="patrinymic">Отчество: </label>
 					<input type="text" id="patrinymic" name="name_3" >
 				</div><!-- Отчество -->
-				<div class="input-wrap">
-					<label for="index">Индекс: </label>
-					<input type="number" id="index" name="index">
-				</div><!-- Индекс -->
-				<div class="input-wrap">
-					<label for="city">Город: </label>
-					<input type="text" id="city" name="city">
-				</div><!-- Город -->
-				<div class="input-wrap">
-					<label for="street">Улица: </label>
-					<input type="text" id="street" name="street">
-				</div><!-- Улица -->
-				<div class="input-wrap">
-					<label for="flat">Дом: </label>
-					<input type="text" id="flat" name="house">
-				</div><!-- Дом -->
-				<div class="input-wrap">
-					<label for="flat">Квартира: </label>
-					<input type="text" id="flat" name="flat">
-				</div><!-- Квартира -->
+                <?$addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
+                if (!empty($addresses)){
+                    $disabled = $user['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
+                    <div class="input-wrap">
+                        <label for="patrinymic">Адрес: </label>
+                        <select name="address_id" <?=$disabled?>>
+                            <?$counter = 0;
+                            foreach($addresses as $row){
+                                $counter++;
+                                $selected = $counter == 1 && $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
+                                <option value="<?=$row['id']?>" <?=$row['is_default'] == 1 ? 'selected' : ''?>>
+                                    <?=\core\UserAddress::getString($row['id'], json_decode($row['json'], true))?>
+                                </option>
+                            <?}?>
+                        </select>
+                    </div>
+                <?}?>
 				<div class="input-wrap">
 					<label for="phone">Телефон: </label>
 					<input type="tel" id="phone" name="telefon" placeholder="+7 (___) ___-__-__">
@@ -206,14 +208,24 @@ if (!$_GET['id']){
 				</div><!-- Сохранить шаблон доставки -->
 				<button>Сформировать отправку</button>
 			</form>
-			<?$templates = $db->select('templates', '*', "`user_id`=$user_id");
+			<?$templatesResult = $db->query("
+                SELECT
+                    t.*,
+                    ua.json
+                FROM
+                    #templates t
+                LEFT JOIN
+                    #user_addresses ua ON ua.id = t.address_id
+                WHERE
+                    t.user_id = $user_id
+            ", '');
 			$deliveries = $db->select('deliveries', '*', '', '', '', '', true);
-			if (count($templates)){?>
+			if ($templatesResult->num_rows){?>
 				<div class="templates-block">
 					<input type="hidden" id="js_deliveries" value="<?=str_replace('"', '#', json_encode($deliveries))?>">
 					<h4>Сохраненные шаблоны</h4>
 					<ol>
-						<?foreach($templates as $template){?>
+						<?foreach($templatesResult as $template){?>
 							<li>
 								<?=getStrTemplate($template)?>
 								<i class="fa fa-times delete_template" aria-hidden="true" data-id="<?=$template['id']?>"></i> 
@@ -269,11 +281,7 @@ else{
 				<tr>
 					<th>Получатель</th>
 					<th>Способ доставки</th>
-					<th>Индекс</th>
-					<th>Город</th>
-					<th>Улица</th>
-					<th>Дом</th>
-					<th>Квартира</th>
+					<th>Адрес</th>
 					<th>Телефон</th>
 					<th>Паспорт</th>
 					<th>Страхование</th>
@@ -281,11 +289,12 @@ else{
 				<tr>
 				<td><?=$sending['receiver'];?></td>
 				<td><?=$sending['sub_delivery']?></td>
-				<td><?=$sending['index']?></td>
-				<td><?=$sending['city']?></td>
-				<td><?=$sending['street']?></td>
-				<td><?=$sending['house']?></td>
-				<td><?=$sending['flat']?></td>
+				<td>
+                    <?=\core\UserAddress::getString(
+                        $sending['address_id'],
+                        json_decode($sending['json'], true)
+                    )?>
+                </td>
 				<td><?=$sending['telefon']?></td>
 				<td><?=$sending['pasport']?></td>
 				<td><?=$sending['insure'] ? 'Да' : 'Нет'?></td>

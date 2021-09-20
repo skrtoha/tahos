@@ -6482,7 +6482,7 @@ span.delete-btn {
       .sending-page form#delivery-form .input-wrap label[for="pasport"] {
         position: relative;
         top: 6px; }
-    .sending-page form#delivery-form .input-wrap input {
+    .sending-page form#delivery-form .input-wrap input, .input-wrap div.jq-selectbox{
       width: -webkit-calc(100% - 140px);
       width: calc(100% - 140px);
       -webkit-box-sizing: border-box;

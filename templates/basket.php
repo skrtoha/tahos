@@ -100,6 +100,7 @@ if ($_GET['act'] == 'to_offer'){
 	header('Location: /orders');
 }
 $res_basket = core\Basket::get($_SESSION['user']);
+if (!$res_basket->num_rows) return;
 $noReturnIsExists = false;
 ?>
 <div class="basket">
@@ -379,7 +380,6 @@ $noReturnIsExists = false;
 		<div style="clear: both"></div>
 	</div>
 <?}?>
-<?if ($basket->num_rows){?>
     <div id="additional_options" class="product-popup mfp-hide">
         <h2>Дополнительные параметры заказа</h2>
         <div class="content">
@@ -464,5 +464,4 @@ $noReturnIsExists = false;
         </div>
         <a class="button" href="/basket/to_offer">Оформить заказ</a>
     </div>
-<?}?>
 

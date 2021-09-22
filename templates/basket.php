@@ -100,6 +100,7 @@ if ($_GET['act'] == 'to_offer'){
 	header('Location: /orders');
 }
 $res_basket = core\Basket::get($_SESSION['user']);
+if (!$res_basket->num_rows) return;
 $noReturnIsExists = false;
 ?>
 <div class="basket">
@@ -379,88 +380,88 @@ $noReturnIsExists = false;
 		<div style="clear: both"></div>
 	</div>
 <?}?>
-<?//debug($user)?>
-<div id="additional_options" class="product-popup mfp-hide">
-    <h2>Дополнительные параметры заказа</h2>
-    <div class="content">
-        <form action="">
-            <div class="wrapper">
-                <div class="left">Выберите способ доставки</div>
-                <div class="right">
-                    <label>
-                        <?$checked = $user['delivery_type'] == 'Самовывоз' ? 'checked' : ''?>
-                        <input type="radio" name="delivery" value="Самовывоз" <?=$checked?>>
-                        <span>Самовывоз из <?=$user['issue_adres']?></span>
-                    </label>
-                    <label>
-                        <?$checked = $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
-                        <input type="radio" name="delivery" value="Доставка" <?=$checked?>>
-                        <span>Доставка в:</span>
-                    </label>
-                    <?$addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
-                    if (!empty($addresses)){
-                        $disabled = $user['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
-                        <select name="address_id" <?=$disabled?>>
-                            <?$counter = 0;
-                            foreach($addresses as $row){
-                                $counter++;
-                                $selected = $counter == 1 && $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
-                                <option value="<?=$row['id']?>" <?=$row['is_default'] == 1 ? 'selected' : ''?>>
-                                    <?=UserAddress::getString($row['id'], json_decode($row['json'], true))?>
-                                </option>
-                            <?}?>
-                        </select>
-                    <?}?>
+    <div id="additional_options" class="product-popup mfp-hide">
+        <h2>Дополнительные параметры заказа</h2>
+        <div class="content">
+            <form action="">
+                <div class="wrapper">
+                    <div class="left">Выберите способ доставки</div>
+                    <div class="right">
+                        <label>
+                            <?$checked = $user['delivery_type'] == 'Самовывоз' ? 'checked' : ''?>
+                            <input type="radio" name="delivery" value="Самовывоз" <?=$checked?>>
+                            <span>Самовывоз из <?=$user['issue_adres']?></span>
+                        </label>
+                        <label>
+                            <?$checked = $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
+                            <input type="radio" name="delivery" value="Доставка" <?=$checked?>>
+                            <span>Доставка в:</span>
+                        </label>
+                        <?$addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
+                        if (!empty($addresses)){
+                            $disabled = $user['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
+                            <select name="address_id" <?=$disabled?>>
+                                <?$counter = 0;
+                                foreach($addresses as $row){
+                                    $counter++;
+                                    $selected = $counter == 1 && $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
+                                    <option value="<?=$row['id']?>" <?=$row['is_default'] == 1 ? 'selected' : ''?>>
+                                        <?=UserAddress::getString($row['id'], json_decode($row['json'], true))?>
+                                    </option>
+                                <?}?>
+                            </select>
+                        <?}?>
+                    </div>
                 </div>
-            </div>
-            <div class="wrapper">
-                <div class="left">Выберите способ оплаты</div>
-                <div class="right">
-                    <label>
-                        <?$checked = $user['pay_type'] == 'наличный' ? 'checked' : ''?>
-                        <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
-                        <span>Наличный</span>
-                    </label>
-                    <label>
-                        <?$checked = $user['pay_type'] == 'безналичный' ? 'checked' : ''?>
-                        <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
-                        <span>Безналичный</span>
-                    </label>
+                <div class="wrapper">
+                    <div class="left">Выберите способ оплаты</div>
+                    <div class="right">
+                        <label>
+                            <?$checked = $user['pay_type'] == 'наличный' ? 'checked' : ''?>
+                            <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
+                            <span>Наличный</span>
+                        </label>
+                        <label>
+                            <?$checked = $user['pay_type'] == 'безналичный' ? 'checked' : ''?>
+                            <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
+                            <span>Безналичный</span>
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <div class="wrapper">
-                <div class="right">Выберите дату отгрузки</div>
-                <?
-                $dateTimeObject = new DateTime();
-                $end = clone $dateTimeObject;
-                
-                if ($minDelivery){
-                    $begin = $dateTimeObject->add(new DateInterval("P{$minDelivery}D"));
-                }
-                else $begin = $dateTimeObject;
-                
-                $end = $end->add(new DateInterval("P{$maxDelivery}D"));
-                ?>
-                <input type="hidden" name="min_date" value="<?=$begin->format('d.m.Y')?>">
-                <input type="hidden" name="max_date" value="<?=$end->format('d.m.Y')?>">
-                <div class="left">
-                    <input type="text" name="date_issue" value="">
-                    <div class="calendar-icon"></div>
+                <div class="wrapper">
+                    <div class="right">Выберите дату отгрузки</div>
+                    <?
+                    $dateTimeObject = new DateTime();
+                    $end = clone $dateTimeObject;
+                    
+                    if ($minDelivery){
+                        $begin = $dateTimeObject->add(new DateInterval("P{$minDelivery}D"));
+                    }
+                    else $begin = $dateTimeObject;
+                    
+                    $end = $end->add(new DateInterval("P{$maxDelivery}D"));
+                    ?>
+                    <input type="hidden" name="min_date" value="<?=$begin->format('d.m.Y')?>">
+                    <input type="hidden" name="max_date" value="<?=$end->format('d.m.Y')?>">
+                    <div class="left">
+                        <input type="text" name="date_issue" value="">
+                        <div class="calendar-icon"></div>
+                    </div>
                 </div>
-            </div>
-            <div class="wrapper">
-                <div class="right"></div>
-                <div class="left">
-                    <label>
-                        <input type="checkbox" name="entire_order" value="1">
-                        <span>
+                <div class="wrapper">
+                    <div class="right"></div>
+                    <div class="left">
+                        <label>
+                            <input type="checkbox" name="entire_order" value="1">
+                            <span>
                         Хочу получить заказ целиком
                         (заказ будет отгружен после поступления всех позиций на склад)
                     </span>
-                    </label>
+                        </label>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        <a class="button" href="/basket/to_offer">Оформить заказ</a>
     </div>
-    <a class="button" href="/basket/to_offer">Оформить заказ</a>
-</div>
+

@@ -21,104 +21,106 @@ $status_classes = [
 <h1><?=$title?></h1>
 <div class="clearfix"></div>
 <div class="orders">
-    <h3>Информация</h3>
-    <form id="orderInfo" style="margin-bottom: 20px">
-        <table  cellspacing="1">
-            <tr class="head">
-                <th>Тип оплаты</th>
-                <th>Доставка</th>
-                <th>Дата отгрузки</th>
-                <th>Адрес</th>
-                <th>Весь заказ</th>
-            </tr>
-            <tr>
-                <td label="Тип оплаты">
-                    <?if ($editOrderInfo){?>
-                        <select name="pay_type">
-                            <?$selected = $orderInfo['pay_type'] == 'Наличный' ? 'selected' : ''?>
-                            <option <?=$selected?> value="Наличный">Наличный</option>
-                            <?$selected = $orderInfo['pay_type'] == 'Безналичный' ? 'selected' : ''?>
-                            <option <?=$selected?> value="Безналичный">Безналичный</option>
-                        </select>
-                    <?}
-                    else{?>
-                        <?=$orderInfo['pay_type']?>
-                    <?}?>
-
-                </td>
-                <td label="Доставка">
-                    <?if ($editOrderInfo){?>
-                        <select name="delivery">
-                            <?$selected = $orderInfo['delivery'] == 'Доставка' ? 'selected' : ''?>
-                            <option <?=$selected?> value="Доставка">Доставка</option>
-                            <?$selected = $orderInfo['delivery'] == 'Самовывоз' ? 'selected' : ''?>
-                            <option <?=$selected?> value="Самовывоз">Самовывоз</option>
-                        </select>
-                    <?}
-                    else{?>
-                        <?=$orderInfo['delivery']?>
-                    <?}?>
-                </td>
-                <td label="Дата отгрузки">
-                    <?$dateTimeObject = DateTime::createFromFormat('Y-m-d 00:00:00', $orderInfo['date_issue']);
-                    if ($editOrderInfo){
-                        $end = clone $dateTimeObject;
-                        if ($orderInfo['minDelivery']){
-                            $begin = $dateTimeObject->add(new DateInterval("P{$orderInfo['min_delivery']}D"));
-                        }
-                        else $begin = $dateTimeObject;
-                        $end = $end->add(new DateInterval("P{$orderInfo['max_delivery']}D"));
-                        ?>
-                        <input type="hidden" id="min_date" value="<?=$begin->format('d.m.Y')?>">
-                        <input type="hidden" id="max_date" value="<?=$end->format('d.m.Y')?>">
-                        <div class="date-wrap">
-                            <input type="text" class="data-pic-beg" name="date_issue" value="<?=$dateTimeObject->format('d.m.Y');?>">
-                            <div class="calendar-icon"></div>
-                        </div>
-                    <?}
-                    else{?>
-                        <?=$dateTimeObject->format('d.m.Y');?>
-                    <?}?>
-                </td>
-                <td label="Адрес">
-                    <?if ($editOrderInfo){
-                        $addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
-                        if (!empty($addresses)){
-                            $disabled = $orderInfo['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
-                            <select name="address_id" <?=$disabled?>>
-                                <?foreach($addresses as $row){
-                                    $selected = $row['id'] == $orderInfo['address_id'] ? 'selected' : ''?>
-                                    <option value="<?=$row['id']?>" <?=$selected?>>
-                                        <?=\core\UserAddress::getString(
-                                            $row['id'],
-                                            json_decode($row['json'], true)
-                                        )?>
-                                    </option>
-                                <?}?>
+    <?if ($orderInfo){?>
+        <h3>Информация</h3>
+        <form id="orderInfo" style="margin-bottom: 20px">
+            <table  cellspacing="1">
+                <tr class="head">
+                    <th>Тип оплаты</th>
+                    <th>Доставка</th>
+                    <th>Дата отгрузки</th>
+                    <th>Адрес</th>
+                    <th>Весь заказ</th>
+                </tr>
+                <tr>
+                    <td label="Тип оплаты">
+                        <?if ($editOrderInfo){?>
+                            <select name="pay_type">
+                                <?$selected = $orderInfo['pay_type'] == 'Наличный' ? 'selected' : ''?>
+                                <option <?=$selected?> value="Наличный">Наличный</option>
+                                <?$selected = $orderInfo['pay_type'] == 'Безналичный' ? 'selected' : ''?>
+                                <option <?=$selected?> value="Безналичный">Безналичный</option>
                             </select>
+                        <?}
+                        else{?>
+                            <?=$orderInfo['pay_type']?>
                         <?}?>
-                    <?}
-                    else{
-                        if ($orderInfo['delivery'] == 'Доставка'){?>
-                            <?=\core\UserAddress::getString(
-                                $orderInfo['address_id'],
-                                json_decode($orderInfo['json'], true)
-                            )?>
+
+                    </td>
+                    <td label="Доставка">
+                        <?if ($editOrderInfo){?>
+                            <select name="delivery">
+                                <?$selected = $orderInfo['delivery'] == 'Доставка' ? 'selected' : ''?>
+                                <option <?=$selected?> value="Доставка">Доставка</option>
+                                <?$selected = $orderInfo['delivery'] == 'Самовывоз' ? 'selected' : ''?>
+                                <option <?=$selected?> value="Самовывоз">Самовывоз</option>
+                            </select>
+                        <?}
+                        else{?>
+                            <?=$orderInfo['delivery']?>
                         <?}?>
-                    <?}?>
-                </td>
-                <td label="Весь заказ">
-                    <?if ($editOrderInfo){
-                        $checked = $orderInfo['entire_order'] == 1 ? 'checked' : ''; ?>
-                        <input <?=$checked?> type="checkbox" name="entire_order" value="1">
-                    <?}
-                    else{?>
-                        <?=$orderInfo['entire_order'] == 1 ? 'Да' : 'Нет'?>
-                    <?}?>
-                </td>
-            </tr>
-        </table>
-    </form>
+                    </td>
+                    <td label="Дата отгрузки">
+                        <?$dateTimeObject = DateTime::createFromFormat('Y-m-d 00:00:00', $orderInfo['date_issue']);
+                        if ($editOrderInfo){
+                            $end = clone $dateTimeObject;
+                            if ($orderInfo['minDelivery']){
+                                $begin = $dateTimeObject->add(new DateInterval("P{$orderInfo['min_delivery']}D"));
+                            }
+                            else $begin = $dateTimeObject;
+                            $end = $end->add(new DateInterval("P{$orderInfo['max_delivery']}D"));
+                            ?>
+                            <input type="hidden" id="min_date" value="<?=$begin->format('d.m.Y')?>">
+                            <input type="hidden" id="max_date" value="<?=$end->format('d.m.Y')?>">
+                            <div class="date-wrap">
+                                <input type="text" class="data-pic-beg" name="date_issue" value="<?=$dateTimeObject->format('d.m.Y');?>">
+                                <div class="calendar-icon"></div>
+                            </div>
+                        <?}
+                        else{?>
+                            <?=$dateTimeObject->format('d.m.Y');?>
+                        <?}?>
+                    </td>
+                    <td label="Адрес">
+                        <?if ($editOrderInfo){
+                            $addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
+                            if (!empty($addresses)){
+                                $disabled = $orderInfo['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
+                                <select name="address_id" <?=$disabled?>>
+                                    <?foreach($addresses as $row){
+                                        $selected = $row['id'] == $orderInfo['address_id'] ? 'selected' : ''?>
+                                        <option value="<?=$row['id']?>" <?=$selected?>>
+                                            <?=\core\UserAddress::getString(
+                                                $row['id'],
+                                                json_decode($row['json'], true)
+                                            )?>
+                                        </option>
+                                    <?}?>
+                                </select>
+                            <?}?>
+                        <?}
+                        else{
+                            if ($orderInfo['delivery'] == 'Доставка'){?>
+                                <?=\core\UserAddress::getString(
+                                    $orderInfo['address_id'],
+                                    json_decode($orderInfo['json'], true)
+                                )?>
+                            <?}?>
+                        <?}?>
+                    </td>
+                    <td label="Весь заказ">
+                        <?if ($editOrderInfo){
+                            $checked = $orderInfo['entire_order'] == 1 ? 'checked' : ''; ?>
+                            <input <?=$checked?> type="checkbox" name="entire_order" value="1">
+                        <?}
+                        else{?>
+                            <?=$orderInfo['entire_order'] == 1 ? 'Да' : 'Нет'?>
+                        <?}?>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    <?}?>
 	<?if ($device == 'desktop' || $device == 'tablet'){?>
         <h3>Товары</h3>
         <table class="orders-table">

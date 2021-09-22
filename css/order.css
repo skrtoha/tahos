@@ -13,6 +13,9 @@ span.crossedout {
     display: block;
     text-decoration-color: red;
 }
+#orderInfo .jq-selectbox{
+    width: auto;
+}
 span.crossedout {
     text-decoration: line-through;
     display: block;
@@ -116,7 +119,6 @@ a.cancel_comment{
  .fa-pencil-square-o{
 		font-size: 1.6em !important;
 		cursor: pointer;
-}
 }
 tr.gif{
 	display: table-row;
@@ -372,9 +374,6 @@ header .hints a.jspArrow:hover {
 
 .owl-carousel .owl-grab {
 	cursor: move;
-	cursor: -webkit-grab;
-	cursor: -o-grab;
-	cursor: -ms-grab;
 	cursor: grab; }
 
 .owl-carousel.owl-rtl {
@@ -415,16 +414,11 @@ header .hints a.jspArrow:hover {
 	top: 50%;
 	margin-left: -40px;
 	margin-top: -40px;
-	background: url("owl.video.play.png") no-repeat;
 	cursor: pointer;
 	z-index: 1;
 	-webkit-backface-visibility: hidden;
 	-webkit-transition: scale 100ms ease;
 	transition: scale 100ms ease; }
-
-.owl-carousel .owl-video-play-icon:hover {
-	-webkit-transition: scale(1.3, 1.3);
-	transition: scale(1.3, 1.3); }
 
 .owl-carousel .owl-video-playing .owl-video-tn,
 .owl-carousel .owl-video-playing .owl-video-play-icon {
@@ -502,12 +496,10 @@ header .hints a.jspArrow:hover {
 	cursor: progress; }
 
 .mfp-zoom-out-cur, .mfp-zoom-out-cur .mfp-image-holder .mfp-close {
-	cursor: -webkit-zoom-out;
 	cursor: zoom-out; }
 
 .mfp-zoom {
 	cursor: pointer;
-	cursor: -webkit-zoom-in;
 	cursor: zoom-in; }
 
 .mfp-auto-cursor .mfp-content {
@@ -735,7 +727,37 @@ img.mfp-img {
 	-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 					box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 	background: #444; }
-
+@media screen and (max-width: 800px){
+    #orderInfo tr.head {
+        display: none;
+    }
+    .jq-selectbox__select-text{
+        white-space: normal;
+    }
+    .jq-selectbox li{
+        height: auto;
+        white-space: normal;
+    }
+    #orderInfo td:before{
+        content: attr(label);
+    }
+    #orderInfo tr {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #orderInfo td {
+        padding: 10px 0;
+    }
+    #orderInfo td:before {
+        float: left;
+        content: attr(label);
+        width: 115px;
+        display: inline-block;
+        text-align: left;
+    }
+}
 .mfp-figure small {
 	color: #BDBDBD;
 	display: block;
@@ -3765,7 +3787,6 @@ img.mfp-img {
 	opacity: 0.8;
 	filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
 	/* Firefox 10+ */
-	filter: gray;
 	/* IE6-9 */
 	-webkit-filter: grayscale(100%);
 	/* Chrome 19+ & Safari 6+ */ }
@@ -3910,7 +3931,6 @@ img.mfp-img {
 	opacity: 0.8;
 	filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
 	/* Firefox 10+ */
-	filter: gray;
 	/* IE6-9 */
 	-webkit-filter: grayscale(100%);
 	/* Chrome 19+ & Safari 6+ */ }
@@ -3950,8 +3970,6 @@ img.mfp-img {
 	background-image: none;
 	background-position: 0 0; }
 
-.jstree-default > .jstree-container-ul .jstree-loading > .jstree-ocl {
-	background: url("throbber.gif") center center no-repeat; }
 
 .jstree-default .jstree-file {
 	background: url("../img/jstree/32px.png") -100px -68px no-repeat; }
@@ -4096,7 +4114,6 @@ img.mfp-img {
 	opacity: 0.8;
 	filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
 	/* Firefox 10+ */
-	filter: gray;
 	/* IE6-9 */
 	-webkit-filter: grayscale(100%);
 	/* Chrome 19+ & Safari 6+ */ }
@@ -4135,9 +4152,6 @@ img.mfp-img {
 	background-color: transparent;
 	background-image: none;
 	background-position: 0 0; }
-
-.jstree-default-small > .jstree-container-ul .jstree-loading > .jstree-ocl {
-	background: url("throbber.gif") center center no-repeat; }
 
 .jstree-default-small .jstree-file {
 	background: url("../img/jstree/32px.png") -103px -71px no-repeat; }
@@ -4282,8 +4296,6 @@ img.mfp-img {
 	opacity: 0.8;
 	filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='jstree-grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#jstree-grayscale");
 	/* Firefox 10+ */
-	filter: gray;
-	/* IE6-9 */
 	-webkit-filter: grayscale(100%);
 	/* Chrome 19+ & Safari 6+ */ }
 
@@ -4321,9 +4333,6 @@ img.mfp-img {
 	background-color: transparent;
 	background-image: none;
 	background-position: 0 0; }
-
-.jstree-default-large > .jstree-container-ul .jstree-loading > .jstree-ocl {
-	background: url("throbber.gif") center center no-repeat; }
 
 .jstree-default-large .jstree-file {
 	background: url("../img/jstree/32px.png") -96px -64px no-repeat; }
@@ -5650,6 +5659,7 @@ form#send-message .info_btn {
 		line-height: normal; }
 div[store_id][item_id]{
 	white-space: nowrap;
+    display: flex;
 }
 table.basket-table td {
 	padding: 30px 0; }
@@ -6508,13 +6518,61 @@ span.delete-btn {
 			.account #account-history-tabs .buttons button .fa {
 				font-size: 1.5em;
 				padding-right: 10px; }
-
+.pickmeup .pmu-instance .pmu-day-of-week *, .pickmeup .pmu-instance .pmu-days * {
+    display: inline-block;
+    line-height: 1.5em;
+    width: 2em;
+}
+.pickmeup .pmu-instance .pmu-disabled, .pickmeup .pmu-instance .pmu-disabled:hover {
+    color: #333;
+    cursor: default;
+}
+.jq-checkbox {
+    height: 21px;
+    width: 20px;
+}
+.jq-checkbox.checked:after {
+    width: 12px;
+    height: 13px;
+    top: 3px;
+}
+.pickmeup .pmu-instance .pmu-not-in-month {
+    color: #868686;
+}
+.pickmeup .pmu-instance .pmu-button {
+    color: #000;
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+}
+.pmu-disabled {
+    color: #949494 !important;
+}
+.pickmeup * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
 .sending-page h4 {
 	margin-top: 20px; }
 
 .sending-page table.middle-view, .sending-page table.small-view {
 	display: none; }
-
+.jq-selectbox li{
+    text-align: left;
+}
+.date-wrap .calendar-icon {
+    right: -28px;
+    z-index: 10;
+    height: 34px;
+    top: 0px;
+    width: 44px;
+    border-radius: 0 4px 4px 0;
+}
+input.data-pic-beg {
+    font-size: 15px;
+    border: 1px solid #C7C7C7;
+    border-radius: 4px;
+}
 .sending-page table textarea {
 	resize: none;
 	max-width: 200px;

@@ -42,7 +42,7 @@ switch ($act) {
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
-		$order = get_order('');
+		$order = \core\OrderValue::getOrderInfo($_GET['id']);
 		$res_order_values = OrderValue::get(['order_id' => $_GET['id']]);
 		order_print($order, $res_order_values);
 		break;
@@ -204,7 +204,7 @@ function show_form($act){
 	$db->update('orders', array('is_new' => 0), "`id`=$id");
 	switch($act){
 		case 's_change':
-			$order = get_order('');
+			$order = \core\OrderValue::getOrderInfo($_GET['id'], '');
 			$res_order_values = core\OrderValue::get(['order_id' => $_GET['id']], '');
 			$page_title = "Просмотр заказа";
 			break;

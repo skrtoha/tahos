@@ -421,4 +421,49 @@ class OrderValue{
 				OrderValue::changeStatus(7, $ov);
 		}
 	}
+    
+    public static function getOrderInfo($order_id, $flag = ''){
+        $query = "
+            SELECT
+                o.id,
+                DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS date,
+                GROUP_CONCAT(ov.status_id) AS statuses,
+                GROUP_CONCAT(ov.price) AS prices,
+                GROUP_CONCAT(ov.quan) AS quans,
+                GROUP_CONCAT(ov.ordered) AS ordered,
+                GROUP_CONCAT(ov.arrived) AS arrived,
+                GROUP_CONCAT(ov.issued) AS issued,
+                GROUP_CONCAT(ov.declined) AS declined,
+                GROUP_CONCAT(ov.returned) AS returned,
+                " . User::getUserFullNameForQuery() . " AS organization,
+                CONCAT_WS(' ', u.name_1, u.name_2, u.name_3) AS fio,
+                if (u.delivery_type = 'Самовывоз', u.issue_id, 1) as user_issue,
+                min(ps.delivery) as min_delivery,
+                max(ps.delivery) as max_delivery,
+                o.user_id,
+                u.bill,
+                u.reserved_funds,
+                u.defermentOfPayment,
+                o.pay_type,
+                o.delivery,
+                o.address_id,
+                o.entire_order,
+                o.date_issue,
+                o.is_new,
+                o.is_draft,
+                ua.json,
+                isSuspended(GROUP_CONCAT(ov.status_id)) AS is_suspended
+            FROM
+                #orders o
+            LEFT JOIN #orders_values ov ON ov.order_id=o.id
+            LEFT JOIN #provider_stores ps on ps.id = ov.store_id
+            LEFT JOIN #users u ON u.id=o.user_id
+            LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
+            LEFT JOIN #user_addresses ua ON ua.id = o.address_id
+            WHERE o.id={$order_id}
+        ";
+        if ($flag) return $GLOBALS['db']->query($query, $flag);
+        $order = $GLOBALS['db']->select_unique($query, $flag);
+        return $order[0];
+    }
 }

@@ -1,9 +1,14 @@
 <?
 require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/orders.function.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/sendings.function.php');
+
+use core\OrderValue;
+
 if (isset($_GET['act']) && $_GET['act'] == 'edit') $title = 'Редактирование заказа';
 else $title = "Просмотр заказа";
-$res_orders_values = core\OrderValue::get(['order_id' => $_GET['id']], '');
+$res_orders_values = OrderValue::get(['order_id' => $_GET['id']], '');
+$orderInfo = OrderValue::getOrderInfo($_GET['id'], '');
+$editOrderInfo = $orderInfo['is_suspended'] && isset($_GET['act']) && $_GET['act'] == 'edit' ? true : false;
 $total = 0;
 $status_classes = [ 
 	'Отменен' => 'status-return',
@@ -16,201 +21,301 @@ $status_classes = [
 <h1><?=$title?></h1>
 <div class="clearfix"></div>
 <div class="orders">
+    <h3>Информация</h3>
+    <form id="orderInfo" style="margin-bottom: 20px">
+        <table  cellspacing="1">
+            <tr class="head">
+                <th>Тип оплаты</th>
+                <th>Доставка</th>
+                <th>Дата отгрузки</th>
+                <th>Адрес</th>
+                <th>Весь заказ</th>
+            </tr>
+            <tr>
+                <td label="Тип оплаты">
+                    <?if ($editOrderInfo){?>
+                        <select name="pay_type">
+                            <?$selected = $orderInfo['pay_type'] == 'Наличный' ? 'selected' : ''?>
+                            <option <?=$selected?> value="Наличный">Наличный</option>
+                            <?$selected = $orderInfo['pay_type'] == 'Безналичный' ? 'selected' : ''?>
+                            <option <?=$selected?> value="Безналичный">Безналичный</option>
+                        </select>
+                    <?}
+                    else{?>
+                        <?=$orderInfo['pay_type']?>
+                    <?}?>
+
+                </td>
+                <td label="Доставка">
+                    <?if ($editOrderInfo){?>
+                        <select name="delivery">
+                            <?$selected = $orderInfo['delivery'] == 'Доставка' ? 'selected' : ''?>
+                            <option <?=$selected?> value="Доставка">Доставка</option>
+                            <?$selected = $orderInfo['delivery'] == 'Самовывоз' ? 'selected' : ''?>
+                            <option <?=$selected?> value="Самовывоз">Самовывоз</option>
+                        </select>
+                    <?}
+                    else{?>
+                        <?=$orderInfo['delivery']?>
+                    <?}?>
+                </td>
+                <td label="Дата отгрузки">
+                    <?$dateTimeObject = DateTime::createFromFormat('Y-m-d 00:00:00', $orderInfo['date_issue']);
+                    if ($editOrderInfo){
+                        $end = clone $dateTimeObject;
+                        if ($orderInfo['minDelivery']){
+                            $begin = $dateTimeObject->add(new DateInterval("P{$orderInfo['min_delivery']}D"));
+                        }
+                        else $begin = $dateTimeObject;
+                        $end = $end->add(new DateInterval("P{$orderInfo['max_delivery']}D"));
+                        ?>
+                        <input type="hidden" id="min_date" value="<?=$begin->format('d.m.Y')?>">
+                        <input type="hidden" id="max_date" value="<?=$end->format('d.m.Y')?>">
+                        <div class="date-wrap">
+                            <input type="text" class="data-pic-beg" name="date_issue" value="<?=$dateTimeObject->format('d.m.Y');?>">
+                            <div class="calendar-icon"></div>
+                        </div>
+                    <?}
+                    else{?>
+                        <?=$dateTimeObject->format('d.m.Y');?>
+                    <?}?>
+                </td>
+                <td label="Адрес">
+                    <?if ($editOrderInfo){
+                        $addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
+                        if (!empty($addresses)){
+                            $disabled = $orderInfo['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
+                            <select name="address_id" <?=$disabled?>>
+                                <?foreach($addresses as $row){
+                                    $selected = $row['id'] == $orderInfo['address_id'] ? 'selected' : ''?>
+                                    <option value="<?=$row['id']?>" <?=$selected?>>
+                                        <?=\core\UserAddress::getString(
+                                            $row['id'],
+                                            json_decode($row['json'], true)
+                                        )?>
+                                    </option>
+                                <?}?>
+                            </select>
+                        <?}?>
+                    <?}
+                    else{
+                        if ($orderInfo['delivery'] == 'Доставка'){?>
+                            <?=\core\UserAddress::getString(
+                                $orderInfo['address_id'],
+                                json_decode($orderInfo['json'], true)
+                            )?>
+                        <?}?>
+                    <?}?>
+                </td>
+                <td label="Весь заказ">
+                    <?if ($editOrderInfo){
+                        $checked = $orderInfo['entire_order'] == 1 ? 'checked' : ''; ?>
+                        <input <?=$checked?> type="checkbox" name="entire_order" value="1">
+                    <?}
+                    else{?>
+                        <?=$orderInfo['entire_order'] == 1 ? 'Да' : 'Нет'?>
+                    <?}?>
+                </td>
+            </tr>
+        </table>
+    </form>
 	<?if ($device == 'desktop' || $device == 'tablet'){?>
-		<table class="orders-table">
-			<tr>
-				<th>Наименование</th>
-				<th>Поставщик</th>
-				<th>Кол-во</th>
-				<th>Статус</th>
-				<th>Сумма</th>
-				<?if (isset($_GET['act'])){?>
-					<th></th>
-				<?}?>
-			</tr>
-			<?if (!$res_orders_values->num_rows){?>
-				<tr>
-					<td colspan="8">Заказов не найдено</td>
-				</tr>
-			<?}
-			else{
-				while ($order = $res_orders_values->fetch_assoc()) {
-					$blocked = !in_array($order['status_id'], [7, 5]) || (!isset($_GET['act'])) ? 'blocked' : false;?>
-					<tr order_id="<?=$order['order_id']?>" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" class="<?=$blocked?>">
-						<td class="name-col">
-							<b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b> 
-							<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
-							<?=$order['title_full']?>
-						</td>
-						<td <?=$order['noReturn']?>><?=$order['cipher']?></td>
-						<td>
-							<?if (!$blocked){?>
-								<div store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" packaging="<?=$order['packaging']?>" class="count-block" summand="<?=$order['price']?>">
-									<span class="minus">-</span>
-									<input value="<?=$order['quan']?>">
-									<span class="plus">+</span>
-								</div>
-							<?}
-							else{?>
-								<?=$order['quan']?>
-							<?}?>
-						</td>
-						<td>
-							<span class="status-col <?=$order['status_class']?>">
-							<?switch($order['status']){
-								case 'Заказано':
-									$summ = $order['ordered'] * $order['price'];?>
-									Заказано 
-									<?if ($order['ordered'] < $order['quan']){?>
-										- <?=$order['ordered']?> шт.
-									<?}
-									break;
-								case 'Выдано':
-									$summ = !$order['issued'] ? $order['issued'] * $order['price'] : ($order['issued'] - $order['returned']) * $order['price']?>
-									Выдано
-									<?if (
-											(
-												$order['issued'] && 
-												(
-													$order['arrived'] < $order['ordered'] || 
-													$order['issued'] < $order['arrived'] ||
-													$order['ordered'] < $order['quan'] 
-												)
-											) ||
-											(
-												$order['returned'] &&
-												$order['arrived'] == $order['issued'] &&
-												$order['returned'] < $order['arrived']
-											)
-										){?>
-										- <?=$order['issued'] - $order['returned']?> шт.
-									<?}
-									if ($order['issued'] < $order['arrived']){?>
-										<span class="status-col status-block status-sended">Пришло - <?=$order['arrived'] - $order['issued']?> шт.</span>
-									<?}
-									if ($order['returned']){?>
-										<span class="status-col status-block status-return">Возврат - <?=$order['returned']?> шт.</span>
-									<?}
-									break;
-								case 'Возврат':
-									$summ = 0;
-									?>
-									<span class="status-col status-block status-return">Возврат</span>
-									<?break;
-								case 'В работе':
-									$summ = $order['price'] * $order['quan']?>
-									В работе
-									<?break;
-								case 'Нет в наличии':
-									$summ = 0?>
-									<span class="status-col status-block status-return">Нет в наличии</span>
-									<?break;
-								case 'На отправке':
-									$summ = $order['arrived'] * $order['price'];?>
-									На отправке
-									<?if ($order['issued'] < $order['arrived'] && $order['issued'] < $order['ordered'] && $order['ordered'] < $order['quan']){?>
-										- <?=$order['arrived'] - $order['issued']?> шт.
-									<?}
-									if ($order['issued'] && $order['issued'] < $order['arrived']){?>
-										<span class="status-col status-delivery status-block">Выдано - <?=$order['arrived'] - $order['issued']?> шт.</span>
-									<?}
-									break;
-								case 'Отменен':
-									$summ = 0;?>
-									Отменен
-									<?break;
-								case 'Приостановлено':
-									$summ = $order['quan'] * $order['price']?>
-									Приостановлено
-									<?break;
-								case 'Пришло':
-									$summ = $order['arrived'] * $order['price']?>
-									Пришло
-									<?if (!$order['issued'] && ($order['arrived'] < $order['ordered'] || $order['ordered'] < $order['quan'])){?>
-										- <?=$order['arrived']?> шт.
-									<?}
-									if ($order['issued'] && $order['issued'] < $order['arrived']){?>
-										- <?=$order['arrived'] - $order['issued']?> шт.
-										<span class="status-col status-delivery status-block">Выдано - <?=$order['issued']?> шт.</span>
-									<?}
-									break;
-							}
-							if ($order['arrived'] && $order['arrived'] < $order['ordered'] && !$order['declined']){?>
-								<span class="status-block status-expecting">Ожидается - <?=$order['ordered'] - $order['arrived']?> шт.</span>
-							<?}
-							if (
-									(
-										$order['ordered'] && 
-										$order['ordered'] < $order['quan']
-									) ||
-									(
-										$order['declined'] &&
-										$order['arrived'] < $order['ordered']
-									)
-								){
-								$declined = !$order['declined'] ? $order['quan'] - $order['ordered'] : $order['quan'] - $order['arrived'];?>
-								<span class="status-col status-block status-refused">Отказ - <?=$declined?> шт.</span>
-							<?}
-							?>
-							</span>
-						</td>
-						<td>
-							<span class="price_format">
-								<?$total += $summ?>
-								<?switch($order['status']){
-									case 'Возврат':?>
-										<span class="crossedout"><?=$order['price'] * $order['returned']?></span>
-										<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
-										<?break;
-									case 'Выдано':?>
-											<?if ($order['declined']){?>
-												<span class="crossedout"><?=$order['ordered'] * $order['price']?></span>
-												<span class="new_price"><?=$order['issued'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
-											<?}
-											elseif ($order['returned']){?>
-												<span class="crossedout"><?=$order['issued'] * $order['price']?></span>
-												<span class="new_price"><?=$order['returned'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
-											<?}
-											else{?>
-												<?=$summ?>
-												<i class="fa fa-rub" aria-hidden="true"></i>
-											<?}?>
-										<?break;
-									case 'Заказано':?>
-										<?if ($order['ordered'] < $order['quan']){?>
-											<span class="crossedout"><?=$order['quan'] * $order['price']?></span>
-											<span class="new_price"><?=$order['ordered'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
-										<?}
-										else{?>
-											<?=$summ?>
-											<i class="fa fa-rub" aria-hidden="true"></i>
-										<?}
-									break;
-									default:?>
-										<?=$summ?>
-										<i class="fa fa-rub" aria-hidden="true"></i>
-								<?}?>
-							</span>
-						</td>
-						<?if (isset($_GET['act'])){?>
-							<td style="width: 70px; position: relative">
-								<?if (!$blocked){?>
-									<i title="Комментарий" class="fa fa-pencil-square-o comment-btn" aria-hidden="true"></i>
-									<div class="comment-block">
-										<textarea class="comment_textarea" placeholder="Напишите Ваш комментарий"><?=$order['comment']?></textarea>
-										<button class="save_comment">Сохранить</button>
-										<a href="#" class="cancel_comment">Отменить</a>
-									</div>
-									<span act="delete" class="delete-btn" type_view="big">
-										<i style="margin: 0" class="fa fa-times" aria-hidden="true"></i>
-									</span>
-								<?}?>
-							</td>
-						<?}?>
-					</tr>
-				<?}
-			}?>
-		</table>
+        <h3>Товары</h3>
+        <table class="orders-table">
+            <tr>
+                <th>Наименование</th>
+                <th>Поставщик</th>
+                <th>Кол-во</th>
+                <th>Статус</th>
+                <th>Сумма</th>
+                <?if (isset($_GET['act'])){?>
+                    <th></th>
+                <?}?>
+            </tr>
+            <?if (!$res_orders_values->num_rows){?>
+                <tr>
+                    <td colspan="8">Заказов не найдено</td>
+                </tr>
+            <?}
+            else{
+                while ($order = $res_orders_values->fetch_assoc()) {
+                    $blocked = !in_array($order['status_id'], [7, 5]) || (!isset($_GET['act'])) ? 'blocked' : false;?>
+                    <tr order_id="<?=$order['order_id']?>" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" class="<?=$blocked?>">
+                        <td class="name-col">
+                            <b class="brend_info" brend_id="<?=$order['brend_id']?>"><?=$order['brend']?></b>
+                            <a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a>
+                            <?=$order['title_full']?>
+                        </td>
+                        <td <?=$order['noReturn']?>><?=$order['cipher']?></td>
+                        <td>
+                            <?if (!$blocked){?>
+                                <div store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" packaging="<?=$order['packaging']?>" class="count-block" summand="<?=$order['price']?>">
+                                    <span class="minus">-</span>
+                                    <input value="<?=$order['quan']?>">
+                                    <span class="plus">+</span>
+                                </div>
+                            <?}
+                            else{?>
+                                <?=$order['quan']?>
+                            <?}?>
+                        </td>
+                        <td>
+                        <span class="status-col <?=$order['status_class']?>">
+                        <?switch($order['status']){
+                            case 'Заказано':
+                                $summ = $order['ordered'] * $order['price'];?>
+                                Заказано
+                                <?if ($order['ordered'] < $order['quan']){?>
+                                - <?=$order['ordered']?> шт.
+                            <?}
+                                break;
+                            case 'Выдано':
+                                $summ = !$order['issued'] ? $order['issued'] * $order['price'] : ($order['issued'] - $order['returned']) * $order['price']?>
+                                Выдано
+                                <?if (
+                                (
+                                    $order['issued'] &&
+                                    (
+                                        $order['arrived'] < $order['ordered'] ||
+                                        $order['issued'] < $order['arrived'] ||
+                                        $order['ordered'] < $order['quan']
+                                    )
+                                ) ||
+                                (
+                                    $order['returned'] &&
+                                    $order['arrived'] == $order['issued'] &&
+                                    $order['returned'] < $order['arrived']
+                                )
+                            ){?>
+                                - <?=$order['issued'] - $order['returned']?> шт.
+                            <?}
+                                if ($order['issued'] < $order['arrived']){?>
+                                    <span class="status-col status-block status-sended">Пришло - <?=$order['arrived'] - $order['issued']?> шт.</span>
+                                <?}
+                                if ($order['returned']){?>
+                                    <span class="status-col status-block status-return">Возврат - <?=$order['returned']?> шт.</span>
+                                <?}
+                                break;
+                            case 'Возврат':
+                                $summ = 0;
+                                ?>
+                                <span class="status-col status-block status-return">Возврат</span>
+                                <?break;
+                            case 'В работе':
+                                $summ = $order['price'] * $order['quan']?>
+                                В работе
+                                <?break;
+                            case 'Нет в наличии':
+                                $summ = 0?>
+                                <span class="status-col status-block status-return">Нет в наличии</span>
+                                <?break;
+                            case 'На отправке':
+                                $summ = $order['arrived'] * $order['price'];?>
+                                На отправке
+                                <?if ($order['issued'] < $order['arrived'] && $order['issued'] < $order['ordered'] && $order['ordered'] < $order['quan']){?>
+                                - <?=$order['arrived'] - $order['issued']?> шт.
+                            <?}
+                                if ($order['issued'] && $order['issued'] < $order['arrived']){?>
+                                    <span class="status-col status-delivery status-block">Выдано - <?=$order['arrived'] - $order['issued']?> шт.</span>
+                                <?}
+                                break;
+                            case 'Отменен':
+                                $summ = 0;?>
+                                Отменен
+                                <?break;
+                            case 'Приостановлено':
+                                $summ = $order['quan'] * $order['price']?>
+                                Приостановлено
+                                <?break;
+                            case 'Пришло':
+                                $summ = $order['arrived'] * $order['price']?>
+                                Пришло
+                                <?if (!$order['issued'] && ($order['arrived'] < $order['ordered'] || $order['ordered'] < $order['quan'])){?>
+                                - <?=$order['arrived']?> шт.
+                            <?}
+                                if ($order['issued'] && $order['issued'] < $order['arrived']){?>
+                                    - <?=$order['arrived'] - $order['issued']?> шт.
+                                    <span class="status-col status-delivery status-block">Выдано - <?=$order['issued']?> шт.</span>
+                                <?}
+                                break;
+                        }
+                        if ($order['arrived'] && $order['arrived'] < $order['ordered'] && !$order['declined']){?>
+                            <span class="status-block status-expecting">Ожидается - <?=$order['ordered'] - $order['arrived']?> шт.</span>
+                        <?}
+                        if (
+                            (
+                                $order['ordered'] &&
+                                $order['ordered'] < $order['quan']
+                            ) ||
+                            (
+                                $order['declined'] &&
+                                $order['arrived'] < $order['ordered']
+                            )
+                        ){
+                            $declined = !$order['declined'] ? $order['quan'] - $order['ordered'] : $order['quan'] - $order['arrived'];?>
+                            <span class="status-col status-block status-refused">Отказ - <?=$declined?> шт.</span>
+                        <?}
+                        ?>
+                        </span>
+                        </td>
+                        <td>
+                        <span class="price_format">
+                            <?$total += $summ?>
+                            <?switch($order['status']){
+                                case 'Возврат':?>
+                                    <span class="crossedout"><?=$order['price'] * $order['returned']?></span>
+                                    <span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
+                                    <?break;
+                                case 'Выдано':?>
+                                    <?if ($order['declined']){?>
+                                        <span class="crossedout"><?=$order['ordered'] * $order['price']?></span>
+                                        <span class="new_price"><?=$order['issued'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+                                    <?}
+                                    elseif ($order['returned']){?>
+                                        <span class="crossedout"><?=$order['issued'] * $order['price']?></span>
+                                        <span class="new_price"><?=$order['returned'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+                                    <?}
+                                    else{?>
+                                        <?=$summ?>
+                                        <i class="fa fa-rub" aria-hidden="true"></i>
+                                    <?}?>
+                                    <?break;
+                                case 'Заказано':?>
+                                    <?if ($order['ordered'] < $order['quan']){?>
+                                        <span class="crossedout"><?=$order['quan'] * $order['price']?></span>
+                                        <span class="new_price"><?=$order['ordered'] * $order['price']?><i class="fa fa-rub" aria-hidden="true"></i></span>
+                                    <?}
+                                    else{?>
+                                        <?=$summ?>
+                                        <i class="fa fa-rub" aria-hidden="true"></i>
+                                    <?}
+                                    break;
+                                default:?>
+                                    <?=$summ?>
+                                    <i class="fa fa-rub" aria-hidden="true"></i>
+                                <?}?>
+                        </span>
+                        </td>
+                        <?if (isset($_GET['act'])){?>
+                            <td style="width: 70px; position: relative">
+                                <?if (!$blocked){?>
+                                    <i title="Комментарий" class="fa fa-pencil-square-o comment-btn" aria-hidden="true"></i>
+                                    <div class="comment-block">
+                                        <textarea class="comment_textarea" placeholder="Напишите Ваш комментарий"><?=$order['comment']?></textarea>
+                                        <button class="save_comment">Сохранить</button>
+                                        <a href="#" class="cancel_comment">Отменить</a>
+                                    </div>
+                                    <span act="delete" class="delete-btn" type_view="big">
+                                    <i style="margin: 0" class="fa fa-times" aria-hidden="true"></i>
+                                </span>
+                                <?}?>
+                            </td>
+                        <?}?>
+                    </tr>
+                <?}
+            }?>
+        </table>
+		
 	<?}
 	else{?>
 		<table class="orders-table small-view">
@@ -363,7 +468,7 @@ $status_classes = [
 		</span>
 	</p>
 	<?if (isset($_GET['act']) && $_GET['act'] == 'edit'){?>
-		<a class="button" style="float: left;margin-top:20px" href="/orders">Готово</a>
+		<a class="button edit" style="float: left;margin-top:20px" href="/orders">Готово</a>
 	<?}
 	else{?>
 		<a class="button" style="float: left;margin-top:20px" href="/order/<?=$_GET['id']?>/edit">Редактировать</a>

@@ -71,6 +71,13 @@ switch ($_POST['act']){
 	case 'undoReturn':
 		$db->update('returns', ['status_id' => 5], "`id` = {$_POST['return_id']}");
 		break;
+    case 'changeOrderInfo':
+        $values = $_POST['values'];
+        $dateTimeObject = DateTime::createFromFormat('d.m.Y', $values['date_issue']);
+        $values['date_issue'] = $dateTimeObject->format('Y-m-d');
+        $values['entire_order'] = $values['entire_order'] ?? 0;
+        $db->update('orders', $values, "`id` = {$_POST['order_id']}");
+        break;
 }
 if ($res) echo true;
 else echo false;

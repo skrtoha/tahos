@@ -28,7 +28,31 @@ function editComment(obj){
 		} 
 	});
 }
+function setDateIssueDelivery(date){
+    const selector = 'input[name=date_issue]';
+    pickmeup.defaults.locales['ru'] = {
+        days: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        daysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        daysMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+    };
+    pickmeup(selector).destroy();
+    pickmeup('input[name=date_issue]', {
+        min: date,
+        date: date,
+        format: 'd.m.Y',
+        locale: 'ru',
+        hide_on_select: true
+    });
+}
 $(function(){
+    setDateIssueDelivery($('#min_date').val());
+    $('input[name=entire_order]').on('change', function(){
+        const $th = $(this);
+        if ($th.is(':checked')) setDateIssueDelivery($('#max_date').val());
+        else setDateIssueDelivery($('#min_date').val())
+    })
 	$(".count-block .minus, .count-block .plus").click(function(event) {
 		var th = $(this);
 		var params = getParams(th.closest('tr'), th.attr('class'));
@@ -135,4 +159,22 @@ $(function(){
 			}
 		})
 	})
+
+    $('input[type=checkbox]').styler();
+
+    $('a.button.edit').on('click', function(e){
+        let data = {"act": "changeOrderInfo"};
+        data.order_id = $('table.orders-table tr[order_id]').attr('order_id');
+        data.values = {};
+        $.each($('#orderInfo').serializeArray(), function(i, item){
+            data.values[item.name] = item.value;
+        })
+        console.log(data);
+        $.ajax({
+            type: 'post',
+            url: '/ajax/order.php',
+            data: data,
+            success: function(){}
+        })
+    })
 })

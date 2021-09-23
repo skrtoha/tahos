@@ -45,7 +45,6 @@ $status_classes = [
                         else{?>
                             <?=$orderInfo['pay_type']?>
                         <?}?>
-
                     </td>
                     <td label="Доставка">
                         <?if ($editOrderInfo){?>

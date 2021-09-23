@@ -377,7 +377,7 @@
 		<?if (in_array($view, ['category'])){?>
 			{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
 		<?}?>
-		<?if (in_array($view, ['article'])){?>
+		<?if (in_array($view, ['article', 'orders', 'order'])){?>
 			{"src" : "/js/get_store_info.js", "async" : false},
 		<?}?>
         <?if (in_array($view, ['settings'])){?>

@@ -206,7 +206,11 @@ $orders = get_order_group($params, '');
 										<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
 										<?=$order['title']?>
 									</td>
-									<td <?=$order['noReturn']?>><?=$order['cipher']?></td>
+									<td <?=$order['noReturn']?>>
+                                        <a href="" store_id="<?=$order['store_id']?>">
+                                            <?=$order['cipher']?>
+                                        </a>
+                                    </td>
 									<?if ($device == 'desktop'){?>
 										<td style="padding-right: 10px"><?=$order['date_from']?></td>
 									<?}?>
@@ -428,7 +432,7 @@ $orders = get_order_group($params, '');
 											<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
 											<?=$order['title']?>
 										</span>
-										Поставщик: <strong><?=$order['cipher']?></strong> <br>
+										Поставщик: <strong store_id="<?=$order['store_id']?>"><?=$order['cipher']?></strong> <br>
 										Дата заказа: <strong><?=$order['date_from']?></strong> <br>
 										Дата доставки: <strong><?=$order['date_to']?></strong> <br>
 										Количество: <strong class="quan"><?=$order['quan']?></strong> <br>

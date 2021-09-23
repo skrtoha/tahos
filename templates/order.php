@@ -146,7 +146,9 @@ $status_classes = [
                             <a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a>
                             <?=$order['title_full']?>
                         </td>
-                        <td <?=$order['noReturn']?>><?=$order['cipher']?></td>
+                        <td <?=$order['noReturn']?>>
+                            <a href="" store_id="<?=$order['store_id']?>"><?=$order['cipher']?></a>
+                        </td>
                         <td>
                             <?if (!$blocked){?>
                                 <div store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" packaging="<?=$order['packaging']?>" class="count-block" summand="<?=$order['price']?>">

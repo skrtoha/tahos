@@ -334,7 +334,8 @@ $(function(){
 		})
 		return false;
 	})
-    $('tr[order_id][store_id]').on('click', function(){
+    $('tr[order_id][store_id]').on('click', function(e){
+        if ($(e.target).attr('store_id')) return;
         document.location.href = '/order/' + $(this).attr('order_id');
     })
 });

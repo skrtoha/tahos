@@ -696,6 +696,38 @@ button::-moz-focus-inner {
 	-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 					box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 	background: #000; }
+a[store_id] {
+    text-decoration: none;
+}
+.mfp-bg {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1042;
+    overflow: hidden;
+    position: fixed;
+    background: #0b0b0b;
+    opacity: 0.5;
+}
+.mfp-auto-cursor .mfp-content {
+    padding: 20px;
+    padding-top: 30px;
+    cursor: auto;
+}
+.mfp-inline-holder .mfp-content, .mfp-ajax-holder .mfp-content {
+    width: auto;
+    background: white;
+    cursor: auto;
+}
+.mfp-content {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 auto;
+    text-align: left;
+    z-index: 1045;
+}
 
 /* Main image in popup */
 img.mfp-img {

@@ -21,7 +21,7 @@ $status_classes = [
 <h1><?=$title?></h1>
 <div class="clearfix"></div>
 <div class="orders">
-    <?if ($orderInfo){?>
+    <?if ($orderInfo['date_issue'] && $orderInfo['delivery']){?>
         <h3>Информация</h3>
         <form id="orderInfo" style="margin-bottom: 20px">
             <table  cellspacing="1">

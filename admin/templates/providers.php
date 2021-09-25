@@ -154,9 +154,14 @@ switch ($act) {
 		message('Успешно удалено!');
 		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
+    case 'set_address':
+        $providers = Provider::get();
+        $providerInfo = $providers[$_GET['id']];
+        setAddress($providerInfo);
+        break;
     default:
 		view();
-}
+} 
 function mainStores($res_main_stores, $handlePrices){?>
 	<div style="float: right;margin-bottom: 5px;">Всего: <?=$res_main_stores->num_rows?></div>
 	<table class="t_table" cellspacing="1">
@@ -418,6 +423,9 @@ function provider(){
 		<?if (core\Provider::getProviderAPITitle($_GET['id'])){?>
 			<a href="?view=settings&act=api_settings&provider_id=<?=$_GET['id']?>">Настройки API</a>
 		<?}?>
+        <?if ($_GET['id'] == 15){?>
+            <a href="/admin/?view=providers&act=set_address&id=<?=$_GET['id']?>">Сопоставить адреса</a>
+        <?}?>
 		<div style="width: 100%; height: 10px"></div>
 	<?}?>
 	<div class="t_form">
@@ -827,4 +835,23 @@ function itemsToOrder(){
 	</table>
 	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
 <?}
-?>
+function setAddress($providerInfo){?>
+    <div id="status" class="t_form" style="">
+        <div class="bg">
+            <a href="/admin">Главная</a>
+            &gt; Настройки &gt;
+            <a href="?view=settings&amp;act=providers">Настройки поставщиков</a>
+            > <a href="/admin/?view=providers&act=provider&id=<?=$_GET['id']?>"><?=$providerInfo['title']?></a>
+            > Сопоставить адреса
+        </div>
+    </div>
+    <table class="t_table" style="margin-top: 15px">
+        <tbody>
+        <tr>
+            <td>Адрес сайта</td>
+            <td>Адрес сайта</td>
+        </tr>
+        </tbody>
+    </table>
+<?}?>
+

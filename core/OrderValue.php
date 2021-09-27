@@ -422,7 +422,27 @@ class OrderValue{
 		}
 	}
     
-    public static function getOrderInfo($order_id, $flag = ''){
+    
+    /**
+     * @param $order_id
+     * @param bool $provider_id - если передан, тогда в выборку попадут данные из provider_addresses
+     * @param string $flag
+     * @return mixed
+     */
+    public static function getOrderInfo($order_id, $provider_id = true, $flag = ''){
+        $selectAddressId = 'o.address_id';
+        if ($provider_id){
+            $leftJoin = "
+                LEFT JOIN
+                    #provider_addresses pa
+                ON
+                    pa.address_site_id = o.address_id AND
+                    pa.user_id = o.user_id AND
+                    pa.provider_id = $provider_id
+                ";
+            $selectAddressId .= ", pa.address_provider_id";
+        }
+        else $leftJoin = '';
         $query = "
             SELECT
                 o.id,
@@ -446,7 +466,7 @@ class OrderValue{
                 u.defermentOfPayment,
                 o.pay_type,
                 o.delivery,
-                o.address_id,
+                $selectAddressId,
                 o.entire_order,
                 o.date_issue,
                 o.is_new,
@@ -460,6 +480,7 @@ class OrderValue{
             LEFT JOIN #users u ON u.id=o.user_id
             LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
             LEFT JOIN #user_addresses ua ON ua.id = o.address_id
+            $leftJoin
             WHERE o.id={$order_id}
         ";
         if ($flag) return $GLOBALS['db']->query($query, $flag);

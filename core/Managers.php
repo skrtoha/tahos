@@ -95,7 +95,7 @@ class Managers{
 	public static function getPermissions($group_id){
 		return self::getInstanceDatabase()->getFieldOnID('manager_groups', $group_id, 'permissions');
 	}
-	public function isActionForbidden(string $view, string $action)
+	public static function isActionForbidden(string $view, string $action)
 	{
 		if (isset(self::$permissions[$view][$action])) return false;
 		else return true;

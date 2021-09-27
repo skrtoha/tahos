@@ -1,4 +1,6 @@
 <?php
+/* @var $db \core\Database */
+
 use core\Managers;
 use core\Provider;
 $act = $_GET['act'];
@@ -155,9 +157,38 @@ switch ($act) {
 		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
     case 'set_address':
+        $page_title = 'Сопоставить адреса доставки';
+        $user_id = 3;
+        if (!empty($_POST)){
+            $db->delete('provider_addresses', "`provider_id` = {$_GET['id']} AND `user_id` = $user_id");
+            $countPost = count($_POST['address_provider_id']);
+            for($i = 0; $i < $countPost; $i++){
+                if (!$_POST['address_site_id'][$i]) continue;
+                $db->insert('provider_addresses', [
+                    'address_site_id' => $_POST['address_site_id'][$i],
+                    'address_provider_id' => $_POST['address_provider_id'][$i],
+                    'provider_id' => $_GET['id'],
+                    'user_id' => $_POST['user_id'][$i]
+                ]);
+            }
+        }
         $providers = Provider::get();
         $providerInfo = $providers[$_GET['id']];
-        setAddress($providerInfo);
+        $addressList = $db->query("
+            SELECT
+                ua.id AS address_site_id,
+                ua.user_id,
+                ua.json,
+                pa.address_provider_id
+            from
+                #user_addresses ua
+            left join
+                #provider_addresses pa ON pa.user_id = ua.user_id AND ua.id = pa.address_site_id
+            where
+                ua.user_id = $user_id
+        ", '');
+        $addressProviderList = Provider::getProviderAddressList($_GET['id']);
+        setAddress($providerInfo, $addressList, $addressProviderList, $user_id);
         break;
     default:
 		view();
@@ -835,7 +866,7 @@ function itemsToOrder(){
 	</table>
 	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
 <?}
-function setAddress($providerInfo){?>
+function setAddress($providerInfo, mysqli_result $addressList, $addressProviderList, $user_id){?>
     <div id="status" class="t_form" style="">
         <div class="bg">
             <a href="/admin">Главная</a>
@@ -845,13 +876,45 @@ function setAddress($providerInfo){?>
             > Сопоставить адреса
         </div>
     </div>
-    <table class="t_table" style="margin-top: 15px">
-        <tbody>
-        <tr>
-            <td>Адрес сайта</td>
-            <td>Адрес сайта</td>
-        </tr>
-        </tbody>
-    </table>
+    <form method="post" action="/admin/?view=providers&act=set_address&id=<?=$_GET['id']?>">
+        <table class="t_table" style="margin-top: 15px">
+            <thead>
+                <tr>
+                    <th>Адрес сайта</th>
+                    <th>Адрес сайта <?=$providerInfo['title']?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?foreach($addressProviderList as $providerAddress){?>
+                <tr>
+                    <td label="Адрес сайта <?=$providerInfo['title']?>">
+                        <select name="address_site_id[]">
+                            <option value="">...ничего не выбрано</option>
+                            <?foreach($addressList as $address){
+                                $selected = $address['address_provider_id'] == $providerAddress['id'] ? 'selected' : ''?>
+                                <option <?=$selected?> value="<?=$address['address_site_id']?>">
+                                    <?=\core\UserAddress::getString(
+                                        $address['id'],
+                                        json_decode($address['json'], true)
+                                    )?>
+                                </option>
+                            <?}?>
+                        </select>
+                    </td>
+                    <td label="Адрес сайта">
+                        <input type="hidden" name="user_id[]" value="<?=$user_id?>">
+                        <input type="hidden" value="<?=$providerAddress['id']?>" name="address_provider_id[]">
+                        <span><?=$providerAddress['address']?></span>
+                    </td>
+                </tr>
+            <?}?>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="Сохранить">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
 <?}?>
 

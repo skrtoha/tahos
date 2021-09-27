@@ -1,5 +1,7 @@
 <?php
 namespace core;
+use core\Provider\Rossko;
+
 abstract class Provider{
 	private static $ignoreProvidersForMarkups = [18, 14];
 	private static $counterDaysDelivery;
@@ -7,6 +9,14 @@ abstract class Provider{
 	public static $todayIssue;
 
 	protected abstract static function getItemsToOrder(int $provider_id);
+    
+    public static function getProviderAddressList($provider_id){
+        $output = "";
+        switch ($provider_id){
+            case 15: $output = Rossko::getAddressList();
+        }
+        return $output;
+    }
 
 	public static function getProviderTitle($provider_id){
 		$providers = self::get();

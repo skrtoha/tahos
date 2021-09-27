@@ -21,8 +21,19 @@ class Rossko extends Provider{
 		)
 	);
 
-
-	private static function isActivatedPrivate(){
+    public static function getAddressList(){
+        $checkoutDetails = self::getCheckoutDetails();
+        $output = [];
+        foreach($checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address as $value){
+            $output[] = [
+                'id' => $value->id,
+                'address' => "$value->city, $value->street, $value->house, $value->office"
+            ];
+        }
+        return $output;
+    }
+    
+    private static function isActivatedPrivate(){
 		$params = json_decode(\core\Setting::get('api_settings', self::getParams()->provider_id));
 		if ($params->private->isActive) return true;
 		else return false;
@@ -298,8 +309,10 @@ class Rossko extends Provider{
 		if (!$checkoutDetails){
 			$checkoutDetails = self::getCheckoutDetails('private');
 			if (!$checkoutDetails) die("Ошибка получения checkoutDetails. Подробности в логе.");
-		} 
-		$payment_id = $typeOrganization == 'private' ? 2 : 1;
+		}
+        $array = explode('-', $parts[0]['comment']);
+        $orderInfo = OrderValue::getOrderInfo($array[0], 15, '');
+		$payment_id = $orderInfo['pay_type'] == 'Безналичный' ? 1 : 2;
 		
 		$soap  = self::getSoap('GetCheckout');
 		if (!$soap){
@@ -309,19 +322,27 @@ class Rossko extends Provider{
 			]);
 			return false;
 		}
+        
+        $delivery = [];
+        if ($orderInfo['delivery'] == 'Доставка'){
+            $delivery['delivery_id'] = '000000002';
+            $delivery['address_id'] = $orderInfo['address_provider_id'];
+        }
+        else $delivery = [
+            'delivery_id' => '000000001',
+            'city' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->city,
+            'street' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->street,
+            'house' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->house,
+            'office' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->office
+        ];
 
 		$param = array(
 			'KEY1' => self::getParams('private')->KEY1,
 			'KEY2' => self::getParams('private')->KEY2,
-			'delivery' => array(
-				'delivery_id' => '000000001',
-				'city' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->city,
-				'street' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->street,
-				'house' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->house,
-				'office' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->office
-			),
+			'delivery' => $delivery,
 			'payment' => array(
 				'payment_id' => $payment_id,
+                'requisite_id' => $checkoutDetails->CheckoutDetailsResult->CompanyList->company->id,
 				'company_name' => $checkoutDetails->CheckoutDetailsResult->CompanyList->company->name,
 				'company_requisite' => $checkoutDetails->CheckoutDetailsResult->CompanyList->company->requisite
 			),

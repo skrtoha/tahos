@@ -304,7 +304,7 @@ class Autopiter extends Provider{
 		];
 		foreach($clients as $client){
 			$res = $client->MakeOrderFromBasket();
-			$itemCart = & $res->Items->ResponseCodeItemCart;
+			$itemCart = & $res->MakeOrderFromBasketResult->Items->ResponseCodeItemCart;
 			if (!$itemCart) return false;
 			if (is_array($itemCart)){
 				foreach($itemCart as $ic) self::parseSendOrderItemCart($ic);

@@ -199,6 +199,7 @@ $(function() {
 		data += '&email=' + $('#email').val();
 		data += '&telefon=' + $('#phone').val();
 		data += '&adres=' + $('#address').val();
+        data += '&pay_type=' + $('#pay_type').val();
 		if (!$('#additional-functions').is(':checked')) {
 			data += '&currency_id=1';
 		} else {

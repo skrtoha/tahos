@@ -417,12 +417,12 @@ $noReturnIsExists = false;
                     <div class="left">Выберите способ оплаты</div>
                     <div class="right">
                         <label>
-                            <?$checked = $user['pay_type'] == 'наличный' ? 'checked' : ''?>
+                            <?$checked = $user['pay_type'] == 'Наличный' ? 'checked' : ''?>
                             <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
                             <span>Наличный</span>
                         </label>
                         <label>
-                            <?$checked = $user['pay_type'] == 'безналичный' ? 'checked' : ''?>
+                            <?$checked = $user['pay_type'] == 'Безналичный' ? 'checked' : ''?>
                             <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
                             <span>Безналичный</span>
                         </label>

@@ -32,7 +32,7 @@ $firstElement = true;?>
 	</tr>
 	<?$firstElement = false;?>
 <?}
-$searchVin = $db->select('search_vin', '*', "`user_id` = {$_POST['user_id']}", 'date', 'desc', "0, 10");
+$searchVin = $db->select('search_vin', '*', "`user_id` = {$_POST['user_id']}", 'date', false, "0, 10");
 if (!empty($searchVin)){
     foreach($searchVin as $row){?>
         <tr>

@@ -312,7 +312,7 @@ class Rossko extends Provider{
 		}
         $array = explode('-', $parts[0]['comment']);
         $orderInfo = OrderValue::getOrderInfo($array[0], 15, '');
-		$payment_id = $orderInfo['pay_type'] == 'Безналичный' ? 1 : 2;
+        $payment_id = $typeOrganization == 'private' ? 2 : 1;
 		
 		$soap  = self::getSoap('GetCheckout');
 		if (!$soap){

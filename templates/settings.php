@@ -71,6 +71,19 @@ $res_user_socials = $db->query("
 		</form>				
 		<h3 style="margin-top: 40px">Способ доставки</h3>
 		<form action="" id="delivery">
+            <div class="input-wrap">
+                <label for="pay_type">
+                    Способ оплаты:
+                </label>
+                <select id="pay_type">
+                    <option <?=$user['pay_type'] == 'Наличный' ? 'selected' : ''?> value="Наличный">
+                        Наличный
+                    </option>
+                    <option <?=$user['pay_type'] == 'Безналичный' ? 'selected' : ''?> value="Безналичный">
+                        Безналичный
+                    </option>
+                </select>
+            </div>
 			<div class="input-wrap">
 				<label for="delivery-way">
 					Выбранный способ:

@@ -140,11 +140,15 @@ function rememberUserSearch(item_id){
 
 function handlePressedEnterSearch(){
 	let $elem = $('div.search tr.active');
-	if ($elem.size()){
+	if ($elem.length){
 		rememberUserSearch($elem.attr('item_id'));
 		return document.location.href = $elem.find('a').attr('href');
 	} 
-	else return document.location.href = '/search/article/' + $('input[name=search_input]').val();
+	else{
+        let val = $('input[name=search_input]').val();
+        if (!val) val = '9091901122';
+        return document.location.href = '/search/article/' + val;
+    }
 }
 function selectItemByKey(event){
 	let $input = $(event.target);
@@ -471,9 +475,6 @@ $(function() {
 		$(".overlay").addClass("none_bg");
 		$(".h_overlay, .overlay").show();
 		$("header .search").addClass("show");
-	})
-	$('div.search > form').on('submit', function(e){
-		e.preventDefault();
 	})
 	$("button.search_btn").click(function(e){
 		return handlePressedEnterSearch();

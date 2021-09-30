@@ -654,6 +654,7 @@ function user_orders(){
 	";
 	$res_orders_values = $db->query($query, '');
 	?>
+    <div id="total">Всего: <?=$all?></div>
 	<input type="hidden" id="user_id" value="<?=$id?>">
     <table class="t_table" cellspacing="1">
         <tr class="head">

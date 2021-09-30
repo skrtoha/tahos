@@ -20,7 +20,8 @@ if (!isset($_GET['tab'])){
 			'6' => 1,
 			'7' => 1,
 			'8' => 1,
-			'11' => 1
+			'11' => 1,
+            '12' => 1
 		]
 	];
 } 
@@ -266,6 +267,10 @@ $orders = get_order_group($params, '');
 												$summ = 0?>
 												<span class="status-col status-block status-return">Нет в наличии</span>
 												<?break;
+                                            case 'Отменен клиентом':
+                                                $summ = 0?>
+                                                <span class="status-col status-block status-return">Отменен клиентом</span>
+                                                <?break;
 											case 'На отправке':
 												$summ = $order['arrived'] * $order['price'];?>
 												На отправке
@@ -353,7 +358,8 @@ $orders = get_order_group($params, '');
 														<i class="fa fa-rub" aria-hidden="true"></i>
 													<?}
 													break;
-												case 'Нет в наличии':?>
+												case 'Нет в наличии':
+                                                case 'Отменен клиентом':?>
 													<span class="crossedout"><?=$order['price'] * $order['quan']?></span>
 													<span class="new_price">0 <i class="fa fa-rub" aria-hidden="true"></i></span>
 													<?break;

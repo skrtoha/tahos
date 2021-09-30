@@ -603,8 +603,8 @@ function show_form($act){
 	</div>
 <?}
 function user_orders(){
+    require_once('templates/pagination.php');
 	global $status, $db, $page_title;
-	if (!empty($_POST['income'])) setIncome($_POST['income']);
 	$id = $_GET['id'];
 	$user = $db->select_one('users', ['name_1', 'name_2', 'name_3'], "`id`=$id");
 	$status = "
@@ -615,16 +615,16 @@ function user_orders(){
 		</a> >
 	";
 	$where = "o.user_id=$id";
-	if (!isset($_GET['income'])){
-		$page_title = 'Заказы пользователя';
-		$status .= $page_title;
-	}
-	else{
-		$page_title = "Пришло";
-		$status .= '<a href="/admin/?view=orders&act=user_orders&id='.$_GET['id'].'">Заказы пользвателя</a> > ';
-		$status .= $page_title;
-		$where .= " AND ov.status_id=3";
-	}
+    $page_title = 'Заказы пользователя';
+    $status .= $page_title;
+    
+    $all = $db->getCount('orders_values', "`user_id` = $id");
+    $perPage = core\Setting::get('items', 'perPage');
+    $linkLimit = core\Setting::get('items', 'linkLimit');
+    $page = $_GET['page'] ?: 1;
+    $chank = getChank($all, $perPage, $linkLimit, $page);
+    $start = $chank[$page] ?: 0;
+    
 	$query = "
 		SELECT
 			ps.cipher,
@@ -649,58 +649,54 @@ function user_orders(){
 		WHERE
 			$where
 		ORDER BY o.created DESC
+        LIMIT
+			$start,$perPage
 	";
 	$res_orders_values = $db->query($query, '');
 	?>
 	<input type="hidden" id="user_id" value="<?=$id?>">
-	<form action="" method="post">
-		<table class="t_table" cellspacing="1">
-			<tr class="head">
-				<td>Поставщик</td>
-				<td>Бренд</td>
-				<td>Артикул</td>
-				<td>Наименование</td>
-				<td>Цена</td>
-				<td>Кол-во</td>
-				<td>Сумма</td>
-				<td>Комментарий</td>
-				<td>№ заказа</td>
-				<td>Дата</td>
-				<td>Статус</td>
-				<?if (isset($_GET['income'])){?>
-					<td></td>
-				<?}?>
-			</tr>
-			<?if (!$res_orders_values->num_rows){?>
-				<td colspan="12">Заказов пользователя не найдено</td>
-			<?}
-			else{
-				while ($v = $res_orders_values->fetch_assoc()){?>
-					<tr class="status_<?=$v['class']?>">
-						<td label="Поставщик"><?=$v['cipher']?></td>
-						<td label="Бренд"><?=$v['brend']?></td>
-						<td label="Артикул"><?=$v['article']?></td>
-						<td label="Наименование"><?=$v['title_full']?></td>
-						<td label="Цена"><span class="price_format"><?=$v['price']?></span></td>
-						<td label="Кол-во"><?=$v['quan']?></td>
-						<td label="Сумма"><span class="price_format"><?=$v['price'] * $v['quan']?></span></td>
-						<td label="Комментарий"><?=$v['comment']?></td>
-						<td label="№ заказа"><a href="?view=orders&id=<?=$v['order_id']?>&act=change"><?=$v['order_id']?></a></td>
-						<td label="Дата"><?=$v['created']?></td>
-						<td label="Статус" class="change_status"><?=$v['status']?></td>
-						<?if (isset($_GET['income'])){?>
-							<td label=""><input type="checkbox" name="income[]" value="<?=$v['order_id']?>:<?=$v['item_id']?>"></td>
-						<?}?>
-					</tr>
-				<?}
-			}?>
-			<?if (isset($_GET['income'])){?>
-				<tr>
-					<td style="text-align: right" colspan="12"><input  type="submit" value="Отправлено"></td>
-				</tr>
-			<?}?>
-		</table>
-	</form>
+    <table class="t_table" cellspacing="1">
+        <tr class="head">
+            <td>Поставщик</td>
+            <td>Бренд</td>
+            <td>Артикул</td>
+            <td>Наименование</td>
+            <td>Цена</td>
+            <td>Кол-во</td>
+            <td>Сумма</td>
+            <td>Комментарий</td>
+            <td>№ заказа</td>
+            <td>Дата</td>
+            <td>Статус</td>
+            <?if (isset($_GET['income'])){?>
+                <td></td>
+            <?}?>
+        </tr>
+        <?if (!$res_orders_values->num_rows){?>
+            <td colspan="12">Заказов пользователя не найдено</td>
+        <?}
+        else{
+            while ($v = $res_orders_values->fetch_assoc()){?>
+                <tr class="status_<?=$v['class']?>">
+                    <td label="Поставщик"><?=$v['cipher']?></td>
+                    <td label="Бренд"><?=$v['brend']?></td>
+                    <td label="Артикул"><?=$v['article']?></td>
+                    <td label="Наименование"><?=$v['title_full']?></td>
+                    <td label="Цена"><span class="price_format"><?=$v['price']?></span></td>
+                    <td label="Кол-во"><?=$v['quan']?></td>
+                    <td label="Сумма"><span class="price_format"><?=$v['price'] * $v['quan']?></span></td>
+                    <td label="Комментарий"><?=$v['comment']?></td>
+                    <td label="№ заказа"><a href="?view=orders&id=<?=$v['order_id']?>&act=change"><?=$v['order_id']?></a></td>
+                    <td label="Дата"><?=$v['created']?></td>
+                    <td label="Статус" class="change_status"><?=$v['status']?></td>
+                    <?if (isset($_GET['income'])){?>
+                        <td label=""><input type="checkbox" name="income[]" value="<?=$v['order_id']?>:<?=$v['item_id']?>"></td>
+                    <?}?>
+                </tr>
+            <?}
+        }?>
+    </table>
+    <?pagination($chank, $page, ceil($all / $perPage), $href = "?view=orders&act=user_orders&id=$id&page=");?>
 <?}
 function items_status(array $params = []){
 	extract($params);

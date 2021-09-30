@@ -325,7 +325,7 @@ switch ($params[0]){
                     $logger->warning("Ошибка:" . $e->getMessage());
                     $logger->info("Попытка обработки файла другим способом....");
                     parseWithPhpOffice($workingFile, $debuggingMode, $logger);
-                    endSuccessfullyProccessing($price->isLogging, $logger);
+                    endSuccessfullyProccessing($price->isLogging, $logger, $params[1]);
                     break 2;
                 }
                 foreach ($reader->getSheetIterator() as $sheet) {

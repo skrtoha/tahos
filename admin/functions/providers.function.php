@@ -230,23 +230,23 @@ function parse_row($row, $fields, core\Price $price, $stringNumber){
 		'row' => $stringNumber
 	]);
 }
-function endSuccessfullyProccessing($isLogging, Logger $logger){
+function endSuccessfullyProccessing($isLogging, Logger $logger, $store_id){
 	global $db, $price, $stringNumber;
-	$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$_GET['store_id']}", '');
+	$db->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE `id`={$store_id}", '');
 
-		$price->setLog('alert', "Обработано $stringNumber строк");
-		$price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
-		$price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
-        $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
-		
-		$logger->alert("Обработано $stringNumber строк");
-		$logger->alert("Добавлено в прайс: {$price->insertedStoreItems} записей");
-		$logger->alert("Вставлено: $price->insertedBrends брендов");
-		$logger->alert("Вставлено: $price->insertedItems номенклатуры");
-		
-		if ($isLogging){
-		    $logger->info("Полный лог: $price->nameFileLog");
-        }
+    $price->setLog('alert', "Обработано $stringNumber строк");
+    $price->setLog('alert', "Добавлено в прайс: $price->insertedStoreItems записей");
+    $price->setLog('alert', "Вставлено: $price->insertedBrends брендов");
+    $price->setLog('alert', "Вставлено: $price->insertedItems номенклатуры");
+    
+    $logger->alert("Обработано $stringNumber строк");
+    $logger->alert("Добавлено в прайс: {$price->insertedStoreItems} записей");
+    $logger->alert("Вставлено: $price->insertedBrends брендов");
+    $logger->alert("Вставлено: $price->insertedItems номенклатуры");
+    
+    if ($isLogging){
+        $logger->info("Полный лог: $price->nameFileLog");
+    }
 }
 function parseWithPhpOffice($workingFile, $debuggingMode, Logger $logger){
 	global $emailPrice, $price, $stringNumber;

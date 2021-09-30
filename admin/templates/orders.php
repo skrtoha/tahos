@@ -1,8 +1,9 @@
 ﻿<?php
 use core\Provider;
 use core\OrderValue;
-//SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
-// require_once('functions/')
+
+/* @var $db \core\Database */
+
 $act = $_GET['act'];
 $id = $_GET['id'];
 
@@ -314,7 +315,7 @@ function show_form($act){
                         </select>
                     <?}
                     else{
-                        if ($order['address_id']){?>
+                        if ($order['address_id'] && $order['json']){?>
                             <?=\core\UserAddress::getString(
                                 $order['address_id'],
                                 json_decode($order['json'], true)

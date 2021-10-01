@@ -25,7 +25,7 @@ function addItemDiffHtml(type, items){
 			let selected2 = itemInfo.status == '2' ? 'selected' : '';
 			strHtml += `
 				<td label="Статус">
-					<form>
+					<form class="status">
 						<input type="hidden" name="act" value="analogies">
 						<input type="hidden" name="view" value="items">
 						<input type="hidden" name="item_id" value="${$('#clearItemDiff').attr('item_id')}">
@@ -509,7 +509,7 @@ $(function(){
 	$(document).on('change', '#itemDiff select[name=status]', function(){
 		$(this).closest('form').submit();
 	})
-    $('form.status').on('submit', function(e){
+    $(document).on('submit', 'form.status', function(e){
         e.preventDefault();
         const $form = $(this).closest('form');
         $.ajax({

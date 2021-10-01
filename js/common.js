@@ -138,16 +138,17 @@ function rememberUserSearch(item_id){
 	})
 }
 
-function handlePressedEnterSearch(){
+function handlePressedEnterSearch(event){
+    event.preventDefault();
 	let $elem = $('div.search tr.active');
 	if ($elem.length){
 		rememberUserSearch($elem.attr('item_id'));
-		return document.location.href = $elem.find('a').attr('href');
+		document.location.href = $elem.find('a').attr('href');
 	} 
 	else{
         let val = $('input[name=search_input]').val();
         if (!val) val = '9091901122';
-        return document.location.href = '/search/article/' + val;
+        document.location.href = '/search/article/' + val;
     }
 }
 function selectItemByKey(event){
@@ -477,7 +478,7 @@ $(function() {
 		$("header .search").addClass("show");
 	})
 	$("button.search_btn").click(function(e){
-		return handlePressedEnterSearch();
+		return handlePressedEnterSearch(e);
 	});
 	$(".login_btn").click(function(){
 		$('.overlay').click();

@@ -335,6 +335,9 @@ $(function(){
 		return false;
 	})
     $('tr[order_id][store_id]').on('click', function(e){
+        if ($(e.target).hasClass('message')) return;
+        if ($(e.target).hasClass('cancel_comment')) return;
+        if ($(e.target).hasClass('comment-btn')) return;
         if ($(e.target).attr('store_id')) return;
         document.location.href = '/order/' + $(this).attr('order_id');
     })

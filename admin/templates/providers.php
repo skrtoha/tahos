@@ -157,10 +157,11 @@ switch ($act) {
 		header("Location: {$_SERVER['HTTP_REFERER']}");
 		break;
     case 'set_address':
-        $page_title = 'Сопоставить адреса доставки';
-        $user_id = 3;
+        $params = [];
+        $params['page_title'] = 'Сопоставить адреса доставки';
+        $params['user_id'] = $_GET['user_id'] ?? $_GET['user_id'];
         if (!empty($_POST)){
-            $db->delete('provider_addresses', "`provider_id` = {$_GET['id']} AND `user_id` = $user_id");
+            $db->delete('provider_addresses', "`provider_id` = {$_GET['id']} AND `user_id` = {$params['user_id']}");
             $countPost = count($_POST['address_provider_id']);
             for($i = 0; $i < $countPost; $i++){
                 if (!$_POST['address_site_id'][$i]) continue;
@@ -173,22 +174,28 @@ switch ($act) {
             }
         }
         $providers = Provider::get();
-        $providerInfo = $providers[$_GET['id']];
-        $addressList = $db->query("
-            SELECT
-                ua.id AS address_site_id,
-                ua.user_id,
-                ua.json,
-                pa.address_provider_id
-            from
-                #user_addresses ua
-            left join
-                #provider_addresses pa ON pa.user_id = ua.user_id AND ua.id = pa.address_site_id
-            where
-                ua.user_id = $user_id
+        $params['providerInfo'] = $providers[$_GET['id']];
+        $params['addressProviderList'] = Provider::getProviderAddressList($_GET['id']);
+        if ($params['user_id']){
+            $res_user = \core\User::get(['user_id' => $params['user_id']]);
+            $params['userInfo'] = $res_user->fetch_assoc();
+            $params['page_title'] = " для {$params['userInfo']['full_name']}";
+            $params['addressList'] = $db->query("
+                SELECT
+                    ua.id AS address_site_id,
+                    ua.user_id,
+                    ua.json,
+                    pa.address_provider_id
+                from
+                    #user_addresses ua
+                left join
+                    #provider_addresses pa ON pa.user_id = ua.user_id AND ua.id = pa.address_site_id
+                where
+                    ua.user_id = {$params['user_id']}
         ", '');
-        $addressProviderList = Provider::getProviderAddressList($_GET['id']);
-        setAddress($providerInfo, $addressList, $addressProviderList, $user_id);
+        }
+        else $userInfo = [];
+        setAddress($params);
         break;
     default:
 		view();
@@ -866,55 +873,60 @@ function itemsToOrder(){
 	</table>
 	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
 <?}
-function setAddress($providerInfo, mysqli_result $addressList, $addressProviderList, $user_id){?>
+function setAddress($params){?>
     <div id="status" class="t_form" style="">
         <div class="bg">
             <a href="/admin">Главная</a>
             &gt; Настройки &gt;
             <a href="?view=settings&amp;act=providers">Настройки поставщиков</a>
-            > <a href="/admin/?view=providers&act=provider&id=<?=$_GET['id']?>"><?=$providerInfo['title']?></a>
-            > Сопоставить адреса
+            > <a href="/admin/?view=providers&act=provider&id=<?=$_GET['id']?>"><?=$params['providerInfo']['title']?></a>
+            > Сопоставить адреса <?=isset($params['userInfo']) ? ' для '.$params['userInfo']['full_name'] : ''?>
         </div>
     </div>
-    <form method="post" action="/admin/?view=providers&act=set_address&id=<?=$_GET['id']?>">
-        <table class="t_table" style="margin-top: 15px">
-            <thead>
+
+    <input class="intuitive_search" type="text" name="items" value="" placeholder="Выбрать пользователя" required>
+    
+    <?if ($params['userInfo']['id']){?>
+        <form method="post" action="/admin/?view=providers&act=set_address&id=<?=$_GET['id']?>">
+            <table class="t_table" style="margin-top: 15px">
+                <thead>
                 <tr>
                     <th>Адрес сайта</th>
-                    <th>Адрес сайта <?=$providerInfo['title']?></th>
+                    <th>Адрес сайта <?=$params['providerInfo']['title']?></th>
                 </tr>
-            </thead>
-            <tbody>
-            <?foreach($addressProviderList as $providerAddress){?>
+                </thead>
+                <tbody>
+                <?foreach($params['addressProviderList'] as $providerAddress){?>
+                    <tr>
+                        <td label="Адрес сайта <?=$params['providerInfo']['title']?>">
+                            <select name="address_site_id[]">
+                                <option value="">...ничего не выбрано</option>
+                                <?foreach($params['addressList'] as $address){
+                                    $selected = $address['address_provider_id'] == $providerAddress['id'] ? 'selected' : ''?>
+                                    <option <?=$selected?> value="<?=$address['address_site_id']?>">
+                                        <?=\core\UserAddress::getString(
+                                            $address['id'],
+                                            json_decode($address['json'], true)
+                                        )?>
+                                    </option>
+                                <?}?>
+                            </select>
+                        </td>
+                        <td label="Адрес сайта">
+                            <input type="hidden" name="user_id[]" value="<?=$params['userInfo']['id']?>">
+                            <input type="hidden" value="<?=$providerAddress['id']?>" name="address_provider_id[]">
+                            <span><?=$providerAddress['address']?></span>
+                        </td>
+                    </tr>
+                <?}?>
                 <tr>
-                    <td label="Адрес сайта <?=$providerInfo['title']?>">
-                        <select name="address_site_id[]">
-                            <option value="">...ничего не выбрано</option>
-                            <?foreach($addressList as $address){
-                                $selected = $address['address_provider_id'] == $providerAddress['id'] ? 'selected' : ''?>
-                                <option <?=$selected?> value="<?=$address['address_site_id']?>">
-                                    <?=\core\UserAddress::getString(
-                                        $address['id'],
-                                        json_decode($address['json'], true)
-                                    )?>
-                                </option>
-                            <?}?>
-                        </select>
-                    </td>
-                    <td label="Адрес сайта">
-                        <input type="hidden" name="user_id[]" value="<?=$user_id?>">
-                        <input type="hidden" value="<?=$providerAddress['id']?>" name="address_provider_id[]">
-                        <span><?=$providerAddress['address']?></span>
+                    <td colspan="2">
+                        <input type="submit" value="Сохранить">
                     </td>
                 </tr>
-            <?}?>
-            <tr>
-                <td colspan="2">
-                    <input type="submit" value="Сохранить">
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </form>
+                </tbody>
+            </table>
+        </form>
+    <?}?>
 <?}?>
 

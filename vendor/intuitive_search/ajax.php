@@ -145,27 +145,43 @@ switch($_GET['tableName']){
 				</li>";
 		}
 		break;
-		case 'provider_stores':
-			$res_provider_stores = $db->query("
-				SELECT
-					ps.id,
-					ps.cipher,
-					ps.title
-				FROM
-					#provider_stores ps
-				WHERE
-					ps.cipher LIKE '%{$_GET['value']}%' OR ps.title LIKE '%{$_GET['value']}%'
-				LIMIT
-					0, {$_GET['maxCountResults']}
-				", '');
-				foreach($res_provider_stores as $ps){
-					$output .= "
-						<li>
-							<a store_id=\"{$ps['id']}\" class=\"provider_store\" href=\"#\">
-								{$ps['cipher']} - {$ps['title']}
-							</a>
-						</li>";
-				}
-			break;
+    case 'provider_stores':
+        $res_provider_stores = $db->query("
+            SELECT
+                ps.id,
+                ps.cipher,
+                ps.title
+            FROM
+                #provider_stores ps
+            WHERE
+                ps.cipher LIKE '%{$_GET['value']}%' OR ps.title LIKE '%{$_GET['value']}%'
+            LIMIT
+                0, {$_GET['maxCountResults']}
+            ", '');
+            foreach($res_provider_stores as $ps){
+                $url =
+                $output .= "
+                    <li>
+                        <a store_id=\"{$ps['id']}\" class=\"provider_store\" href=\"#\">
+                            {$ps['cipher']} - {$ps['title']}
+                        </a>
+                    </li>";
+            }
+        break;
+    case 'users':
+        $res_users = \core\User::get([
+            'full_name' => $_GET['value'],
+            'limit' => "0, {$_GET['maxCountResults']}"
+        ]);
+        $url = "/admin/?view=providers&act=set_address&id={$_GET['additionalConditions']['provider_id']}";
+        foreach($res_users as $user){
+            $output .= "
+                <li>
+                    <a href=\"{$url}&user_id={$user['id']}\">
+                        {$user['full_name']}
+                    </a>
+                </li>";
+        }
+        break;
 }
 echo $output;

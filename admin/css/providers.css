@@ -4,11 +4,20 @@
 #actions{
 	margin-bottom: 10px;
 }
+.intuitiveSearch_wrap{
+    margin-top: 10px;
+}
+input.intuitive_search {
+    text-overflow: ellipsis;
+}
 tr.store{
 	cursor: pointer;
 }
 form input[type=submit]{
 	margin: 0 auto;
+}
+#contents{
+    margin-top: 25px;
 }
 tr.dayOff {
     color: red;

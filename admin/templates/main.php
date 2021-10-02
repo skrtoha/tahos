@@ -153,7 +153,8 @@ use admin\functions\LeftMenu;
 			'brends',
 			'goods_arrival',
 			'users',
-			'category'
+			'category',
+            'providers'
 		];
 		if (in_array($view, $arrayIntuitiveSearch)){?>
 			{"src" : "/vendor/intuitive_search/script.js", "async" : false},

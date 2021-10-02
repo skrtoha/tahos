@@ -25,10 +25,10 @@
 		},
 		getResults: function(params){
 			let self = this;
-			if (params.event.keyCode == 38 || params.event.keyCode == 40){
+			if (params.event.keyCode === 38 || params.event.keyCode === 40){
 				return self.selectItemByKey(params.event);
 			}
-			if (params.event.keyCode == 13){
+			if (params.event.keyCode === 13){
 				return self.applyEnterPressing(params.event);
 			}
 			let minLength = typeof params.minLength != 'undefined' ? params.minLength : self.defaultParams.minLength;

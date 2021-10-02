@@ -133,6 +133,21 @@ function set_empty_store(){
 	}
 }
 $(function(){
+    $('input.intuitive_search').on('keyup focus', function(e){
+        e.preventDefault();
+        let val = $(this).val();
+        let minLength = 1;
+        val = val.replace(/[^\wа-яА-Я]+/gi, '');
+        intuitive_search.getResults({
+            event: e,
+            value: val,
+            minLength: minLength,
+            tableName: 'users',
+            additionalConditions: {
+                provider_id: getParams().id
+            }
+        });
+    });
 	$(document).on('click', '[type=checkbox][name*=isWorkDay]', function(){
 		let th = $(this);
 		if (!th.is(':checked')){

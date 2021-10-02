@@ -38,6 +38,8 @@ class User{
 	public static function get($params = []){
 		$db = $GLOBALS['db'];
 		$where = '';
+        $having = '';
+        $limit = '';
 		if (!empty($params)){
 			if (isset($params['user_id']) && !$params['user_id']) return [
 				'markup' => 0,
@@ -50,13 +52,19 @@ class User{
 				switch($key){
 					case 'user_id': $where .= "u.id = {$value} AND "; break;
 					case 'withWithdraw': $where .= "u.bill < 0 AND "; break;
+                    case 'full_name': $having .= "full_name LIKE '%{$value}%' AND "; break;
+                    case 'limit': $limit = "LIMIT $value"; break;
 				}
 			}
 			if ($where){
 				$where = substr($where, 0, -5);
 				$where = "WHERE $where";
-			} 
-		}
+			}
+            if ($having){
+                $having = substr($having, 0, -5);
+                $having = "HAVING $having";
+            }
+        }
 		$q_user = "
 			SELECT 
 				u.*,
@@ -82,6 +90,8 @@ class User{
 			LEFT JOIN 
 				#organizations_types ot ON ot.id=u.organization_type
 			$where
+			$having
+			$limit
 		";
 		return $db->query($q_user, '');
 	}

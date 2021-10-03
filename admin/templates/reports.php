@@ -124,7 +124,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					c.brend_article
 				ORDER BY
 					cnt DESC
-			", '');
+			", 'result');
 			if (!$res_search->num_rows) return;
 			foreach($res_search as $value) $output[] = [
 				'brend_article' => $value['brend_article'],

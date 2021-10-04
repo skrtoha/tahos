@@ -27,8 +27,8 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				$reports->clearWrongAnalogies();
 				break;
 			}
-			if ($_POST['act'] == 'removeWrongAnalogy'){
-				$reports->removeWrongAnalogy();
+			if ($_POST['act'] == 'hideWrongAnalogy'){
+				$reports->hideWrongAnalogy();
 				break;
 			}
 			$values = $reports->getWrongAnalogies();
@@ -302,7 +302,7 @@ function wrongAnalogy($values){?>
 					<tr>
 						<td><?=$v['text']?></td>
 						<td><?=$v['from']?></td>
-						<td><a class="removeWrongAnalogy" item_id="<?=$v['param1']?>" item_diff="<?=$v['param2']?>" href="">Удалить связку</a></td>
+						<td><a class="hideWrongAnalogy" item_id="<?=$v['param1']?>" item_diff="<?=$v['param2']?>" href="">Скрыть</a></td>
 					</tr>
 				<?}
 			}

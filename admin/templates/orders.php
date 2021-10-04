@@ -573,7 +573,7 @@ function show_form($act){
 									$orders_statuses = get_order_statuses($ov['status_id']);?>
 									<br>новый статус:
 									<select class="change_status" name="status_id">
-									<option value="">...выбрать</option>
+									    <option value="">...выбрать</option>
 										<?foreach($orders_statuses as $order_status){
 											$selected = $ov['status_id'] == $order_status['id'] ? 'selected' : '';?>
 											<option <?=$selected?> value="<?=$order_status['id']?>"><?=$order_status['title']?></option>

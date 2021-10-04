@@ -1,6 +1,6 @@
 <?class Reports{
 	private $tab;
-	public function __construct($tab, $db){
+	public function __construct($tab, \core\Database $db){
 		$this->db = $db;
 		$this->tab = $tab;
 	}
@@ -73,9 +73,17 @@
 	public function clearWrongAnalogies(){
 		return $this->db->delete('log_diff', "`type`='wrongAnalogy'");
 	}
-	public function removeWrongAnalogy(){
+	public function hideWrongAnalogy(){
 		$this->db->delete('log_diff', "`type`='wrongAnalogy' AND `param1`={$_POST['item_id']} AND `param2`={$_POST['item_diff']}");
-		$this->db->delete('analogies', "`item_id`={$_POST['item_id']} AND `item_diff`={$_POST['item_diff']}");
-		$this->db->delete('analogies', "`item_id`={$_POST['item_diff']} AND `item_diff`={$_POST['item_id']}");
+		$this->db->update(
+            'analogies',
+            ['status' => 2],
+            "`item_id`={$_POST['item_id']} AND `item_diff`={$_POST['item_diff']}"
+        );
+        $this->db->update(
+            'analogies',
+            ['status' => 2],
+            "`item_id`={$_POST['item_diff']} AND `item_diff`={$_POST['item_id']}"
+        );
 	}
 }?>

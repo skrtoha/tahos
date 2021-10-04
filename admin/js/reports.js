@@ -47,7 +47,7 @@ $(function(){
 					}
 				})
 			})
-			$(document).on('click', '.removeWrongAnalogy', function(e){
+			$(document).on('click', '.hideWrongAnalogy', function(e){
 				e.preventDefault();
 				if (!confirm('Вы уверены?')) return false;
 				var th = $(this);
@@ -56,7 +56,7 @@ $(function(){
 					url: reports.ajaxUrl,
 					data:{
 						tab: reports.tab,
-						act: 'removeWrongAnalogy',
+						act: 'hideWrongAnalogy',
 						item_id: th.attr('item_id'),
 						item_diff: th.attr('item_diff')
 					},

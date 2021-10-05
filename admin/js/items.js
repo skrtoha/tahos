@@ -14,6 +14,11 @@ function addItemDiffHtml(type, items){
 						${itemInfo.article}
 					</a>
 				</td>
+				<td label="Кат. номер">
+					<a target="blank" href="?view=items&act=item&id=${itemInfo.item_id}">
+						${itemInfo.article_cat}
+					</a>
+				</td>
 				<td label="Название">${itemInfo.title_full}</td>
 				<td label="Штрих-код">${itemInfo.barcode}</td>
 		`;

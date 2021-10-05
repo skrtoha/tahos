@@ -401,6 +401,7 @@ class Item{
 			i.id AS item_id,
 			b.title AS brend,
 			i.article,
+            i.article_cat,
 			i.title_full,
 			ib.barcode,
 			$analogiesFields

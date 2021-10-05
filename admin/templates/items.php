@@ -688,6 +688,7 @@ function itemDiff($type){
 		<tr class="head">
 			<td>Бренд</td>
 			<td>Артикул</td>
+            <td>Кат. номер</td>
 			<td>Название</td>
 			<td>Штрих-код</td>
 			<?if ($type == 'analogies'){?>
@@ -703,6 +704,9 @@ function itemDiff($type){
 					<td label="Артикул">
 						<a target="blank" href="?view=items&act=item&id=<?=$value['item_id']?>"><?=$value['article']?></a>
 					</td>
+                    <td label="Кат. номер">
+                        <a target="blank" href="?view=items&act=item&id=<?=$value['item_id']?>"><?=$value['article_cat']?></a>
+                    </td>
 					<td label="Название"><?=$value['title_full']?></td>
 					<td label="Штрих-код"><?=$value['barcode']?></td>
 					<?if ($type == 'analogies'){?>

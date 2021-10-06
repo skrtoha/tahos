@@ -133,9 +133,11 @@ $(function(){
 				url: '/ajax/parts-catalogs.php',
 				data: data,
 				success: function(res){
+                    if (isProccessedGarage) return;
                     isProccessedGarage = true;
+                    let added = res === 'is_garaged' ? 'added' : '';
 					$h1.prepend(`
-						<div id="to_garage">
+						<div id="to_garage" class="${added}">
 							<button class="${res}" title="Добавить / Удалить в гараж"></button>
 						</div>
 					`);
@@ -146,12 +148,18 @@ $(function(){
 						$.ajax({
 							type: 'post',
 							url: '/ajax/parts-catalogs.php',
-							data: data,
-							success: function(response){
-								if (data.act == 'addToGarage') $('#to_garage button').addClass('is_garaged');
-								else $('#to_garage button').removeClass('is_garaged');
-							}
-						})
+                            data: data,
+                            success: function(response){
+                                const button = $('#to_garage button');
+                                let added = '';
+                                if (data.act === 'addToGarage'){
+                                    button.addClass('is_garaged');
+                                    added = 'added';
+                                }
+                                else button.removeClass('is_garaged');
+                                button.closest('div').attr('class', added);
+                            }
+                        })
 					})
 				}
 			})

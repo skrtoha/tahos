@@ -11,11 +11,17 @@
 .NwmhI9JCaIQ_ffRS2xDnD{
   margin-bottom: 10px;
 }
-#to_garage {
-    float: left;
+#to_garage{
+    float: right;
+}
+#to_garage::before {
+    content: 'Добавить в гараж';
+    font-size: 15px;
     position: relative;
-    z-index: 1;
-    margin-right: 10px;
+    top: -9px;
+}
+#to_garage.added::before{
+    content: 'Добавлено в гараж'
 }
 #to_garage button {
     background: url(/img/icons/garage_open.png) no-repeat center, #0069a0;

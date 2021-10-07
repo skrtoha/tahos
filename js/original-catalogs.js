@@ -98,39 +98,10 @@ $('.slider').each(function(){
 		});
 	})
 
-$(document).on('submit', '#to_garage__form', function (e){
-    e.preventDefault();
-    let th = $(this);
-    let formData = {};
-    $.each(th.serializeArray(), function(i, item){
-        formData[item.name] = item.value;
-    })
-    $.ajax({
-        type: 'post',
-        url: '/ajax/parts-catalogs.php',
-        data: formData,
-        success: function(response){
-            const button = $('#to_garage button');
-            let added = '';
-            if (formData.act === 'addToGarage'){
-                button.addClass('is_garaged');
-                added = 'added';
-            }
-            else button.removeClass('is_garaged');
-            button.closest('div').attr('class', added);
-            $.magnificPopup.close();
-        }
-    })
-})
-
 $(function(){
     let isProccessedGarage = false;
     let isProccessedVin = false;
-    let href = document.location.href;
-    let isPageVin = /carInfo\?q=/.test(href);
-    href = href.replace(/.*\?/, '');
-
-    const urlParams = new URLSearchParams(href);
+    let isPageVin = false;
 
     let intervalID = setInterval(function(){
         let user_id = + $('input[name=user_id]').val();
@@ -142,6 +113,11 @@ $(function(){
         let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
         if (!$('#to_garage').size()) isProccessedGarage = false;
         if($partsCatalogsNodes.size() && !isProccessedGarage){
+            let href = document.location.href;
+            isPageVin = /carInfo\?q=/.test(href);
+            href = href.replace(/.*\?/, '');
+            const urlParams = new URLSearchParams(href);
+
 			let $h1 = $partsCatalogsNodes.find('h1');
 			let title = $h1.html();
 			title = title.replace(/[^\w ]+/g, '');
@@ -170,62 +146,23 @@ $(function(){
 							<button class="${result.isGaraged}" full_name="${result.userFullName}" title="Добавить / Удалить в гараж"></button>
 						</div>
 					`);
-                    $('#to_garage').on('click',function(){
-                        let th = $(this).find('button');
-                        let act;
-                        if (th.hasClass('is_garaged')) act = 'removeFromGarage';
-                        else act = 'addToGarage';
+                    $('#to_garage').on('click',function(e){
+                        let title = $h1.text();
+                        data.title = title.trim();
 
-                        let title = $('h1.qrVRWcv0QaEBzE2ths3od').text();
-                        title = title.trim();
-                        let year = $('li._1aQVewIy8-bOC25Ti2Wsxl:first-child div._1UgSrnp4JyS_GOucnzUvx9').text();
-                        year = year.trim();
+                        data.year = '';
+                        $.each($('li._1aQVewIy8-bOC25Ti2Wsxl div._1UgSrnp4JyS_GOucnzUvx9'), function(i, item){
+                            let string = $(item).text();
+                            string = string.trim();
+                            if (/^\d{4}$/.test(string)) data.year = string;
+                        })
+
                         let vin = $('#id-vin-frame-search').val();
-                        vin = vin.trim();
+                        data.vin = vin.trim();
 
-                        $.magnificPopup.open({
-                            items: {
-                                src: `
-                                    <div class="wrapper">
-                                        <form id="to_garage__form" action="">
-                                            <table style="margin-top: 20px">
-                                                <tr>
-                                                    <td>Название</td>
-                                                    <td>
-                                                        <input type="text" name="title" value="${title}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Год</td>
-                                                    <td>
-                                                        <input type="text" name="year" value="${year}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Владелец</td>
-                                                    <td>
-                                                        <input type="text" name="owner" value="${result.userFullName}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                        <input type="submit" value="Сохранить">
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                            <input type="hidden" value="${act}" name="act">
-                                            <input type="hidden" value="${user_id}" name="user_id">
-                                            <input type="hidden" value="${title}" name="title">
-                                            <input type="hidden" value="${data.catalogId}" name="catalogId">
-                                            <input type="hidden" value="${data.modelId}" name="modelId">
-                                            <input type="hidden" value="${data.carId}" name="carId">
-                                            <input type="hidden" value="${data.q}" name="q">
-                                        </form>
-                                    </div>
-                                `,
-                                type: 'inline'
-                            }
-                        });
+                        data.userFullName = result.userFullName;
+
+                        eventAddGarage(this, data);
                     })
 				}
 			})

@@ -8,6 +8,17 @@
 .active-tab [modification_id]:hover{
   cursor: pointer;
  }
+.item b{
+    font-weight: 800;
+}
+.mosaic-view .wrapper{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: stretch;
+    justify-content: space-between;
+    align-items: stretch;
+}
 .jspContainer {
   overflow: hidden;
   position: relative;
@@ -4986,15 +4997,10 @@ header .login {
   .items .content {
     margin-top: 20px; }
     .items .content .item {
-      display: inline-block;
-      outline: none;
-      -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      float: left;
-      width: -webkit-calc(50% - 20px);
       width: calc(50% - 20px);
       padding: 20px;
-      margin-right: 20px; }
+    }
       .items .content .item:hover {
         outline: 1px solid #c3c3c3; }
       .items .content .item .img, .items .content .item .description {

@@ -50,6 +50,11 @@ function garage(){
 	if ($res_modifications->num_rows){
 		while($row = $res_modifications->fetch_assoc()){
 			$isFromPartsCatalogs = is_numeric($row['modification_id']);
+            if (!$isFromPartsCatalogs){
+                $array = explode(',', $row['modification_id']);
+                $vin = $array[3];
+            }
+            else $vin = $row['vin'];
 			$array = [
 				'modification_id' => $row['modification_id'],
 				'title_garage' => $row['title_garage'],
@@ -59,7 +64,7 @@ function garage(){
 				'vehicle_id' => $row['vehicle_id'],
 				'title_brend' => $row['title_brend'],
 				'title_model' => $row['title_model'],
-				'vin' => $row['vin'],
+				'vin' => $vin,
 				'year' => $row['year']
 			];
 			if ($row['is_active']) $modifications['active'][] = $array;
@@ -152,75 +157,79 @@ function garage(){
 			<div class="content">
 				<div class="mosaic-view">
 					<div class="active-tab">
-						<?if (empty($modifications['active'])){?>
-							<p class="removable">Активных моделей не найдено</p>
-						<?}
-						else{
-							foreach($modifications['active'] as $value){?>
-								<div class="item" modification_id="<?=$value['modification_id']?>">
-									<a class="model-name" href="#">
-										<?=$value['title_brend']?> <?=$value['title_model']?> <?=$value['title_modification'] ? "{$value['title_modification']}" : ''?>
-									</a>
-									<div class="clearfix"></div>
-									<?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
-										<div class="img">
-											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
-										</div>
-									<?}
-									else{
-										$vehicle_id = is_numeric($value['modification_id']) ? $value['vehicle_id'] : 11;?>
-										<div class="img">
-											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$value['title']?>">
-										</div>
-									<?}?>
-									<div class="description">
-										<div class="parametrs">
-											<p>Имя: <?=$value['title_garage']?></p>
-											<p>VIN: <?=$value['vin']?></p>
-											<p>Год выпуска: <?=$value['year']?></p>
-										</div>
-									</div>
-									<div class="clearfix"></div>
-									<a href="" class="remove-item">Удалить</a>
-								</div>
-							<?}
-						}?>
-						<div class="clearfix"></div>
+                        <div class="wrapper">
+                            <?if (empty($modifications['active'])){?>
+                                <p class="removable">Активных моделей не найдено</p>
+                            <?}
+                            else{
+                                foreach($modifications['active'] as $value){?>
+                                    <div class="item" modification_id="<?=$value['modification_id']?>">
+                                        <a class="model-name" href="#">
+                                            <?=$value['title_brend']?> <?=$value['title_model']?> <?=$value['title_modification'] ? "{$value['title_modification']}" : ''?>
+                                        </a>
+                                        <div class="clearfix"></div>
+                                        <?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
+                                            <div class="img">
+                                                <img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
+                                            </div>
+                                        <?}
+                                        else{
+                                            $vehicle_id = is_numeric($value['modification_id']) ? $value['vehicle_id'] : 11;?>
+                                            <div class="img">
+                                                <img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$value['title']?>">
+                                            </div>
+                                        <?}?>
+                                        <div class="description">
+                                            <div class="parametrs">
+                                                <p><b>Имя:</b> <?=$value['title_garage']?></p>
+                                                <p><b>VIN:</b> <?=$value['vin']?></p>
+                                                <p><b>Владелец:</b> <?=$value['owner']?></p>
+                                                <p><b>Год выпуска:</b> <?=$value['year']?></p>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <a href="" class="remove-item">Удалить</a>
+                                    </div>
+                                <?}
+                            }?>
+                        </div>
 					</div>
 					<div class="not-active-tab">
-						<?if (empty($modifications['non_active'])){?>
-							<p class="removable">Неактивных моделей не найдено</p>
-						<?}
-						else{
-							foreach($modifications['non_active'] as $value){?>
-								<div class="item" modification_id="<?=$value['modification_id']?>">
-									<a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
-									<div class="clearfix"></div>
-									<?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
-										<div class="img">
-											<img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
-										</div>
-									<?}
-									else{
-										$vehicle_id = is_numeric($value['modification_id']) ? $value['vehicle_id'] : 11;?>
-										<div class="img">
-											<img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$value['title']?>">
-										</div>
-									<?}?>
-									<div class="description">
-										<div class="parametrs">
-											<p>Имя: <?=$value['title_garage']?></p>
-											<p>VIN: <?=$value['vin']?></p>
-											<p>Год выпуска: <?=$value['year']?></p>
-										</div>
-									</div>
-									<div class="clearfix"></div>
-									<a href="#" class="remove-item">Удалить из гаража</a>
-							<a href="#" class="restore-item">Восстановить</a>
-								</div>
-							<?}
-						}?>
-						<div class="clearfix"></div>
+                        <div class="wrapper">
+                            <?if (empty($modifications['non_active'])){?>
+                                <p class="removable">Неактивных моделей не найдено</p>
+                            <?}
+                            else{
+                                foreach($modifications['non_active'] as $value){?>
+                                    <div class="item" modification_id="<?=$value['modification_id']?>">
+                                        <a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
+                                        <div class="clearfix"></div>
+                                        <?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
+                                            <div class="img">
+                                                <img src="<?=core\Config::$imgUrl?>/models/<?=$value['model_id']?>.jpg" alt="<?=$value['title']?>">
+                                            </div>
+                                        <?}
+                                        else{
+                                            $vehicle_id = is_numeric($value['modification_id']) ? $value['vehicle_id'] : 11;?>
+                                            <div class="img">
+                                                <img src="<?=core\Config::$imgUrl?>/vehicles/<?=$vehicle_id?>.jpg" alt="<?=$value['title']?>">
+                                            </div>
+                                        <?}?>
+                                        <div class="description">
+                                            <div class="parametrs">
+                                                <p><b>Имя:</b> <?=$value['title_garage']?></p>
+                                                <p><b>VIN:</b> <?=$value['vin']?></p>
+                                                <p><b>Владелец:</b> <?=$value['owner']?></p>
+                                                <p><b>Год выпуска:</b> <?=$value['year']?></p>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <a href="#" class="remove-item">Удалить из гаража</a>
+                                        <a href="#" class="restore-item">Восстановить</a>
+                                    </div>
+                                <?}
+                            }?>
+                        </div>
 					</div>
 				</div>
 				<div class="list-view">

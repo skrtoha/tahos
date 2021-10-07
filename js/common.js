@@ -2,6 +2,85 @@ var cookieOptions = {path: '/'};
 var cp_api = false;
 let countCharactersForSearch = 3;
 var h_win = $(window).height();
+function showPopupAddGarage(data){
+    let src = `
+        <div class="wrapper">
+            <form id="to_garage__form" action="">
+                <table style="margin-top: 20px">
+                    <tr>
+                        <td>Название</td>
+                        <td>
+                            <input type="text" name="title" value="${data.title}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Год</td>
+                        <td>
+                            <input type="text" name="year" value="${data.year}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Владелец</td>
+                        <td>
+                            <input type="text" name="owner" value="${data.userFullName}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="submit" value="Сохранить">
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" value="${data.user_id}" name="user_id">
+                <input type="hidden" value="${data.act}" name="act">
+                <input type="hidden" value="${data.title}" name="title">
+    `;
+    if (typeof data.modification_id !== 'undefined'){
+        src += `<input type="hidden" value="${data.modification_id}" name="modification_id">`
+    }
+    if (typeof data.catalogId !== 'undefined'){
+        src += `<input type="hidden" value="${data.catalogId}" name="catalogId">`
+    }
+    if (typeof data.modelId !== 'undefined'){
+        src += `<input type="hidden" value="${data.modelId}" name="modelId">`
+    }
+    if (typeof data.carId !== 'undefined'){
+        src += `<input type="hidden" value="${data.carId}" name="carId">`
+    }
+    if (typeof data.q !== 'undefined'){
+        src += `<input type="hidden" value="${data.q}" name="q">`
+    }
+    src += `
+            </form>
+        </div>
+    `;
+    $.magnificPopup.open({
+        items: {
+            src: src,
+            type: 'inline'
+        }
+    });
+}
+function eventAddGarage(object, data){
+    let th = $(object).find('button');
+    if (th.hasClass('is_garaged')){
+        data.act = 'removeFromGarage';
+        $.ajax({
+            type: 'post',
+            url: '/ajax/parts-catalogs.php',
+            data: data,
+            success: function(response){
+                th.removeClass('is_garaged');
+                $.magnificPopup.close();
+            }
+        })
+    }
+
+    else{
+        data.act = 'addToGarage';
+        showPopupAddGarage(data);
+    }
+}
 function getParams(url = ''){
 	let str = url ? url : window.location.search;
 	if (!str) return false;
@@ -238,6 +317,30 @@ $(function() {
 			$("#full-image").hide();
 		});
 	});
+    $(document).on('submit', '#to_garage__form', function (e){
+        e.preventDefault();
+        let th = $(this);
+        let formData = {};
+        $.each(th.serializeArray(), function(i, item){
+            formData[item.name] = item.value;
+        })
+        $.ajax({
+            type: 'post',
+            url: '/ajax/parts-catalogs.php',
+            data: formData,
+            success: function(response){
+                const button = $('#to_garage button');
+                let added = '';
+                if (formData.act === 'addToGarage'){
+                    button.addClass('is_garaged');
+                    added = 'added';
+                }
+                else button.removeClass('is_garaged');
+                button.closest('div').attr('class', added);
+                $.magnificPopup.close();
+            }
+        })
+    })
 	$(document).on('click', '#main-pic img', function(event) {
 		$('#full-image .img-wrap').html('<img src="' + $(this).attr('data-zoom-image') + '">' + 
 			'<a class="close" href="#" title="Закрыть"></a>');

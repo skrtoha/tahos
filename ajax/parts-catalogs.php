@@ -38,5 +38,6 @@ switch($_POST['act']){
 		break;
 }
 function getEntitiesPartsCatalogs(){
+    if (isset($_POST['modification_id'])) return $_POST['modification_id'];
 	return "{$_POST['catalogId']},{$_POST['modelId']},{$_POST['carId']},{$_POST['q']}";
 }

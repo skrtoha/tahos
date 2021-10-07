@@ -69,24 +69,23 @@ $(function(){
 		else document.location.href = data.node.a_attr.href;
 		// return false;
 	});
-	$('#to_garage button').on('click', function(){
-		var act;
-		if ($(this).hasClass('is_garaged')){
-			act = 'from_modification_from_garage';
-			show_message('Успешно удалено из гаража!');
-		}
-		else{
-			act = 'from_modification_to_garage';
-			show_message('Успешно добавлено в гараж!');
-		}
-		$(this).toggleClass('is_garaged');
-		$.ajax({
-			type: 'post',
-			url: '/ajax/garage.php',
-			data: 'act=' + act + '&user_id=' + $(this).attr('user_id') + '&modification_id=' + $(this).attr('modification_id'),
-			success: function(response){
-				console.log(response); return;
-			}
-		})
+	$('#to_garage').on('click', function(e){
+        let data = {};
+        data.title = $('div.breadcrumbs span').text();
+
+        data.year = '';
+        $.each($('div.description dl dd'), function(i, item){
+            let string = $(item).text();
+            string = string.trim();
+            if (/\d{4}/.test(string)) data.year = string;
+        })
+
+        data.userFullName = $('input[name=full_name]').val() ?? '';
+
+        data.modification_id = $('#to_garage button').attr('modification_id');
+
+        data.user_id = $('input[name=user_id]').val();
+
+		eventAddGarage(this, data);
 	})
 });

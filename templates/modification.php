@@ -64,6 +64,7 @@ if ($res_nodes->num_rows){
 }
 ?>
 <div class="catalogue-original">
+    <input type="hidden" name="full_name" value="<?=$user['full_name']?>">
 	<div class="clearfix"></div>
 	<div class="item-info-block">
 		<?if (file_exists(core\Config::$imgPath . "/models/{$_GET['model_id']}.jpg")){?>

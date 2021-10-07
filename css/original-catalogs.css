@@ -11,14 +11,81 @@
 .NwmhI9JCaIQ_ffRS2xDnD{
   margin-bottom: 10px;
 }
+.mfp-bg {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1042;
+    overflow: hidden;
+    position: fixed;
+    background: #0b0b0b;
+    opacity: 0.5;
+}
+.mfp-content {
+    width: auto;
+    background: white;
+    cursor: auto; }
+.mfp-s-ready .mfp-preloader {
+    display: none;
+}
+.mfp-preloader {
+    color: #CCC;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    text-align: center;
+    margin-top: -0.8em;
+    left: 8px;
+    right: 8px;
+    z-index: 1044;
+}
+.mfp-content .wrapper form input{
+    width: 100%;
+}
+.mfp-container:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+.mfp-container {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    padding: 0 8px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.mfp-wrap {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1043;
+    position: fixed;
+    outline: none !important;
+    -webkit-backface-visibility: hidden;
+}
+
 #to_garage{
     float: right;
+    cursor: pointer;
 }
 #to_garage::before {
     content: 'Добавить в гараж';
     font-size: 15px;
     position: relative;
     top: -9px;
+}
+.mfp-content table tr td{
+    padding: 5px 0;
+}
+.mfp-content table tr {
+    border: none;
 }
 #to_garage.added::before{
     content: 'Добавлено в гараж'
@@ -439,21 +506,15 @@ header .hints a.jspArrow:hover {
 }
 .mfp-inline-holder .mfp-content,
 .mfp-ajax-holder .mfp-content {
-  width: 100%;
-  cursor: auto;
+    width: auto;
+    padding: 10px;
 }
 .mfp-ajax-cur {
   cursor: progress;
 }
 .mfp-zoom-out-cur,
 .mfp-zoom-out-cur .mfp-image-holder .mfp-close {
-  cursor: -webkit-zoom-out;
   cursor: zoom-out;
-}
-.mfp-zoom {
-  cursor: pointer;
-  cursor: -webkit-zoom-in;
-  cursor: zoom-in;
 }
 .mfp-auto-cursor .mfp-content {
   cursor: auto;
@@ -517,30 +578,17 @@ button::-moz-focus-inner {
   border: 0;
 }
 .mfp-close {
-  width: 44px;
-  height: 44px;
-  line-height: 44px;
-  position: absolute;
-  right: 0;
-  top: 0;
-  text-decoration: none;
-  text-align: center;
-  opacity: 0.65;
-  padding: 0 0 18px 10px;
-  color: #FFF;
-  font-style: normal;
-  font-size: 28px;
-  font-family: Arial, Baskerville, monospace;
+    right: 0;
+    top: -30px;
+    font-size: 28px;
 }
 .mfp-close:hover,
 .mfp-close:focus {
   opacity: 1;
 }
-.mfp-close:active {
-  top: 1px;
-}
 .mfp-close-btn-in .mfp-close {
   color: #333;
+    position: absolute;
 }
 .mfp-image-holder .mfp-close,
 .mfp-iframe-holder .mfp-close {

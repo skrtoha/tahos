@@ -97,6 +97,32 @@ $('.slider').each(function(){
 			}
 		});
 	})
+
+$(document).on('submit', '#to_garage__form', function (e){
+    e.preventDefault();
+    let th = $(this);
+    let formData = {};
+    $.each(th.serializeArray(), function(i, item){
+        formData[item.name] = item.value;
+    })
+    $.ajax({
+        type: 'post',
+        url: '/ajax/parts-catalogs.php',
+        data: formData,
+        success: function(response){
+            const button = $('#to_garage button');
+            let added = '';
+            if (formData.act === 'addToGarage'){
+                button.addClass('is_garaged');
+                added = 'added';
+            }
+            else button.removeClass('is_garaged');
+            button.closest('div').attr('class', added);
+            $.magnificPopup.close();
+        }
+    })
+})
+
 $(function(){
     let isProccessedGarage = false;
     let isProccessedVin = false;
@@ -108,11 +134,13 @@ $(function(){
 
     let intervalID = setInterval(function(){
         let user_id = + $('input[name=user_id]').val();
+        let result;
         if (!user_id){
             clearInterval(intervalID);
             return false;
         }
         let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
+        if (!$('#to_garage').size()) isProccessedGarage = false;
         if($partsCatalogsNodes.size() && !isProccessedGarage){
 			let $h1 = $partsCatalogsNodes.find('h1');
 			let title = $h1.html();
@@ -122,45 +150,83 @@ $(function(){
 			let data = {
 				'user_id': user_id,
 				'title': title,
-				'catalogId': urlParams.get('catalogId'),
-				'modelId': urlParams.get('modelId'),
-				'carId': urlParams.get('carId'),
-				'q': urlParams.get('q')
+				'catalogId': urlParams.get('catalogId') ?? '',
+				'modelId': urlParams.get('modelId') ?? '',
+				'carId': urlParams.get('carId') ?? '',
+				'q': urlParams.get('q') ?? ''
 			};
 			data.act = 'isGaraged';
 			$.ajax({
 				type: 'post',
 				url: '/ajax/parts-catalogs.php',
 				data: data,
-				success: function(res){
+				success: function(response){
                     if (isProccessedGarage) return;
                     isProccessedGarage = true;
-                    let added = res === 'is_garaged' ? 'added' : '';
+                    result = JSON.parse(response);
+                    let added = result.isGaraged === 'is_garaged' ? 'added' : '';
 					$h1.prepend(`
 						<div id="to_garage" class="${added}">
-							<button class="${res}" title="Добавить / Удалить в гараж"></button>
+							<button class="${result.isGaraged}" full_name="${result.userFullName}" title="Добавить / Удалить в гараж"></button>
 						</div>
 					`);
-					$('#to_garage button').on('click', function(){
-						let th = $(this);
-						if (th.hasClass('is_garaged')) data.act = 'removeFromGarage';
-						else data.act = 'addToGarage';
-						$.ajax({
-							type: 'post',
-							url: '/ajax/parts-catalogs.php',
-                            data: data,
-                            success: function(response){
-                                const button = $('#to_garage button');
-                                let added = '';
-                                if (data.act === 'addToGarage'){
-                                    button.addClass('is_garaged');
-                                    added = 'added';
-                                }
-                                else button.removeClass('is_garaged');
-                                button.closest('div').attr('class', added);
+                    $('#to_garage').on('click',function(){
+                        let th = $(this).find('button');
+                        let act;
+                        if (th.hasClass('is_garaged')) act = 'removeFromGarage';
+                        else act = 'addToGarage';
+
+                        let title = $('h1.qrVRWcv0QaEBzE2ths3od').text();
+                        title = title.trim();
+                        let year = $('li._1aQVewIy8-bOC25Ti2Wsxl:first-child div._1UgSrnp4JyS_GOucnzUvx9').text();
+                        year = year.trim();
+                        let vin = $('#id-vin-frame-search').val();
+                        vin = vin.trim();
+
+                        $.magnificPopup.open({
+                            items: {
+                                src: `
+                                    <div class="wrapper">
+                                        <form id="to_garage__form" action="">
+                                            <table style="margin-top: 20px">
+                                                <tr>
+                                                    <td>Название</td>
+                                                    <td>
+                                                        <input type="text" name="title" value="${title}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Год</td>
+                                                    <td>
+                                                        <input type="text" name="year" value="${year}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Владелец</td>
+                                                    <td>
+                                                        <input type="text" name="owner" value="${result.userFullName}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <input type="submit" value="Сохранить">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <input type="hidden" value="${act}" name="act">
+                                            <input type="hidden" value="${user_id}" name="user_id">
+                                            <input type="hidden" value="${title}" name="title">
+                                            <input type="hidden" value="${data.catalogId}" name="catalogId">
+                                            <input type="hidden" value="${data.modelId}" name="modelId">
+                                            <input type="hidden" value="${data.carId}" name="carId">
+                                            <input type="hidden" value="${data.q}" name="q">
+                                        </form>
+                                    </div>
+                                `,
+                                type: 'inline'
                             }
-                        })
-					})
+                        });
+                    })
 				}
 			})
 		}

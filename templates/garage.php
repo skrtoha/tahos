@@ -15,37 +15,9 @@ function garage(){
 		ORDER BY
 			v.title
 	", '');
-	$res_modifications = $db->query("
-		SELECT
-			g.modification_id,
-			g.title AS title_garage,
-			g.is_active,
-		    g.year,
-            g.owner,
-			m.model_id,
-			m.title AS title_modification,
-			md.vin,
-			md.title AS title_model,
-			b.title AS title_brend,
-			md.vehicle_id,
-			fv.title AS year
-		FROM
-			#garage g
-		LEFT JOIN
-			#modifications m ON m.id=g.modification_id
-		LEFT JOIN
-			#models md ON md.id=m.model_id
-		LEFT JOIN
-			#vehicle_model_fvs fvs ON fvs.modification_id=g.modification_id
-		LEFT JOIN
-			#vehicle_filter_values fv ON fv.id=fvs.fv_id
-		LEFT JOIN
-			#vehicle_filters f ON f.id=fv.filter_id AND f.title='Год'
-		LEFT JOIN
-			#brends b ON b.id=md.brend_id
-		WHERE
-			g.user_id={$user['id']}
-	", '');
+    $query = \core\Garage::getQuery();
+    $query .= "WHERE g.user_id={$user['id']}";
+	$res_modifications = $db->query($query, '');
 	$modifications = array();
 	if ($res_modifications->num_rows){
 		while($row = $res_modifications->fetch_assoc()){
@@ -59,6 +31,7 @@ function garage(){
 				'modification_id' => $row['modification_id'],
 				'title_garage' => $row['title_garage'],
 				'title_modification' => $isFromPartsCatalogs ? $row['title'] : $row['title_garage'],
+                'phone' => $row['phone'],
                 'owner' => $row['owner'],
 				'model_id' => $row['model_id'],
 				'vehicle_id' => $row['vehicle_id'],
@@ -181,7 +154,7 @@ function garage(){
                                         <?}?>
                                         <div class="description">
                                             <div class="parametrs">
-                                                <p><b>Имя:</b> <?=$value['title_garage']?></p>
+                                                <p><b>Телефон:</b> <?=$value['phone']?></p>
                                                 <p><b>VIN:</b> <?=$value['vin']?></p>
                                                 <p><b>Владелец:</b> <?=$value['owner']?></p>
                                                 <p><b>Год выпуска:</b> <?=$value['year']?></p>
@@ -189,6 +162,7 @@ function garage(){
                                         </div>
                                         <div class="clearfix"></div>
                                         <a href="" class="remove-item">Удалить</a>
+                                        <a href="" class="edit-item">Редактировать</a>
                                     </div>
                                 <?}
                             }?>
@@ -217,7 +191,7 @@ function garage(){
                                         <?}?>
                                         <div class="description">
                                             <div class="parametrs">
-                                                <p><b>Имя:</b> <?=$value['title_garage']?></p>
+                                                <p><b>Телефон:</b> <?=$value['phone']?></p>
                                                 <p><b>VIN:</b> <?=$value['vin']?></p>
                                                 <p><b>Владелец:</b> <?=$value['owner']?></p>
                                                 <p><b>Год выпуска:</b> <?=$value['year']?></p>

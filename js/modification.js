@@ -80,7 +80,7 @@ $(function(){
             if (/\d{4}/.test(string)) data.year = string;
         })
 
-        data.userFullName = $('input[name=full_name]').val() ?? '';
+        data.owner = $('input[name=full_name]').val() ?? '';
 
         data.modification_id = $('#to_garage button').attr('modification_id');
 

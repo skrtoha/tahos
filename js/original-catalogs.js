@@ -160,7 +160,7 @@ $(function(){
                         let vin = $('#id-vin-frame-search').val();
                         data.vin = vin.trim();
 
-                        data.userFullName = result.userFullName;
+                        data.owner = result.userFullName;
 
                         eventAddGarage(this, data);
                     })

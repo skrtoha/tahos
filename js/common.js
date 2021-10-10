@@ -22,13 +22,13 @@ function showPopupAddGarage(data){
                     <tr>
                         <td>Владелец</td>
                         <td>
-                            <input type="text" name="owner" value="">
+                            <input type="text" name="owner" value="${data.owner}">
                         </td>
                     </tr>
                     <tr>
                         <td>Телефон</td>
                         <td>
-                            <input type="text" name="phone" value="">
+                            <input type="text" name="phone" value="${data.phone}">
                         </td>
                     </tr>
                     <tr>
@@ -39,7 +39,6 @@ function showPopupAddGarage(data){
                 </table>
                 <input type="hidden" value="${data.user_id}" name="user_id">
                 <input type="hidden" value="${data.act}" name="act">
-                <input type="hidden" value="${data.title}" name="title">
     `;
     if (typeof data.modification_id !== 'undefined'){
         src += `<input type="hidden" value="${data.modification_id}" name="modification_id">`

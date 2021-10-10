@@ -1,4 +1,38 @@
 $(function(){
+    $(document).on('click', '.edit-item', function(e){
+        e.preventDefault();
+        const modification_id = $(this).closest('div.item').attr('modification_id');
+        $.ajax({
+            url: '/ajax/parts-catalogs.php',
+            type: 'post',
+            data: {
+                act: 'getGarageInfo',
+                modification_id: modification_id
+            },
+            success: function (response){
+                let garageInfo = JSON.parse(response);
+                garageInfo.title = garageInfo.title_garage;
+                garageInfo.act = 'addToGarage';
+                showPopupAddGarage(garageInfo);
+            }
+        })
+    })
+    $(document).on('submit', '#to_garage__form', function (e){
+        let formData = {};
+        $.each($(this).serializeArray(), function(i, item){
+            formData[item.name] = item.value;
+        })
+        const parameters = $('div[modification_id="' + formData.modification_id + '"] .parametrs');
+        parameters.find('p:nth-child(1)').html(`
+            <b>Телефон: </b> ${formData.phone}
+        `);
+        parameters.find('p:nth-child(3)').html(`
+            <b>Владелец: </b> ${formData.owner}
+        `);
+        parameters.find('p:nth-child(4)').html(`
+            <b>Год выпуска: </b> ${formData.year}
+        `);
+    })
 	$('.add_ts').magnificPopup({
 		type: 'inline',
 		preloader: false,
@@ -203,6 +237,7 @@ $(function(){
 	$(document).on('click', '.active-tab [modification_id]', function(event){
 		var t = $('a.remove-item');
 		if (t.is(event.target)) return false;
+        if ($(event.target).hasClass('edit-item')) return false;
 		document.location.href = '/garage/' + $(this).attr('modification_id');
 	})
 })

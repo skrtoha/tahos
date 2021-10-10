@@ -13,11 +13,9 @@ switch($_POST['act']){
 		$entitiesPartsCatalogs = getEntitiesPartsCatalogs();
 		$row = $db->select_one('garage', '*', "`user_id` = {$_POST['user_id']} AND `modification_id` = '$entitiesPartsCatalogs'");
 		if ($row) $isGaraged = 'is_garaged';
-        $result = \core\User::get(['user_id' => $_POST['user_id']]);
-        $userInfo = $result->fetch_assoc();
         echo json_encode([
             'isGaraged' => $isGaraged,
-            'userFullName' => $userInfo['full_name']
+            'userFullName' => ''
         ]);
 		break;
 	case 'addToGarage':
@@ -31,12 +29,24 @@ switch($_POST['act']){
         if (isset($_POST['year']) && $_POST['year']) $array['year'] = $_POST['year'];
         if (isset($_POST['phone']) && $_POST['phone']) $array['phone'] = $_POST['phone'];
         
-		$db->insert('garage', $array);
+		$db->insert('garage', $array, [
+            'duplicate' => [
+                'owner' => $_POST['owner'],
+                'phone' => $_POST['phone'],
+                'year' => $_POST['year'],
+                'title' => $_POST['title']
+            ]
+        ]);
 		break;
 	case 'removeFromGarage':
 		$entitiesPartsCatalogs = getEntitiesPartsCatalogs();
 		$db->delete('garage', "`user_id` = {$_POST['user_id']} AND `modification_id` = '$entitiesPartsCatalogs'");
 		break;
+    case 'getGarageInfo':
+        $query = \core\Garage::getQuery();
+        $query .= "WHERE g.modification_id = '{$_POST['modification_id']}'";
+        echo json_encode($db->query($query)->fetch_assoc());
+        break;
 }
 function getEntitiesPartsCatalogs(){
     if (isset($_POST['modification_id'])) return $_POST['modification_id'];

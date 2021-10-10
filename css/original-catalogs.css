@@ -557,6 +557,19 @@ header .hints a.jspArrow:hover {
 .mfp-s-error .mfp-content {
   display: none;
 }
+@media screen and (max-width: 550px){
+    #to_garage::before{
+        content: '' !important;
+    }
+    #to_garage{
+        right: -5px;
+        position: relative;
+    }
+    h1.qrVRWcv0QaEBzE2ths3od {
+        width: calc(100% - 7px);
+        margin-right: 0;
+    }
+}
 button.mfp-close,
 button.mfp-arrow {
   overflow: visible;

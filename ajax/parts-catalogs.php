@@ -29,6 +29,7 @@ switch($_POST['act']){
         if (isset($_POST['year']) && $_POST['year']) $array['year'] = $_POST['year'];
         if (isset($_POST['owner']) && $_POST['owner']) $array['owner'] = $_POST['owner'];
         if (isset($_POST['year']) && $_POST['year']) $array['year'] = $_POST['year'];
+        if (isset($_POST['phone']) && $_POST['phone']) $array['phone'] = $_POST['phone'];
         
 		$db->insert('garage', $array);
 		break;

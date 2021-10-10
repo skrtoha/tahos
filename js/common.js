@@ -22,7 +22,13 @@ function showPopupAddGarage(data){
                     <tr>
                         <td>Владелец</td>
                         <td>
-                            <input type="text" name="owner" value="${data.userFullName}">
+                            <input type="text" name="owner" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Телефон</td>
+                        <td>
+                            <input type="text" name="phone" value="">
                         </td>
                     </tr>
                     <tr>
@@ -60,6 +66,8 @@ function showPopupAddGarage(data){
             type: 'inline'
         }
     });
+    $.mask.definitions['~'] = '[+-]';
+    $("input[name=phone]").mask("+7 (999) 999-99-99");
 }
 function eventAddGarage(object, data){
     let th = $(object).find('button');
@@ -75,7 +83,6 @@ function eventAddGarage(object, data){
             }
         })
     }
-
     else{
         data.act = 'addToGarage';
         showPopupAddGarage(data);

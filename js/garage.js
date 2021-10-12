@@ -50,8 +50,6 @@ $(function(){
 			}
 		}
 	});
-	$(".item img").matchHeight();
-	$(".item").matchHeight();
 	$(".active-switch").click(function (event) {
 		event.preventDefault;
 		$(".not-active-switch").removeClass("active");

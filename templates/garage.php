@@ -43,75 +43,16 @@ function garage(){
 			if ($row['is_active']) $modifications['active'][] = $array;
 			else $modifications['non_active'][] = $array;
 		}
-	}
-
-	//модификации с parts-catalogs
-	/*$res_modifications = $db->query("
-		SELECT
-			g.*
-		FROM
-			#garage g
-		WHERE
-			g.user_id = {$user}
-	")*/
-	// debug($modifications);
-	?>
+	}?>
 	<div class="garage">
 		<a class="button add_ts" href="#add_ts_form">Добавить транспортное средство</a>
 		<div class="filter-form" id="add_ts_form">
-			<?if ($res_vehicles->num_rows){?>
-				<h3>Добавить ТС</h3>
-				<form action="/garage/select_modification/" method="post">
-				<div class="search-wrap">
-					<input type="text" placeholder="Поиск по наименованию">
-					<div class="search-icon"></div>
-				</div>
-				<p>Выберите параметры фильтра:</p>
-				<div class="input_box clearfix">
-					<div class="input">
-						<div class="select">
-							<select name="vehicle_id" data-placeholder="Тип транспорта">
-								<option selected></option>
-								<?while($row = $res_vehicles->fetch_assoc()){?>
-									<option value="<?=$row['href']?>"><?=$row['title']?></option>
-								<?}?>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="input_box clearfix">
-					<div class="input">
-						<div class="select">
-							<select disabled name="brend_id" data-placeholder="Марка">
-								<option></option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="input_box clearfix">
-					<div class="input">
-						<div class="select">
-							<select disabled name="year_id" data-placeholder="Год выпуска">
-								<option></option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="input_box clearfix">
-					<div class="input">
-						<div class="select">
-							<select disabled name="model_id" data-placeholder="Модель">
-								<option></option>
-							</select>
-						</div>
-					</div>
-				</div>
-
-				<button>Добавить</button>
-
-			</form>
-			<?}?>
-				
+            <form action="/" method="post">
+                <div class="search-wrap">
+                    <input type="text" placeholder="Поиск по наименованию">
+                    <div class="search-icon"></div>
+                </div>
+            </form>
 		</div>
 		<div class="items">
 			<div class="option-panel">
@@ -163,6 +104,7 @@ function garage(){
                                         <div class="clearfix"></div>
                                         <a href="" class="remove-item">Удалить</a>
                                         <a href="" class="edit-item">Редактировать</a>
+                                        <div class="clearfix"></div>
                                     </div>
                                 <?}
                             }?>

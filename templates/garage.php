@@ -118,7 +118,9 @@ function garage(){
                             else{
                                 foreach($modifications['non_active'] as $value){?>
                                     <div class="item" modification_id="<?=$value['modification_id']?>">
-                                        <a class="model-name" href="#"><?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)</a>
+                                        <a class="model-name" href="#">
+                                            <?=$value['title_brend']?> <?=$value['title_model']?> (<?=$value['title_modification']?>)
+                                        </a>
                                         <div class="clearfix"></div>
                                         <?if (file_exists(core\Config::$imgPath . "/models/{$value['model_id']}.jpg")){?>
                                             <div class="img">
@@ -153,9 +155,10 @@ function garage(){
 						<table class="wide-view">
 							<tr>
 								<th>Название</th>
-								<th>Vin номер</th>
-								<th>Год выпуска</th>
-								<th>Удалить</th>
+								<th>VIN</th>
+                                <th>Владелец</th>
+                                <th>Год выпуска</th>
+                                <th></th>
 							</tr>
 							<?if(empty($modifications['active'])){?>
 								<tr class="removable"><td colspan="4">Активных моделей не найдено</td></tr>
@@ -163,8 +166,13 @@ function garage(){
 							else{
 								foreach($modifications['active'] as $value){?>
 									<tr modification_id="<?=$value['modification_id']?>">
-										<td><a href="#"><?=$value['title_modification']?></a></td>
+										<td>
+                                            <?=$value['title_brend']?>
+                                            <?=$value['title_model']?>
+                                            <?=$value['title_modification'] ? "{$value['title_modification']}" : ''?>
+                                        </td>
 										<td><p><?=$value['vin']?></p></td>
+										<td><p><?=$value['owner']?></p></td>
 										<td><p><?=$value['year']?></p></td>
 										<td><a href="#" class="remove-item">Удалить</a></td>
 									</tr>

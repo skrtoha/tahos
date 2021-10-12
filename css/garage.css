@@ -437,8 +437,6 @@ header .hints a.jspArrow:hover {
 .owl-carousel .owl-controls .owl-nav .owl-prev,
 .owl-carousel .owl-controls .owl-nav .owl-next,
 .owl-carousel .owl-controls .owl-dot {
-    cursor: pointer;
-    cursor: hand;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -9666,11 +9664,6 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
         margin: 0 0 22px 0;
     }
 
-    .garage .filter-form {
-        width: 290px;
-        padding: 20px;
-    }
-
     .catalogue .filter-form {
         width: 100%;
     }
@@ -13961,11 +13954,6 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
         margin: 0 0 22px 0;
     }
 
-    .garage .filter-form {
-        width: 290px;
-        padding: 20px;
-    }
-
     .catalogue .filter-form {
         width: 100%;
     }
@@ -14428,14 +14416,9 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
     }
 
     .garage .filter-form {
-        display: none;
-        width: 95%;
-        position: absolute;
+        display: block;
+        width: 100%;
         z-index: 1000;
-        left: 50%;
-        -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-        transform: translateX(-50%);
     }
 
     .garage .items {

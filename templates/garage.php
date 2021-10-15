@@ -95,10 +95,10 @@ function garage(){
                                         <?}?>
                                         <div class="description">
                                             <div class="parametrs">
-                                                <p><b>Телефон:</b> <?=$value['phone']?></p>
-                                                <p><b>VIN:</b> <?=$value['vin']?></p>
                                                 <p><b>Владелец:</b> <?=$value['owner']?></p>
+                                                <p><b>VIN:</b> <?=$value['vin']?></p>
                                                 <p><b>Год выпуска:</b> <?=$value['year']?></p>
+                                                <p><b>Телефон:</b> <?=$value['phone']?></p>
                                             </div>
                                         </div>
                                         <div class="clearfix"></div>
@@ -135,10 +135,10 @@ function garage(){
                                         <?}?>
                                         <div class="description">
                                             <div class="parametrs">
-                                                <p><b>Телефон:</b> <?=$value['phone']?></p>
-                                                <p><b>VIN:</b> <?=$value['vin']?></p>
                                                 <p><b>Владелец:</b> <?=$value['owner']?></p>
+                                                <p><b>VIN:</b> <?=$value['vin']?></p>
                                                 <p><b>Год выпуска:</b> <?=$value['year']?></p>
+                                                <p><b>Телефон:</b> <?=$value['phone']?></p>
                                             </div>
                                         </div>
                                         <div class="clearfix"></div>
@@ -355,7 +355,7 @@ function modification(){
 	<div class="garage-inside-ts">
 		<a class="button change_ts" href="/garage">Сменить ТС</a>
 		<div class="ts-info">
-			<h1><?=$m['brend']?> <?=$m['model_title']?> (<?=$m['modification_title']?>)</h1>
+			<h1><?=$m['model_title']?> <?=$m['modification_title']?></h1>
 			<div class="img-and-name">
 				<div class="img-wrap">
 					<?if (file_exists(core\Config::$imgPath . "/models/{$m['model_id']}.jpg")){?>

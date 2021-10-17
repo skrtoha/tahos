@@ -46,7 +46,7 @@ class Issues{
 			);
 
 			if ($insert_order_issue_values !== true){
-				die("Ошибка: $this->db->$last_query | $insert_order_issue_values");
+				die("Ошибка: {$this->db->last_query} | $insert_order_issue_values");
 			}
 			
 			$res_orderValue = core\OrderValue::get([
@@ -56,7 +56,10 @@ class Issues{
 			]);
 			$orderValue = $res_orderValue->fetch_assoc();
 			$titles[] = "<b>{$orderValue['brend']} {$orderValue['article']}</b>";
-			$totalSumm += $issued * $orderValue['price'];
+            
+            if (!$orderValue['is_payed']){
+                $totalSumm += $issued * $orderValue['price'];
+            }
 			
 			core\OrderValue::changeStatus(1, [
 				'order_id' => $a[0],
@@ -67,13 +70,15 @@ class Issues{
 		}
 		
 		core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
-
-		core\OrderValue::setFunds([
-			'user_id' => $this->user_id,
-			'issue_id' => $issue_id,
-			'titles' => $titles,
-			'totalSumm' => $totalSumm
-		]);
+		
+        if ($totalSumm){
+            core\OrderValue::setFunds([
+                'user_id' => $this->user_id,
+                'issue_id' => $issue_id,
+                'titles' => $titles,
+                'totalSumm' => $totalSumm
+            ]);
+        }
 		
 		if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			echo $issue_id;

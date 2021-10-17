@@ -195,6 +195,9 @@ function garage(){
 											<?if ($value['vin']){?>
 											 <br> VIN: <?=$value['vin']?>
 											<?}?>
+                                            <?if ($value['owner']){?>
+                                                <br>Владелец: <?=$value['owner']?>
+                                            <?}?>
 										</p></td>
 										<td><a href="#" class="remove-item">Удалить</a></td>
 									</tr>
@@ -214,6 +217,9 @@ function garage(){
 													<?if ($value['vin']){?>
 														<br> VIN: <?=$value['vin']?>
 													<?}?>
+                                                <?if ($value['owner']){?>
+                                                    <br>Владелец: <?=$value['owner']?>
+                                                <?}?>
 											</p>
 											<a href="#" class="remove-item">Удалить</a>
 										</td>

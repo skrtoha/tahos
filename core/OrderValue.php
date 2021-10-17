@@ -89,7 +89,9 @@ class OrderValue{
 			case 11:
 				$values['ordered'] = "`ordered` + {$params['quan']}";
 				self::update($values, $params);
-				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price']);
+                if (!$params['is_payed']){
+                    User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price']);
+                }
 				self::changeInStockStoreItem($params['quan'], $params);
 				break;
 			//отменен клиентом
@@ -317,6 +319,7 @@ class OrderValue{
 				IF(r.item_id IS NOT NULL, 1, 0) return_ordered,
 				IF (ps.noReturn, 'class=\"noReturn\" title=\"Возврат поставщику невозможен!\"', '') AS noReturn,
 				c.id AS correspond_id,
+				o.is_payed,
 				IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
 				IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
 				(
@@ -471,6 +474,7 @@ class OrderValue{
                 o.date_issue,
                 o.is_new,
                 o.is_draft,
+                o.is_payed,
                 ua.json,
                 isSuspended(GROUP_CONCAT(ov.status_id)) AS is_suspended
             FROM

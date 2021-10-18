@@ -676,7 +676,7 @@ switch ($params[0]){
             if ($res === true) $successedDelivery++;
             else $logger->error($res);
         }
-        $logger->alert("Всего отпрвлено $successedDelivery сообщений пользователям");
+        $logger->alert("Всего отправлено $successedDelivery сообщений пользователям");
         break;
     case 'subscribeCommonPrices':
         $logger->alert('Рассылка прайсов');
@@ -695,7 +695,7 @@ switch ($params[0]){
             'subject' => 'Прайс с tahos.ru',
             'body' => 'Прайс с tahos.ru'
         ], [$file]);
-        $logger->alert("Всего отпрвлено ".count($emails)." сообщений пользователям");
+        $logger->alert("Всего отправлено ".count($emails)." сообщений пользователям");
         break;
     case 'priceSportAvto':
         ini_set('memory_limit', '2048M');

@@ -10,7 +10,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
  */
 class Mailer{
 	public static $config = [
-		'email' => 'mail@tahos.ru',
+		'email' => 'test@tahos.ru',
 		'username' => 'mail@tahos.ru',
 		'password' => 'Anton12345',
 		'host' => 'smtp.mail.ru',
@@ -31,8 +31,8 @@ class Mailer{
 		$mail->Username = self::$config['username'];
 		$mail->Password = self::$config['password'];
 		$mail->setFrom(self::$config['email'], 'Tahos.ru');     
-		$mail->SMTPSecure = 'tls';            
-		$mail->Port = 2525;
+		$mail->SMTPSecure = '';
+		$mail->Port = 465;
 		if (is_array($params['emails'])){
 			foreach($params['emails'] as $email) $mail->addAddress($email);
 		} else $mail->addAddress($params['emails']);

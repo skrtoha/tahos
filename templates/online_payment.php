@@ -15,7 +15,6 @@ $prices = array_sum(explode(',', $orderInfo['prices']));
     <input type="hidden" name="need-email" value="false">
     <input type="hidden" name="need-phone" value="false">
     <input type="hidden" name="need-address" value="false">
-    <input type="hidden" name="paymentType" value="<?=$orderInfo['pay_type']?>">
     <input type="hidden" name="successURL" value="http://tahos.ru/orders">
     <input type="hidden" name="sum" value="<?=$prices?>" required pattern="[0-9]+">
 </form>

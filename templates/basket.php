@@ -96,7 +96,7 @@ if ($_GET['act'] == 'to_offer'){
         exit();
     }
     
-    if (in_array($additional_options['pay_type'], ['PC', 'AC'])){
+    if (in_array($additional_options['pay_type'], ['Онлайн'])){
         header("Location: /online_payment/$order_id");
         die();
     }
@@ -421,25 +421,22 @@ $noReturnIsExists = false;
                 <div class="wrapper">
                     <div class="left">Выберите способ оплаты</div>
                     <div class="right">
+                        <?if ($user['user_type'] == 'entity'){?>
+                            <label>
+                                <?$checked = $user['pay_type'] == 'Безналичный' ? 'checked' : ''?>
+                                <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
+                                <span>Безналичный</span>
+                            </label>
+                        <?}?>
                         <label>
                             <?$checked = $user['pay_type'] == 'Наличный' ? 'checked' : ''?>
                             <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
                             <span>Наличный</span>
                         </label>
                         <label>
-                            <?$checked = $user['pay_type'] == 'Безналичный' ? 'checked' : ''?>
-                            <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
-                            <span>Безналичный</span>
-                        </label>
-                        <label>
-                            <?$checked = $user['pay_type'] == 'Карта' ? 'checked' : ''?>
-                            <input <?=$checked?> type="radio" name="pay_type" value="AC">
-                            <span>Онлайн оплата картой</span>
-                        </label>
-                        <label>
-                            <?$checked = $user['pay_type'] == 'Yoomoney' ? 'checked' : ''?>
-                            <input <?=$checked?> type="radio" name="pay_type" value="PC">
-                            <span>Онлайн оплата Yoomoney</span>
+                            <?$checked = $user['pay_type'] == 'Онлайн' ? 'checked' : ''?>
+                            <input <?=$checked?> type="radio" name="pay_type" value="Онлайн">
+                            <span>Онлайн оплата</span>
                         </label>
                     </div>
                 </div>

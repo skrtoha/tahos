@@ -674,8 +674,28 @@ switch ($params[0]){
                 'body' => 'Прайс с tahos.ru'
             ], [$file]);
             if ($res === true) $successedDelivery++;
+            else $logger->error($res);
         }
         $logger->alert("Всего отпрвлено $successedDelivery сообщений пользователям");
+        break;
+    case 'subscribeCommonPrices':
+        $logger->alert('Рассылка прайсов');
+        $emails = [];
+        $res_emails = $db->query("SELECT * FROM #subscribe_prices", '');
+        if (!$res_emails->num_rows) break;
+        foreach($res_emails as $row) $emails[] = $row['email'];
+        
+        $query = \core\StoreItem::getQueryStoreItem();
+        $query .= " WHERE si.store_id = 23";
+        $res_store_items = $db->query($query);
+        $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price');
+        
+        $res = core\Mailer::send([
+            'emails' => $emails,
+            'subject' => 'Прайс с tahos.ru',
+            'body' => 'Прайс с tahos.ru'
+        ], [$file]);
+        $logger->alert("Всего отпрвлено ".count($emails)." сообщений пользователям");
         break;
     case 'priceSportAvto':
         ini_set('memory_limit', '2048M');

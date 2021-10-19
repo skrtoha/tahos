@@ -367,11 +367,13 @@ function show_form($act){
 					<div class="value">
 						<select name="pay_type">
 							<?$array = empty($_POST) ? $user : $_POST;
-							$selected = $array['pay_type'] == 'наличный' ? 'selected' : '';?>
-							<option <?=$selected?> value="наличный">наличный</option>
-							<?$selected = $array['pay_type'] == 'безналичный' ? 'selected' : '';
+							$selected = $array['pay_type'] == 'Наличный' ? 'selected' : '';?>
+							<option <?=$selected?> value="Наличный">Наличный</option>
+							<?$selected = $array['pay_type'] == 'Безналичный' ? 'selected' : '';
 							$disabled = $array['organization_name'] ? '' : 'disabled';?>
-							<option <?=$disabled?> <?=$selected?> value="безналичный">безналичный</option>
+							<option <?=$disabled?> <?=$selected?> value="Безналичный">Безналичный</option>
+                            <?$selected = $array['pay_type'] == 'Онлайн' ? 'selected' : '';?>
+                            <option <?=$selected?> value="Онлайн">Онлайн</option>
 						</select>
 					</div>
 				</div>

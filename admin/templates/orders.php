@@ -235,16 +235,21 @@ function show_form($act){
 				</a> 
 				(<b class="price_format"><?=$order['bill'] - $order['reserved_funds']?></b> руб.)
 			</td>
-			<td label="Сумма" class="price_format total"><?=get_summ([
-				'statuses' => $order['statuses'],
-				'price' => $order['prices'],
-				'quan' => $order['quans'],
-				'ordered' => $order['ordered'],
-				'arrived' => $order['arrived'],
-				'issued' => $order['issued'],
-				'declined' => $order['declined'],
-				'returned' => $order['returned']
-			])?></td>
+			<td label="Сумма" class="price_format total">
+                <?=get_summ([
+                    'statuses' => $order['statuses'],
+                    'price' => $order['prices'],
+                    'quan' => $order['quans'],
+                    'ordered' => $order['ordered'],
+                    'arrived' => $order['arrived'],
+                    'issued' => $order['issued'],
+                    'declined' => $order['declined'],
+                    'returned' => $order['returned']
+                ])?>
+                <?if ($order['is_payed']){?>
+                    <b>(оплачен)</b>
+                <?}?>
+            </td>
 			<td label="Статус"><?=$order['is_draft'] ? 'Черновик' : get_status($order['statuses'])?></td>
 			<td label="Дата заказа"><?=$order['date']?></td>
 		</tr>

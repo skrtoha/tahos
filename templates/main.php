@@ -383,7 +383,7 @@
         <?if (in_array($view, ['settings'])){?>
             {"src" : "/vendor/jquery-fias/jquery.fias.min.js", "async" : false},
         <?}?>
-        <?if (in_array($view, ['orders', 'basket', 'order'])){?>
+        <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
             {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},
         <?}?>
 		{"src" : "/js/<?=$view?>.js", "async" : false}

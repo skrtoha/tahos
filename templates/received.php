@@ -17,20 +17,38 @@ $sha1 = sha1(
 	$secret_key.'&'.
 	$_POST['label']
 );
+
+file_put_contents($_SERVER['DOCUMENT_ROOT'].'/received.json', json_encode($_POST));
+
+$label = explode(':', $_POST['label']);
+
 if ($sha1 != $_POST['sha1_hash']) exit();
-if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Яндекс.Деньги';
-else $comment = 'Пополнение банковской картой';
-$bill = $db->getFieldOnID('users', $_POST['label'], 'bill') + $_POST['withdraw_amount'];
+
+switch($label[0]){
+    case 'account':
+        $user_id = $label[1];
+        $bill = $db->getFieldOnID('users', $user_id, 'bill') + $_POST['withdraw_amount'];
+        if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Яндекс.Деньги';
+        else $comment = 'Пополнение банковской картой';
+        core\User::checkOverdue($user_id, $_POST['withdraw_amount']);
+        $db->update('users', array('bill' => $bill), '`id`='.$user_id);
+        break;
+    case 'order':
+        $comment = "Онлайн оплата заказа №{$label[1]}";
+        $orderInfo = \core\OrderValue::getOrderInfo($label[1]);
+        $user_id = $orderInfo['user_id'];
+        $bill = $db->getFieldOnID('users', $user_id, 'bill');
+        $db->update('orders', ['is_payed' => 1], "`id` = {$label[1]}");
+        break;
+}
 $db->insert(
-	'funds',
-	[
-		'type_operation' => 1,
-		'sum' => $_POST['withdraw_amount'],
-		'remainder' => $bill,
-		'user_id' => $_POST['label'],
-		'comment' => $comment
-	]
+    'funds',
+    [
+        'type_operation' => 1,
+        'sum' => $_POST['withdraw_amount'],
+        'remainder' => $bill,
+        'user_id' => $user_id,
+        'comment' => $comment
+    ]
 );
-$db->update('users', array('bill' => $bill), '`id`='.$_POST['label']);
-core\User::checkOverdue($_POST['label'], $_POST['withdraw_amount']);
 ?>

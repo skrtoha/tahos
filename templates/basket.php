@@ -5,26 +5,26 @@ if (!$_SESSION['user']) header('Location: /');
 $title = "Корзина";
 $user_id = $_SESSION['user'];
 if ($_GET['act'] == 'to_offer'){
-	$res_basket = core\Basket::get($user_id, true);
-
-	if (!$res_basket->num_rows){
-		message('Нечего отправлять!', false);
-		header('Location: /basket');
-		exit();
-	}
-	
-	//проверяем превышение лимита
-	$available = $user['bill'] - $user['reserved_funds'];
-	$totalAmountBasket = 0;
-	if ($available < 0 && abs($available) > $user['credit_limit']){
-		message('Превышен кредитный лимит!', false);
-		header("Location: /basket");
-		exit();
-	}
+    $res_basket = core\Basket::get($user_id, true);
+    
+    if (!$res_basket->num_rows){
+        message('Нечего отправлять!', false);
+        header('Location: /basket');
+        exit();
+    }
+    
+    //проверяем превышение лимита
+    $available = $user['bill'] - $user['reserved_funds'];
+    $totalAmountBasket = 0;
+    if ($available < 0 && abs($available) > $user['credit_limit']){
+        message('Превышен кредитный лимит!', false);
+        header("Location: /basket");
+        exit();
+    }
     
     $additional_options = json_decode($_COOKIE['additional_options'], true);
     $dateTimeObject = DateTime::createFromFormat('d.m.Y', $additional_options['date_issue']);
-	$insertOrder = [
+    $insertOrder = [
         'user_id' => $_SESSION['user'],
         'is_draft' => 0,
         'delivery' => $additional_options['delivery'],
@@ -35,69 +35,74 @@ if ($_GET['act'] == 'to_offer'){
     ];
     $res = $db->insert('orders', $insertOrder);
     if ($res !== true) die ("$res | $db->last_query");
-	$order_id = $db->last_id();
-
-	$body = "<h1>Заказанные товары:</h1><table style='width: 100%;border-collapse: collapse;''>";
-
-	foreach ($res_basket as $value){
-		if (!$value['isToOrder']) continue;
-		
-		//если товара уже нету в прайсах, то тоже пропускаем
-		if (!$value['cipher']) continue;
-
-		$body .= "
-			<tr>
-				<td style='border: 1px solid black'>{$value['brend']}</td>
-				<td style='border: 1px solid black'>{$value['article']}</td>
-				<td style='border: 1px solid black'>{$value['title']}</td>
-				<td style='border: 1px solid black'>{$value['cipher']}</td>
-				<td style='border: 1px solid black'>{$value['price']}</td>
-				<td style='border: 1px solid black'>{$value['quan']}</td>
-				<td style='border: 1px solid black'>{$value['comment']}</td>
-			</tr>
-		";
-		
-		$query = core\StoreItem::getQueryStoreItem();
-		$query .= "
-			WHERE si.store_id = {$value['store_id']} AND si.item_id = {$value['item_id']}
-		";
-		$result = $db->query($query, '');
-		$storeItemInfo = $result->fetch_assoc();
-
-		$res = $db->insert(
-			'orders_values', 
-			[
-				'user_id' => $_SESSION['user'],
-				'order_id' => $order_id,
-				'store_id' => $value['store_id'],
-				'item_id' => $value['item_id'],
-				'withoutMarkup' => $storeItemInfo['priceWithoutMarkup'],
-				'price' => $value['price'],
-				'quan' => $value['quan'],
-				'comment' => $value['comment']
-		 	]
-	 	);
-
-		if ($res !== true) die("$res | $last_query");
-	 	
-	 	$db->delete('basket', "`user_id`={$_SESSION['user']} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
-	} 
-	$body .= "</table>";
-
-
-	core\Mailer::send([
-		'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
-		'subject' => 'Новый заказ на tahos.ru',
-		'body' => $body
-	]);
-	
- 	if ($user['isAutomaticOrder'] && core\User::noOverdue($user_id)){
-		header("Location: /admin/?view=orders&id=$order_id&act=allInWork&automaticOrder=1");
-		exit();
-	}
-
-	message('Успешно отправлено в заказы!');
-	header('Location: /orders');
+    $order_id = $db->last_id();
+    
+    $body = "<h1>Заказанные товары:</h1><table style='width: 100%;border-collapse: collapse;''>";
+    
+    foreach ($res_basket as $value){
+        if (!$value['isToOrder']) continue;
+        
+        //если товара уже нету в прайсах, то тоже пропускаем
+        if (!$value['cipher']) continue;
+    
+        $body .= "
+            <tr>
+                <td style='border: 1px solid black'>{$value['brend']}</td>
+                <td style='border: 1px solid black'>{$value['article']}</td>
+                <td style='border: 1px solid black'>{$value['title']}</td>
+                <td style='border: 1px solid black'>{$value['cipher']}</td>
+                <td style='border: 1px solid black'>{$value['price']}</td>
+                <td style='border: 1px solid black'>{$value['quan']}</td>
+                <td style='border: 1px solid black'>{$value['comment']}</td>
+            </tr>
+        ";
+        
+        $query = core\StoreItem::getQueryStoreItem();
+        $query .= "
+            WHERE si.store_id = {$value['store_id']} AND si.item_id = {$value['item_id']}
+        ";
+        $result = $db->query($query, '');
+        $storeItemInfo = $result->fetch_assoc();
+    
+        $res = $db->insert(
+            'orders_values',
+            [
+                'user_id' => $_SESSION['user'],
+                'order_id' => $order_id,
+                'store_id' => $value['store_id'],
+                'item_id' => $value['item_id'],
+                'withoutMarkup' => $storeItemInfo['priceWithoutMarkup'],
+                'price' => $value['price'],
+                'quan' => $value['quan'],
+                'comment' => $value['comment']
+            ]
+        );
+    
+        if ($res !== true) die("$res | $last_query");
+        
+        $db->delete('basket', "`user_id`={$_SESSION['user']} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
+    }
+    $body .= "</table>";
+    
+    
+    core\Mailer::send([
+        'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
+        'subject' => 'Новый заказ на tahos.ru',
+        'body' => $body
+    ]);
+    
+    if ($user['isAutomaticOrder'] && core\User::noOverdue($user_id)){
+        header("Location: /admin/?view=orders&id=$order_id&act=allInWork&automaticOrder=1");
+        exit();
+    }
+    
+    if (in_array($additional_options['pay_type'], ['Онлайн'])){
+        header("Location: /online_payment/$order_id");
+        die();
+    }
+    
+    message('Успешно отправлено в заказы!');
+    header('Location: /orders');
 }
 $res_basket = core\Basket::get($_SESSION['user']);
 if (!$res_basket->num_rows) return;
@@ -416,15 +421,22 @@ $noReturnIsExists = false;
                 <div class="wrapper">
                     <div class="left">Выберите способ оплаты</div>
                     <div class="right">
+                        <?if ($user['user_type'] == 'entity'){?>
+                            <label>
+                                <?$checked = $user['pay_type'] == 'Безналичный' ? 'checked' : ''?>
+                                <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
+                                <span>Безналичный</span>
+                            </label>
+                        <?}?>
                         <label>
                             <?$checked = $user['pay_type'] == 'Наличный' ? 'checked' : ''?>
                             <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
                             <span>Наличный</span>
                         </label>
                         <label>
-                            <?$checked = $user['pay_type'] == 'Безналичный' ? 'checked' : ''?>
-                            <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
-                            <span>Безналичный</span>
+                            <?$checked = $user['pay_type'] == 'Онлайн' ? 'checked' : ''?>
+                            <input <?=$checked?> type="radio" name="pay_type" value="Онлайн">
+                            <span>Онлайн оплата</span>
                         </label>
                     </div>
                 </div>

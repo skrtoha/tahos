@@ -65,6 +65,7 @@ class LeftMenu{
 		'Отчеты',
 		'Тест API поставщиков',
 		'Рассылки прайсов',
+        'Настройки почты',
 		'Блокировка сайта',
 		'Настройки'
 	];
@@ -96,6 +97,7 @@ class LeftMenu{
 		'Отчеты' => ['reports'],
 		'Настройки' => ['settings'],
 		'Тест API поставщиков' => ['test_api_providers'],
+        'Настройки почты' => ['email_settings'],
 		'Рассылки прайсов' => ['subscribePrices'],
 		'Блокировка сайта' => ['blockSite']
 	];
@@ -116,6 +118,7 @@ class LeftMenu{
 			'Соединения' => 'connections',
 			'Тест API поставщиков' => 'test_api_providers',
 			'Рассылки прайсов' => 'subscribePrices',
+            'Настройки почты' => 'email_settings',
 			'Блокировка сайта' => 'blockSite'
 		],
 		'Финансовые операции' => 'funds',

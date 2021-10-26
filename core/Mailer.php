@@ -9,12 +9,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
  * Класс реализует оповещение на сайте
  */
 class Mailer{
-	public static $config = [
-		'email' => 'test@tahos.ru',
-		'username' => 'test@tahos.ru',
-		'password' => 'Anton12345',
-		'host' => 'smtp.mail.ru',
-	];
 	/**
 	 * Отправляет сообщение
 	 * @param  [array] $params массив параметров (['emails'], subject, body)
@@ -22,6 +16,14 @@ class Mailer{
 	 */
 	public static function send($params, $attachments = []){
 		if (!Config::$isSendEmails) return true;
+        
+        $config = [
+            'email' => Setting::get('email_settings', 'email'),
+            'username' => Setting::get('email_settings', 'username'),
+            'password' => Setting::get('email_settings', 'password'),
+            'host' => Setting::get('email_settings', 'host'),
+        ];
+        
 		$mail = new PHPMailer();
 		$mail->isSMTP();
 		$mail->isHTML(true);  

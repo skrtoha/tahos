@@ -28,17 +28,17 @@ class Mailer{
 		$mail->isSMTP();
 		$mail->isHTML(true);  
 		$mail->SMTPDebug = 0;
-		$mail->Host = self::$config['host'];
+		$mail->Host = $config['host'];
 		$mail->SMTPAuth = true;
-		$mail->Username = self::$config['username'];
-		$mail->Password = self::$config['password'];
-		$mail->setFrom(self::$config['email'], 'Tahos.ru');     
+		$mail->Username = $config['username'];
+		$mail->Password = $config['password'];
+		$mail->setFrom($config['email'], 'Tahos.ru');
 		$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
 		$mail->Port = 465;
 		if (is_array($params['emails'])){
 			foreach($params['emails'] as $email) $mail->addAddress($email);
 		} else $mail->addAddress($params['emails']);
-		$mail->addReplyTo(self::$config['email'], 'Tahos.ru');
+		$mail->addReplyTo($config['email'], 'Tahos.ru');
 		$mail->Body = $params['body'];
 		$mail->Subject = $params['subject'];
 		$mail->CharSet = 'UTF-8';

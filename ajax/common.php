@@ -1,6 +1,8 @@
 <?require_once ("../core/DataBase.php");
 require_once('../core/functions.php');
 
+/** @var $result mysqli_result */
+
 ini_set('error_reporting', E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -87,9 +89,10 @@ switch($_POST['act']){
                 <p>Доброго времени суток!</p>
                 <p>Кто-то, возможно, вы, отправил запрос на восстановление пароля с сайта <a href='http://tahos.ru'>tahos.ru</a>.</p>
                 <p>Если это были не вы, просто проигнорируйте это письмо.</p>
-                <p>Ссылка на <a href='http://tahos.ru/recovery?key=$string'>восстановление</a> пароля.</p>
+                <p>Ссылка на <a href='http://tahos.ru/recovery/$string'>восстановление</a> пароля.</p>
             "
         ]);
+        echo 'ok';
         break;
 }
 ?>

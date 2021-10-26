@@ -31,7 +31,7 @@ class Mailer{
 		$mail->Username = self::$config['username'];
 		$mail->Password = self::$config['password'];
 		$mail->setFrom(self::$config['email'], 'Tahos.ru');     
-		$mail->SMTPSecure = 'ssl';
+		$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
 		$mail->Port = 465;
 		if (is_array($params['emails'])){
 			foreach($params['emails'] as $email) $mail->addAddress($email);

@@ -51,10 +51,11 @@ class User{
 			foreach($params as $key => $value){
 				switch($key){
 					case 'user_id': $where .= "u.id = {$value} AND "; break;
-                    case 'email': $where .= "u.email = '$value' AND "; break;
 					case 'withWithdraw': $where .= "u.bill < 0 AND "; break;
                     case 'full_name': $having .= "full_name LIKE '%{$value}%' AND "; break;
                     case 'limit': $limit = "LIMIT $value"; break;
+                    default:
+                        $where .= "u.$key = '$value' AND ";
 				}
 			}
 			if ($where){

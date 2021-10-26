@@ -74,5 +74,22 @@ switch($_POST['act']){
         ];
         $db->insert('search_vin', $arrayInsert);
         break;
+    case 'restore_password':
+        $result = \core\User::get(['email' => $_POST['email']]);
+        if (!$result->num_rows) break;
+        $user = $result->fetch_assoc();
+        $string = \core\Provider::getRandomString(24);
+        \core\User::update($user['id'], ['auth_key' => $string]);
+        \core\Mailer::send([
+            'emails' => $_POST['email'],
+            'subject' => 'Восстановление пароля',
+            'body' => "
+                <p>Доброго времени суток!</p>
+                <p>Кто-то, возможно, вы, отправил запрос на восстановление пароля с сайта <a href='http://tahos.ru'>tahos.ru</a>.</p>
+                <p>Если это были не вы, просто проигнорируйте это письмо.</p>
+                <p>Ссылка на <a href='http://tahos.ru/recovery?key=$string'>восстановление</a> пароля.</p>
+            "
+        ]);
+        break;
 }
 ?>

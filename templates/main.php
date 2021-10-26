@@ -182,6 +182,20 @@
 							<?}?>
 						</div>
 					</div>
+                    <div id="restore_password" class="product-popup mfp-hide">
+                        <h2>Востановить пароль</h2>
+                        <div class="content">
+                            <form action="">
+                                <div class="wrapper">
+                                    <div class="left">Введите ваш email:</div>
+                                    <div class="right">
+                                        <input type="email" name="email">
+                                    </div>
+                                </div>
+                                <input type="submit" value="Отправить">
+                            </form>
+                        </div>
+                    </div>
 				</div>
 			<?}?>
 			<div class="clear"></div>

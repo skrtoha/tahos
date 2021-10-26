@@ -9,6 +9,19 @@
   font-weight: normal;
   font-style: normal;
 }
+#restore_password .wrapper .right {
+    margin-top: 10px;
+}
+#restore_password input[type="submit"] {
+    margin-top: 15px;
+    float: none;
+}
+#restore_password .content {
+    margin-top: 15px;
+}
+#restore_password input[type=email]{
+    width: 100%;
+}
 label[for=w_not_remember_checkbox] {
     margin-right: 10px;
 }

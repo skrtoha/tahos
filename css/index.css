@@ -364,7 +364,6 @@ header .hints a.jspArrow {
 	position: absolute
 }
 .mfp-ajax-holder .mfp-content, .mfp-inline-holder .mfp-content {
-	width: 100%;
 	cursor: auto
 }
 .mfp-ajax-cur {

@@ -653,4 +653,32 @@ $(function() {
 			$(this).children("h4").toggleClass('open');
 		});
 	}
+    $('div.forgot_password a').on('click', function(e){
+        e.preventDefault();
+        $.magnificPopup.open({
+            items: {
+                src: '#restore_password',
+                type: 'inline'
+            }
+        });
+    })
+    $(document).on('submit', '#restore_password form', function(e){
+        e.preventDefault();
+        let formData = {};
+        $.each($(this).serializeArray(), function(i, item){
+            formData[item.name] = item.value;
+        })
+        formData.act = 'restore_password';
+        $.ajax({
+            type: 'post',
+            url: '/ajax/common.php',
+            data: formData,
+            success: function(response){
+                if (response != 'ok') return show_message('Данный email не найден!', 'error');
+                $('#restore_password').html(`
+                    <p>Ссылка для восстановления отправлена на email</p> 
+                `)
+            }
+        })
+    })
 });

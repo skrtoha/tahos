@@ -202,19 +202,6 @@ function getTotalCount($filters){
     foreach($resultCount as $value) $totalCount += $value['cnt'];
     return $totalCount;
 }
-function getSearchHistoryCountElements($params){
-    $params  = [
-        'fields_vin' => "COUNT(*) as cnt",
-        'fields_items' => "COUNT(*) as cnt",
-        'where' => '',
-        'order' => '',
-        'having' => getWhere($_GET),
-        'limit' => ''
-    ];
-    $resultCount = $db->query(buildQuery($params));
-    $totalCount = 0;
-    foreach($resultCount as $value) $totalCount += $value['cnt'];
-}
 function view(){
 	global $status, $db, $page_title;
 	require_once('templates/pagination.php');
@@ -233,8 +220,9 @@ function view(){
 			u.id,
 			" . core\User::getUserFullNameForQuery() . " AS name,
 			u.telefon,
-			u.email
-		FROM 
+			u.email,
+			DATE_FORMAT(u.created, '%d.%m.%Y %H:%i:%s') AS created
+		FROM
 			#users u
 		LEFT JOIN 
 			#organizations_types ot ON ot.id=u.organization_type
@@ -244,18 +232,23 @@ function view(){
 	$all = $db->found_rows();
 	$perPage = 30;
 	$linkLimit = 10;
-	$page = $_GET['page'] ? $_GET['page'] : 1;
+	$page = $_GET['page'] ?: 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
-	$start = $chank[$page] ? $chank[$page] : 0;
+	$start = $chank[$page] ?? 0;
+    $direction = $_GET['direction'] ?? 'asc';
+    $directionHref = $direction == 'asc' ? 'desc' : 'asc';
+    $sort = $_GET['sort'] ?? 'name';
 	$query = "
 		$query
 		ORDER BY
-			name
+			$sort $direction
 		LIMIT
 			$start, $perPage
 	";
 	$query = str_replace('SQL_CALC_FOUND_ROWS', '', $query);
 	$users = $db->query($query, '');
+    $direction = $_GET['direction'] == 'asc' ? 'desc' : 'asc';
+    $urlSort = "/admin/?view=users&direction=$directionHref";
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions">
@@ -271,9 +264,12 @@ function view(){
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
-			<td>ФИО</td>
-			<td>Телефон</td>
-			<td>E-mail</td>
+			<td>
+                <a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=name">ФИО</a>
+            </td>
+			<td><a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=telefon">Телефон</a></td>
+			<td><a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=email">E-mail</a></td>
+			<td><a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=u.created">Дата создания</a></td>
 		</tr>
 		<?if (count($users)){
 			foreach($users as $user){?>
@@ -281,6 +277,7 @@ function view(){
 					<td label="ФИО"><?=$user['name']?></td>
 					<td label="Телефон"><?=$user['telefon']?></td>
 					<td label="E-mail"><?=$user['email']?></td>
+					<td label="Дата создания"><?=$user['created']?></td>
 				</tr>
 			<?}
 		}
@@ -288,7 +285,13 @@ function view(){
 			<tr><td colspan="3">Пользователей не найдено</td></tr>
 		<?}?>
 	</table>
-	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=users&page=");
+    <?
+        $href = '/admin/?view=users';
+        if ($_GET['sort']) $href .= "&sort={$_GET['sort']}";
+        if ($_GET['direction']) $href .= "&direction={$_GET['direction']}";
+        $href .= '&page=';
+    ?>
+	<?pagination($chank, $page, ceil($all / $perPage), $href);
 }
 function show_form($act){
 	global $status, $db, $page_title;

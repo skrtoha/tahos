@@ -15,6 +15,9 @@ div.intuitiveSearch_wrap{
 .icon-cancel-circle1:before {
     content: "\ea0d";
 }
+a.sort{
+    text-decoration: none;
+}
 select[name^=store_id]{
 	width: 100%;
 }

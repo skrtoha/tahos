@@ -222,7 +222,8 @@
 				url: '/admin/ajax/store_item.php',
 				data: {
 					column: 'getStoreItemsByItemID',
-					item_id: item_id
+					item_id: item_id,
+                    user_id: $('div.value input[type=submit]').attr('user_id')
 				},
 				beforeSend: function(){
 					showGif();

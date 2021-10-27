@@ -1,14 +1,18 @@
 <?php
 namespace core;
 class StoreItem{
-	public static function getQueryStoreItem(): string
+	public static function getQueryStoreItem($discount = 0): string
 	{
+        if ($discount) $userDiscount = "@price * {$discount} / 100";
+        else $userDiscount = 0;
+        
 		return "
 			SELECT
 				si.item_id,
 				si.store_id,
 				(si.price * c.rate) AS priceWithoutMarkup,
-				CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100) AS price,
+				@price := si.price * c.rate + si.price * c.rate * ps.percent / 100,
+                CEIL(@price - $userDiscount) AS price,
 				si.packaging,
 				si.in_stock,
 				ps.cipher,

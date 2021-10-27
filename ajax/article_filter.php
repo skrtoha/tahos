@@ -1,4 +1,6 @@
-<?php 
+<?php
+/** @var $res_user mysqli_result */
+
 session_start();
 require_once ("../core/DataBase.php");
 require_once ("../core/functions.php");
@@ -18,7 +20,7 @@ if ($_POST['filters_on']) $filters = [
 ];
 else $filters = [];
 
-$res_user = core\User::get(['user_id' => $_SESSION['user'] ? $_SESSION['user'] : false]);
+$res_user = core\User::get(['user_id' => $_SESSION['user'] ?: false]);
 if ($res_user->num_rows) $user = $res_user->fetch_assoc();
 else $user = $res_user;
 

@@ -1,4 +1,5 @@
-<?php 
+<?php
+/** @var $result mysqli_result */
 require_once ("../../core/DataBase.php");
 
 $db = new core\Database();
@@ -54,7 +55,9 @@ switch ($_POST['column']) {
 		}
 		break;
 	case 'getStoreItemsByItemID':
-		$query = core\StoreItem::getQueryStoreItem();
+        $result = \core\User::get(['id' => $_POST['user_id']]);
+        $userInfo = $result->fetch_assoc();
+		$query = core\StoreItem::getQueryStoreItem($userInfo['discount']);
 		$query .= "
 			WHERE si.item_id = {$_POST['item_id']}
 		";

@@ -4,6 +4,7 @@ $title = 'Установка нового пароля';
 
 $result = \core\User::get(['auth_key' => $_GET['auth_key']]);
 $user = $result->fetch_assoc();
+\core\User::update($user['id'], ['auth_key' => null]);
 if (!$result->num_rows) die("Произошла ошибка!");
 
 if (!empty($_POST)){

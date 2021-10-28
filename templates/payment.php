@@ -80,7 +80,7 @@ $designation = $db->getFieldOnID('currencies', $user['currency_id'], 'designatio
 				<input type="hidden" name="receiver" value="410013982328385">
 				<input type="hidden" name="formcomment" value="<?=$fio?>">
 				<input type="hidden" name="short-dest" value="">
-				<input type="hidden" name="label" value="<?=$_SESSION['user']?>">
+				<input type="hidden" name="label" value="account:<?=$_SESSION['user']?>">
 				<input type="hidden" name="quickpay-form" value="donate">
 				<input type="hidden" name="targets" value="Пополнение счета пользователя">
 				<input type="hidden" name="comment" value="Пополнение счета для <?=$_SESSION['user']?>">

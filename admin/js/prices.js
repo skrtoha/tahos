@@ -133,6 +133,7 @@ $(function(){
 				}) 
 				storeInfo.store_id = $('table.t_table').attr('store_id');
 				storeInfo.item_id = item_id;
+                storeInfo.priceWithoutMarkup = '';
 				modal_show(add_item_to_store.getHtmlForm(storeInfo));
 			}
 		})
@@ -144,6 +145,7 @@ $(function(){
 		$.each(array, function(i, value){
 			formData[value.name] = value.value
 		});
+        formData.price = formData.price.replace(',', '.');
 		let str = `
 			<tr>
 				<td>${itemInfo.brend}</td>

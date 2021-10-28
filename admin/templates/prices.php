@@ -214,22 +214,25 @@ function items(){
 			$orderBy
 	";
 	// echo $query; exit();
-	$all = $db->query("
-		SELECT SQL_CALC_FOUND_ROWS
-			si.item_id
+    $groupQuery = $db->query("
+		SELECT
+			COUNT(*) AS count,
+            SUM(si.price * si.in_stock) AS summ
 		FROM
 			#store_items si
 		WHERE 
 			$where
 	", '');
-	$all = $db->found_rows();
+    $result = $groupQuery->fetch_assoc();
+	$all = $result['count'];
+    $commonSumm = $result['summ'];
 	$page_title = "Прайс $title_store";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=prices'>Прайсы</a> > $page_title";
 	$perPage = 30;
 	$linkLimit = 10;
-	$page = $_GET['page'] ? $_GET['page'] : 1;
+	$page = $_GET['page'] ?? 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
-	$start = $chank[$page] ? $chank[$page] : 0;
+	$start = $chank[$page] ?? 0;
 	$query .= " LIMIT $start,$perPage";
 	$linkHref = "/admin/?view=prices&act=items&id={$_GET['id']}";
 	$menu = [
@@ -245,7 +248,12 @@ function items(){
 		$menu['requiredRemain'] = 'Мин. наличие';
 	}
 	$res_items = $db->query($query, '');?>
-	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
+	<div id="total" style="margin-top: 10px;">
+        Всего: <?=$all?>
+        <?if ($_GET['id'] == 23){?>
+            на сумму <b><?=$commonSumm?></b> р.
+        <?}?>
+    </div>
 	<div class="actions" style="">
 		<input style="width: 264px;" type="text" name="searchArticle" value="" placeholder="Поиск по артикулу" class="intuitive_search">
 			<input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">

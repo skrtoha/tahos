@@ -11,6 +11,10 @@ input[column=packaging]
 tr.sort td a{
 	text-decoration: none;
 }
+div.actions > form{
+    float: left;
+    margin-right: 10px;
+}
 tr.sort td{
 	cursor: pointer;
     white-space: nowrap;

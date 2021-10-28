@@ -168,8 +168,6 @@ function items(){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];
 	require_once('templates/pagination.php');
-	$search = $_GET['search'] ? $_GET['search'] : $_POST['search'];
-	$search = core\Item::articleClear($search);
 	$title_store = $db->getFieldOnID('provider_stores', $id, 'cipher');
 	$orderBy = "si.created DESC";
 	if (isset($_GET['sort'])){
@@ -186,12 +184,10 @@ function items(){
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}
 	$where = '';
-	if ($search) $where = "
-		(
-			i.article='$search'
-		) 
-		AND 
-	";
+	if (isset($_GET['article'])){
+        $article = \core\Item::articleClear($_GET['article']);
+        $where = "(i.article='$article') AND ";
+    }
 	$where .= "si.store_id=$id";
 	$query = "
 		SELECT 
@@ -220,6 +216,7 @@ function items(){
             SUM(si.price * si.in_stock) AS summ
 		FROM
 			#store_items si
+		LEFT JOIN #items i ON si.item_id=i.id
 		WHERE 
 			$where
 	", '');
@@ -255,8 +252,14 @@ function items(){
         <?}?>
     </div>
 	<div class="actions" style="">
-		<input style="width: 264px;" type="text" name="searchArticle" value="" placeholder="Поиск по артикулу" class="intuitive_search">
-			<input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
+        <form>
+            <input type="hidden" name="view" value="prices">
+            <input type="hidden" name="act" value="items">
+            <input type="hidden" name="id" value="<?=$_GET['id']?>">
+            <input class="intuitive_search" style="width: 264px;" type="text" name="article" value="<?=$_GET['article']?>" placeholder="Поиск по артикулу" required>
+            <input type="submit" value="Искать">
+        </form>
+        <input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
 	</div>
 	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>">
 		<tr class="head sort">

@@ -281,8 +281,7 @@ $(function(){
 		let th = $(this);
 		$('span.main-photo').removeClass('icon-lock').addClass('icon-unlocked');
 		th.removeClass('icon-unlocked').addClass('icon-lock');
-		$('li[big]').removeClass('main-photo');
-		$('li[big]').find('input[name*=is_main]').val(0);
+		$('li[big]').removeClass('main-photo').find('input[name*=is_main]').val(0);
 		th.closest('li').addClass('main-photo').find('input[name*=is_main]').val(1);
 	})
 	$(document).on('change', '#loadPhoto', function(){
@@ -300,8 +299,7 @@ $(function(){
 					aspectRatio: 0.8,
 					cropBoxResizable: false
 				});
-				$('#modal-container').addClass('active');
-				$('#modal-container').on('click', function(event){
+				$('#modal-container').addClass('active').on('click', function(event){
 					var t = $('#modal-container');
 					if (t.is(event.target)){
 			      	cropper.reset();

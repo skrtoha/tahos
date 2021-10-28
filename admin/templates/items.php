@@ -5,7 +5,7 @@ use core\Item;
 if (isset($_FILES['photo'])){
 	$name = preg_replace('/[а-яА-Я]+/u', "", $_FILES['photo']['name']);
 	copy($_FILES['photo']['tmp_name'], core\Config::$tmpFolderPath . '/' . $name);?>
-		<img id="uploadedPhoto" src="<?=core\Config::$tmpFolderUrl?>/<?=$name?>">
+		<img id="uploadedPhoto" src="<?=core\Config::$tmpFolderUrl?>/<?=$name?>" alt="">
 		<button id="savePhoto">Сохранить</button>
 	<?
 	exit();
@@ -172,7 +172,6 @@ switch ($act) {
 	case 'deleteItemDiff':
 		debug($_GET);
 		break;
-	case 'search': search(); break;
 	case 'items': items(); break;
 	case 'item': 
 		item('s_change'); 

@@ -79,7 +79,7 @@ $(function(){
 			}
 		})
 	})
-	$('input[name=searchArticle].intuitive_search').on('keyup focus', function(e){
+	$('input[name=article].intuitive_search').on('keyup focus', function(e){
 		set_intuitive_search(e, 'store_items');
 	})
 	$('input[name=storeItemsForAdding].intuitive_search').on('keyup focus', function(e){
@@ -141,7 +141,7 @@ $(function(){
 	$(document).on('submit', 'form.add_item_to_store', function(){
 		if (add_item_to_store.isValidated == false) return false;
 		let array = $(this).serializeArray();
-		let formData = new Object();
+		let formData = {};
 		$.each(array, function(i, value){
 			formData[value.name] = value.value
 		});

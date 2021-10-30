@@ -316,7 +316,7 @@ switch ($params[0]){
                     $logger->warning($e->getMessage());
                     $logger->info("Обработка с помощью PhpOffice...");
                     parseWithPhpOffice($workingFile, $debuggingMode, $logger);
-                    endSuccessfullyProccessing($price->isLogging, $logger);
+                    endSuccessfullyProccessing($price->isLogging, $logger, $params[1]);
                     break 2;
                 }
                 try{

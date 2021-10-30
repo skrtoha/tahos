@@ -250,9 +250,9 @@ function endSuccessfullyProccessing($isLogging, Logger $logger, $store_id){
 }
 function parseWithPhpOffice($workingFile, $debuggingMode, Logger $logger){
 	global $emailPrice, $price, $stringNumber;
-	$xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
-	$xls->setActiveSheetIndex(0);
-	$sheet = $xls->getActiveSheet();
+    $xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($workingFile);
+    $xls->setActiveSheetIndex(0);
+    $sheet = $xls->getActiveSheet();
 	$rowIterator = $sheet->getRowIterator();
 	foreach ($rowIterator as $iterator) {
 		$row = array();

@@ -4,7 +4,6 @@
     },
     "require": {
         "katzgrau/klogger": "dev-master",
-        "phpoffice/phpspreadsheet": "^1.18",
         "box/spout": "^3.1",
         "ext-soap": "*",
         "ext-mysqli": "*",
@@ -15,7 +14,8 @@
         "mobiledetect/mobiledetectlib": "^2.8",
         "phpmailer/phpmailer": "^6.4",
       "ext-imap": "*",
-        "firebase/php-jwt": "^5.4"
+        "firebase/php-jwt": "^5.4",
+        "phpoffice/phpspreadsheet": "^1.18"
     },
     "autoload": {
         "psr-4": {

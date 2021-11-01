@@ -142,6 +142,10 @@
 					tableName: 'items',
 				});
 			});
+            $('div.set-addresses > button').on('click', function(e) {
+                e.preventDefault();
+                modal_show();
+            })
 		},
         history_search: function(params = {}){
             let uoa = this;

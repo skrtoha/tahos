@@ -577,9 +577,8 @@ $(document).ready(function(e){
 		$('#left_menu').removeClass('show');
 	})
 })
-function modal_show(content){
-	$('#modal-container')
-		.addClass('active')
-		.find('#modal_content')
-		.html(content);
+function modal_show(content = null){
+    $container = $('#modal-container');
+    $container.addClass('active');
+    if (content) $container.find('#modal_content').html(content);
 }

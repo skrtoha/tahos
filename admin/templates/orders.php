@@ -254,98 +254,100 @@ function show_form($act){
 			<td label="Дата заказа"><?=$order['date']?></td>
 		</tr>
 	</table>
-    <?if ($order['pay_type'] && $order['delivery']){?>
-        <h3 style="margin-top: 10px">Дополнительная информация о заказе</h3>
-        <a id="changeAdditionalInformation" href="?view=orders&id=<?=$_GET['id']?>&act=change&additionalInformation">Изменить</a>
-        <?if (isset($_GET['additionalInformation'])){?>
-            <form action="<?=$_SERVER['REQUEST_URI']?>" method="post">
-        <?}?>
-        <table class="t_table" cellspacing="1">
-            <tr class="head">
-                <td>Тип оплаты</td>
-                <td>Доставка</td>
-                <td>Дата отгрузки</td>
-                <td>Адрес</td>
-                <td>Весь заказ</td>
-            </tr>
-            <tr>
-                <td label="Тип оплаты">
-                    <?if (isset($_GET['additionalInformation'])){?>
-                        <select name="pay_type">
-                            <?$selected = $order['pay_type'] == 'Наличный' ? 'selected' : ''?>
-                            <option <?=$selected?> value="Наличный">Наличный</option>
-                            <?$selected = $order['pay_type'] == 'Безналичный' ? 'selected' : ''?>
-                            <option  <?=$selected?> value="Безналичный">Безналичный</option>
-                        </select>
-                    <?}
-                    else{?>
-                        <?=$order['pay_type']?>
-                    <?}?>
-                </td>
-                <td label="Доставка">
-                    <?if (isset($_GET['additionalInformation'])){?>
-                        <select name="delivery">
-                            <?$selected = $order['delivery'] == 'Доставка' ? 'selected' : ''?>
-                            <option <?=$selected?> value="Доставка">Доставка</option>
-                            <?$selected = $order['delivery'] == 'Самовывоз' ? 'selected' : ''?>
-                            <option <?=$selected?> value="Самовывоз">Самовывоз</option>
-                        </select>
-                    <?}
-                    else{?>
-                        <?=$order['delivery']?>
-                    <?}?>
-                </td>
-                <?$dateTimeObject = DateTime::createFromFormat('Y-m-d H:i:s', $order['date_issue'])?>
-                <td label="Дата отгрузки">
-                    <?if (isset($_GET['additionalInformation'])){?>
-                        <input class="datetimepicker" type="text" name="date_issue" value="<?=$dateTimeObject->format('d.m.Y')?>">
-                    <?}
-                    else{?>
-                        <?=$dateTimeObject->format('d.m.Y')?>
-                    <?}?>
-                </td>
-                <td label="Адрес">
-                    <?if (isset($_GET['additionalInformation'])){
-                        $addressList = $db->select('user_addresses', ['id', 'json'], "`user_id` = {$order['user_id']}");?>
-                        <select name="address_id" <?=$order['delivery'] == 'Самовывоз' ? 'disabled' : ''?>>
-                            <option value="">ничего не выбрано</option>
-                            <?foreach($addressList as $address){?>
-                                <option value="<?=$address['id']?>" <?=$address['id'] == $order['address_id'] ? 'selected' : ''?>>
-                                    <?=\core\UserAddress::getString(
-                                        $address['id'],
-                                        json_decode($address['json'], true)
-                                    )?>
-                                </option>
-                            <?}?>
-                        </select>
-                    <?}
-                    else{
-                        if ($order['address_id'] && $order['json']){?>
-                            <?=\core\UserAddress::getString(
-                                $order['address_id'],
-                                json_decode($order['json'], true)
-                            )?>
+    <h3 style="margin-top: 10px">Дополнительная информация о заказе</h3>
+    <a id="changeAdditionalInformation" href="?view=orders&id=<?=$_GET['id']?>&act=change&additionalInformation">Изменить</a>
+    <?if (isset($_GET['additionalInformation'])){?>
+        <form action="<?=$_SERVER['REQUEST_URI']?>" method="post">
+    <?}?>
+    <table class="t_table" cellspacing="1">
+        <tr class="head">
+            <td>Тип оплаты</td>
+            <td>Доставка</td>
+            <td>Дата отгрузки</td>
+            <td>Адрес</td>
+            <td>Весь заказ</td>
+        </tr>
+        <tr>
+            <td label="Тип оплаты">
+                <?if (isset($_GET['additionalInformation'])){?>
+                    <select name="pay_type">
+                        <?$selected = $order['pay_type'] == 'Наличный' ? 'selected' : ''?>
+                        <option <?=$selected?> value="Наличный">Наличный</option>
+                        <?$selected = $order['pay_type'] == 'Безналичный' ? 'selected' : ''?>
+                        <option  <?=$selected?> value="Безналичный">Безналичный</option>
+                    </select>
+                <?}
+                else{?>
+                    <?=$order['pay_type']?>
+                <?}?>
+            </td>
+            <td label="Доставка">
+                <?if (isset($_GET['additionalInformation'])){?>
+                    <select name="delivery">
+                        <?$selected = $order['delivery'] == 'Доставка' ? 'selected' : ''?>
+                        <option <?=$selected?> value="Доставка">Доставка</option>
+                        <?$selected = $order['delivery'] == 'Самовывоз' ? 'selected' : ''?>
+                        <option <?=$selected?> value="Самовывоз">Самовывоз</option>
+                    </select>
+                <?}
+                else{?>
+                    <?=$order['delivery']?>
+                <?}?>
+            </td>
+            <?if ($order['date_issue']){
+                $dateTimeObject = DateTime::createFromFormat('Y-m-d H:i:s', $order['date_issue']);
+                $date = $dateTimeObject->format('d.m.Y');
+            }
+            else $date = '';?>
+            <td label="Дата отгрузки">
+                <?if (isset($_GET['additionalInformation'])){?>
+                    <input class="datetimepicker" type="text" name="date_issue" value="<?=$date?>">
+                <?}
+                else{?>
+                    <?=$date?>
+                <?}?>
+            </td>
+            <td label="Адрес">
+                <?if (isset($_GET['additionalInformation'])){
+                    $addressList = $db->select('user_addresses', ['id', 'json'], "`user_id` = {$order['user_id']}");?>
+                    <select name="address_id" <?=$order['delivery'] == 'Самовывоз' ? 'disabled' : ''?>>
+                        <option value="">ничего не выбрано</option>
+                        <?foreach($addressList as $address){?>
+                            <option value="<?=$address['id']?>" <?=$address['id'] == $order['address_id'] ? 'selected' : ''?>>
+                                <?=\core\UserAddress::getString(
+                                    $address['id'],
+                                    json_decode($address['json'], true)
+                                )?>
+                            </option>
                         <?}?>
+                    </select>
+                <?}
+                else{
+                    if ($order['address_id'] && $order['json']){?>
+                        <?=\core\UserAddress::getString(
+                            $order['address_id'],
+                            json_decode($order['json'], true)
+                        )?>
                     <?}?>
-                </td>
-                <td label="Весь заказ">
-                    <?if (isset($_GET['additionalInformation'])){?>
-                        <select name="entire_order">
-                            <option <?=$order['entire_order'] == 1 ? 'selected' : ''?> value="1">Да</option>
-                            <option <?=$order['entire_order'] == 0 ? 'selected' : ''?> value="0">Нет</option>
-                        </select>
-                    <?}
-                    else{?>
-                        <?=$order['entire_order'] == '1' ? 'Да' : 'Нет'?>
-                    <?}?>
-                    
-                </td>
-            </tr>
-        </table>
-        <?if (isset($_GET['additionalInformation'])){?>
-                <input style="margin-top: 10px" type="submit" value="Сохранить">
-            </form>
-        <?}?>
+                <?}?>
+            </td>
+            <td label="Весь заказ">
+                <?if (isset($_GET['additionalInformation'])){?>
+                    <select name="entire_order">
+                        <option <?=$order['entire_order'] == 1 ? 'selected' : ''?> value="1">Да</option>
+                        <option <?=$order['entire_order'] == 0 ? 'selected' : ''?> value="0">Нет</option>
+                    </select>
+                <?}
+                else{?>
+                    <?=$order['entire_order'] == '1' ? 'Да' : 'Нет'?>
+                <?}?>
+                
+            </td>
+        </tr>
+    </table>
+    <?if (isset($_GET['additionalInformation'])){?>
+            <input style="margin-top: 10px" type="submit" value="Сохранить">
+        </form>
     <?}?>
 	<h3 style="margin-top: 10px">Товары в заказе</h3>
 	<a class="allInWork" href="/admin/?view=orders&id=<?=$_GET['id']?>&act=allInWork">В работе для всех</a>

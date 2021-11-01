@@ -15,6 +15,10 @@ use admin\functions\LeftMenu;
 	<?if (in_array($_GET['view'], ['items', 'categories'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/cropper/cropper.css">
 	<?}?>
+    <?if (in_array($_GET['view'], ['users'])){?>
+        <link rel="stylesheet" type="text/css" href="/vendor/addressee/style.css">
+        <link rel="stylesheet" type="text/css" href="/vendor/addressee/jquery.fias.min.css">
+    <?}?>
 	<?if (in_array($_GET['view'], ['connections', 'index', 'brends'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/chosen/chosen.css">
 	<?}?>
@@ -145,6 +149,10 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['connections', 'index', 'brends'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
 		<?}?>
+        <?if (in_array($view, ['users'])){?>
+                {"src" : "/vendor/addressee/jquery.fias.min.js", "async" : false},
+                {"src" : "/vendor/addressee/script.js", "async" : false},
+        <?}?>
 		<?
 		$arrayIntuitiveSearch = [
 			'items', 
@@ -169,7 +177,11 @@ use admin\functions\LeftMenu;
 	<?}?>
 <div id="modal-container">
 	<div class="modal">
-		<div id="modal_content"></div>
+		<div id="modal_content">
+            <?if ($_GET['view'] == 'users'){?>
+                <?require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/addressee/template.php');?>
+            <?}?>
+         </div>
 		<span id="modal_close" class="icon-cross1"></span>
 	</div>
 </div>

@@ -1,6 +1,7 @@
 <?php
 $act = $_GET['act'];
 $id = $_GET['id'];
+$_SESSION['user'] = $_GET['id'];
 if ($_POST['form_submit']){
 	$saveble = true;
 	$id = $_GET['id'];
@@ -489,6 +490,14 @@ function show_form($act){
 						<input type="checkbox" name="bonus_program" <?=$checked?> value="1">
 					</div>
 				</div>
+                <div class="field">
+                    <div class="title">Адреса доставки</div>
+                    <div class="value">
+                        <div class="input-wrap set-addresses ">
+                            <button>Показать</button>
+                        </div>
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Количество бонусов</div>
 					<div class="value">

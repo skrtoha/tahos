@@ -18,7 +18,8 @@
 		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css">
 	<?}?>
     <?if ($view == 'settings'){?>
-        <link rel="stylesheet" href="/vendor/jquery-fias/jquery.fias.min.css">
+        <link rel="stylesheet" href="/vendor/addressee/jquery.fias.min.css">
+        <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
 	<meta name="theme-color" content="#0081BC">
@@ -395,7 +396,8 @@
 			{"src" : "/js/get_store_info.js", "async" : false},
 		<?}?>
         <?if (in_array($view, ['settings'])){?>
-            {"src" : "/vendor/jquery-fias/jquery.fias.min.js", "async" : false},
+            {"src" : "/vendor/addressee/jquery.fias.min.js", "async" : false},
+            {"src" : "/vendor/addressee/script.js", "async" : false},
         <?}?>
         <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
             {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},

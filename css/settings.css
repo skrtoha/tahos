@@ -87,9 +87,6 @@ input{
 .jq-radio__div {
     position: relative;
 }
-#set-address > div {
-    display: flex;
-}
 .jq-radio.checked .jq-radio__div::after {
     left: 3px;
     position: absolute;
@@ -127,28 +124,6 @@ input{
   position: absolute;
   right: 0;
 }
-.address span:last-child::after {
-    content: "";
-}
-.address .fa-times {
-    font-size: 1.2em;
-    color: red;
-    -webkit-transition: all ease .2s;
-    transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) .2s;
-    position: absolute;
-    right: 4px;
-    top: 0;
-}
-div.address:hover{
-    cursor: pointer;
-}
-.address .fa-times:hover{
-    cursor: pointer;
-}
-form.js-form-address .right {
-    width: 50%;
-    float: right;
-}
 .fa-remove:before, .fa-close:before, .fa-times:before {
     content: "\f00d";
 }
@@ -170,16 +145,6 @@ form.js-form-address .right {
     display: inline-block;
     margin-right: 5px;
     color: #727272;
-}
-form.js-form-address > div.input{
-    width: 50%;
-    margin: 0 auto;
-    color: #5f5f5f;
-}
-#set-address .right{
-}
-#set-address .left{
-
 }
 div#address_multiple_fields input[type=button] {
     float: left;
@@ -205,14 +170,6 @@ div#address_multiple_fields input[type=button] {
   border: 1px solid #0081BC;
   cursor: pointer;
 }
-form.js-form-address div.flex{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-content: space-around;
-    justify-content: flex-start;
-    align-items: center;
-}
 form.js-form-address .half{
     margin-right: 10px;
 }
@@ -222,9 +179,6 @@ form.js-form-address .half .input{
 form.js-form-address .half .input label{
     margin-bottom: 4px;
     display: block;
-}
-form.js-form-address input{
-    width: 250px;
 }
 div.popup {
   width: 100%;
@@ -869,41 +823,6 @@ img.mfp-img {
 }
 .mfp-gallery .mfp-image-holder .mfp-figure {
   cursor: pointer;
-}
-@media screen and (max-width: 948px){
-    .address{
-        margin-right: 0;
-    }
-    #set-address > div{
-        padding-top: 20px
-    }
-    form.js-form-address > div.input{
-        margin-top: 15px;
-    }
-    #set-address > div{
-        flex-direction: column;
-    }
-    form.js-form-address input{
-        width: 100%;
-    }
-    input[name="zip"]{
-        width: calc(100% - 52px) !important;
-    }
-    form.js-form-address div.flex{
-        flex-direction: column;
-    }
-    form.js-form-address .half{
-        width: 100%;
-    }
-    div#address_multiple_fields input[type=button]{
-        float: none;
-    }
-    form.js-form-address .half .input label{
-        margin-bottom: 2px;
-    }
-    form.js-form-address .half .input{
-        margin-bottom: 0;
-    }
 }
     @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
   /**
@@ -5184,9 +5103,6 @@ header .login .social_buttons {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   padding: 30px;
-  width: 100%;
-}
-.mfp-content .filter-form input {
   width: 100%;
 }
 .mfp-content .filter-form h3 {

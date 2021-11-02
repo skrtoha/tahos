@@ -253,4 +253,7 @@ $res_user_socials = $db->query("
 		<button id="apply">Применить</button>
 	</div>
 </div>
-<? require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/addressee/template.php';?>
+<?
+$user_id = $_SESSION['user'];
+require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/addressee/template.php';
+?>

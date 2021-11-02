@@ -1,7 +1,7 @@
 <?php
 $act = $_GET['act'];
 $id = $_GET['id'];
-$_SESSION['user'] = $_GET['id'];
+$GLOBALS['user'] = $_GET['id'];
 if ($_POST['form_submit']){
 	$saveble = true;
 	$id = $_GET['id'];

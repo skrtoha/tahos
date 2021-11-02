@@ -3,7 +3,6 @@
 
 div.popup > div {
   box-sizing: border-box;
-  width: 90%;
   background: white;
   z-index: inherit;
   padding: 20px;

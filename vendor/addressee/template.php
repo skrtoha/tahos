@@ -1,3 +1,7 @@
+<?
+/* @var $user_id int */
+/* @var $db \core\Database */
+?>
 <div id="set-address" class="popup">
     <div id="set-address-wrapper" >
         <div id="address_multiple_fields" class="left">
@@ -43,7 +47,7 @@
             <?$userAddresses = $db->select(
                 'user_addresses',
                 '*',
-                "`user_id` = {$_SESSION['user']}",
+                "`user_id` = {$user_id}",
                 'created'
             );
             if (!empty($userAddresses)){

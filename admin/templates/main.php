@@ -179,7 +179,10 @@ use admin\functions\LeftMenu;
 	<div class="modal">
 		<div id="modal_content">
             <?if ($_GET['view'] == 'users'){?>
-                <?require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/addressee/template.php');?>
+                <?
+                $user_id = $_GET['id'];
+                require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/addressee/template.php');
+                ?>
             <?}?>
          </div>
 		<span id="modal_close" class="icon-cross1"></span>

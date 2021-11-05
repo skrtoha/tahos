@@ -12,9 +12,7 @@ class Mailer{
     const TYPE_EMAIL_PRICE = 'email_price';
     const TYPE_INFO = 'info';
     const TYPE_SUBSCRIBE = 'subscribe';
-    /**
-     * @param $type string email_price, info, subscribe
-     */
+
     public function __construct($type){
         $settings = json_decode(Setting::get('email', $type));
         $this->email = $settings->email;

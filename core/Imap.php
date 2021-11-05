@@ -1,12 +1,10 @@
 <?php
 namespace core;
 class Imap{
-	private $login = 'price@tahos.ru';
-	private $password = 'Anton12345';
 	public $error;
 
 	public function __construct(){
-        $settings = Setting::get('email', 'email_price');
+        $settings = Setting::get('email', Mailer::TYPE_EMAIL_PRICE);
         $settings = json_decode($settings);
 		try{
 			$this->connection = imap_open($settings->host, $settings->username, $settings->password);

@@ -1,4 +1,6 @@
 <?php
+/* @var $db \core\Database */
+/* @var $user array */
 
 use core\Mailer;
 use core\UserAddress;
@@ -80,7 +82,7 @@ if ($_GET['act'] == 'to_offer'){
             ]
         );
     
-        if ($res !== true) die("$res | $last_query");
+        if ($res !== true) die("$res | $db->last_query");
         
         $db->delete('basket', "`user_id`={$_SESSION['user']} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
     }

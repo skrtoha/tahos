@@ -7,6 +7,7 @@ use core\Provider;
 use core\Setting;
 use Katzgrau\KLogger\Logger;
 use Psr\Log\LogLevel;
+use core\Mailer;
 
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 1);
@@ -668,7 +669,8 @@ switch ($params[0]){
                     fclose($fp);
                     break;
             }
-            $res = core\Mailer::send([
+            $mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
+            $res = $mailer->send([
                 'emails' => $user['subscribe_email'],
                 'subject' => 'Прайс с tahos.ru',
                 'body' => 'Прайс с tahos.ru'
@@ -690,7 +692,8 @@ switch ($params[0]){
         $res_store_items = $db->query($query);
         $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price');
         
-        $res = core\Mailer::send([
+        $mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
+        $res = $mailer->send([
             'emails' => $emails,
             'subject' => 'Прайс с tahos.ru',
             'body' => 'Прайс с tahos.ru'

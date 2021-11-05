@@ -1,4 +1,6 @@
-<?require_once ("../core/DataBase.php");
+<? use core\Mailer;
+
+require_once ("../core/DataBase.php");
 require_once('../core/functions.php');
 
 /** @var $result mysqli_result */
@@ -82,7 +84,9 @@ switch($_POST['act']){
         $user = $result->fetch_assoc();
         $string = \core\Provider::getRandomString(24);
         \core\User::update($user['id'], ['auth_key' => $string]);
-        \core\Mailer::send([
+        
+        $mailer = new Mailer(Mailer::TYPE_INFO);
+        $mailer->send([
             'emails' => $_POST['email'],
             'subject' => 'Восстановление пароля',
             'body' => "

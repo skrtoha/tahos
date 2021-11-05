@@ -1,4 +1,6 @@
 <?php
+
+use core\Mailer;
 use core\UserAddress;
 
 if (!$_SESSION['user']) header('Location: /');
@@ -84,8 +86,8 @@ if ($_GET['act'] == 'to_offer'){
     }
     $body .= "</table>";
     
-    
-    core\Mailer::send([
+    $mailer = new Mailer(Mailer::TYPE_INFO);
+    $mailer->send([
         'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
         'subject' => 'Новый заказ на tahos.ru',
         'body' => $body

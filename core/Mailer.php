@@ -1,44 +1,46 @@
 <?php
 namespace core;
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 /**
  * Класс реализует оповещение на сайте
  */
 class Mailer{
-	/**
-	 * Отправляет сообщение
-	 * @param  [array] $params массив параметров (['emails'], subject, body)
-	 * @return [mixed] true в случае удачной отправки либо сообщение об ошибке  
-	 */
-	public static function send($params, $attachments = []){
+    private $email, $username, $password, $host;
+    
+    const TYPE_EMAIL_PRICE = 'email_price';
+    const TYPE_INFO = 'info';
+    const TYPE_SUBSCRIBE = 'subscribe';
+    /**
+     * @param $type string email_price, info, subscribe
+     */
+    public function __construct($type){
+        $settings = json_decode(Setting::get('email', $type));
+        $this->email = $settings->email;
+        $this->username = $settings->username;
+        $this->password = $settings->password;
+        $this->host = $settings->host;
+    }
+    
+	public function send($params, $attachments = []){
 		if (!Config::$isSendEmails) return true;
-        
-        $config = [
-            'email' => Setting::get('email_settings', 'email'),
-            'username' => Setting::get('email_settings', 'username'),
-            'password' => Setting::get('email_settings', 'password'),
-            'host' => Setting::get('email_settings', 'host'),
-        ];
-        
+  
 		$mail = new PHPMailer();
 		$mail->isSMTP();
 		$mail->isHTML(true);  
 		$mail->SMTPDebug = 0;
-		$mail->Host = $config['host'];
+		$mail->Host = $this->host;
 		$mail->SMTPAuth = true;
-		$mail->Username = $config['username'];
-		$mail->Password = $config['password'];
-		$mail->setFrom($config['email'], 'Tahos.ru');
+		$mail->Username = $this->username;
+		$mail->Password = $this->password;
+		$mail->setFrom($this->email, 'Tahos.ru');
 		$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
 		$mail->Port = 465;
 		if (is_array($params['emails'])){
 			foreach($params['emails'] as $email) $mail->addAddress($email);
 		} else $mail->addAddress($params['emails']);
-		$mail->addReplyTo($config['email'], 'Tahos.ru');
+		$mail->addReplyTo($this->email, 'Tahos.ru');
 		$mail->Body = $params['body'];
 		$mail->Subject = $params['subject'];
 		$mail->CharSet = 'UTF-8';

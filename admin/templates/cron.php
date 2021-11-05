@@ -1,5 +1,6 @@
 <?php
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use core\Mailer;
 use core\Provider\Mikado;
 use core\Provider;
 
@@ -910,7 +911,8 @@ switch($_GET['act']){
 					fclose($fp);
 					break;
 			}
-			$res = core\Mailer::send([
+            $mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
+			$res = $mailer->send([
 				'emails' => $user['subscribe_email'],
 				'subject' => 'Прайс с tahos.ru',
 				'body' => 'Прайс с tahos.ru'

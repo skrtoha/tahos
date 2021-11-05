@@ -177,7 +177,9 @@ class OrderValue{
                 'item_id' => $params['item_id']
             ]));
 		    $orderValue = $orderValuerResult->fetch_assoc();
-		    Mailer::send([
+            
+            $mailer = new Mailer(Mailer::TYPE_INFO);
+		    $mailer->send([
 		        'emails' => $orderValue['email'],
                 'subject' => 'Отказ поставщика',
                 'body' => "Поставщик отказал в поставке товара {$orderValue['brend']} {$orderValue['article']} {$orderValue['title_full']}"

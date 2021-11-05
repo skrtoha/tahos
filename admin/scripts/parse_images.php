@@ -1,5 +1,6 @@
 <?php
 use core\Item;
+use core\Mailer;
 
 set_time_limit(0);
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
@@ -130,7 +131,8 @@ if ($missedBrends){
 }
 $result = ob_get_clean();
 echo $result;
-core\Mailer::send([
+$mailer = new Mailer(Mailer::TYPE_INFO);
+$mailer->send([
 	'emails' => ['skrtoha@gmail.com'],
 	'subject' => 'Обработка закончена',
 	'body' => $result

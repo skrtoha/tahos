@@ -1,4 +1,6 @@
 <?php
+
+use core\Mailer;
 use core\UserAddress;
 require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/DataBase.php");
 
@@ -147,7 +149,8 @@ switch($_POST['act']){
 		$res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
 		$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'price_tahos');
 
-		$res = core\Mailer::send([
+		$mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
+        $res = $mailer->send([
 			'emails' => [$_POST['email']],
 			'subject' => 'Прайс с tahos.ru',
 			'body' => 'Прайс с tahos.ru'
@@ -163,7 +166,8 @@ switch($_POST['act']){
 		}
 		else $file = core\Config::$tmpFolderPath . "/main_stores.xlsx";
 
-		$res = core\Mailer::send([
+		$mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
+        $res = $mailer->send([
 			'emails' => [$_POST['email']],
 			'subject' => 'Прайс с tahos.ru',
 			'body' => 'Прайс с tahos.ru'

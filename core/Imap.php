@@ -5,9 +5,11 @@ class Imap{
 	private $password = 'Anton12345';
 	public $error;
 
-	public function __construct($imap){
+	public function __construct(){
+        $settings = Setting::get('email', 'email_price');
+        $settings = json_decode($settings);
 		try{
-			$this->connection = imap_open($imap, $this->login, $this->password);
+			$this->connection = imap_open($settings->host, $settings->username, $settings->password);
 			if (!$this->connection) throw new \Exception('Не удалось подключиться к почте по протоколу Imap');
 		} catch(\Exception $e){
 			$this->error = $e->getMessage();

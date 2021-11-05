@@ -221,7 +221,7 @@ switch ($params[0]){
     
         $logger->alert("Прайс {$emailPrice['title']}");
     
-        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $imap = new core\Imap();
         $fileImap = $imap->getLastMailFrom([
             'from' => $emailPrice['from'],
             'name' => $emailPrice['name']
@@ -385,7 +385,7 @@ switch ($params[0]){
             258159 => 'ROJA'
         ];
         $rossko = new core\Provider\Rossko($db);
-        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $imap = new core\Imap();
         $filename = $imap->getLastMailFrom(['from' => 'price@rossko.ru', 'name' => 'rossko_price.zip']);
         if (!$filename){
             $logger->error("Не удалось получить файл из почты.");
@@ -484,7 +484,7 @@ switch ($params[0]){
         
         $price = new core\Price($db, $emailPrice);
         
-        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $imap = new core\Imap();
         $filename = $imap->getLastMailFrom(['from' => 'noreply@berg.ru', 'name' => $params[0]]);
         if (!$filename){
             $logger->alert("Не удалось получить файл из почты.");
@@ -709,7 +709,7 @@ switch ($params[0]){
         
         $price = new core\Price($db, $emailPrice);
         
-        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $imap = new core\Imap();
         if ($imap->error) {
             $logger->error("Подключение не удалось");
             break;

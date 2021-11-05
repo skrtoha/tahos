@@ -130,7 +130,7 @@ switch($_GET['act']){
 		
 		$price = new core\Price($db, $emailPrice);
 
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$imap = new core\Imap();
 		$filename = $imap->getLastMailFrom(['from' => 'noreply@berg.ru', 'name' => $_GET['act']]);
 		if (!$filename){
 			$errorText = "Не удалось получить файл из почты.";
@@ -197,7 +197,7 @@ switch($_GET['act']){
         ];
 		$price = new core\Price($db, $emailPrice);
 
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$imap = new core\Imap();
 		$filename = $imap->getLastMailFrom(['from' => 'price@voshod-avto.ru', 'name' => 'Voshod.zip']);
 		if (!$filename) die("<br>Не удалось получить файл из почты.");
 		
@@ -356,7 +356,7 @@ switch($_GET['act']){
 		
 		$price = new core\Price($db, $emailPrice);
 
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$imap = new core\Imap();
 		if ($imap->error) die("Подключение не удалось");
 		$filename = $imap->getLastMailFrom(['from' => 'zakaz@sportavto.com', 'name' => 'price.zip']);
 		if (!$filename){
@@ -429,7 +429,7 @@ switch($_GET['act']){
 			// ,4 => 'ARMK'
 		];
 		$armtek = new core\Provider\Armtek($db);
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$imap = new core\Imap();
 		if (isset($imap->error)) {
 			echo "$imap->error";
 			break;
@@ -534,7 +534,7 @@ switch($_GET['act']){
 	case 'priceMparts':
         ini_set('memory_limit', '2048M');
 	    echo "<h2>Прайс МПартс</h2>";
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$imap = new core\Imap();
 		if (isset($imap->error)){
 			echo "<br>$imap->error";
 			break;
@@ -632,7 +632,7 @@ switch($_GET['act']){
         ];
 		$price = new core\Price($db, 'priceForumAuto');
 
-		$imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+		$imap = new core\Imap();
 		$fileImap = $imap->getLastMailFrom(['from' => 'post@mx.forum-auto.ru', 'name' => 'Forum-Auto_Price.zip']);
 		if (!$fileImap){
 			$errorText = "Не удалось получить Forum-Auto_Price.zip из почты";
@@ -741,7 +741,7 @@ switch($_GET['act']){
         echo "<h2>Прайс {$emailPrice['title']}</h2>";
         
         
-        $imap = new core\Imap('{imap.mail.ru:993/imap/ssl}INBOX/Newsletters');
+        $imap = new core\Imap();
 		$fileImap = $imap->getLastMailFrom([
 			'from' => $emailPrice['from'],
 			'name' => $emailPrice['name']

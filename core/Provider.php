@@ -419,8 +419,8 @@ abstract class Provider{
 	 * @return array price, in_stock
 	 */
 	public static function getPrice(array $params){
-		if (!$params['provider_id']) return false;
-		if (!$params['store_id']) return false;
+		if (!$params['provider_id']) return [];
+		if (!$params['store_id']) return [];
 
 		$provider = self::getInstanceProvider($params['provider_id']);
 		if (!$provider || !self::getIsEnabledApiOrder($params['provider_id'])){
@@ -431,7 +431,7 @@ abstract class Provider{
 			'price' => 0,
 			'available' => -1
 		];
-		if (!$price['price']) return false;
+		if (!$price['price']) return [];
 		if (!in_array($params['provider_id'], self::$ignoreProvidersForMarkups)){
 			$price['price'] = self::getPriceWithMarkups($price['price'], $params['store_id'], $params['user_id']);
 		}
@@ -556,6 +556,7 @@ abstract class Provider{
 				case 'Авторусь':
 				case 'Rossko':
 				case 'Forum-Avto':
+				case 'Autoeuro':
 					$output = Provider\Abcp::getItemsToOrder($p['id']);
 					break;
 				default:

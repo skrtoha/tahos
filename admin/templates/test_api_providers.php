@@ -40,7 +40,8 @@ if (isset($_GET['act'])){
 					core\Provider\ForumAuto::setArticle($_GET['item_id'], $item['brend'], $item['article']);
 					break;
 				case 'Autoeuro':
-					core\Provider\Autoeuro::setArticle($item['brend'], $item['article'], $_GET['item_id']);
+                    $autoeuro = new \core\Provider\Autoeuro($_GET['item_id']);
+					$autoeuro->setArticle($item['brend'], $item['article']);
 					break;
 				case 'Autokontinent':
 					core\Provider\Autokontinent::setArticle($item['brend'], $item['article'], $_GET['item_id']);

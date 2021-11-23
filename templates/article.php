@@ -18,7 +18,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
     $rossko = new core\Provider\Rossko($db);
     $rossko->execute("{$abcp->item['brand']} {$abcp->item['article']}");
 
-    core\Provider\Autoeuro::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+    $autoeuro = new Autoeuro($_GET['item_id']);
+    $autoeuro->setArticle($abcp->item['brand'], $abcp->item['article']);
 
     core\Provider\Autokontinent::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 

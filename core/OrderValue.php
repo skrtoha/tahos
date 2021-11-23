@@ -1,5 +1,6 @@
 <?php
 namespace core;
+use core\Provider\Autoeuro;
 use core\Provider\Berg;
 
 class OrderValue{
@@ -34,6 +35,13 @@ class OrderValue{
 			]
 		);
 	}
+    
+    /**
+     * @param $params array order_id, user_id
+     */
+    private static function allItemsArrived($params){
+        return true;
+    }
 
 	/**
 	 * changes status
@@ -76,6 +84,19 @@ class OrderValue{
 				break;
 			//пришло
 			case 3:
+                $orderInfo = self::getOrderInfo($params['order_id'], false, '');
+                $arrived = explode(',', $orderInfo['arrived']);
+                $isAllArrived = true;
+                foreach($arrived as $value){
+                    if ($value == 0) $isAllArrived = false;
+                }
+                if (self::allItemsArrived($params)){
+                    
+                    /*$mailer = new Mailer(Mailer::TYPE_INFO);
+                    $mailer->send([
+                    
+                    ]);*/
+                }
 				$values['arrived'] = $params['quan'];
 				self::update($values, $params);
 				break;
@@ -403,8 +424,8 @@ class OrderValue{
 				self::$countOrdered = Provider\ForumAuto::sendOrder();
 				break;
 			case 18: //Autoeuro
-				Provider\Autoeuro::putBusket($ov);
-				if ($automaticOrder) self::$countOrdered = Provider\Autoeuro::sendOrder();
+                Provider::addToProviderBasket($ov);
+                if ($automaticOrder) self::$countOrdered = Autoeuro::sendOrder();
 				break;
 			case 19://Favorit
 				Provider\FavoriteParts::addToBasket($ov);

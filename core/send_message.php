@@ -6,7 +6,7 @@ exit();*/
 $db = new core\Database();
 if ($_POST['message_send']){
 	if (!$_POST['correspond_id']){
-		$db->insert(
+		$result = $db->insert(
 			'corresponds',
 			[
 				'user_id' => $_SESSION['user'] ? $_SESSION['user'] : $_POST['user_id'],
@@ -15,8 +15,7 @@ if ($_POST['message_send']){
 				'store_id' => $_POST['store_id'],
 				'item_id' => $_POST['item_id'],
 				'last_id' => $db->getMax('messages', 'id') + 1,
-			],
-			['print_query' => false]
+			]
 		);
 		$last_correspond_id = $db->last_id();
 	} 

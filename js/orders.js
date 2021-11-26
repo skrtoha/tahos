@@ -335,6 +335,7 @@ $(function(){
 		return false;
 	})
     $('tr[order_id][store_id]').on('click', function(e){
+        if ($(e.target).hasClass('return')) return;
         if ($(e.target).hasClass('message')) return;
         if ($(e.target).hasClass('cancel_comment')) return;
         if ($(e.target).hasClass('comment-btn')) return;

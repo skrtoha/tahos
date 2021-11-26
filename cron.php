@@ -190,10 +190,18 @@ switch ($params[0]){
 			LEFT JOIN
 				#provider_stores ps ON ps.id = si.store_id
 			WHERE
-				ps.is_main = 0
+				ps.id != 23
 		",'');
         $mysqli = $db->get_mysqli();
         $logger->info("Удалено {$mysqli->affected_rows} строк.");
+        $db->query("
+            UPDATE
+                #provider_stores
+            SET
+                price_updated = current_timestamp
+            WHERE
+                id != 23
+        ");
         break;
     case 'emailPrice':
         ini_set('memory_limit', '2048M');

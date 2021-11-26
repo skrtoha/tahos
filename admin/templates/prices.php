@@ -82,7 +82,7 @@ function view(){
 			<input style="width: 264px;" type="text" name="search" value="<?=$search?>" placeholder="Поиск">
 			<input type="submit" value="Искать">
 		</form>
-        <a href="?view=prices&act=clearAllPrices">Очистить все прайсы</a>
+        <a href="/cron.php?param1=clearStores">Очистить все прайсы</a>
 	</div>
 	<table class="t_table" cellspacing="1">
 		<tr class="head">

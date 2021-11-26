@@ -1,7 +1,7 @@
 <?php
 namespace core;
 class Basket{
-	public static function get($user_id, $isToOrder = false): \mysqli_result
+	public static function get($user_id, $isToOrder = false)
 	{
 		if ($isToOrder) $whereIsToOrder = "
 		    AND b.isToOrder = 1
@@ -21,7 +21,7 @@ class Basket{
 			CASE
 				WHEN aok.order_term IS NOT NULL THEN aok.order_term
 				ELSE
-					IF (si.in_stock = 0, ps.under_order, ps.delivery) 
+					IF (si.in_stock = 0, ps.under_order, ps.delivery)
 			END AS delivery,
 			ps.cipher,
 			ps.provider_id,

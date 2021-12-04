@@ -63,9 +63,9 @@ if ($_POST['form_submit']){
 		message('Неверный формат e-mail!', false);
 		$b_registration = false;
 	}
-	$address = $_POST['address'];
-	$address = str_replace(array(" ", ")", "(", "-"), "", $address);
-	if ($db->getCount('users', "`email` = '$email'")){
+	$phone = $_POST['phone'];
+    $phone = str_replace(array(" ", ")", "(", "-"), "", $phone);
+	if ($db->getCount('users', "`phone` = '$phone'")){
 		message('Такой номер телефона уже зарегистрирован!', false);
 		$b_registration = false;
 	}
@@ -174,8 +174,8 @@ $res_issues = $db->query("
 					При регистрации вам однократно высылается пароль который вы сможете сменить в личном
 					кабинете. Там же вы сможете настроить SMS оповещения о движении заказа.</p>
 			</div>
-			<div class="input" name="address">
-				<input type="text" name="address" placeholder="+7 (___) ___-__-__" value="<?=$address?>">
+			<div class="input" name="phone">
+				<input type="text" name="phone" placeholder="+7 (___) ___-__-__" value="<?=$phone?>">
 			</div>
 		</div>
 		<div class="input_box input_email clearfix">
@@ -238,7 +238,6 @@ $res_issues = $db->query("
 		 <script>
 			  grecaptcha.ready(function() {
 					grecaptcha.execute('<?php echo SITE_KEY;?>', {action: 'homepage'}).then(function(token) {
-						 console.log(token);
 						 document.getElementById('g-recaptcha-response').value=token;
 					});
 			  });

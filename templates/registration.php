@@ -94,6 +94,13 @@ if ($_POST['form_submit']){
 		if ($res === true){
 			message('Вы успешно зарегистрированы!');
 			$_SESSION['user'] = $db->last_id();
+   
+            \core\User::setAddress(
+                $_SESSION['user'],
+                $_POST['addressee'],
+                $_POST['default_address']
+            );
+   
 			header("Location: /");
 		}
 		else die("$db->last_query | $res");
@@ -108,7 +115,7 @@ $res_issues = $db->query("
 ");?>
 <div class="registration">
 	<h1>Регистрация</h1>
-	<form action="" method="post" >
+	<form id="registration" action="" method="post" >
 		<input type="hidden" name="form_submit" value="1">
 		<div class="user_type clearfix">
 			<?if ($_POST['form_submit']){?>
@@ -182,32 +189,33 @@ $res_issues = $db->query("
 				<input type="text" name="email" value="<?=$email?>">
 			</div>
 		</div>
-		<?if ($res_issues->num_rows){?>
-			<div id="div_issue" class="input_box issue_div clearfix" style="">
-				<p>Пункт выдачи</p>
-				<div class="input">
-					<div class="select">
-						<select name="issue_id">
-							<option value="">...выберите</option>
-							<?while($row = $res_issues->fetch_assoc()){?>
-								<option value="<?=$row['id']?>"><?=$row['title']?></option>
-							<?}?>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="input_box delivery_method clearfix">
-				<p>Способ доставки</p>
-				<div class="input">
-					<div class="select">
-						<select name="delivery_type">
-							<option selected value="Доставка">Доставка</option>
-							<option value="Самовывоз" >Самовывоз</option>
-						</select>
-					</div>
-				</div>
-			</div>
-		<?}?>
+        <div class="input_box delivery_method clearfix">
+            <p>Способ доставки</p>
+            <div class="input">
+                <div class="select">
+                    <select name="delivery_type">
+                        <option selected value="Самовывоз" >Самовывоз</option>
+                        <option value="Доставка">Доставка</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="div_issue" class="input_box issue_div clearfix" style="">
+            <p>Пункт выдачи</p>
+            <div class="input">
+                <div class="select">
+                    <select name="issue_id">
+                        <option value="">...выберите</option>
+                        <?while($row = $res_issues->fetch_assoc()){?>
+                            <option value="<?=$row['id']?>"><?=$row['title']?></option>
+                        <?}?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="input_box set-addresses" style="display: none">
+            <button>Адреса доствки</button>
+        </div>
 		<div class="input_box clearfix">
 			<p>Пароль</p>
 			<div class="input">
@@ -238,6 +246,11 @@ $res_issues = $db->query("
 	</form>
 </div>
 <div id="map" class="">
-	<!-- <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?sid=z7VNSevfo6D6GHSqRPVSqExzHwOlBrQN&amp;width=100%25&amp;height=720&amp;lang=ru_RU&load=package.geoObjects&sourceType=constructor&amp;scroll=true"></script> -->
+	 <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?sid=z7VNSevfo6D6GHSqRPVSqExzHwOlBrQN&amp;width=100%25&amp;height=786&amp;lang=ru_RU&load=package.geoObjects&sourceType=constructor&amp;scroll=true"></script>
 </div>
 <div class="clear"></div>
+<?
+$user_id = null;
+$form = 'registration';
+require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/addressee/template.php';
+?>

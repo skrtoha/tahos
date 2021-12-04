@@ -220,7 +220,7 @@ function view(){
 		SELECT SQL_CALC_FOUND_ROWS
 			u.id,
 			" . core\User::getUserFullNameForQuery() . " AS name,
-			u.telefon,
+			u.phone,
 			u.email,
 			DATE_FORMAT(u.created, '%d.%m.%Y %H:%i:%s') AS created
 		FROM

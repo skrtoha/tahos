@@ -44,18 +44,27 @@ function createSubMenu(item, collection, submenu) {
 		});
 }
 function init() {
+    let center;
+    let groups = get_groups();
+    if (groups.length == 1){
+        center = [+groups[0]['coord_1'], +groups[0]['coord_2']]
+    }
+    else center = [55.751574, 37.573856];
+
 	myMap = new ymaps.Map('issue_check', {
-		center: [50.8636, 74.6111],
-		zoom: 12,
+        center: center,
+        zoom: 14,
 		controls: []
 	}, {
 		searchControlProvider: 'yandex#search'
 	});
 	var menu = $('<ul name="issue" class="hidden"></ul>');
 	var collection = new ymaps.GeoObjectCollection(null);
-	myMap.geoObjects.add(collection);
-	var groups = get_groups();
-	for (var key in groups) createSubMenu(groups[key], collection, menu);
+
+    myMap.geoObjects.add(collection);
+    for (var key in groups){
+        createSubMenu(groups[key], collection, menu);
+    }
 	$('#div_issue').append(menu);
 	$('select[name=issue_id]').on('change', function(){
 		var issue_id = $(this).val();
@@ -65,8 +74,7 @@ function init() {
 			$('#show_map #apply').attr('issue_id', '');
 		} 
 	})
-	// Выставляем масштаб карты чтобы были видны все группы.
-	myMap.setBounds(myMap.geoObjects.getBounds());
+    if (groups.length > 1) myMap.setBounds(myMap.geoObjects.getBounds());
 }
 $(function() {
 	$("#same-address").styler();
@@ -76,9 +84,9 @@ $(function() {
 	//additional-functions show
 	$("#additional-functions").change(function(event) {
 		if ($(this).prop("checked") == true) {
-			$("form#additional .additional-functions").show();
+			$("#additional .additional-functions").show();
 		} else {
-			$("form#additional .additional-functions").hide();
+			$("#additional .additional-functions").hide();
 		}
 	});
     $('div.set-addresses > button').on('click', function(e) {

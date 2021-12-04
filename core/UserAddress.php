@@ -4,9 +4,11 @@ class UserAddress{
     public static function edit($params){
         $json = is_array($params['json']) ? json_encode($params['json']) : $params['json'];
         if (isset($params['address_id']) && $params['address_id']){
+            $update = ['json' => $json];
+            if (isset($params['is_default'])) $update['is_default'] = $params['is_default'];
             $GLOBALS['db']->update(
                 'user_addresses',
-                ['json' => $json],
+                $update,
                 "`id` = {$params['address_id']}"
             );
             return $params['address_id'];
@@ -14,6 +16,7 @@ class UserAddress{
         $GLOBALS['db']->insert(
             'user_addresses',
             [
+                'is_default' => $params['is_default'] ?: 0,
                 'user_id' => $params['user_id'],
                 'json' => $json
             ]
@@ -21,7 +24,7 @@ class UserAddress{
         return $GLOBALS['db']->last_id();
     }
     
-    public static function getHtmlString($address_id, array $data, $isDefault = 0){
+    public static function getHtmlString($address_id = '', array $data, $isDefault = 0){
         $checked = $isDefault ? 'checked' : '';
         $output = "
             <div class='address' id='{$address_id}'>
@@ -31,6 +34,7 @@ class UserAddress{
             $output .= "<span kladr_id='{$row['kladr_id']}' name='{$row['name']}'>{$row['value']}</span>";
         }
         $output .= '<i class="fa fa-times delete_address" aria-hidden="true"></i>';
+        $output .= '<input type="hidden" name="addressee[]" value='.json_encode($data, JSON_HEX_QUOT).'">';
         $output .= "</div>";
         return $output;
     }

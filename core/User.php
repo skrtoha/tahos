@@ -1,5 +1,6 @@
 <?php
 namespace core;
+
 class User{
 	public static function noOverdue($user_id){
 		$query = Fund::getQueryListFunds(
@@ -183,4 +184,48 @@ class User{
 			)
 		";
 	}
+    
+    public static function updateSettings($settings, $user){
+        $update = $settings['data'];
+        $db = $GLOBALS['db'];
+        
+        $db->delete('user_addresses', "`user_id` = {$user['id']}");
+    
+        if (!$update['is_subscribe']) $update['is_subscribe'] = 0;
+        if (!$update['get_news']) $update['get_news'] = 0;
+        if (!$update['show_all_analogies']) $update['show_all_analogies'] = 0;
+        if (!$update['get_notifications']) $update['get_notifications'] = 0;
+    
+        if ($update['password']){
+            if ($settings['data']['password'] != $_POST['password']['repeat_new_password']){
+                return 'Пароли не совпадают';
+            }
+            if (md5($_POST['password']['old_password']) != $user['password']){
+                return 'Неверный старый пароль';
+            }
+            $update['password'] = md5($update['password']);
+        }
+        else unset($update['password']);
+        
+        if (!empty($settings['addressee'])){
+            self::setAddress(
+                $user['id'],
+                $settings['addressee'],
+                $settings['default_address']
+            );
+        }
+        
+        return $db->update('users', $update, "`id` = {$user['id']}");
+    }
+    
+    public static function setAddress($user_id, $addressee, $default_address){
+        $count = count($addressee);
+        for($i = 0; $i < $count; $i++){
+            UserAddress::edit([
+                'user_id' => $user_id,
+                'json' => $addressee[$i],
+                'is_default' => $default_address[$i]
+            ]);
+        }
+    }
 }

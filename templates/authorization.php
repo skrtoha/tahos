@@ -30,7 +30,7 @@ if ($_POST['token']){
 $login = $_POST['login'];
 $password = md5($_POST['password']);
 if (!preg_match("/.+@.+/", $login)) $login = str_replace(array(' ', ')', '(', '-'), '', $login);
-$user = $db->select_one('users', "id,email", "(`email`='$login' OR `telefon`='$login') AND `password`='$password'");
+$user = $db->select_one('users', "id,email", "(`email`='$login' OR `phone`='$login') AND `password`='$password'");
 if (empty($user)){
     setcookie('message', 'Неверный логин или пароль!');
     setcookie('message_type', 'error');

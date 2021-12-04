@@ -1,12 +1,15 @@
 @charset "UTF-8";
 /* Large Devices, Wide Screens */
-
+#personal-data div.form{
+    margin-bottom: 40px;
+}
 div.popup > div {
   box-sizing: border-box;
   background: white;
   z-index: inherit;
   padding: 20px;
   position: relative;
+    width: 80%;
 }
 #div_issue > p{
   padding: 0 0 10px 0
@@ -17,7 +20,7 @@ div.popup > div {
 }
 #div_issue {
   position: absolute;
-    width: 265px;
+    width: 222px;
     background: white;
     left: 35px;
     z-index: 1;
@@ -86,25 +89,6 @@ input{
 .jq-radio__div {
     position: relative;
 }
-.jq-radio.checked .jq-radio__div::after {
-    left: 3px;
-    position: absolute;
-    top: 3px;
-    content: " ";
-    display: block;
-    width: 12px;
-    height: 12px;
-    background: #0082bf;
-    border-radius: 6px;
-}
-.jq-checkbox, .jq-radio {
-    vertical-align: -4px;
-    width: 18px;
-    height: 18px;
-    border: 1px solid #C3C3C3;
-    background: linear-gradient(#FFF, #E6E6E6);
-    cursor: pointer;
-}
 .text_selected {
   box-sizing: border-box;
   padding: 0 65px 0 10px;
@@ -125,14 +109,6 @@ input{
 }
 .fa-remove:before, .fa-close:before, .fa-times:before {
     content: "\f00d";
-}
-.address {
-    margin-top: 10px;
-    border: 1px solid #c8c8c8;
-    margin-right: 48px;
-    padding: 10px 30px 10px 10px;
-    background: #F0F0F0;
-    position: relative;
 }
 .address span::after {
     content: ", ";
@@ -6116,9 +6092,8 @@ span.delete-btn:hover {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.settings-page form {
-  padding-right: 40px;
-  margin-bottom: 40px;
+#contact-info{
+    margin-top: 40px;
 }
 .settings-page form .input-wrap {
   position: relative;
@@ -6144,34 +6119,39 @@ span.delete-btn:hover {
 .settings-page button {
   margin-top: 10px;
 }
-.settings-page form#delivery, .settings-page form#change-password, .settings-page form#additional, .settings-page form#personal-data {
+.settings-page #delivery, .settings-page #change-password, .settings-page #additional, .settings-page form#personal-data {
   display: inline-block;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.settings-page form#change-password {
-  margin-top: 30px;
+.settings-page #change-password {
+  margin-top: -5px;
 }
-.settings-page form#change-password label {
+.settings-page #change-password label {
   width: 180px;
 }
-.settings-page form#additional {
+.settings-page #additional {
   margin-top: 30px;
 }
 .settings-page form#subscribe label
  {
   width: 170px;
 }
-.settings-page form#additional label
- {
-  width: 330px;
+#subscribe {
+    margin-top: 40px !important;
 }
-.settings-page form#additional label.switch,
+.settings-page #additional label.switch,
 .settings-page form#subscribe label.switch {
   width: 34px;
   top: 6px;
 }
-.settings-page form#additional label.switch input,
+#additional .input-wrap label {
+    width: 331px;
+}
+#subscribe label.switch {
+    width: 34px;
+}
+.settings-page #additional label.switch input,
 .settings-page form#subscribe label.switch input
  {
   display: none;
@@ -6181,9 +6161,7 @@ span.delete-btn:hover {
 }
 .settings-page form#personal-data button {
   float: none;
-}
-.settings-page form#personal-data label {
-  width: 190px;
+    display: block;
 }
 .settings-page form#personal-data #additional-phone {
   display: none;
@@ -6204,17 +6182,16 @@ span.delete-btn:hover {
   display: none;
   min-height: 100px;
 }
-.settings-page form#additional .additional-functions {
-  display: none;
-  padding: 20px 0;
+.settings-page #additional .additional-functions {
+  padding: 5px 0;
 }
-.settings-page form#additional .additional-functions label {
+.settings-page #additional .additional-functions label {
   width: 100px;
 }
-.settings-page form#additional .additional-functions .jq-selectbox {
+.settings-page #additional .additional-functions .jq-selectbox {
   width: 100px;
 }
-.settings-page form#additional .additional-functions input {
+.settings-page #additional .additional-functions input {
   width: 56px;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -6853,45 +6830,45 @@ span.delete-btn:hover {
   text-transform: none;
   font-weight: bold;
 }
-.sending-page form#delivery-form {
+.sending-page #delivery-form {
   width: 330px;
   float: left;
 }
-.sending-page form#delivery-form .select-wrap {
+.sending-page #delivery-form .select-wrap {
   display: block;
   width: 260px;
   margin-bottom: 20px;
 }
-.sending-page form#delivery-form .input-wrap {
+.sending-page #delivery-form .input-wrap {
   width: 340px;
   display: block;
 }
-.sending-page form#delivery-form .input-wrap label {
+.sending-page #delivery-form .input-wrap label {
   width: 130px;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.sending-page form#delivery-form .input-wrap label[for="pasport"] {
+.sending-page #delivery-form .input-wrap label[for="pasport"] {
   position: relative;
   top: 6px;
 }
-.sending-page form#delivery-form .input-wrap input {
+.sending-page #delivery-form .input-wrap input {
   width: -webkit-calc(100% - 140px);
   width: calc(100% - 140px);
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   text-align: left;
 }
-.sending-page form#delivery-form .checkbx-wrap {
+.sending-page #delivery-form .checkbx-wrap {
   margin: 10px 0;
 }
-.sending-page form#delivery-form .checkbx-wrap label {
+.sending-page #delivery-form .checkbx-wrap label {
   margin-right: 10px;
 }
-.sending-page form#delivery-form button {
+.sending-page #delivery-form button {
   margin-top: 30px;
 }
-.sending-page form#delivery-form .for-tk {
+.sending-page #delivery-form .for-tk {
   display: none;
 }
 .sending-page .templates-block {
@@ -7481,7 +7458,7 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
   .settings-page .col {
     width: 100%;
   }
-  .settings-page form#delivery label {
+  .settings-page #delivery label {
     width: 210px;
   }
   footer {
@@ -7726,7 +7703,7 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
     left: 50%;
     margin-left: -345px;
   }
-  .settings-page .personal-data-block, .settings-page form#delivery, .settings-page form#change-password, .settings-page form#additional, .settings-page form#personal-data {
+  .settings-page .personal-data-block, .settings-page #delivery, .settings-page #change-password, .settings-page #additional, .settings-page form#personal-data {
     float: none;
     width: 100%;
     margin-bottom: 30px;
@@ -7881,7 +7858,7 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
   .sending-page table.middle-view tr:last-child {
     border-bottom: 1px dashed #c8c8c8;
   }
-  .sending-page form#delivery-form, .sending-page .templates-block {
+  .sending-page #delivery-form, .sending-page .templates-block {
     width: 100%;
   }
   .sending-page .templates-block {
@@ -8137,7 +8114,7 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
     width: 66px;
     height: 66px;
   }
-  .settings-page form#additional label.switch {
+  .settings-page #additional label.switch {
     top: 0;
   }
   .messages-page table td:first-child, .messages-page table th:first-child {
@@ -8313,13 +8290,13 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
   .settings-page form .input-wrap input {
     width: 100%;
   }
-  .settings-page form#delivery label {
+  .settings-page #delivery label {
     width: 100%;
   }
-  .settings-page form#delivery label[for="same-address"] {
+  .settings-page #delivery label[for="same-address"] {
     width: 80%;
   }
-  .settings-page form#additional label {
+  .settings-page #additional label {
     width: 80%;
   }
   .settings-page form#personal-data input {
@@ -8423,17 +8400,17 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
   .sending-page table.small-view p {
     padding-bottom: 0;
   }
-  .sending-page form#delivery-form .input-wrap {
+  .sending-page #delivery-form .input-wrap {
     width: 100%;
   }
-  .sending-page form#delivery-form .input-wrap label {
+  .sending-page #delivery-form .input-wrap label {
     width: 100%;
     text-align: left;
   }
-  .sending-page form#delivery-form .input-wrap label[for=pasport] {
+  .sending-page #delivery-form .input-wrap label[for=pasport] {
     top: 0;
   }
-  .sending-page form#delivery-form .input-wrap input {
+  .sending-page #delivery-form .input-wrap input {
     width: 100%;
   }
   .catalogue-original .option-panel .view-switchs {
@@ -8575,7 +8552,7 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
   .date-wrap {
     width: 127px;
   }
-  .settings-page form#additional .input-wrap:nth-of-type(2) label.switch {
+  .settings-page #additional .input-wrap:nth-of-type(2) label.switch {
     top: -4px;
   }
   .models .content .items .item {
@@ -8668,7 +8645,7 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
   }
 }
 @media only screen and (max-width: 360px) {
-  .settings-page form#additional .input-wrap:nth-of-type(3) label.switch {
+  .settings-page #additional .input-wrap:nth-of-type(3) label.switch {
     top: -4px;
   }
 }
@@ -8726,4 +8703,7 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
   right: 20px;
   z-index: 2000;
   top: 14px;
+}
+input[name="data[is_subscribe]"] {
+    display: none !important;
 }

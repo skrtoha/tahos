@@ -19,28 +19,37 @@ function setAddress(formData){
         }
     })
 }
+
+const getHtml = (data, address_id = '', isDefault = 0) => {
+    const checked = isDefault ? 'checked' : '';
+    const default_address = isDefault ? 1 : 0;
+    let output = `
+         <div class='address' id='${address_id}'>
+            <input ${checked} type='radio' name='isDefault' value='${address_id}'>
+    `;
+    $.each(data, (i, item) => {
+        output += `
+            <span kladr_id='${item.kladr_id}' name='${item.name}'>${item.value}</span>
+        `;
+    })
+    output += `
+        <i class="fa fa-times delete_address" aria-hidden="true"></i>
+        <input form="${form}" type="hidden" name="addressee[]" value='${JSON.stringify(data)}'>
+        <input form="${form}" type="hidden" name="default_address[]" value="${default_address}">
+        </div>
+    `;
+    return output;
+}
+
 function deleteAddress(obj){
     if (!confirm('Вы уверены?')) return false;
     let th = $(obj).closest('div');
-    $.ajax({
-        type: 'post',
-        url: '/admin/ajax/user.php',
-        data: {
-            act: 'deleteAddress',
-            address_id: th.attr('id')
-        },
-        success: function(){
-            th.remove();
-        }
-    })
+    th.remove();
 }
-function setDefault(address_id){
-    $.ajax({
-        url: '/ajax/settings.php',
-        type: 'post',
-        data: {set_default_address: address_id},
-        success: function(response){}
-    })
+function setDefault(obj){
+    const selector = 'input[name="default_address[]"]';
+    $('div.address').find(selector).val(0);
+    obj.closest('div.address').find(selector).val(1)
 }
 function setLabel($input, text) {
     text = text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
@@ -73,8 +82,8 @@ $(function(){
     $(document).on('click', 'div.address', function(e){
         let th = $(e.target);
         if (th.hasClass('delete_address')) return deleteAddress(this);
-        if (th.hasClass('jq-radio')) return setDefault(th.find('input').val());
-        if (th.attr('name') == 'isDefault') return setDefault(th.val());
+        if (th.hasClass('jq-radio')) return setDefault(th);
+        if (th.attr('name') == 'isDefault') return setDefault(th);
         let formData = {};
         th.closest('div.address').find('span').each(function(){
             let th = $(this);
@@ -109,27 +118,35 @@ $(function(){
 
         if (countFilledFields < 4) return show_message('Слишком мало данных для сохранения!', 'error');
 
-        $.ajax({
-            type: 'post',
-            url: '/admin/ajax/user.php',
-            data: {
-                act: 'changeAddress',
-                address_id: address_id,
-                data: formData
-            },
-            success: function(response){
-                if (address_id){
-                    $('.address[id=' + address_id + ']').remove()
-                }
-                $('#set-address .right').append(response);
-                if (getParams()['view'] != 'users'){
-                    $('#set-address input[type=radio]').styler();
-                }
-            }
-        })
+        if (address_id){
+            $('.address[id=' + address_id + ']').remove()
+        }
+
+        $('#set-address .right').append(getHtml(formData));
+        const selector = '#set-address-wrapper .right div.address';
+        if ($(selector).size() == 1){
+            const obj = $(selector + ':first-child input[name=isDefault]');
+            obj.prop('checked', true);
+            setDefault(obj);
+        }
+        if (getParams()['view'] != 'users'){
+            $('.address input[type=radio]').styler();
+        }
 
         $('input[name=address_id]').val('');
         form.find('input:not([type=button])').val('');
+    })
+
+    $('div.set-addresses > button').on('click', function(e) {
+        e.preventDefault();
+        $('#overlay').css('display', 'flex');
+        $('#set-address').css('display', 'flex');
+        $('.address input[type=radio]').styler();
+    })
+    $('.bt_close').on('click', function() {
+        $(this).closest('div.popup').css('display', 'none');
+        $('#overlay').css('display', 'none');
+        $('.popup_selected').empty();
     })
 
     var $container = $(document.getElementById('address_multiple_fields'));

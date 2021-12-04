@@ -1977,40 +1977,6 @@ footer .social_networks a.ok{
   .end-calendar {
     position: absolute;
     left: 65px !important; }
-  .settings-page .personal-data-block .labels-block {
-    width: 100%;
-    text-align: left; }
-    .settings-page .personal-data-block .labels-block p {
-      padding-bottom: 20px; }
-  .settings-page .personal-data-block .data-block {
-    width: 100%;
-    padding-left: 0;
-    position: absolute;
-    left: 0;
-    margin-top: 20px;
-    padding-left: 5px; }
-    .settings-page .personal-data-block .data-block p {
-      padding-bottom: 20px; }
-  .settings-page form .input-wrap label {
-    width: 100%;
-    padding-bottom: 5px;
-    text-align: left; }
-  .settings-page form .input-wrap input {
-    width: 100%; }
-  .settings-page form#delivery label {
-    width: 100%; }
-  .settings-page form#delivery label[for="same-address"] {
-    width: 80%; }
-  .settings-page form#additional label {
-    width: 80%; }
-  .settings-page form#personal-data input {
-    width: 90%; }
-  .settings-page form#personal-data .info {
-    right: 10px;
-    left: auto;
-    top: 60px; }
-    .settings-page form#personal-data .info:before {
-      right: 17px; }
   .info_btn .infotext {
     right: 10px;
     left: auto; }
@@ -2083,15 +2049,6 @@ footer .social_networks a.ok{
       width: 100%; }
     .sending-page table.small-view p {
       padding-bottom: 0; }
-  .sending-page form#delivery-form .input-wrap {
-    width: 100%; }
-    .sending-page form#delivery-form .input-wrap label {
-      width: 100%;
-      text-align: left; }
-      .sending-page form#delivery-form .input-wrap label[for=pasport] {
-        top: 0; }
-    .sending-page form#delivery-form .input-wrap input {
-      width: 100%; }
   .catalogue-original .option-panel .view-switchs {
     display: none; }
   .catalogue-original .filter-form .input_box {
@@ -2222,8 +2179,6 @@ footer .social_networks a.ok{
     font-size: 16px; }
   .date-wrap {
     width: 127px; }
-  .settings-page form#additional .input-wrap:nth-of-type(2) label.switch {
-    top: -4px; }
   .models .content .items .item {
     width: 33.33333333%; }
   .auto-types .content .items .item {
@@ -2275,20 +2230,10 @@ footer .social_networks a.ok{
   footer .contacts .social_networks {
     width: 340px; } }
 
-@media only screen and (max-width: 360px) {
-  .settings-page form#additional .input-wrap:nth-of-type(3) label.switch {
-    top: -4px; } }
-
 /* Custom, iPhone Retina */
 @media only screen and (max-width: 320px) {
   .cart-popup:before {
     right: 55px; }
-  .settings-page form#personal-data .info {
-    right: 0;
-    left: auto;
-    top: 60px; }
-    .settings-page form#personal-data .info:before {
-      right: 9px; }
   footer .contacts .item_box,
   footer .contacts .social_networks {
     width: 320px; }

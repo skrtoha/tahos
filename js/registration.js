@@ -94,28 +94,15 @@ $(function(){
 	$('.text_selected').on('click', function(){
 		$(this).next().toggleClass('opened');
 	})
-	// $("select[name=delivery_type]").on('change', function(){
-	// 	if ($(this).val() == 'Самовывоз'){
-	// 		$('#div_issue > p').html('Пункт выдачи');
-	// 		if ($(document).width() >= 925){
-	// 			$('#map').addClass('loading');
-	// 			$('select[name=issue_id]').prop('disabled', true).trigger('refresh');
-	// 		}
-	// 	}
-	// 	else{
-	// 		$('#map').empty();
-	// 		$('#div_issue > p').html('Пункт доставки');
-	// 	} 
-	// 	$('select[name=issue_id] option').prop('selected', false);
-	// 	$('select[name=issue_id] option:first-child').prop('selected', true);
-	// 	$('select[name=issue_id]').trigger('refresh');
-	// });
-	$('div.registration form').on('submit', function(e){
-		if (!$('select[name=issue_id]').val()){
-			if ($('select[name=delivery_type]').val() == 'Самовывоз') str = 'Выберите пункт выдачи!';
-			else str = 'Выберите пункт доставки!';
-			show_message(str, 'error');
-			e.preventDefault();
-		}
-	})
+	$("select[name=delivery_type]").on('change', function(){
+		const th = $(this);
+        if (th.val() == 'Доставка'){
+            $('#div_issue').hide();
+            $('div.set-addresses').show();
+        }
+        else{
+            $('#div_issue').show();
+            $('div.set-addresses').hide();
+        }
+	});
 });

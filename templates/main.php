@@ -17,7 +17,7 @@
 		<?if (in_array($view, ['category'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css">
 	<?}?>
-    <?if ($view == 'settings'){?>
+    <?if (in_array($view, ['settings', 'registration'])){?>
         <link rel="stylesheet" href="/vendor/addressee/jquery.fias.min.css">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
@@ -395,10 +395,6 @@
 		<?if (in_array($view, ['article', 'orders', 'order'])){?>
 			{"src" : "/js/get_store_info.js", "async" : false},
 		<?}?>
-        <?if (in_array($view, ['settings'])){?>
-            {"src" : "/vendor/addressee/jquery.fias.min.js", "async" : false},
-            {"src" : "/vendor/addressee/script.js", "async" : false},
-        <?}?>
         <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
             {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},
         <?}?>

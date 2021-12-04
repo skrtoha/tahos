@@ -3,7 +3,7 @@
     box-sizing: border-box;
     background: white;
     z-index: inherit;
-    padding: 20px;
+    padding: 50px 20px 20px 20px;
     position: relative;
 }
 form.js-form-address div.flex {
@@ -62,6 +62,20 @@ form.js-form-address .half {
         margin-bottom: 0;
     }
 }
+.address .jq-radio.checked .jq-radio__div::after {
+    left: 3px;
+    position: absolute;
+    top: 3px;
+    content: " ";
+    display: block;
+    width: 12px;
+    height: 12px;
+    background: #0082bf;
+    border-radius: 6px;
+}
+.address .jq-radio {
+    border-radius: 18px;
+}
 form.js-form-address .half .input {
     margin-bottom: 10px;
 }
@@ -90,9 +104,7 @@ form.js-form-address > div.input {
 }
 .address {
     margin-top: 10px;
-    border: 1px
-    solid #c8c8c8;
-    margin-right: 48px;
+    border: 1px solid #c8c8c8;
     padding: 10px 30px 10px 10px;
     background: #F0F0F0;
     position: relative;

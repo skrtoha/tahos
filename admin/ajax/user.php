@@ -190,11 +190,11 @@ switch($_POST['act']){
 		);
 		break;
     case 'changeAddress':
-        $id = UserAddress::edit([
+        /*$id = UserAddress::edit([
             'address_id' => $_POST['address_id'],
             'user_id' => $_SESSION['user'],
             'json' => $_POST['data']
-        ]);
+        ]);*/
         echo UserAddress::getHtmlString($id, $_POST['data']);
         break;
     case 'deleteAddress':

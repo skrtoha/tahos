@@ -1,2 +1,3 @@
-ALTER TABLE `tahos_orders_values` ADD `withoutMarkup` INT(11) UNSIGNED NULL DEFAULT NULL AFTER `price`;
+alter table tahos_users change adres address varchar(255) null;
+alter table tahos_users change telefon phone varchar(20) null;
 

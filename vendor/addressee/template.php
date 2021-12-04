@@ -38,25 +38,46 @@
                     </div>
                 </div>
                 <div class="input">
-                    <input type="button" value="Сохранить">
+                    <input type="button" value="Добавить">
                 </div>
                 <div id="tooltip" style="display: none;"><b></b><span></span></div>
             </form>
         </div>
-        <div class="right">
-            <?$userAddresses = $db->select(
-                'user_addresses',
-                '*',
-                "`user_id` = {$user_id}",
-                'created'
-            );
-            if (!empty($userAddresses)){
-                foreach($userAddresses as $row){
-                    $data = json_decode($row['json'], true);?>
-                    <?=\core\UserAddress::getHtmlString($row['id'], $data, $row['is_default'])?>
-                <?}
-            }?>
-        </div>
+        <div class="right"></div>
         <button title="Close (Esc)" type="button" class="bt_close">×</button>
     </div>
 </div>
+<? if ($user_id){
+    $userAddresses = [];
+    $resultUserAddresses = $db->select(
+        'user_addresses',
+        '*',
+        "`user_id` = {$user_id}",
+        'created'
+    );
+    if (!empty($resultUserAddresses)){
+        foreach($resultUserAddresses as $value){
+            $userAddresses[] = [
+                'id' => $value['id'],
+                'is_default' => $value['is_default'],
+                'data' => json_decode($value['json'], true)
+            ];
+        }
+    }
+}
+?>
+<script src="/vendor/addressee/jquery.fias.min.js"></script>
+<script src="/vendor/addressee/script.js"></script>
+<script>
+    const form = '<?=$form?>';
+    $(function(){
+        const userAddresses = JSON.parse('<?=json_encode($userAddresses)?>');
+        if (userAddresses !== null){
+            $.each(userAddresses, (i, item) => {
+                $('#set-address-wrapper .right').append(
+                    getHtml(item.data, item.id, +item.is_default, form)
+                );
+            })
+        }
+    })
+</script>

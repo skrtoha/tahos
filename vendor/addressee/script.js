@@ -129,9 +129,7 @@ $(function(){
             obj.prop('checked', true);
             setDefault(obj);
         }
-        if (getParams()['view'] != 'users'){
-            $('.address input[type=radio]').styler();
-        }
+        $('.address input[type=radio]').styler();
 
         $('input[name=address_id]').val('');
         form.find('input:not([type=button])').val('');

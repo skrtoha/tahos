@@ -45,8 +45,16 @@ if ($_POST['form_submit']){
 	}
 	if ($saveble) {
 		if ($_POST['form_submit'] == 1){
-			if (core\User::update($id, $array)) message('Изменения успешно сохранены!');
+			if (core\User::update($id, $array)){
+                \core\User::setAddress(
+                        $_GET['id'],
+                        $_POST['addressee'],
+                        $_POST['default_address']
+                );
+                message('Изменения успешно сохранены!');
+            }
 			header("Location: ?view=users&id=$id&act=change");
+            die();
 		}
 		else{
 			if ($db->insert('users', $array)) message('Пользователь успешно добавлен!');
@@ -317,7 +325,7 @@ function show_form($act){
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
 	<div class="t_form">
 		<div class="bg">
-			<form method="post" enctype="multipart/form-data">
+			<form method="post" enctype="multipart/form-data" id="user">
 				<input type="hidden" name="form_submit" value="<?=$act == 's_change' ? 1 : 2?>">
 				<div class="field">
 					<div class="title">Фамилия</div>

@@ -10,6 +10,13 @@ div.intuitiveSearch_wrap{
 #pagination-container{
     margin-top: 10px;
 }
+#set-address > div{
+    padding: 20px !important;
+}
+.address .jq-radio.checked .jq-radio__div::after{
+    top: 2px !important;
+    left: 2px !important;
+}
 #actions{
     margin-bottom: 10px;
 }

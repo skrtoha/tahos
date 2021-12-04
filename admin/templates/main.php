@@ -6,6 +6,7 @@ use admin\functions\LeftMenu;
 <head>
 	<title><?=$page_title?></title>
 	<link rel="stylesheet" type="text/css" href="/admin/css/common.css">
+    <script src="/js/libs.min.js" type="application/javascript"></script>
 	<?if(file_exists("css/{$_GET['view']}.css")){?>
 		<link rel="stylesheet" type="text/css" href="css/<?=$_GET['view']?>.css">
 	<?}?>
@@ -127,7 +128,6 @@ use admin\functions\LeftMenu;
 </div>
 	<!-- Optimized loading JS Start -->
 	<script>var scr = {"scripts":[
-		{"src" : "/js/libs.min.js", "async" : false},
 		{"src" : "/js/jquery.priceformat.min.js", "async" : false},
 		{"src" : "/js/jquery.cookie.js", "async" : false},
 		{"src" : "/admin/js/common.js", "async" : false},
@@ -149,10 +149,6 @@ use admin\functions\LeftMenu;
 		<?if (in_array($view, ['connections', 'index', 'brends'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
 		<?}?>
-        <?if (in_array($view, ['users'])){?>
-                {"src" : "/vendor/addressee/jquery.fias.min.js", "async" : false},
-                {"src" : "/vendor/addressee/script.js", "async" : false},
-        <?}?>
 		<?
 		$arrayIntuitiveSearch = [
 			'items', 
@@ -180,6 +176,7 @@ use admin\functions\LeftMenu;
 		<div id="modal_content">
             <?if ($_GET['view'] == 'users'){?>
                 <?
+                $form = 'user';
                 $user_id = $_GET['id'];
                 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/addressee/template.php');
                 ?>

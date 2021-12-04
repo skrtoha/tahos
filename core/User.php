@@ -189,8 +189,6 @@ class User{
         $update = $settings['data'];
         $db = $GLOBALS['db'];
         
-        $db->delete('user_addresses', "`user_id` = {$user['id']}");
-    
         if (!$update['is_subscribe']) $update['is_subscribe'] = 0;
         if (!$update['get_news']) $update['get_news'] = 0;
         if (!$update['show_all_analogies']) $update['show_all_analogies'] = 0;
@@ -219,6 +217,7 @@ class User{
     }
     
     public static function setAddress($user_id, $addressee, $default_address){
+        $GLOBALS['db']->delete('user_addresses', "`user_id` = $user_id");
         $count = count($addressee);
         for($i = 0; $i < $count; $i++){
             UserAddress::edit([

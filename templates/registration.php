@@ -63,9 +63,9 @@ if ($_POST['form_submit']){
 		message('Неверный формат e-mail!', false);
 		$b_registration = false;
 	}
-	$telefon = $_POST['telefon'];
-	$telefon = str_replace(array(" ", ")", "(", "-"), "", $telefon);
-	if ($db->getCount('users', "`telefon` LIKE '%$telefon'")){
+	$address = $_POST['address'];
+	$address = str_replace(array(" ", ")", "(", "-"), "", $address);
+	if ($db->getCount('users', "`email` = '$email'")){
 		message('Такой номер телефона уже зарегистрирован!', false);
 		$b_registration = false;
 	}
@@ -87,7 +87,7 @@ if ($_POST['form_submit']){
 		'delivery_type' => $delivery_type,
 		'issue_id' => $_POST['issue_id'],
 		'password' => md5($password_1),
-		'telefon' => $telefon
+		'phone' => $phone
 	);
 	if ($b_registration){
 		$res = $db->insert('users', $insert, ['print_query' => false]);
@@ -102,6 +102,7 @@ if ($_POST['form_submit']){
             );
    
 			header("Location: /");
+            die();
 		}
 		else die("$db->last_query | $res");
 	}
@@ -173,8 +174,8 @@ $res_issues = $db->query("
 					При регистрации вам однократно высылается пароль который вы сможете сменить в личном
 					кабинете. Там же вы сможете настроить SMS оповещения о движении заказа.</p>
 			</div>
-			<div class="input" name="telefon">
-				<input type="text" name="telefon" placeholder="+7 (___) ___-__-__" value="<?=$telefon?>">
+			<div class="input" name="address">
+				<input type="text" name="address" placeholder="+7 (___) ___-__-__" value="<?=$address?>">
 			</div>
 		</div>
 		<div class="input_box input_email clearfix">

@@ -101,7 +101,15 @@ $('.slider').each(function(){
 $(function(){
     let isProccessedGarage = false;
     let isProccessedVin = false;
-    let isPageVin = false;
+
+    let href = document.location.href;
+    let isPageVin = /carInfo\?q=/.test(href);
+    href = href.replace(/.*\?/, '');
+    const urlParams = new URLSearchParams(href);
+
+    if (isPageVin){
+        // const saveUserVin()
+    }
 
     let intervalID = setInterval(function(){
         let user_id = + $('input[name=user_id]').val();
@@ -113,11 +121,6 @@ $(function(){
         let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
         if (!$('#to_garage').size()) isProccessedGarage = false;
         if($partsCatalogsNodes.size() && !isProccessedGarage){
-            let href = document.location.href;
-            isPageVin = /carInfo\?q=/.test(href);
-            href = href.replace(/.*\?/, '');
-            const urlParams = new URLSearchParams(href);
-
 			let $h1 = $partsCatalogsNodes.find('h1');
 			let title = $h1.html();
 			title = title.replace(/[^\w ]+/g, '');

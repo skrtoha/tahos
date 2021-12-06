@@ -18,6 +18,12 @@ form.js-form-address .half {
     margin-right: 10px;
 }
 @media screen and (max-width: 948px) {
+    form.js-form-address > div.input{
+        width: 100% !important;
+    }
+    form.js-form-address .half{
+        margin-right: 0 !important;
+    }
     .address {
         margin-right: 0;
     }

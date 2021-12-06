@@ -5791,6 +5791,12 @@ span.delete-btn:hover {
 	#news .news_title.one_row {
 		line-height: 30px
 	}
+    .registration .user_type{
+        margin: 5px 0;
+    }
+    .registration .input_box{
+        margin-bottom: 5px;
+    }
 	.registration {
 		width: 100%
 	}

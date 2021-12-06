@@ -101,9 +101,14 @@ $('.slider').each(function(){
 $(function(){
     let isProccessedGarage = false;
     let isProccessedVin = false;
-    let isPageVin = false;
 
     let intervalID = setInterval(function(){
+        let href = document.location.href;
+        const isPageVin = /carInfo\?q=/.test(href);
+
+        href = href.replace(/.*\?/, '');
+        const urlParams = new URLSearchParams(href);
+
         let user_id = + $('input[name=user_id]').val();
         let result;
         if (!user_id){
@@ -113,11 +118,6 @@ $(function(){
         let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
         if (!$('#to_garage').size()) isProccessedGarage = false;
         if($partsCatalogsNodes.size() && !isProccessedGarage){
-            let href = document.location.href;
-            isPageVin = /carInfo\?q=/.test(href);
-            href = href.replace(/.*\?/, '');
-            const urlParams = new URLSearchParams(href);
-
 			let $h1 = $partsCatalogsNodes.find('h1');
 			let title = $h1.html();
 			title = title.replace(/[^\w ]+/g, '');
@@ -168,8 +168,8 @@ $(function(){
 			})
 		}
 
-		if (isPageVin && !isProccessedVin){
-		    let data = {};
+        if (isPageVin && !isProccessedVin){
+            let data = {};
             $tbody = $('div.LjoJ3TC3QBG0Gj1e1y18m tbody._2s4Zlis3TQ_ERIPo_5CYhW');
             $tr = $tbody.find('tr._2ra47Mt1RDDKqGLLJbQWkG:first-child');
             let brend = $tr.find('td:nth-child(1)').html();
@@ -190,7 +190,6 @@ $(function(){
                 }
             })
         }
-
 	}, 500);
 })
 	

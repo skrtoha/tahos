@@ -142,6 +142,9 @@ class User{
 	 * @return [boolean] true if updated successfully 
 	 */
 	public static function update($user_id, $fields){
+        unset($fields['addressee']);
+        unset($fields['default_address']);
+        unset($fields['address_id']);
 		return $GLOBALS['db']->update('users', $fields, "`id`=$user_id");
 	}
 

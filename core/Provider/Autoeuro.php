@@ -215,19 +215,21 @@ class Autoeuro extends Provider{
             'order_term' => $minPriceObject['delivery']
         ]);
         
-        $GLOBALS['db']->insert('store_items', [
-            'store_id' => self::getParams()->minDeliveryStoreID,
-            'item_id' => $item_id,
-            'price' => $minDeliveryObject['price'],
-            'in_stock' => $minDeliveryObject['amount'],
-            'packaging' => $code['packing']
-        ]);
-        $GLOBALS['db']->insert('autoeuro_order_keys', [
-            'store_id' => self::getParams()->minDeliveryStoreID,
-            'item_id' => $item_id,
-            'offer_key' => $minDeliveryObject['offer_key'],
-            'order_term' => $minDeliveryObject['delivery']
-        ]);
+        if (count($code['offers']) > 1){
+            $GLOBALS['db']->insert('store_items', [
+                'store_id' => self::getParams()->minDeliveryStoreID,
+                'item_id' => $item_id,
+                'price' => $minDeliveryObject['price'],
+                'in_stock' => $minDeliveryObject['amount'],
+                'packaging' => $code['packing']
+            ]);
+            $GLOBALS['db']->insert('autoeuro_order_keys', [
+                'store_id' => self::getParams()->minDeliveryStoreID,
+                'item_id' => $item_id,
+                'offer_key' => $minDeliveryObject['offer_key'],
+                'order_term' => $minDeliveryObject['delivery']
+            ]);
+        }
 	}
 	
     private function getStoreId($offer){

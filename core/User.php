@@ -205,25 +205,22 @@ class User{
         }
         else unset($update['password']);
         
-        if (!empty($settings['addressee'])){
-            self::setAddress(
-                $user['id'],
-                $settings['addressee'],
-                $settings['default_address']
-            );
-        }
+        self::setAddress(
+            $user['id'],
+            $settings['addressee'] ?? [],
+            $settings['default_address'] ?? []
+        );
         
         return $db->update('users', $update, "`id` = {$user['id']}");
     }
     
     public static function setAddress($user_id, $addressee, $default_address, $address_id = []){
         self::clearUserAddress($user_id, $addressee, $default_address, $address_id);
-        $count = count($addressee);
-        for($i = 0; $i < $count; $i++){
+        foreach($addressee as $key => $value){
             UserAddress::edit([
                 'user_id' => $user_id,
-                'json' => $addressee[$i],
-                'is_default' => $default_address[$i]
+                'json' => $value,
+                'is_default' => $default_address[$key]
             ]);
         }
     }

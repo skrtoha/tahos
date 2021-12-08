@@ -53,7 +53,8 @@ if ($_POST['form_submit']){
                 \core\User::setAddress(
                         $_GET['id'],
                         $_POST['addressee'],
-                        $_POST['default_address']
+                        $_POST['default_address'],
+                        $_POST['address_id']
                 );
                 message('Изменения успешно сохранены!');
             }

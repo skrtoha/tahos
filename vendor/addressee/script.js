@@ -36,6 +36,7 @@ const getHtml = (data, address_id = '', isDefault = 0) => {
         <i class="fa fa-times delete_address" aria-hidden="true"></i>
         <input form="${form}" type="hidden" name="addressee[]" value='${JSON.stringify(data)}'>
         <input form="${form}" type="hidden" name="default_address[]" value="${default_address}">
+        <input type="hidden" form="${form}" name="address_id[]" value="${address_id}">
         </div>
     `;
     return output;

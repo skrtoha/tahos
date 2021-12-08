@@ -216,8 +216,8 @@ class User{
         return $db->update('users', $update, "`id` = {$user['id']}");
     }
     
-    public static function setAddress($user_id, $addressee, $default_address){
-        $GLOBALS['db']->delete('user_addresses', "`user_id` = $user_id");
+    public static function setAddress($user_id, $addressee, $default_address, $address_id = []){
+        self::clearUserAddress($user_id, $addressee, $default_address, $address_id);
         $count = count($addressee);
         for($i = 0; $i < $count; $i++){
             UserAddress::edit([
@@ -225,6 +225,20 @@ class User{
                 'json' => $addressee[$i],
                 'is_default' => $default_address[$i]
             ]);
+        }
+    }
+    
+    public static function clearUserAddress($user_id, & $addressee, & $default_address, & $address_id){
+        global $db;
+        if (!$user_id) return;
+        $userAddressesList = $db->select('user_addresses', '*', "`user_id` = $user_id");
+        if (empty($userAddressesList)) return;
+        foreach($userAddressesList as $address){
+            $result = $db->delete('user_addresses', "`id` = {$address['id']}");
+            if ($result === true) continue;
+            $key = array_search($address['id'], $address_id);
+            unset($addressee[$key]);
+            unset($default_address[$key]);
         }
     }
 }

@@ -1,4 +1,8 @@
 <?php
+/** @var $db \core\Database $act */
+
+use core\UserAddress;
+
 $act = $_GET['act'];
 $id = $_GET['id'];
 $GLOBALS['user'] = $_GET['id'];
@@ -23,8 +27,8 @@ if ($_POST['form_submit']){
 			case 'pass':
 				if ($value) $array['password'] = md5($value);
 				break;
-			case 'telefon':
-				$array['telefon'] = str_replace(array('(', ')', ' ', '-'), '', $value);
+			case 'phone':
+				$array['phone'] = str_replace(array('(', ')', ' ', '-'), '', $value);
 				break;
 			default: 
 				if ($key != 'pass' and $key != 'form_submit') $array[$key] = $value;
@@ -276,7 +280,7 @@ function view(){
 			<td>
                 <a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=name">ФИО</a>
             </td>
-			<td><a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=telefon">Телефон</a></td>
+			<td><a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=phone">Телефон</a></td>
 			<td><a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=email">E-mail</a></td>
 			<td><a class="sort" title="Сортировка" href="<?=$urlSort?>&sort=u.created">Дата создания</a></td>
 		</tr>
@@ -284,7 +288,7 @@ function view(){
 			foreach($users as $user){?>
 				<tr class="users_box" user_id="<?=$user['id']?>">
 					<td label="ФИО"><?=$user['name']?></td>
-					<td label="Телефон"><?=$user['telefon']?></td>
+					<td label="Телефон"><?=$user['phone']?></td>
 					<td label="E-mail"><?=$user['email']?></td>
 					<td label="Дата создания"><?=$user['created']?></td>
 				</tr>
@@ -403,11 +407,11 @@ function show_form($act){
 				</div>
 				<div class="field">
 					<div class="title">Телефон</div>
-					<div class="value"><input type=text name="telefon" value="<?=$_POST['telefon'] ? $_POST['telefon'] : $user['telefon']?>"></div>
+					<div class="value"><input type=text name="phone" value="<?=$_POST['phone'] ? $_POST['phone'] : $user['phone']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Фактический адрес</div>
-					<div class="value"><input type=text name="adres" value="<?=$_POST['adres'] ? $_POST['adres'] : $user['adres']?>"></div>
+					<div class="value"><input type=text name="address" value="<?=$_POST['address'] ? $_POST['address'] : $user['address']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Тип доставки</div>

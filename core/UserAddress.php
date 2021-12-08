@@ -1,4 +1,5 @@
 <?php
+/** @global $db \core\Database */
 namespace core;
 class UserAddress{
     public static function edit($params){

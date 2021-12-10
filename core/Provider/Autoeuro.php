@@ -228,7 +228,7 @@ class Autoeuro extends Provider{
                 'item_id' => $item_id,
                 'offer_key' => $minDeliveryObject['offer_key'],
                 'order_term' => $minDeliveryObject['delivery']
-            ]);
+            ], 'result');
         }
 	}
 	
@@ -296,17 +296,28 @@ class Autoeuro extends Provider{
         return self::getParams()->payer_key;
     }
     
+    private static function getOrderKeys($store_id, $item_id){
+        return $GLOBALS['db']->select_one(
+            'autoeuro_order_keys',
+            'offer_key',
+            "`store_id` = {$store_id} AND `item_id` = {$item_id}"
+        );
+    }
+    
 	public static function sendOrder(){
         $sentItems = 0;
         $providerBasket = parent::getProviderBasket(self::getParams()->provider_id, '');
         if (!$providerBasket->num_rows) return false;
         $stock_items = [];
         while($pb = $providerBasket->fetch_assoc()){
-            $aeok = $GLOBALS['db']->select_one(
-                'autoeuro_order_keys',
-                'offer_key',
-                "`store_id` = {$pb['store_id']} AND `item_id` = {$pb['item_id']}"
-            );
+            $aeok = self::getOrderKeys($pb['store_id'], $pb['item_id']);
+            
+            if (empty($aeok)){
+                $class = new static($pb['item_id']);
+                $class->setArticle($pb['brend'], $pb['article']);
+                $aeok = self::getOrderKeys($pb['store_id'], $pb['item_id']);
+            }
+            
             $stock_items[] = [
                 'offer_key' => $aeok['offer_key'],
                 'quantity' => $pb['quan'],

@@ -484,7 +484,7 @@ switch ($params[0]){
     case 'BERG_GREB': //Прайс Москва
     case 'BERG_GERY': //Прайс Ярославль
     case 'BERG_2021': //Прайс Москва2
-    case 'BERG_YBDIR': //Прайс Москва2
+    case 'BERG_YBDIR': //Прайс БДИР
         ini_set('memory_limit', '2048M');
         $logger->alert("Прайс {$params[0]}");
         $emailPrice = [

@@ -356,7 +356,7 @@ switch ($params[0]){
                 }
                 break;
             case 'csv':
-                while ($data = fgetcsv($workingFile, 1000, "\n")) {
+                while ($data = fgetcsv($workingFile, 0, "\n")) {
                     $row = iconv('windows-1251', 'utf-8', $data[0]);
                     $row = explode(';', str_replace('"', '', $row));
                     $stringNumber++;
@@ -484,6 +484,7 @@ switch ($params[0]){
     case 'BERG_GREB': //Прайс Москва
     case 'BERG_GERY': //Прайс Ярославль
     case 'BERG_2021': //Прайс Москва2
+    case 'BERG_YBDIR': //Прайс Москва2
         ini_set('memory_limit', '2048M');
         $logger->alert("Прайс {$params[0]}");
         $emailPrice = [
@@ -506,9 +507,10 @@ switch ($params[0]){
         if ($params[0] == 'BERG_GREB') $store_id = 275;
         if ($params[0] == 'BERG_GERY') $store_id = 276;
         if ($params[0] == 'BERG_2021') $store_id = 337952;
+        if ($params[0] == 'BERG_YBDIR') $store_id = 952496;
         $db->delete('store_items', "`store_id`=$store_id");
         $i = 0;
-        while ($data = fgetcsv($handle, 1000, "\n")) {
+        while ($data = fgetcsv($handle, 0, "\n")) {
             $row = iconv('windows-1251', 'utf-8', $data[0]);
             $row = explode(';', str_replace('"', '', $row));
             $i++;

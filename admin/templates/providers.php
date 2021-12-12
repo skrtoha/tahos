@@ -718,6 +718,7 @@ function priceEmail(){
 							Excel
 						</label>
 					</div>
+                </div>
 				<div class="field">
 					<div class="title">Очищать прайс</div>
 					<div class="value">

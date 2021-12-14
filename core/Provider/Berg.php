@@ -10,23 +10,25 @@ class Berg extends Provider{
 		'key',
         'url'
 	];
+    
+    public static $provider_id = 16;
 	
 	public static function getUrlString($action, $typeOrganization = 'entity'){
-		return self::getParams($typeOrganization)->url . "$action.json?key=" . self::getParams($typeOrganization)->key;
+		return self::getParams($typeOrganization)->url."$action.json?key=" . self::getParams($typeOrganization)->key;
 	}
 
 	public static function getParams($typeOrganization = 'entity'){
 		return parent::getApiParams([
-			'api_title' => 'Berg',
+			'provider_id' => self::$provider_id,
 			'typeOrganization' => $typeOrganization
 		]);
 	}
 	
 	public static function setArticle($brend, $article, $item_id){
-         if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
-        if (!parent::isActive(self::getParams()->provider_id)) return false;
+        if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+        if (!parent::isActive(self::$provider_id)) return false;
         
-        $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
+        $providerBrend = parent::getProviderBrend(self::$provider_id, $brend);
         
         $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]=$article&items[0][brand_name]=$providerBrend";
         $result = parent::getCurlUrlData($url);
@@ -63,12 +65,12 @@ class Berg extends Provider{
     private static function getStoreId($offer){
         if ($offer->warehouse->name == 'BERG MSK') return self::getParams()->mainStoreId;
         if ($offer->warehouse->name == 'BERG YAR') return self::getParams()->storeYar;
-        if ($offer->warehouse->name == 'BERG MSK2') return self::getParams()->storeMsk2;
+        if ($offer->warehouse->name == 'BERG MSK2') return self::getParams()->storeMsk;
     
         $array = $GLOBALS['db']->select_one(
             'provider_stores',
             'id',
-            "`title` = '{$offer->warehouse->name}' AND `provider_id` = ".self::getParams()->provider_id
+            "`title` = '{$offer->warehouse->name}' AND `provider_id` = ".self::$provider_id
         );
         if (!empty($array)) return $array['id'];
         
@@ -76,7 +78,7 @@ class Berg extends Provider{
             'provider_stores',
             [
                 'title' => $offer->warehouse->name,
-                'provider_id' => self::getParams()->provider_id,
+                'provider_id' => self::$provider_id,
                 'cipher' => strtoupper(parent::getRandomString(4)),
                 'currency_id' => 1,
                 'delivery' => $offer->assured_period,
@@ -86,8 +88,8 @@ class Berg extends Provider{
     }
     
     public static function getCoincidences($search){
-        if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
-        if (!parent::isActive(self::getParams()->provider_id)) return false;
+        if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
+        if (!parent::isActive(self::$provider_id)) return false;
     
         $output = [];
         $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]=$search";
@@ -107,7 +109,7 @@ class Berg extends Provider{
     }
     
     private static function getWarehouseName($store_id){
-        switch(self::getParams()->provider_id){
+        switch(self::$provider_id){
             case 26:
             case 27:
                 switch($store_id){
@@ -120,7 +122,7 @@ class Berg extends Provider{
     
     public static function getPrice(array $params)
     {
-        $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $params['brend']);
+        $providerBrend = parent::getProviderBrend($params['provider_id'], $params['brend']);
         $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]={$params['article']}&items[0][brand_name]={$providerBrend}";
         $result = parent::getCurlUrlData($url);
         $data = json_decode($result);
@@ -146,7 +148,7 @@ class Berg extends Provider{
     }
     
     public static function sendOrder(){
-	    $providerBasket = parent::getProviderBasket(self::getParams()->provider_id);
+	    $providerBasket = parent::getProviderBasket(self::$provider_id);
 	    if (!$providerBasket->num_rows) return 0;
 	    
 	    $items = [];

@@ -35,8 +35,6 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	exit();
 }
 if ($connection->denyAccess) die('Доступ запрещен!');
-if ($_GET['type'] == 'armtek') get_items_armtek($_GET['item_id']);
-// debug($_GET); exit();
 $title = "Список совпадений";
 $search_count_user = 10;
 if ($_GET['type'] == 'vin'){

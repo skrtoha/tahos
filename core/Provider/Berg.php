@@ -106,22 +106,35 @@ class Berg extends Provider{
 	    return Abcp::getItemsToOrder($provider_id);
     }
     
+    private static function getWarehouseName($store_id){
+        switch(self::getParams()->provider_id){
+            case 26:
+            case 27:
+                switch($store_id){
+                    case self::getParams()->storeMsk: return 'BERG MSK';
+                    case self::getParams()->storeYar: return 'BERG YAR';
+                }
+        }
+        return false;
+    }
+    
     public static function getPrice(array $params)
     {
-        $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]={$params['article']}&items[0][brand_name]={$params['brend']}";
+        $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $params['brend']);
+        $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]={$params['article']}&items[0][brand_name]={$providerBrend}";
         $result = parent::getCurlUrlData($url);
         $data = json_decode($result);
-        
+    
         if (!$data->resources[0]->offers) return false;
         
         foreach($data->resources[0]->offers as $offer){
-            if ($offer->warehouse->name == $params['providerStore']) return [
+            if ($offer->warehouse->name == self::getWarehouseName($params['store_id'])) return [
                 'price' => $offer->price,
                 'available' => $offer->quantity
             ];
         }
         
-        return false;
+        return [];
     }
     
     public static function isInBasket($ov){

@@ -204,6 +204,7 @@ class Berg extends Provider{
                 'price' => $result->order->items[0]->price,
                 'quan' => $result->order->items[0]->quantity
             ]);
+            
         
             parent::updateProviderBasket(
                 [

@@ -43,7 +43,10 @@ class Berg extends Provider{
             if (empty($obj->offers)) continue;
             
             foreach($obj->offers as $offer){
-                $stores[$offer->warehouse->type][$offer->warehouse->name] = $offer->warehouse;
+                $store_id = self::getStoreId($offer);
+                
+                if (!$store_id) continue;
+                
                 $GLOBALS['db']->insert('store_items', [
                     'store_id' => self::getStoreId($offer),
                     'item_id' => $item_id,
@@ -66,25 +69,7 @@ class Berg extends Provider{
         if ($offer->warehouse->name == 'BERG MSK') return self::getParams()->mainStoreId;
         if ($offer->warehouse->name == 'BERG YAR') return self::getParams()->storeYar;
         if ($offer->warehouse->name == 'BERG MSK2') return self::getParams()->storeMsk;
-    
-        $array = $GLOBALS['db']->select_one(
-            'provider_stores',
-            'id',
-            "`title` = '{$offer->warehouse->name}' AND `provider_id` = ".self::$provider_id
-        );
-        if (!empty($array)) return $array['id'];
-        
-        $GLOBALS['db']->insert(
-            'provider_stores',
-            [
-                'title' => $offer->warehouse->name,
-                'provider_id' => self::$provider_id,
-                'cipher' => strtoupper(parent::getRandomString(4)),
-                'currency_id' => 1,
-                'delivery' => $offer->assured_period,
-                'percent' => 10
-            ]);
-        return $GLOBALS['db']->last_id();
+        return false;
     }
     
     public static function getCoincidences($search){
@@ -109,19 +94,17 @@ class Berg extends Provider{
     }
     
     private static function getWarehouseName($store_id){
-        switch(self::$provider_id){
-            case 26:
-            case 27:
-                switch($store_id){
-                    case self::getParams()->storeMsk: return 'BERG MSK';
-                    case self::getParams()->storeYar: return 'BERG YAR';
-                }
+        switch($store_id){
+            case self::getParams()->storeMsk: return 'BERG MSK2';
+            case self::getParams()->storeYar: return 'BERG YAR';
+            case self::getParams()->mainStoreId: return 'BERG MSK';
         }
         return false;
     }
     
     public static function getPrice(array $params)
     {
+        self::$provider_id = $params['provider_id'];
         $providerBrend = parent::getProviderBrend($params['provider_id'], $params['brend']);
         $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]={$params['article']}&items[0][brand_name]={$providerBrend}";
         $result = parent::getCurlUrlData($url);
@@ -130,7 +113,9 @@ class Berg extends Provider{
         if (!$data->resources[0]->offers) return false;
         
         foreach($data->resources[0]->offers as $offer){
-            if ($offer->warehouse->name == self::getWarehouseName($params['store_id'])) return [
+            $warehouse = self::getWarehouseName($params['store_id']);
+            if (!$warehouse) continue;
+            if ($offer->warehouse->name == $warehouse) return [
                 'price' => $offer->price,
                 'available' => $offer->quantity
             ];
@@ -148,13 +133,14 @@ class Berg extends Provider{
     }
     
     public static function sendOrder(){
-	    $providerBasket = parent::getProviderBasket(self::$provider_id);
+	    $providerBasket = parent::getProviderBasket([16, 26, 27]);
 	    if (!$providerBasket->num_rows) return 0;
 	    
 	    $items = [];
 	    $ordered = 0;
 	    foreach($providerBasket as $row){
-	        $items['items'][] = [
+	        self::$provider_id = $row['provider_id'];
+            $items['items'][] = [
 	            'resource_article' => $row['article'],
                 'brand_name' => $row['brend']
             ];

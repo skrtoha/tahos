@@ -92,6 +92,9 @@ abstract class Provider{
 	}
 	public static function getProviderBasket($provider_id, $flag = NULL): \mysqli_result
 	{
+        if (is_array($provider_id)) $where = "p.id IN (".implode(',', $provider_id).")";
+        else $where = "p.id IN ($provider_id)";
+        $where .= " AND pb.response IS NULL";
 		return self::getInstanceDataBase()->query("
 			SELECT
 				pb.order_id,
@@ -128,7 +131,7 @@ abstract class Provider{
 			LEFT JOIN
 				#users u ON u.id = o.user_id
 			WHERE
-				p.id = $provider_id AND pb.response IS NULL
+				$where
 		", $flag);
 	}
     /**

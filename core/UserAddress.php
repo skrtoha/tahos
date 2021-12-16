@@ -42,6 +42,7 @@ class UserAddress{
     
     public static function getString($address_id, array $data){
         $output = "";
+        if (empty($data)) return $data;
         foreach($data as $row){
             $output .= "{$row['value']}, ";
         }

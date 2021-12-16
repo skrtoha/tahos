@@ -896,7 +896,7 @@ textarea {
   background: url(/img/icons/select__arrow_up.png) center center no-repeat, #0082BF
 }
 .hidden {
-  display: none
+  display: none !important;
 }
 .filter-form {
   background: #fff;

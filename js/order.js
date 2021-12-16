@@ -169,12 +169,28 @@ $(function(){
         $.each($('#orderInfo').serializeArray(), function(i, item){
             data.values[item.name] = item.value;
         })
-        console.log(data);
         $.ajax({
             type: 'post',
             url: '/ajax/order.php',
             data: data,
             success: function(){}
         })
+    })
+
+    $('select[name=delivery]').on('change', function(e){
+        const val = $(this).val();
+        const $address_id = $('select[name=address_id]');
+        const $user_issue = $('#user_issue');
+        switch(val){
+            case 'Доставка':
+                $address_id.removeClass('hidden');
+                $user_issue.addClass('hidden');
+                break;
+            case 'Самовывоз':
+                $address_id.addClass('hidden');
+                $user_issue.removeClass('hidden');
+                break;
+        }
+        $('select').trigger('refresh');
     })
 })

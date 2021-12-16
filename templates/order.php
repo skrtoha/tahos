@@ -85,7 +85,7 @@ $status_classes = [
                     <td label="Адрес">
                         <?if ($editOrderInfo){
                             $addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
-                            $hidden = $orderInfo['delivery_type'] == 'Самовывоз' ? 'hidden' : ''; ?>
+                            $hidden = $orderInfo['delivery'] == 'Самовывоз' ? 'hidden' : ''; ?>
                             <select name="address_id" class="<?=$hidden?>">
                                 <?if (!empty($addresses)){
                                     foreach($addresses as $row){
@@ -99,16 +99,12 @@ $status_classes = [
                                     <?}?>
                                 <?}?>
                             </select>
-                            <? $hidden = $orderInfo['delivery_type'] == 'Доставка' ? 'hidden' : '';
-                            $issuesList = $db->select('issues', '*');
-                            if (!empty($issuesList)){?>
-                                <select name="issue_id" class="<?=$hidden?>">
-                                    <?foreach($issuesList as $issue){?>
-                                        <option value="<?=$issue['id']?>"><?=$issue['adres']?></option>
-                                    <?}?>
-                                </select>
-                            <?}
-                        }
+                            <?$hidden = $orderInfo['delivery'] == 'Доставка' ? 'hidden' : '';
+                            $issueAddress = $db->getFieldOnID('issues', $orderInfo['user_issue'], 'adres');?>
+                            <span id="user_issue" class="<?=$hidden?>">
+                                <?=$issueAddress?>
+                            </span>
+                        <?}
                         else{
                             if ($orderInfo['delivery'] == 'Доставка'){?>
                                 <?=\core\UserAddress::getString(

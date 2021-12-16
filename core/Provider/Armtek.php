@@ -131,6 +131,7 @@ class Armtek extends Provider{
 	    $currentDate = new \DateTime();
 	    $targetDate = \DateTime::createFromFormat('YmdHis', $sting);
 	    $totalDays = $targetDate->diff($currentDate)->days;
+        $totalDays = $totalDays == 0 ? 1 : $totalDays;
 	    $days = 0;
 	    for($i = 1; $i <= $totalDays; $i++){
 	        $dayWeek = $currentDate->add(new \DateInterval('P1D'))->format('l');

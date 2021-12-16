@@ -1,4 +1,6 @@
 <?
+/** @var $db \core\Database */
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/orders.function.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/sendings.function.php');
 
@@ -83,10 +85,10 @@ $status_classes = [
                     <td label="Адрес">
                         <?if ($editOrderInfo){
                             $addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
-                            if (!empty($addresses)){
-                                $disabled = $orderInfo['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
-                                <select name="address_id" <?=$disabled?>>
-                                    <?foreach($addresses as $row){
+                            $hidden = $orderInfo['delivery_type'] == 'Самовывоз' ? 'hidden' : ''; ?>
+                            <select name="address_id" class="<?=$hidden?>">
+                                <?if (!empty($addresses)){
+                                    foreach($addresses as $row){
                                         $selected = $row['id'] == $orderInfo['address_id'] ? 'selected' : ''?>
                                         <option value="<?=$row['id']?>" <?=$selected?>>
                                             <?=\core\UserAddress::getString(
@@ -95,15 +97,27 @@ $status_classes = [
                                             )?>
                                         </option>
                                     <?}?>
+                                <?}?>
+                            </select>
+                            <? $hidden = $orderInfo['delivery_type'] == 'Доставка' ? 'hidden' : '';
+                            $issuesList = $db->select('issues', '*');
+                            if (!empty($issuesList)){?>
+                                <select name="issue_id" class="<?=$hidden?>">
+                                    <?foreach($issuesList as $issue){?>
+                                        <option value="<?=$issue['id']?>"><?=$issue['adres']?></option>
+                                    <?}?>
                                 </select>
-                            <?}?>
-                        <?}
+                            <?}
+                        }
                         else{
                             if ($orderInfo['delivery'] == 'Доставка'){?>
                                 <?=\core\UserAddress::getString(
                                     $orderInfo['address_id'],
                                     json_decode($orderInfo['json'], true)
                                 )?>
+                            <?}
+                            else{?>
+                                <?=$db->getFieldOnID('issues', $orderInfo['user_issue'], 'adres');?>
                             <?}?>
                         <?}?>
                     </td>

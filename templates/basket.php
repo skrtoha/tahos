@@ -431,7 +431,10 @@ $noReturnIsExists = false;
                                 <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
                                 <span>Безналичный</span>
                             </label>
-                        <?}?>
+                        <?}
+                        else{
+                            if ($user['pay_type'] == 'Безналичный') $user['pay_type'] = 'Наличный';
+                        }?>
                         <label>
                             <?$checked = $user['pay_type'] == 'Наличный' ? 'checked' : ''?>
                             <input <?=$checked?> type="radio" name="pay_type" value="Наличный">

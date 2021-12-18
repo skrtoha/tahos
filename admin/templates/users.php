@@ -47,6 +47,9 @@ if ($_POST['form_submit']){
 		message('Выберите точку выдачи!', false);
 		$saveble = false;
 	}
+    if ($array['user_type'] == 'private' && $array['pay_type'] == 'Безналичный'){
+        $array['pay_type'] = 'Наличный';
+    }
 	if ($saveble) {
 		if ($_POST['form_submit'] == 1){
 			if (core\User::update($id, $array)){

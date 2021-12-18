@@ -486,6 +486,8 @@ switch ($params[0]){
     case 'BERG_2021': //Прайс Москва2
     case 'BERG_MRIDB': //Прайс БДИР Москва
     case 'BERG_YBDIR': //Прайс БДИР Ярославль
+    case 'BERG_MDMG': //Прайс ДМГ Москва
+    case 'BERG_JARDMG': //Прайс ДМГ Ярославль
         ini_set('memory_limit', '2048M');
         $logger->alert("Прайс {$params[0]}");
         $emailPrice = [
@@ -510,6 +512,8 @@ switch ($params[0]){
         if ($params[0] == 'BERG_2021') $store_id = 337952;
         if ($params[0] == 'BERG_MRIDB') $store_id = 952496;
         if ($params[0] == 'BERG_YBDIR') $store_id = 952497;
+        if ($params[0] == 'BERG_MDMG') $store_id = 963806;
+        if ($params[0] == 'BERG_JARDMG') $store_id = 963807;
         $db->delete('store_items', "`store_id`=$store_id");
         $i = 0;
         while ($data = fgetcsv($handle, 0, "\n")) {

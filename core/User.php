@@ -241,4 +241,11 @@ class User{
             unset($default_address[$key]);
         }
     }
+
+    public static function getPayType($type_organization){
+        $payType = ['Наличный', 'Онлайн'];
+        if ($type_organization == 'entity') $payType[] = 'Безналичный';
+        sort($payType);
+        return $payType;
+    }
 }

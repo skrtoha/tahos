@@ -74,12 +74,11 @@ $data = !empty($_POST) ? $_POST['data'] : $user;
                         Способ оплаты:
                     </label>
                     <select id="pay_type" name="data[pay_type]">
-                        <option <?=$data['pay_type'] == 'Наличный' ? 'selected' : ''?> value="Наличный">
-                            Наличный
-                        </option>
-                        <option <?=$data['pay_type'] == 'Безналичный' ? 'selected' : ''?> value="Безналичный">
-                            Безналичный
-                        </option>
+                        <?foreach(\core\User::getPayType($user['user_type']) as $type){?>
+                            <option <?=$data['pay_type'] == $type ? 'selected' : ''?> value="<?=$type?>">
+                                <?=$type?>
+                            </option>
+                        <?}?>
                     </select>
                 </div>
                 <div class="input-wrap">

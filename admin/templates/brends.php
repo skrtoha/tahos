@@ -57,7 +57,9 @@ switch ($act){
 		$oldTitle = $db->select_one('brends', 'title', "`id` = {$_GET['id']}");
 		// debug($_POST); exit();
 
-		if ($db->update('brends', $_POST, "`id`=".$_GET['id'])){
+        $result = $db->update('brends', $_POST, "`id`=".$_GET['id']);
+        
+		if ($result === true){
 			$db->query("
 				UPDATE #filters_values fv
 				LEFT JOIN
@@ -73,6 +75,10 @@ switch ($act){
 			if ($_GET['from']) header("Location: ".get_from_uri($_GET['from']));
 			else header("Location: ?view=brends");
 		}
+        else{
+            message($result, false);
+            show_form('s_change');
+        }
 		break;
 	case 's_add':
 		if (Managers::isActionForbidden('Бренды товаров', 'Добавление')){
@@ -428,6 +434,10 @@ function show_form($act){
 					<div class="title">Название</div>
 					<div class="value"><input type=text name="title" value="<?=$brend['title']?>"></div>
 				</div>
+                <div class="field">
+                    <div class="title">Ссылка</div>
+                    <div class="value"><input type=text name="href" value="<?=$brend['href']?>"></div>
+                </div>
 				<div class="field">
 					<div class="title">Фото</div>
 					<div class="value">

@@ -1,3 +1,9 @@
-alter table tahos_users change adres address varchar(255) null;
-alter table tahos_users change telefon phone varchar(20) null;
+alter table tahos_categories
+    add isShowAtBottom int(1) default 1 not null;
+
+    alter table tahos_categories
+        modify isShowAtBottom int(1) default 1 not null after isShowOnMainPage;
+
+alter table tahos_categories
+    add isShowAtBottom int(1) default 1 not null;
 

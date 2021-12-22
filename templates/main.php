@@ -42,7 +42,7 @@
 				<div class="arrow_up"></div>
 			</div>
 			<div class="catalog">
-			<?$categories = $db->select('categories', 'id,title,href', '`parent_id`=0', 'pos', true);?>
+			<?$categories = $db->select('categories', '*', '`parent_id`=0', 'pos', true);?>
 				<ul>
 					<li>
 						<a href="/original-catalogs">
@@ -292,11 +292,12 @@
 			<div class="item catalog_list">
 				<h4>Каталог товаров</h4>
 				<ul>
-					<!-- <li><a href="/original-catalogs">Каталоги автозапчастей</a></li>
-					<li><a href="#">Все для автосервиса</a></li> -->
-					<?if (!empty($categories)) foreach ($categories as $value){?>
-						<li><a href="/category/<?=$value['href']?>"><?=$value['title']?></a></li>
-					<?}?>
+					<?if (!empty($categories)){
+                        foreach ($categories as $value){
+                            if (!$value['isShowAtBottom']) continue; ?>
+                            <li><a href="/category/<?=$value['href']?>"><?=$value['title']?></a></li>
+                        <?}?>
+                    <?}?>
 				</ul>
 			</div>
 			<div class="item partnership">

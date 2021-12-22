@@ -18,7 +18,8 @@ if ($_POST['submit']){
 		'title' => $_POST['title'],
 		'href' => $href,
 		'pos' => $_POST['pos'] ? $_POST['pos'] : 0,
-		'isShowOnMainPage' => $_POST['isShowOnMainPage']
+		'isShowOnMainPage' => $_POST['isShowOnMainPage'] ?? 0,
+        'isShowAtBottom' => $_POST['isShowAtBottom'] ?? 0
 	];
 	$bl = true;
 	if ($id) $where = "`href`='{$array['href']}' AND `id`!=$id";
@@ -197,12 +198,18 @@ function show_form(){
 					<div class="value"><input type="text" name="pos" value="<?=$array['pos']?>"></div>
 				</div>
 				<div class="field">
-					<div class="title">Показывать на<br>основной странице</div>
+					<div class="title">Показывать на</div>
 					<div class="value">
-						<select name="isShowOnMainPage">
-							<option <?=$array['isShowOnMainPage'] == 0 ? 'selected' : ''?> value="0">нет</option>
-							<option <?=$array['isShowOnMainPage'] == 1 ? 'selected' : ''?> value="1">да</option>
-						</select>
+                        <label>
+                            <span>На главной</span>
+                            <?$checked = $array['isShowOnMainPage'] ? 'checked' : ''?>
+                            <input type="checkbox" name="isShowOnMainPage" value="1" <?=$checked?>>
+                        </label>
+                        <label>
+                            В футере
+                            <?$checked = $array['isShowAtBottom'] ? 'checked' : ''?>
+                            <input type="checkbox" name="isShowAtBottom" value="1" <?=$checked?>>
+                        </label>
 					</div>
 				</div>
 				<div class="field">

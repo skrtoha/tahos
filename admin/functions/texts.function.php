@@ -1,8 +1,57 @@
 <?class Texts{
 	private $error;
-	public function __construct($db){
+	public function __construct(\core\Database $db){
 		$this->db = $db;
 	}
+    function getTexts($column){
+        $rubrics = $this->db->select('texts', '*', "`column` = $column");
+        return $rubrics;
+    }
+    function getHtmlTextList($array, $column){?>
+        <div id="total" style="margin-top: 10px;">Всего: <?=count($array)?></div>
+        <div class="actions">
+            <a href="?view=texts&tab=<?=$column?>&act=rubric_add">Добавить</a>
+        </div>
+        <table class="t_table" cellspacing="1">
+            <thead>
+                <tr class="head">
+                    <td>Название</td>
+                </tr>
+            </thead>
+            <tbody>
+                <?foreach($array as $value){?>
+                    <tr data-href="/admin/?view=texts&tab=<?=$column?>&act=text_rubric&id=<?=$value['id']?>#tabs|texts:<?=$column?>">
+                        <td><?=$value['title']?></td>
+                    </tr>
+                <?}?>
+            </tbody>
+        </table>
+    <?}
+    function getHtmlRubrics($array){?>
+        <div id="total" style="margin-top: 10px;">Всего: <?=count($array)?></div>
+        <div class="actions">
+            <a href="?view=texts&tab=<?=$column?>&act=text_add">Добавить</a>
+        </div>
+        <table class="t_table" cellspacing="1">
+            <thead>
+            <tr class="head">
+                <td>Название</td>
+                <td>Ссылка</td>
+            </tr>
+            </thead>
+            <tbody>
+            <?foreach($array as $value){?>
+                <tr data-href="/admin/?view=texts&tab=<?=$column?>&act=text&id=<?=$value['id']?>">
+                    <td><?=$value['title']?></td>
+                    <td><?=$value['href']?></td>
+                </tr>
+            <?}?>
+            </tbody>
+        </table>
+    <?}
+    public function getRubrics(){
+        return $this->db->select('text_rubrics', '*');
+    }
 	function theme(){
 		if (!empty($_POST)) $this->change_theme();
 		if ($_GET['id']){
@@ -278,10 +327,17 @@
 		}
 		else message($res, false);
 	}
-	function settings($field, $title = ''){
-		if (!empty($_POST) && $_GET['tab'] == $field){
-			// $this->db->update('settings', [$field => $_POST['text']], "`id`=1");
-			core\Setting::update($field, $_POST['text']);
+	public function getHtmlText($text_id, $tab, $title = ''){
+        $textInfo = $this->db->select_one('texts', '*', "`id` = $text_id");
+		if (!empty($_POST)){
+            $post = $_POST;
+            if (!$post['href']) $post['href'] = translite($post['title']);
+            if ($text_id) $result = $this->db->update('texts', $post, "`id` = {$text_id}");
+            else{
+                $this->db->insert('texts', $post);
+                header("Location: /admin/?view=texts&tab=$tab&act=rubric&id=".$this->db->last_id());
+                die();
+            }
 			message('Успешно сохранено');
 		}?>
 		<?if ($title){?>
@@ -290,16 +346,30 @@
 		<div class="t_form">
 			<div class="bg">
 				<form action="" method="post" enctype="multipart/form-data">
+                    <div class="field">
+                        <div class="value">
+                            <input required type="text" name="title" value="<?=$textInfo['title']?>">
+                        </div>
+                    </div>
 					<div class="field">
 						<div class="value">
-							<textarea name="text" class="need"><?=core\Setting::get($field)?></textarea>
+							<textarea name="text" class="need"><?=$textInfo['text']?></textarea>
 						</div>
 					</div>
+                    <div class="field">
+                        <div class="value">
+                            <input type="text" name="href" value="<?=$textInfo['href']?>">
+                        </div>
+                    </div>
 					<div class="field">
 						<div class="value"><input type="submit" class="button" value="Сохранить"></div>
 					</div>
 				</form>
 			</div>
 		</div>
+        <a class="bottom" href="/admin/?view=texts&tab=<?=$tab?>">Назад</a>
+        <? if ($text_id){?>
+            <a class="bottom delete" href="/admin/?view=texts&tab=<?=$tab?>&act=rubric_delete&id=<?=$text_id?>">Удалить</a>
+        <?}?>
 	<?}
 }?>

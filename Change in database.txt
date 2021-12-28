@@ -1,9 +1,1 @@
-alter table tahos_categories
-    add isShowAtBottom int(1) default 1 not null;
-
-    alter table tahos_categories
-        modify isShowAtBottom int(1) default 1 not null after isShowOnMainPage;
-
-alter table tahos_categories
-    add isShowAtBottom int(1) default 1 not null;
-
+rename table tahos_help_texts to tahos_texts;

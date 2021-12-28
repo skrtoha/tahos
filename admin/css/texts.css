@@ -98,3 +98,10 @@ tr[text_id], tr[rubric_id]{
 .t_form .title{
     width: 100px;
 }
+.t_form .value{
+    width: 100%;
+}
+a.bottom{
+    margin-top: 10px;
+    display: inline-block
+}

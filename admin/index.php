@@ -6,12 +6,6 @@ ini_set('display_startup_errors', 1);
 use core\Log;
 use core\Managers;
 
-// set_exception_handler('error_handler',);
-// function error_handler($e){
-// 	if (get_class($e) == 'ParseError') return debug($e);
-// 	Log::insertThroughException($e);
-// }
-
 require_once('../core/DataBase.php');
 require_once('templates/functions.php');
 session_start();

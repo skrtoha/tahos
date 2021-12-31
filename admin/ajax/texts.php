@@ -16,4 +16,10 @@ switch($_GET['act']){
         $titles[$_GET['number']] = $_GET['title'];
         Setting::update('texts', 'titles', json_encode($titles, JSON_UNESCAPED_UNICODE));
         break;
+    case 'changeTextRubric':
+        if (strlen($_GET['title']) == 0) $db->delete('text_rubrics', "`id` = {$_GET['id']}");
+        else{
+            $db->update('text_rubrics', ['title' => $_GET['title']], "`id` = {$_GET['id']}");
+        }
+        break;
 }

@@ -105,3 +105,10 @@ a.bottom{
     margin-top: 10px;
     display: inline-block
 }
+p.title{
+    margin: 5px 0;
+    font-weight: bold;
+}
+div.actions{
+    margin-bottom: 10px;
+}

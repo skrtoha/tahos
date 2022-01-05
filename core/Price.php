@@ -3,7 +3,7 @@ namespace core;
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/admin/templates/functions.php');
 class Price{
-	private $log;
+	public $log;
 	public $brends = array();
 	public $insertedBrends = 0;
 	public $insertedItems = 0;

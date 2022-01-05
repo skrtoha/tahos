@@ -34,11 +34,12 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' || !empty($_POST)){
                     $rubricInfo = $db->select_one('text_rubrics', '*', "`id` = {$_GET['id']}");
                     $textRubric = $textClass->getTextRubricList($_GET['id']);
                     $textClass->showHtmlTextList(
-                            $textRubric,
-                            2,
-                            'text',
-                            "{$rubricInfo['title']}: список статей",
-                        
+                        $textRubric,
+                        2,
+                        'text_rubric_change',
+                        "{$rubricInfo['title']}: список статей",
+                        "/admin/?view=texts&tab=2#tabs|texts:2",
+                        '/admin/?view=texts&tab=2&act=text_rubric_add#tabs|texts:2'
                     );
                     break;
                 default:

@@ -22,14 +22,16 @@
         $rubrics = $this->db->select('texts', '*', "`column` = $column");
         return $rubrics;
     }
-    public function showHtmlTextList($array, $column, $act, $title = '', $backUrl = ''){?>
+    public function showHtmlTextList($array, $column, $act, $title = '', $backUrl = '', $addUrl = ''){?>
         <div id="total" style="margin-top: 10px;">Всего: <?=count($array)?></div>
         <?if ($title){?>
             <p class="title"><?=$title?></p>
         <?}?>
-        <div class="actions">
-            <a href="?view=texts&tab=<?=$column?>&act=<?=$act?>_add#tabs|texts:<?=$column?>">Добавить</a>
-        </div>
+        <?if ($addUrl){?>
+            <div class="actions">
+                <a href="<?=$addUrl?>">Добавить</a>
+            </div>
+        <?}?>
         <table class="t_table" cellspacing="1">
             <thead>
                 <tr class="head">
@@ -99,7 +101,7 @@
             <a class="bottom delete" href="/admin/?view=texts&tab=<?=$tab?>&act=rubric_delete&id=<?=$text_id?>">Удалить</a>
         <?}?>
 	<?}
-    public function showHtmlTextRubricForm($rubric_id, $tab){
+    public function showHtmlTextRubricForm($rubric_id, $tab, array $params = []){
         if ($rubric_id){
             $rubricInfo = $this->db->select_one('text_rubrics', '*', "`id` = $rubric_id");
         }
@@ -131,7 +133,7 @@
             </div>
         </div>
         <a class="bottom" href="/admin/?view=texts&tab=<?=$tab?>#tabs|texts:<?=$tab?>">Назад</a>
-        <? if ($rubric_id){?>
+        <? if ($params['delete_url']){?>
             <a class="bottom delete" href="/admin/?view=texts&tab=<?=$tab?>&act=rubric_delete&id=<?=$rubric_id?>">Удалить</a>
         <?}?>
     <?}

@@ -176,8 +176,8 @@ class Autokontinent extends Provider{
 	private static function addAnalogy($mainItemID, $item_id){
 		static $processedAnalogies = [];
 		if (isset($processedAnalogies["$mainItemID:$item_id"])) return;
-		parent::getInstanceDataBase()->insert('analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
-		parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
+		parent::getInstanceDataBase()->insert('item_analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
+		parent::getInstanceDataBase()->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
 	}
 	private static function getDaysDelivery($dt_delivery){
 		$dateDelivery = \DateTime::createFromFormat('Y-m-d H:i:s', $dt_delivery);

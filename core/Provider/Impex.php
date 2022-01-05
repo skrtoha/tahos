@@ -169,9 +169,9 @@ class Impex extends Provider{
 							);
 							$last_sub = $array['id'];
 						} 
-						$db->insert('articles', ['item_id' => $last_sub, 'item_diff' => $last_sub]);
-						$db->insert('analogies',['item_id' => $item_last_id, 'item_diff' => $last_sub]);
-						$db->insert('analogies',['item_id' => $last_sub, 'item_diff' => $item_last_id]);
+						$db->insert('item_articles', ['item_id' => $last_sub, 'item_diff' => $last_sub]);
+						$db->insert('item_analogies',['item_id' => $item_last_id, 'item_diff' => $last_sub]);
+						$db->insert('item_analogies',['item_id' => $last_sub, 'item_diff' => $item_last_id]);
 						if ($store_id && $item['price_yen']) $db->insert(
 							'store_items', 
 							[
@@ -190,7 +190,7 @@ class Impex extends Provider{
 				foreach($articles as $value){
 					$current = $value;
 					foreach($articles as $val) $db->insert(
-						'articles',
+						'item_articles',
 						[
 							'item_id' => $current,
 							'item_diff' => $val

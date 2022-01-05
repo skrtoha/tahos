@@ -209,7 +209,7 @@ class Mikado extends Provider{
 			);
 			if ($res === true){
 				$item_id = $GLOBALS['db']->last_id();
-				$GLOBALS['db']->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+				$GLOBALS['db']->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			}
 		}
 	}
@@ -289,8 +289,8 @@ class Mikado extends Provider{
 		if (!$item_id) return false;
 		$GLOBALS['db']->query(Abcp::getQueryDeleteByProviderId($item_id, 8), ''); 
 		if ($row->CodeType == 'Analog' || $row->CodeType == 'AnalogOEM'){
-			$GLOBALS['db']->insert('analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id], ['print_query' => false]);
-			$GLOBALS['db']->insert('analogies', ['item_id' => $item_id, 'item_diff' => $_GET['item_id']], ['print_query' => false]);
+			$GLOBALS['db']->insert('item_analogies', ['item_id' => $_GET['item_id'], 'item_diff' => $item_id], ['print_query' => false]);
+			$GLOBALS['db']->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $_GET['item_id']], ['print_query' => false]);
 		}
 		if (!empty($row->OnStocks)){
 			if (is_array($row->OnStocks->StockLine)){

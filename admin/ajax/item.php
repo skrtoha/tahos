@@ -103,18 +103,18 @@ switch($_POST['act']){
 	case 'addItem':
 		//debug($_POST); //exit();
 		$res = $db->query("
-			SELECT * FROM #analogies WHERE item_id={$_POST['item_id']}
+			SELECT * FROM #item_analogies WHERE item_id={$_POST['item_id']}
 		", '');
 
 		$db->insert($_POST['type'], ['item_id' => $_POST['item_id'], 'item_diff' => $_POST['item_diff']]/*, ['print' => true]*/);
 		if (in_array($_POST['type'], ['articles', 'analogies', 'substitutes'])){
-			$db->insert($_POST['type'], ['item_id' => $_POST['item_diff'], 'item_diff' => $_POST['item_id']]/*, ['print' => true]*/);
+			$db->insert('item_'.$_POST['type'], ['item_id' => $_POST['item_diff'], 'item_diff' => $_POST['item_id']]/*, ['print' => true]*/);
 		}
 		if ($_POST['addAllAnalogies']){
 			if ($res->num_rows){
 				while($row = $res->fetch_assoc()){
-					$db->insert('analogies', ['item_id' => $_POST['item_diff'], 'item_diff' => $row['item_diff']]/*, ['print' => true]*/);
-					$db->insert('analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_diff']]/*, ['print' => true]*/);
+					$db->insert('item_analogies', ['item_id' => $_POST['item_diff'], 'item_diff' => $row['item_diff']]/*, ['print' => true]*/);
+					$db->insert('item_analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_diff']]/*, ['print' => true]*/);
 				} 
 			}
 		}
@@ -131,11 +131,11 @@ switch($_POST['act']){
 		$db->delete($_POST['type'], "`item_id` = {$_POST['item_diff']} AND `item_diff` = {$_POST['item_id']}");
 		if ($_POST['type'] == 'analogies'){
 			$res = $db->query("
-				SELECT item_diff FROM #analogies WHERE `item_id`={$_POST['item_id']}
+				SELECT item_diff FROM #item_analogies WHERE `item_id`={$_POST['item_id']}
 			", '');
 			if ($res->num_rows){
 				while($row = $res->fetch_assoc()){
-					$db->delete('analogies', "
+					$db->delete('item_analogies', "
 						(`item_id`={$_POST['item_diff']} AND `item_diff`={$row['item_diff']}) OR
 						(`item_id`={$row['item_diff']} AND `item_diff`={$_POST['item_diff']})
 					");

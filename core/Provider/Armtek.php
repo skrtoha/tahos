@@ -182,7 +182,7 @@ class Armtek extends Provider{
 			], ['print_query' => false]);
 			if ($res === true){
 				$item_id = $GLOBALS['db']->last_id();
-				$GLOBALS['db']->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+				$GLOBALS['db']->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 				if ($from == 'mikado') $GLOBALS['db']->insert('mikado_zakazcode', ['item_id' => $item_id, 'ZakazCode' => $object->ZakazCode]);
 				return $item_id;
 			} 
@@ -200,8 +200,8 @@ class Armtek extends Provider{
 			$item_id = $this->getItemId($value);
 			if (!$value->ANALOG) $this->mainItemId = $item_id;
 			else{
-				$GLOBALS['db']->insert('analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
-				$GLOBALS['db']->insert('analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
+				$GLOBALS['db']->insert('item_analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
+				$GLOBALS['db']->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
 			}
 			$GLOBALS['db']->insert('store_items', [
 				'store_id' => $store_id,

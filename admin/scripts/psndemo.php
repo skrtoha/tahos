@@ -262,7 +262,7 @@ foreach($html->find('#Motorcycles_content a.NV_mod_detail_link_text_1') as $a_ve
 									$item_id = $db->last_id();
 									$inserted_items++;
 									$log->info("Номенклатура {$node_item['article_cat']} с брендом $brend_title успешно вставлен с id=$item_id");
-									$res_articles_insert = $db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+									$res_articles_insert = $db->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 									if ($res_articles_insert === true) $log->info("Таблица articles пополнена c item_id и item_diff = $item_id артикул {$node_item['article_cat']} и $brend_title");
 									else $log->error("Ошибка вставки articles c item_id и item_diff = $item_id артикул {$node_item['article_cat']} и $brend_title: $res_articles_insert");
 								}
@@ -312,7 +312,7 @@ foreach($html->find('#Motorcycles_content a.NV_mod_detail_link_text_1') as $a_ve
 										$item_diff_id = $db->last_id();
 										$inserted_items_diff++;
 										$log->info("Деталь-замена $brend_title - {$node_item['replaces']} для {$node_item['article_cat']} добавлена с id=$item_diff_id ");
-										$res_articles_insert = $db->insert('articles', ['item_id' => $item_diff_id, 'item_diff' => $item_diff_id]);
+										$res_articles_insert = $db->insert('item_articles', ['item_id' => $item_diff_id, 'item_diff' => $item_diff_id]);
 										if ($res_articles_insert === true) 
 											$log->info("Таблица articles пополнена заменой c item_id и item_diff = $item_diff_id артикул {$node_item['article_cat']} и $brend_title");
 										else 

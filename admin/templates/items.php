@@ -121,8 +121,8 @@ switch ($act) {
 	case 'analogies': 
 	case 'substitutes': 
 		if (isset($_GET['status'])){
-			$db->update($act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_id']} AND `item_diff` = {$_GET['item_diff']}");
-			$db->update($act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_diff']} AND `item_diff` = {$_GET['item_id']}");
+			$db->update('item_'.$act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_id']} AND `item_diff` = {$_GET['item_diff']}");
+			$db->update('item_'.$act, ['status' => $_GET['status']], "`item_id` = {$_GET['item_diff']} AND `item_diff` = {$_GET['item_id']}");
 			die();
 		}
 		itemDiff($act); 
@@ -225,19 +225,19 @@ function item($act){
 	<input type="hidden" id="item_id" value="<?=$id?>">
 	<? if ($act != 's_add'){?> 
 		<div id="need_similar">
-			<?$count = $db->getCount('complects', "`item_id`={$item['id']} AND `item_diff`<>{$item['id']}");
+			<?$count = $db->getCount('item_complects', "`item_id`={$item['id']} AND `item_diff`<>{$item['id']}");
 			$class = $count ? 'red' : '';?>
 			<a class="<?=$class?>" href="?view=items&act=complects&id=<?=$item['id']?>">Комплектность(<?=$count?>)</a>
-			<?$count = $db->getCount('articles', "`item_id`={$item['id']} AND `item_diff`<>{$item['id']}");
+			<?$count = $db->getCount('item_articles', "`item_id`={$item['id']} AND `item_diff`<>{$item['id']}");
 			$class = $count ? 'red' : '';?>
 			<a class="<?=$class?>" href="?view=items&act=articles&id=<?=$item['id']?>">Подобные(<?=$count?>)</a>
 			<?$count = $db->getCount('store_items', "`item_id`=".$item['id']);
 			$class = $count ? 'red' : '';?>
 			<a class="<?=$class?>" href="?view=items&act=prices&id=<?=$item['id']?>">Прайсы(<?=$count?>)</a>
-			<?$count = $db->getCount('substitutes', "`item_id`=".$item['id']);
+			<?$count = $db->getCount('item_substitutes', "`item_id`=".$item['id']);
 			$class = $count ? 'red' : '';?>
 			<a class="<?=$class?>" href="?view=items&act=substitutes&id=<?=$item['id']?>">Замены(<?=$count?>)</a>
-			<?$count = $db->getCount('analogies', "`item_id`=".$item['id']);
+			<?$count = $db->getCount('item_analogies', "`item_id`=".$item['id']);
 			$class = $count ? 'red' : '';?>
 			<a class="<?=$class?>" href="?view=items&act=analogies&id=<?=$item['id']?>">Аналоги(<?=$count?>)</a>
 			<a href="?view=items&act=history&item_id=<?=$item['id']?>">История</a>

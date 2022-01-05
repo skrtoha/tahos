@@ -248,7 +248,7 @@ class Abcp extends Provider{
 		$last_res = $res;
 		if ($res === true){
 			$last_id = $this->db->last_id();
-			$res2 = $this->db->insert('articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
+			$res2 = $this->db->insert('item_articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
 			if ($insertedItems !== NULL){
 				$this->db->insert('rendered_voshod', ['item_id' => $last_id], ['print_query' => false]);
 				$insertedItems++;
@@ -264,9 +264,9 @@ class Abcp extends Provider{
 	}
 	public function insertAnalogies($provider_id, $item_id, $item){
 		$param = self::getParam($provider_id);
-		$res1 = $this->db->insert('analogies', ['item_id' => $this->item_id, 'item_diff' => $item_id], ['print_query' => false]);
+		$res1 = $this->db->insert('item_analogies', ['item_id' => $this->item_id, 'item_diff' => $item_id], ['print_query' => false]);
 		$last_query1 = $this->db->last_query;
-		$res2 = $this->db->insert('analogies', ['item_id' => $item_id, 'item_diff' => $this->item_id], ['print_query' => false]);
+		$res2 = $this->db->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $this->item_id], ['print_query' => false]);
 		$last_query2 = $this->db->last_query;
 		if ($res1 === true && $res2 === true) return $this->db->insert(
 			'log_diff',

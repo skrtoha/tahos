@@ -88,7 +88,7 @@ class ForumAuto extends Provider{
 			]/*, ['print' => true]*/);
 			if ($res === true){
 				$item_id = parent::getInstanceDataBase()->last_id();
-				parent::getInstanceDataBase()->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+				parent::getInstanceDataBase()->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 			}
 			else {
 				$item = Item::getByBrendIDAndArticle($brend_id, $part->art);

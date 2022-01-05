@@ -266,7 +266,7 @@ foreach($brend_paths as $brend_path){
 							if ($res === true){
 								$item_id = $db->last_id();
 								$log->info("Номенклатура {$r[2]}, $brend_name добавлена с id=$item_id");
-								$res_insert_articles = $db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+								$res_insert_articles = $db->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 								if ($res_insert_articles == true) $log->info("Таблица articles пополнена для номенклатуры {$r[2]}, $brend_name");
 								else $log->error("Ошибка вставки в articles: $res | {$db->last_query}");
 								$inserted_items++;
@@ -332,7 +332,7 @@ foreach($brend_paths as $brend_path){
 									$item_diff_id = $item_diff['id'];
 									$log->notice("Замена {$r[4]} бренда $brend_name уже присутствует с id=$item_diff_id");
 								}
-								$res = $db->insert('articles', ['item_id' => $item_diff_id, 'item_diff' => $item_diff_id]);
+								$res = $db->insert('item_articles', ['item_id' => $item_diff_id, 'item_diff' => $item_diff_id]);
 								if ($res === true){
 									$log->info("Таблица articles пополнена для {$r[4]} бренда $brend_name с id=$item_diff_id");
 								}

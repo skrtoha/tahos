@@ -156,7 +156,7 @@ if ($_POST['items_analogies']){
 		if ($resMain === true){
 			$insertedItems++;
 			$item_main_id = $db->last_id();
-			$db->insert('articles', ['item_id' => $item_main_id, 'item_diff' => $item_main_id]);
+			$db->insert('item_articles', ['item_id' => $item_main_id, 'item_diff' => $item_main_id]);
 		} 
 		else{
 			$itemMain = core\Item::getByBrendIDAndArticle($brendMain, $articleMain);

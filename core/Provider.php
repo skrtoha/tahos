@@ -532,17 +532,17 @@ abstract class Provider{
 			LEFT JOIN
 				#provider_stores ps ON ps.id = si.store_id
 			LEFT JOIN
-				#analogies diff ON diff.item_diff = si.item_id
+				#item_analogies diff ON diff.item_diff = si.item_id
 			$where
 		", '');
         
         self::getInstanceDataBase()->query("
 		    UPDATE
-                tahos_provider_stores ps
+                #provider_stores ps
             left join
-                tahos_store_items si on ps.id = si.store_id
+                #store_items si on ps.id = si.store_id
             left join
-                tahos_analogies diff on diff.item_diff = si.item_id
+                #item_analogies diff on diff.item_diff = si.item_id
             set ps.price_updated = current_timestamp()
             $where
 		");

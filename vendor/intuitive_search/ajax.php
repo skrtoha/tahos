@@ -48,7 +48,7 @@ switch($_GET['tableName']){
 				}
 				$query .= "
 					LEFT JOIN
-						#{$_GET['additionalConditions']['act']} diff ON diff.item_diff = i.id AND diff.item_id = {$_GET['additionalConditions']['item_id']}
+						#item_{$_GET['additionalConditions']['act']} diff ON diff.item_diff = i.id AND diff.item_id = {$_GET['additionalConditions']['item_id']}
 					WHERE
 						i.article LIKE '{$_GET['value']}%' AND diff.item_id IS NULL $additionalWhere
 					LIMIT

@@ -13,6 +13,7 @@ $(function(){
             const params = getParams();
             if (typeof params['act'] !== 'undefined') str += '&act=' + params['act'];
             if (typeof params['id'] !== 'undefined') str += '&id=' + params['id'];
+            if (typeof params['parent_id'] !== 'undefined') str += '&parent_id=' + params['parent_id'];
 			str += '#tabs|texts:' + obj.tab;
             $.ajax({
                 type: 'get',

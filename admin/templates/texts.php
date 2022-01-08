@@ -7,44 +7,63 @@ $titles = json_decode(Setting::get('titles'), true);
 $textClass = new Texts($db);
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' || !empty($_POST)){
     switch ($_GET['tab']){
+        case 4:
         case 1:
             switch($_GET['act']){
-                case 'text_add':
-                case 'text':
+                case 'article_add':
+                case 'article':
                     $id = $_GET['id'] ?? null;
-                    $textClass->showHtmlText($id , 1);
+                    $textClass->showHtmlArticle($id , $_GET['tab']);
                     break;
-                case 'text_delete':
-                    $db->delete('texts', "`id` = {$_GET['id']}");
-                    header("Location: /admin/?view=texts&tab=1");
+                case 'article_delete':
+                    $db->delete('text_articles', "`id` = {$_GET['id']}");
+                    header("Location: /admin/?view=texts&tab={$_GET['tab']}");
                     die();
                 default:
-                    $textList = $textClass->getTexts(1);
-                    $textClass->showHtmlTextList($textList, 1, 'text');
+                    $articleList = $textClass->getArticles($_GET['tab']);
+                    $textClass->showHtmlArticleList(
+                        $articleList,
+                        $_GET['tab'],
+                        'article',
+                        false,
+                        false,
+                        "/admin/?view=texts&tab={$_GET['tab']}&act=article_add#tabs|texts:{$_GET['tab']}"
+                    );
                 }
             break;
         case 2:
             switch ($_GET['act']){
-                case 'text_rubric_add':
-                case 'text_rubric_change':
+                case 'rubric_delete':
+                    $db->delete('text_rubrics', "`id` = {$_GET['id']}");
+                    header("Location: /admin/?view=texts&tab=2#tabs|texts:2");
+                    die();
+                case 'article_add':
+                case 'article':
+                    $id = $_GET['id'] ?? null;
+                    $textClass->showHtmlArticle($id, 2, 'Добавление статьи');
+                    break;
+                case 'rubric_add':
+                case 'rubric_change':
                     $id = $_GET['id'] ?? null;
                     $textClass->showHtmlTextRubricForm($id, 2);
                     break;
-                case 'text_rubric':
-                    $rubricInfo = $db->select_one('text_rubrics', '*', "`id` = {$_GET['id']}");
-                    $textRubric = $textClass->getTextRubricList($_GET['id']);
-                    $textClass->showHtmlTextList(
-                        $textRubric,
+                case 'rubric':
+                    $rubricInfo = $textClass->getRubrics(['id' => $_GET['id']]);
+                    $rubricInfo = $rubricInfo[0];
+                    $articles = $textClass->getArticleRubricList($_GET['id']);
+                    $textClass->showHtmlArticleList(
+                        $articles,
                         2,
-                        'text_rubric_change',
+                        'article',
                         "{$rubricInfo['title']}: список статей",
                         "/admin/?view=texts&tab=2#tabs|texts:2",
-                        '/admin/?view=texts&tab=2&act=text_rubric_add#tabs|texts:2'
+                        "/admin/?view=texts&tab=2&act=article_add&parent_id={$_GET['id']}#tabs|texts:2",
+                        "/admin/?view=texts&tab=2&act=rubric_delete&id={$_GET['id']}"
                     );
                     break;
                 default:
                     $rubrics = $textClass->getRubrics();
-                    $textClass->showHtmlTextList($rubrics, 2, 'text_rubric');
+                    $textClass->showHtmlArticleList($rubrics, 2, 'rubric');
             }
             break;
         case 4:

@@ -63,7 +63,14 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' || !empty($_POST)){
                     break;
                 default:
                     $rubrics = $textClass->getRubrics();
-                    $textClass->showHtmlArticleList($rubrics, 2, 'rubric');
+                    $textClass->showHtmlArticleList(
+                        $rubrics,
+                        2,
+                        'rubric',
+                        '',
+                        '',
+                        "/admin/?view=texts&tab=2&act=rubric_add#tabs|texts:{$_GET['tab']}"
+                    );
             }
             break;
         case 4:

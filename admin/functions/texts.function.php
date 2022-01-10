@@ -145,7 +145,7 @@
             }
             else{
                 $this->db->insert('text_rubrics', $post);
-                header("Location: /admin/?view=texts&tab=$tab&act=rubric&id=".$this->db->last_id());
+                header("Location: /admin/?view=texts&tab=$tab&act=rubric&id=".$this->db->last_id()."#tabs|texts:$tab");
                 die();
             }
         }?>

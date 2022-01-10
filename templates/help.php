@@ -1,43 +1,44 @@
 <?
 $title = 'Помощь';
-// debug($_GET); 
+$rubrics = [];
 $res_rubrics = $db->query("
-	SELECT
-		hr.id AS rubric_id,
-		hr.href AS href,
-		hr.title AS rubric_title,
-		ht.id AS text_id,
-		ht.title AS text_title
-	FROM
-		#texts_to_rubrics ttr
-	LEFT JOIN
-		#help_rubrics hr ON hr.id=ttr.rubric_id
-	LEFT JOIN
-		#help_texts ht ON ht.id=ttr.text_id
+    SELECT
+        atr.rubric_id,
+        tr.title AS rubric_title,
+        atr.article_id,
+        ta.title AS article_title,
+        ta.href AS article_href
+    FROM
+		#text_article_to_rubric atr
+    LEFT JOIN
+        #text_articles ta ON ta.id = atr.article_id
+    left JOIN
+        #text_rubrics tr ON tr.id = atr.rubric_id
 	ORDER BY
-		hr.title
+		tr.title
 ", '');
 if ($res_rubrics->num_rows){
 	while ($row = $res_rubrics->fetch_assoc()){
 		$r = & $rubrics[$row['rubric_id']];
 		$r['title'] = $row['rubric_title'];
-		$r['href'] = $row['href'];
-		$r['text'][$row['text_id']] = $row['text_title'];
+		$r['articles'][$row['article_id']] = $row['article_title'];
 	}
 }
-// debug($rubrics);
 ?>
 <div class="help-page">
 	<h1>Помощь</h1>
 	<div class="questions-block">
 		<?if (!empty($rubrics)){
-			foreach($rubrics as $key => $value){
-				if (empty($value['text'])) continue;?>
-				<button class="accordion <?=$value['href'] == $_GET['rubric_href'] ? 'active' : ''?>"><?=$value['title']?></button>
-				<div class="panel <?=$value['href'] == $_GET['rubric_href'] ? 'show' : ''?>">
+			foreach($rubrics as $rubric_id => $value){
+				if (empty($value['articles'])) continue;
+                $active = $rubric_id == $_GET['rubric_href'] ? 'active' : ''; ?>
+				<button class="accordion <?=$active?>"><?=$value['title']?></button>
+				<div class="panel <?=$active ? 'show' : ''?>">
 					<ul>
-						<?foreach($value['text'] as $k => $v){?>
-							<li><a text_id="<?=$k?>" href="#"><?=$v?></a></li>
+						<?foreach($value['articles'] as $article_id => $title){?>
+							<li>
+                                <a data-article-id="<?=$article_id?>" href="#"><?=$title?></a>
+                            </li>
 						<?}?>
 					</ul>
 				</div>

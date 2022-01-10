@@ -27,7 +27,7 @@ class Item{
 		$resItems = $db->insert('items', $fields/*, ['print' => true]*/);
 		if ($resItems !== true) return $resItems;
 		$last_id = $db->last_id();
-		$db->insert('articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
+		$db->insert('item_articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
 		if ($barcode){
 			$resBarcode = $db->insert('item_barcodes', [
 				'item_id' => $last_id,
@@ -112,7 +112,7 @@ class Item{
 		return true;
 	}
 	public static function clearAnalogies($item_id){
-		return $GLOBALS['db']->delete('analogies', "`item_id` = $item_id OR `item_diff` = $item_id");
+		return $GLOBALS['db']->delete('item_analogies', "`item_id` = $item_id OR `item_diff` = $item_id");
 	}
 	public static function getHrefArticle($article){
 		return "/search/article/$article";
@@ -407,7 +407,7 @@ class Item{
 			$analogiesFields
 			GROUP_CONCAT(c.title SEPARATOR '; ') AS categories
 		FROM
-			#$type diff
+			#item_$type diff
 		LEFT JOIN
 			#items i ON i.id = diff.item_diff
 		LEFT JOIN

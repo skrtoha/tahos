@@ -1,305 +1,172 @@
 <?class Texts{
 	private $error;
-	public function __construct($db){
+	public function __construct(\core\Database $db){
 		$this->db = $db;
 	}
-	function theme(){
-		if (!empty($_POST)) $this->change_theme();
-		if ($_GET['id']){
-			$res_help_texts = $this->db->query("
-				SELECT
-					ht.*,
-					GROUP_CONCAT(ttr.rubric_id) AS rubrics
-				FROM
-					#help_texts ht
-				LEFT JOIN
-					#texts_to_rubrics ttr ON ttr.text_id=ht.id
-				WHERE
-					ht.id={$_GET['id']}
-				GROUP BY
-					ht.id
-			", '');
-			$array = $res_help_texts->fetch_assoc();
-			if ($array['rubrics']) $rubrics = explode(',', $array['rubrics']);
-			else $rubrics = array();
+    
+    public function getArticleRubricList($id){
+        $output = [];
+        $result = $this->db->query("
+            SELECT
+                a.id,
+                atr.rubric_id,
+                a.title,
+                a.text
+            FROM #text_article_to_rubric atr
+            LEFT JOIN #text_articles a ON a.id = atr.article_id
+            WHERE atr.rubric_id = $id
+        ");
+        while($row = $result->fetch_assoc()) $output[] = $row;
+        return $output;
+    }
+    public function getArticles($column){
+        return $this->db->select('text_articles', '*', "`column` = $column");
+    }
+    public function showHtmlArticleList($array, $column, $act, $title = '', $backUrl = '', $addUrl = '', $deleteUrl = ''){?>
+        <div id="total" style="margin-top: 10px;">Всего: <?=count($array)?></div>
+        <?if ($title){?>
+            <p class="title"><?=$title?></p>
+        <?}?>
+        <?if ($addUrl || $addUrl){?>
+            <div class="actions">
+                <?if ($addUrl){?>
+                    <a href="<?=$addUrl?>">Добавить</a>
+                <?}?>
+                <?if ($deleteUrl){?>
+                    <a class="delete" href="<?=$deleteUrl?>">Удалить</a>
+                <?}?>
+            </div>
+        <?}?>
+        <table class="t_table" cellspacing="1">
+            <thead>
+                <tr class="head">
+                    <td>Название</td>
+                </tr>
+            </thead>
+            <tbody>
+                <?foreach($array as $value){?>
+                    <tr data-id="<?=$value['id']?>" data-href="/admin/?view=texts&tab=<?=$column?>&act=<?=$act?>&id=<?=$value['id']?>#tabs|texts:<?=$column?>">
+                        <td><?=$value['title']?></td>
+                    </tr>
+                <?}?>
+            </tbody>
+        </table>
+        <?if ($backUrl){?>
+            <a href="<?=$backUrl?>">Назад</a>
+        <?}?>
+    <?}
+    public function getRubrics($params = []){
+        $where = '';
+        if (!empty($params)){
+            foreach($params as $key => $value){
+                switch ($key){
+                    default:
+                        $where .= "`$key` = $value AND ";
+                }
+            }
+        }
+        if (strlen($where)) $where = substr($where, 0, -5);
+        return $this->db->select('text_rubrics', '*', $where);
+    }
+	public function showHtmlArticle($id, $tab, $title = ''){
+		if (!empty($_POST)){
+            $post = $_POST;
+            $post['column'] = $_GET['tab'];
+            if (!$post['href']) $post['href'] = translite($post['title']);
+            if ($id){
+                $this->db->update('text_articles', $post, "`id` = {$id}");
+            }
+            else{
+                if (isset($post['parent_id'])){
+                    $parent_id = $post['parent_id'];
+                    unset($post['parent_id']);
+                }
+                $this->db->insert('text_articles', $post);
+                $article_id = $this->db->last_id();
+                if(isset($parent_id)){
+                    $this->db->insert('text_article_to_rubric', [
+                        'article_id' => $article_id,
+                        'rubric_id' => $parent_id
+                    ]);
+                    $url = "/admin/?view=texts&tab=$tab&act=rubric&id=$parent_id#tabs|texts:$tab";
+                }
+                else $url = "/admin/?view=texts&tab=$tab&act=article&id=".$article_id;
+                header("Location: $url");
+                die();
+            }
+            $textInfo = $post;
 		}
-		else{
-			$array = $_POST;
-			$rubrics = array();
-		}
-		$res_help_rubrics = $this->db->query("
-			SELECT
-				hr.id,
-				hr.title
-			FROM
-				#help_rubrics hr
-			ORDER BY
-				title
-		", '');
-		if ($_GET['id']){?>
-			<div class="actions">
-				<a class="item_remove" href="?view=help&act=theme_delete&id=<?=$_GET['id']?>">Удалить</a>
-			</div>
-		<?}?>
-		<div class="t_form">
-			<div class="bg">
-				<form action="" method="post" enctype="multipart/form-data">
-					<div class="field">
-						<div class="title">Название</div>
-						<div class="value"><input type=text name="title" value="<?=$array['title']?>"></div>
-					</div>
-					<div class="field">
-						<div class="title">Текст</div>
-						<div class="value">
-							<textarea name="text" class="need"><?=$array['text']?></textarea>
-						</div>
-					</div>
-					<?if ($res_help_rubrics->num_rows){?>
-						<div class="field">
-							<div class="title">Отображать в рубриках</div>
-							<div class="value">
-								<?while($row = $res_help_rubrics->fetch_assoc()){?>
-									<label>
-										<input <?=in_array($row['id'], $rubrics) ? 'checked' : ''?> type="checkbox" name="rubric_id[]" value="<?=$row['id']?>">
-										<?=$row['title']?>
-									</label><br>
-								<?}
-							}
-							else{?>
-								<p>Рубрик не задано</p>
-							<?}?>
-							</div>
-						</div>
-					<div class="field">
-						<div class="title"></div>
-						<div class="value"><input type="submit" class="button" value="Сохранить"></div>
-					</div>
-				</form>
-			</div>
-		</div>
-	<?}
-	private function change_theme(){
-		// debug($_POST); exit();
-		if (!$this->theme_validation()){
-			message($this->error, false);
-			return false;
-		}
-		$this->db->delete("texts_to_rubrics", "`text_id`={$_GET['id']}");
-		$array = [
-			'title' => $_POST['title'],
-			'text' => $_POST['text'],
-			'href' => translite($_POST['title'])
-		];
-		if (!$_GET['id']){
-			$res = $this->db->insert('help_texts', $array);
-			$text_id = $this->db->last_id();
-		}
-		else{
-			$res = $this->db->update('help_texts', $array, "`id`={$_GET['id']}");
-			$text_id = $_GET['id'];
-		}
-		if (!empty($_POST['rubric_id'])){
-			foreach ($_POST['rubric_id'] as $value){
-				$this->db->insert('texts_to_rubrics', ['text_id' => $text_id, 'rubric_id' => $value]);
-			}
-		}
-		if ($res === true){
-			message('Успешно сохранено!');
-			header("Location: ?view=texts&tab=help#tabs|texts:help");
-		} 
-		else message($res, false);
-	}
-	private function change_rubric(){
-		// debug($_POST);
-		if (!$this->rubric_validation()){
-			message($this->error, false);
-			return false;
-		}
-		$array = [
-			'title' => $_POST['title'],
-			'href' => translite($_POST['title'])
-		];
-		if (!$_GET['id']){
-			$res = $this->db->insert('help_rubrics', $array);
-		}
-		else{
-			$res = $this->db->update('help_rubrics', $array, "`id`={$_GET['id']}");
-		}
-		if ($res === true){
-			message('Успешно сохранено!');
-			header("Location: ?view=texts&tab=help&act=rubrics#tabs|texts:help");
-		} 
-		else message($res, false);
-	}
-	private function theme_validation(){
-		if(!$_POST['title']){
-			$this->error = 'Название не должно быть пустым!';
-			return false;
-		}
-		if (!$_POST['text']){
-			$this->error = 'Текст не должен быть пустым!';
-			return false;
-		}
-		return true;
-	}
-	private function rubric_validation(){
-		if(!$_POST['title']){
-			$this->error = 'Название не должно быть пустым!';
-			return false;
-		}
-		return true;
-	}
-	function themes(){
-		$res_help_texts = $this->db->query("
-			SELECT
-				ht.id,
-				ht.title,
-				GROUP_CONCAT(hr.title SEPARATOR ', ') AS rubric_title
-			FROM
-				#help_texts ht
-			LEFT JOIN
-				#texts_to_rubrics ttr ON ttr.text_id=ht.id
-			LEFT JOIN
-				#help_rubrics hr ON hr.id=ttr.rubric_id
-			GROUP BY ttr.text_id
-			ORDER BY ht.title
-		", '');?>
-		<div id="total" style="margin-top: 10px;">Всего: <?=$res_help_texts->num_rows?></div>
-		<div class="actions">
-			<a href="?view=texts&tab=help&act=theme_add#tabs|texts:help">Добавить</a>
-			<a href="?view=texts&tab=help&act=rubrics#tabs|texts:help">Список рубрик</a>
-			<a href="?view=texts&tab=help&act=help_main#tabs|texts:help">Текст по умолчанию</a>
-		</div>
-		<table class="t_table" cellspacing="1">
-			<tr class="head">
-				<td>Название</td>
-				<td>Рубрики</td>
-			</tr>
-			<?if ($res_help_texts->num_rows){
-				while($row = $res_help_texts->fetch_assoc()){?>
-					<tr text_id="<?=$row['id']?>">
-						<td><?=$row['title']?></td>
-						<td><?=$row['rubric_title']?></td>
-					</tr>
-				<?}
-			}
-			else{?>
-				<tr class="removable">
-					<td colspan="3">Тем не найдено</td>
-				</tr>
-			<?}?>
-		</table>
-	<?}
-	function rubrics(){
-		$res_rubrics = $this->db->query("
-			SELECT	
-				hr.*
-			FROM
-				#help_rubrics hr
-			ORDER BY
-				hr.title
-		", '');?>
-		<div id="total" style="margin-top: 10px;">Всего: <?=$res_rubrics->num_rows?></div>
-		<div class="actions">
-			<a href="?view=texts&tab=help&act=rubric_add#tabs|texts:help">Добавить</a>
-			<a href="?view=texts&tab=help#tabs|texts:help">Список тем</a>
-		</div>
-		<table class="t_table" cellspacing="1">
-			<tr class="head">
-				<td>Название</td>
-			</tr>
-			<?if ($res_rubrics->num_rows){
-				while($row = $res_rubrics->fetch_assoc()){?>
-					<tr rubric_id="<?=$row['id']?>">
-						<td><?=$row['title']?></td>
-					</tr>
-				<?}
-			}
-			else{?>
-				<tr class="removable">
-					<td colspan="3">Рубрик не найдено</td>
-				</tr>
-			<?}?>
-		</table>
-	<?}
-	function rubric(){
-		if (!empty($_POST)) $this->change_rubric();
-		$this->status = '<a href="/admin">Главная</a> > <a href="?view=help">Помощь</a> > ';
-		if ($_GET['id']){
-			$res_help_rubrics = $this->db->query("
-				SELECT
-					hr.id,
-					hr.title
-				FROM
-					#help_rubrics hr
-				WHERE
-					hr.id={$_GET['id']}
-				ORDER BY
-					title
-			", '');
-			$array = $res_help_rubrics->fetch_assoc();
-		}
-		else{
-			$array = $_POST;
-		}
-		if ($_GET['id']){?>
-			<div class="actions">
-				<a class="item_remove" href="?view=help&act=rubric_delete&id=<?=$_GET['id']?>">Удалить</a>
-			</div>
-		<?}?>
-		<div class="t_form">
-			<div class="bg">
-				<form action="" method="post" enctype="multipart/form-data">
-					<div class="field">
-						<div class="title">Название</div>
-						<div class="value"><input type="text" name="title" value="<?=$array['title']?>"></div>
-					</div>
-					<div class="field">
-						<div class="title"></div>
-						<div class="value"><input type="submit" class="button" value="Сохранить"></div>
-					</div>
-				</form>
-			</div>
-		</div>
-	<?}
-	function rubric_delete(){
-		$res = $this->db->delete('help_rubrics', "`id`={$_GET['id']}");
-		if ($res === true){
-			message('Успешно удалено!');
-			header("Location: ?view=help&act=rubrics");
-		}
-		else message($res, false);
-	}
-	function theme_delete(){
-		$res = $this->db->delete('help_texts', "`id`={$_GET['id']}");
-		if ($res === true){
-			message('Успешно удалено!');
-			header("Location: ?view=help");
-		}
-		else message($res, false);
-	}
-	function settings($field, $title = ''){
-		if (!empty($_POST) && $_GET['tab'] == $field){
-			// $this->db->update('settings', [$field => $_POST['text']], "`id`=1");
-			core\Setting::update($field, $_POST['text']);
-			message('Успешно сохранено');
-		}?>
+        else $textInfo = $this->db->select_one('text_articles', '*', "`id` = $id");
+        ?>
 		<?if ($title){?>
 			<h2><?=$title?></h2>
 		<?}?>
 		<div class="t_form">
 			<div class="bg">
 				<form action="" method="post" enctype="multipart/form-data">
+                    <div class="field">
+                        <div class="value">
+                            <input required type="text" name="title" value="<?=$textInfo['title']?>">
+                        </div>
+                    </div>
 					<div class="field">
 						<div class="value">
-							<textarea name="text" class="need"><?=core\Setting::get($field)?></textarea>
+							<textarea name="text" class="need"><?=$textInfo['text']?></textarea>
 						</div>
 					</div>
+                    <div class="field">
+                        <div class="value">
+                            <input type="text" name="href" value="<?=$textInfo['href']?>">
+                        </div>
+                    </div>
+                    <?if(isset($_GET['parent_id']) && $_GET['parent_id']){?>
+                        <input type="hidden" name="parent_id" value="<?=$_GET['parent_id']?>">
+                    <?}?>
 					<div class="field">
 						<div class="value"><input type="submit" class="button" value="Сохранить"></div>
 					</div>
 				</form>
 			</div>
 		</div>
+        <a class="bottom" href="/admin/?view=texts&tab=<?=$tab?>#tabs|texts:<?=$tab?>">Назад</a>
+        <? if ($id){?>
+            <a class="bottom delete" href="/admin/?view=texts&tab=<?=$tab?>&act=article_delete&id=<?=$id?>#tabs|texts:<?=$tab?>">Удалить</a>
+        <?}?>
 	<?}
+    public function showHtmlTextRubricForm($rubric_id, $tab, array $params = []){
+        if ($rubric_id){
+            $rubricInfo = $this->db->select_one('text_rubrics', '*', "`id` = $rubric_id");
+        }
+        if (!empty($_POST)){
+            $post = $_POST;
+            if ($rubric_id){
+                $this->db->update('text_rubrics', $post, "`id` = {$rubric_id}");
+                $rubricInfo['title'] = $post['title'];
+            }
+            else{
+                $this->db->insert('text_rubrics', $post);
+                header("Location: /admin/?view=texts&tab=$tab&act=rubric&id=".$this->db->last_id()."#tabs|texts:$tab");
+                die();
+            }
+        }?>
+        <h3>Редактирование рубрики</h3>
+        <div class="t_form">
+            <div class="bg">
+                <form action="" method="post" enctype="multipart/form-data">
+                    <div class="field">
+                        <div class="value">
+                            <input required type="text" name="title" value="<?=$rubricInfo['title']?>">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="value"><input type="submit" class="button" value="Сохранить"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <a class="bottom" href="/admin/?view=texts&tab=<?=$tab?>#tabs|texts:<?=$tab?>">Назад</a>
+        <? if ($params['delete_url']){?>
+            <a class="bottom delete" href="/admin/?view=texts&tab=<?=$tab?>&act=rubric_delete&id=<?=$rubric_id?>">Удалить</a>
+        <?}?>
+    <?}
 }?>

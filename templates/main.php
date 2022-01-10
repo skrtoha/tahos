@@ -1,3 +1,8 @@
+<?php
+
+use core\Setting;
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -260,37 +265,41 @@
 			<a class="close" href="#" title="Закрыть"></a>
 		</div>
 	</div>
+ 
+    <?
+    $titles = json_decode(Setting::get('texts', 'titles'), true);
+    $articleList = $db->select('text_articles', ['href', 'title', 'column'], "`column` IN (1, 4)");
+    ?>
+ 
 	<footer>
 		<div class="wrapper">
 			<div class="item information">
-				<h4>Информация</h4>
+				<h4><?=$titles[1]?></h4>
 				<ul>
-					<li><a href="/page/about_company">О компании</a></li>
-					<li><a href="/page/partner_programs">Партнерские программы</a></li>
-					<li><a href="/page/for_regions">Регионам</a></li>
-					<li><a href="/page/for_providers">Поставщикам</a></li>
-					<li><a href="/page/for_wholesellers">Оптовикам</a></li>
+                    <?foreach($articleList as $article){
+                        if ($article['column'] != 1) continue; ?>
+                        <li>
+                            <a href="/page/<?=$article['href']?>"><?=$article['title']?></a>
+                        </li>
+                    <?}?>
 				</ul>
 			</div>
 			<div class="item shop">
-				<h4>Интернет магазин</h4>
-				<?$res_rubrics = $db->query("
-					SELECT
-						hr.*
-					FROM
-						#help_rubrics hr
-				");?>
+				<h4><?=$titles[2]?></h4>
+				<?
+                $rubricList = $db->select('text_rubrics', '*');
+                ?>
 				<ul>
 					<li><a href="/help">Помощь</a></li>
-					<?if ($res_rubrics->num_rows){
-						while($row = $res_rubrics->fetch_assoc()){?>
-							<li><a href="/help/<?=$row['href']?>"><?=$row['title']?></a></li>
-						<?}
+					<?if (count($rubricList)){
+                        foreach($rubricList as $rubric){?>
+                            <li><a href="/help/<?=$rubric['id']?>"><?=$rubric['title']?></a></li>
+                        <?}
 					}?>
 				</ul>
 			</div>
 			<div class="item catalog_list">
-				<h4>Каталог товаров</h4>
+				<h4><?=$titles[3]?></h4>
 				<ul>
 					<?if (!empty($categories)){
                         foreach ($categories as $value){
@@ -301,10 +310,12 @@
 				</ul>
 			</div>
 			<div class="item partnership">
-				<h4>Партнерство</h4>
+				<h4><?=$titles[4]?></h4>
 				<ul>
-					<li><a href="#">Реклама на сайте</a></li>
-					<li><a href="#">Сделано с оптимизмом</a></li>
+                    <?foreach($articleList as $article){
+                        if ($article['column'] != 4) continue; ?>
+                        <li><a href="<?=$article['href']?>"><?=$article['title']?></a></li>
+                    <?}?>
 					<li><a href="https://vk.com/tahos">Мы Вконтакте</a></li>
 				</ul>
 				<div class="payment_systems"></div>

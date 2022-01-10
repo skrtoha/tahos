@@ -28,7 +28,7 @@ if (isset($_GET['brend_id'])){
 		// 	['print_query' => false]
 		// );
 		// $item_id = $db->last_id();
-		// $db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
+		// $db->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
 
 		$array = $db->select_one('items', ['id'], "`brend_id`={$_GET['brend_id']} AND `article`='$article'");
 		if (empty($array)){

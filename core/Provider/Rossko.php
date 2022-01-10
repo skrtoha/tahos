@@ -110,7 +110,7 @@ class Rossko extends Provider{
 		], ['print_query' => $printQuery, 'deincrement_duplicate' => true]);
 		if ($res === true){
 			$item_id = $this->db->last_id();
-			$this->db->insert('articles', ['item_id' => $item_id, 'item_diff' => $item_id], ['print_query' => false]);
+			$this->db->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id], ['print_query' => false]);
 			return $item_id;
 		} 
 		else{
@@ -162,8 +162,8 @@ class Rossko extends Provider{
 		);
 	}
 	private function addAnalogy($item_id, $item_diff){
-		$res = $this->db->insert('analogies', ['item_id' => $item_id, 'item_diff' => $item_diff], ['print_query' => false]);
-		$res = $this->db->insert('analogies', ['item_id' => $item_diff, 'item_diff' => $item_id], ['print_query' => false]);
+		$res = $this->db->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $item_diff], ['print_query' => false]);
+		$res = $this->db->insert('item_analogies', ['item_id' => $item_diff, 'item_diff' => $item_id], ['print_query' => false]);
 	}
 	private function renderStock($item_id, $stock){
 		$store_id = $this->addProviderStore($stock);

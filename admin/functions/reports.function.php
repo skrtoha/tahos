@@ -76,12 +76,12 @@
 	public function hideWrongAnalogy(){
 		$this->db->delete('log_diff', "`type`='wrongAnalogy' AND `param1`={$_POST['item_id']} AND `param2`={$_POST['item_diff']}");
 		$this->db->update(
-            'analogies',
+            'item_analogies',
             ['status' => 2],
             "`item_id`={$_POST['item_id']} AND `item_diff`={$_POST['item_diff']}"
         );
         $this->db->update(
-            'analogies',
+            'item_analogies',
             ['status' => 2],
             "`item_id`={$_POST['item_diff']} AND `item_diff`={$_POST['item_id']}"
         );

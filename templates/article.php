@@ -99,8 +99,8 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 			$res = $db->query("
 				SELECT SQL_CALC_FOUND_ROWS
 					COUNT(c.item_diff) 
-				FROM `tahos_complects` c 
-				LEFT JOIN tahos_store_items si ON si.item_id=c.item_diff 
+				FROM #item_complects c
+				LEFT JOIN #store_items si ON si.item_id=c.item_diff
 				WHERE 
 					c.item_id={$_GET['item_id']} AND si.store_id IS NOT null AND si.price>0 GROUP BY c.item_diff
 				");

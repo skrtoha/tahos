@@ -161,8 +161,8 @@ class Autoeuro extends Provider{
 		if (!$item_id) return;
 
 		if ($code['cross'] === "0"){
-			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
-			parent::getInstanceDataBase()->insert('analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
+			parent::getInstanceDataBase()->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
+			parent::getInstanceDataBase()->insert('item_analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
 		}
         
         $minPrice = 100000000000000000000;

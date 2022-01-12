@@ -1,7 +1,9 @@
 <?php
 namespace core;
+
 use core\Provider\Autoeuro;
 use core\Provider\Berg;
+
 
 class OrderValue{
 	public static $countOrdered = 0;
@@ -130,6 +132,16 @@ class OrderValue{
 				if ($status_id == 8){
 					$GLOBALS['db']->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
 				}
+                if ($status_id == 12){
+                    $GLOBALS['db']->query("
+                        UPDATE
+                            #store_items
+                        SET
+                            `in_stock` = `in_stock` + {$ov['quan']}
+                        WHERE
+                            `store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}
+                    ");
+                }
 
 				self::update($values, $params);
 				break;

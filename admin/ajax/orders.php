@@ -39,16 +39,17 @@ switch($_POST['status_id']){
 			'item_id' => $post['item_id']
 		], ['response' => 'нет в наличии']);
 		break;
-	case 8://отменен
+    case 8://отменен
+    case 12:
 		$post['quan'] = $_POST['ordered'];
-		core\OrderValue::changeStatus(8, $post);
+		core\OrderValue::changeStatus($_POST['status_id'], $post);
 		core\Provider::updateProviderBasket([
 			'order_id' => $post['order_id'],
 			'store_id' => $post['store_id'],
 			'item_id' => $post['item_id']
 		], ['response' => 'отменен']);
 		break;
-	case 11://заказано
+    case 11://заказано
 		$post['quan'] = $_POST['ordered'];
 		core\OrderValue::changeStatus(11, $post);
 		break;

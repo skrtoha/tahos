@@ -92,7 +92,7 @@ $in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
 	</form>
 	<div class="ionTabs" id="search-result-tabs" data-name="search-result-tabs">
 		<ul class="ionTabs__head">
-			<?$substitutes = $db->getCount('substitutes', "`item_id`={$_GET['item_id']} AND `hidden`=0");
+			<?$substitutes = $db->getCount('item_substitutes', "`item_id`={$_GET['item_id']} AND `hidden`=0");
 			if ($substitutes) $substitutes = "<span>$substitutes</span>";
 			else $substitutes = '';
 			// debug($user);

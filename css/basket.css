@@ -522,6 +522,9 @@ img.mfp-img {
         height: auto;
         white-space: normal;
     }
+    .car_left, .car_right{
+        width: 100% !important;
+    }
 }
 
 @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
@@ -7864,4 +7867,30 @@ input[name=date_issue] {
 }
 .jq-selectbox__dropdown{
     width: 100% !important;
+}
+.icon-truck:before {
+    content: "\e9b0";
+}
+.car_right {
+    position: relative;
+    top: 3px;
+}
+
+.car_left, .car_right {
+    width: 49%;
+    display: inline-block;
+}
+input[name="vin_input"] {
+    width: 100%;
+}
+.wrapper.vin .right{
+    display: none;
+}
+.wrapper.vin .right.active{
+    display: block;
+}
+.wrapper.vin a{
+    text-decoration: none;
+    display: block;
+    margin-bottom: 5px;
 }

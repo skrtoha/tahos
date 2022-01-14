@@ -420,4 +420,7 @@ $(function(){
         })
         $.cookie('additional_options', JSON.stringify(formData));
     })
+    $('.wrapper.vin a').on('click', function(){
+        $('.wrapper.vin .right').toggleClass('active');
+    })
 })

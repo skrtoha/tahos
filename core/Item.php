@@ -369,7 +369,13 @@ class Item{
 				ib.barcode,
 				b.title AS brend
 			";
-		if (isset($params['withCategories'])){
+        if (in_array('itemVin', $params)){
+            $query .= ",
+                iv.vin,
+                DATE_FORMAT(iv.created, '%d.%m.%Y %H:%i:%s') AS created
+            ";
+        }
+		if (in_array('withCategories', $params)){
 			$query .= ",GROUP_CONCAT(c.title SEPARATOR '; ') AS categories";
 		}
 		$query .= "
@@ -380,7 +386,7 @@ class Item{
 			LEFT JOIN
 				#item_barcodes ib ON ib.item_id = i.id
 		";
-		if (isset($params['withCategories'])){
+		if (in_array('withCategories', $params)){
 			$query .= "
 				LEFT JOIN	
 					#categories_items ci ON diff.item_diff = ci.item_id
@@ -388,6 +394,12 @@ class Item{
 					#categories c ON c.id = ci.category_id
 			";
 		}
+        if (in_array('itemVin', $params)){
+            $query .= "
+                 LEFT JOIN
+                    #item_vin iv ON iv.item_id = i.id
+            ";
+        }
 		return $query;
 	}
 	public static function getResItemDiff($type, $item_id, $flag = '')

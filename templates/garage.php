@@ -385,8 +385,9 @@ function modification(){
 		<div class="ionTabs" id="selected-ts-tabs" data-name="selected-ts-tabs">
 			<ul class="ionTabs__head">
 				<li class="ionTabs__tab" data-target="Tab_1_name">Основные</li>
-				<li class="ionTabs__tab" data-target="Tab_2_name">Тех. информация</li>
-				<li class="ionTabs__tab" data-target="Tab_3_name">документация</li>
+                <?if (!is_numeric($_GET['modification_id'])){?>
+                    <li class="ionTabs__tab" data-target="Tab_2_name">Заказы</li>
+                <?}?>
 			</ul>
 			<div class="ionTabs__body">
 				<div class="ionTabs__item" data-name="Tab_1_name">
@@ -416,13 +417,32 @@ function modification(){
 						}?>
 					</ul>
 				</div>
-				<div class="ionTabs__item" data-name="Tab_2_name">
-					Контент вкладки 2
-				</div>
-				<div class="ionTabs__item" data-name="Tab_3_name">
-					Контент вкладки 3
-				</div>
-
+                <?if (!is_numeric($_GET['modification_id'])){?>
+                    <div class="ionTabs__item" data-name="Tab_2_name">
+                        <?
+                        $array = explode(',', $_GET['modification_id']);
+                        $query = \core\Item::getQueryItemInfo(['itemVin']);
+                        $query .= "
+                            WHERE
+                                iv.vin LIKE '%{$array[3]}%'
+                        ";
+                        $itemList = $db->query($query);
+                        if ($itemList->num_rows){?>
+                            <table id="item_vin">
+                                <?foreach($itemList as $item){?>
+                                    <tr>
+                                        <td><?=$item['created']?></td>
+                                        <td>
+                                            <a href="/article/<?=$item['id']?>-<?=$item['article']?>">
+                                                <?=$item['brend']?> <?=$item['article']?> <?=$item['title_full']?>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?}?>
+                            </table>
+                        <?}?>
+                    </div>
+                <?}?>
 				<div class="ionTabs__preloader"></div>
 			</div>
 		</div>

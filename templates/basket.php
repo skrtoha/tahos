@@ -88,6 +88,15 @@ if ($_GET['act'] == 'to_offer'){
     }
     $body .= "</table>";
     
+    if ($additional_options['vin_select']) $db->insert('item_vin', [
+        'vin' => $additional_options['vin_select'],
+        'item_id' => $value['item_id']
+    ]);
+    if ($additional_options['vin_input']) $db->insert('item_vin', [
+        'vin' => $additional_options['vin_input'],
+        'item_id' => $value['item_id']
+    ]);
+    
     $mailer = new Mailer(Mailer::TYPE_INFO);
     $mailer->send([
         'emails' => ['info@tahos.ru', 'skrtoha@gmail.com'],
@@ -477,6 +486,31 @@ $noReturnIsExists = false;
                         (заказ будет отгружен после поступления всех позиций на склад)
                     </span>
                         </label>
+                    </div>
+                </div>
+                <div class="wrapper vin">
+                    <? $carList = $db->select(
+                        'garage',
+                        'modification_id',
+                        "`user_id` = {$_SESSION['user']} AND `modification_id` NOT REGEXP '^[[:digit:]]+$'"
+                    );?>
+                    <a href="#">Привязать к VIN</a>
+                    <div class="right">
+                        <?if (!empty($carList)){?>
+                            <div class="car_left">
+                                <select name="vin_select">
+                                    <option value="">...выберите из гаража</option>
+                                    <?foreach($carList as $car){
+                                        $array = explode(',', $car['modification_id']); ?>
+                                        <option value="<?=$array[3]?>"><?=$array[3]?></option>
+                                    <?}?>
+                                    <option value="1">vin</option>
+                                </select>
+                            </div>
+                        <?}?>
+                        <div class="car_right">
+                            <input type="text" name="vin_input" placeholder="Добавить по VIN">
+                        </div>
                     </div>
                 </div>
             </form>

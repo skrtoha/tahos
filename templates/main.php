@@ -26,6 +26,10 @@ use core\Setting;
         <link rel="stylesheet" href="/vendor/addressee/jquery.fias.min.css">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
+    <?if (in_array($view, ['basket'])){?>
+        <link rel="stylesheet" href="/admin/fonts/icomoon.eot">
+        <link rel="stylesheet" href="/vendor/addressee/style.css">
+    <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
 	<meta name="theme-color" content="#0081BC">
 	<script type="text/javascript" src="/js/libs.min.js"></script>

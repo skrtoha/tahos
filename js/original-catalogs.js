@@ -25,6 +25,7 @@ function apply_items(models){
 	$('select.select_model').html(option).trigger('refresh');
 }
 getUrlString = getParams();
+let orderedItems = [];
 $(".view-switch").click(function(event) {
 	$(".view-switch").removeClass("active");
 	$(this).addClass("active");
@@ -98,6 +99,31 @@ $('.slider').each(function(){
 		});
 	})
 
+$(document).on('click', '#vinItems', function(e){
+    e.preventDefault();
+    let htmlString = '<table id="ordered_items">';
+    $.each(orderedItems, function(i, item){
+        htmlString += `
+            <tr>
+                <td>${item.created}</td>
+                <td>
+                    <a target="_blank" href="/article/${item.item_id}-${item.article}">
+                        ${item.brend} ${item.article} ${item.title_full}
+                    </a>
+                </td>
+            </tr>
+            
+        `;
+    })
+    htmlString += '</table>';
+    $.magnificPopup.open({
+        items: {
+            src: htmlString,
+            type: 'inline'
+        }
+    });
+})
+
 $(function(){
     let isProccessedGarage = false;
     let isProccessedVin = false;
@@ -141,11 +167,16 @@ $(function(){
                     isProccessedGarage = true;
                     result = JSON.parse(response);
                     let added = result.isGaraged === 'is_garaged' ? 'added' : '';
-					$h1.prepend(`
+                    let htmlString = `
 						<div id="to_garage" class="${added}">
-							<button class="${result.isGaraged}" full_name="${result.userFullName}" title="Добавить / Удалить в гараж"></button>
-						</div>
-					`);
+						    <button class="${result.isGaraged}" full_name="${result.userFullName}" title="Добавить / Удалить в гараж"></button>
+                        </div>
+					`;
+                    if (result.orderedItems.length){
+                        htmlString += `<a href="#" id="vinItems">Заказаные товары</a>`;
+                        orderedItems = result.orderedItems;
+                    }
+					$h1.prepend(htmlString);
                     $('#to_garage').on('click',function(e){
                         let title = $h1.text();
                         data.title = title.trim();

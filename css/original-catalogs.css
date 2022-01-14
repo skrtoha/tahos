@@ -8992,3 +8992,21 @@ table.hit-list-table td:nth-child(5) {
 @media only screen and (min-width: 1200px) {
   /**/
 }
+#vinItems {
+    float: right;
+    font-size: 17px;
+    margin-right: 15px;
+    position: relative;
+    top: 12px;
+    text-decoration: none;
+}
+#ordered_items a{
+    text-decoration: none;
+}
+#ordered_items td{
+    padding: 10px 0;
+}
+#ordered_items td:nth-child(1){
+    padding-right: 10px;
+
+}

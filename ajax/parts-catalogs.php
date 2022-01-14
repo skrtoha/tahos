@@ -13,9 +13,25 @@ switch($_POST['act']){
 		$entitiesPartsCatalogs = getEntitiesPartsCatalogs();
 		$row = $db->select_one('garage', '*', "`user_id` = {$_POST['user_id']} AND `modification_id` = '$entitiesPartsCatalogs'");
 		if ($row) $isGaraged = 'is_garaged';
+        
+        $orderedItems = [];
+        $query = \core\Item::getQueryItemInfo(['itemVin']);
+        $query .= " WHERE iv.vin LIKE '%{$_POST['q']}%'";
+        $result = $db->query($query);
+        if ($result->num_rows){
+            foreach($result as $item) $orderedItems[] = [
+                'created' => $item['created'],
+                'item_id' => $item['id'],
+                'brend' => $item['brend'],
+                'article' => $item['article'],
+                'title_full' => $item['title_full']
+            ];
+        }
+        
         echo json_encode([
             'isGaraged' => $isGaraged,
-            'userFullName' => ''
+            'userFullName' => '',
+            'orderedItems' => $orderedItems
         ]);
 		break;
 	case 'addToGarage':

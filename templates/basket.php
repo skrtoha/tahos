@@ -491,7 +491,7 @@ $noReturnIsExists = false;
                 <div class="wrapper vin">
                     <? $carList = $db->select(
                         'garage',
-                        'modification_id',
+                        'modification_id,title,owner',
                         "`user_id` = {$_SESSION['user']} AND `modification_id` NOT REGEXP '^[[:digit:]]+$'"
                     );?>
                     <a href="#">Привязать к VIN</a>
@@ -501,8 +501,12 @@ $noReturnIsExists = false;
                                 <select name="vin_select">
                                     <option value="">...выберите из гаража</option>
                                     <?foreach($carList as $car){
-                                        $array = explode(',', $car['modification_id']); ?>
-                                        <option value="<?=$array[3]?>"><?=$array[3]?></option>
+                                        $array = explode(',', $car['modification_id']);
+                                        $title = $array[3];
+                                        if ($car['title']) $title .= " - {$car['title']}";
+                                        if ($car['owner']) $title .= " - {$car['owner']}";
+                                        ?>
+                                        <option value="<?=$array[3]?>"><?=$title?></option>
                                     <?}?>
                                     <option value="1">vin</option>
                                 </select>

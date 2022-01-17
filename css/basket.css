@@ -7894,3 +7894,7 @@ input[name="vin_input"] {
     display: block;
     margin-bottom: 5px;
 }
+#additional_options .jq-selectbox__dropdown li {
+    white-space: normal !important;
+    height: auto;
+}

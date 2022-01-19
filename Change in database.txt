@@ -1,1 +1,2 @@
-rename table tahos_help_texts to tahos_texts;
+alter table tahos_users
+    add get_sms_provider_refuse int(1) default 0 not null;

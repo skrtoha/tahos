@@ -566,7 +566,7 @@ switch ($params[0]){
         $mikado = new core\Provider\Mikado();
         $files = [
             'MikadoStock' => [1],
-            'MikadoStockReg' => [10, 35, 135, 43, 51, 50]
+            'MikadoStockReg' => [10, 35, 135, /*43, 51,*/ 50]
         ];
         $stocks = Provider\Mikado::getStocks();
         foreach($files as $zipName => $valuesList){

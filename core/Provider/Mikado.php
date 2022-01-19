@@ -311,8 +311,8 @@ class Mikado extends Provider{
 				10 => self::getParams()->MIPE,
 				35 => self::getParams()->MIVO,
                 135 => self::getParams()->MICH,
-                43 => self::getParams()->MIKI,
-                51 => self::getParams()->MIMU,
+//                43 => self::getParams()->MIKI,
+//                51 => self::getParams()->MIMU,
                 50 => self::getParams()->MIMO
 			];
 		}

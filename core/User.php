@@ -196,6 +196,7 @@ class User{
         if (!$update['get_news']) $update['get_news'] = 0;
         if (!$update['show_all_analogies']) $update['show_all_analogies'] = 0;
         if (!$update['get_notifications']) $update['get_notifications'] = 0;
+        if (!$update['get_sms_provider_refuse']) $update['get_sms_provider_refuse'] = 0;
     
         if ($update['password']){
             if ($settings['data']['password'] != $_POST['password']['repeat_new_password']){

@@ -133,6 +133,15 @@ $data = !empty($_POST) ? $_POST['data'] : $user;
                 </div>
                 <div class="input-wrap">
                     <label for="get_notifications">
+                        Получать sms-оповещение при отказе поставщика
+                    </label>
+                    <label style="position: relative;top: 5px" class="switch">
+                        <input value="1" id="get_notifications" name="data[get_sms_provider_refuse]" type="checkbox" <?=$data['get_sms_provider_refuse'] ? 'checked' : ''?>>
+                        <div class="slider round"></div>
+                    </label>
+                </div>
+                <div class="input-wrap">
+                    <label for="get_notifications">
                         Получать дополнительные оповещения
                     </label>
                     <label style="position: relative;top: 5px" class="switch">

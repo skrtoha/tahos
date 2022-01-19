@@ -3,6 +3,7 @@ namespace core;
 
 use core\Provider\Autoeuro;
 use core\Provider\Berg;
+use core\Sms\SmsAero;
 
 
 class OrderValue{
@@ -131,6 +132,19 @@ class OrderValue{
 				//если отменено поставщиком
 				if ($status_id == 8){
 					$GLOBALS['db']->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
+                    $res_user = User::get(['id' => $ov['user_id']]);
+                    $userInfo = $res_user->fetch_assoc();
+                    if ($userInfo['get_sms_provider_refuse'] && $userInfo['phone']){
+                        $smsAero = new SmsAero();
+                        $query = Item::getQueryItemInfo();
+                        $query .= " WHERE i.id = {$ov['item_id']}";
+                        $itemInfo = $GLOBALS['db']->query($query)->fetch_assoc();
+                        $itemInfo['title_full'] = substr($itemInfo['title_full'], 0, 50);
+                        $smsAero->sendSms(
+                            $userInfo['phone'],
+                            "Позиция {$itemInfo['brend']}-{$itemInfo['article']} отменена поставщиком. Заказ {$_SERVER['HTTP_ORIGIN']}/order/{$ov['order_id']}"
+                        );
+                    }
 				}
                 if ($status_id == 12){
                     $GLOBALS['db']->query("

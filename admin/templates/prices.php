@@ -2,7 +2,7 @@
 $act = $_GET['act'];
 switch ($act) {
     case 'clearAllPrices':
-        \core\Provider::clearStoresItems(false);
+        \core\Provider::clearStoresItems();
         break;
 	case 'delete':
 		if ($db->delete('providers', "`id`=".$_GET['id'])){

@@ -75,9 +75,13 @@ switch ($params[0]){
         }
         $logger->alert("Удалено $counter записей");
         break;
-    case 'clearAllPrices':
+    case 'clearStores':
         $logger->alert('Полная очистка прайсов');
-        Provider::clearStoresItems(false);
+        Provider::clearStoresItems();
+        break;
+    case 'clearExceptMainStores':
+        $logger->alert('Очистка прайсов, кроме основных складов');
+        Provider::clearStoresItems(['!main_stores']);
         break;
     case 'orderBerg':
         $logger->alert('Отправка заказа в Берг');

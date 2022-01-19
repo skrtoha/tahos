@@ -509,15 +509,18 @@ abstract class Provider{
 		return $array['title'];
 	}
 
-	public static function clearStoresItems($provider_id, array $params = []){
-	    if ($provider_id) $where = "ps.provider_id = $provider_id AND ";
+	public static function clearStoresItems(array $params = []){
+	    if (isset($params['provider_id']) && $params['provider_id']){
+            $where = "ps.provider_id = {$params['provider_id']} AND ";
+        }
 	    else $where = '';
-		if (!empty($params)){
+        
+        if (!empty($params)){
 			foreach($params as $key => $value){
 				switch($key){
-					case 'item_id': 
-						$where .= "(si.item_id = $value OR diff.item_id = $value) AND ";
-						break;
+                    case '!main_stores':
+                        $where .= "ps.is_main != 1 AND ";
+                        break;
 				}
 			}
 		}
@@ -529,20 +532,13 @@ abstract class Provider{
 		
 		self::getInstanceDataBase()->query("
 			DELETE si FROM #store_items si
-			LEFT JOIN
-				#provider_stores ps ON ps.id = si.store_id
-			LEFT JOIN
-				#item_analogies diff ON diff.item_diff = si.item_id
+			LEFT JOIN #provider_stores ps ON ps.id = si.store_id
 			$where
 		", '');
         
         self::getInstanceDataBase()->query("
 		    UPDATE
                 #provider_stores ps
-            left join
-                #store_items si on ps.id = si.store_id
-            left join
-                #item_analogies diff on diff.item_diff = si.item_id
             set ps.price_updated = current_timestamp()
             $where
 		");

@@ -8,7 +8,7 @@ class SmsAero implements ISms{
 
     public function generateUrl($method, $params){
         $config = Config::$SmsAero;
-        $params ['sign'] = "SMS Aero";
+        $params ['sign'] = "Tahos";
         return "https://{$config['email']}:{$config['api_key']}@".self::API_URL.$method."?".http_build_query($params);
     }
 

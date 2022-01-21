@@ -18,11 +18,12 @@ $sha1 = sha1(
 	$_POST['label']
 );
 
-file_put_contents($_SERVER['DOCUMENT_ROOT'].'/received.json', json_encode($_POST));
 
 $label = explode(':', $_POST['label']);
 
 if ($sha1 != $_POST['sha1_hash']) exit();
+
+file_put_contents($_SERVER['DOCUMENT_ROOT'].'/received.json', json_encode($_POST));
 
 switch($label[0]){
     case 'account':
@@ -51,4 +52,5 @@ $db->insert(
         'comment' => $comment
     ]
 );
+die();
 ?>

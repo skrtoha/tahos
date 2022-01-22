@@ -53,12 +53,19 @@ $data = !empty($_POST) ? $_POST['data'] : $user;
                         Электронная почта:
                     </label>
                     <input type="email" id="email" name="data[email]" value="<?=$data['email']?>">
+                    <span class="icon-mail2" title="Email не подтвержден"></span>
                 </div>
                 <div class="input-wrap">
                     <label for="phone">
                         Телефон:
                     </label>
                     <input type="tel" name="data[phone]" id="phone" placeholder="+7 (___) ___-__-__" value="<?=$data['phone']?>">
+                    <?if ($data['phone_confirmed']){?>
+                        <span class="icon-checkmark1" title="Номер подвержден"></span>
+                    <?}
+                    else{?>
+                        <span class="icon-phone" title="Номер не подтвержден"></span>
+                    <?}?>
                 </div>
                 <div class="input-wrap">
                     <label for="address">

@@ -538,8 +538,9 @@ header .hints a.jspArrow:hover {
   z-index: 1045;
 }
 .mfp-inline-holder .mfp-content, .mfp-ajax-holder .mfp-content {
-  width: 100%;
-  cursor: auto;
+    width: auto;
+    padding: 34px 15px 15px 15px;
+    background: white;
 }
 .mfp-ajax-cur {
   cursor: progress;
@@ -8706,4 +8707,33 @@ table.hit-list-table td:nth-child(4), table.hit-list-table td:nth-child(5) {
 }
 input[name="data[is_subscribe]"] {
     display: none !important;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    font-size: 23px;
+    position: relative;
+    top: 3px;
+    right: 36px;
+    color: #f32424;
+    cursor: pointer;
+}
+.icon-mail2:before {
+     content: "\ea84";
+ }
+.icon-phone:before {
+    content: "\e942";
+}
+.icon-checkmark1:before {
+    content: "\ea10";
+    color: #036e03;
+}
+#email-confirmation b, #phone-confirmation b{
+    font-weight: bold;
+}
+#email-confirmation p, #phone-confirmation p{
+    margin: 15px 0;
+}
+input[name="code"] {
+    margin: 15px 0;
+    width: 100%;
 }

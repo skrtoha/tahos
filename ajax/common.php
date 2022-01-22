@@ -1,4 +1,6 @@
-<? use core\Mailer;
+<?
+session_start();
+use core\Mailer;
 
 require_once ("../core/DataBase.php");
 require_once('../core/functions.php');
@@ -97,6 +99,40 @@ switch($_POST['act']){
             "
         ]);
         echo 'ok';
+        break;
+    case 'send_email_confirmation':
+        $mailer = new Mailer('info');
+        $token = \core\Provider::getRandomString(12);
+        $db->update('users', ['confirm_email_token' => $token], "`id` = {$_SESSION['user']}");
+        /*$mailer->send([
+            'emails' => [$_POST['email']],
+            'subject' => 'Подтверждение адреса электронной почты',
+            'body' => "
+                <p>
+                    Для подтверждения электронной почты перейдите по
+                    <a href=\"{$_SERVER['HTTP_ORIGIN']}/confirm.php?token=$token\">ссылке</a>
+                </p>
+            "
+        ]);*/
+        break;
+    case 'send_sms_confirmation':
+        $code = rand(1000, 9999);
+        $result = \core\User::get(['user_id' => $_SESSION['user']]);
+        $userInfo = $result->fetch_assoc();
+        $db->update('users', ['confirm_sms_code' => $code], "`id` = {$_SESSION['user']}");
+        $smsAero = new core\Sms\SmsAero();
+        $smsAero->sendSms(
+            $userInfo['phone'],
+            "Tahos.ru, код подтверждения - $code"
+        );
+        break;
+    case 'confirm_phone_number':
+        $result = \core\User::get(['user_id' => $_SESSION['user']]);
+        $userInfo = $result->fetch_assoc();
+        if ($_POST['code'] == $userInfo['confirm_sms_code']){
+            \core\User::update($_SESSION['user'], ['phone_confirmed' => 1]);
+            echo 'ok';
+        }
         break;
 }
 ?>

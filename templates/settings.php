@@ -53,7 +53,12 @@ $data = !empty($_POST) ? $_POST['data'] : $user;
                         Электронная почта:
                     </label>
                     <input type="email" id="email" name="data[email]" value="<?=$data['email']?>">
-                    <span class="icon-mail2" title="Email не подтвержден"></span>
+                    <?if ($data['email_confirmed']){?>
+                        <span class="icon-checkmark1" title="Email подвержден"></span>
+                    <?}
+                    else{?>
+                        <span class="icon-mail2" title="Email не подтвержден"></span>
+                    <?}?>
                 </div>
                 <div class="input-wrap">
                     <label for="phone">

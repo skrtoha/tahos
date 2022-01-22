@@ -296,7 +296,9 @@ $(function() {
             },
             url: '/ajax/common.php',
             success: function(response){
-
+                $.magnificPopup.close();
+                if (response === 'ok') show_message('Подтверждение отправлено на ваш email');
+                else show_message('Произошла ошибка отправки', 'error');
             }
         })
     })

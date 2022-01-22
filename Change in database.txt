@@ -2,4 +2,7 @@ alter table tahos_users
     add confirm_email_token int(1) default 0 null;
     alter table tahos_users
         add confirm_sms_code int(1) default 0 null;
+         alter table tahos_users
+                add confirm_email int(1) default 0 null;
+
 

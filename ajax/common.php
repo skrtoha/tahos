@@ -104,7 +104,7 @@ switch($_POST['act']){
         $mailer = new Mailer('info');
         $token = \core\Provider::getRandomString(12);
         $db->update('users', ['confirm_email_token' => $token], "`id` = {$_SESSION['user']}");
-        /*$mailer->send([
+        $result = $mailer->send([
             'emails' => [$_POST['email']],
             'subject' => 'Подтверждение адреса электронной почты',
             'body' => "
@@ -113,7 +113,9 @@ switch($_POST['act']){
                     <a href=\"{$_SERVER['HTTP_ORIGIN']}/confirm.php?token=$token\">ссылке</a>
                 </p>
             "
-        ]);*/
+        ]);
+        if ($result === true) echo 'ok';
+        else echo "Произошла ошибка";
         break;
     case 'send_sms_confirmation':
         $code = rand(1000, 9999);

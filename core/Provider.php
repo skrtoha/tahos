@@ -510,10 +510,10 @@ abstract class Provider{
 	}
 
 	public static function clearStoresItems(array $params = []){
+        $where = "ps.id != 23 AND ";
 	    if (isset($params['provider_id']) && $params['provider_id']){
-            $where = "ps.provider_id = {$params['provider_id']} AND ";
+            $where .= "ps.provider_id = {$params['provider_id']} AND ";
         }
-	    else $where = '';
         
         if (!empty($params)){
 			foreach($params as $key => $value){

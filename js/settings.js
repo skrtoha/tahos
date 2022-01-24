@@ -1,4 +1,5 @@
 var myMap;
+let htmlCloseButton = `<button title="Close (Esc)" type="button" class="mfp-close">×</button>`;
 function get_groups() {
 	var result;
 	$.ajax({
@@ -204,5 +205,101 @@ $(function() {
         $('div.pickup-addreses').toggleClass('hidden');
         $('div.set-addresses').toggleClass('hidden');
         $(document).trigger('refresh');
+    })
+    $('span.icon-mail2:not(.applied)').on('click', function(){
+        const $th = $(this);
+        const email = $th.prev().val();
+        $.magnificPopup.open({
+            items: {
+                src: `
+                    <div id="email-confirmation">
+                        <h3>Подтверждение электронной почты</h3>
+                        <p>На ваш email <b>${email}</b> будет отправлена ссылка для подтверждения</p>
+                        <button>Отправить</button>
+                    </div>
+                `,
+                type: 'inline'
+            }
+        });
+    })
+    $('span.icon-phone:not(.applied)').on('click', function(){
+        const $th = $(this);
+        const phoneNumber = $th.closest('.input-wrap').find('input[name="data[phone]"]').val();
+        $.magnificPopup.open({
+            items: {
+                src: `
+                    <div id="phone-confirmation">
+                        <h3>Подтверждение номера телефона</h3>
+                        <p>На номер телефона <b>${phoneNumber}</b> будет отпрвлено сообщение с кодом подтверждения</p>
+                        <button class="send">Отправить</button>
+                    </div>
+                `
+            }
+        })
+    })
+    $(document).on('click', '#phone-confirmation button.send', function(){
+        const $th = $(this);
+        $.ajax({
+            type: 'post',
+            data: {
+                act: 'send_sms_confirmation',
+                phone: $th.closest('div').find('b').text()
+            },
+            url: '/ajax/common.php',
+            success: function(response){
+                $('#phone-confirmation').html(`
+                    <form id="enter_code" action="">
+                        <label for="input_code">Введите код подтверждения</label>
+                        <input type="number" required name="code" placeholder="Код подтверждения">
+                        <input type="submit" value="Подтвердить">
+                    </form>
+                    ${htmlCloseButton}
+                `)
+            }
+        })
+    })
+    $(document).on('submit', '#enter_code', function(e){
+        e.preventDefault();
+        let formData = {};
+        $.each($(this).serializeArray(), function(i, item){
+            formData[item.name] = item.value;
+        })
+        $.ajax({
+            url: '/ajax/common.php',
+            data: {
+                act: 'confirm_phone_number',
+                code: formData.code
+            },
+            type: 'post',
+            success: function(response){
+                if (response === 'ok'){
+                    $.magnificPopup.close();
+                    show_message('Номер успешно подтвержден');
+                    const $phone = $('input[name="data[phone]"]');
+                    $phone.next().remove();
+                    $phone.after(`
+                        <span class="icon-checkmark1"></span>
+                    `);
+
+                }
+                else show_message('Неверный номер', 'error');
+            }
+        })
+    })
+    $(document).on('click', '#email-confirmation', function (){
+        const $th = $(this);
+        $.ajax({
+            type: 'post',
+            data: {
+                act: 'send_email_confirmation',
+                email: $th.closest('div').find('b').text()
+            },
+            url: '/ajax/common.php',
+            success: function(response){
+                $.magnificPopup.close();
+                if (response === 'ok') show_message('Подтверждение отправлено на ваш email');
+                else show_message('Произошла ошибка отправки', 'error');
+            }
+        })
     })
 });

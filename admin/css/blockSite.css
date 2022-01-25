@@ -1,0 +1,17 @@
+select{
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 0 10px;
+    border: 1px solid #c8c8c8;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: #fff;
+    color: #5f5f5f;
+    height: 25px;
+}
+select[name=is_blocked] {
+    display: inline-block;
+}
+input[name=count_seconds] {
+    width: auto !important;
+}

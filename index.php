@@ -1,5 +1,7 @@
 <?php
 use core\Log;
+use core\Setting;
+
 ini_set('error_reporting', E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -24,7 +26,7 @@ if ($detect->isMobile() && !$detect->isTablet()) $device = 'mobile';
 // echo "$device<br>";
 
 
-$view = $_GET['view'] ? $_GET['view'] : 'index';
+$view = $_GET['view'] ?: 'index';
 if ($view == 'exit'){
 	session_destroy();
 	setcookie('jwt', '');
@@ -38,7 +40,7 @@ if($_GET['act'] == 'unbind'){
 	message('Социальная сеть успешно отвязана!');
 	header('Location: /settings');
 }
-$path = "templates/$view.php";
+
 
 if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
     $jwtInfo = \core\Authorize::getJWTInfo($_COOKIE['jwt']);
@@ -51,20 +53,30 @@ else $user = $res_user;
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
 
 //blockSite
-if (
-	core\Setting::get('blockSite', 'is_blocked') 
-	&& !in_array($_SERVER['REMOTE_ADDR'], core\Config::$allowedIpForAuthorization)
-){
-	die("На сайте проводятся регламентные работы");
+$blockData = json_decode(Setting::get('blockSite', 'is_blocked'), true);
+$time_espiration = $blockData['time'] + $blockData['count_seconds'];
+$count_seconds = $time_espiration - time();
+if ($count_seconds < 0 && $blockData['is_blocked']){
+    $data = [
+        'is_blocked' => 0,
+        'count_seconds' => 0,
+        'time' => 0
+    ];
+    Setting::update('blockSite', 'is_blocked', json_encode($data));
+}
+if ($count_seconds > 0 && $blockData['is_blocked']){
+	$view = 'blocked';
 }
 
 core\UserIPS::registerIP([
-	'user_id' => $_SESSION['user'] ? $_SESSION['user'] : null,
+	'user_id' => $_SESSION['user'] ?: null,
 	'ip' => $_SERVER['REMOTE_ADDR'],
 	'view' => $view
 ]);
 
 $basket = get_basket();
+
+$path = "templates/$view.php";
 if (file_exists($path)){
 	ob_start();
 	require_once($path);

@@ -88,8 +88,8 @@ if ($_POST['form_submit']){
 				} 
 
 				$nameBody = $time . $i;
-				copy($photo['big'], "$dir_big/$nameBody.jpg");
-				copy($photo['small'], "$dir_small/$nameBody.jpg");
+				copy($_SERVER['DOCUMENT_ROOT'].$photo['big'], "$dir_big/$nameBody.jpg");
+				copy($_SERVER['DOCUMENT_ROOT'].$photo['small'], "$dir_small/$nameBody.jpg");
 				if ($photo['is_main']) Item::update(['photo' => "$nameBody.jpg"], ['id' => $last_id]);
 				$i++;
 			}

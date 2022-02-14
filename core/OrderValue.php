@@ -218,11 +218,11 @@ class OrderValue{
 	 */
 	public static function update($values, $params){
 		if ($values['status_id'] == 6){
-		    $orderValuerResult = self::get(Provider::getWhere([
+		    $orderValuerResult = self::get([
                 'order_id' => $params['order_id'],
                 'store_id' => $params['store_id'],
                 'item_id' => $params['item_id']
-            ]));
+            ]);
 		    $orderValue = $orderValuerResult->fetch_assoc();
             
             $mailer = new Mailer(Mailer::TYPE_INFO);

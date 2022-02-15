@@ -22,7 +22,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/core/Database.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 $db = new core\Database();
 
-
 $params = [];
 $counter = 0;
 if (!empty($_GET)){

@@ -9,4 +9,5 @@ core/Config.php
 Accounting/
 trade/
 .idea/
+web.config
 

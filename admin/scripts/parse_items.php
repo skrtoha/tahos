@@ -4,25 +4,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/core/DataBase.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 
 $db = new core\Database();
-
-for($i = 0; $i < 236; $i++){
-//    $result = json_decode(getResultQuery($i), true);
-    $result = json_decode(file_get_contents('test.json'), true);
-    foreach($result['entities'] as $entity){
-        $brend_id = \core\Provider\Armtek::getBrendId($entity['brand']);
-        foreach($entity['fields'] as $title => $value){
-            switch($title){
-                case 'shinyDiametrDyuym':
-                case 'shinyShirinaProfilyaMm':
-                case 'shinyVysotaProfilya':
-                    $filter_id = $filterValues[$title];
-                    break;
-            }
-
-
-        }
-    }
-}
+$errors = [];
 
 $filterValues = [
     'shinyDiametrDyuym' => 274,
@@ -31,10 +13,7 @@ $filterValues = [
         '98 (750 кг)' => 1473,
         '99 (775 кг)' => 1474
     ],
-    'shinyIndeksSkorosti' => [
-        'T (до 190 км/ч)' => 1542,
-        'H (до 210 км/ч)' => 1535,
-    ],
+    'shinyIndeksSkorosti' => 277,
     'shinySezonnost' => [
         'зима' => 2103,
         'лето' => 1447,
@@ -50,6 +29,85 @@ $filterValues = [
     'shinyVysotaProfilya' => 273,
     'shinyShipy'
 ];
+
+function get_filter_value_id($filter_id, $value){
+    global $db, $errors;
+    $category_id = 100;
+    static $filterValues;
+    $fv = & $filterValues[$filter_id][$value];
+    if (isset($fv)) return $fv;
+    $query = "
+        select
+            tf.id,
+            tf.title,
+            tfv.title as filter_value,
+            tfv.id as filter_value_id
+        from
+            tahos_filters_values tfv
+                left join
+            tahos_filters tf on tfv.filter_id = tf.id
+                left join
+            tahos_categories tc on tf.category_id = tc.id
+        where 
+              tf.category_id = $category_id and 
+              tfv.title = '$value' and 
+              tfv.filter_id = $filter_id
+    ";
+    $result = $db->query($query);
+    if (!$result->num_rows){
+        $errors[] = "Не найдено $filter_id $value";
+        $fv = false;
+        return false;
+    }
+    $result = $result->fetch_assoc();
+    $fv = $result['filter_value_id'];
+    return $fv;
+}
+
+for($i = 0; $i < 236; $i++){
+//    $result = json_decode(getResultQuery($i), true);
+    $result = json_decode(file_get_contents('test.json'), true);
+    foreach($result['entities'] as $entity){
+        $brend_id = \core\Provider\Armtek::getBrendId($entity['brand']);
+        if (!$brend_id){
+            $errors[] = "Бренд {$entity['brand']} не найден";
+            continue;
+        }
+        $resItemInsert = \core\Item::insert([
+            'brend_id' => $brend_id,
+            'article' => $entity['article'],
+            'article_cat' => $entity['article'],
+            'title_full' => $entity['title']
+        ]);
+
+        if ($resItemInsert !== true){
+            $errors[] = $resItemInsert;
+            continue;
+        }
+        $item_id = \core\Item::$lastInsertedItemID;
+
+        foreach($entity['fields'] as $title => $value){
+            switch($title){
+                case 'shinyDiametrDyuym':
+                case 'shinyShirinaProfilyaMm':
+                case 'shinyVysotaProfilya':
+                    $filter_value_id = $filterValues[$title];
+                    break;
+                case 'shinyIndeksSkorosti':
+                    $value = preg_replace('/ \(.*\)/i', '', $value);
+                    $filter_value_id = get_filter_value_id($filterValues[$title], $value);
+                    break;
+            }
+            $db->insert('items_values', [
+                'item_id' => $item_id,
+                'value_id' => $filter_value_id
+            ]);
+
+        }
+    }
+}
+
+
 
 function getResultQuery($page = 0){
     $curl = curl_init();

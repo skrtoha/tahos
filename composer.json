@@ -15,7 +15,8 @@
         "phpmailer/phpmailer": "^6.4",
         "ext-imap": "*",
         "firebase/php-jwt": "^5.4",
-        "phpoffice/phpspreadsheet": "^1.18"
+        "phpoffice/phpspreadsheet": "^1.18",
+      "ext-xdebug": "*"
     },
     "autoload": {
         "psr-4": {

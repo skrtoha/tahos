@@ -1,41 +1,82 @@
 <?
+
+use core\Item;
+use core\Provider\Armtek;
+
 set_time_limit(0);
 require_once($_SERVER['DOCUMENT_ROOT'].'/core/DataBase.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 
 $db = new core\Database();
 $errors = [];
+$category_id = 99;
 
 $filterValues = [
-    'shinyDiametrDyuym' => 274,
-    'shinyIndeksNagruzki' => [
-        '84 (500 кг)' => 1459,
-        '98 (750 кг)' => 1473,
-        '99 (775 кг)' => 1474
+    'akbDlina' => 268,
+    'akbKlemmy' => [
+        'выносные (Азия)' => 2325,
+        'тонкие вынос.(Азия)' => 2331,
+        'конусные' => 5779,
+        'резьбовые (Америка)' => 5780,
+        'универсальные (болт и конус)' => 5781,
+        'мото' => 5782,
+        'под болт' => 5783,
+        'прочее' => 5785,
+        'стандартные (Т1)' => 2326,
+        'тонкие (Т3)' => 2331,
+        'винтовые' => 5786,
+        'винтовые + стандартные (T1)' => 5787
     ],
-    'shinyIndeksSkorosti' => 277,
-    'shinySezonnost' => [
-        'зима' => 2103,
-        'лето' => 1447,
-        'всесез' => 1585
+    'akbModelAkkumulyatora' => 612,
+    'akbNominalnoyeNapryazheniye' => [
+        '12V' =>2322
     ],
-    'shinyShirinaProfilyaMm' => 272,
-    'shinyTekhnologiyaRunflat' => [
-        'true' => 1393
+    'akbStartstop' => [
+        true => 5790,
+        false => 5791
     ],
-    'shinyTipTransportnogoSredstva' => [
-        'легковой' => 2107
+    'akbSukhozaryazhennaya' => [
+        true => 5792,
+        false => 5793
     ],
-    'shinyVysotaProfilya' => 273,
-    'shinyShipy'
+    'akbSeriya' => 613,
+    'akbPolyarnost' => 265,
+    'akbPuskovoytok' => 263,
+    'akbShirina' => 269,
+    'akbSposobKrepleniya' => [
+        'B01 нижнее крепление' => 2399,
+        'B13' => 2327,
+        'B00' => 2324,
+        'B03 нижнее крепление' => 2454,
+        'нижнее крепление' => 5774,
+        'универсальное крепление' => 5775,
+        'верхняя планка' => 5776
+    ],
+    'akbEtn' => 618,
+    'akbTipBatarei' => [
+        'AGM' => 2329,
+        'Ca/Ca (Кальциевые)' => 2323,
+        'EFB' => 5777,
+        'Sb/Ca (Гибридные)' => 2453,
+        'Sb/Sb (Малосурьмянистые)' => 5778,
+    ],
+    'akbVysota' => 270,
+    'akbYemkost' => 264,
+    'akbObsluzhivayemaya' => [
+        true => 5788,
+        false => 5789
+    ]
 ];
 
-function get_filter_value_id($filter_id, $value){
-    global $db, $errors;
-    $category_id = 100;
+function get_filter_value_id($filter_id, $value, $is_like = false){
+    global $db, $errors, $category_id;
     static $filterValues;
     $fv = & $filterValues[$filter_id][$value];
     if (isset($fv)) return $fv;
+
+    if ($is_like) $whereTitle = "tfv.title like '%$value%' and ";
+    else $whereTitle = "tfv.title = '$value' and ";
+
     $query = "
         select
             tf.id,
@@ -50,13 +91,12 @@ function get_filter_value_id($filter_id, $value){
             tahos_categories tc on tf.category_id = tc.id
         where 
               tf.category_id = $category_id and 
-              tfv.title = '$value' and 
+              $whereTitle
               tfv.filter_id = $filter_id
     ";
     $result = $db->query($query);
     if (!$result->num_rows){
         $errors[] = "Не найдено $filter_id $value";
-        $fv = false;
         return false;
     }
     $result = $result->fetch_assoc();
@@ -64,48 +104,117 @@ function get_filter_value_id($filter_id, $value){
     return $fv;
 }
 
-for($i = 0; $i < 236; $i++){
-//    $result = json_decode(getResultQuery($i), true);
-    $result = json_decode(file_get_contents('test.json'), true);
+for($i = 1; $i <= 3; $i++){
+    $result = json_decode(file_get_contents("json/$i.json"), true);
     foreach($result['entities'] as $entity){
-        $brend_id = \core\Provider\Armtek::getBrendId($entity['brand']);
+        $brend_id = Armtek::getBrendId($entity['brand']);
         if (!$brend_id){
             $errors[] = "Бренд {$entity['brand']} не найден";
             continue;
         }
-        $resItemInsert = \core\Item::insert([
+        $article = Item::articleClear($entity['article']);
+        $resItemInsert = Item::insert([
             'brend_id' => $brend_id,
-            'article' => $entity['article'],
+            'article' => $article,
             'article_cat' => $entity['article'],
-            'title_full' => $entity['title']
+            'title_full' => $entity['title'],
+            'title' => $entity['title']
         ]);
 
         if ($resItemInsert !== true){
-            $errors[] = $resItemInsert;
+            $res = $db->select_one('items', 'id', "`article` = '{$article}' and brend_id = $brend_id");
+            $item_id = $res['id'];
+        }
+        else $item_id = Item::$lastInsertedItemID;
+
+        if (!$item_id){
+            $errors[] = "Ошибка получения item_id {$entity['brand']}[$brend_id] - {$entity['article']}";
             continue;
         }
-        $item_id = \core\Item::$lastInsertedItemID;
+
+        $db->insert('categories_items', [
+            'item_id' => $item_id,
+            'category_id' => $category_id
+        ]);
+
+        //todo для грузовых
+        $resItemValuesInsert = $db->insert('items_values', [
+            'item_id' => $item_id,
+            'value_id' => 2458
+        ]);
+
+        if ($entity['brand']){
+            switch($entity['brand']){
+                case 'АКОМ': $filter_value_id = 1751; break;
+                default:
+                    $filter_value_id = get_filter_value_id(262, $entity['brand'], true);
+            }
+            if ($filter_value_id !== false){
+                $db->insert('items_values', [
+                    'item_id' => $item_id,
+                    'value_id' => $filter_value_id
+                ]);
+
+            }
+        }
 
         foreach($entity['fields'] as $title => $value){
+            if (!$value) continue;
+            if (is_numeric($value)){
+                if((string) $value == (string) (int) $value){
+                    $value = (int) $value;
+                }
+            }
+            $isFoundedTitle = false;
+            $filter_value_id = false;
             switch($title){
-                case 'shinyDiametrDyuym':
-                case 'shinyShirinaProfilyaMm':
-                case 'shinyVysotaProfilya':
-                    $filter_value_id = $filterValues[$title];
-                    break;
-                case 'shinyIndeksSkorosti':
-                    $value = preg_replace('/ \(.*\)/i', '', $value);
+                case 'akbDlina':
+                case 'akbModelAkkumulyatora':
+                case 'akbSeriya':
+                case 'akbPolyarnost':
+                case 'akbPuskovoytok':
+                case 'akbShirina':
+                case 'akbEtn':
+                case 'akbVysota':
+                case 'akbYemkost':
                     $filter_value_id = get_filter_value_id($filterValues[$title], $value);
+                    if (!$filter_value_id){
+                        $db->insert('filters_values', [
+                            'title' => $value,
+                            'filter_id' => $filterValues[$title]
+                        ]);
+                        $filter_value_id = $db->last_id();
+                    }
+                    $isFoundedTitle = true;
+                    break;
+                case 'akbKlemmy':
+                case 'akbNominalnoyeNapryazheniye':
+                case 'akbStartstop':
+                case 'akbSukhozaryazhennaya':
+                case 'akbSposobKrepleniya':
+                case 'akbTipBatarei':
+                case 'akbObsluzhivayemaya':
+                    $isFoundedTitle = true;
+                    $filter_value_id = $filterValues[$title][$value];
                     break;
             }
-            $db->insert('items_values', [
-                'item_id' => $item_id,
-                'value_id' => $filter_value_id
-            ]);
+            if (!$filter_value_id && $isFoundedTitle && $value){
+                $errors[] = "$item_id: ошибка получения value_id для $title $value";
+                continue;
+            }
 
+            if ($filter_value_id){
+                $resItemValuesInsert = $db->insert('items_values', [
+                    'item_id' => $item_id,
+                    'value_id' => $filter_value_id
+                ]);
+            }
         }
+        echo "Конец fields";
     }
+    echo "";
 }
+echo json_encode($errors);
 
 
 

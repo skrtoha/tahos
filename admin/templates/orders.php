@@ -497,7 +497,10 @@ function show_form($act){
 							case 7://в работе
 								$summ = $ov['quan'] * $ov['price'];
 								break;
-							case 8: $summ = 0; break;	
+							case 8:
+                            case 12:
+                                $summ = 0;
+                                break;
 							case 11://заказано
 								$summ = $ov['price'] * $ov['ordered'];
 								if ($ov['ordered'] < $ov['quan']){?>

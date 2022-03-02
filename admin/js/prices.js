@@ -116,7 +116,6 @@ $(function(){
 		let $a = $(this);
 		let item_id = $a.attr('item_id');
 		let storeInfo = add_item_to_store.storeInfo;
-		console.log(add_item_to_store.storeInfo);
 		showGif();
 		$.ajax({
 			type: 'post',
@@ -135,9 +134,59 @@ $(function(){
 				storeInfo.item_id = item_id;
                 storeInfo.priceWithoutMarkup = '';
 				modal_show(add_item_to_store.getHtmlForm(storeInfo));
+
+                //добавление возможности выбора поставщика для основного склада
+                if (storeInfo.store_id === '23'){
+                    $.ajax({
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            'act': 'getAllProviders'
+                        },
+                        url: '/admin/ajax/providers.php',
+                        success: function(response){
+                            let str = `
+                                    <tr class="provider">
+                                        <td>Поставщик</td>
+                                        <td>
+                                            <select id="provider_id">
+                                                <option value="">...выберите</option>`;
+                            $.each(response, function(i, item){
+                                str += `<option value="${item.id}">${item.title}</option>`;
+                            })
+                            str += `</select></td></tr>`;
+                            $('.add_item_to_store tbody tr:last-child').before(str);
+                        }
+                    })
+                }
 			}
 		})
 	})
+    $(document).on('change', '#provider_id', function(){
+        $('.provider_store').remove();
+        const $th = $(this);
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: '/admin/ajax/providers.php',
+            data: {
+                act: 'getProviderStores',
+                provider_id: $th.val()
+            },
+            success: function(response){
+                let str = `
+                    <tr class="provider_store">
+                        <td>Склад</td>
+                        <td>
+                            <select name="store_id">`;
+                $.each(response, function(i, item){
+                    str += `<option value="${item.id}">${item.cipher} - ${item.title}</option>`;
+                })
+                str += `</select></td></tr>`;
+                $('.add_item_to_store tr.provider').after(str);
+            }
+        })
+    })
 	$(document).on('submit', 'form.add_item_to_store', function(){
 		if (add_item_to_store.isValidated == false) return false;
 		let array = $(this).serializeArray();

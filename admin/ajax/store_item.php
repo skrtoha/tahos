@@ -53,6 +53,13 @@ switch ($_POST['column']) {
 				]]
 			);
 		}
+
+        if ($_POST['is_main']){
+            $db->insert('main_store_item', [
+                'item_id' => $_POST['item_id'],
+                'store_id' => $_POST['store_id']
+            ]);
+        }
 		break;
 	case 'getStoreItemsByItemID':
         $result = \core\User::get(['id' => $_POST['user_id']]);

@@ -1,4 +1,5 @@
 <?php
+/* @var $db \core\Database */
 $act = $_GET['act'];
 switch ($act) {
     case 'clearAllPrices':
@@ -11,12 +12,13 @@ switch ($act) {
 		}
 		break;
 	case 'items': items(); break;
-	case 'item': item(); break;
 	case 'add': show_form('s_add'); break;
 	case 'change': show_form('s_change'); break;
 	case 'search_add': search_add(); break;
 	case 'delete_item':
-		if ($db->delete('store_items', "`item_id`=".$_GET['item_id']." AND `store_id`=".$_GET['store_id'])){
+        $where = "`item_id`=".$_GET['item_id']." AND `store_id`=".$_GET['store_id'];
+		if ($db->delete('store_items', $where)){
+            $db->delete('main_store_item', $where);
 			exit();
 		}
 		break;

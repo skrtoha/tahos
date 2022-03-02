@@ -73,7 +73,7 @@ abstract class Provider{
 	public static function get(){
 		static $providers;
 		if (!$providers) {
-			$result = self::getInstanceDataBase()->select('providers', '*', '', 'title');
+			$result = self::getInstanceDataBase()->select('providers', '*', '', 'title', true);
 			foreach($result as $value) $providers[$value['id']] = $value;
 		}
 		return $providers;

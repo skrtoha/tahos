@@ -1,5 +1,8 @@
 <?php
 /* @var $db \core\Database */
+
+use core\Config;
+
 $act = $_GET['act'];
 switch ($act) {
     case 'clearAllPrices':
@@ -18,7 +21,7 @@ switch ($act) {
 	case 'delete_item':
         $where = "`item_id`=".$_GET['item_id']." AND `store_id`=".$_GET['store_id'];
 		if ($db->delete('store_items', $where)){
-            $db->delete('main_store_item', $where);
+            $db->delete('main_store_item', "`item_id` = {$_GET['item_id']}");
 			exit();
 		}
 		break;
@@ -34,6 +37,32 @@ switch ($act) {
 			header("Location: ?view=prices");
 		}
 		break;
+    case 'updatePrices':
+        $query = "
+            SELECT
+                si2.store_id AS main_store_item,
+                si2.price AS main_store_item_price,
+				si.item_id,
+				si.store_id,
+                si.price
+			FROM
+				#store_items si
+			LEFT JOIN
+                #main_store_item msi ON msi.item_id = si.item_id
+            LEFT JOIN
+			    #store_items si2 ON si2.store_id = msi.store_id AND si2.item_id = si.item_id     
+            WHERE
+                si.store_id = ".Config::MAIN_STORE_ID;
+        $result = $db->query($query, '');
+        foreach($result as $row){
+            $db->update(
+                'store_items',
+                ['price' => $row['main_store_item_price']],
+                "`store_id` = ".Config::MAIN_STORE_ID." AND item_id = {$row['item_id']}"
+            );
+        }
+        header("Location: /admin/?view=prices&act=items&id=".Config::MAIN_STORE_ID);
+        die;
 	default:
 		view();
 }
@@ -200,12 +229,16 @@ function items(){
 			b.title as brend, 
 			rr.requiredRemain,
 			IF(i.article_cat != '', i.article_cat, i.article) AS article, 
-			IF (i.title_full<>'', i.title_full, i.title) AS title_full
+			IF (i.title_full<>'', i.title_full, i.title) AS title_full,  
+		    CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item   
 		FROM
 			#store_items si
 		LEFT JOIN #items i ON si.item_id=i.id
 		LEFT JOIN #brends b ON b.id=i.brend_id
 		LEFT JOIN #required_remains rr ON rr.item_id = si.item_id
+		LEFT JOIN #main_store_item msi ON msi.item_id = si.item_id    
+		LEFT JOIN #provider_stores ps ON ps.id = msi.store_id 
+		LEFT JOIN #providers p ON p.id = ps.provider_id
 		WHERE 
 			$where
 		ORDER BY
@@ -242,14 +275,15 @@ function items(){
 		'in_stock' => 'В наличии',
 		'price' => 'Цена',
 	];
-	if ($id == 23){
+	if ($id == Config::MAIN_STORE_ID){
 		$menu['summ'] = 'Сумма';
 		$menu['requiredRemain'] = 'Мин. наличие';
+        $menu['main_store_item'] = 'Поставщик';
 	}
 	$res_items = $db->query($query, '');?>
 	<div id="total" style="margin-top: 10px;">
         Всего: <?=$all?>
-        <?if ($_GET['id'] == 23){?>
+        <?if ($_GET['id'] == Config::MAIN_STORE_ID){?>
             на сумму <b><?=$commonSumm?></b> р.
         <?}?>
     </div>
@@ -262,6 +296,9 @@ function items(){
             <input type="submit" value="Искать">
         </form>
         <input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
+        <?if($_GET['id'] == Config::MAIN_STORE_ID){?>
+            <a href="/admin/?view=prices&act=updatePrices">Обновить цены</a>
+        <?}?>
 	</div>
 	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>">
 		<tr class="head sort">
@@ -288,11 +325,12 @@ function items(){
 					<td><input type="text" class="store_item" value="<?=$pi['packaging']?>" column="packaging" item_id="<?=$pi['item_id']?>"></td>
 					<td><input type="text" class="store_item" value="<?=$pi['in_stock']?>" column="in_stock" item_id="<?=$pi['item_id']?>"></td>
 					<td><input type="text" class="store_item" value="<?=$pi['price']?>" column="price" item_id="<?=$pi['item_id']?>"></td>
-					<?if ($id == 23){?>
+					<?if ($id == Config::MAIN_STORE_ID){?>
 						<td><?=$pi['price'] * $pi['in_stock']?></td>
 						<td>
 							<input type="text" class="store_item" value="<?=$pi['requiredRemain']?>" column="requiredRemain" item_id="<?=$pi['item_id']?>">
-							</td>
+                        </td>
+                        <td><?=$pi['main_store_item']?></td>
 					<?}?>
 					<td><a title="Удалить" item_id="<?=$pi['item_id']?>" class="deleteStoreItem" href="#"><span class="icon-cancel-circle1"></span></a></td>
 				</tr>

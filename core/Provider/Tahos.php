@@ -4,7 +4,7 @@ use core\Provider;
 use core\Config;
 
 class Tahos extends Provider{
-	public static $store_id = 23;
+	public static $store_id = Config::MAIN_STORE_ID;
 	public static $provider_id = 14;
 	public static $isDoNotShowStoresCheeperTahos = true;
 

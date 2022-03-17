@@ -23,7 +23,7 @@ function showStoreInfo(store_id, item_id){
             itemInfo.title_full = result.title_full;
             itemInfo.article = result.article;
 
-            if (typeof storeInfo.main_store !== 'undefined'){
+            if (storeInfo.main_store !== null){
                 store.store_id = storeInfo.main_store.store_id;
                 store.provider_id = storeInfo.main_store.provider_id;
                 store.cipher = storeInfo.main_store.cipher;

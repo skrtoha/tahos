@@ -63,7 +63,7 @@
                     let providerString = '';
                     $.each(storeInfo.providerList, function(i, item){
                         let selected = '';
-                        if (typeof storeInfo.main_store !== 'undefined' && item.id == storeInfo.main_store.provider_id){
+                        if (storeInfo.main_store !== null && item.id == storeInfo.main_store.provider_id){
                             selected = 'selected';
                             main_store.provider = item.title;
                             main_store.provider_id = item.id;

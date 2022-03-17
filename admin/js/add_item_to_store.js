@@ -159,7 +159,6 @@
 					url: '/admin/ajax/store_item.php',
 					data: output,
 					success: function(response){
-						console.log(output);
 						$('input[column=packaging][item_id=' + output.item_id + ']').val(output.packaging);
 						$('input[column=price][item_id=' + output.item_id + ']').val(output.price);
 						$('input[column=in_stock][item_id=' + output.item_id + ']').val(output.in_stock);

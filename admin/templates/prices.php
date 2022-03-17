@@ -47,18 +47,24 @@ switch ($act) {
                 si.price
 			FROM
 				#store_items si
-			LEFT JOIN
+			RIGHT JOIN
                 #main_store_item msi ON msi.item_id = si.item_id
             LEFT JOIN
 			    #store_items si2 ON si2.store_id = msi.store_id AND si2.item_id = si.item_id     
             WHERE
-                si.store_id = ".Config::MAIN_STORE_ID;
+                si.store_id = ".Config::MAIN_STORE_ID." AND si.price != si2.price";
         $result = $db->query($query, '');
         foreach($result as $row){
+            $where = "`store_id` = ".Config::MAIN_STORE_ID." AND item_id = {$row['item_id']}";
             $db->update(
                 'store_items',
                 ['price' => $row['main_store_item_price']],
-                "`store_id` = ".Config::MAIN_STORE_ID." AND item_id = {$row['item_id']}"
+                $where
+            );
+            $db->update(
+                'main_store_item',
+                ['updated' => (new DateTime())->format('Y-m-d H:i:s')],
+                "`item_id` = {$row['item_id']}"
             );
         }
         header("Location: /admin/?view=prices&act=items&id=".Config::MAIN_STORE_ID);
@@ -210,7 +216,8 @@ function items(){
 			case 'in_stock': $orderBy = 'si.in_stock'; break;
 			case 'price': $orderBy = 'si.price'; break;
 			case 'requiredRemain': $orderBy = 'rr.requiredRemain'; break;
-			case 'summ': $orderBy = 'si.price * si.in_stock';
+			case 'summ': $orderBy = 'si.price * si.in_stock'; break;
+            case 'updated': $orderBy = 'msi.updated'; break;
 		}
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}
@@ -230,7 +237,8 @@ function items(){
 			rr.requiredRemain,
 			IF(i.article_cat != '', i.article_cat, i.article) AS article, 
 			IF (i.title_full<>'', i.title_full, i.title) AS title_full,  
-		    CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item   
+		    CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item,
+            msi.updated
 		FROM
 			#store_items si
 		LEFT JOIN #items i ON si.item_id=i.id
@@ -273,12 +281,13 @@ function items(){
 		'title_full' => 'Название',
 		'packaging' => 'Мин. заказ',
 		'in_stock' => 'В наличии',
-		'price' => 'Цена',
+		'price' => 'Цена'
 	];
 	if ($id == Config::MAIN_STORE_ID){
 		$menu['summ'] = 'Сумма';
 		$menu['requiredRemain'] = 'Мин. наличие';
         $menu['main_store_item'] = 'Поставщик';
+        $menu['updated'] = 'Обновлен';
 	}
 	$res_items = $db->query($query, '');?>
 	<div id="total" style="margin-top: 10px;">
@@ -331,6 +340,11 @@ function items(){
 							<input type="text" class="store_item" value="<?=$pi['requiredRemain']?>" column="requiredRemain" item_id="<?=$pi['item_id']?>">
                         </td>
                         <td><?=$pi['main_store_item']?></td>
+                        <td column="updated" item_id="<?=$pi['item_id']?>">
+                            <?if ($pi['updated']){?>
+                                <?=DateTime::createFromFormat('Y-m-d H:i:s', $pi['updated'])->format('d.m.Y H:i:s')?>
+                            <?}?>
+                        </td>
 					<?}?>
 					<td><a title="Удалить" item_id="<?=$pi['item_id']?>" class="deleteStoreItem" href="#"><span class="icon-cancel-circle1"></span></a></td>
 				</tr>

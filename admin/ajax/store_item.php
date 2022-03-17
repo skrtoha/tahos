@@ -59,11 +59,14 @@ switch ($_POST['column']) {
                 'main_store_item',
                 "`item_id` = {$_POST['item_id']} AND `store_id` = {$_POST['main_store_id']}"
             );
+            $updated = (new DateTime())->format('Y-m-d H:i:s');
             $db->insert('main_store_item', [
                 'item_id' => $_POST['item_id'],
-                'store_id' => $_POST['main_store_id']
+                'store_id' => $_POST['main_store_id'],
+                'updated' => $updated
             ], ['duplicate' => [
-                'store_id' => $_POST['main_store_id']
+                'store_id' => $_POST['main_store_id'],
+                'updated' => $updated
             ]]);
         }
 		break;

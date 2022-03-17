@@ -133,7 +133,7 @@ switch($_POST['act']){
             $store_items['providerStoreList'] = $db->select(
                 'provider_stores',
                 'id,title,cipher',
-                "`provider_id` = {$store_items['main_store']['provider_id']}"
+                "`provider_id` = {$store_items['main_store']['provider_id']} AND is_main = 1"
             );
         }
 		echo json_encode($store_items);

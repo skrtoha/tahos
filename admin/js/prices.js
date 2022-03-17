@@ -23,7 +23,7 @@ function showStoreInfo(store_id, item_id){
             itemInfo.title_full = result.title_full;
             itemInfo.article = result.article;
 
-            if (storeInfo.main_store !== null){
+            if (typeof storeInfo.main_store !== 'undefined' && storeInfo.main_store !== null){
                 store.store_id = storeInfo.main_store.store_id;
                 store.provider_id = storeInfo.main_store.provider_id;
                 store.cipher = storeInfo.main_store.cipher;
@@ -232,12 +232,15 @@ $(function(){
 				<td><input type="text" class="store_item" value="${formData.price}" column="price" item_id="${itemInfo.id}"></td>
 			`;
 		if (formData.store_id == '23'){
+            let now = new Date();
+            let updated = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
 			str += `
 				<td>${formData.price * formData.in_stock}</td>
 				<td>
 					<input type="text" class="store_item" value="${formData.requiredRemain}" column="requiredRemain" item_id="${itemInfo.id}">
 				</td>
-                <td>${store.provider}-${store.store}</td>`
+                <td>${store.provider}-${store.store}</td>
+                <td>${updated}</td>`
 		}
 		str += `<td>
                     <a title="Удалить" item_id="${itemInfo.id}" class="deleteStoreItem" href="">

@@ -79,6 +79,12 @@
                                     ${providerString}
                                 </select>
                             </td>
+                        </tr>
+                        <tr>
+                            <td>Закупка:</td>
+                            <td>
+                                <input name="min_price" value="${main_store.min_price}" type="text">
+                            </td>
                         </tr>`;
 
                     if (typeof storeInfo.providerStoreList !== 'undefined'){

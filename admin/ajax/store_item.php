@@ -63,10 +63,12 @@ switch ($_POST['column']) {
             $db->insert('main_store_item', [
                 'item_id' => $_POST['item_id'],
                 'store_id' => $_POST['main_store_id'],
-                'updated' => $updated
+                'updated' => $updated,
+                'min_price' => $_POST['min_price']
             ], ['duplicate' => [
                 'store_id' => $_POST['main_store_id'],
-                'updated' => $updated
+                'updated' => $updated,
+                'min_price' => $_POST['min_price']
             ]]);
         }
 		break;

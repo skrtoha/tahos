@@ -44,7 +44,8 @@ switch ($act) {
                 si2.price AS main_store_item_price,
 				si.item_id,
 				si.store_id,
-                si.price
+                si.price,
+                msi.min_price    
 			FROM
 				#store_items si
 			RIGHT JOIN
@@ -55,6 +56,7 @@ switch ($act) {
                 si.store_id = ".Config::MAIN_STORE_ID." AND si.price != si2.price";
         $result = $db->query($query, '');
         foreach($result as $row){
+            if ($row['main_store_item_price'] < $row['min_price']) continue;
             $where = "`store_id` = ".Config::MAIN_STORE_ID." AND item_id = {$row['item_id']}";
             $db->update(
                 'store_items',
@@ -218,6 +220,7 @@ function items(){
 			case 'requiredRemain': $orderBy = 'rr.requiredRemain'; break;
 			case 'summ': $orderBy = 'si.price * si.in_stock'; break;
             case 'updated': $orderBy = 'msi.updated'; break;
+            case 'min_price': $orderBy = 'msi.min_price'; break;
 		}
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}
@@ -238,6 +241,7 @@ function items(){
 			IF(i.article_cat != '', i.article_cat, i.article) AS article, 
 			IF (i.title_full<>'', i.title_full, i.title) AS title_full,  
 		    CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item,
+            msi.min_price,
             msi.updated
 		FROM
 			#store_items si
@@ -287,6 +291,7 @@ function items(){
 		$menu['summ'] = 'Сумма';
 		$menu['requiredRemain'] = 'Мин. наличие';
         $menu['main_store_item'] = 'Поставщик';
+        $menu['min_price'] = 'Закупка';
         $menu['updated'] = 'Обновлен';
 	}
 	$res_items = $db->query($query, '');?>
@@ -340,6 +345,7 @@ function items(){
 							<input type="text" class="store_item" value="<?=$pi['requiredRemain']?>" column="requiredRemain" item_id="<?=$pi['item_id']?>">
                         </td>
                         <td><?=$pi['main_store_item']?></td>
+                        <td><input type="text" class="store_item" value="<?=$pi['min_price']?>" column="min_price" item_id="<?=$pi['item_id']?>"></td>
                         <td column="updated" item_id="<?=$pi['item_id']?>">
                             <?if ($pi['updated']){?>
                                 <?=DateTime::createFromFormat('Y-m-d H:i:s', $pi['updated'])->format('d.m.Y H:i:s')?>

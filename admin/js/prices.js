@@ -27,6 +27,7 @@ function showStoreInfo(store_id, item_id){
                 store.store_id = storeInfo.main_store.store_id;
                 store.provider_id = storeInfo.main_store.provider_id;
                 store.cipher = storeInfo.main_store.cipher;
+                store.min_price = storeInfo.main_store.min_price;
             }
 
 			showGif(false);
@@ -222,6 +223,11 @@ $(function(){
 			formData[value.name] = value.value
 		});
         formData.price = formData.price.replace(',', '.');
+
+        if (typeof formData.min_price !== 'undefined'){
+            formData.min_price = formData.min_price.replace(',', '.');
+        }
+
 		let str = `
 			<tr>
 				<td>${itemInfo.brend}</td>
@@ -240,6 +246,9 @@ $(function(){
 					<input type="text" class="store_item" value="${formData.requiredRemain}" column="requiredRemain" item_id="${itemInfo.id}">
 				</td>
                 <td>${store.provider}-${store.store}</td>
+                <td>
+                    <input type="text" class="store_item" value="${formData.min_price}" column="min_price" item_id="${itemInfo.id}">
+                </td>
                 <td>${updated}</td>`
 		}
 		str += `<td>

@@ -4,7 +4,8 @@ tr[store_id]{
 input[column=price],
 input[column=in_stock],
 input[column=requiredRemain],
-input[column=packaging]
+input[column=packaging],
+input[column=min_price]
 {
 	width: 70px;
 }

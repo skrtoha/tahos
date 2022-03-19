@@ -94,6 +94,7 @@ switch($_POST['act']){
 	case 'getStoreItem':
         $query = "
             select
+                b.title as brend,
                 i.article,
                 si.item_id,
                 si.store_id,
@@ -120,14 +121,15 @@ switch($_POST['act']){
                     ps.id as store_id,
                     ps.provider_id,
                     ps.cipher,
-                    ps.title
+                    ps.title,
+                    msi.min_price
                 from
                     #main_store_item msi
                 left join
                     #provider_stores ps on ps.id = msi.store_id
                 where
                     msi.item_id = {$_POST['item_id']}
-            ");
+            ", '');
             $store_items['main_store'] = $result->fetch_assoc();
             $store_items['providerList'] = Provider::get();
             $store_items['providerStoreList'] = $db->select(

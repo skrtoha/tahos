@@ -348,7 +348,7 @@ function items(){
                         <td><input type="text" class="store_item" value="<?=$pi['min_price']?>" column="min_price" item_id="<?=$pi['item_id']?>"></td>
                         <td column="updated" item_id="<?=$pi['item_id']?>">
                             <?if ($pi['updated']){?>
-                                <?=DateTime::createFromFormat('Y-m-d H:i:s', $pi['updated'])->format('d.m.Y H:i:s')?>
+                                <?=DateTime::createFromFormat('Y-m-d H:i:s', $pi['updated'])->format('d.m.Y')?>
                             <?}?>
                         </td>
 					<?}?>

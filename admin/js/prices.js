@@ -239,7 +239,7 @@ $(function(){
 			`;
 		if (formData.store_id == '23'){
             let now = new Date();
-            let updated = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            let updated = now.toLocaleDateString();
 			str += `
 				<td>${formData.price * formData.in_stock}</td>
 				<td>

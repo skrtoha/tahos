@@ -50,68 +50,6 @@
 						 		'<input name="packaging" value="' + storeInfo.packaging + '" type="text">' +
 						 	 '</td>' +
 					 	'</tr>';
-                if (storeInfo.store_id == 23){
-                    str +=
-                        '<tr>' +
-                            '<td>Минимальное наличие:</td>' +
-                            '<td>' +
-                                '<input name="requiredRemain" value="' + storeInfo.requiredRemain + '" type="text">' +
-                            '</td>' +
-                        '</tr>';
-                }
-				if (typeof storeInfo.providerList !== 'undefined'){
-                    let providerString = '';
-                    $.each(storeInfo.providerList, function(i, item){
-                        let selected = '';
-                        if (storeInfo.main_store !== null && item.id == storeInfo.main_store.provider_id){
-                            selected = 'selected';
-                            main_store.provider = item.title;
-                            main_store.provider_id = item.id;
-                        }
-                        providerString += `<option ${selected} value="${item.id}">${item.title}</option>`;
-                    })
-                    str += `
-                        <tr class="provider">
-                            <td>Поставщик:</td>
-                            <td>
-                                <select id="provider_id">
-                                    <option value="">...выберите</option>
-                                    ${providerString}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Закупка:</td>
-                            <td>
-                                <input name="min_price" value="${main_store.min_price}" type="text">
-                            </td>
-                        </tr>`;
-
-                    if (typeof storeInfo.providerStoreList !== 'undefined'){
-                        let providerStoreString = '';
-                        $.each(storeInfo.providerStoreList, function(i, item){
-                            let selected = '';
-                            if (item.id == storeInfo.main_store.store_id){
-                                selected = 'selected';
-                                main_store.store_id = item.id;
-                                main_store.store = item.cipher + '-' + item.title;
-                            }
-                            providerStoreString += `<option ${selected} value="${item.id}">${item.cipher}-${item.title}</option>`;
-                        })
-
-                        str += `
-                            <tr class="provider_store">
-                                <td>Склад:</td>
-                                <td>
-                                    <select name="main_store_id">
-                                        <option value="">...выберите</option>
-                                        ${providerStoreString}
-                                    </select>
-                                </td>
-                            </tr>`;
-                    }
-                }
-
 				str +=
                     '<tr>' +
                         '<td colspan="2">' +

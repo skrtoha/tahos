@@ -150,7 +150,7 @@ function getHtmlAdditionStringMainStore(providerList, providerStoreList = {}, st
             '</td>' +
         '</tr>';
 
-    let requiredRemain = 0;
+    let requiredRemain = 1;
     if (Object.keys(storeInfo).length != 0){
         requiredRemain = storeInfo.requiredRemain;
     }
@@ -285,7 +285,8 @@ $(function(){
 	$(document).on('submit', 'form.add_item_to_store', function(){
 		if (add_item_to_store.isValidated == false) return false;
 
-        $(`a.deleteStoreItem[item_id=${itemInfo.id}]`).closest('tr').remove();
+        const prevTr = $(`a.deleteStoreItem[item_id=${itemInfo.id}]`).closest('tr').prev();
+        prevTr.next().remove();
 
 		let array = $(this).serializeArray();
 		let formData = {};
@@ -328,7 +329,7 @@ $(function(){
                 </td>
 		    </tr>`;
 		$('table.t_table tbody tr.empty').remove();
-		$('table.t_table tbody tr.head.sort').after(str);
+		prevTr.after(str);
 	})
 	$(document).on('click', 'a.deleteStoreItem', function(){
 		if (!confirm('Действительно удалить')) return false;

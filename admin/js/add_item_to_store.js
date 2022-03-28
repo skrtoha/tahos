@@ -98,6 +98,11 @@
 
                 output.is_main = $('table[store_id]').attr('store_id') === '23' ? 1 : 0;
 
+                if (typeof output.min_price !== 'undefined'){
+                    output.min_price = output.min_price.replace(',', '.');
+                }
+                output.price = output.price.replace(',', '.');
+
 				$.ajax({
 					type: 'post',
 					url: '/admin/ajax/store_item.php',

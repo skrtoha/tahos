@@ -193,7 +193,7 @@ class Berg extends Provider{
                 continue;
             }
             
-            $url = self::getUrlString('/ordering/place_order');
+            $url = self::getUrlString('/ordering/place_order', $row['typeOrganization']);
             $json = parent::getCurlUrlData($url, $order);
             $result = json_decode($json);
             

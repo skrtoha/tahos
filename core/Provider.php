@@ -73,7 +73,7 @@ abstract class Provider{
 	public static function get(){
 		static $providers;
 		if (!$providers) {
-			$result = self::getInstanceDataBase()->select('providers', '*', '', 'title');
+			$result = self::getInstanceDataBase()->select('providers', '*', '', 'title', true);
 			foreach($result as $value) $providers[$value['id']] = $value;
 		}
 		return $providers;
@@ -510,7 +510,7 @@ abstract class Provider{
 	}
 
 	public static function clearStoresItems(array $params = []){
-        $where = "ps.id != 23 AND ";
+        $where = "ps.id != ".Config::MAIN_STORE_ID." AND ";
 	    if (isset($params['provider_id']) && $params['provider_id']){
             $where .= "ps.provider_id = {$params['provider_id']} AND ";
         }

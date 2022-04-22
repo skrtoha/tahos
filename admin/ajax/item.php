@@ -1,4 +1,8 @@
 <?php
+
+use core\Config;
+use core\Provider;
+
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 
@@ -80,25 +84,65 @@ switch($_POST['act']){
 		copy($_SERVER['DOCUMENT_ROOT'].$_POST['initial'], core\Config::$tmpFolderPath . $pathBig);
 
 		echo json_encode([
-			'small' => core\Config::$tmpFolderUrl . $pathSmall,
-			'big' => core\Config::$tmpFolderUrl . $pathBig
+			'small' => Config::$tmpFolderUrl . $pathSmall,
+			'big' => Config::$tmpFolderUrl . $pathBig
 		]);
 		break;
 	case 'applyCategory':
 		$db->insert('categories_items', ['item_id' => $_POST['item_id'], 'category_id' => $_POST['category_id']]);
 		break;
 	case 'getStoreItem':
-		$query = core\StoreItem::getQueryStoreItem();
+        $query = "
+            select
+                b.title as brend,
+                i.article,
+                si.item_id,
+                si.store_id,
+                i.title_full,
+                si.price as priceWithoutMarkup,
+                si.in_stock,
+                si.packaging
+            from
+                #store_items si
+            left join
+                #items i ON i.id = si.item_id
+            left join
+                #brends b ON b.id = i.brend_id
+        ";
 		$query .= "
 			WHERE
 				si.store_id = {$_POST['store_id']} AND si.item_id = {$_POST['item_id']}
 		";
 		$res_store_items = $db->query($query, '');
-		echo json_encode($res_store_items->fetch_assoc());
+        $store_items = $res_store_items->fetch_assoc();
+        if ($_POST['store_id'] == Config::MAIN_STORE_ID){
+            $result = $db->query("
+                select
+                    ps.id as store_id,
+                    ps.provider_id,
+                    ps.cipher,
+                    ps.title,
+                    msi.min_price
+                from
+                    #main_store_item msi
+                left join
+                    #provider_stores ps on ps.id = msi.store_id
+                where
+                    msi.item_id = {$_POST['item_id']}
+            ", '');
+            $store_items['main_store'] = $result->fetch_assoc();
+            $store_items['providerList'] = Provider::get();
+            $store_items['providerStoreList'] = $db->select(
+                'provider_stores',
+                'id,title,cipher',
+                "`provider_id` = {$store_items['main_store']['provider_id']} AND is_main = 1"
+            );
+        }
+		echo json_encode($store_items);
 		break;
 	case 'getItemInfo':
-		// debug($_POST);
-		echo json_encode(core\Item::getByID($_POST['item_id']));
+        $itemInfo = core\Item::getByID($_POST['item_id']);
+        echo json_encode($itemInfo);
 		break;
 	case 'addItem':
 		//debug($_POST); //exit();

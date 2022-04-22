@@ -87,7 +87,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				LEFT JOIN
 					#brends b ON b.id = i.brend_id
 				LEFT JOIN
-					#store_items si ON si.item_id = ov.item_id AND si.store_id = 23
+					#store_items si ON si.item_id = ov.item_id AND si.store_id = ".\core\Config::MAIN_STORE_ID."
 				WHERE
 					o.created BETWEEN '$from' AND '$to'
 				GROUP BY

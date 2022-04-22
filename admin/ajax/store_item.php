@@ -53,6 +53,24 @@ switch ($_POST['column']) {
 				]]
 			);
 		}
+
+        if ($_POST['is_main']){
+            $db->delete(
+                'main_store_item',
+                "`item_id` = {$_POST['item_id']} AND `store_id` = {$_POST['main_store_id']}"
+            );
+            $updated = (new DateTime())->format('Y-m-d H:i:s');
+            $db->insert('main_store_item', [
+                'item_id' => $_POST['item_id'],
+                'store_id' => $_POST['main_store_id'],
+                'updated' => $updated,
+                'min_price' => $_POST['min_price']
+            ], ['duplicate' => [
+                'store_id' => $_POST['main_store_id'],
+                'updated' => $updated,
+                'min_price' => $_POST['min_price']
+            ]]);
+        }
 		break;
 	case 'getStoreItemsByItemID':
         $result = \core\User::get(['id' => $_POST['user_id']]);

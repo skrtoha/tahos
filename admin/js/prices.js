@@ -1,4 +1,5 @@
-var itemInfo;
+var itemInfo = {};
+let store = {};
 function showStoreInfo(store_id, item_id){
 	$.ajax({
 		type: 'post',
@@ -17,8 +18,23 @@ function showStoreInfo(store_id, item_id){
 			$.each(result, function(key, value){
 				storeInfo[key] = value;
 			})
+            itemInfo.brend = result.brend;
+            itemInfo.id = result.item_id;
+            itemInfo.title_full = result.title_full;
+            itemInfo.article = result.article;
+
+            if (typeof storeInfo.main_store !== 'undefined' && storeInfo.main_store !== null){
+                store.store_id = storeInfo.main_store.store_id;
+                store.provider_id = storeInfo.main_store.provider_id;
+                store.provider = storeInfo.providerList[store.provider_id].title;
+                store.cipher = storeInfo.main_store.cipher;
+                store.store = storeInfo.main_store.cipher + '-' + storeInfo.main_store.title;
+                store.min_price = storeInfo.main_store.min_price;
+            }
+
 			showGif(false);
-			modal_show(add_item_to_store.getHtmlForm(storeInfo));
+			modal_show(add_item_to_store.getHtmlForm(storeInfo, store));
+            if (storeInfo.store_id == '23') addHtmlMainStore(storeInfo, store);
 		}
 	})
 	return false;
@@ -57,6 +73,95 @@ function deleteStoreItem(item_id, store_id){
 			show_message('Удачно удалено!');
 		}
 	})
+}
+function addHtmlMainStore(storeInfo = {}, mainStore = {}){
+    let htmlString = '';
+    const $selector = $('.add_item_to_store tbody tr:last-child');
+    if (Object.keys(storeInfo).length == 0){
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: {
+                'act': 'getAllProviders'
+            },
+            url: '/admin/ajax/providers.php',
+            success: function(response){
+                htmlString = getHtmlAdditionStringMainStore(response);
+                $selector.before(htmlString);
+            }
+        })
+    }
+    else{
+        htmlString = getHtmlAdditionStringMainStore(
+            storeInfo.providerList,
+            storeInfo.providerStoreList,
+            storeInfo,
+            mainStore
+        )
+        $selector.before(htmlString);
+    }
+}
+function getHtmlAdditionStringMainStore(providerList, providerStoreList = {}, storeInfo = {}, mainStore = {}){
+    let str = `
+        <tr class="provider">
+            <td>Поставщик</td>
+            <td>
+                <select id="provider_id">
+                    <option value="">...выберите</option>`;
+    $.each(providerList, function(i, item){
+        let selected = '';
+        if (Object.keys(mainStore).length != 0){
+            if (item.id == mainStore.provider_id) selected = 'selected';
+        }
+        str += `<option ${selected} value="${item.id}">${item.title}</option>`;
+    })
+    str += `</select></td></tr>`;
+    if (Object.keys(providerStoreList).length != 0){
+        let providerStoreString = '';
+        $.each(providerStoreList, function(i, item){
+            let selected = '';
+            if (item.id == mainStore.store_id){
+                selected = 'selected';
+            }
+            providerStoreString += `<option ${selected} value="${item.id}">${item.cipher}-${item.title}</option>`;
+        })
+
+        str += `
+            <tr class="provider_store">
+                <td>Склад:</td>
+                <td>
+                    <select name="main_store_id">
+                        <option value="">...выберите</option>
+                        ${providerStoreString}
+                    </select>
+                </td>
+            </tr>`;
+    }
+
+    let min_price = 0;
+    if (Object.keys(mainStore).length != 0){
+        min_price = mainStore.min_price;
+    }
+    str +=
+        '<tr>' +
+            '<td>Закупка:</td>' +
+            '<td>' +
+                '<input name="min_price" value="' + min_price + '" type="text">' +
+            '</td>' +
+        '</tr>';
+
+    let requiredRemain = 1;
+    if (Object.keys(storeInfo).length != 0){
+        requiredRemain = storeInfo.requiredRemain;
+    }
+    str +=
+        '<tr>' +
+            '<td>Минимальное наличие:</td>' +
+            '<td>' +
+                '<input name="requiredRemain" value="' + requiredRemain + '" type="text">' +
+            '</td>' +
+        '</tr>';
+    return str;
 }
 $(function(){
 	$('tr[store_id]').on('click', function(){
@@ -116,14 +221,14 @@ $(function(){
 		let $a = $(this);
 		let item_id = $a.attr('item_id');
 		let storeInfo = add_item_to_store.storeInfo;
-		console.log(add_item_to_store.storeInfo);
 		showGif();
 		$.ajax({
 			type: 'post',
 			url: '/admin/ajax/item.php',
 			data: {
 				item_id: item_id,
-				act: 'getItemInfo'
+				act: 'getItemInfo',
+                store_id: $('table.t_table').attr('store_id')
 			},
 			success: function(response){
 				showGif(false);
@@ -135,17 +240,65 @@ $(function(){
 				storeInfo.item_id = item_id;
                 storeInfo.priceWithoutMarkup = '';
 				modal_show(add_item_to_store.getHtmlForm(storeInfo));
+
+                //добавление возможности выбора поставщика для основного склада
+                if (storeInfo.store_id === '23') addHtmlMainStore();
 			}
 		})
 	})
+    $(document).on('change', '#provider_id', function(){
+        $('.provider_store').remove();
+        const $th = $(this);
+
+        store.provider_id = $(this).val();
+        store.provider = $('#provider_id option:selected').text();
+
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: '/admin/ajax/providers.php',
+            data: {
+                act: 'getProviderStores',
+                provider_id: $th.val()
+            },
+            success: function(response){
+                let str = `
+                    <tr class="provider_store">
+                        <td>Склад</td>
+                        <td>
+                            <select name="main_store_id">`;
+                store.store_id = response[0].id;
+                store.store = response[0].cipher + '-' + response[0].title;
+                $.each(response, function(i, item){
+                    str += `<option value="${item.id}">${item.cipher}-${item.title}</option>`;
+                })
+                str += `</select></td></tr>`;
+                $('.add_item_to_store tr.provider').after(str);
+            }
+        })
+    })
+    $(document).on('change', 'select[name=main_store_id]', function(){
+        const $th = $(this);
+        store.store_id = $th.val();
+        store.store = $th.find('option:selected').text();
+    })
 	$(document).on('submit', 'form.add_item_to_store', function(){
 		if (add_item_to_store.isValidated == false) return false;
+
+        const prevTr = $(`a.deleteStoreItem[item_id=${itemInfo.id}]`).closest('tr').prev();
+        prevTr.next().remove();
+
 		let array = $(this).serializeArray();
 		let formData = {};
 		$.each(array, function(i, value){
 			formData[value.name] = value.value
 		});
         formData.price = formData.price.replace(',', '.');
+
+        if (typeof formData.min_price !== 'undefined'){
+            formData.min_price = formData.min_price.replace(',', '.');
+        }
+
 		let str = `
 			<tr>
 				<td>${itemInfo.brend}</td>
@@ -156,23 +309,27 @@ $(function(){
 				<td><input type="text" class="store_item" value="${formData.price}" column="price" item_id="${itemInfo.id}"></td>
 			`;
 		if (formData.store_id == '23'){
+            let now = new Date();
+            let updated = now.toLocaleDateString();
 			str += `
 				<td>${formData.price * formData.in_stock}</td>
 				<td>
 					<input type="text" class="store_item" value="${formData.requiredRemain}" column="requiredRemain" item_id="${itemInfo.id}">
 				</td>
-			`
+                <td>${store.provider}-${store.store}</td>
+                <td>
+                    <input type="text" class="store_item" value="${formData.min_price}" column="min_price" item_id="${itemInfo.id}">
+                </td>
+                <td>${updated}</td>`
 		}
-		str += `
-			<td>
-				<a title="Удалить" item_id="${itemInfo.id}" class="deleteStoreItem" href="">
-					<span class="icon-cancel-circle1"></span>
-				</a>
-				</td>
-		</tr>
-		`;
+		str += `<td>
+                    <a title="Удалить" item_id="${itemInfo.id}" class="deleteStoreItem" href="">
+                        <span class="icon-cancel-circle1"></span>
+                    </a>
+                </td>
+		    </tr>`;
 		$('table.t_table tbody tr.empty').remove();
-		$('table.t_table tbody tr.head.sort').after(str);
+		prevTr.after(str);
 	})
 	$(document).on('click', 'a.deleteStoreItem', function(){
 		if (!confirm('Действительно удалить')) return false;

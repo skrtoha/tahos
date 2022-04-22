@@ -88,6 +88,15 @@ switch($_POST['act']){
 		}
 		getStoreInfo($storeInfo);
 		break;
+    case 'getProviderStores':
+        $output = $db->select(
+            'provider_stores',
+            'id,cipher,title',
+            "`provider_id` = {$_POST['provider_id']} AND `is_main` = 1",
+            'is_main, cipher, title'
+        );
+        echo json_encode($output);
+        break;
 }
 function getStoreInfo($storeInfo){?>
 	<div id="providerInfo">

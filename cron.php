@@ -75,10 +75,6 @@ switch ($params[0]){
         }
         $logger->alert("Удалено $counter записей");
         break;
-    case 'clearStores':
-        $logger->alert('Полная очистка прайсов');
-        Provider::clearStoresItems();
-        break;
     case 'clearExceptMainStores':
         $logger->alert('Очистка прайсов, кроме основных складов');
         Provider::clearStoresItems(['!main_stores']);
@@ -194,7 +190,7 @@ switch ($params[0]){
 			LEFT JOIN
 				#provider_stores ps ON ps.id = si.store_id
 			WHERE
-				ps.id != 23
+				ps.id != ".\core\Config::MAIN_STORE_ID."
 		",'');
         $mysqli = $db->get_mysqli();
         $logger->info("Удалено {$mysqli->affected_rows} строк.");
@@ -204,7 +200,7 @@ switch ($params[0]){
             SET
                 price_updated = current_timestamp
             WHERE
-                id != 23
+                id != ".\core\Config::MAIN_STORE_ID."
         ");
         break;
     case 'emailPrice':
@@ -710,7 +706,7 @@ switch ($params[0]){
         foreach($res_emails as $row) $emails[] = $row['email'];
         
         $query = \core\StoreItem::getQueryStoreItem();
-        $query .= " WHERE si.store_id = 23";
+        $query .= " WHERE si.store_id = ".\core\Config::MAIN_STORE_ID;
         $res_store_items = $db->query($query);
         $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price');
         

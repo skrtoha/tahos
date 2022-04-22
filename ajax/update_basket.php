@@ -19,6 +19,11 @@ switch($_GET['act']){
 				`store_id`={$_GET['store_id']}
 			"
 		);
+        $db->update(
+            'store_items',
+            ['price' => $_GET['price']],
+            "`store_id` = {$_GET['store_id']} and `item_id`={$_GET['item_id']}"
+        );
 		break;
 }
 header('Location: '.$_SERVER['HTTP_REFERER']);

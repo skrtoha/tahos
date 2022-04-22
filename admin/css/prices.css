@@ -4,7 +4,8 @@ tr[store_id]{
 input[column=price],
 input[column=in_stock],
 input[column=requiredRemain],
-input[column=packaging]
+input[column=packaging],
+input[column=min_price]
 {
 	width: 70px;
 }
@@ -25,6 +26,9 @@ tr.sort td.active .icon-arrow-down2{
 .icon-arrow-down2:before {
   content: "\ea3e";
     color: #007f8e;
+}
+a.deleteStoreItem{
+    text-decoration: none;
 }
 a.desc ~ .icon-arrow-down2:before{
 	content: "\ea3a";

@@ -481,7 +481,7 @@ switch ($params[0]){
         }
         Provider::updatePriceUpdated(['provider_id' => core\Provider\Rossko::getParams()->provider_id]);
         break;
-    case 'BERG_GREB': //Прайс Москва
+    case 'BERG_BERGMSK': //Прайс Москва
     case 'BERG_GERY': //Прайс Ярославль
     case 'BERG_2021': //Прайс Москва2
     case 'BERG_MRIDB': //Прайс БДИР Москва
@@ -507,7 +507,7 @@ switch ($params[0]){
         }
         $handle = fopen($filename, 'r');
         
-        if ($params[0] == 'BERG_GREB') $store_id = 275;
+        if ($params[0] == 'BERG_BERGMSK') $store_id = 275;
         if ($params[0] == 'BERG_GERY') $store_id = 276;
         if ($params[0] == 'BERG_2021') $store_id = 337952;
         if ($params[0] == 'BERG_MRIDB') $store_id = 952496;

@@ -20,8 +20,8 @@ $_SERVER['DOCUMENT_ROOT'] = $document_root;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/core/Database.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
-$db = new core\Database();
 
+$db = new core\Database();
 
 $params = [];
 $counter = 0;
@@ -356,9 +356,16 @@ switch ($params[0]){
                 }
                 break;
             case 'csv':
-                while ($data = fgetcsv($workingFile, 0, "\n")) {
-                    $row = iconv('windows-1251', 'utf-8', $data[0]);
+                if (!is_resource($workingFile)) $handle = fopen($workingFile, 'r');
+                else $handle = $workingFile;
+                while ($data = fgetcsv($handle, 0, "\n")) {
+                    if (preg_match('/[^a-zа-я\d.,+\-\s\/"\']{4}/i', $data[0])){
+                        $row = iconv('windows-1251', 'utf-8', $data[0]);
+                    }
+                    else $row = $data[0];
+                    
                     $row = explode(';', str_replace('"', '', $row));
+                    
                     $stringNumber++;
                     if ($debuggingMode){
                         debug($row);
@@ -378,7 +385,7 @@ switch ($params[0]){
                 break;
         }
     
-        endSuccessfullyProccessing($price->isLogging, $logger);
+        endSuccessfullyProccessing($price->isLogging, $logger, $params[0]);
         break;
     case 'priceRossko':
         ini_set('memory_limit', '2048M');

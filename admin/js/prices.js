@@ -30,6 +30,7 @@ function showStoreInfo(store_id, item_id){
                 store.cipher = storeInfo.main_store.cipher;
                 store.store = storeInfo.main_store.cipher + '-' + storeInfo.main_store.title;
                 store.min_price = storeInfo.main_store.min_price;
+                store.requiredRemain = storeInfo.main_store.requiredRemain;
             }
 
 			showGif(false);
@@ -152,7 +153,7 @@ function getHtmlAdditionStringMainStore(providerList, providerStoreList = {}, st
 
     let requiredRemain = 1;
     if (Object.keys(storeInfo).length != 0){
-        requiredRemain = storeInfo.requiredRemain;
+        requiredRemain = storeInfo.main_store.requiredRemain;
     }
     str +=
         '<tr>' +

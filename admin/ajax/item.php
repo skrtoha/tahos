@@ -122,11 +122,14 @@ switch($_POST['act']){
                     ps.provider_id,
                     ps.cipher,
                     ps.title,
-                    msi.min_price
+                    msi.min_price,
+                    ri.requiredRemain
                 from
                     #main_store_item msi
                 left join
                     #provider_stores ps on ps.id = msi.store_id
+                left join 
+                    #required_remains ri on ri.item_id = msi.item_id
                 where
                     msi.item_id = {$_POST['item_id']}
             ", '');

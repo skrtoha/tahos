@@ -367,6 +367,7 @@ switch ($params[0]){
                     $row = explode(';', str_replace('"', '', $row));
                     
                     $stringNumber++;
+                    if ($stringNumber == 1) continue;
                     if ($debuggingMode){
                         debug($row);
                         if ($stringNumber > 100){

@@ -241,62 +241,76 @@ class FavoriteParts extends Provider{
 	 * @return mixed false - no goods for order, true - successfully sent, string - error
 	 */
 	public static function toOrder(){
-		$baskets = [
-			'entity' => self::getBasket('entity'),
-			'private' => self::getBasket('private')
-		];
-		foreach($baskets as $typeOrganization => $basket){
-		    if (empty($basket)) continue;
-			$dateShipments = [];
-			$PaymentType = $typeOrganization == 'entity' ? 2 : 1;
-			foreach($basket['cart'] as $value) $dateShipments[$value['dateShipment']][] = $value;
-			foreach($dateShipments as $date => $dateShipment){
-				$GoodsList = self::getGoodsForBasket($dateShipment, $typeOrganization);
-				if (empty($GoodsList)) continue;
-				$user = self::getUser($typeOrganization);
-				// debug($user);
-				$array = [
-					'WarehouseShipping' => self::getWarehouseShipping($basket),
-					'ShippingDate' => $date,
-					'TradePoint' => '070C5324-32F6-11EB-A33B-005056802F4C',
-					'PaymentType' => $PaymentType,
-					'DeliveryType' => $user['deliveryType'],
-					'TransportType' => $user['transportType'],
-					'Comment' => '',
-					'GoodsList' => $GoodsList 
-				];
-				// debug($array); exit();
-				$curl = curl_init('http://api.favorit-parts.ru/ws/v1/order/');
-				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-				curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($array));
-				curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($curl, CURLOPT_HTTPHEADER, [
-				   "Content-type: application/json", 
-					"X-Favorit-DeveloperKey: ".self::getParams($typeOrganization)->developerKey,
-					'X-Favorit-ClientKey: '.self::getParams($typeOrganization)->key
-				]);
-				$result = curl_exec($curl);
-				if (!parent::isJSON($result)){
-					foreach($GoodsList as $good) Log::insert([
-						'text' => $result,
-						'additional' => "osi: " . $good['Comment']
-					]);
-				}
-				curl_close($curl);
-				self::setStatusOrdered($GoodsList);
-			}
-		}
+        $ordered = 0;
+
+        $basket = self::getBasket();
+
+        if (empty($basket)) return 0;
+
+        $dateShipments = [];
+
+        foreach($basket['cart'] as $value) $dateShipments[$value['dateShipment']][] = $value;
+
+        foreach($dateShipments as $date => $dateShipment){
+            foreach($dateShipment as $good){
+                $osi = explode('-', $good['comment']);
+                $orderInfo = OrderValue::getOrderInfo($osi[0]);
+
+                $user = self::getUser();
+
+                $PaymentType = in_array($orderInfo['pay_type'], ['Наличный', 'Онлайн']) ? 1 : 2;
+
+                $array = [
+                    'WarehouseShipping' => self::getWarehouseShipping($basket),
+                    'ShippingDate' => $date,
+                    'TradePoint' => '070C5324-32F6-11EB-A33B-005056802F4C',
+                    'PaymentType' => $PaymentType,
+                    'DeliveryType' => $user['deliveryType'],
+                    'TransportType' => $user['transportType'],
+                    'Comment' => '',
+                    'GoodsList' => [
+                        [
+                            'Goods' => $good['goods'],
+                            'WarehouseGroup' => $good['warehouseGroup'],
+                            'Count' => $good['count'],
+                            'Comment' => $good['comment'],
+                            'PaymentType' => $PaymentType
+                        ]
+                    ]
+                ];
+                $curl = curl_init('http://api.favorit-parts.ru/ws/v1/order/');
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($array));
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                    "Content-type: application/json",
+                    "X-Favorit-DeveloperKey: ".self::getParams()->developerKey,
+                    'X-Favorit-ClientKey: '.self::getParams()->key
+                ]);
+                $result = curl_exec($curl);
+
+                if (!parent::isJSON($result)){
+                    Log::insert([
+                        'text' => $result,
+                        'additional' => "osi: " . $good['Comment']
+                    ]);
+                }
+                curl_close($curl);
+
+                self::setStatusOrdered($good);
+
+                $ordered += $good['count'];
+            }
+        }
+        return $ordered;
 	}
 	/**
-	 * sets status "ordered" after successfully sended order favorite parts
+	 * sets the status "ordered" after successfully sent order to favorite parts
 	 */
-	public static function setStatusOrdered($GoodsList){
+	public static function setStatusOrdered($good){
 		$where = '';
-		foreach($GoodsList as $good){
-			$array = explode('-', $good['Comment']);
-			$where .= "(`order_id` = {$array[0]} AND `store_id` = {$array[1]} AND `item_id` = {$array[2]}) OR ";
-		}
-		$where = substr($where, 0, -4);
+        $array = explode('-', $good['comment']);
+        $where .= "(`order_id` = {$array[0]} AND `store_id` = {$array[1]} AND `item_id` = {$array[2]})";
 		$orders_values = $GLOBALS['db']->query("
 			SELECT
 				ov.*
@@ -310,51 +324,12 @@ class FavoriteParts extends Provider{
 		foreach($orders_values as $ov) OrderValue::changeStatus(11, $ov);
 	}
 	/**
-	 * gets goods for favorite basket using getBasket
-	 * @param  array $basket received by getBasket
-	 * @return [type]         [description]
-	 */
-	private static function getGoodsForBasket($cart, $inputTypeOrganization){
-		$output = array();
-		foreach($cart as $b){
-			$osi = explode('-', $b['comment']);
-			$typeOrganization = parent::getUserTypeByOrderID($osi[0]);
-			$output[] = [
-				'Goods' => $b['goods'],
-				'WarehouseGroup' => $b['warehouseGroup'],
-				'Count' => $b['count'],
-				'Comment' => $b['comment'],
-				'PaymentType' => $typeOrganization == 'private' ? 1 : 2 
-			];
-		} 
-		return $output;
-	}
-	/**
 	 * gets Warehouse Shipping for basket
 	 * @param  array $basket value received by method 
 	 * @return [type]         [description]
 	 */
 	private static function getWarehouseShipping($basket){
 		foreach($basket['warehouseShipping'] as $key => $value) return $key;
-	}
-	/**
-	 * gets dateShipment in goods $basket['cart']
-	 * @param  array $cart $basket['cart']
-	 * @return [type] max date shipping
-	 */
-	private static function getShippingDate($cart){
-		// debug($cart);
-		$max = [
-			'unix' => strtotime($cart[0]['dateShipment']),
-			'dateShipment' => $cart[0]['dateShipment']
-		];
-		foreach($cart as $value){
-			if (strtotime($value['dateShipment']) > $max['unix']) $max = [
-				'unix' => strtotime($value['dateShipment']),
-				'dateShipment' => $value['dateShipment']
-			];
-		}
-		return $max['dateShipment'];
 	}
 	/**
 	 * gets user info in Favorite Parts

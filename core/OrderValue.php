@@ -478,7 +478,7 @@ class OrderValue{
     
     
     /**
-     * @param $order_id
+     * @param mixed $order_id
      * @param bool $provider_id - если передан, тогда в выборку попадут данные из provider_addresses
      * @param string $flag
      * @return mixed
@@ -497,6 +497,9 @@ class OrderValue{
             $selectAddressId .= ", pa.address_provider_id";
         }
         else $leftJoin = '';
+
+        if (!is_array($order_id)) $order_id = [$order_id];
+
         $query = "
             SELECT
                 o.id,
@@ -536,10 +539,15 @@ class OrderValue{
             LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
             LEFT JOIN #user_addresses ua ON ua.id = o.address_id
             $leftJoin
-            WHERE o.id={$order_id}
+            WHERE o.id IN (".implode(',', $order_id).")
         ";
         if ($flag) return $GLOBALS['db']->query($query, $flag);
-        $order = $GLOBALS['db']->select_unique($query, $flag);
-        return $order[0];
+        $orders = $GLOBALS['db']->select_unique($query, $flag);
+
+        if (count($orders) == 1) return $orders[0];
+
+        $output = [];
+        foreach($orders as $o) $output[$o['id']] = $o;
+        return $output;
     }
 }

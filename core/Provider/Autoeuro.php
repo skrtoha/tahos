@@ -292,8 +292,9 @@ class Autoeuro extends Provider{
         return Armtek::removeFromBasket($ov);
 	}
 
-    private static function getPayerKey(){
-        return self::getParams()->payer_key;
+    private static function getPayerKey($pay_type = 'Наличный'){
+        $type_organization = in_array($pay_type, ['Наличный', 'Онлайн']) ? 'private' : 'entity';
+        return self::getParams($type_organization)->payer_key;
     }
     
     private static function getOrderKeys($store_id, $item_id){
@@ -310,6 +311,7 @@ class Autoeuro extends Provider{
         if (!$providerBasket->num_rows) return false;
         $stock_items = [];
         while($pb = $providerBasket->fetch_assoc()){
+            $orderInfo = OrderValue::getOrderInfo($pb['order_id']);
             $aeok = self::getOrderKeys($pb['store_id'], $pb['item_id']);
             
             if (empty($aeok)){
@@ -328,7 +330,7 @@ class Autoeuro extends Provider{
         $url = self::getUrlString('create_order');
         $response = parent::getUrlData($url, [
             'delivery_key' => self::getParams()->delivery_key,
-            'payer_key' => self::getPayerKey(),
+            'payer_key' => self::getPayerKey($orderInfo['pay_type']),
             'comment' => '',
             'wait_all_goods' => 0,
             'stock_items' => $stock_items

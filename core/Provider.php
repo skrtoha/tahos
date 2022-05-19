@@ -111,7 +111,8 @@ abstract class Provider{
 				u.id AS user_id,
 				p.title AS provider,
 				p.api_title,
-				u.user_type as typeOrganization
+				u.user_type as typeOrganization,
+				o.pay_type
 			FROM
 				#provider_basket pb
 			LEFT JOIN

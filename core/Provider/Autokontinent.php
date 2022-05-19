@@ -327,7 +327,7 @@ class Autokontinent extends Provider{
 		self::executeSendOrder('entity', $basket);
 	}
 	private static function executeSendOrder($typeOrganization, $basket){
-		if (empty($basket)) return;
+		if (empty($basket)) return 0;
 		
 		try{
 			$json = Provider::getCurlUrlData(

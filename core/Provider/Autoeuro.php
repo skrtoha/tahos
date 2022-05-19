@@ -309,57 +309,75 @@ class Autoeuro extends Provider{
         $sentItems = 0;
         $providerBasket = parent::getProviderBasket(self::getParams()->provider_id, '');
         if (!$providerBasket->num_rows) return false;
-        $stock_items = [];
+
+        $providerBasketPayType = [
+            'Наличный' => [],
+            'Безналичный' => []
+        ];
         while($pb = $providerBasket->fetch_assoc()){
-            $orderInfo = OrderValue::getOrderInfo($pb['order_id']);
-            $aeok = self::getOrderKeys($pb['store_id'], $pb['item_id']);
-            
-            if (empty($aeok)){
-                $class = new static($pb['item_id']);
-                $class->setArticle($pb['brend'], $pb['article']);
+            switch ($pb['pay_type']){
+                case 'Наличный':
+                case 'Онлайн':
+                $providerBasketPayType['Наличный'][] = $pb;
+                    break;
+                case 'Безналичный':
+                    $providerBasketPayType['Безналичный'][] = $pb;
+            }
+        }
+
+        foreach($providerBasketPayType as $pay_type => $providerBasket){
+            $sentStockItems = [];
+            $stock_items = [];
+            foreach($providerBasket as $pb){
                 $aeok = self::getOrderKeys($pb['store_id'], $pb['item_id']);
+
+                if (empty($aeok)){
+                    $class = new static($pb['item_id']);
+                    $class->setArticle($pb['brend'], $pb['article']);
+                    $aeok = self::getOrderKeys($pb['store_id'], $pb['item_id']);
+                }
+
+                $stock_items[] = [
+                    'offer_key' => $aeok['offer_key'],
+                    'quantity' => $pb['quan'],
+                    'comment' => "{$pb['order_id']}-{$pb['store_id']}-{$pb['item_id']}"
+                ];
+                $sentStockItems[$aeok['offer_key']] = $pb;
             }
-            
-            $stock_items[] = [
-                'offer_key' => $aeok['offer_key'],
-                'quantity' => $pb['quan'],
-                'comment' => "{$pb['order_id']}-{$pb['store_id']}-{$pb['item_id']}"
-            ];
-            $sentStockItems[$aeok['offer_key']] = $pb;
-        }
-        $url = self::getUrlString('create_order');
-        $response = parent::getUrlData($url, [
-            'delivery_key' => self::getParams()->delivery_key,
-            'payer_key' => self::getPayerKey($orderInfo['pay_type']),
-            'comment' => '',
-            'wait_all_goods' => 0,
-            'stock_items' => $stock_items
-        ]);
-        $result = json_decode($response);
-        
-        if ($result->DATA[0]->result === false){
-            foreach($stock_items as $si){
-                $osi = explode('-', $si['comment']);
-                Log::insert([
-                    'text' => "Ошибка отправки заказа",
-                    'additional' => "osi: {$osi['order_id']}-{$osi['store_id']}-{$osi['item_id']}"
-                ]);
+            $url = self::getUrlString('create_order');
+            $response = parent::getUrlData($url, [
+                'delivery_key' => self::getParams()->delivery_key,
+                'payer_key' => self::getPayerKey($pay_type),
+                'comment' => '',
+                'wait_all_goods' => 0,
+                'stock_items' => $stock_items
+            ]);
+            $result = json_decode($response);
+
+            if ($result->DATA[0]->result === false){
+                foreach($stock_items as $si){
+                    $osi = explode('-', $si['comment']);
+                    Log::insert([
+                        'text' => "Ошибка отправки заказа",
+                        'additional' => "osi: {$osi['order_id']}-{$osi['store_id']}-{$osi['item_id']}"
+                    ]);
+                }
+
             }
-            
-        }
-        
-        foreach($result->META->request->parameters->stock_items as $value){
-            $pb = $sentStockItems[$value->offer_key];
-            $sentItems += $pb['quan'];
-            OrderValue::changeStatus(11, $pb);
-            parent::updateProviderBasket(
-                [
-                    'order_id' => $pb['order_id'],
-                    'store_id' => $pb['store_id'],
-                    'item_id' => $pb['item_id']
-                ],
-                ['response' => 'OK']
-            );
+
+            foreach($result->META->request->parameters->stock_items as $value){
+                $pb = $sentStockItems[$value->offer_key];
+                $sentItems += $pb['quan'];
+                OrderValue::changeStatus(11, $pb);
+                parent::updateProviderBasket(
+                    [
+                        'order_id' => $pb['order_id'],
+                        'store_id' => $pb['store_id'],
+                        'item_id' => $pb['item_id']
+                    ],
+                    ['response' => 'OK']
+                );
+            }
         }
         return $sentItems;
 	}

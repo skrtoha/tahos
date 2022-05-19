@@ -138,84 +138,104 @@ class Berg extends Provider{
 	    
 	    $items = [];
 	    $ordered = 0;
-	    foreach($providerBasket as $row){
-	        self::$provider_id = $row['provider_id'];
-            $items['items'][] = [
-	            'resource_article' => $row['article'],
-                'brand_name' => $row['brend']
-            ];
-            $url = self::getUrlString('/ordering/get_stock').'&'.http_build_query($items);
-            $result = parent::getCurlUrlData($url);
-            $data = json_decode($result);
-            
-            if (empty($data->resources)){
-                Log::insert([
-                    'text' => "Берг: не удалось отправить в заказ",
-                    'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
-                ]);
-                continue;
+
+        $providerBasketType = [
+            'private' => [],
+            'entity' => []
+        ];
+        foreach($providerBasket as $row){
+            switch($row['pay_type']){
+                case 'Наличный':
+                case 'Онлайн':
+                    $providerBasketType['private'][] = $row;
+                    break;
+                case 'Безналичный':
+                    $providerBasketType['entity'][] = $row;
+                    break;
             }
-        
-            if (count($data->resources) > 1){
-                Log::insert([
-                    'text' => "Берг: слишком много совпадений, проверьте бренды",
-                    'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
-                ]);
-                continue;
-            }
-            
-            $order = [];
-            $order['force'] = 0;
-            $order['order']['payment_type'] = $row['typeOrganization'] == 'private' ? 1 : 2;
-            $order['order']['dispatch_type'] = 3;
-            $order['order']['dispatch_time'] = 2;
-            
-            //todo при развертывании закоментировать
-//            $order['order']['is_test'] = 1;
-            
-            foreach($data->resources[0]->offers as $offer){
-                if ($offer->warehouse->name != $row['store']) continue;
-                $order['order']['dispatch_at'] = self::getDateDispatch($offer->average_period);
-                $order['order']['items'][] = [
-                    'resource_id' => $data->resources[0]->id,
-                    'warehouse_id' => $offer->warehouse->id,
-                    'quantity' => $row['quan'],
-                    'comment' => "{$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+        }
+
+	    foreach($providerBasketType as $type_organization => $pb){
+            foreach($pb as $row){
+                self::$provider_id = $row['provider_id'];
+                $items['items'][] = [
+                    'resource_article' => $row['article'],
+                    'brand_name' => $row['brend']
                 ];
-                break;
-            }
-            
-            if (empty($order['order']['items'])){
-                Log::insert([
-                    'text' => "Берг: товар не найден на складе",
-                    'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
-                ]);
-                continue;
-            }
-            
-            $url = self::getUrlString('/ordering/place_order', $row['typeOrganization']);
-            $json = parent::getCurlUrlData($url, $order);
-            $result = json_decode($json);
-            
-            OrderValue::changeStatus(11, [
-                'order_id' => $row['order_id'],
-                'store_id' => $row['store_id'],
-                'item_id' => $row['item_id'],
-                'price' => $result->order->items[0]->price,
-                'quan' => $result->order->items[0]->quantity
-            ]);
-            
-        
-            parent::updateProviderBasket(
-                [
+                $url = self::getUrlString('/ordering/get_stock').'&'.http_build_query($items);
+                $result = parent::getCurlUrlData($url);
+                $data = json_decode($result);
+
+                if (empty($data->resources)){
+                    Log::insert([
+                        'text' => "Берг: не удалось отправить в заказ",
+                        'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                    ]);
+                    continue;
+                }
+
+                if (count($data->resources) > 1){
+                    Log::insert([
+                        'text' => "Берг: слишком много совпадений, проверьте бренды",
+                        'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                    ]);
+                    continue;
+                }
+
+                $order = [];
+                $order['force'] = 0;
+                $order['order']['payment_type'] = $type_organization == 'private' ? 1 : 2;
+                $order['order']['dispatch_type'] = 3;
+                $order['order']['dispatch_time'] = 2;
+
+                //todo при развертывании закоментировать
+//            $order['order']['is_test'] = 1;
+
+                foreach($data->resources[0]->offers as $offer){
+                    if ($offer->warehouse->name != $row['store']) continue;
+                    $order['order']['dispatch_at'] = self::getDateDispatch($offer->average_period);
+                    $order['order']['items'][] = [
+                        'resource_id' => $data->resources[0]->id,
+                        'warehouse_id' => $offer->warehouse->id,
+                        'quantity' => $row['quan'],
+                        'comment' => "{$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                    ];
+                    break;
+                }
+
+                if (empty($order['order']['items'])){
+                    Log::insert([
+                        'text' => "Берг: товар не найден на складе",
+                        'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                    ]);
+                    continue;
+                }
+
+                $url = self::getUrlString('/ordering/place_order', $type_organization);
+                $json = parent::getCurlUrlData($url, $order);
+                $result = json_decode($json);
+
+                OrderValue::changeStatus(11, [
                     'order_id' => $row['order_id'],
                     'store_id' => $row['store_id'],
-                    'item_id' => $row['item_id']
-                ],
-                ['response' => 'OK']
-            );
-            
-            $ordered += $result->order->items[0]->quantity;
+                    'item_id' => $row['item_id'],
+                    'price' => $result->order->items[0]->price,
+                    'quan' => $result->order->items[0]->quantity
+                ]);
+
+
+                parent::updateProviderBasket(
+                    [
+                        'order_id' => $row['order_id'],
+                        'store_id' => $row['store_id'],
+                        'item_id' => $row['item_id']
+                    ],
+                    ['response' => 'OK']
+                );
+
+                $ordered += $result->order->items[0]->quantity;
+            }
+
 	    }
 	    
         return $ordered;

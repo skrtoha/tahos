@@ -6,7 +6,7 @@ class UserIPS{
 	private const MaxNonAuthorizatedConnections = 100;
 	private const MaxPeriodHours = 24;
 
-	public static $isBlockedUser;
+	public static $isBlockedUser = false;
 
 	public static function getHoursBetweenTwoDays($start, $end){
 		$first = new \DateTime($start);
@@ -16,20 +16,28 @@ class UserIPS{
 	}
 
 	public static function registerIP($params){
-		$IPInfo = self::getIPInfo($params['ip']);
+		if ($params['view'] == 'authorization') return false;
+
+        $IPInfo = self::getIPInfo($params['ip']);
 		if (!$params['user_id']){
 			$params['user_id'] = 'DEFAULT';
 			$maxConnections = self::MaxNonAuthorizatedConnections;
 		} 
 		else $maxConnections = self::MaxAuthorizatedConnections;
-		
-		self::$isBlockedUser = $IPInfo['count_connections'] > $maxConnections;
-		
-		$hours = self::getHoursBetweenTwoDays($IPInfo['first'], $IPInfo['last']);
-		if ($hours > self::MaxPeriodHours){
-			self::$isBlockedUser = false;
-			self::resetFirstDate($params['ip']);
-		}
+
+        $hours = self::getHoursBetweenTwoDays($IPInfo['first'], $IPInfo['last']);
+        if (
+            $hours < self::MaxPeriodHours &&
+            (int) $IPInfo['count_connections'] > $maxConnections
+        ){
+            self::$isBlockedUser = true;
+            self::insert($params);
+        }
+        else{
+            self::$isBlockedUser = false;
+        }
+
+        if ($hours > self::MaxPeriodHours) return self::resetFirstDate($params['ip']);
 
 		if ($params['view'] == 'exceeded_connections' && self::$isBlockedUser) return false;
 

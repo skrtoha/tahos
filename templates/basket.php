@@ -400,24 +400,25 @@ $noReturnIsExists = false;
 <?}?>
     <div id="additional_options" class="product-popup mfp-hide">
         <h2>Дополнительные параметры заказа</h2>
+        <?$addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");?>
         <div class="content">
             <form action="">
                 <div class="wrapper">
                     <div class="left">Выберите способ доставки</div>
                     <div class="right">
                         <label>
-                            <?$checked = $user['delivery_type'] == 'Самовывоз' ? 'checked' : ''?>
+                            <?$checked = $user['delivery_type'] == 'Самовывоз' || empty($addresses) ? 'checked' : ''?>
                             <input type="radio" name="delivery" value="Самовывоз" <?=$checked?>>
                             <span>Самовывоз из <?=$user['issue_adres']?></span>
                         </label>
-                        <label>
-                            <?$checked = $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
-                            <input type="radio" name="delivery" value="Доставка" <?=$checked?>>
-                            <span>Доставка в:</span>
-                        </label>
-                        <?$addresses = $db->select('user_addresses', '*', "`user_id` = {$_SESSION['user']}");
-                        if (!empty($addresses)){
-                            $disabled = $user['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
+                        <?if (!empty($addresses)){?>
+                            <label>
+                                <?$checked = $user['delivery_type'] == 'Доставка' ? 'checked' : ''?>
+                                <input type="radio" name="delivery" value="Доставка" <?=$checked?>>
+                                <span>Доставка в:</span>
+                            </label>
+
+                            <?$disabled = $user['delivery_type'] == 'Самовывоз' ? 'disabled' : ''; ?>
                             <select name="address_id" <?=$disabled?>>
                                 <?$counter = 0;
                                 foreach($addresses as $row){

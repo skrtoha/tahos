@@ -337,11 +337,11 @@ function show_form($act){
 				<input type="hidden" name="form_submit" value="<?=$act == 's_change' ? 1 : 2?>">
 				<div class="field">
 					<div class="title">Фамилия</div>
-					<div class="value"><input type=text name="name_1" value="<?=$_POST['name_1'] ? $_POST['name_1'] : $user['name_1']?>"></div>
+					<div class="value"><input type=text name="name_1" value="<?=$_POST['name_1'] ?: $user['name_1']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Имя</div>
-					<div class="value"><input type=text name="name_2" value="<?=$_POST['name_2'] ? $_POST['name_2'] : $user['name_2']?>"></div>
+					<div class="value"><input type=text name="name_2" value="<?=$_POST['name_2'] ?: $user['name_2']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Отчество</div>
@@ -401,6 +401,10 @@ function show_form($act){
 					<div class="title">Наценка при заказе вручную</div>
 					<div class="value"><input type=text name="markup_handle_order" value="<?=$array['markup_handle_order']?>"></div>
 				</div>
+                <div class="field">
+                    <div class="title">Максимальное кол-во соединений</div>
+                    <div class="value"><input type="text" name="max_connections" value="<?=$array['max_connections']?>"></div>
+                </div>
 				<div class="field">
 					<div class="title">Скидка</div>
 					<div class="value"><input type=text name="discount" value="<?=$array['discount']?>"></div>

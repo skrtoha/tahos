@@ -44,6 +44,7 @@ else{
         ]);
         setcookie('jwt', $jwt, time()+60*60*24*30);
     }
+    $db->update('user_ips', ['user_id' => $user['id']], "ip = '{$_SERVER['SERVER_ADDR']}'");
     message('Вы успешно авторизовались!');
 }
 header("Location: {$_SERVER['HTTP_REFERER']}");

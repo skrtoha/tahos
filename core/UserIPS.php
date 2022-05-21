@@ -1,10 +1,14 @@
 <?php
 namespace core;
+
+/* @global $db \core\Database */
+
 class UserIPS{
 
-	private const MaxAuthorizatedConnections = 1000;
 	private const MaxNonAuthorizatedConnections = 100;
 	private const MaxPeriodHours = 24;
+
+    private static $noRenderView = ['authorization', 'exit'];
 
 	public static $isBlockedUser = false;
 
@@ -16,14 +20,14 @@ class UserIPS{
 	}
 
 	public static function registerIP($params){
-		if ($params['view'] == 'authorization') return false;
+        if (in_array($params['view'], self::$noRenderView)) return false;
 
         $IPInfo = self::getIPInfo($params['ip']);
 		if (!$params['user_id']){
 			$params['user_id'] = 'DEFAULT';
 			$maxConnections = self::MaxNonAuthorizatedConnections;
 		} 
-		else $maxConnections = self::MaxAuthorizatedConnections;
+		else $maxConnections = $IPInfo['max_connections'];
 
         $hours = self::getHoursBetweenTwoDays($IPInfo['first'], $IPInfo['last']);
         if (
@@ -39,16 +43,26 @@ class UserIPS{
 
         if ($hours > self::MaxPeriodHours) return self::resetFirstDate($params['ip']);
 
-		if ($params['view'] == 'exceeded_connections' && self::$isBlockedUser) return false;
+		if ($params['view'] == 'exceeded_connections' && self::$isBlockedUser){
+            self::setMessage();
+            return false;
+        }
 
 		if (!$IPInfo) return self::insert($params);
 		if (!$IPInfo['last']) return self::insert($params);
 
-
-		if (self::$isBlockedUser) return self::handleRefuseAccess();
+		if (self::$isBlockedUser){
+            self::handleRefuseAccess();
+            return false;
+        }
 
 		return self::insert($params);
 	}
+
+    private static function setMessage(){
+        if ($_SESSION['user']) return;
+        message("Превышено количество запросов. Авторизуйтесь для продолжения", false);
+    }
 
 	private static function resetFirstDate($ip){
 		return $GLOBALS['db']->query("
@@ -64,13 +78,25 @@ class UserIPS{
 	}
 
 	public static function getIPInfo($ip){
-		return $GLOBALS['db']->select_one('user_ips', '*', "`ip` = '$ip'");
+        global $db;
+        $result = $db->query("
+            SELECT
+                ui.*,
+                u.max_connections
+            FROM
+                #user_ips ui
+            LEFT JOIN
+                #users u ON u.id = ui.user_id
+            WHERE
+                ui.ip = '$ip'
+        ")->fetch_assoc();
+		return $result;
 	}
 
 	private static function handleRefuseAccess(){
-
-		message("Превышено количество запросов. Авторизуйтесь для продолжения", false);
+        self::setMessage();
 		header("Location: /exceeded_connections");
+        die();
 	}
 
 	private static function insert($params){

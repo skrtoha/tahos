@@ -1,4 +1,6 @@
 <?
+/* @var $db \core\Database */
+
 $act = $_GET['act'];
 if (isset($_GET['auth']) && in_array($_SERVER['REMOTE_ADDR'], core\Config::$allowedIpForAuthorization)) $_SESSION['user'] = $_GET['auth'];
 if (!empty($_POST)){
@@ -7,7 +9,7 @@ if (!empty($_POST)){
 	$manager = $db->select_one('managers', '*', "`login` = '$login' AND `password` = '$password' AND `is_blocked` = 0");
 	if (!empty($manager)){
 		message('Вы успешно авторизовались!');
-		$_SESSION['auth'] = 1;	
+		$_SESSION['auth'] = 1;
 		$_SESSION['manager'] = $manager;
 		header('Location: /admin/?view=orders');
 	}

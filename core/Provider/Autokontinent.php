@@ -320,7 +320,7 @@ class Autokontinent extends Provider{
 		return true;
 	}
 	public static function sendOrder(){
-		$basket = self::getBasket();
+		$basket = self::getBasket('private');
 		self::executeSendOrder('private', $basket);
 
 		$basket = self::getBasket('entity');

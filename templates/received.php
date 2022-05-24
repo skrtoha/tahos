@@ -3,6 +3,8 @@ require_once('core/DataBase.php');
 require_once('core/functions.php');
 require_once('vendor/autoload.php');
 
+file_put_contents('json/'.(new DateTime())->format('Y_m_d_H_i_s').'.json', json_encode($_POST));
+
 $db = new core\Database();
 
 $secret_key = 'RMoTDr8+TgrVFTyKv2AK/AC4';
@@ -22,8 +24,6 @@ $sha1 = sha1(
 $label = explode(':', $_POST['label']);
 
 if ($sha1 != $_POST['sha1_hash']) exit();
-
-file_put_contents($_SERVER['DOCUMENT_ROOT'].'/received.json', json_encode($_POST));
 
 switch($label[0]){
     case 'account':

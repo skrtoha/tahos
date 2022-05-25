@@ -50,9 +50,13 @@ switch($_POST['act']){
 		$output = '';
 		$query = core\Item::getQueryItemInfo();
 		$article = core\Item::articleClear($_POST['value']);
+        $query = str_replace('SELECT', 'SELECT DISTINCT', $query);
 		$query .= "
+		    LEFT JOIN
+		        #store_items si ON si.item_id = i.id
 			WHERE
 				i.article LIKE '$article%'
+            ORDER BY si.price DESC
 			LIMIT
 				0, {$_POST['maxCountResults']}
 		";

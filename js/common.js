@@ -568,7 +568,7 @@ $(function() {
 			data: {
 				act: 'searchArticles',
 				value: inputValue,
-				maxCountResults: 5
+				maxCountResults: 10
 			},
 			success: function(response){
 				$('table.coincidences tr.item').remove();

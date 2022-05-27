@@ -9,15 +9,15 @@ $db = new core\Database();
 
 $secret_key = 'RMoTDr8+TgrVFTyKv2AK/AC4';
 $sha1 = sha1(
-	$_POST['notification_type'].'&'.
-	$_POST['operation_id'].'&'.
-	$_POST['amount'].'&'.
-	$_POST['currency'].'&'.
-	$_POST['datetime'].'&'.
-	$_POST['sender'].'&'.
-	$_POST['codepro'].'&'.
-	$secret_key.'&'.
-	$_POST['label']
+    $_POST['notification_type'].'&'.
+    $_POST['operation_id'].'&'.
+    $_POST['amount'].'&'.
+    $_POST['currency'].'&'.
+    $_POST['datetime'].'&'.
+    $_POST['sender'].'&'.
+    $_POST['codepro'].'&'.
+    $secret_key.'&'.
+    $_POST['label']
 );
 
 

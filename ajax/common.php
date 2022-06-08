@@ -56,7 +56,7 @@ switch($_POST['act']){
 		        #store_items si ON si.item_id = i.id
 			WHERE
 				i.article LIKE '$article%' OR 
-				(si.price IS NOT NULL AND i.title_full LIKE '$article%')
+				(i.title_full LIKE '$article%' AND si.price IS NOT NULL)
             ORDER BY si.price DESC, i.article
 			LIMIT
 				0, {$_POST['maxCountResults']}

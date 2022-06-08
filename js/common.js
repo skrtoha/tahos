@@ -1,3 +1,4 @@
+let ajaxIsProcessing = false;
 var cookieOptions = {path: '/'};
 var cp_api = false;
 let countCharactersForSearch = 3;
@@ -514,6 +515,8 @@ $(function() {
 		$('.hints').show();
 	})
 	$('.search_input').on('keyup input', function(event){
+        if (ajaxIsProcessing) return;
+
 		if (event.keyCode == 38 || event.keyCode == 40){
 			return selectItemByKey(event);
 		}
@@ -570,7 +573,11 @@ $(function() {
 				value: inputValue,
 				maxCountResults: 10
 			},
+            beforeSend: function(){
+                ajaxIsProcessing = true;
+            },
 			success: function(response){
+                ajaxIsProcessing = false;
 				$('table.coincidences tr.item').remove();
 				$('table.coincidences').append(response);
 			}

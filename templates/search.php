@@ -158,11 +158,12 @@ function setCoincidences($c){
 function search_items($flag = ''){
 	global $db, $res_items;
 	$for_search = core\Item::articleClear($_GET['search']);
-	$ucs = 10; //user_count_search
+	$ucs = 100; //user_count_search
 	// print_r($_GET);
 	switch ($_GET['type']){
 		case 'article': 
 			$where = "i.`article`='$for_search'";
+            $where .= " OR (i.title_full LIKE '{$_GET['search']}%' AND si.price IS NOT NULL)";
 			$type_search = 1;
 			break;
 		case 'barcode':
@@ -176,13 +177,13 @@ function search_items($flag = ''){
 			b.title as brend,
 			i.brend_id AS brend_id,
 			IF (
-					i.article_cat != '', 
-					i.article_cat, 
-					IF (
-						i.article !='',
-						i.article,
-						ib.barcode
-					)
+                i.article_cat != '', 
+                i.article_cat, 
+                IF (
+                    i.article !='',
+                    i.article,
+                    ib.barcode
+                )
 			) AS article,
 			IF (i.title_full!='', i.title_full, i.title) AS title_full,
 			FLOOR(si.price * c.rate + si.price * c.rate * (ps.percent/100)) AS price,
@@ -202,6 +203,7 @@ function search_items($flag = ''){
 		LEFT JOIN #provider_stores ps ON ps.id=si.store_id
 		LEFT JOIN #currencies c ON ps.currency_id=c.id
 		WHERE $where
+        LIMIT 0, $ucs
 	", $flag);
 	if (!$res_items->num_rows) return false;
 	$price_min = 0;

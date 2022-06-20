@@ -41,7 +41,6 @@ class Imap{
 				$body = $this->structure_encoding($recursive_data["encoding"], $msg_body);
 			}
 			if($recursive_data["encoding"] == 3){
-			 
 				$body = $this->structure_encoding($recursive_data["encoding"], $msg_body);
 			}
 			if($recursive_data["encoding"] == 2){
@@ -63,7 +62,12 @@ class Imap{
                         $d["attachs"][$j]["name"] = iconv_mime_decode($d["attachs"][$j]["name"], 0, 'utf-8');
                     }
 
-					if (!preg_match('/'.quotemeta($params["name"]).'/iu', $d["attachs"][$j]["name"])) continue;
+					if (
+                        !preg_match(
+                            '/'.quotemeta($params["name"]).'/iu',
+                            $d["attachs"][$j]["name"]
+                        )
+                    ) continue;
 					$d["attachs"][$j]["file"] = $this->structure_encoding(
 						$msg_structure->parts[$j]->encoding,
 						imap_fetchbody($this->connection, $i, $f)

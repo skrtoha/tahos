@@ -141,6 +141,7 @@
 			var is_photo = item.photo ? true : false;
 			var c_photos = Object.keys(i.photos).length;
 			if (is_photo){
+                bigImages = [];
 				var src_small = getImgUrl() + '/items/small/' + item.id + '/' + item.photo;
 				var src_big = getImgUrl() + '/items/big/' + item.id + '/' + item.photo;
 				str += '' +
@@ -152,6 +153,7 @@
 					for (var k in i.photos){
 						var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.photos[k];
 						var src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.photos[k];
+                        bigImages.push({src: src_big});
 						str += '<img src="' + src_small + '" data-big-img="' + src_big + '">';
 					}
 					str += '</div>';

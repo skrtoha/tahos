@@ -3,6 +3,7 @@ var cookieOptions = {path: '/'};
 var cp_api = false;
 let countCharactersForSearch = 3;
 var h_win = $(window).height();
+let bigImages = [];
 function showPopupAddGarage(data){
     let src = `
         <div class="wrapper">
@@ -349,7 +350,28 @@ $(function() {
         })
     })
 	$(document).on('click', '#main-pic img', function(event) {
-		$('#full-image .img-wrap').html('<img src="' + $(this).attr('data-zoom-image') + '">' + 
+        const $th = $(this);
+        const currentImage = $th.attr('data-zoom-image');
+        let currentNumber = 0;
+        let counter = 0;
+        $.each(bigImages, function(i, item){
+            if (item.src == currentImage) currentNumber = counter;
+            counter++;
+        })
+        let magnificPopup = $.magnificPopup.instance;
+        magnificPopup.open({
+            items: bigImages,
+            type: 'image',
+            gallery:{
+                enabled: true,
+                navigateByImgClick: true,
+                preload: [0, 1]
+            }
+        });
+        magnificPopup.goTo(currentNumber);
+        /*return;
+        console.log(images);
+		$('#full-image .img-wrap').html('<img src="' + $(this).attr('data-zoom-image') + '">' +
 			'<a class="close" href="#" title="Закрыть"></a>');
 		$("#full-image").show();
 		$(document).mouseup(function(e){
@@ -359,7 +381,7 @@ $(function() {
 		$("#full-image .close").click(function(event) {
 			event.preventDefault();
 			$("#full-image").hide();
-		});
+		});*/
 	});
 	$(document).on('click', '.brend_info', function(e){
 		$.ajax({

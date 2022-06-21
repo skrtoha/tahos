@@ -900,10 +900,7 @@ img.mfp-img {
 	right: 0;
 	width: auto;
 	height: auto;
-	z-index: -1;
-	-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-					box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-	background: #444; }
+	z-index: -1; }
 
 .mfp-figure small {
 	color: #BDBDBD;

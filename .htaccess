@@ -24,6 +24,8 @@ RewriteCond %{HTTP_USER_AGENT} aiHitBot
 RewriteRule (.*) - [F,L]
 RewriteCond %{HTTP_USER_AGENT} trovitBot
 RewriteRule (.*) - [F,L]
+RewriteCond %{HTTP_USER_AGENT} PetalBot
+RewriteRule (.*) - [F,L]
 
 
 RewriteCond %{REQUEST_FILENAME} !-f

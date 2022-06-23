@@ -2,7 +2,6 @@ images/
 tmp/
 admin/logs
 phpAdmin/
-*.config
 *.jpg
 *.txt
 core/Config.php

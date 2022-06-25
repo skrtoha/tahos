@@ -417,7 +417,7 @@ use core\Setting;
         <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
             {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},
         <?}?>
-        <?if (in_array($view, ['article'])){?>
+        <?if (in_array($view, ['article', 'category'])){?>
             {"src": "/vendor/blueimp/js/jquery.blueimp-gallery.min.js"},
         <?}?>
 		{"src" : "/js/<?=$view?>.js", "async" : false}

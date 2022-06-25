@@ -358,7 +358,11 @@ $(function() {
             if (item == currentImage) currentNumber = counter;
             counter++;
         })
-        let gallery = blueimp.Gallery(bigImages, {index: currentNumber});
+        let gallery = blueimp.Gallery(bigImages, {
+            index: currentNumber,
+            onopen: function(){
+            }
+        });
 	});
 	$(document).on('click', '.brend_info', function(e){
 		$.ajax({

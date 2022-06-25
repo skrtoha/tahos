@@ -12,30 +12,6 @@
 				$(".option-panel a").removeClass("active");
 				elem.addClass('active');
 				if (elem.hasClass('active')) elem.toggleClass('desc');
-				// if(!$('.mosaic-view .item_1').length) return false;
-				/*if (!sub_id){
-					if (!elem.hasClass('desc')) category.setMosaicList(asc);
-					else{
-						if (desc.mosaic) category.setMosaicList(desc);
-						else{
-							$.ajax({
-								type: "POST",
-								url: "/ajax/category_items.php",
-								data: 'type=subcategories&category_id=' + $('#category_id').val(),
-								success: function(msg){
-									return;
-									// console.log(msg);
-									var res = JSON.parse(msg);
-									desc = category.getHtmlMosaicList(res);
-									category.setMosaicList(desc);
-								}
-							})
-						}
-					}
-				}
-				else{*/
-					setTimeout(category.setItems(), 1);
-				// }
 			});
 			$(document).on('click', '#search-same', function(){
 				document.location.href = $(this).attr('href');

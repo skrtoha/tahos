@@ -355,33 +355,10 @@ $(function() {
         let currentNumber = 0;
         let counter = 0;
         $.each(bigImages, function(i, item){
-            if (item.src == currentImage) currentNumber = counter;
+            if (item == currentImage) currentNumber = counter;
             counter++;
         })
-        let magnificPopup = $.magnificPopup.instance;
-        magnificPopup.open({
-            items: bigImages,
-            type: 'image',
-            gallery:{
-                enabled: true,
-                navigateByImgClick: true,
-                preload: [0, 1]
-            }
-        });
-        magnificPopup.goTo(currentNumber);
-        /*return;
-        console.log(images);
-		$('#full-image .img-wrap').html('<img src="' + $(this).attr('data-zoom-image') + '">' +
-			'<a class="close" href="#" title="Закрыть"></a>');
-		$("#full-image").show();
-		$(document).mouseup(function(e){
-			var container = $("#full-image .img-wrap");
-			if (!container.is(e.target) && container.has(e.target).length === 0) container.parent().hide();
-		});
-		$("#full-image .close").click(function(event) {
-			event.preventDefault();
-			$("#full-image").hide();
-		});*/
+        let gallery = blueimp.Gallery(bigImages, {index: currentNumber});
 	});
 	$(document).on('click', '.brend_info', function(e){
 		$.ajax({

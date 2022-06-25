@@ -30,6 +30,9 @@ use core\Setting;
         <link rel="stylesheet" href="/admin/fonts/icomoon.eot">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
+    <?if (in_array($view, ['article'])){?>
+        <link rel="stylesheet" type="text/css" href="/vendor/blueimp/css/blueimp-gallery.min.css">
+    <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
 	<meta name="theme-color" content="#0081BC">
 	<script type="text/javascript" src="/js/libs.min.js"></script>
@@ -413,6 +416,9 @@ use core\Setting;
 		<?}?>
         <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
             {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},
+        <?}?>
+        <?if (in_array($view, ['article'])){?>
+            {"src": "/vendor/blueimp/js/jquery.blueimp-gallery.min.js"},
         <?}?>
 		{"src" : "/js/<?=$view?>.js", "async" : false}
 		]};!function(t,n,r){"use strict";var c=function(t){if("[object Array]"!==Object.prototype.toString.call(t))return!1;for(var r=0;r<t.length;r++){var c=n.createElement("script"),e=t[r];c.src=e.src,c.async=e.async,n.body.appendChild(c)}return!0};t.addEventListener?t.addEventListener("load",function(){c(r.scripts);},!1):t.attachEvent?t.attachEvent("onload",function(){c(r.scripts)}):t.onload=function(){c(r.scripts)}}(window,document,scr);

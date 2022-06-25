@@ -153,7 +153,7 @@
 					for (var k in i.photos){
 						var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.photos[k];
 						var src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.photos[k];
-                        bigImages.push({src: src_big, type: 'image'});
+                        bigImages.push(src_big);
 						str += '<img src="' + src_small + '" data-big-img="' + src_big + '">';
 					}
 					str += '</div>';

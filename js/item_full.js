@@ -158,6 +158,7 @@
 					}
 					str += '</div>';
 				}
+                else bigImages.push(src_big);
 			} 
 			else str += '' +
 						'<div id="pic">' + 

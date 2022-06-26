@@ -30,7 +30,7 @@ use core\Setting;
         <link rel="stylesheet" href="/admin/fonts/icomoon.eot">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
-    <?if (in_array($view, ['article'])){?>
+    <?if (in_array($view, ['article', 'category'])){?>
         <link rel="stylesheet" type="text/css" href="/vendor/blueimp/css/blueimp-gallery.min.css">
     <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">

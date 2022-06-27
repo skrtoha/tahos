@@ -7613,6 +7613,7 @@ span.delete-btn {
 	#order-filter-form .checkbox-wrap {
 		display: block; }
 	.product-popup-wrap .mfp-content {
+        box-sizing: border-box;
 		width: 100%; }
 	.product-popup .price {
 		display: none; }

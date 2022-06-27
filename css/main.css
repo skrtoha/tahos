@@ -1863,6 +1863,13 @@ footer .social_networks a.ok{
 }
 /* Extra Small Devices, Phones */
 @media screen and (max-width: 550px) {
+    header .catalog{
+        width: 100%;
+        left: 0;
+    }
+    header .catalog ul{
+        width: 100%;
+    }
   #actions_slider .prev, #actions_slider .next {
     width: 68px;
     height: 68px; }
@@ -2143,6 +2150,8 @@ footer .social_networks a.ok{
     margin-top: 20px;
     margin-bottom: 20px; }
   footer .contacts {
+      margin: 0;
+      width: 100%;
     padding: 35px 0; }
     footer .contacts .item_box {
       width: 340px;

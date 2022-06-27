@@ -6331,39 +6331,6 @@ span.delete-btn:hover {
     .page-wrap:after, footer {
         height: 577px
     }
-    footer .item {
-        padding: 30px 20px 30px 0
-    }
-    footer .information {
-        margin: 0 0 0 40px;
-        width: -webkit-calc((100% - 301px)/ 100*32);
-        width: calc((100% - 301px)/ 100*32)
-    }
-    footer .shop {
-        width: -webkit-calc((100% - 301px)/ 100*36);
-        width: calc((100% - 301px)/ 100*36)
-    }
-    footer .catalog_list {
-        width: -webkit-calc((100% - 301px)/ 100*32);
-        width: calc((100% - 301px)/ 100*32)
-    }
-    footer .partnership {
-        margin: 0 40px 0 0;
-        padding: 30px 0
-    }
-    footer .contacts {
-        float: none;
-        clear: both;
-        margin: 0;
-        padding: 35px 40px;
-        width: 100%;
-        height: auto;
-        background: #0081bc
-    }
-    footer .contacts .item_box {
-        float: left;
-        width: 430px
-    }
 }
 @media screen and (max-width:1440px) {
     .selection form {
@@ -6455,34 +6422,6 @@ span.delete-btn:hover {
     }
     .settings-page form#delivery label {
         width: 210px
-    }
-    footer {
-        height: auto
-    }
-    footer .item {
-        padding: 30px 20px 30px 0
-    }
-    footer .information {
-        margin: 0 0 0 40px;
-        width: -webkit-calc((100% - 310px)/ 100*47);
-        width: calc((100% - 310px)/ 100*47)
-    }
-    footer .shop {
-        width: -webkit-calc((100% - 310px)/ 100*53);
-        width: calc((100% - 310px)/ 100*53)
-    }
-    footer .catalog_list {
-        float: right;
-        width: 270px
-    }
-    footer .partnership {
-        float: none;
-        clear: both;
-        margin: 0 0 0 40px;
-        padding: 0 0 30px
-    }
-    footer .contacts {
-        padding: 35px 40px
     }
 }
 @media screen and (max-width:1024px) {
@@ -6670,90 +6609,13 @@ span.delete-btn:hover {
     }
 }
 @media screen and (max-width:880px) {
-    header .catalog {
-        left: 50%;
-        margin-left: -345px
-    }
     .settings-page .personal-data-block, .settings-page form#additional, .settings-page form#change-password, .settings-page form#delivery, .settings-page form#personal-data {
         float: none;
         width: 100%;
         margin-bottom: 30px
     }
-    footer .information {
-        margin: 0 0 0 40px;
-        width: -webkit-calc((100% - 40px)/ 100*48);
-        width: calc((100% - 40px)/ 100*48)
-    }
-    footer .shop {
-        width: -webkit-calc((100% - 40px)/ 100*52);
-        width: calc((100% - 40px)/ 100*52)
-    }
-    footer .catalog_list {
-        float: left;
-        margin: 0 0 0 40px;
-        padding: 0 20px 30px 0;
-        clear: both;
-        width: -webkit-calc((100% - 40px)/ 100*48);
-        width: calc((100% - 40px)/ 100*48)
-    }
-    footer .partnership {
-        float: left;
-        clear: none;
-        margin: 0;
-        padding: 0 20px 30px 0;
-        width: -webkit-calc((100% - 40px)/ 100*52);
-        width: calc((100% - 40px)/ 100*52)
-    }
-    footer .contacts {
-        padding: 35px 40px
-    }
 }
 @media only screen and (max-width:750px) {
-    header .catalog_btn {
-        margin: 27px 0 0 -webkit-calc((100% - 351px)/ 5);
-        margin: 27px 0 0 calc((100% - 351px)/ 5)
-    }
-    header div.search_btn {
-        margin: 26px 0 0 -webkit-calc((100% - 351px)/ 5);
-        margin: 26px 0 0 calc((100% - 351px)/ 5)
-    }
-    header .cart {
-        margin: 25px 0 0 -webkit-calc((100% - 351px)/ 5);
-        margin: 25px 0 0 calc((100% - 351px)/ 5)
-    }
-    header .login_btn, header .profile_btn {
-        margin: 24px 0 0 -webkit-calc((100% - 351px)/ 5);
-        margin: 24px 0 0 calc((100% - 351px)/ 5);
-        padding: 0;
-        width: 24px
-    }
-    header .login_btn span, header .profile_btn span {
-        display: none
-    }
-    .garage .add_ts {
-        display: block
-    }
-    .garage .filter-form {
-        display: none;
-        width: 95%;
-        position: absolute;
-        z-index: 1000;
-        left: 50%;
-        -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-        transform: translateX(-50%)
-    }
-    .garage .items {
-        z-index: 1;
-        width: 100%;
-        padding-left: 0
-    }
-    .garage .items .option-panel {
-        margin-top: 20px
-    }
-    .garage .items .item {
-        padding: 5px
-    }
     .payment .pay-methods-wrap {
         width: 100%;
         margin-left: 0;
@@ -6969,22 +6831,6 @@ span.delete-btn:hover {
     h1 {
         font-size: 26px
     }
-    header .catalog {
-        left: -20px;
-        margin: 0
-    }
-    header .open_filter form {
-        width: 375px;
-        position: static;
-        top: 0;
-        left: 0
-    }
-    header .open_filter .select {
-        width: 321px
-    }
-    header .open_filter .text {
-        width: 258px
-    }
     .selection p {
         float: none;
         clear: both;
@@ -7181,7 +7027,7 @@ span.delete-btn:hover {
         padding: 0 5px
     }
     header {
-        padding: 0 3px
+        padding: 0 3px;
     }
     header .logo {
         margin: 21px 0 0 -20px;
@@ -7458,14 +7304,6 @@ span.delete-btn:hover {
     .models .content .list-view .name-block {
         width: 50%
     }
-    footer .contacts {
-        padding: 35px 0
-    }
-    footer .contacts .item_box {
-        width: 340px;
-        margin: 0 auto
-    }
-
 }
 @media screen and (max-width:415px) {
     div.list-view > div > a{

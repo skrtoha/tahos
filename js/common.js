@@ -360,7 +360,9 @@ $(function() {
         })
         let gallery = blueimp.Gallery(bigImages, {
             index: currentNumber,
-            onopen: function(){
+            thumbnailIndicators: true,
+            onopened: function(){
+                $('#blueimp-gallery').addClass('blueimp-gallery-controls');
             }
         });
 	});

@@ -4580,7 +4580,7 @@ header .login .social_buttons {
 	text-decoration: none;
 	outline: 0
 }
-.registration .accept a:hover, footer a:hover {
+.registration .accept a:hover {
 	text-decoration: underline
 }
 .registration .accept input[type=checkbox] {
@@ -7307,8 +7307,6 @@ span.delete-btn:hover {
 		.cart-popup:before {
 			right: 110px;
 			display: none; }
-	footer .contacts {
-		padding: 35px 0; }
  }
 
 @media screen and (max-width: 415px) {
@@ -7418,9 +7416,6 @@ span.delete-btn:hover {
 	}
 	.settings-page form#personal-data .info:before {
 		right: 9px
-	}
-	footer .contacts .item_box {
-		font-size: 15px
 	}
 }
 @media only screen and (min-width:750px) {

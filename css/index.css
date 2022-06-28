@@ -6450,42 +6450,6 @@ span.delete-btn:hover {
 	.page-wrap {
 		margin-bottom: -577px
 	}
-	.page-wrap:after, footer {
-		height: 577px
-	}
-	footer .item {
-		padding: 30px 20px 30px 0
-	}
-	footer .information {
-		margin: 0 0 0 40px;
-		width: -webkit-calc((100% - 301px)/ 100*32);
-		width: calc((100% - 301px)/ 100*32)
-	}
-	footer .shop {
-		width: -webkit-calc((100% - 301px)/ 100*36);
-		width: calc((100% - 301px)/ 100*36)
-	}
-	footer .catalog_list {
-		width: -webkit-calc((100% - 301px)/ 100*32);
-		width: calc((100% - 301px)/ 100*32)
-	}
-	footer .partnership {
-		margin: 0 40px 0 0;
-		padding: 30px 0
-	}
-	footer .contacts {
-		float: none;
-		clear: both;
-		margin: 0;
-		padding: 35px 40px;
-		width: 100%;
-		height: auto;
-		background: #0081bc
-	}
-	footer .contacts .item_box {
-		float: left;
-		width: 430px
-	}
 }
 @media screen and (max-width:1310px) {
 	.search-wrap {
@@ -6561,39 +6525,10 @@ span.delete-btn:hover {
 	.settings-page form#delivery label {
 		width: 210px
 	}
-	footer {
-		height: auto
-	}
-	footer .item {
-		padding: 30px 20px 30px 0
-	}
-	footer .information {
-		margin: 0 0 0 40px;
-		width: -webkit-calc((100% - 310px)/ 100*47);
-		width: calc((100% - 310px)/ 100*47)
-	}
-	footer .shop {
-		width: -webkit-calc((100% - 310px)/ 100*53);
-		width: calc((100% - 310px)/ 100*53)
-	}
-	footer .catalog_list {
-		float: right;
-		width: 270px
-	}
-	footer .partnership {
-		float: none;
-		clear: both;
-		margin: 0 0 0 40px;
-		padding: 0 0 30px
-	}
-	footer .contacts {
-		padding: 35px 40px
-	}
 }
 @media screen and (max-width:1024px) {
 	header .catalog_btn {
 		margin: 27px 0 0 -webkit-calc((100% - 462px)/ 5);
-		margin: 27px 0 0 calc((100% - 462px)/ 5)
 	}
 	header .search {
 		display: none;
@@ -6773,34 +6708,6 @@ span.delete-btn:hover {
 		float: none;
 		width: 100%;
 		margin-bottom: 30px
-	}
-	footer .information {
-		margin: 0 0 0 40px;
-		width: -webkit-calc((100% - 40px)/ 100*48);
-		width: calc((100% - 40px)/ 100*48)
-	}
-	footer .shop {
-		width: -webkit-calc((100% - 40px)/ 100*52);
-		width: calc((100% - 40px)/ 100*52)
-	}
-	footer .catalog_list {
-		float: left;
-		margin: 0 0 0 40px;
-		padding: 0 20px 30px 0;
-		clear: both;
-		width: -webkit-calc((100% - 40px)/ 100*48);
-		width: calc((100% - 40px)/ 100*48)
-	}
-	footer .partnership {
-		float: left;
-		clear: none;
-		margin: 0;
-		padding: 0 20px 30px 0;
-		width: -webkit-calc((100% - 40px)/ 100*52);
-		width: calc((100% - 40px)/ 100*52)
-	}
-	footer .contacts {
-		padding: 35px 40px
 	}
 }
 @media only screen and (max-width:750px) {
@@ -7133,21 +7040,6 @@ span.delete-btn:hover {
 	.account table.small-view td:nth-child(2), .account table.small-view th:nth-child(2) {
 		text-align: center
 	}
-	.account table.small-view td:last-child, footer .item {
-		padding-left: 10px
-	}
-	footer .contacts .item_box {
-		width: auto;
-		float: none
-	}
-	footer .catalog_list, footer .information, footer .partnership, footer .shop {
-		margin: 0;
-		padding-top: 30px;
-		width: auto
-	}
-	footer .partnership {
-		padding-bottom: 30px
-	}
 }
 @media screen and (max-width: 550px) {
 	.selection .select {
@@ -7415,25 +7307,8 @@ span.delete-btn:hover {
 		.cart-popup:before {
 			right: 110px;
 			display: none; }
-	footer .item {
-		padding-left: 10px; }
-	footer .contacts .item_box {
-		width: auto;
-		float: none; }
-	footer .information,
-	footer .shop,
-	footer .catalog_list,
-	footer .partnership {
-		margin: 0;
-		padding-top: 30px;
-		width: auto; }
-	footer .partnership {
-		padding-bottom: 30px; }
 	footer .contacts {
 		padding: 35px 0; }
-		footer .contacts .item_box {
-			width: 340px;
-			margin: 0 auto; }
  }
 
 @media screen and (max-width: 415px) {
@@ -7526,11 +7401,6 @@ span.delete-btn:hover {
 		overflow: scroll; }
 	.catalogue-original .items .content {
 		margin-top: 20px; }
-	footer .contacts .item_box {
-		width: 340px;
-		-webkit-box-sizing: border-box;
-						box-sizing: border-box;
-		padding-left: 5px; }
  }
 @media only screen and (max-width:360px) {
 	.settings-page form#additional .input-wrap:nth-of-type(3) label.switch {
@@ -7558,3 +7428,4 @@ span.delete-btn:hover {
 		display: block
 	}
 }
+

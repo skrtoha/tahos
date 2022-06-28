@@ -6679,11 +6679,6 @@ span.delete-btn:hover {
         width: 100%;
         margin-bottom: 30px
     }
-    footer .information {
-        margin: 0 0 0 40px;
-        width: -webkit-calc((100% - 40px)/ 100*48);
-        width: calc((100% - 40px)/ 100*48)
-    }
     footer .shop {
         width: -webkit-calc((100% - 40px)/ 100*52);
         width: calc((100% - 40px)/ 100*52)

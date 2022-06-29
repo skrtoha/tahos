@@ -1,5 +1,6 @@
 <?php
 namespace core\Provider;
+use core\Database;
 use core\Provider;
 use core\Log;
 use core\OrderValue;
@@ -150,13 +151,16 @@ class Autoeuro extends Provider{
     
     private static function getDelivery(object  $o){
         if (!$o->order_before || !$o->delivery_time) return 1;
-        $beforeTime = \DateTime::createFromFormat('Y-m-d H:i', $o->order_before);
-        $deliveryTime = \DateTime::createFromFormat('Y-m-d H:i', $o->delivery_time);
+        $beforeTime = new \DateTime();
+        $deliveryTime = \DateTime::createFromFormat('Y-m-d H:i', $o->delivery_time_max);
         $diff = $deliveryTime->diff($beforeTime);
-        return $diff->d + 1;
+        return $diff->days;
     }
     
 	private function parseCode($code){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
 		$item_id = $this->insertItem($code);
 		if (!$item_id) return;
 
@@ -175,15 +179,15 @@ class Autoeuro extends Provider{
             if ($offer['dealer'] && $offer['warehouse_name']){
                 $store_id = $this->getStoreId($offer);
                 if (!$store_id) continue;
-                
-                $GLOBALS['db']->insert('store_items', [
+
+                $db->insert('store_items', [
                     'store_id' => $store_id,
                     'item_id' => $item_id,
                     'price' => $offer['price'],
                     'in_stock' => $offer['amount'],
                     'packaging' => $code['packing']
                 ]);
-                $GLOBALS['db']->insert('autoeuro_order_keys', [
+                $db->insert('autoeuro_order_keys', [
                     'store_id' => $store_id,
                     'item_id' => $item_id,
                     'offer_key' => $offer['offer_key']
@@ -200,35 +204,47 @@ class Autoeuro extends Provider{
                 $minDelivery = $offer['delivery'];
             }
         }
-        
-        $GLOBALS['db']->insert('store_items', [
+
+        $db->insert('store_items', [
             'store_id' => self::getParams()->minPriceStoreID,
             'item_id' => $item_id,
             'price' => $minPriceObject['price'],
             'in_stock' => $minPriceObject['amount'],
             'packaging' => $code['packing']
         ]);
-        $GLOBALS['db']->insert('autoeuro_order_keys', [
-            'store_id' => self::getParams()->minPriceStoreID,
-            'item_id' => $item_id,
-            'offer_key' => $minPriceObject['offer_key'],
-            'order_term' => $minPriceObject['delivery']
-        ]);
+        $db->insert(
+            'autoeuro_order_keys',
+            [
+                'store_id' => self::getParams()->minPriceStoreID,
+                'item_id' => $item_id,
+                'offer_key' => $minPriceObject['offer_key'],
+                'order_term' => $minPriceObject['delivery']
+            ],
+            ['duplicate' => [
+                'order_term' => $minPriceObject['delivery']
+            ]]
+        );
         
         if (count($code['offers']) > 1){
-            $GLOBALS['db']->insert('store_items', [
+            $db->insert('store_items', [
                 'store_id' => self::getParams()->minDeliveryStoreID,
                 'item_id' => $item_id,
                 'price' => $minDeliveryObject['price'],
                 'in_stock' => $minDeliveryObject['amount'],
                 'packaging' => $code['packing']
             ]);
-            $GLOBALS['db']->insert('autoeuro_order_keys', [
-                'store_id' => self::getParams()->minDeliveryStoreID,
-                'item_id' => $item_id,
-                'offer_key' => $minDeliveryObject['offer_key'],
-                'order_term' => $minDeliveryObject['delivery']
-            ], 'result');
+            $db->insert(
+                'autoeuro_order_keys',
+                [
+                    'store_id' => self::getParams()->minDeliveryStoreID,
+                    'item_id' => $item_id,
+                    'offer_key' => $minDeliveryObject['offer_key'],
+                    'order_term' => $minDeliveryObject['delivery']
+                ],
+                ['duplicate' => [
+                    'order_term' => $minDeliveryObject['delivery']
+                ]]
+            );
         }
 	}
 	

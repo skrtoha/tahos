@@ -152,7 +152,7 @@ class Autoeuro extends Provider{
     private static function getDelivery(object  $o){
         if (!$o->order_before || !$o->delivery_time) return 1;
         $beforeTime = new \DateTime();
-        $deliveryTime = \DateTime::createFromFormat('Y-m-d H:i', $o->delivery_time_max);
+        $deliveryTime = \DateTime::createFromFormat('Y-m-d H:i', $o->delivery_time);
         $diff = $deliveryTime->diff($beforeTime);
         return $diff->days;
     }

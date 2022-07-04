@@ -1,4 +1,7 @@
-<?php 
+<?php
+
+use core\Breadcrumb;
+
 define('SITE_KEY', '6LcfUd0ZAAAAAP-DnIWD44bV79Q-tOtXy7DmEs95');
 define('SECRET_KEY', '6LcfUd0ZAAAAAMrCgklmnmhOVijPrjQi0BQYSAvd');
 function getCaptcha($SecretKey) {
@@ -113,7 +116,10 @@ $res_issues = $db->query("
 		i.title
 	FROM
 		#issues i
-");?>
+");
+Breadcrumb::add('/registration', 'Регистрация');
+Breadcrumb::out();
+?>
 <div class="registration">
 	<h1>Регистрация</h1>
 	<form id="registration" action="" method="post" >

@@ -1,4 +1,6 @@
-<?if (!$_SESSION['user']) header('Location: /');
+<? use core\Breadcrumb;
+
+if (!$_SESSION['user']) header('Location: /');
 $title = "Избранное";
 $user_id = $_SESSION['user'];
 $favorites = $db->select_unique("
@@ -31,6 +33,8 @@ $favorites = $db->select_unique("
 	WHERE 
 		f.user_id={$_SESSION['user']}
 ", '');
+Breadcrumb::add('/favorites', 'Избранное');
+Breadcrumb::out();
 ?>
 <div class="favorites">
 	<h1>Избранное</h1>

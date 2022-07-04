@@ -1,4 +1,6 @@
-<?if (!$_SESSION['user']) header('Location: /');
+<? use core\Breadcrumb;
+
+if (!$_SESSION['user']) header('Location: /');
 $title = 'Настройки';
 if (!empty($_POST)){
     $result = \core\User::updateSettings($_POST, $user);
@@ -20,6 +22,8 @@ $res_user_socials = $db->query("
 	LEFT JOIN #users_socials us ON us.social_id=s.id AND us.user_id={$_SESSION['user']}
 ", '');
 $data = !empty($_POST) ? $_POST['data'] : $user;
+Breadcrumb::add('/settings', 'Настройки');
+Breadcrumb::out();
 ?>
 <div class="settings-page" style="margin-top: 20px">
 	<h1>Настройки</h1>

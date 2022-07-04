@@ -1,5 +1,8 @@
-<?if (!$_SESSION['user']) header('Location: /');
+<? use core\Breadcrumb;
+
+if (!$_SESSION['user']) header('Location: /');
 $title = 'Сообщения';
+Breadcrumb::add('/messages', 'Сообщения');
 $is_messages = false;
 $news = $db->select_unique("
 	SELECT
@@ -42,7 +45,9 @@ $corresponds = $db->query("
 		c.user_id={$_SESSION['user']} AND
 		(c.is_hidden IS NULL OR c.is_hidden=0)
 	ORDER BY m.created DESC
-", '');?>
+", '');
+Breadcrumb::out();
+?>
 <div class="messages-page">
 	<h1>Сообщения</h1>
 	<button id="new_message">Написать новое сообщение</button>

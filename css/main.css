@@ -2769,3 +2769,21 @@ footer{
     }
 }
 
+.breadcrumb {
+    padding: 0;
+    margin: 10px 0;
+    text-transform: uppercase;
+}
+.breadcrumb a {
+    display: inline-block;
+    font-size: 15px;
+    vertical-align: top;
+    text-decoration: none;
+}
+.breadcrumb_item:before {
+    content: '→';
+    display: inline-block;
+    margin: -2px 1px;
+    vertical-align: top;
+}
+

@@ -1,5 +1,7 @@
 <?
 // debug($_GET);
+use core\Breadcrumb;
+
 if ($_GET['to_garage'] && $user['id'] && $_GET['modification_id']){
 	$res = $db->insert(
 		'garage',
@@ -43,6 +45,7 @@ while($row = $res_vehicels->fetch_assoc()){
 			'href' => $row['href'],
 			'category' => $row['category']
 		];
+        if ($_GET['vehicle'] == $row['href']) Breadcrumb::add('/original-catalogs/'.$row['href'], $row['title']);
 }
 $vt = & $vehicles_title;
 $res_brends = $db->query("
@@ -69,6 +72,11 @@ if ($res_brends->num_rows){
 		$brend_titles[$row['brend_id']]['brend_id'] = $row['brend_id'];
 		$brend_titles[$row['brend_id']]['title'] = $row['title'];
 		$brend_titles[$row['brend_id']]['href'] = $row['href'];
+
+        if ($row['href'] == $_GET['brend']) Breadcrumb::add(
+            '/original-catalogs/'.$_GET['vehicle'].'/'.$_GET['brend'],
+            $row['title']
+        );
 	}
 }
 $res_models = $db->query("
@@ -93,6 +101,10 @@ if ($res_models->num_rows){
 			'href' => $row['href'],
 			'vin' => $row['vin']
 		];
+        if ($row['href'] == $_GET['href']) Breadcrumb::add(
+            '/original-catalogs/'.$_GET['vehicle'].'/'.$_GET['brend'].'/'.$_GET['model_id'].'/'.$_GET['href'].'/vin',
+            $row['title']
+        );
 	}
 }
 $res_filters = $db->query("
@@ -186,6 +198,7 @@ if ($res_modifications->num_rows){
 	// debug($filters);
 }
 $title = 'Выбор модификации';
+Breadcrumb::out();
 ?>
 <div class="auto-types">
 	<?if ($_GET['to_garage']){
@@ -209,7 +222,11 @@ $title = 'Выбор модификации';
 							<select <?=$to_garage ? 'disabled' : ''?> id="vehicle" data-placeholder="Транспортное средство">
 								<option selected></option>
 								<?foreach($vehicles_title as $key => $value){
-									$selected = $value['href'] == $_GET['vehicle'] ? 'selected' : '';?>
+                                    if ($value['href'] == $_GET['vehicle']){
+                                        $selected = 'selected';
+                                        Breadcrumb::add('/orginal-catalogs/'.$_GET['vehicle'], $key);
+                                    }
+									?>
 									<option <?=$selected?> value="<?=$value['href']?>"><?=$key?></option>
 								<?}?>
 							</select>

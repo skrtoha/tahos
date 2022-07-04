@@ -1,4 +1,7 @@
 <?
+
+use core\Breadcrumb;
+
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	if (!core\Config::$isUseApiProviders){
 		echo json_encode([]);
@@ -34,6 +37,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	echo json_encode($coincidences);
 	exit();
 }
+Breadcrumb::add("/search/{$_GET['type']}/{$_GET['search']}", 'Список совпадений');
 if ($connection->denyAccess) die('Доступ запрещен!');
 $title = "Список совпадений";
 $search_count_user = 10;
@@ -86,7 +90,9 @@ else{
 			header("Location: /article/$id-{$item['article']}");
 			exit();
 		} 
-	}?>
+	}
+    Breadcrumb::out();
+    ?>
 	<input type="hidden" name="search" value="<?=$_GET['search']?>">
 	<div class="hit-list">
 		<h1>Список совпадений</h1>

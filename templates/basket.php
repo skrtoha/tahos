@@ -2,6 +2,7 @@
 /* @var $db \core\Database */
 /* @var $user array */
 
+use core\Breadcrumb;
 use core\Mailer;
 use core\UserAddress;
 
@@ -120,6 +121,8 @@ if ($_GET['act'] == 'to_offer'){
 $res_basket = core\Basket::get($_SESSION['user']);
 if (!$res_basket->num_rows) return;
 $noReturnIsExists = false;
+Breadcrumb::add('/basket', 'Корзина');
+Breadcrumb::out();
 ?>
 <div class="basket">
 	<h1>Корзина</h1>

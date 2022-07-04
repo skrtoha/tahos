@@ -1,6 +1,13 @@
-<?$title = 'Оригинальные каталоги';
+<? use core\Breadcrumb;
+
+Breadcrumb::add('/original-catalogs', 'Оригинальные каталоги');
+
+$title = 'Оригинальные каталоги';
 if ($_GET['vehicle'] == 'legkovie-avtomobili'){
-	$title = 'Легковые автомобили';?>
+	$title = 'Легковые автомобили';
+    Breadcrumb::add('/original-catalogs/legkovie-avtomobili', 'Легковые автомобили');
+    Breadcrumb::out();
+    ?>
  
 	<div id="parts-catalog"
 	  data-key="TWS-4F5CE688-B8A5-4903-9E1C-0E125922134F"
@@ -35,6 +42,7 @@ else{
 				'href' => $row['href'],
 				'is_mosaic' => $row['is_mosaic']
 			];
+            if ($row['href'] == $_GET['vehicle']) Breadcrumb::add('/original-catalogs/'.$row['href'], $row['title']);
 	}
 	// debug($vehicles_mosaic);
 	if ($_GET['vehicle']){
@@ -62,10 +70,13 @@ else{
 				$brend_titles[$row['brend_id']]['brend_id'] = $row['brend_id'];
 				$brend_titles[$row['brend_id']]['title'] = $row['title'];
 				$brend_titles[$row['brend_id']]['href'] = $row['href'];
+
+                if ($row['href'] == $_GET['brend']) $brendBreadcrumbs = [$row['href'], $row['title']];
 			}
 		}
 	}
 	if ($_GET['vehicle'] && $_GET['brend']){
+        Breadcrumb::add($brendBreadcrumbs[0], $brendBreadcrumbs[1]);
 		// debug($_GET);
 		//если зашли с гаража с применением только фильтра года
 		if($_GET['brend'] && $_GET['vehicle'] && $_GET['year']){
@@ -143,6 +154,8 @@ else{
 				title_2 DESC
 		", '');
 	}
+
+    Breadcrumb::out();
 	?>
 	<div class="auto-types">
 		<!-- обозначение если ссылка пришла из гаража -->
@@ -166,7 +179,11 @@ else{
 								<select <?=$is_garage ? 'disabled' : ''?> id="vehicle" data-placeholder="Транспортное средство">
 									<option selected></option>
 									<?foreach($vehicles_mosaic as $key => $value){
-										$selected = $value['href'] == $_GET['vehicle'] ? 'selected' : '';?>
+                                        if ($value['href'] == $_GET['vehicle']){
+                                            $selected = 'selected';
+                                            Breadcrumb::add($value['href'], $value['title']);
+                                        }
+                                        else $selected = '';?>
 										<option <?=$selected?> value="<?=$value['href']?>"><?=$value['title']?></option>
 									<?}?>
 								</select>

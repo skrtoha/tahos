@@ -154,7 +154,7 @@ class Autoeuro extends Provider{
         $beforeTime = new \DateTime();
         $deliveryTime = \DateTime::createFromFormat('Y-m-d H:i', $o->delivery_time);
         $diff = $deliveryTime->diff($beforeTime);
-        return $diff->days;
+        return $diff->days + 1;
     }
     
 	private function parseCode($code){

@@ -1,4 +1,6 @@
 <?
+
+use core\Breadcrumb;
 use core\Provider\Autoeuro;
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
@@ -44,6 +46,11 @@ foreach($array['store_items'] as $key => $value){
 		'store_item' => $value
 	];
 }
+
+Breadcrumb::add(
+    "/{$_GET['view']}/{$store_items[0]['item_id']}-{$store_items[0]['store_item']['article']}/noUseAPI",
+    $store_items[0]['store_item']['title_full']
+);
 // debug($store_items);
 $hide_form = true;
 foreach ($store_items as $key => $value){
@@ -60,7 +67,9 @@ if (!empty($array['prices']) && !empty($array['deliveries'])){
 if (isset($user['markupSettings'])) $ms = & $user['markupSettings'];
 else $ms = false;
 
-$in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';?>
+$in_stock = $_POST['in_stock_only'] ? $_POST['in_stock_only'] : '';
+Breadcrumb::out();
+?>
 <input type="hidden" id="item_id" value="<?=$_GET['item_id']?>">
 <input type="hidden" id="price_from" value="<?=$price_from?>">
 <input type="hidden" id="price_to" value="<?=$price_to?>">

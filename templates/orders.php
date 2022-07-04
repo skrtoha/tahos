@@ -1,4 +1,7 @@
 <?
+
+use core\Breadcrumb;
+
 require_once('admin/functions/orders.function.php');
 require_once('admin/functions/sendings.function.php');
 $title = 'Заказы';
@@ -55,6 +58,8 @@ $status_classes = [
 	'В работе' => 'status-sended'
 ];
 $orders = get_order_group($params, '');
+Breadcrumb::add('/orders', 'Заказы');
+Breadcrumb::out();
 ?>
 <h1>Заказы</h1>
 <?if ($user['delivery_type'] == 'Доставка'){?>

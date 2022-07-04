@@ -1,7 +1,13 @@
 <?
+
+use core\Breadcrumb;
+
 if (empty($user)) header("Location: /");
 if ($_GET['modification_id']) modification();
 else garage();
+
+Breadcrumb::add('/garage', 'Гараж');
+
 function garage(){
 	global $db, $title, $user;
 	$title = 'Гараж';
@@ -43,7 +49,9 @@ function garage(){
 			if ($row['is_active']) $modifications['active'][] = $array;
 			else $modifications['non_active'][] = $array;
 		}
-	}?>
+	}
+    Breadcrumb::out();
+    ?>
 	<div class="garage">
 		<a class="button add_ts" href="#add_ts_form">Добавить транспортное средство</a>
 		<div class="filter-form" id="add_ts_form">
@@ -355,6 +363,8 @@ function modification(){
 		WHERE
 			c.parent_id=0
 	", '');
+    Breadcrumb::add('/garage/'.$_GET['modification_id'], $m['modification_title']);
+    Breadcrumb::out();
 	?>
 	<script src="/js/garage-selected-ts.js"></script>
 	<input type="hidden" name="modification_id" value="<?=$_GET['modification_id']?>">

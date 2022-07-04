@@ -1,4 +1,6 @@
-<?$title = "Баланс";
+<? use core\Breadcrumb;
+
+$title = "Баланс";
 if ($_POST['bonus_current']){
 	// debug($_POST); exit();
 	$savable = true;
@@ -33,7 +35,10 @@ if ($_POST['bonus_current']){
 if (!$_SESSION['user']) header("Location: /");
 $fio = $user['name_1'].' '.$user['name_2'].' '.$user['name_3'];
 
-$designation = $db->getFieldOnID('currencies', $user['currency_id'], 'designation');?>
+$designation = $db->getFieldOnID('currencies', $user['currency_id'], 'designation');
+Breadcrumb::add('/payment', 'Баланс');
+Breadcrumb::out();
+?>
 <div class="payment">
 	<div class="balance-block">
 		<h1>Баланс</h1>

@@ -1,4 +1,6 @@
 <?
+
+use core\Breadcrumb;
 use core\Item;
 $href = $_GET['href'];
 $category = $db->select('categories', '*', "`parent_id`=0 AND `href`='$href'");
@@ -7,14 +9,19 @@ $category_id = $category['id'];
 $subs = $db->select('categories', '*', "`parent_id`=$category_id", 'pos', true);
 
 
-if (!$_GET['sub']) $title = $category['title'];
+if (!$_GET['sub']){
+    $title = $category['title'];
+    Breadcrumb::add("/$view/{$_GET['href']}", $title);
+}
 else{
+    Breadcrumb::add("/$view/{$_GET['href']}", $category['title']);
 	if (count($subs)){
 		foreach ($subs as $key => $value){
 			if($value['href'] == $_GET['sub']){
 				$sub_id = $value['id'];
 				$title = $value['title'];
-			} 
+                Breadcrumb::add("/$view/{$_GET['href']}/{$_GET['sub']}", $title);
+			}
 		}
 	}
 
@@ -80,7 +87,8 @@ else{
 			}
 		}
 	}
-} 
+}
+Breadcrumb::out();
 // debug($subs);
 ?>
 <div class="catalogue catalogue-filter">

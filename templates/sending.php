@@ -1,5 +1,9 @@
 <?
+
+use core\Breadcrumb;
+
 if (!$_GET['id']){
+    Breadcrumb::add('/sending', 'Формирование отправки');
 	$title = 'Формирование отправки';
 	// debug($_GET);
 	$user_id = $_SESSION['user'];
@@ -57,6 +61,7 @@ if (!$_GET['id']){
 	$weight = 0;
 	$sum = 0;
 	$quan = 0;
+    Breadcrumb::out();
 	?>
 	<div class="sending-page">
 		<h1>Формирование отправки</h1>
@@ -239,11 +244,14 @@ if (!$_GET['id']){
 <?}
 else{
 	$title = "Отправка №{$_GET['id']}";
+    Breadcrumb::add('/sending', 'Формирование отправки');
+    Breadcrumb::add('sending/'.$_GET['id'], 'title');
 	require_once "admin/functions/sendings.function.php";
 	$sendings = new Sendings($_SESSION['user'], $db);
 	$sending = $sendings->getSendings();
 	$sending = $sending[0];
 	$sending_values = $sendings->getSendingValues($sending['issue_id']);
+    Breadcrumb::out();
 	?>
 	<div class="sending-page">
 		<h1>Отправка №<?=$_GET['id']?></h1>

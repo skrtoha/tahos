@@ -1,4 +1,6 @@
-<?if (!$_SESSION['user']) header('Location: /');
+<? use core\Breadcrumb;
+
+if (!$_SESSION['user']) header('Location: /');
 if ($_POST['image_submit']){
 	$bool = true;
 	$name = $_FILES['image']['name'];
@@ -18,7 +20,10 @@ if ($_POST['image_submit']){
 	}
 	exit();
 }
-$messages_themes = $db->select('messages_themes', '*', '', '`id`<=5', '', '', true);?>
+$messages_themes = $db->select('messages_themes', '*', '', '`id`<=5', '', '', true);
+Breadcrumb::add('/new message', 'Отправить сообщение');
+Breadcrumb::out();
+?>
 <div class="orders-message">
 	<h1>Отправить сообщение</h1>
 	<form action="/core/send_message.php" id="send-message" method="post">

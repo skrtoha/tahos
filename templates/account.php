@@ -1,4 +1,6 @@
-<?$title = 'Счет';
+<? use core\Breadcrumb;
+
+$title = 'Счет';
 /**
  * Параметры запроса
  * @var array
@@ -53,7 +55,9 @@ $res_bonuses = $db->query("
 		`user_id`={$_SESSION['user']} AND
 		transfered=1
 ", '');
-// debug($funds);
+
+Breadcrumb::add('/account', 'Счет');
+Breadcrumb::out();
 ?>
 <div class="account">
 	<div class="sidebar">

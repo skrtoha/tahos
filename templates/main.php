@@ -214,6 +214,7 @@ use core\Setting;
 			<div class="clear"></div>
 		</div>
 	</header>
+    <h1 class="hidden"><?=$title?></h1>
 	<input type="hidden" name="currency_id" value="<?=$user['currency_id']?>">
 	<div class="cart-popup">
 		<table class="cart-popup-table">

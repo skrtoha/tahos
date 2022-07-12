@@ -563,7 +563,6 @@ header .login .social_buttons {
 	border: 3px solid #ccc;
 	background: #eee
 }
-\
 .garage .add_ts, .h_overlay, .overlay {
 	display: none
 }
@@ -1497,7 +1496,6 @@ span.delete-btn:hover {
 	margin-left: 30px
 }
 .payment .pay-methods-wrap .pay-methods {
-	overflow: overlay;
 	margin-bottom: 30px
 }
 .payment .pay-methods-wrap .pay-methods .method {
@@ -1953,7 +1951,6 @@ span.delete-btn:hover {
 }
 .account #account-history-tabs .buttons {
 	margin-bottom: 20px;
-	overflow: overlay
 }
 .account #account-history-tabs .buttons button {
 	margin-right: 10px;

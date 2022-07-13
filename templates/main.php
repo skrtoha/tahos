@@ -17,7 +17,7 @@ use core\Setting;
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-touch-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
-<!--	<link href="/css/main.css" rel="stylesheet" type="text/css" />-->
+	<link href="/css/main.css" rel="stylesheet" type="text/css" />
     <link href="/css/_main.css" rel="stylesheet" type="text/css" />
     <?if (file_exists($_SERVER['DOCUMENT_ROOT'])."/css/_$view.css"){?>
         <link rel="stylesheet" type="text/css" href="/css/_<?=$view?>.css">

@@ -2036,10 +2036,6 @@ span.delete-btn:hover {
 	header .catalog_btn {
 		margin: 27px 37px 0 4px
 	}
-	header .search {
-		width: -webkit-calc(100% - 582px);
-		width: calc(100% - 582px)
-	}
 	.payment .pay-block-wrap {
 		top: 0
 	}
@@ -2125,14 +2121,6 @@ span.delete-btn:hover {
 @media screen and (max-width:1024px) {
 	header .catalog_btn {
 		margin: 27px 0 0 -webkit-calc((100% - 462px)/ 5);
-	}
-	header .search {
-		display: none;
-		float: none;
-		width: 100%;
-		position: fixed;
-		top: 75px;
-		left: 0
 	}
 	header div.search_btn {
 		display: block;
@@ -2659,8 +2647,6 @@ span.delete-btn:hover {
 						transform: translateX(-50%); }
 	#main {
 		padding: 0 5px; }
-	header {
-		padding: 0 3px; }
 		header .login {
 			width: 100%; }
 			header .login h3 {

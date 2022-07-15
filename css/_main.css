@@ -432,7 +432,7 @@ header .logo {
 
 .login .registration_link {
     float: left;
-    margin: 0 0 0 14px;
+    margin: 0 0 23px 14px;
     height: 34px;
     font-size: 14px;
     line-height: 34px;
@@ -1945,5 +1945,13 @@ a.footer_email {
         width: 340px;
         margin: 35px auto 0;
         text-align: center;
+    }
+}
+
+@media screen and (max-width: 415px){
+    header .profile, header .settings {
+        right: 50%;
+        margin-right: -webkit-calc(375px/2*(-1));
+        margin-right: calc(375px/2*(-1));
     }
 }

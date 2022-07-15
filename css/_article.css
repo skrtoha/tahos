@@ -1,0 +1,250 @@
+.search-result #offers-filter-form input {
+    display: inline-block;
+    width: 65px;
+}
+
+h3.title_analogies {
+    margin-top: 40px
+}
+
+#analogies {
+    display: none
+}
+
+a.showAllResults {
+    color: #e01d1d;
+    margin-bottom: 15px;
+    display: block
+}
+
+.search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
+    display: inline-block;
+    margin-right: 40px;
+}
+
+.search-result .mobile-layout, .search-result .hidden-row {
+    display: none
+}
+
+.search-result .mobile-layout .goods-header {
+    float: left;
+    width: 100%;
+    position: relative
+}
+
+.search-result .mobile-layout .goods-header p:first-child {
+    padding-bottom: 0
+}
+
+.search-result .mobile-layout .goods-header .fa-camera {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    color: #000;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    background: #ebf0f1;
+    text-align: center;
+    font-size: 1.6em;
+    cursor: pointer
+}
+
+.search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
+    display: inline-block;
+    margin-right: 40px
+}
+
+.search-result #offers-filter-form .price-wrap input:first-of-type, .search-result #offers-filter-form .time-wrap input:first-of-type {
+    margin-right: 10px
+}
+
+.search-result #offers-filter-form .instock-wrap {
+    position: relative;
+    top: 3px
+}
+
+.search-result #offers-filter-form .instock-wrap label {
+    vertical-align: text-top
+}
+
+.search-result #offers-filter-form .price-wrap input {
+    width: 80px
+}
+
+.search-result #offers-filter-form label {
+    display: inline-block;
+    margin-right: 5px
+}
+
+.search-result #offers-filter-form input {
+    display: inline-block;
+    width: 65px
+}
+
+.search-result #offers-filter-form button {
+    display: inline-block;
+    float: none
+}
+
+.search-result table button {
+    font-size: 12px;
+    height: 25px;
+    line-height: 25px;
+    float: none;
+    margin: 0 auto
+}
+
+.search-result table button::before {
+    content: 'Остальные предложения'
+}
+
+.search-result table button.active::before {
+    content: 'Скрыть'
+}
+
+.search-result table th .fa {
+    display: inline-block;
+    text-align: center;
+    font-size: 2em;
+    padding: 2px 6px 3px 3px;
+    color: #fff
+}
+
+.search-result table th:nth-child(-n+2) {
+    text-align: left
+}
+
+.goods-header.empty {
+    border-bottom: 1px dashed #c8c8c8
+}
+
+.search-result table td {
+    vertical-align: top;
+    min-height: 40px
+}
+
+.search-result table td:nth-child(-n+2) {
+    text-align: left
+}
+
+.search-result table td.name-col {
+    position: relative
+}
+
+.search-result table tr {
+    border: none
+}
+
+.search-result table tr.button-row {
+    border-bottom: 1px dashed #c8c8c8
+}
+
+.search-result table tr.button-row.active td {
+    padding-bottom: 20px
+}
+
+.search-result table tr:first-child {
+    border-bottom: none
+}
+
+.search-result table tr.hidden-row td {
+    padding-top: 0
+}
+
+.search-result table ul {
+    padding: 0;
+    min-height: 40px
+}
+
+.search-result table ul li {
+    height: 40px;
+    line-height: 40px;
+    margin: 10px 0;
+    white-space: nowrap
+}
+
+.search-result table ul.to-cart-list li {
+    position: relative
+}
+
+.search-result table .to-stock-btn {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    font-size: 2.2em;
+    padding: 2px 6px 3px 3px;
+    color: #0082BF
+}
+
+.search-result table .to-stock-btn:hover {
+    color: #006a9b
+}
+
+.search-result table .goods-counter {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 50%;
+    background: red;
+    height: 15px;
+    width: 15px;
+    line-height: 15px;
+    text-align: center;
+    color: #fff;
+    padding: 1px;
+    font-size: 15px
+}
+
+.search-result table.small-view tr:nth-child(2n+1) td {
+    padding-top: 0
+}
+
+.search-result table.small-view tr:first-child {
+    border: none
+}
+
+.search-result table.small-view tr.button-row td {
+    text-align: right
+}
+
+.search-result table.small-view tr.button-row td button {
+    float: right
+}
+
+@media screen and (max-width: 928px) {
+    .search-result #offers-filter-form button {
+        margin-top: 20px
+    }
+
+    .search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
+        display: inline-block;
+        margin-right: 20px
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
+        margin-top: 20px
+    }
+
+    .search-result .ionTabs__body {
+        padding: 0
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .search-result .mobile-layout {
+        display: block
+    }
+
+    .search-result .articul-table {
+        display: none
+    }
+
+    .search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
+        display: block
+    }
+}

@@ -130,7 +130,8 @@ a.showAllResults {
 }
 
 .search-result table td.name-col {
-    position: relative
+    position: relative;
+    line-height: 20px;
 }
 
 .search-result table tr {
@@ -214,6 +215,567 @@ a.showAllResults {
     float: right
 }
 
+.first-full.shown td {
+    padding: 0
+}
+
+li.user_markup a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: 800
+}
+
+.jq-radio {
+    border-radius: 50%
+}
+
+
+.jq-checkbox, .jq-radio {
+    vertical-align: -4px;
+    width: 18px;
+    height: 18px;
+    margin: 0 4px 0 0;
+    border: 1px solid #C3C3C3;
+    background: linear-gradient(#FFF, #E6E6E6);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05), inset -1px -1px #FFF, inset 1px -1px #FFF;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    overflow: hidden
+}
+
+.jq-radio.checked .jq-radio__div {
+    width: 12px;
+    height: 12px;
+    margin: 3px 0 0 3px;
+    border-radius: 50%;
+    background: #0082BF;
+    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, .7)
+}
+
+
+.jq-checkbox.disabled, .jq-radio.disabled {
+    opacity: .55
+}
+
+.jq-file.disabled, .jq-file.disabled .jq-file__name, .jq-file.disabled .jq-file__browse {
+    border-color: #CCC;
+    background: #F5F5F5;
+    box-shadow: none;
+    color: #888
+}
+
+.jq-checkbox {
+    text-align: left;
+    border: 1px solid #0082BF;
+    box-sizing: border-box;
+    -webkit-transition: all ease;
+    transition: all ease;
+    position: relative;
+    height: 18px;
+    width: 18px;
+}
+
+.info, .jq-checkbox {
+    -webkit-box-sizing: border-box;
+}
+
+.jq-radio.disabled + span, .jq-checkbox.disabled + span {
+    color: #999
+}
+
+
+li.user_markup {
+    float: right;
+    position: relative
+}
+
+li.withSubprice {
+    line-height: 30px !important;
+    position: relative
+}
+
+.ionTabs {
+    position: relative;
+    margin-top: 30px;
+}
+
+span.subprice {
+    display: block;
+    line-height: 0;
+    font-size: 12px;
+    color: #00aafb;
+    font-weight: 700
+}
+
+.ionTabs__head {
+    position: relative;
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    height: 42px;
+    background: #0082BF;
+    border-bottom: 5px solid #8cdaff;
+}
+
+.ionTabs__head:before, .ionTabs__head:after {
+    content: "";
+    display: table
+}
+.jq-checkbox.checked:after{
+    content: "";
+}
+
+.ionTabs__head li {
+    height: inherit;
+    color: #fff;
+    padding: 0 20px;
+    line-height: 42px;
+    text-align: center;
+}
+
+.info_btn, .input-wrap, .input-wrap input, .input-wrap label, .ionTabs__head li {
+    display: inline-block;
+}
+
+.jq-checkbox.checked:after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    left: 3px;
+    top: 3px;
+    background: #0082BF
+}
+
+.ionTabs__head:after {
+    clear: both
+}
+
+.ionTabs__tab {
+    position: relative;
+    display: block;
+    float: left;
+    list-style-type: none;
+    background: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer
+}
+
+.ionTabs__head li.ionTabs__tab_state_active:after {
+    content: "";
+    height: 0;
+    width: 0;
+    border-bottom: 8px solid #8cdaff;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    bottom: 0;
+    position: absolute;
+    left: 50%;
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+.ionTabs__tab.ionTabs__tab_state_active {
+    cursor: default;
+    background: #0069A3;
+    position: relative;
+}
+
+.ionTabs__body {
+    position: relative;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.ionTabs__item {
+    position: relative;
+    display: none
+}
+
+.ionTabs__item.ionTabs__item_state_active {
+    display: block
+}
+
+.ionTabs__preloader {
+    position: relative
+}
+
+
+.pickmeup {
+    margin-top: 10px;
+    background: #fafafa;
+    border-radius: 0;
+    box-sizing: content-box;
+    display: inline-block;
+    position: absolute;
+    border: 1px solid #0081bc;
+    box-shadow: 1.5px 2.6px 7px rgba(0, 0, 0, 0.35)
+}
+
+.pickmeup * {
+    box-sizing: border-box
+}
+
+.pickmeup.pmu-flat {
+    position: relative
+}
+
+.pickmeup.pmu-hidden {
+    display: none
+}
+
+.pickmeup .pmu-instance {
+    display: inline-block;
+    height: 13.8em;
+    padding: 0;
+    text-align: center;
+    width: 15em
+}
+
+.pickmeup .pmu-instance .pmu-button {
+    color: #000;
+    cursor: pointer;
+    outline: none;
+    text-decoration: none
+}
+
+.pickmeup .pmu-instance .pmu-today {
+    background: #17384d;
+    color: #ccc
+}
+
+.pickmeup .pmu-instance .pmu-button:hover {
+    background: transparent;
+    color: #ccc
+}
+
+.pickmeup .pmu-instance .pmu-not-in-month {
+    color: #c8c8c8
+}
+
+.pickmeup .pmu-instance .pmu-disabled, .pickmeup .pmu-instance .pmu-disabled:hover {
+    color: #333;
+    cursor: default
+}
+
+.pickmeup .pmu-instance .pmu-selected {
+    background: #0082BF;
+    color: #fff
+}
+
+.pickmeup .pmu-instance .pmu-not-in-month.pmu-selected {
+    background: #17384d
+}
+
+.pickmeup .pmu-instance nav {
+    color: #000;
+    display: -ms-flexbox;
+    line-height: 2em
+}
+
+.pickmeup .pmu-instance nav :first-child :hover {
+    color: #ccc
+}
+
+.pickmeup .pmu-instance nav .pmu-prev, .pickmeup .pmu-instance nav .pmu-next {
+    display: none;
+    height: 2em;
+    width: 1em
+}
+
+.pickmeup .pmu-instance nav .pmu-month {
+    width: 14em
+}
+
+.pickmeup .pmu-instance .pmu-years *, .pickmeup .pmu-instance .pmu-months * {
+    display: inline-block;
+    line-height: 3.6em;
+    width: 3.5em
+}
+
+.pickmeup .pmu-instance .pmu-day-of-week {
+    color: #999;
+    cursor: default
+}
+
+.pickmeup .pmu-instance .pmu-day-of-week *, .pickmeup .pmu-instance .pmu-days * {
+    display: inline-block;
+    line-height: 1.5em;
+    width: 2em
+}
+
+.pickmeup .pmu-instance .pmu-day-of-week * {
+    line-height: 1.8em
+}
+
+.pickmeup .pmu-instance:first-child .pmu-prev, .pickmeup .pmu-instance:last-child .pmu-next {
+    display: block
+}
+
+.pickmeup .pmu-instance:first-child .pmu-month, .pickmeup .pmu-instance:last-child .pmu-month {
+    width: 13em
+}
+
+.pickmeup .pmu-instance:first-child:last-child .pmu-month {
+    width: 12em
+}
+
+.pickmeup:not(.pmu-view-days) .pmu-days, .pickmeup:not(.pmu-view-days) .pmu-day-of-week, .pickmeup:not(.pmu-view-months) .pmu-months, .pickmeup:not(.pmu-view-years) .pmu-years {
+    display: none
+}
+
+div.emptyAvailabilityMainStores {
+    text-align: left;
+    margin: 0 auto;
+    width: 323px
+}
+
+div.emptyAvailabilityMainStores p {
+    padding: 10px 0
+}
+
+div.emptyAvailabilityMainStores img {
+    float: left;
+    width: 34px;
+    margin-right: 10px
+}
+
+#user_markup {
+    background: #f1f1f1;
+    z-index: 53;
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 47px;
+    padding: 20px;
+    color: #727272;
+    width: 346px
+}
+
+#user_markup .background {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0
+}
+
+#user_markup form button[disabled] {
+    color: #ccc
+}
+
+#user_markup form button {
+    margin-top: 5px;
+    display: block
+}
+
+#user_markup label:last-child {
+    margin-top: 10px
+}
+
+#user_markup label.markup {
+    display: block;
+    text-align: left;
+    float: left
+}
+
+#user_markup label.showInBasket {
+    display: block;
+    text-align: left
+}
+
+#user_markup label.markup ~ span {
+    display: block;
+    float: left;
+    margin-left: 5px;
+    font-size: 20px;
+    line-height: 35px;
+}
+
+#user_markup form input {
+    display: initial
+}
+
+#user_markup label.showType {
+    display: block;
+    text-align: left;
+    margin-left: 25px
+}
+
+#user_markup label span {
+    position: relative
+}
+
+#user_markup input[name=markup] {
+    width: 50px;
+    text-align: center;
+    padding: 0;
+    float: left;
+    margin-left: 10px
+}
+
+#user_markup input[name=showType] {
+    display: block
+}
+
+#user_markup input[name=showType] ~ label {
+    display: inline-block
+}
+
+#user_markup::before {
+    content: "";
+    position: absolute;
+    right: 18px;
+    top: -10px;
+    z-index: 1000;
+    height: 0;
+    width: 0;
+    border-bottom: 10px solid #f1f1f1;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent
+}
+
+.articul-table tr.gif {
+    display: block !important
+}
+
+.articul-table tr, .mobile-layout tr {
+    display: none
+}
+
+.articul-table tr.shown {
+    display: table-row
+}
+
+.mobile-layout tr.shown {
+    display: table-row
+}
+
+.mobile-layout tr.shown.empty td {
+    padding-bottom: 20px
+}
+
+table.small-view {
+    border-bottom: 1px dashed #c8c8c8 !important
+}
+
+b.brend_info {
+    font-weight: 700;
+    cursor: pointer;
+}
+
+a.sortable.asc, a.sortable.desc {
+    padding-right: 10px;
+    position: relative;
+    display: block
+}
+
+a.sortable {
+    color: #fff
+}
+
+
+table.small-view li.count-block input {
+    position: relative;
+    top: 0;
+    height: 28px;
+    width: 40px
+}
+
+a.sortable.in_stock.asc {
+    font-size: 13px;
+    line-height: 17px;
+    width: 80px
+}
+
+.icon-checkmark1:before {
+    content: "\ea10";
+    color: #77d077;
+    font-size: 18px
+}
+
+table#item_into {
+    display: none
+}
+
+li.count-block input {
+    position: relative;
+    top: -3px
+}
+
+
+span.icon-checkmark1 {
+    margin-right: 3px
+}
+
+a.sortable.asc::after, a.sortable.desc::after {
+    content: '';
+    background: url(/img/icons/favicon.png) no-repeat right;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: -2px
+}
+
+.icon-tab {
+    content: "\ea45";
+    color: #fff;
+    background: #0082BF;
+    padding: 4px;
+    border-radius: 14px;
+    font-size: 12px;
+    margin-right: 5px
+}
+
+a.sortable.desc::after {
+    transform: rotate(180deg)
+}
+
+span[class^=icon] {
+    cursor: pointer
+}
+
+.noReturn > a {
+    cursor: pointer;
+    color: red;
+    font-weight: 800
+}
+
+table td.name-col a {
+    position: relative;
+    top: 2px;
+    font-size: 16px
+}
+
+.fa-camera:before {
+    content: "\f030";
+    font-size: 19px
+}
+
+.fa-font:before {
+    content: "\f031"
+}
+
+.filter-form .search-wrap, .filter-form input, table {
+    width: 100%
+}
+
+.count-block input {
+    text-align: center;
+    width: 70px;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    border-color: #0082BF
+}
+
+.count-block input::-webkit-inner-spin-button, .count-block input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0
+}
+
 @media screen and (max-width: 928px) {
     .search-result #offers-filter-form button {
         margin-top: 20px
@@ -229,22 +791,78 @@ a.showAllResults {
     .search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
         margin-top: 20px
     }
+    .search-result .ionTabs__body {
+        padding: 0;
+    }
 
     .search-result .ionTabs__body {
         padding: 0
     }
+
+    table.articul-table {
+        display: table;
+        font-size: 12px
+    }
+
+    table.articul-table th {
+        font-size: 12px
+    }
+
+    table.articul-table th:first-child {
+        padding-left: 5px
+    }
+
+    table.articul-table td:first-child {
+        padding-left: 5px
+    }
+
+    table.articul-table th:nth-child(3), table.articul-table td:nth-child(3) {
+        display: none
+    }
+
+    table.articul-table ul li {
+        font-size: 12px
+    }
 }
 
 @media screen and (max-width: 550px) {
+    .ionTabs__body {
+        padding: 0;
+    }
     .search-result .mobile-layout {
         display: block
     }
 
+    .ionTabs__head li {
+        font-size: 12px;
+        padding: 0 5px
+    }
+
+    .ionTabs__head li:nth-child(n + 2) {
+        padding-right: 21px
+    }
+
+    .ionTabs__body {
+        padding: 0
+    }
     .search-result .articul-table {
         display: none
     }
 
     .search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
         display: block
+    }
+    .mobile-layout .icon-tab:before {
+        font-size: 14px;
+    }
+    .fa-gear:before, .fa-cog:before, .fa-camera:before {
+        position: relative;
+        font-size: 30px;
+        top: 5px;
+    }
+    .mobile-layout span.icon-tab.wrongAnalogy {
+        position: absolute;
+        right: 0;
+        top: 10px;
     }
 }

@@ -10,9 +10,7 @@ dd, strong {
     font-weight: 700
 }
 
-.info_btn, .input-wrap, .input-wrap input, .input-wrap label, .ionTabs__head li {
-    display: inline-block;
-}
+
 
 
 blockquote, q {
@@ -98,31 +96,8 @@ ol {
     background: #0082BF;
     border-bottom: 5px solid #8cdaff
 }
-.ionTabs__head li {
-    height: inherit;
-    color: #fff;
-    padding: 0 20px;
-    line-height: 42px;
-    text-align: center;
-}
-.ionTabs__head li.ionTabs__tab_state_active {
-    background: #0069A3;
-    position: relative;
-}
-.ionTabs__head li.ionTabs__tab_state_active:after {
-    content: "";
-    height: 0;
-    width: 0;
-    border-bottom: 8px solid #8cdaff;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    bottom: 0;
-    position: absolute;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%)
-}
+
+
 .ionTabs__body {
     margin-top: 10px;
     padding: 10px
@@ -186,9 +161,6 @@ span[class^=icon_] {
     -webkit-box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, .5);
     box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, .5)
 }
-.info, .jq-checkbox {
-    -webkit-box-sizing: border-box
-}
 .date-wrap input:disabled+.calendar-icon, input:disabled {
     opacity: .5
 }
@@ -207,24 +179,7 @@ span[class^=icon_] {
     top: -9px
 }
 
-.jq-checkbox {
-    text-align: left;
-    border: 1px solid #0082BF;
-    box-sizing: border-box;
-    -webkit-transition: all ease;
-    transition: all ease;
-    position: relative;
-    height: 18px;
-    width: 18px;
-}
-.jq-checkbox.checked:after {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    left: 3px;
-    top: 3px;
-    background: #0082BF
-}
+
 body input:focus:required:invalid, body input:required:valid, body textarea:focus:required:invalid, body textarea:required:valid {
     color: #666
 }
@@ -263,17 +218,7 @@ body input:focus:required:invalid, body input:required:valid, body textarea:focu
     line-height: 34px;
     font-size: 30px
 }
-.count-block input {
-    text-align: center;
-    width: 70px;
-    -webkit-border-radius: 0;
-    border-radius: 0;
-    border-color: #0082BF
-}
-.count-block input::-webkit-inner-spin-button, .count-block input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0
-}
+
 .checkbox-wrap {
     display: inline-block;
     margin: 25px 0
@@ -415,9 +360,7 @@ textarea {
     float: left
 }
 
-.filter-form .search-wrap, .filter-form input, table {
-    width: 100%
-}
+
 .filter-form h3 {
     margin-bottom: 20px
 }
@@ -426,13 +369,7 @@ textarea {
 }
 
 
-.clearfix:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden
-}
+
 
 .breadcrumbs {
     margin-bottom: 30px
@@ -522,22 +459,8 @@ input:checked+.slider:before {
 #news a, #news img{
     display: block
 }
-.hints a {
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    font-size: 18px;
-    line-height: 32px;
-    color: #0069a3;
-    text-decoration: none;
-    outline: 0;
-    display: block;
-    white-space: nowrap;
-}
-.hints table td{;
-    text-align: left;
-    padding: 0 0 0 10px;
-    cursor: pointer;
-}
+
+
 
 #news {
     float: left;
@@ -1110,10 +1033,6 @@ select:not([disabled]) ~.jq-selectbox.opened .jq-selectbox__select .jq-selectbox
 }
 #brend_info table tr td{
     padding: 10px;
-}
-b.brend_info{
-    font-weight: 700;
-    cursor: pointer;
 }
 .description-block li i.fa{
     display: none;

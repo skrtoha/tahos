@@ -54,6 +54,12 @@ hr {
     border-style: dashed;
     border-color: #ccc
 }
+.icon-tab:before {
+    content: "\ea45"
+}
+table th {
+    vertical-align: middle;
+}
 
 a.button, button, input[type=submit], input[type=reset] {
     float: left;
@@ -170,7 +176,11 @@ form input:hover {
 .hints table tr {
     border: none;
 }
-
+.hints table td{;
+    text-align: left;
+    padding: 0 0 0 10px;
+    cursor: pointer;
+}
 .hints table.previous_search, .hints table.coincidences {
     display: none;
 }
@@ -179,11 +189,26 @@ a.button:hover, button:hover, input[type=submit]:hover, input[type=reset]:hover 
     background: #0069a3;
     text-decoration: none
 }
-
+.hints a {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 18px;
+    line-height: 32px;
+    color: #0069a3;
+    text-decoration: none;
+    outline: 0;
+    display: block;
+    white-space: nowrap;
+}
 button {
     float: none
 }
-
+.jq-selectbox, table td, table th {
+    vertical-align: middle;
+}
+table td:first-child, table th:first-child {
+    text-align: left;
+}
 input[type=number] {
     text-align: center
 }
@@ -1298,10 +1323,16 @@ label[for=w_not_remember_checkbox] {
 .fa {
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
-    font-size: inherit;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    margin-left: 0;
+}
+
+.fa-cart-arrow-down:before {
+    content: "\f218"
 }
 
 .fa-remove:before, .fa-close:before, .fa-times:before {
@@ -1707,7 +1738,13 @@ a.footer_email {
     margin: -2px 1px;
     vertical-align: top;
 }
-
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden
+}
 @media screen and (max-width: 1490px) {
     footer .contacts .item_box {
         float: left;

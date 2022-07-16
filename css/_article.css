@@ -286,7 +286,8 @@ li.user_markup {
 
 li.withSubprice {
     line-height: 30px !important;
-    position: relative
+    position: relative;
+    top: -8px;
 }
 
 .ionTabs {

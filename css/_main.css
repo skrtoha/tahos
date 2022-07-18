@@ -1610,6 +1610,16 @@ button::-moz-focus-inner {
     border: 0;
 }
 
+.jspPane{
+    margin-left: 0 !important;
+}
+
+.jspContainer {
+    overflow: hidden;
+    position: relative;
+    outline: none
+}
+
 @media screen and (max-width: 1490px) {
     footer .contacts .item_box {
         float: left;
@@ -1754,7 +1764,6 @@ button::-moz-focus-inner {
     header .catalog {
         left: -15px;
     }
-
     header .logo {
         margin: 21px 0 0 -20px;
         width: 160px;

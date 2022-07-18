@@ -544,6 +544,123 @@ input[name=date_issue] {
     border-radius: 0 5px 5px 0;
 }
 
+span.available {
+    display: none;
+}
+
+.mfp-bg {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1042;
+    overflow: hidden;
+    position: fixed;
+    background: #0b0b0b;
+    opacity: 0.5;
+}
+
+.mfp-wrap {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1043;
+    position: fixed;
+    outline: none !important;
+    -webkit-backface-visibility: hidden;
+}
+
+.mfp-container {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    padding: 0 8px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.mfp-container:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.wrapper.vin .right.active {
+    display: block;
+}
+
+.wrapper.vin .right {
+    display: none;
+}
+
+.car_left, .car_right {
+    width: 49%;
+    display: inline-block;
+}
+
+button.mfp-close, button.mfp-arrow {
+    overflow: visible;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    display: block;
+    outline: none;
+    padding: 0;
+    z-index: 1046;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+}
+
+.mfp-close {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    text-decoration: none;
+    text-align: center;
+    opacity: 0.65;
+    padding: 0 0 18px 10px;
+    color: #FFF;
+    font-style: normal;
+    font-size: 28px;
+    font-family: Arial, Baskerville, monospace;
+}
+
+.car_left, .car_right {
+    width: 49%;
+    display: inline-block;
+}
+.wrapper.vin a {
+    text-decoration: none;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.car_right {
+    position: relative;
+    top: 3px;
+}
+input[name="vin_input"] {
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .mfp-container {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+}
+
 @media screen and (max-width: 880px) {
     .comment-block {
         right: 0;
@@ -583,5 +700,17 @@ input[name=date_issue] {
 
     table.basket-table {
         display: none;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .car_left, .car_right {
+        width: 100% !important;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    #main {
+        padding: 0 5px;
     }
 }

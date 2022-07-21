@@ -635,6 +635,22 @@ button.mfp-close, button.mfp-arrow {
     font-size: 28px;
     font-family: Arial, Baskerville, monospace;
 }
+.basket .total span {
+    padding-left: 0;
+    padding-right: 20px;
+}
+
+.basket .mobile-view {
+    display: none;
+}
+
+.basket .total {
+    margin-top: 20px;
+    text-align: right;
+    font-weight: bold;
+    white-space: nowrap;
+    font-size: 18px;
+}
 
 .car_left, .car_right {
     width: 49%;
@@ -651,6 +667,14 @@ button.mfp-close, button.mfp-arrow {
     top: 3px;
 }
 input[name="vin_input"] {
+    width: 100%;
+}
+
+#basket_clear{
+    cursor: pointer;
+}
+
+.basket-table{
     width: 100%;
 }
 

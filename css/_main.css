@@ -1620,6 +1620,12 @@ button::-moz-focus-inner {
     outline: none
 }
 
+footer .address{
+    background: inherit;
+    border: none;
+    padding: 0;
+}
+
 @media screen and (max-width: 1490px) {
     footer .contacts .item_box {
         float: left;
@@ -1862,11 +1868,9 @@ button::-moz-focus-inner {
         text-align: center;
     }
 }
-
-@media screen and (max-width: 415px) {
-    header .profile, header .settings {
-        right: 50%;
-        margin-right: -webkit-calc(375px / 2 * (-1));
-        margin-right: calc(375px / 2 * (-1));
+@media screen and (max-width: 375px){
+    header .profile {
+        width: 100vw;
+        left: -20px;
     }
 }

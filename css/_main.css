@@ -1625,6 +1625,46 @@ footer .address{
     border: none;
     padding: 0;
 }
+footer #driving_direction{
+    color: white;
+}
+#full-image {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100vw;
+    background: rgba(11, 11, 11, 0.5);
+    z-index: 1050;
+    max-height: 100vh;
+}
+#full-image #map {
+    float: none;
+    width: auto;
+}
+#full-image .img-wrap .close:after {
+    content: "\f00d";
+}
+#full-image .img-wrap .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: fontAwesome;
+}
+#full-image .img-wrap {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    position: absolute;
+    background: white;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
 
 @media screen and (max-width: 1490px) {
     footer .contacts .item_box {

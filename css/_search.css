@@ -1,0 +1,7 @@
+.hit-list-table{
+    width: 100%;
+}
+.icon-bin:before {
+    content: "\e9ac";
+    cursor: pointer;
+}

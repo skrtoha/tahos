@@ -343,23 +343,7 @@ textarea {
     padding: 20px
 }
 
-.search-wrap {
-    position: relative;
-    min-width: 250px
-}
 
-.search-wrap input {
-    width: 100%
-}
-
-.search-wrap .search-icon {
-    width: 16px;
-    height: 16px;
-    position: absolute;
-    right: 9px;
-    top: 9px;
-    background: url(/img/icons/search_gray.png) center no-repeat
-}
 
 .pseudo-select {
     text-align: left;
@@ -394,24 +378,9 @@ textarea {
     background: url(/img/icons/select__arrow_up.png) center center no-repeat, #0082BF
 }
 
-.filter-form {
-    background: #fff;
-    display: inline-block;
-    box-sizing: border-box;
-    border: 1px solid #bfbfbf;
-    padding: 30px;
-    width: 330px;
-    float: left
-}
 
 
-.filter-form h3 {
-    margin-bottom: 20px
-}
 
-.filter-form p {
-    margin: 10px 0
-}
 
 
 .breadcrumbs {

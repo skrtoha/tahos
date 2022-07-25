@@ -416,7 +416,7 @@ header .logo {
     float: left;
     margin: 7px 0 0 14px;
     padding: 1px 0 0 0;
-    width: 90px;
+    width: 80px;
     height: 34px;
     font-size: 14px;
     line-height: 18px;
@@ -1619,6 +1619,24 @@ button::-moz-focus-inner {
     position: relative;
     outline: none
 }
+.jq-checkbox {
+    text-align: left;
+    border: 1px solid #0082BF;
+    box-sizing: border-box;
+    -webkit-transition: all ease;
+    transition: all ease;
+    position: relative;
+    height: 18px;
+    width: 18px;
+}
+.jq-checkbox.checked:after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    left: 3px;
+    top: 3px;
+    background: #0082BF;
+}
 
 footer .address{
     background: inherit;
@@ -1664,6 +1682,112 @@ footer #driving_direction{
     -webkit-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+}
+.mosaic-view .item_1 .product > p:nth-child(2) {
+    height: 28px;
+    position: relative;
+    overflow: hidden;
+}
+.pic-and-description {
+    position: relative;
+}
+.mfp-hide {
+    display: none!important;
+}
+.fa-star, .fa-star-half-o, .fa-star-o {
+    color: gold;
+}
+.mfp-bg {
+    z-index: 1042;
+    overflow: hidden;
+    background: #0b0b0b;
+    opacity: .5;
+}
+.mfp-bg, .mfp-wrap {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+}
+.mfp-wrap {
+    z-index: 1043;
+    outline: 0!important;
+}
+.mfp-bg, .mfp-wrap {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+}
+.mfp-container:before {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+.mfp-auto-cursor .mfp-content {
+    cursor: auto;
+}
+.mfp-ajax-holder .mfp-content, .mfp-inline-holder .mfp-content {
+    width: 100%;
+    cursor: auto;
+}
+.mfp-content {
+    display: inline-block;
+    text-align: left;
+    z-index: 1045;
+    position: relative;
+}
+.mfp-content {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+    text-align: left;
+    z-index: 1045;
+    vertical-align: middle;
+}
+
+.mfp-close-btn-in .mfp-close {
+    color: #333;
+}
+button.mfp-arrow, button.mfp-close {
+    overflow: visible;
+    cursor: pointer;
+    background: 0 0;
+    border: 0;
+    -webkit-appearance: none;
+    display: block;
+    outline: 0;
+    padding: 0;
+    z-index: 1046;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+}
+.mfp-close {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    right: 0;
+    top: 0px;
+    text-decoration: none;
+    opacity: .65;
+    padding: 0 0 18px 10px;
+    font-style: normal;
+    font-size: 28px;
+    font-family: Arial, Baskerville, monospace;
+}
+.mfp-close, .mfp-preloader a:hover {
+    color: #FFF;
+}
+.mfp-arrow, .mfp-close, .mfp-counter, .mfp-preloader {
+    user-select: none;
+}
+.mfp-close, .mfp-preloader {
+    text-align: center;
+    position: absolute;
 }
 
 @media screen and (max-width: 1490px) {
@@ -1759,6 +1883,12 @@ footer #driving_direction{
         margin: 24px 0 0 0 !important;
     }
 }
+@media (max-width: 900px){
+    .mfp-container {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+}
 
 @media screen and (max-width: 880px) {
     footer .information {
@@ -1807,8 +1937,29 @@ footer #driving_direction{
 }
 
 @media screen and (max-width: 550px) {
+    header .login .social_buttons{
+        margin-top: 10px;
+    }
+    .content .wrapper{
+        min-width: auto;
+    }
     header .catalog {
         left: -15px;
+    }
+    header .login h3 {
+        display: none;
+    }
+    header .login {
+        width: 100vw;
+        padding: 15px;
+        right: -15px;
+    }
+    header .login input[type="text"], header .login input[type="password"] {
+        margin-bottom: 10px;
+        width: calc(100% - 94px);
+    }
+    header .login p {
+        padding-bottom: 0;
     }
     header .logo {
         margin: 21px 0 0 -20px;

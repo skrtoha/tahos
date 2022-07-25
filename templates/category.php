@@ -241,17 +241,17 @@ Breadcrumb::out();
 				<div class="pagination-container"></div>
 			</div>
 			<div class="list-view <?=$_GET['viewTab'] == 'list-view' ? '' : 'hidden'?>">
-				<div>
-					<?if (!$_GET['sub']){
-						foreach($subs as $value){?>
-						<a href="<?=$href?>/<?=$value['href']?>"><?=$value['title']?></a>
-					<?}?>
-				</div>
+                <?if (!$_GET['sub']){?>
+                    <div>
+                        <?foreach($subs as $value){?>
+                            <a href="<?=$href?>/<?=$value['href']?>"><?=$value['title']?></a>
+                        <?}?>
+                    </div>
 				<?}
 				else{?>
 					<table class="goods"></table>
 					<div class="pagination-container"></div>
-			<?}?>
+			    <?}?>
 			</div>
 		</div>
 	</div>

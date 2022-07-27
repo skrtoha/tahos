@@ -765,6 +765,9 @@ div.list-view > div > a {
 i[class$=fa-rub], i[class$=fa-usd], i[class$=fa-eur], i[class$=fa-jpy] {
     margin-left: 3px;
 }
+.fa-question-circle-o:before {
+    content: "\f29c";
+}
 
 #item_into .to-stock-btn {
     position: relative;
@@ -1200,6 +1203,19 @@ span[class^=icon_] {
 .ionTabs__body {
     z-index: 2;
 }
+.mfp-container {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+.mfp-arrow:after, .mfp-arrow:before, .mfp-container:before, .mfp-figure:after {
+    content: '';
+}
 .mfp-close, .mfp-preloader {
     text-align: center;
     position: absolute;
@@ -1298,6 +1314,11 @@ span[class^=icon_] {
 }
 
 @media screen and (max-width: 700px) {
+    .product-popup .description-block {
+        width: 100%;
+        float: none;
+        padding-left: 0;
+    }
     .product-popup .gallery-block {
         width: 100%;
         float: none;

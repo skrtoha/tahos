@@ -1292,6 +1292,9 @@ a.articul {
 .cart-popup tr td:nth-child(3) {
     white-space: nowrap;
 }
+.cart-popup table{
+    width: 100%;
+}
 
 footer input[name=telephone] {
     background: none;

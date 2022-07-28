@@ -231,3 +231,45 @@
 .content .item_brends .item:last-child{
     float: none;
 }
+.content .item_brends .item .img-wrap img {
+    width: 100%;
+    max-width: 60px;
+    height: 100%;
+}
+.content .item_brends .item p {
+    text-transform: uppercase;
+    color: #0082BF;
+    font-size: 0.8rem;
+}
+.content .list-view .name-block {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: inline-block;
+    float: left;
+    width: 25%;
+    padding: 10px;
+    text-transform: uppercase;
+}
+.content .list-view .name-block .letter {
+    font-size: 3em;
+}
+.content .list-view .name-block .models a {
+    display: block;
+    padding-bottom: 10px;
+}
+.content .mosaic-view .name-block {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: inline-block;
+    float: left;
+    width: 25%;
+    padding: 10px;
+    text-transform: uppercase;
+}
+.content .mosaic-view .name-block .letter {
+    font-size: 3em;
+}
+.mosaic-view .name-block .models a {
+    display: block;
+    padding-bottom: 10px;
+}

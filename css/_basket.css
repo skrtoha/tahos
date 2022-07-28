@@ -678,6 +678,13 @@ input[name="vin_input"] {
     width: 100%;
 }
 
+.checkbox-wrap label:before, .date-wrap .calendar-icon, .info:before, .jq-checkbox.checked:after, .pseudo-select:after {
+    content: "";
+}
+.fa-star:before {
+    content: "\f005";
+}
+
 @media (max-width: 900px) {
     .mfp-container {
         padding-left: 6px;

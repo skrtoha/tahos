@@ -1296,6 +1296,114 @@ a.articul {
     width: 100%;
 }
 
+.jspContainer {
+    overflow: hidden;
+    position: relative;
+    outline: 0
+}
+.jspPane {
+    position: absolute;
+    width: 100%
+}
+.jspVerticalBar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 13px;
+    height: 100%;
+    background: #fff
+}
+.jspHorizontalBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 16px;
+    background: red;
+    display: none
+}
+.jspHorizontalBar *, .jspVerticalBar * {
+    margin: 0;
+    padding: 0
+}
+.jspCap {
+    display: none
+}
+.jspHorizontalBar .jspCap {
+    float: left
+}
+.jspTrack {
+    box-sizing: border-box;
+    padding: 0 1px;
+    background: #fff;
+    position: relative;
+    border-left: 1px solid #e3e3e3;
+    border-right: 1px solid #e3e3e3
+}
+.jspDrag {
+    background: #0099de;
+    position: relative;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    -webkit-border-radius: 9px;
+    border-radius: 9px
+}
+.jspHorizontalBar .jspDrag, .jspHorizontalBar .jspTrack {
+    float: left;
+    height: 100%
+}
+.jspArrow {
+    background: #fff;
+    text-indent: -20000px;
+    display: block;
+    cursor: pointer;
+    border: 1px solid #e3e3e3;
+    border-top: none;
+    border-bottom: none
+}
+.jspArrow.jspDisabled, header .catalog a.jspArrow:hover, header .hints a.jspArrow:hover {
+    cursor: default;
+    background: #fff
+}
+header .catalog a.jspArrow {
+    border-top: none;
+    border-bottom: none
+}
+header .hints a.jspArrow {
+    padding: 0
+}
+.jspVerticalBar .jspArrow {
+    height: 5px
+}
+.jspHorizontalBar .jspArrow {
+    width: 16px;
+    float: left;
+    height: 100%
+}
+.jspVerticalBar .jspArrow:focus {
+    outline: 0
+}
+.jspCorner {
+    background: #eeeef4;
+    float: left;
+    height: 100%
+}
+* html .jspCorner {
+    margin: 0 -3px 0 0
+}
+.jq-checkbox.checked:after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    left: 3px;
+    top: 3px;
+    background: #0082BF;
+}
+.checkbox-wrap label:before, .date-wrap .calendar-icon, .info:before, .jq-checkbox.checked:after, .pseudo-select:after {
+    content: "";
+}
+
 footer input[name=telephone] {
     background: none;
     font-size: 34px;

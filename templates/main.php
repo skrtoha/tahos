@@ -1,10 +1,17 @@
 <?php
 
+/** @var $title string */
+/** @var $view string */
+/** @var $device string */
+/** @var $content string */
+/** @global $db \core\Database */
+/** @var $user array */
+
 use core\Setting;
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
 	<meta charset="utf-8">
 	<title><?=$title?></title>
@@ -266,8 +273,7 @@ use core\Setting;
 			<tr>
 				<td colspan="4">Корзина пуста</td>
 			</tr>
-			<?}?>
-		</table>
+        <?}?>
 	</div>
 	<!-- <div class="page-wrap"> -->
 		<div id="main"><?=$content?></div>
@@ -398,7 +404,6 @@ use core\Setting;
 				<?}?>
 				<div class="clear"></div>
 			</div>
-			<div class="clear"></div>
 		</div>
 	</footer>
 	<div class="h_overlay"></div>

@@ -1421,7 +1421,11 @@ footer {
 
 footer .wrapper {
     min-width: auto;
-    max-width: 1597px
+    max-width: 1597px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 footer h4 {
@@ -1438,31 +1442,7 @@ footer a {
 
 footer .item {
     box-sizing: border-box;
-    float: left;
-    padding: 30px 20px 0 0
-}
-
-footer .information {
-    margin: 0 0 0 20px;
-    width: -webkit-calc((100% - 706px) / 100 * 32);
-    width: calc((100% - 706px) / 100 * 32)
-}
-
-footer .shop {
-    width: -webkit-calc((100% - 706px) / 100 * 36);
-    width: calc((100% - 706px) / 100 * 36)
-}
-
-footer .catalog_list {
-    width: -webkit-calc((100% - 706px) / 100 * 32);
-    width: calc((100% - 706px) / 100 * 32)
-}
-
-footer .partnership {
-    float: right;
-    margin: 0 20px 0 0;
-    padding: 30px 0 0;
-    width: 221px
+    padding: 30px 0 0 30px;
 }
 
 footer .partnership h4 {
@@ -1480,8 +1460,7 @@ footer .payment_systems {
 }
 
 footer .contacts {
-    margin: 0 30px 0 0;
-    padding: 30px 30px 0 40px;
+    padding: 30px;
     width: 415px;
     height: 323px;
     background: url(../img/footer__contacts__background.png) right bottom no-repeat #0081bc;
@@ -1895,21 +1874,21 @@ button.mfp-arrow, button.mfp-close {
     position: absolute;
 }
 
+.item:not(.contacts) {
+    flex: 1;
+}
+
 @media screen and (max-width: 1490px) {
     footer .contacts .item_box {
         float: left;
     }
 
     footer .wrapper .item:not(.contacts){
-        width: calc(25% - 10px);
-        margin-bottom: 25px;
+        padding-right: 30px;
     }
 
     footer .contacts {
-        float: none;
-        clear: both;
-        margin: 0;
-        padding: 35px 40px;
+        margin-top: 25px;
         width: 100%;
         height: auto;
         background: #0081bc;
@@ -1922,31 +1901,9 @@ button.mfp-arrow, button.mfp-close {
 }
 
 @media screen and (max-width: 1100px) {
-    footer .item {
-        padding: 30px 20px 30px 0;
-    }
-
-    footer .information {
-        margin: 0 0 0 40px;
-        width: -webkit-calc((100% - 310px) / 100 * 47);
-        width: calc((100% - 310px) / 100 * 47);
-    }
-
-    footer .shop {
-        width: -webkit-calc((100% - 310px) / 100 * 53);
-        width: calc((100% - 310px) / 100 * 53);
-    }
-
     footer .catalog_list {
         float: right;
         width: 270px;
-    }
-
-    footer .partnership {
-        float: none;
-        clear: both;
-        margin: 0 0 0 40px;
-        padding: 0 0 30px 0;
     }
 
     footer .contacts {
@@ -1997,41 +1954,6 @@ button.mfp-arrow, button.mfp-close {
     .mfp-container {
         padding-left: 6px;
         padding-right: 6px;
-    }
-}
-
-@media screen and (max-width: 880px) {
-    footer .information {
-        margin: 0 0 0 40px;
-        width: -webkit-calc((100% - 40px) / 100 * 48);
-        width: calc((100% - 40px) / 100 * 48);
-    }
-
-    footer .contacts {
-        padding: 35px 40px;
-    }
-
-    footer .shop {
-        width: -webkit-calc((100% - 40px) / 100 * 52);
-        width: calc((100% - 40px) / 100 * 52);
-    }
-
-    footer .partnership {
-        float: left;
-        clear: none;
-        margin: 0;
-        padding: 0 20px 30px 0;
-        width: -webkit-calc((100% - 40px) / 100 * 52);
-        width: calc((100% - 40px) / 100 * 52);
-    }
-
-    footer .catalog_list {
-        float: left;
-        margin: 0 0 0 40px;
-        padding: 0 20px 30px 0;
-        clear: both;
-        width: -webkit-calc((100% - 40px) / 100 * 48);
-        width: calc((100% - 40px) / 100 * 48);
     }
 }
 
@@ -2087,9 +2009,12 @@ button.mfp-arrow, button.mfp-close {
         left: 0;
     }
 
+    .item:not(.contacts){
+        flex: auto;
+    }
+
     footer .item:not(.contacts) {
-        padding: 20px;
-        padding-bottom: 0;
+        padding: 20px 20px 0;
         width: 100%;
         margin: 0;
     }
@@ -2155,7 +2080,7 @@ button.mfp-arrow, button.mfp-close {
     }
 
     footer .contacts {
-        padding: 35px 0;
+        padding: 10px;
     }
 
     footer .contacts .item_box {

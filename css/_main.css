@@ -239,11 +239,6 @@ a {
     text-decoration: none;
     outline: 0
 }
-
-a:hover {
-    text-decoration: underline
-}
-
 p {
     padding: 10px 0
 }
@@ -1903,6 +1898,11 @@ button.mfp-arrow, button.mfp-close {
 @media screen and (max-width: 1490px) {
     footer .contacts .item_box {
         float: left;
+    }
+
+    footer .wrapper .item:not(.contacts){
+        width: calc(25% - 10px);
+        margin-bottom: 25px;
     }
 
     footer .contacts {

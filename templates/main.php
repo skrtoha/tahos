@@ -274,6 +274,7 @@ use core\Setting;
 				<td colspan="4">Корзина пуста</td>
 			</tr>
         <?}?>
+        </table>
 	</div>
 	<!-- <div class="page-wrap"> -->
 		<div id="main"><?=$content?></div>

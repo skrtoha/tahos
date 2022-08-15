@@ -1237,6 +1237,13 @@ span[class^=icon_] {
     position: relative;
 }
 
+.catalogue.catalogue-filter .item {
+    margin-top: 10px;
+    width: -webkit-calc(33.33333333% - 10px);
+    width: calc(50% - 10px);
+    vertical-align: middle;
+}
+
 @media screen and (max-width: 1100px) {
     .catalogue .filter-form {
         width: 100%;

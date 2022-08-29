@@ -935,7 +935,6 @@ i[class$=fa-rub], i[class$=fa-usd], i[class$=fa-eur], i[class$=fa-jpy] {
 }
 
 .owl-carousel .owl-controls .owl-dot, .owl-carousel .owl-controls .owl-nav .owl-next, .owl-carousel .owl-controls .owl-nav .owl-prev {
-    cursor: pointer;
     cursor: hand;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1027,7 +1026,6 @@ i[class$=fa-rub], i[class$=fa-usd], i[class$=fa-eur], i[class$=fa-jpy] {
     top: 50%;
     margin-left: -40px;
     margin-top: -40px;
-    background: url(owl.video.play.png) no-repeat;
     cursor: pointer;
     z-index: 1;
     -webkit-transition: scale .1s ease;
@@ -1303,7 +1301,7 @@ span[class^=icon_] {
     }
 
     .description-block li {
-        padding: 0px !important;
+        padding: 0 !important;
         width: 70px !important;
     }
 

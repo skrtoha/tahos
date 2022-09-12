@@ -1,0 +1,456 @@
+.balance-block .account-debts {
+    color: red
+}
+
+.balance-block .account-total, .balance-block .account-bonus {
+    color: #0081bc;
+    font-size: 18px
+}
+
+.account #account-history-tabs {
+    float: left;
+    margin-left: 20px;
+    width: -webkit-calc(100% - 340px);
+    margin-top: 0
+}
+
+.account .sidebar .account-history-block {
+    border: 1px solid #c8c8c8;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 20px;
+}
+
+.account table th:nth-child(2), .account table td:nth-child(2) {
+    text-align: left
+}
+
+.account table.small-view {
+    display: none
+}
+
+.account .sidebar {
+    float: left;
+    width: 320px
+}
+
+.account .sidebar .balance-block, .account .sidebar .account-history-block {
+    width: 100%;
+    float: none
+}
+
+.account .sidebar .account-history-block {
+    border: 1px solid #c8c8c8;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 20px
+}
+
+.account .sidebar .account-history-block button {
+    margin-top: 20px
+}
+
+.account .sidebar .account-history-block .checkbox-wrap {
+    margin-top: 0;
+    display: block;
+    margin: 25px 0;
+}
+
+.account #account-history-tabs .buttons {
+    margin-bottom: 20px;
+}
+
+.account #account-history-tabs .buttons button {
+    margin-right: 10px;
+    float: right
+}
+
+.account #account-history-tabs .buttons button .fa {
+    font-size: 1.5em;
+    padding-right: 10px
+}
+
+.account .sidebar .balance-block {
+    border: none;
+    border-bottom: 1px dashed #ccc
+}
+
+.balance-block {
+    padding: 20px;
+    width: 320px;
+    float: left;
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid #c8c8c8
+}
+
+.balance-block button {
+    margin-top: 10px
+}
+
+.pickmeup {
+    margin-top: 10px;
+    background: #fafafa;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    display: inline-block;
+    position: absolute;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    border: 1px solid #0081bc;
+    -webkit-box-shadow: 1.5px 2.6px 7px rgba(0, 0, 0, 0.35);
+    box-shadow: 1.5px 2.6px 7px rgba(0, 0, 0, 0.35);
+}
+
+.pickmeup * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.pickmeup.pmu-flat {
+    position: relative;
+}
+
+.pickmeup.pmu-hidden {
+    display: none;
+}
+
+.pickmeup .pmu-instance {
+    display: inline-block;
+    height: 13.8em;
+    padding: 0;
+    text-align: center;
+    width: 15em;
+}
+
+.pickmeup .pmu-instance .pmu-button {
+    color: #000;
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+}
+
+.pickmeup .pmu-instance .pmu-today {
+    background: #17384d;
+    color: #ccc;
+}
+
+.pickmeup .pmu-instance .pmu-button:hover {
+    background: transparent;
+    color: #ccc;
+}
+
+.pickmeup .pmu-instance .pmu-not-in-month {
+    color: #c8c8c8;
+}
+
+.pickmeup .pmu-instance .pmu-disabled,
+.pickmeup .pmu-instance .pmu-disabled:hover {
+    color: #333;
+    cursor: default;
+}
+
+.pickmeup .pmu-instance .pmu-selected {
+    background: #0082BF;
+    color: #fff;
+}
+
+.pickmeup .pmu-instance .pmu-not-in-month.pmu-selected {
+    background: #17384d;
+}
+
+.pickmeup .pmu-instance nav {
+    color: #000;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    line-height: 2em;
+}
+
+.pickmeup .pmu-instance nav *:first-child :hover {
+    color: #ccc;
+}
+
+.pickmeup .pmu-instance nav .pmu-prev,
+.pickmeup .pmu-instance nav .pmu-next {
+    display: none;
+    height: 2em;
+    width: 1em;
+}
+
+.pickmeup .pmu-instance nav .pmu-month {
+    width: 14em;
+}
+
+.pickmeup .pmu-instance .pmu-years *,
+.pickmeup .pmu-instance .pmu-months * {
+    display: inline-block;
+    line-height: 3.6em;
+    width: 3.5em;
+}
+
+.pickmeup .pmu-instance .pmu-day-of-week {
+    color: #999;
+    cursor: default;
+}
+
+.pickmeup .pmu-instance .pmu-day-of-week *,
+.pickmeup .pmu-instance .pmu-days * {
+    display: inline-block;
+    line-height: 1.5em;
+    width: 2em;
+}
+
+.pickmeup .pmu-instance .pmu-day-of-week * {
+    line-height: 1.8em;
+}
+
+.pickmeup .pmu-instance:first-child .pmu-prev,
+.pickmeup .pmu-instance:last-child .pmu-next {
+    display: block;
+}
+
+.pickmeup .pmu-instance:first-child .pmu-month,
+.pickmeup .pmu-instance:last-child .pmu-month {
+    width: 13em;
+}
+
+.pickmeup .pmu-instance:first-child:last-child .pmu-month {
+    width: 12em;
+}
+
+.pickmeup:not(.pmu-view-days) .pmu-days,
+.pickmeup:not(.pmu-view-days) .pmu-day-of-week,
+.pickmeup:not(.pmu-view-months) .pmu-months,
+.pickmeup:not(.pmu-view-years) .pmu-years {
+    display: none;
+}
+
+.ionTabs__head {
+    position: relative;
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    height: 42px;
+    background: #0082BF;
+    border-bottom: 5px solid #8cdaff;
+}
+
+.ionTabs__head:before, .ionTabs__head:after {
+    content: "";
+    display: table;
+}
+
+.ionTabs__head li.ionTabs__tab_state_active {
+    background: #0069A3;
+    position: relative;
+}
+
+.ionTabs__head:after {
+    clear: both;
+}
+
+.ionTabs__head:before, .ionTabs__head:after {
+    content: "";
+    display: table;
+}
+
+.ionTabs__body {
+    position: relative;
+    z-index: 2;
+}
+
+.ionTabs__item.ionTabs__item_state_active {
+    display: block;
+}
+
+.ionTabs__item {
+    position: relative;
+    display: none;
+}
+
+.ionTabs__body {
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.ionTabs__tab.ionTabs__tab_state_active {
+    cursor: default;
+}
+
+.ionTabs__head li {
+    height: inherit;
+    color: #fff;
+    padding: 0 20px;
+    line-height: 42px;
+    text-align: center;
+}
+
+.ionTabs__head li.ionTabs__tab_state_active:after {
+    cursor: default;
+    width: 0;
+    border-bottom: 8px solid #8cdaff;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    bottom: 0;
+    position: absolute;
+    left: 50%;
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+.info_btn, .input-wrap, .input-wrap input, .input-wrap label, .ionTabs__head li {
+    display: inline-block;
+}
+
+.checkbox-wrap input[type=radio] {
+    display: none;
+}
+
+.checkbox-wrap label {
+    margin: 0 20px 0 0;
+    padding: 0 0 0 30px;
+    font-size: 18px;
+    line-height: 22px;
+    color: #323232;
+    cursor: pointer;
+    position: relative;
+}
+
+.checkbox-wrap label:before {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #0081bc;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 50%;
+    margin-top: -11px;
+    left: 0;
+}
+
+.checkbox-wrap input[type=radio]:checked + label:before {
+    background: #0081bc;
+    -webkit-box-shadow: 0 0 0 5px #fff inset;
+}
+
+.checkbox-wrap label:before, .date-wrap .calendar-icon, .info:before, .jq-checkbox.checked:after, .pseudo-select:after {
+    content: "";
+}
+
+.date-wrap {
+    width: 110px;
+    position: relative;
+}
+
+.date-wrap, .date-wrap input, .pseudo-select, .search-wrap {
+    display: inline-block;
+}
+
+#data-pic-beg, #data-pic-end {
+    cursor: pointer;
+}
+
+.date-wrap input {
+    font-size: 12px;
+    position: relative;
+    z-index: 1;
+    background: 0 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    width: 100%;
+    border: 1px solid #0082BF;
+}
+
+.date-wrap, .date-wrap input, .pseudo-select, .search-wrap {
+    display: inline-block;
+}
+
+.date-wrap .calendar-icon {
+    z-index: 0;
+    top: 2px;
+    right: 2px;
+    width: 30px;
+    height: -webkit-calc(100% - 4px);
+    height: calc(100% - 4px);
+    position: absolute;
+    background: url(/img/icons/calendar-icon.png) center center no-repeat, #0082BF;
+}
+td.name-col b {
+    font-weight: 800;
+}
+
+@media only screen and (max-width: 750px) {
+    .account .sidebar{
+        width: 100%;
+    }
+    .balance-block {
+        border: none;
+        border-bottom: 1px dashed #ccc;
+        width: 100%
+    }
+    .account .sidebar .balance-block, .account .sidebar .account-history-block {
+        border: none;
+        border-bottom: 1px dashed #ccc;
+    }
+    .account #account-history-tabs {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 20px;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .account table {
+        display: none
+    }
+
+    .account table.small-view {
+        display: table
+    }
+
+    .account table.small-view th:nth-child(2), .account table.small-view td:nth-child(2) {
+        text-align: center
+    }
+
+    .account table.small-view td:first-child {
+        padding-left: 5px
+    }
+
+    .account table.small-view td:last-child {
+        padding-left: 10px
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .ionTabs__body {
+        padding: 0;
+    }
+    #main {
+        padding: 0 5px;
+    }
+}
+
+@media screen and (max-width: 415px) {
+    .account .sidebar .balance-block, .account .sidebar .account-history-block {
+        padding: 10px
+    }
+
+    .account #account-history-tabs .buttons button {
+        float: left;
+        margin-bottom: 10px
+    }
+}

@@ -56,6 +56,20 @@ tr[order_id] {
     margin-top: 0;
     position: relative;
 }
+.status-wrap {
+    width: 180px;
+}
+.pseudo-select:after {
+    width: 40px;
+    height: 100%;
+    background: url(/img/icons/select__arrow_down.png) center center no-repeat, #0082BF;
+    -webkit-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+    top: 0;
+    right: 0;
+    position: absolute;
+    cursor: pointer;
+}
 
 #main > h1 {
     float: left;
@@ -194,10 +208,6 @@ table.orders-table {
 [data-name=returns] table tr.first {
     cursor: pointer;
     border-bottom: 1px dashed #c8c8c8;
-}
-
-table.orders-table tr:first-child {
-    border: none;
 }
 
 [data-name=returns] table tr {
@@ -353,19 +363,25 @@ div.status {
     padding: 5px 0;
 }
 
-.status-wrap .label, .switch {
-    display: inline-block;
-    height: 20px;
-}
-
 .status-wrap .switch {
     float: right;
     margin-top: 5px;
+}
+.switch {
+    width: 34px;
 }
 
 .switch input {
     display: none;
 }
+.status-wrap {
+    width: 180px;
+}
+ .status-wrap .label, .switch {
+     display: inline-block;
+     height: 20px;
+ }
+
 
 .slider {
     border-radius: 20px;
@@ -436,7 +452,7 @@ input:checked + .slider:before {
     margin-bottom: 15px;
 }
 
-table.orders-table tr:first-child {
+table.orders-table:not(.small-view) tr:first-child {
     border: none;
 }
 
@@ -667,4 +683,39 @@ a.return, a.removeFromOrder {
     color: red;
     display: block;
     font-size: 13px;
+}
+
+@media screen and (max-width: 550px) {
+    header {
+        padding: 0 3px;
+    }
+    .order-filter-form {
+        text-align: left;
+    }
+
+    .order-filter-form .search-wrap {
+        width: 100%;
+    }
+
+    .order-filter-form .checkbox-wrap {
+        margin-left: 0;
+        display: block;
+    }
+
+    .order-filter-form .pseudo-select {
+        margin-left: 0;
+        margin-top: 20px;
+        display: block;
+    }
+    #main {
+        padding: 0 5px;
+    }
+    .ionTabs__head li {
+        font-size: 12px;
+        padding: 0 5px; }
+    .ionTabs__body {
+        padding: 0; }
+    .status-form{
+        left: 0;
+    }
 }

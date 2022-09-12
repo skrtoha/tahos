@@ -1,0 +1,71 @@
+table.orders-table.small-view {
+    display: none;
+}
+table {
+    width: 100%;
+}
+.orders-message .input-wrap {
+    margin-top: 30px;
+    width: 300px;
+    position: relative;
+}
+.orders-message .input-wrap label {
+    display: block;
+    line-height: 34px;
+}
+.orders-message .input-wrap label, .orders-message .input-wrap .jq-selectbox {
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+}
+form#send-message textarea {
+    width: 100%;
+    resize: none;
+    height: 120px;
+    margin-bottom: 20px;
+}
+#fotos {
+    margin-bottom: 20px;
+}
+form#send-message .info_btn {
+    margin-left: 5px;
+    position: absolute;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    bottom: 0;
+    left: 140px;
+    width: 18px;
+    height: 18px;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background: url(/img/icons/registration__info_icon.png) center top no-repeat;
+    cursor: pointer;
+}
+form#send-message .info {
+    left: 128px;
+    position: absolute;
+    top: 93%;
+}
+#fotos li {
+    display: inline-block;
+    height: 200px;
+    position: relative;
+}
+#fotos img {
+    height: 200px;
+}
+#fotos li:hover:after {
+    content: "Удалить фото";
+    position: absolute;
+    color: white;
+    top: 69%;
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+form#send-message button {
+    margin-top: 30px;
+    float: none;
+    margin-bottom: 50px;
+}

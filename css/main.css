@@ -898,15 +898,6 @@ textarea {
 .hidden {
     display: none !important;
 }
-.filter-form {
-    background: #fff;
-    display: inline-block;
-    box-sizing: border-box;
-    border: 1px solid #bfbfbf;
-    padding: 30px;
-    width: 330px;
-    float: left
-}
 form input, header {
     -webkit-box-sizing: border-box
 }

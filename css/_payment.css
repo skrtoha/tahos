@@ -1,0 +1,213 @@
+.payment .pay-methods-wrap {
+    width: -webkit-calc(100% - 360px);
+    width: calc(100% - 360px);
+    float: left;
+    margin-left: 30px;
+}
+
+.payment .pay-methods-wrap .pay-methods {
+    overflow: overlay;
+    margin-bottom: 30px;
+}
+
+.payment .pay-methods-wrap .pay-methods .method {
+    cursor: pointer;
+    min-height: 123px;
+    min-width: 110px;
+    text-align: center;
+    float: left;
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+.payment .pay-methods-wrap .pay-methods .method p {
+    padding: 0;
+    padding-bottom: 5px;
+    font-size: 14px;
+}
+
+.payment .pay-methods-wrap .pay-methods .method .img {
+    margin: 0 auto;
+    margin-bottom: 5px;
+    width: 70px;
+    height: 70px;
+    padding: 4px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e2e2;
+}
+
+.payment .pay-methods-wrap .pay-methods .method .img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.payment .pay-methods-wrap .pay-methods .method.selected p, .payment .pay-methods-wrap .pay-methods .method:hover p {
+    color: #000;
+}
+
+.payment .pay-methods-wrap .pay-methods .method.selected .img, .payment .pay-methods-wrap .pay-methods .method:hover .img {
+    border: 1px solid #afafaf;
+}
+
+.payment .pay-block-wrap {
+    position: relative;
+    margin-left: 360px;
+    top: -70px;
+}
+
+.payment .pay-block-wrap .pay-block {
+    display: none;
+    max-width: 400px;
+    vertical-align: top;
+    min-height: 200px;
+    width: -webkit-calc(50% - 20px);
+    width: calc(50% - 20px);
+    -webkit-box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.35);
+    border: 1px solid #c8c8c8;
+    padding: 30px;
+    margin: 20px;
+}
+
+.payment .pay-block-wrap .pay-block.show {
+    display: inline-block;
+}
+
+.payment .pay-block-wrap .pay-block .pay-logo {
+    height: 80px;
+}
+
+.payment .pay-block-wrap .pay-block .pay-logo img {
+    height: 100%;
+}
+
+.payment .pay-block-wrap .pay-block h4 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    color: #000;
+}
+
+.payment .pay-block-wrap .pay-block .mobile-number-wrap {
+    margin-bottom: 10px;
+}
+
+.payment .pay-block-wrap .pay-block .mobile-number-wrap input {
+    width: 100px;
+}
+
+.payment .pay-block-wrap .pay-block .amount-wrap input {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+}
+
+.payment .pay-block-wrap .pay-block .amount-wrap label,
+.payment .pay-block-wrap .pay-block .amount-wrap span {
+    display: inline-block;
+}
+
+.payment .pay-block-wrap .pay-block button {
+    float: none;
+    margin-top: 20px;
+}
+
+.balance-block {
+    padding: 20px;
+    width: 320px;
+    float: left;
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #c8c8c8;
+}
+
+.balance-block button {
+    margin-top: 10px;
+}
+
+.balance-block .account-debts {
+    color: red;
+}
+
+.balance-block .account-total,
+.balance-block .account-bonus {
+    color: #0081bc;
+    font-size: 18px;
+}
+
+@media screen and (max-width: 1490px) {
+    .payment .pay-block-wrap {
+        top: 0;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .payment .pay-block-wrap {
+        margin-left: 0;
+    }
+}
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-left: 3px;
+}
+@media only screen and (max-width: 750px) {
+    .payment .pay-methods-wrap {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 30px;
+    }
+
+    .payment .pay-block-wrap .pay-block {
+        width: 100%;
+    }
+
+}
+
+@media screen and (max-width: 550px) {
+    .payment .balance-block {
+        padding: 0;
+        padding-left: 20px;
+        padding-bottom: 20px;
+    }
+
+    .payment .balance-block h1 {
+        margin-bottom: 20px;
+    }
+
+    .payment .pay-method-wrap .pay-methods {
+        margin-bottom: 0;
+    }
+
+    .payment .pay-method-wrap .method {
+        width: 100px;
+    }
+
+    .payment .pay-block-wrap .pay-block {
+        padding: 15px;
+        width: 100%;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .payment .pay-block-wrap .pay-block button {
+        margin-left: 50px;
+    }
+}
+
+@media screen and (max-width: 415px) {
+    .payment .pay-block-wrap .pay-block {
+        max-width: -webkit-calc(100% - 10px);
+        max-width: calc(100% - 10px);
+        margin: 10px 5px;
+    }
+}

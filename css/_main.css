@@ -1875,7 +1875,7 @@ button.mfp-arrow, button.mfp-close {
     position: absolute;
 }
 
-.item:not(.contacts):not([modification_id]) {
+footer .item:not(.contacts) {
     flex: 1;
 }
 footer .information{

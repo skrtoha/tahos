@@ -1,0 +1,452 @@
+@charset "UTF-8";
+.mfp-close {
+
+}
+
+#set-address-wrapper {
+    border: 3px solid #ccc;
+}
+
+#map p {
+    padding: 0;
+}
+
+ul[name=issue] {
+    display: none;
+}
+
+div.popup > div {
+    box-sizing: border-box;
+    background: white;
+    z-index: inherit;
+    padding: 20px;
+    position: relative;
+}
+
+.popup_selected {
+    position: relative;
+    z-index: 100;
+    display: none;
+}
+
+#div_issue {
+    /*display: none;*/
+}
+
+.opened {
+    display: block !important;
+}
+
+.text_selected:hover > div {
+    background: url(/img/icons/select__arrow_down.png) 16px center no-repeat #0081BC;
+}
+
+.text_selected:hover {
+    border: 1px solid #0081BC;
+    cursor: pointer;
+}
+
+.text_selected {
+    box-sizing: border-box;
+    padding: 0 65px 0 10px;
+    width: 100%;
+    height: 34px;
+    border: 1px solid #C7C7C7;
+    line-height: 34px;
+    border-radius: 4px;
+    font-size: 16px;
+    position: relative;
+}
+
+.text_selected > div {
+    background: url(/img/icons/select__arrow_down.png) center no-repeat #C7C7C7;
+    width: 44px;
+    height: 32px;
+    position: absolute;
+    right: 0;
+}
+
+ul[name=issue] {
+    border: 1px solid #C7C7C7;
+    background: #FFF;
+    margin-top: 5px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, .2);
+}
+
+ul[name=issue] li:hover {
+    background-color: #0081BC;
+    color: white;
+    cursor: pointer;
+}
+
+ul[name=issue] li {
+    height: 20px;
+    padding: 5px 10px 6px;
+    line-height: 20px;
+}
+
+ul[name=issue] li.selected {
+    background-color: #A3ABB1;
+    color: #FFF;
+}
+
+#div_issue a {
+    color: #5f5f5f;
+    text-decoration: none;
+}
+
+#popup_map {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.registration {
+    float: left;
+    width: 540px
+}
+
+.registration h1 {
+    font-size: 30px;
+    color: #737373
+}
+
+.registration .user_type {
+    margin: 25px 0
+}
+
+.registration .user_type label {
+    margin: 0 20px 0 0;
+    padding: 0 0 0 30px;
+    font-size: 18px;
+    line-height: 22px;
+    color: #323232;
+    cursor: pointer;
+    position: relative
+}
+
+.registration .user_type label:before {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    content: "";
+    width: 22px;
+    height: 22px;
+    border: 2px solid #0081bc;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 50%;
+    margin-top: -11px;
+    left: 0
+}
+
+.registration .input_box.company_name, .registration .input_box.transport_company, .registration .user_type input[type=radio] {
+    display: none
+}
+
+.registration .user_type input[type=radio]:checked + label:before {
+    background: #0081bc;
+    -webkit-box-shadow: 0 0 0 5px #fff inset
+}
+
+.registration .input_box {
+    margin: 0 0 20px;
+    position: relative
+}
+
+.registration .input_box p {
+    float: left;
+    width: 220px;
+    height: 34px;
+    font-size: 16px;
+    line-height: 34px;
+    color: #5f5f5f;
+    position: relative
+}
+
+.registration .input_box .info_btn {
+    display: block;
+    width: 18px;
+    height: 18px;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background: url(../img/icons/registration__info_icon.png) center top no-repeat;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    margin-top: -10px
+}
+
+.registration .input_box .info_btn:hover {
+    background: url(../img/icons/registration__info_icon.png) center bottom no-repeat
+}
+
+.registration .input_phone .info_btn {
+    left: 166px
+}
+
+.registration .input_email .info_btn {
+    left: 53px
+}
+
+.registration .input_box .info {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 15px;
+    width: 335px;
+    background: #fff;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    z-index: 998;
+    display: none
+}
+
+.registration .input_box .info:before {
+    display: block;
+    content: "";
+    width: 18px;
+    height: 9px;
+    background: url(../img/icons/header__white_arrow_up.png) center no-repeat;
+    position: absolute;
+    top: -9px
+}
+
+.registration .input_phone .info:before {
+    left: 165px
+}
+
+.registration .input_email .info:before {
+    left: 52px
+}
+
+.registration .input_box .info p {
+    float: none;
+    margin: 0;
+    width: 100%;
+    height: auto;
+    font-size: 14px;
+    line-height: 20px
+}
+
+.registration .input_box .info p.title {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #323232
+}
+
+.registration .input_box .input {
+    float: left;
+    width: 320px;
+    height: 34px
+}
+
+.registration .input_box input[type=text],
+.registration .input_box input[type=password] {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    padding: 0 10px;
+    width: 320px;
+    height: 34px;
+    border: 1px solid #c8c8c8;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: #fff;
+    font-family: Roboto, sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    color: #5f5f5f;
+    outline: 0
+}
+
+.registration input::-webkit-input-placeholder {
+    color: #5f5f5f
+}
+
+.registration input:-moz-placeholder {
+    color: #5f5f5f
+}
+
+.registration input::-moz-placeholder {
+    color: #5f5f5f
+}
+
+.registration input:-ms-input-placeholder {
+    color: #5f5f5f
+}
+
+.registration .input_box.company_name input[type=text] {
+    width: 200px
+}
+
+.registration .input_box.company_name .select {
+    float: left;
+    margin: 0 10px 0 0;
+    width: 110px;
+    height: 34px
+}
+
+.registration .accept {
+    margin: 20px 0 20px 0;
+    padding: 0 0 0 20px;
+    font-size: 16px;
+    line-height: 20px;
+    color: #5f5f5f;
+    position: relative
+}
+
+.registration .accept a {
+    color: #0069a3;
+    text-decoration: none;
+    outline: 0
+}
+
+.registration .accept a:hover, footer a:hover {
+    text-decoration: underline
+}
+
+.registration .accept input[type=checkbox] {
+    display: block;
+    float: left;
+    margin: 3px 7px 0 -20px;
+    width: 14px;
+    height: 14px;
+    position: relative
+}
+
+.h_overlay, .overlay {
+    position: fixed;
+    left: 0;
+    top: 0
+}
+
+.registration button {
+    display: block;
+    width: 200px;
+    height: 40px;
+    border: none;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: #0082bf;
+    font-family: Roboto, sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #fff;
+    outline: 0;
+    cursor: pointer
+}
+
+.registration button:hover {
+    background: #0069a3
+}
+
+.registration .fast_login {
+    margin: 80px 0 0 220px
+}
+
+.registration .fast_login p {
+    margin: 0 0 15px;
+    font-size: 18px;
+    color: #323232
+}
+
+.registration .fast_login a {
+    display: block;
+    float: left;
+    margin: 0 10px 0 0;
+    width: 40px;
+    height: 40px;
+    outline: 0
+}
+
+.registration .fast_login a.tw {
+    background: url(../img/icons/login__social_icons.png) 0 top no-repeat
+}
+
+.registration .fast_login a.vk {
+    background: url(../img/icons/login__social_icons.png) -50px top no-repeat
+}
+
+.registration .fast_login a.fb {
+    background: url(../img/icons/login__social_icons.png) -100px top no-repeat
+}
+
+.registration .fast_login a.ok {
+    background: url(../img/icons/login__social_icons.png) -150px top no-repeat
+}
+
+.registration .fast_login a.gp {
+    background: url(../img/icons/login__social_icons.png) -200px top no-repeat
+}
+.registration .fast_login a:hover {
+    opacity: .8
+}
+
+#map {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: right;
+    width: -webkit-calc(100% - 580px);
+    width: calc(100% - 580px);
+    height: 786px;
+    border: 3px solid #ccc;
+    background: #eee;
+    overflow: hidden;
+}
+@media screen and (max-width:928px){
+    .registration {
+        float: none
+    }
+    #map{
+        display: none;
+    }
+}
+@media screen and (max-width:700px) {
+    .registration .user_type{
+        margin: 5px 0;
+    }
+    .registration .input_box{
+        margin-bottom: 5px;
+    }
+    .registration {
+        width: 100%
+    }
+    .registration .input_box p {
+        float: none;
+        margin: 0 0 9px;
+        width: auto;
+        height: auto;
+        line-height: 14px
+    }
+    .registration .input_box .input {
+        float: left;
+        width: 100%
+    }
+    .registration .input_box input[type=text] {
+        width: 100%
+    }
+    .registration .input_box.company_name input[type=text] {
+        width: -webkit-calc(100% - 120px);
+        width: calc(100% - 120px)
+    }
+    .registration .accept {
+        margin: 20px 0
+    }
+    .registration button {
+        margin: 0
+    }
+    .registration .fast_login {
+        margin: 75px 0 0
+    }
+}
+
+@media screen and (max-width:415px){
+    .registration .user_type label {
+        margin: 0 15px 0 0;
+        font-size: 16px
+    }
+}

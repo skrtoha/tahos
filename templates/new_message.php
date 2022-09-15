@@ -1,5 +1,7 @@
 <? use core\Breadcrumb;
 
+/* @var $db \core\Database */
+
 if (!$_SESSION['user']) header('Location: /');
 if ($_POST['image_submit']){
 	$bool = true;

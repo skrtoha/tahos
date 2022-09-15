@@ -1,0 +1,189 @@
+.comment-block {
+    display: none;
+}
+
+span.crossedout {
+    text-decoration: line-through;
+    display: block;
+    text-decoration-color: red;
+}
+
+#orderInfo .jq-selectbox {
+    width: auto;
+}
+
+span.crossedout {
+    text-decoration: line-through;
+    display: block;
+    text-decoration-color: #c37476;
+}
+
+span.new_price {
+    color: #c37476;
+    font-weight: 800;
+}
+
+.comment-block label input {
+    height: auto;
+}
+
+.comment-block {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    width: 320px;
+    padding: 10px;
+    background: #fff;
+    right: -15px;
+    margin-top: 10px;;
+}
+
+.comment-block textarea {
+    resize: none;
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+.comment-block #to_all_positions {
+    height: auto;
+}
+
+.comment-block .save_comment {
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.comment-block .cancel_comment {
+    display: inline-block;
+    margin-left: 30px;
+}
+
+.comment-block {
+    right: 0;
+}
+
+.comment-block:before {
+    height: 0;
+    width: 0;
+    border-bottom: 13px solid #fff;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    content: "";
+    position: absolute;
+    top: -13px;
+    right: 30px;
+}
+
+.total {
+    margin-top: 20px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 18px;
+    float: right;
+}
+
+tr[order_id]:not(.blocked):hover {
+    cursor: pointer;
+    background: #e4faff;
+}
+
+div.status {
+    position: relative;
+    width: 250px;
+    display: inline-block;
+}
+
+div[data-name=Tab_2] tr[order_id] {
+    cursor: pointer;
+}
+
+.comment-block {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    width: 320px;
+    padding: 10px;
+    background: #fff;
+    right: 11px;
+    margin-top: 10px;
+}
+
+.comment-block textarea {
+    resize: none;
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+.comment-block:before {
+    height: 0;
+    width: 0;
+    border-bottom: 13px solid #fff;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    content: "";
+    position: absolute;
+    top: -13px;
+    right: 30px;
+}
+
+a.cancel_comment {
+    display: block;
+}
+
+.fa-pencil-square-o {
+    font-size: 1.6em !important;
+    cursor: pointer;
+}
+
+tr.gif {
+    display: table-row;
+    border-bottom: none !important;
+}
+
+tr.gif td {
+    display: table-cell;
+}
+
+table.orders-table td .status-col.status-ordered {
+    color: #da1ee2;
+}
+
+span.status-expecting {
+    color: #b1b2e6;
+}
+
+span.status-block {
+    display: block;
+}
+
+table.orders-table td .status-col.status-refused {
+    color: #d47a9f;
+}
+
+table.orders-table td .status-col.status-delivery {
+    color: #65b562;
+}
+
+table.orders-table td .status-col.status-sended {
+    color: #00a3e8;
+}
+
+table.orders-table td .status-col.status-done {
+    color: #0069a0;
+}
+
+table.orders-table td .status-col.status-return {
+    color: #f4191f;
+}
+
+table.orders-table td .status-col.status-stoped {
+    color: #ff7f1f;
+}
+#orderInfo table{
+    width: 100%;
+}
+.orders-table{
+    width: 100%;
+}

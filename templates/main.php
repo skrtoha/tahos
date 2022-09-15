@@ -1,10 +1,17 @@
 <?php
 
+/** @var $title string */
+/** @var $view string */
+/** @var $device string */
+/** @var $content string */
+/** @global $db \core\Database */
+/** @var $user array */
+
 use core\Setting;
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
 	<meta charset="utf-8">
 	<title><?=$title?></title>
@@ -17,9 +24,13 @@ use core\Setting;
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-touch-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
-	<link href="/css/main.css" rel="stylesheet" type="text/css" />
-	<link href="/css/<?=$view?>.css" rel="stylesheet" type="text/css" />
-		<?if (in_array($view, ['category'])){?>
+<!--	<link href="/css/main.css" rel="stylesheet" type="text/css" />-->
+    <link href="/css/_main.css" rel="stylesheet" type="text/css" />
+    <?if (file_exists($_SERVER['DOCUMENT_ROOT'])."/css/_$view.css"){?>
+        <link rel="stylesheet" type="text/css" href="/css/_<?=$view?>.css">
+    <?}?>
+<!--	<link href="/css/--><?//=$view?><!--.css" rel="stylesheet" type="text/css" />-->
+    <?if (in_array($view, ['category'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css">
 	<?}?>
     <?if (in_array($view, ['settings', 'registration'])){?>
@@ -262,8 +273,8 @@ use core\Setting;
 			<tr>
 				<td colspan="4">Корзина пуста</td>
 			</tr>
-			<?}?>
-		</table>
+        <?}?>
+        </table>
 	</div>
 	<!-- <div class="page-wrap"> -->
 		<div id="main"><?=$content?></div>
@@ -394,7 +405,6 @@ use core\Setting;
 				<?}?>
 				<div class="clear"></div>
 			</div>
-			<div class="clear"></div>
 		</div>
 	</footer>
 	<div class="h_overlay"></div>

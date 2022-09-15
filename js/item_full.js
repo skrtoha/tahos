@@ -182,10 +182,10 @@
 				if (item.characteristics) str += '<li class="ionTabs__tab" data-target="Tab_2_name"><i class="fa fa-cog" aria-hidden="true"></i></li>';
 				if (item.applicability) str += '<li class="ionTabs__tab" data-target="Tab_3_name"><i class="fa fa-wrench" aria-hidden="true"></i></li>';
 				str += '</ul>';
-				if ($(document).height() > 700){
+				/*if ($(document).height() > 700){
 					if (c_photos) s = 'height: 304px';
 					else s = 'height: 215px';
-				}
+				}*/
 				str += '<div style="' + s + '" class="ionTabs__body">';
 				if (item.full_desc) str += '<div class="ionTabs__item" data-name="Tab_1_name">' + item.full_desc + '</div>';
 				if (item.characteristics) str += '<div class="ionTabs__item" data-name="Tab_2_name">' + item.characteristics + '</div>';

@@ -1,0 +1,245 @@
+.sending-page h4 {
+    margin-top: 20px;
+}
+
+/*.sending-page table.middle-view, .sending-page table.small-view {
+  display: none; }*/
+
+.sending-page table textarea {
+    resize: none;
+    max-width: 200px;
+    width: 100%;
+    height: 60px;
+    font-size: 12px;
+    padding: 10px;
+}
+
+.sending-page .summary {
+    margin: 30px 0;
+    text-align: right;
+}
+
+.sending-page .summary p {
+    display: inline-block;
+    font-size: 18px;
+    text-transform: uppercase;
+    margin-right: 30px;
+}
+
+.sending-page .summary p span {
+    text-transform: none;
+    font-weight: bold;
+}
+
+.sending-page form#delivery-form {
+    width: 330px;
+    float: left;
+}
+
+.sending-page form#delivery-form .select-wrap {
+    display: block;
+    width: 260px;
+    margin-bottom: 20px;
+}
+
+.sending-page form#delivery-form .input-wrap {
+    width: 340px;
+    display: block;
+    margin: 5px 0;
+}
+
+.sending-page form#delivery-form .input-wrap label {
+    width: 130px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: right;
+    display: inline-block;
+    padding-right: 10px;
+}
+
+.sending-page form#delivery-form .input-wrap label[for="pasport"] {
+    position: relative;
+    top: 6px;
+}
+
+.sending-page form#delivery-form .input-wrap input, .input-wrap div.jq-selectbox {
+    width: -webkit-calc(100% - 140px);
+    width: calc(100% - 140px);
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: left;
+    display: inline-block;
+}
+
+.sending-page form#delivery-form .checkbx-wrap {
+    margin: 10px 0;
+}
+
+.sending-page form#delivery-form .checkbx-wrap label {
+    margin-right: 10px;
+}
+
+.sending-page form#delivery-form button {
+    margin-top: 30px;
+}
+
+.sending-page form#delivery-form .for-tk {
+    display: none;
+}
+
+.sending-page .templates-block {
+    float: left;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: -webkit-calc(100% - 370px);
+    width: calc(100% - 370px);
+    margin-left: 30px;
+}
+
+.sending-page .templates-block ol {
+    display: inline-block;
+    padding: 0;
+    border: 1px solid #c8c8c8;
+    list-style-position: inside;
+}
+
+.sending-page .templates-block ol li {
+    position: relative;
+    padding: 10px 25px 10px 10px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.sending-page .templates-block ol li:nth-child(2n+1) {
+    background: #F0F0F0;
+}
+
+.sending-page .templates-block ol li .fa-pencil {
+    font-size: 1.2em;
+    color: #0082BF;
+    padding: 0 10px;
+    cursor: pointer;
+    -webkit-transition: all ease .2s;
+    transition: all ease .2s;
+}
+
+.sending-page .templates-block ol li .fa-pencil:hover {
+    -webkit-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+}
+
+.sending-page .templates-block ol li:hover {
+    color: #fff;
+    background: #0082BF;
+}
+
+.sending-page .templates-block ol li:hover .fa-pencil {
+    color: #fff;
+}
+
+.sending-page .templates-block ol li .fa-times {
+    font-size: 1.2em;
+    color: red;
+    -webkit-transition: all ease .2s;
+    transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) .2s;
+}
+
+.sending-page .templates-block ol li .fa-times:hover {
+    -webkit-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+}
+.filter-form .search-wrap, .filter-form input, table {
+    width: 100%;
+}
+/* Small Devices, Tablets */
+@media only screen and (max-width: 750px) {
+    .sending-page table.middle-view {
+        display: table;
+    }
+
+    .sending-page table.middle-view tr {
+        border: none;
+    }
+
+    .sending-page table.middle-view tr:nth-child(2n) {
+        border-top: 1px dashed #c8c8c8;
+    }
+
+    .sending-page table.middle-view tr:nth-child(2n) td:last-child {
+        vertical-align: bottom;
+        padding-bottom: 0;
+        padding-left: 20px;
+    }
+
+    .sending-page table.middle-view tr:nth-child(2n+1) td {
+        padding-top: 0;
+    }
+
+    .sending-page table.middle-view tr:nth-child(2n+1) textarea {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .sending-page table.middle-view tr:nth-child(2) {
+        border: none;
+    }
+
+    .sending-page table.middle-view tr:last-child {
+        border-bottom: 1px dashed #c8c8c8;
+    }
+
+    .sending-page form#delivery-form,
+    .sending-page .templates-block {
+        width: 100%;
+    }
+
+    .sending-page .templates-block {
+        margin-left: 0;
+    }
+}
+
+/* Extra Small Devices, Phones */
+@media screen and (max-width: 550px) {
+    .sending-page form#delivery-form .input-wrap input, .input-wrap div.jq-selectbox{
+        width: 100%;
+    }
+    .sending-page .summary {
+        text-align: left;
+    }
+
+    .sending-page table.middle-view {
+        display: none;
+    }
+
+    .sending-page table.small-view {
+        display: table;
+    }
+
+    .sending-page table.small-view textarea {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .sending-page table.small-view p {
+        padding-bottom: 0;
+    }
+
+    .sending-page form#delivery-form .input-wrap {
+        width: 100%;
+    }
+
+    .sending-page form#delivery-form .input-wrap label {
+        width: 100%;
+        text-align: left;
+    }
+
+    .sending-page form#delivery-form .input-wrap label[for=pasport] {
+        top: 0;
+    }
+
+    .sending-page form#delivery-form .input-wrap input {
+        width: 100%;
+    }
+}

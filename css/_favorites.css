@@ -1,0 +1,108 @@
+.favorites table td:nth-child(-n+3),
+.favorites table th:nth-child(-n+3) {
+    text-align: left;
+}
+
+.favorites table textarea {
+    height: 60px;
+    width: 100%;
+}
+
+.favorites textarea {
+    resize: none;
+    padding: 5px;
+}
+
+.favorites .mobile-layout {
+    display: none;
+}
+
+.favorites .mobile-layout .goods-header {
+    position: relative;
+}
+
+.favorites .mobile-layout .goods-header p {
+    width: -webkit-calc(100% - 80px);
+    width: calc(100% - 80px);
+}
+
+.favorites .mobile-layout .goods-header p:first-child {
+    padding-bottom: 0;
+}
+
+.favorites .mobile-layout .goods-header .fa-camera {
+    position: absolute;
+    right: 20px;
+    top: -10px;
+    color: #000;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    background: #ebf0f1;
+    text-align: center;
+    font-size: 1.6em;
+    cursor: pointer;
+}
+
+.favorites .mobile-layout .good {
+    padding-bottom: 30px;
+    padding-top: 20px;
+    border-bottom: 1px dashed #c8c8c8;
+}
+
+.favorites .mobile-layout .good:first-child {
+    padding-top: 0;
+}
+
+.favorites .mobile-layout .good .goods-footer {
+    position: relative;
+}
+
+.favorites .mobile-layout .good .goods-footer textarea {
+    width: -webkit-calc(100% - 80px);
+    width: calc(100% - 80px);
+    height: 100px;
+}
+
+.favorites .mobile-layout .good .goods-footer span.delete-btn {
+    position: absolute;
+    text-align: center;
+    right: 25px;
+    top: 5px;
+    width: 40px;
+    height: 40px;
+    line-height: 36px;
+    font-size: 1.5em;
+}
+
+#add-to-favorits.added:before{
+    content: 'Удалить из избранного';
+}
+html {
+	height: 100%;
+	box-sizing: border-box;
+}
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}.fa-camera:before {
+     content: "\f030";
+ }b.brend_info {
+      font-weight: 700;
+      cursor: pointer;
+  }
+@media screen and (max-width: 550px) {
+    .favorites table.favorites-table {
+        display: none;
+    }
+
+    .favorites .mobile-layout {
+        display: block;
+    }
+}

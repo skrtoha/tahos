@@ -463,12 +463,6 @@ dl dd:nth-of-type(2n+1), dl dt:nth-of-type(2n+1) {
     text-align: left;
     margin: 5px 0
 }
-.input-wrap label {
-    text-align: right;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    padding-right: 10px
-}
 ul.list {
     margin-left: 30px
 }
@@ -898,15 +892,6 @@ textarea {
 }
 .hidden {
     display: none !important;
-}
-.filter-form {
-    background: #fff;
-    display: inline-block;
-    box-sizing: border-box;
-    border: 1px solid #bfbfbf;
-    padding: 30px;
-    width: 330px;
-    float: left
 }
 form input, header {
     -webkit-box-sizing: border-box
@@ -2731,8 +2716,8 @@ footer{
         background: #0081bc;
     }
     footer .contacts .item_box {
-         float: left;
-         width: 430px;
+        float: left;
+        width: 430px;
     }
 }
 @media screen and (max-width: 880px){

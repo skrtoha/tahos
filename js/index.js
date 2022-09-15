@@ -21,7 +21,7 @@ $(function(){
 				var brends = JSON.parse(res);
 				// console.log(brends);
 				var str = '<option value=""></option>';
-				for(var key in brends) str += '<option href="' + brends[key].href + '" value="' + brends[key].brend_id + '">' + brends[key].title + '</option>';
+				for(var key in brends) str += '<option>' + brends[key].title + '</option>';
 				$('select.brend_select').prop('disabled', false).html(str).trigger('refresh');
 			}
 		})

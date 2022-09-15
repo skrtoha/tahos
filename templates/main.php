@@ -42,7 +42,7 @@ use core\Setting;
     <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
 	<meta name="theme-color" content="#0081BC">
-	<script type="text/javascript" src="/js/libs.min.js"></script>
+	<script src="/js/libs.min.js"></script>
 	<meta name="msapplication-navbutton-color" content="#0081BC">
 	<meta name="apple-mobile-web-app-status-bar-style" content="#0081BC">
 </head>
@@ -96,7 +96,7 @@ use core\Setting;
 						<label  for="radio2" data-placeholder="Введите штрих-код">Поиск по штрих-коду</label>
 						
 						<input type="radio" <?=$type == 'vin' ? "checked" : ""?> name="type" id="radio3" value="vin">
-						<label for="radio3" type_search="vin" data-placeholder="Введите VIN-номер">Искать по VIN-номеру</label>
+						<label for="radio3" data-placeholder="Введите VIN-номер">Искать по VIN-номеру</label>
 					</div>
 					<button class="search_btn"></button>
 				</form>
@@ -205,7 +205,7 @@ use core\Setting;
                     <div id="restore_password" class="product-popup mfp-hide">
                         <h2>Востановить пароль</h2>
                         <div class="content">
-                            <form action="">
+                            <form action="/">
                                 <div class="wrapper">
                                     <div class="left">Введите ваш email:</div>
                                     <div class="right">
@@ -267,7 +267,7 @@ use core\Setting;
 	<?}
 		else{?>
 			<tr>
-				<td colspan="4">Корзина пуста</td>
+				<td>Корзина пуста</td>
 			</tr>
         <?}?>
         </table>

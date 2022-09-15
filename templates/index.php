@@ -20,7 +20,7 @@ $categories = Category::getAll('c.isShowOnMainPage = 1 AND sc.isShowOnMainPage =
 		<form action="#" method="get">
 			<div class="select active">
 				<select class="vehicle_select" data-placeholder="Тип">
-					<option value=""></option>
+					<option label="Вид транспорта" value=""></option>
 					<?while($row = $res_vehicles->fetch_assoc()){?>
 						<option href="<?=$row['href']?>" value="<?=$row['id']?>"><?=$row['title']?></option>
 					<?}?>

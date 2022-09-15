@@ -22,6 +22,10 @@ span.delete-message {
     text-align: center;
 }
 
+.messages-page table{
+    width: 100%;
+}
+
 .messages-page .subject,
 .messages-page .sender,
 .messages-page .send-time {

@@ -53,7 +53,7 @@ $(function(){
 				// console.log(response); return false;
 				var models = JSON.parse(response);
 				var str = '<option value=""></option>';
-				for (var k in models) str += '<option href="' + models[k].href + '" value="' + models[k].model_id + '">' + models[k].title + '</option>';
+				for (var k in models) str += '<option>' + models[k].title + '</option>';
 				$('select.model_select').prop('disabled', false).html(str).trigger('refresh');
 			}
 		})

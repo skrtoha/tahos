@@ -214,6 +214,7 @@ use core\Setting;
 			<div class="clear"></div>
 		</div>
 	</header>
+    <h1 class="hidden"><?=$title?></h1>
 	<input type="hidden" name="currency_id" value="<?=$user['currency_id']?>">
 	<div class="cart-popup">
 		<table class="cart-popup-table">
@@ -283,6 +284,7 @@ use core\Setting;
 			<div class="item information">
 				<h4><?=$titles[1]?></h4>
 				<ul>
+                    <li><a href="/sitemap">Карта сайта</a></li>
                     <?foreach($articleList as $article){
                         if ($article['column'] != 1) continue; ?>
                         <li>

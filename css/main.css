@@ -36,13 +36,13 @@ label[for=w_not_remember_checkbox] {
     width: 50%;
     display: inline-block;
 }
+header .catalog_btn {
+    margin: 27px 37px 0 4px;
+}
 @media screen and (max-width: 1490px) {
-    header .catalog_btn {
-        margin: 27px 37px 0 4px;
-    }
     header .search {
-        width: -webkit-calc(100% - 582px);
-        width: calc(100% - 582px);
+        width: -webkit-calc(100% - 582px) !important;
+        width: calc(100% - 582px) !important;
     }
 }
 #providerInfo .information .row span.right {
@@ -140,6 +140,7 @@ header .login {
 }
 header .login .social_buttons {
     margin: 22px 26px 0 0;
+    clear: both;
 }
 .icon-circle-down:before {
     content: "\ea43";
@@ -1089,8 +1090,6 @@ header .logo {
 }
 header .catalog_btn {
     float: left;
-    margin: 27px 37px 0 -webkit-calc(100% - 1447px);
-    margin: 27px 37px 0 calc(100% - 1447px);
     width: 30px;
     height: 22px;
     background: url(/img/icons/header__catalog.png) center no-repeat;
@@ -1861,6 +1860,12 @@ footer .social_networks a.ok{
     box-shadow: 0px 0px 8px 3px rgba(0,0,0,0.5);
     display: flex;
 }
+.login p {
+    font-size: 14px;
+    line-height: 14px;
+    color: #5f5f5f;
+    clear: both;
+}
 /* Extra Small Devices, Phones */
 @media screen and (max-width: 550px) {
     #actions_slider .prev, #actions_slider .next {
@@ -1888,7 +1893,8 @@ footer .social_networks a.ok{
     header .login h3 {
         display: none; }
     header .login p {
-        padding-bottom: 0; }
+        padding-bottom: 0;
+    }
     header .login input[type="text"],
     header .login input[type="password"] {
         margin-bottom: 10px;
@@ -2638,6 +2644,10 @@ footer{
 #main{
     flex: 1;
     width: 100%;
+    box-sizing: border-box;
+    margin: 34px auto;
+    padding: 0 20px;
+    max-width: 1597px;
 }
 .social{
     display: block;
@@ -2786,4 +2796,108 @@ footer{
     margin: -2px 1px;
     vertical-align: top;
 }
+.login h3 {
+    padding: 0 0 22px 0;
+    font-size: 24px;
+    line-height: 24px;
+    color: #737373;
+}
+.login p {
+    font-size: 14px;
+    line-height: 14px;
+    color: #5f5f5f;
+    clear: both;
+}
+.login input[type="text"], .login input[type="password"] {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    margin: 7px 0 22px 0;
+    padding: 0 10px;
+    width: 235px;
+    height: 34px;
+    border: 1px solid #c8c8c8;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: #fff;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #000;
+    outline: none;
+}
+.login input[type="password"] {
+    float: left;
+    margin: 8px 0 20px 0;
+}
+.login .forgot_password {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    margin: 7px 0 0 14px;
+    padding: 1px 0 0 0;
+    width: 90px;
+    height: 34px;
+    font-size: 14px;
+    line-height: 18px;
+}
+.login a {
+    color: #0069a3;
+    text-decoration: none;
+    outline: none;
+}
+.login .not_remember {
+    clear: both;
+    margin: 0 0 18px 0;
+    height: 18px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #5f5f5f;
+}
+.login .not_remember label {
+    display: block;
+    float: left;
+}
+.login .not_remember:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.login button {
+    display: block;
+    float: left;
+    width: 80px;
+    height: 34px;
+    border: none;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: #0082bf;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #fff;
+    outline: none;
+    cursor: pointer;
+}
+.login .registration_link {
+    float: left;
+    margin: 0 0 0 14px;
+    height: 34px;
+    font-size: 14px;
+    line-height: 34px;
+}
+.product-popup {
+    max-width: 900px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #fff;
+    padding: 30px;
+    position: relative;
+}
 
+.mfp-hide {
+    display: none !important;
+}

@@ -180,7 +180,6 @@ function items(){
 			$start,$perPage
 	";
 	$res_items = $db->query($query);
-	$categories = $db->select('categories', '*', '', '', '', '', true);
 	$page_title = "Товары бренда <b>".$db->getFieldOnID('brends', $id, 'title')."</b>";
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=brends'>Бренды товаров</a> > $page_title";?>
 	<div id="total" style="margin: 0">Всего: <?=$all?></div>

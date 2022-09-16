@@ -22,23 +22,23 @@ $categories = Category::getAll('c.isShowOnMainPage = 1 AND sc.isShowOnMainPage =
 				<select class="vehicle_select" data-placeholder="Тип">
 					<option label="Вид транспорта" value=""></option>
 					<?while($row = $res_vehicles->fetch_assoc()){?>
-						<option href="<?=$row['href']?>" value="<?=$row['id']?>"><?=$row['title']?></option>
+						<option value="<?=$row['id']?>"><?=$row['title']?></option>
 					<?}?>
 				</select>
 			</div>
 			<div class="select">
 				<select class="brend_select" disabled data-placeholder="Марка">
-					<option value=""></option>
+					<option label="Выбор бренда" value=""></option>
 				</select>
 			</div>
 			<div class="select">
 				<select class="year_select" disabled data-placeholder="Год выпуска">
-					<option value=""></option>
+					<option label="Выбор года" value=""></option>
 				</select>
 			</div>
 			<div class="select">
 				<select disabled class="model_select" data-placeholder="Модель" data-search="true">
-					<option value=""></option>
+					<option label="Выбор модели" value=""></option>
 				</select>
 			</div>
 		</form>

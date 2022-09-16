@@ -1072,6 +1072,10 @@ form input, header {
     -webkit-box-sizing: border-box
 }
 
+#restore_password{
+    background: white;
+    padding: 20px;
+}
 #restore_password .wrapper .right {
     margin-top: 10px;
 }
@@ -1811,11 +1815,23 @@ footer #driving_direction{
     height: 100%;
     vertical-align: middle;
 }
-.mfp-auto-cursor .mfp-content {
-    cursor: auto;
-}
-.mfp-ajax-holder .mfp-content, .mfp-inline-holder .mfp-content {
+.mfp-container {
+    text-align: center;
+    position: absolute;
     width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+.mfp-container:before {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    content: '';
+}
+.mfp-auto-cursor .mfp-content {
     cursor: auto;
 }
 .mfp-content {

@@ -1,0 +1,626 @@
+.product-popup {
+    max-width: 900px;
+    width: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    padding: 20px;
+    position: relative
+}
+
+.product-popup h2.title {
+    color: #0081bc;
+    text-transform: uppercase
+}
+
+.product-popup .price {
+    position: absolute;
+    right: 40px;
+    top: 20px;
+    font-size: 50px;
+    color: #0082BF
+}
+
+.product-popup .mobile-price {
+    display: none
+}
+
+.product-popup .gallery-block {
+    float: left;
+    box-sizing: border-box;
+    width: 200px;
+    display: inline-block
+}
+
+.product-popup .gallery-block .rating {
+    text-align: center
+}
+
+.product-popup .gallery-block #gallery img:hover {
+    outline: 1px solid #c8c8c8
+}
+
+.product-popup .gallery-block #gallery .owl-stage-outer {
+    z-index: 2;
+    padding: 5px 0
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev, .product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next {
+    height: 100%;
+    width: 15px;
+    position: absolute;
+    background: #0082BF;
+    transition: all ease .5s
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev:hover, .product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next:hover {
+    background: #0069A3
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev:before, .product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next:before {
+    display: block;
+    width: inherit;
+    line-height: 100%;
+    color: #fff;
+    font-size: 20px;
+    font-family: "FontAwesome";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%)
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev {
+    left: -15px
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev:before {
+    content: "\f104"
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next {
+    right: -15px
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next:before {
+    content: "\f105"
+}
+
+.product-popup .description-block {
+    width: -webkit-calc(100% - 200px);
+    box-sizing: border-box;
+    float: right;
+    padding-left: 30px;
+    display: inline-block
+}
+
+.product-popup .description-block .ionTabs__body p:first-child {
+    margin-top: 0;
+    padding-top: 0
+}
+
+.product-popup .buttons {
+    margin-top: 0
+}
+
+#div_10 {
+    margin-bottom: 15px;
+}
+
+.product-popup .price {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    font-size: 50px;
+    color: #0082BF;
+}
+
+.product-popup .mobile-price {
+    display: none;
+}
+
+.product-popup .gallery-block #main-pic {
+    cursor: pointer;
+    width: 100%;
+    height: 250px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.product-popup .gallery-block #main-pic:after {
+    -webkit-transition: opacity .3s, font-size .5s;
+    transition: opacity .3s, font-size .5s;
+    content: "\f00e";
+    font-family: fontAwesome;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    opacity: .5;
+}
+
+.product-popup .gallery-block #main-pic:hover:after {
+    opacity: 1;
+    font-size: 1.3em;
+}
+
+.product-popup .gallery-block #main-pic img {
+    width: 100%;
+    object-fit: cover;
+}
+
+.product-popup .gallery-block .rating {
+    cursor: pointer;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.product-popup .gallery-block .rating .fa {
+    font-size: 2em;
+}
+
+.product-popup .gallery-block #gallery img {
+    cursor: pointer;
+}
+
+.product-popup .gallery-block #gallery img:hover {
+    outline: 1px solid #c8c8c8;
+}
+
+.product-popup .gallery-block #gallery .owl-controls {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav {
+    height: 100%;
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev,
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next {
+    height: 100%;
+    width: 15px;
+    position: absolute;
+    background: #0082BF;
+    -webkit-transition: all ease .5s;
+    transition: all ease .5s;
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev:hover,
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next:hover {
+    background: #0069A3;
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev:before,
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next:before {
+    display: block;
+    width: inherit;
+    line-height: 100%;
+    color: #fff;
+    font-size: 20px;
+    font-family: "FontAwesome";
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev {
+    left: -15px;
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev:before {
+    content: "\f104";
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next {
+    right: -15px;
+}
+
+.product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next:before {
+    content: "\f105";
+}
+
+.product-popup .description-block {
+    width: -webkit-calc(100% - 200px);
+    width: calc(100% - 200px);
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    padding-left: 30px;
+    position: relative;
+    min-height: 34px;
+}
+
+.product-popup .description-block .ionTabs__body {
+    margin: 10px 0;
+    max-height: 252px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.product-popup .description-block .ionTabs__body p:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.product-popup .buttons {
+    margin-top: 50px;
+}
+
+.product-popup .buttons button {
+    float: left;
+    margin-right: 10px;
+    height: 39px;
+    position: relative;
+    padding-left: 40px;
+}
+
+.product-popup .buttons button span {
+    position: absolute;
+    left: 5px;
+    padding-top: 6.5px;
+    padding-right: 5px;
+}
+
+.product-popup {
+    max-width: 900px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #fff;
+    padding: 30px;
+    position: relative;
+    margin: 0 auto;
+}
+
+#div_10 {
+    float: left;
+}
+
+.title b {
+    color: #727272;
+}
+
+#div_table {
+    float: right;
+    width: 200px;
+    margin: -15px 24px 10px 0;
+}
+
+#item_into {
+    width: 100%;
+    border: 5px solid #0082BF;
+    white-space: nowrap;
+}
+
+#item_into .goods-counter {
+    position: absolute;
+    top: 0;
+    right: 0;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background: red;
+    height: 15px;
+    width: 15px;
+    line-height: 15px;
+    text-align: center;
+    color: #fff;
+    padding: 1px;
+    font-size: 15px;
+}
+
+#item_into tr {
+    border: none;
+}
+
+#item_into td {
+    padding: 0 10px;
+}
+
+.fa-star-o:before {
+    content: "\f006";
+}
+
+.fa-star, .fa-star-half-o, .fa-star-o {
+    color: gold;
+}
+
+.fa-star:before {
+    content: "\f005"
+}
+
+.fa-star-half-empty:before, .fa-star-half-full:before, .fa-star-half-o:before {
+    content: "\f123"
+}
+
+#mgn_popup .product-popup-tabs {
+    margin-top: 0
+}
+
+.description-block li i.fa {
+    display: none;
+}
+
+.fa-wrench:before {
+    content: "\f0ad";
+}
+
+.owl-controls {
+    width: 100%;
+    height: 15px;
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    font-size: 0;
+    line-height: 0;
+    text-align: center
+}
+
+.owl-dot {
+    box-sizing: border-box;
+    display: inline-block;
+    margin: 0 4px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #fff;
+    border-radius: 50%
+}
+
+.owl-dot.active {
+    background: #fff
+}
+
+.owl-carousel .animated {
+    animation-duration: 1000ms
+}
+
+.owl-carousel .owl-animated-in {
+    z-index: 0
+}
+
+.owl-carousel .owl-animated-out {
+    z-index: 1
+}
+
+.owl-carousel .fadeOut {
+    animation-name: fadeOut
+}
+
+.owl-carousel {
+    display: none;
+    width: 100%;
+    position: relative;
+    z-index: 1
+}
+
+.owl-carousel .owl-stage {
+    position: relative
+}
+
+.owl-carousel .owl-stage:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0
+}
+
+.owl-carousel .owl-stage-outer {
+    position: relative;
+    overflow: hidden
+}
+
+.owl-carousel .owl-controls .owl-nav .owl-prev, .owl-carousel .owl-controls .owl-nav .owl-next, .owl-carousel .owl-controls .owl-dot {
+    cursor: pointer
+}
+
+.owl-carousel.owl-loaded {
+    display: block
+}
+
+.owl-carousel.owl-loading {
+    opacity: 0;
+    display: block
+}
+
+.owl-carousel.owl-hidden {
+    opacity: 0
+}
+
+.owl-carousel .owl-refresh .owl-item {
+    display: none
+}
+
+.owl-carousel .owl-item {
+    position: relative;
+    min-height: 1px;
+    float: left
+}
+
+.owl-carousel .owl-item img {
+    display: block;
+    width: 100%
+}
+
+.owl-carousel .owl-grab {
+    cursor: move
+}
+
+.owl-carousel.owl-rtl {
+    direction: rtl
+}
+
+.owl-carousel.owl-rtl .owl-item {
+    float: right
+}
+
+.no-js .owl-carousel {
+    display: block
+}
+
+.owl-carousel .owl-item .owl-lazy {
+    opacity: 0;
+    transition: opacity 400ms ease
+}
+
+.owl-carousel .owl-item img {
+    transform-style: preserve-3d
+}
+
+.owl-height {
+    transition: height 500ms ease-in-out
+}
+
+.owl-carousel .owl-video-wrapper {
+    position: relative;
+    height: 100%;
+    background: #000
+}
+
+.owl-carousel .owl-video-play-icon {
+    position: absolute;
+    height: 80px;
+    width: 80px;
+    left: 50%;
+    top: 50%;
+    margin-left: -40px;
+    margin-top: -40px;
+    cursor: pointer;
+    z-index: 1;
+    transition: scale 100ms ease
+}
+
+.owl-carousel .owl-video-playing .owl-video-tn, .owl-carousel .owl-video-playing .owl-video-play-icon {
+    display: none
+}
+
+.owl-carousel .owl-video-tn {
+    opacity: 0;
+    height: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: opacity 400ms ease
+}
+
+.owl-carousel .owl-video-frame {
+    position: relative;
+    z-index: 1
+}
+
+.description-block li[data-target=Tab_3_name]:before {
+    content: 'Применяемость';
+}
+
+span[class^=icon_] {
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    background-repeat: no-repeat;
+    background-position: center
+}
+
+.icon_search {
+    width: 25px;
+    height: 25px;
+    background: url(/img/icons/icon_search.png)
+}
+
+.icon_put-in-basket {
+    width: 26px;
+    height: 26px;
+    background: url(/img/icons/info.png);
+    background-size: 18px;
+}
+
+tr.shown.button-row.empty td {
+    padding: 15px 0;
+}
+
+.description-block li i.fa {
+    display: none;
+}
+
+.description-block li[data-target=Tab_1_name]:before {
+    content: 'Описание';
+}
+
+.description-block li[data-target=Tab_2_name]:before {
+    content: 'Характеристики';
+}
+
+.description-block li[data-target=Tab_3_name]:before {
+    content: 'Применяемость';
+}
+.fa-question-circle-o:before {
+    content: "\f29c";
+}
+.fa-wrench:before {
+    content: "\f0ad";
+}
+.icon_heart {
+    width: 26px;
+    height: 23px;
+    background: url(/img/icons/icon_heart.png);
+}
+
+@media screen and (max-width: 800px) {
+    .description-block .ionTabs__head {
+        height: 50px;
+    }
+
+    .description-block li {
+        padding: 0 !important;
+        width: 70px !important;
+    }
+
+    .description-block li[data-target=Tab_1_name]:before,
+    .description-block li[data-target=Tab_2_name]:before,
+    .description-block li[data-target=Tab_3_name]:before {
+        display: none;
+    }
+
+    .description-block li i.fa {
+        display: block;
+        font-size: 36px;
+        margin-top: 4px;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .product-popup .description-block {
+        width: 100%;
+        float: none;
+        padding-left: 0;
+    }
+
+    .product-popup .gallery-block {
+        width: 100%;
+        float: none;
+        margin-top: 15px;
+    }
+
+    .product-popup .buttons button {
+        min-width: 226px;
+    }
+
+    .product-popup .gallery-block #main-pic {
+        height: auto;
+        text-align: center;
+    }
+
+    .product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-next, .product-popup .gallery-block #gallery .owl-controls .owl-nav .owl-prev {
+        width: 30px;
+        z-index: 2;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .product-popup .buttons button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

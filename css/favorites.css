@@ -3,6 +3,10 @@
     text-align: left;
 }
 
+.favorites-table {
+    width: 100%;
+}
+
 .favorites table textarea {
     height: 60px;
     width: 100%;
@@ -77,13 +81,15 @@
     font-size: 1.5em;
 }
 
-#add-to-favorits.added:before{
+#add-to-favorits.added:before {
     content: 'Удалить из избранного';
 }
+
 html {
-	height: 100%;
-	box-sizing: border-box;
+    height: 100%;
+    box-sizing: border-box;
 }
+
 .fa {
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
@@ -91,13 +97,157 @@ html {
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}.fa-camera:before {
-     content: "\f030";
- }b.brend_info {
-      font-weight: 700;
-      cursor: pointer;
-  }
-@media screen and (max-width: 550px) {
+}
+
+.fa-camera:before {
+    content: "\f030";
+}
+
+b.brend_info {
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.fa-camera:before {
+    content: "\f030";
+    font-size: 19px;
+}
+
+.product-popup {
+    max-width: 900px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #fff;
+    padding: 30px;
+    position: relative;
+}
+
+#div_10 {
+    width: calc(100% - 238px);
+    float: left;
+}
+
+.product-popup h2.title {
+    color: #0081bc;
+    text-transform: uppercase;
+}
+
+table#item_into {
+    display: none;
+}
+
+.ionTabs {
+    position: relative;
+    margin-top: 30px;
+}
+
+span.subprice {
+    display: block;
+    line-height: 0;
+    font-size: 12px;
+    color: #00aafb;
+    font-weight: 700;
+}
+
+.ionTabs__head {
+    position: relative;
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    height: 42px;
+    background: #0082BF;
+    border-bottom: 5px solid #8cdaff;
+}
+
+.ionTabs__head:before, .ionTabs__head:after {
+    content: "";
+    display: table
+}
+
+.jq-checkbox.checked:after {
+    content: "";
+}
+
+.ionTabs__head li {
+    height: inherit;
+    color: #fff;
+    padding: 0 20px;
+    line-height: 42px;
+    text-align: center;
+}
+
+.info_btn, .input-wrap, .input-wrap input, .input-wrap label, .ionTabs__head li {
+    display: inline-block;
+}
+
+.jq-checkbox.checked:after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    left: 3px;
+    top: 3px;
+    background: #0082BF
+}
+
+.ionTabs__head:after {
+    clear: both
+}
+
+.ionTabs__tab {
+    position: relative;
+    display: block;
+    float: left;
+    list-style-type: none;
+    background: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer
+}
+
+.ionTabs__head li.ionTabs__tab_state_active:after {
+    content: "";
+    height: 0;
+    width: 0;
+    border-bottom: 8px solid #8cdaff;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    bottom: 0;
+    position: absolute;
+    left: 50%;
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+.ionTabs__tab.ionTabs__tab_state_active {
+    cursor: default;
+    background: #0069A3;
+    position: relative;
+}
+
+.ionTabs__body {
+    position: relative;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.ionTabs__item {
+    position: relative;
+    display: none
+}
+
+.ionTabs__item.ionTabs__item_state_active {
+    display: block
+}
+
+.ionTabs__preloader {
+    position: relative
+}
+@media screen and (max-width: 800px){
+
+}
+    @media screen and (max-width: 550px) {
     .favorites table.favorites-table {
         display: none;
     }

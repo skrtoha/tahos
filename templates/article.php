@@ -1,7 +1,8 @@
 <?
-
 use core\Breadcrumb;
 use core\Provider\Autoeuro;
+
+/** @var \core\Database $db */
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders){
@@ -192,40 +193,3 @@ Breadcrumb::out();
 		<?=Autoeuro::getParams()->minDeliveryStoreID?>
 	];
 </script>
-<div
-    id="blueimp-gallery"
-    class="blueimp-gallery"
-    aria-label="image gallery"
-    aria-modal="true"
-    role="dialog"
->
-    <div class="slides" aria-live="polite"></div>
-    <h3 class="title"></h3>
-    <a
-        class="prev"
-        aria-controls="blueimp-gallery"
-        aria-label="previous slide"
-        aria-keyshortcuts="ArrowLeft"
-    ></a>
-    <a
-        class="next"
-        aria-controls="blueimp-gallery"
-        aria-label="next slide"
-        aria-keyshortcuts="ArrowRight"
-    ></a>
-    <a
-        class="close"
-        aria-controls="blueimp-gallery"
-        aria-label="close"
-        aria-keyshortcuts="Escape"
-    ></a>
-    <a
-        class="play-pause"
-        aria-controls="blueimp-gallery"
-        aria-label="play slideshow"
-        aria-keyshortcuts="Space"
-        aria-pressed="false"
-        role="button"
-    ></a>
-    <ol class="indicator"></ol>
-</div>

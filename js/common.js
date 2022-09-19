@@ -349,23 +349,6 @@ $(function() {
             }
         })
     })
-	$(document).on('click', '#main-pic img', function(event) {
-        const $th = $(this);
-        const currentImage = $th.attr('data-zoom-image');
-        let currentNumber = 0;
-        let counter = 0;
-        $.each(bigImages, function(i, item){
-            if (item == currentImage) currentNumber = counter;
-            counter++;
-        })
-        let gallery = blueimp.Gallery(bigImages, {
-            index: currentNumber,
-            thumbnailIndicators: true,
-            onopened: function(){
-                $('#blueimp-gallery').addClass('blueimp-gallery-controls');
-            }
-        });
-	});
 	$(document).on('click', '.brend_info', function(e){
 		$.ajax({
 			type: "POST",

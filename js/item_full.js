@@ -45,9 +45,9 @@
 								},
 								open: function() {
 									$("#gallery img").on("click", function(event) {
-										$("#main-pic img").attr("src", $(this).attr("src"));
-										$("#main-pic img").attr("data-zoom-image", $(this).attr('data-big-img'));
-										// console.log($("#main-pic").html());
+										$("#main-pic img")
+                                            .attr("src", $(this).attr("src"))
+                                            .attr("data-zoom-image", $(this).attr('data-big-img'));
 									});
 									$.ionTabs(".product-popup-tabs",{
 										type: "none"
@@ -83,6 +83,23 @@
 					} 
 				})
 			})
+            $(document).on('click', '#main-pic img', function(event) {
+                const $th = $(this);
+                const currentImage = $th.attr('data-zoom-image');
+                let currentNumber = 0;
+                let counter = 0;
+                $.each(bigImages, function(i, item){
+                    if (item == currentImage) currentNumber = counter;
+                    counter++;
+                })
+                let gallery = blueimp.Gallery(bigImages, {
+                    index: currentNumber,
+                    thumbnailIndicators: true,
+                    onopened: function(){
+                        $('#blueimp-gallery').addClass('blueimp-gallery-controls');
+                    }
+                });
+            });
 		},
 		getFullItem: function (i){
 			var s = '';

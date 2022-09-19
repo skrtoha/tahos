@@ -26,6 +26,9 @@ use core\Setting;
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
 	<link href="/css/main.css" rel="stylesheet" type="text/css" />
 	<link href="/css/<?=$view?>.css" rel="stylesheet" type="text/css" />
+    <?if (in_array($view, ['article', 'category', 'favorites'])){?>
+        <link rel="stylesheet" type="text/css" href="/css/item_full.css">
+    <?}?>
     <?if (in_array($view, ['category'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css">
 	<?}?>
@@ -37,7 +40,7 @@ use core\Setting;
         <link rel="stylesheet" href="/admin/fonts/icomoon.eot">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
-    <?if (in_array($view, ['article', 'category'])){?>
+    <?if (in_array($view, ['article', 'category', 'favorites'])){?>
         <link rel="stylesheet" type="text/css" href="/vendor/blueimp/css/blueimp-gallery.min.css">
     <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
@@ -413,7 +416,7 @@ use core\Setting;
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/js/jquery.form.js", "async" : false},
 		// {"src" : "/js/to_top.js", "async" : false},
-		<?if (in_array($view, ['category', 'article'])){?>
+		<?if (in_array($view, ['category', 'article', 'favorites'])){?>
 			{"src" : "/js/item_full.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['category'])){?>
@@ -425,7 +428,7 @@ use core\Setting;
         <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
             {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},
         <?}?>
-        <?if (in_array($view, ['article', 'category'])){?>
+        <?if (in_array($view, ['article', 'category', 'favorites'])){?>
             {"src": "/vendor/blueimp/js/jquery.blueimp-gallery.min.js"},
         <?}?>
 		{"src" : "/js/<?=$view?>.js", "async" : false}

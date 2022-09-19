@@ -776,3 +776,4 @@ else{?>
 	var isInBasket = <?=$isInBasket ? 'true' : 'false'?>;
 	var inBasket = JSON.parse('<?=$inBasket?>');
 </script>
+<?require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/blueimp/template.php');?>

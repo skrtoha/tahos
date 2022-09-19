@@ -54,7 +54,7 @@ Breadcrumb::out();
 					</td>
 					<td class="name-col">
 						<?if ($value['is_desc']){?>
-							<a href="#"><i class="fa fa-camera product-popup-link" aria-hidden="true"></i></a>
+							<a href="#"><i item_id="<?=$value['item_id']?>" class="fa fa-camera product-popup-link" aria-hidden="true"></i></a>
 						<?}?>
 						<?=$value['title_full']?>
 					</td>
@@ -80,7 +80,7 @@ Breadcrumb::out();
 							<a href="<?=core\Item::getHrefArticle($value['article'])?>" class="articul"><?=$value['article']?></a>
 						</p>
 						<p><a href="#"></a><?=$value['title_full']?></p>
-						<i class="fa fa-camera product-popup-link" aria-hidden="true"></i>
+						<i item_id="<?=$value['item_id']?>" class="fa fa-camera product-popup-link" aria-hidden="true"></i>
 					</div>
 					<div class="goods-footer">
 						<textarea class="remarks" placeholder="Начните свою запись"><?=$value['remark']?></textarea>
@@ -96,3 +96,4 @@ Breadcrumb::out();
 </div>
 <div id="mgn_popup" class="product-popup mfp-hide"></div>
 <div class="popup-gallery"></div>
+<?require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/blueimp/template.php');?>

@@ -1,14 +1,14 @@
 (function($){
 	window['category'] = {
-		sliders: new Array(),
+		sliders: [],
 		totalNumber: null,
 		pageNumber: $('input[name=pageNumber]').val(),
-		comparingMode: $('input[name=comparing]').is(':checked') ? true : false,
-		filterListTitles: new Array(),
+		comparingMode: !!$('input[name=comparing]').is(':checked'),
+		filterListTitles: [],
 		init: function(){
 			$(document).on('click', ".option-panel a[sort]", function(event) {
 				event.preventDefault();
-				elem = $(this);
+				const elem = $(this);
 				$(".option-panel a").removeClass("active");
 				elem.addClass('active');
 				if (elem.hasClass('active')) elem.toggleClass('desc');
@@ -29,10 +29,11 @@
 			});
 			$("#sort-change-mobile").click(function(event) {
 				event.preventDefault();
-				$(".sort-block").toggle();
+                const $obj = $(".sort-block");
+				$obj.toggle();
 				var t = ($(this).position().top) + 20;
 				var l = ($(this).position().left) - 50;
-				$(".sort-block").offset({top: t, left: l});
+				$obj.offset({top: t, left: l});
 			});
 			$(document).mouseup(function (e)	{
 				var container = $(".sort-block");
@@ -90,7 +91,7 @@
 				var price = +e.attr('price');
 				var item_id = e.attr('item_id');
 				var quan = +e.attr('packaging');
-				if ($('.login_btn span').html() == 'Войти'){
+				if ($('.login_btn span').html() === 'Войти'){
 					$('.login_btn').click();
 					show_message('Для добавления товара в корзину необходимо авторизоваться!', 'error');
 					return false;
@@ -104,8 +105,9 @@
 						// return;
 						// console.log(JSON.parse(msg));
 						get_basket(JSON.parse(msg));
-						if (!$('.cart span').text()) $('.cart').html('<div class="arrow_up"></div><span>' + quan + '</span>');
-						else $('.cart span').html(parseInt($('.cart span').text()) + parseInt(quan));
+                        const $obj = $('.cart span');
+						if (!$obj.text()) $('.cart').html('<div class="arrow_up"></div><span>' + quan + '</span>');
+						else $obj.html(parseInt($('.cart span').text()) + parseInt(quan));
 						show_popup_basket();
 						setTimeout(function(){
 							 if (!$('.cart-popup').is(':hover')) $('.overlay').click();

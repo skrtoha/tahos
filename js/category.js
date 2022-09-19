@@ -12,6 +12,7 @@
 				$(".option-panel a").removeClass("active");
 				elem.addClass('active');
 				if (elem.hasClass('active')) elem.toggleClass('desc');
+                setTimeout(category.setItems(), 1);
 			});
 			$(document).on('click', '#search-same', function(){
 				document.location.href = $(this).attr('href');
@@ -451,6 +452,7 @@
 					category.setPagination();
 				}
 			})
+            return true;
 		},
 		hideUterlyEmptySelects: function(){
 			$('select.filter').each(function(){

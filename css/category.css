@@ -43,6 +43,13 @@ label.filter_value {
     margin: 5px 0;
 }
 
+input:checked+.slider:before {
+    -webkit-transform: translateX(-14px);
+    -ms-transform: translateX(-14px);
+    transform: translateX(-14px);
+    background: #0082BF;
+}
+
 .slider.round:before {
     -webkit-border-radius: 50%;
     border-radius: 50%;

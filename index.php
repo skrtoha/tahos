@@ -25,7 +25,6 @@ if ($detect->isTablet()) $device = 'tablet';
 if ($detect->isMobile() && !$detect->isTablet()) $device = 'mobile';
 // echo "$device<br>";
 
-
 $view = $_GET['view'] ?: 'index';
 if ($view == 'exit'){
 	session_destroy();
@@ -47,9 +46,11 @@ if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
     $_SESSION['user'] = $jwtInfo['user_id'];
 }
 
+/** @var mysqli_result $res_user */
 $res_user = core\User::get(['user_id' => $_SESSION['user'] ?: false]);
 if ($res_user->num_rows) $user = $res_user->fetch_assoc();
 else $user = $res_user;
+
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
 
 //blockSite

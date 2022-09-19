@@ -1,6 +1,8 @@
 <?php
 namespace core;
 
+use mysqli_result;
+
 class User{
 	public static function noOverdue($user_id){
 		$query = Fund::getQueryListFunds(
@@ -31,12 +33,14 @@ class User{
 	 * @var integer
 	 */
 	public static $bonus_size = 1;
-	/**
-	 * gets common information about user
-	 * @param  [integer] $user_id user id
-	 * @return [type] if no $user_id and $_SESSION['user'] returns default values, if no user_id then by $_SESSION['user']
-	 */
-	public static function get($params = []){
+
+    /**
+     * gets common information about user
+     * @param array $params
+     * @return array [type] if no $user_id and $_SESSION['user'] returns default values, if no user_id then by $_SESSION['user']
+     * @return mysqli_result
+     */
+	public static function get(array $params = []){
 		$db = $GLOBALS['db'];
 		$where = '';
         $having = '';

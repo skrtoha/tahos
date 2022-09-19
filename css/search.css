@@ -5,3 +5,12 @@
     content: "\e9ac";
     cursor: pointer;
 }
+.notFound.removable > td{
+    position: relative;
+}
+.notFound.removable img {
+    height: 39px;
+    top: 8px;
+    position: absolute;
+    padding-left: 10px;
+}

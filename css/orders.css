@@ -29,6 +29,10 @@ select {
     height: 25px;
 }
 
+table.orders-table td .message.disable {
+    opacity: .4;
+}
+
 select[disabled] {
     color: #bfbfbf;
 }
@@ -56,9 +60,11 @@ tr[order_id] {
     margin-top: 0;
     position: relative;
 }
+
 .status-wrap {
     width: 180px;
 }
+
 .pseudo-select:after {
     width: 40px;
     height: 100%;
@@ -77,6 +83,11 @@ tr[order_id] {
 
 #main > a {
     float: right;
+}
+
+[data-name=returns] tr.first.active .icon-enlarge2:before {
+    content: "\e98c";
+    color: #0082BF;
 }
 
 .ionTabs__head {
@@ -203,11 +214,6 @@ tr[order_id] {
 
 table.orders-table {
     width: 100%;
-}
-
-[data-name=returns] table tr.first {
-    cursor: pointer;
-    border-bottom: 1px dashed #c8c8c8;
 }
 
 [data-name=returns] table tr {
@@ -367,6 +373,7 @@ div.status {
     float: right;
     margin-top: 5px;
 }
+
 .switch {
     width: 34px;
 }
@@ -374,13 +381,15 @@ div.status {
 .switch input {
     display: none;
 }
+
 .status-wrap {
     width: 180px;
 }
- .status-wrap .label, .switch {
-     display: inline-block;
-     height: 20px;
- }
+
+.status-wrap .label, .switch {
+    display: inline-block;
+    height: 20px;
+}
 
 
 .slider {
@@ -455,6 +464,10 @@ input:checked + .slider:before {
 table.orders-table:not(.small-view) tr:first-child {
     border: none;
 }
+[data-name=returns] table tr.first {
+    cursor: pointer;
+    border-bottom: 1px dashed #c8c8c8 !important;
+}
 
 [data-name=returns] table table.full_info tr td {
     padding: 10px 0;
@@ -499,50 +512,117 @@ table.orders-table tr {
     padding: 0;
 }
 
-[data-name=returns] table tr.first {
-    cursor: pointer;
-    border-bottom: 1px dashed #c8c8c8;
-}
-
-
-tr.gif{
+tr.gif {
     display: table-row;
     border-bottom: none !important;
 }
-tr.gif td{
+
+tr.gif td {
     display: table-cell;
 }
+
 table.orders-table td .status-col.status-ordered {
     color: #da1ee2;
 }
-span.status-expecting{
+
+span.status-expecting {
     color: #b1b2e6;
 }
-span.status-block
-{
+
+span.status-block {
     display: block;
 }
+
 table.orders-table td .status-col.status-refused {
     color: #d47a9f;
 }
+
 table.orders-table td .status-col.status-delivery {
-    color: #65b562; }
+    color: #65b562;
+}
+
 table.orders-table td .status-col.status-sended {
-    color: #00a3e8; }
+    color: #00a3e8;
+}
+
 table.orders-table td .status-col.status-done {
-    color: #0069a0; }
+    color: #0069a0;
+}
+
 table.orders-table td .status-col.status-return {
-    color: #f4191f; }
+    color: #f4191f;
+}
+
 table.orders-table td .status-col.status-stoped {
     color: #ff7f1f;
 }
+
 a.return, a.removeFromOrder {
     color: red;
     display: block;
     font-size: 13px;
 }
 
-@media screen and (max-width: 700px){
+.status_return_1 {
+    color: #ecbf3e;
+}
+
+.status_return_2 {
+    color: #ecbf3e;
+}
+
+.status_return_4 {
+    color: #f4191f;
+}
+
+.status_return_3 {
+    color: #65b562;
+}
+
+@media only screen and (max-width: 750px) {
+    div[data-name=returns] td.icon {
+        position: absolute;
+        right: 0px;
+        top: 0;
+    }
+
+    div[data-name=returns] .undoReturn {
+        width: 60px;
+    }
+
+    div[data-name=returns] tr.first {
+        position: relative;
+    }
+
+    div[data-name=returns] td[class^=status_return] {
+        width: auto;
+    }
+
+    div[data-name=returns] table tr {
+        display: block;
+    }
+
+    div[data-name=returns] table thead {
+        display: none;
+    }
+
+    div[data-name=returns] table td {
+        display: block;
+        text-align: left;
+        padding: 5px 0;
+    }
+
+    div[data-name=returns] table td:before {
+        content: attr(label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+        display: block;
+        padding: 0 8px;
+    }
+}
+
+@media screen and (max-width: 700px) {
     .order-filter-form button {
         display: block;
         margin-left: 0;
@@ -554,6 +634,7 @@ a.return, a.removeFromOrder {
     header {
         padding: 0 3px;
     }
+
     .order-filter-form {
         text-align: left;
     }
@@ -572,15 +653,21 @@ a.return, a.removeFromOrder {
         margin-top: 20px;
         display: block;
     }
+
     #main {
         padding: 0 5px;
     }
+
     .ionTabs__head li {
         font-size: 12px;
-        padding: 0 5px; }
+        padding: 0 5px;
+    }
+
     .ionTabs__body {
-        padding: 0; }
-    .status-form{
+        padding: 0;
+    }
+
+    .status-form {
         left: 0;
     }
 }

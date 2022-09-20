@@ -58,7 +58,7 @@ $categories = Category::getAll('c.isShowOnMainPage = 1 AND sc.isShowOnMainPage =
 					<?if (file_exists(core\Config::$imgPath . '/' . "categories/{$value['id']}.jpg")){?>
 						<div class="right">
 							<a href="/category/<?=$value['href']?>">
-								<img src="<?=core\Config::$imgUrl?>/categories/<?=$value['id']?>.jpg">
+								<img alt="<?=$value['href']?>" src="<?=core\Config::$imgUrl?>/categories/<?=$value['id']?>.jpg">
 							</a>
 						</div>
 					<?}?>

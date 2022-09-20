@@ -380,7 +380,7 @@ use core\Setting;
 						<?}?>
 					</div>
 					<?if ($issue['adres']){?>
-						<a issue_id="<?=$issue['issue_id']?>" href="" id="driving_direction">Схема проезда</a>
+						<a data-issue-id="<?=$issue['issue_id']?>" href="" id="driving_direction">Схема проезда</a>
 					<?}?>
 				</div>
 				<?if (
@@ -392,19 +392,19 @@ use core\Setting;
 					){?>
 					<div class="social_networks">
 						<?if ($issue['twitter']){?>
-							<a target="_blanc" href="<?=$issue['twitter']?>" class="twitter"></a>
+							<a target="_blank" href="<?=$issue['twitter']?>" class="twitter"></a>
 						<?}?>
 						<?if ($issue['vk']){?>
-							<a target="_blanc" href="<?=$issue['vk']?>" class="vk"></a>
+							<a target="_blank" href="<?=$issue['vk']?>" class="vk"></a>
 						<?}?>
 						<?if ($issue['facebook']){?>
-							<a target="_blanc" href="<?=$issue['facebook']?>" class="facebook"></a>
+							<a target="_blank" href="<?=$issue['facebook']?>" class="facebook"></a>
 						<?}?>
 						<?if ($issue['google']){?>
-							<a target="_blanc" href="<?=$issue['google']?>" class="google"></a>
+							<a target="_blank" href="<?=$issue['google']?>" class="google"></a>
 						<?}?>
 						<?if ($issue['ok']){?>
-							<a target="_blanc" href="<?=$issue['ok']?>" class="ok"></a>
+							<a target="_blank" href="<?=$issue['ok']?>" class="ok"></a>
 						<?}?>
 					</div>
 				<?}?>

@@ -285,7 +285,7 @@ $(function() {
 				$.ajax({
 					type: 'post',
 					url: '/ajax/common.php',
-					data: 'act=get_issue_by_id&issue_id=' + th.attr('issue_id'),
+					data: 'act=get_issue_by_id&issue_id=' + th.data('issue-id'),
 					success: function(response){
 						// console.log(response); return false;
 						var issue = JSON.parse(response);

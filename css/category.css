@@ -1119,28 +1119,6 @@ i[class$=fa-rub], i[class$=fa-usd], i[class$=fa-eur], i[class$=fa-jpy] {
         display: table
     }
 }
-@media screen and (max-width: 800px) {
-    .description-block .ionTabs__head {
-        height: 50px;
-    }
-
-    .description-block li {
-        padding: 0 !important;
-        width: 70px !important;
-    }
-
-    .description-block li[data-target=Tab_1_name]:before,
-    .description-block li[data-target=Tab_2_name]:before,
-    .description-block li[data-target=Tab_3_name]:before {
-        display: none;
-    }
-
-    .description-block li i.fa {
-        display: block;
-        font-size: 36px;
-        margin-top: 4px;
-    }
-}
 
 @media screen and (max-width: 700px) {
     .catalogue .filter-form .input_box {

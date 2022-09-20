@@ -542,6 +542,14 @@ a.return, a.removeFromOrder {
     font-size: 13px;
 }
 
+@media screen and (max-width: 700px){
+    .order-filter-form button {
+        display: block;
+        margin-left: 0;
+        margin-top: 20px;
+    }
+}
+
 @media screen and (max-width: 550px) {
     header {
         padding: 0 3px;

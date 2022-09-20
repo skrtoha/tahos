@@ -315,7 +315,27 @@ ul.prevail li {
     position: relative;
     margin-top: 30px;
 }
-
+.ionTabs__tab span:nth-child(2) {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    -webkit-border-radius: 9px;
+    border-radius: 9px;
+    background: #e74e3f;
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 19px;
+    color: #fff;
+    text-align: center;
+    float: right;
+    position: relative;
+    top: 3px;
+}
+li[data-target=Tab_4] span:nth-child(1)::before {
+    content: 'Комплектность';
+}
 span.subprice {
     display: block;
     line-height: 0;
@@ -1168,7 +1188,7 @@ div.donut span.describe {
     }
 
     .ionTabs__head li:nth-child(n + 2) {
-        padding-right: 21px
+        padding-right: 5px
     }
 
     .ionTabs__body {

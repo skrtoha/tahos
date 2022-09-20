@@ -26,6 +26,9 @@ use core\Setting;
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
 	<link href="/css/main.css" rel="stylesheet" type="text/css" />
 	<link href="/css/<?=$view?>.css" rel="stylesheet" type="text/css" />
+    <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
+        <link href="/vendor/pickmeup/pickmeup.css" rel="stylesheet" type="text/css" />
+    <?}?>
     <?if (in_array($view, ['article'])){?>
         <link rel="stylesheet" type="text/css" href="/css/provider_info.css">
     <?}?>

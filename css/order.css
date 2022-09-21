@@ -187,3 +187,40 @@ table.orders-table td .status-col.status-stoped {
 .orders-table{
     width: 100%;
 }
+
+b.brend_info {
+    font-weight: 700;
+    cursor: pointer;
+}
+dd, strong {
+    font-weight: 700;
+}
+
+@media screen and (max-width: 800px){
+    #orderInfo tr.head {
+        display: none;
+    }
+    #orderInfo tr {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #orderInfo td {
+        padding: 10px 0;
+    }
+    #orderInfo td:before {
+        float: left;
+        content: attr(label);
+        width: 115px;
+        display: inline-block;
+        text-align: left;
+        font-weight: 700;
+    }
+}
+
+@media screen and (max-width: 550px){
+    #main {
+        padding: 0 5px;
+    }
+}

@@ -341,7 +341,7 @@ use core\Setting;
                         if ($article['column'] != 4) continue; ?>
                         <li><a href="<?=$article['href']?>"><?=$article['title']?></a></li>
                     <?}?>
-					<li><a href="https://vk.com/tahos">Мы Вконтакте</a></li>
+					<li><a target="_blank" rel="nofollow" href="https://vk.com/tahos">Мы Вконтакте</a></li>
 				</ul>
 				<div class="payment_systems"></div>
 			</div>

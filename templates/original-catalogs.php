@@ -1,4 +1,5 @@
 <? use core\Breadcrumb;
+use core\Exceptions\NotFoundException;
 
 Breadcrumb::add('/original-catalogs', 'Оригинальные каталоги');
 
@@ -16,8 +17,7 @@ if ($_GET['vehicle'] == 'legkovie-avtomobili'){
 	  data-language="ru"
 	></div>
 	<script type="text/javascript" src="https://gui.parts-catalogs.com/v2/parts-catalogs.js"></script>
-<?
-}
+<?}
 else{
 	error_reporting(E_ERROR);
 	$res_vehicels = $db->query("
@@ -74,6 +74,7 @@ else{
                 if ($row['href'] == $_GET['brend']) $brendBreadcrumbs = [$row['href'], $row['title']];
 			}
 		}
+        else throw new NotFoundException('Транспортное средство не найдено');
 	}
 	if ($_GET['vehicle'] && $_GET['brend']){
         Breadcrumb::add($brendBreadcrumbs[0], $brendBreadcrumbs[1]);
@@ -133,6 +134,7 @@ else{
 			if (!empty($years)) $years = array_keys($years);
 			// debug($years);
 		}
+        else throw new NotFoundException('Бренд не найден');
 		$res_years = $db->query("
 			SELECT
 				fv.id,
@@ -292,7 +294,9 @@ else{
 							<?if (!empty($brend_titles)) foreach($brend_titles as $key => $row) {?>
 								<div class="item">
 									<a href="/original-catalogs/<?=strtolower($_GET['vehicle'])?>/<?=$row['href']?>"></a>
-									<?$filePath = array_shift(glob(core\Config::$imgPath . "/brends/{$row['brend_id']}.*"));
+									<?
+                                    $glob = glob(core\Config::$imgPath . "/brends/{$row['brend_id']}.*");
+                                    $filePath = array_shift($glob);
 									$pathinfo = pathinfo($filePath);
 									$src = core\Config::$imgUrl . "/brends/{$pathinfo['basename']}";
 									if ($src){?>

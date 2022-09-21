@@ -1,13 +1,16 @@
 <?
 
 use core\Breadcrumb;
+use core\Exceptions\NotFoundException;
 use core\Item;
 $href = $_GET['href'];
 $category = $db->select('categories', '*', "`parent_id`=0 AND `href`='$href'");
+
+if (is_null($category)) throw new NotFoundException('Категория не найдена');
+
 $category = $category[0];
 $category_id = $category['id'];
 $subs = $db->select('categories', '*', "`parent_id`=$category_id", 'pos', true);
-
 
 if (!$_GET['sub']){
     $title = $category['title'];
@@ -24,6 +27,8 @@ else{
 			}
 		}
 	}
+
+    if (is_null($sub_id)) throw new NotFoundException('Категория не найдена');
 
 	$params = ['view' => 'mosaic-view'];
 	$params['comparing'] = isset($_GET['comparing']) && $_GET['comparing'] == 'on';

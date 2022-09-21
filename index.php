@@ -1,4 +1,6 @@
 <?php
+
+use core\Exceptions\NotFoundException;
 use core\Log;
 use core\Setting;
 
@@ -80,7 +82,14 @@ $basket = get_basket();
 $path = "templates/$view.php";
 if (file_exists($path)){
 	ob_start();
-	require_once($path);
+    try{
+        require_once($path);
+    }
+    catch (NotFoundException $e){
+        $message = $e->getMessage();
+        require_once ('404.php');
+        die();
+    }
 	$content = ob_get_contents();
 	ob_clean();
 }

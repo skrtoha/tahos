@@ -381,7 +381,8 @@ header .logo {
     clear: both;
 }
 
-.login input[type="text"], .login input[type="password"] {
+.login input[type="text"],
+.login input[type="password"] {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     display: block;
@@ -460,6 +461,9 @@ header .logo {
     color: #fff;
     outline: none;
     cursor: pointer;
+}
+.login input[name=phone]{
+    display: none;
 }
 
 .login .registration_link {

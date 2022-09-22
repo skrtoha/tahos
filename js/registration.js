@@ -79,7 +79,6 @@ $(function(){
 			$(".registration .company_name").show();
 		}
 	});
-	$.mask.definitions['~']='[+-]';
 	$(".input_phone input[type='text']").mask("+7 (999) 999-99-99");
 	$(".h_overlay, .overlay").click(function(){
 		$(".input_phone .info").hide();

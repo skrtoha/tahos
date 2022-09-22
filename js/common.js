@@ -4,6 +4,7 @@ var cp_api = false;
 let countCharactersForSearch = 3;
 var h_win = $(window).height();
 let bigImages = [];
+let countPressBackspace = 0;
 function showPopupAddGarage(data){
     let src = `
         <div class="wrapper">
@@ -261,6 +262,9 @@ function selectItemByKey(event){
 	} 
 }
 $(function() {
+    const maskPhone = "+7 (999) 999-99-99";
+    $.mask.definitions['~']='[+-]';
+    $('.login input[name=phone]').mask(maskPhone);
 	cp_init();
 	price_format();
 	$('input[name=remember]').styler();
@@ -675,5 +679,32 @@ $(function() {
                 `)
             }
         })
+    })
+
+    $('.login input[name=login], .login input[name=phone]').on('keyup', (event) => {
+        const t = event.target;
+        switch (t.name){
+            case 'login':
+                countPressBackspace = 0;
+                if (/^\+7/.test(t.value)){
+                    t.style.display = 'none';
+                    t.value = '';
+                    const phone = document.querySelector('.login input[name=phone]');
+                    phone.style.display = 'block';
+                    phone.focus();
+                }
+                break;
+            case 'phone':
+                if (event.key == 'Backspace' && t.value == '+7 (___) ___-__-__'){
+                    countPressBackspace++;
+                    if (countPressBackspace <= 1) break;
+                    t.style.display = 'none';
+                    const login = document.querySelector('.login input[name=login]');
+                    login.style.display = 'block';
+                    login.value = '';
+                    login.focus();
+                }
+                break;
+        }
     })
 });

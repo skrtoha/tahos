@@ -188,6 +188,7 @@ use core\Setting;
 						<input type="hidden" name="form_autorization" value="1">
 						<p>Логин</p>
 						<input type="text" name="login" placeholder="Введите телефон или почту">
+                        <input type="text" name="phone">
 						<p>Пароль</p>
 						<input type="password" name="password">
 						<div class="forgot_password">

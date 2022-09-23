@@ -262,9 +262,10 @@ function selectItemByKey(event){
 	} 
 }
 $(function() {
-    const maskPhone = "+7 (999) 999-99-99";
-    $.mask.definitions['~']='[+-]';
-    $('.login input[name=phone]').mask(maskPhone);
+    const maskPhone = "+7 (~99) 999-99-99";
+    const $phone =  $('.login input[name=phone]');
+    $.mask.definitions['~']='[9]';
+    $phone.mask(maskPhone, {autoclear: false});
 	cp_init();
 	price_format();
 	$('input[name=remember]').styler();
@@ -686,10 +687,12 @@ $(function() {
         switch (t.name){
             case 'login':
                 countPressBackspace = 0;
-                if (/^\+7/.test(t.value)){
+                const started89 = /^8\(?9/.test(t.value);
+                if (/^\+7/.test(t.value) || started89){
                     t.style.display = 'none';
                     t.value = '';
                     const phone = document.querySelector('.login input[name=phone]');
+                    if (started89) phone.value = '+7 9';
                     phone.style.display = 'block';
                     phone.focus();
                 }

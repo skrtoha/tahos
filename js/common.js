@@ -262,10 +262,14 @@ function selectItemByKey(event){
 	} 
 }
 $(function() {
-    const maskPhone = "+7 (~99) 999-99-99";
-    const $phone =  $('.login input[name=phone]');
+    const maskPhone = "+7 (999) 999-99-99";
     $.mask.definitions['~']='[9]';
-    $phone.mask(maskPhone, {autoclear: false});
+    $('.login input[name=phone]').mask(maskPhone, {
+        autoclear: false,
+        completed: () => {
+            document.querySelector('.login input[type=password]').focus()
+        }
+    });
 	cp_init();
 	price_format();
 	$('input[name=remember]').styler();
@@ -593,6 +597,7 @@ $(function() {
 		$('.overlay').click();
 		// $(".h_overlay, .overlay, .profile, .profile_btn .arrow_up").show();
 		$(".h_overlay, .overlay, header .login, header .login_btn .arrow_up").show();
+        $('input[name=login]').focus();
 	});
 	$(".profile_btn").click(function(){
 		$('.cart-popup').hide();

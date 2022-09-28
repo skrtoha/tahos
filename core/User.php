@@ -253,4 +253,106 @@ class User{
         sort($payType);
         return $payType;
     }
+
+    public static function addPaymentList(array $params){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        $db->insert('payment_list', $params);
+    }
+
+    private static function getQueryDebt($date, $user_id){
+        return "
+            SELECT
+                SUM(ps.sum) - SUM(ps.paid) AS sum 
+            FROM
+                #payment_list ps
+            LEFT JOIN
+                tahos_order_issues oi ON oi.id = ps.issue_id
+            WHERE
+                ps.created <= '$date' AND
+                oi.user_id = $user_id AND
+                ps.paid < ps.sum
+            GROUP BY
+                oi.user_id
+        ";
+    }
+
+    public static function getDebt(array $user): array
+    {
+        /** @global $db Database */
+        global $db;
+
+        $designation = '<i class="fa fa-rub" aria-hidden="true"></i>';
+
+        if (!$user['defermentOfPayment']) return [];
+
+        $currentDate = new \DateTime();
+        $currentDate->sub(new \DateInterval("P{$user['defermentOfPayment']}D"));
+        $query = self::getQueryDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
+        $result = $db->query($query);
+
+        if (!$result->num_rows){
+            $currentDate = new \DateTime();
+            $defermentOfPayment = $user['defermentOfPayment'] - 1;
+            $currentDate->sub(new \DateInterval("P{$defermentOfPayment}D"));
+            $query = self::getQueryDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
+            $result = $db->query($query);
+            if (!$result->num_rows) return [];
+            $result = $result->fetch_assoc();
+            return [
+                'message' => "До завтра необходимо внести {$result['sum']} $designation, иначе заказы будут заблокированы",
+                'blocked' => false
+            ];
+        }
+
+        $result = $result->fetch_assoc();
+        return [
+            'message' => "Заказы заблокированы. Задолженность составляет {$result['sum']} $designation",
+            'blocked' => true
+        ];
+    }
+
+    public static function checkDebt($user_id, $amount){
+        /** @var $db Database  */
+        global $db;
+
+        $result = $db->query("
+            SELECT
+                ps.issue_id,
+                ps.sum,
+                ps.paid
+            FROM
+                #payment_list ps
+            LEFT JOIN
+                tahos_order_issues oi ON oi.id = ps.issue_id
+            WHERE
+                ps.paid < ps.sum AND 
+                oi.user_id = $user_id
+            ORDER BY
+                ps.created
+        ");
+
+        if (!$result->num_rows) return;
+
+        $remain = $amount;
+        foreach($result as $row){
+            $difference = $row['sum'] - $row['paid'];
+            if ($remain < $difference){
+                $db->update(
+                    'payment_list',
+                    ['paid' => $row['paid'] + $remain],
+                    "issue_id = {$row['issue_id']}"
+                );
+                break;
+            }
+            $remain = $remain - $difference;
+            $db->update(
+                'payment_list',
+                ['paid' => $row['paid'] + $difference],
+                "issue_id = {$row['issue_id']}"
+            );
+        }
+    }
+
 }

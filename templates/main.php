@@ -64,6 +64,9 @@ use core\Setting;
 		<div><div></div></div>
 	</div>
 	<header>
+        <?if (!empty($debt)){?>
+            <div id="debt"><?=$debt['message']?></div>
+        <?}?>
 		<div class="wrapper">
 			<a href="/" class="logo"></a>
 			<div class="catalog_btn">

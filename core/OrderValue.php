@@ -9,7 +9,9 @@ use core\Sms\SmsAero;
 class OrderValue{
 	public static $countOrdered = 0;
 	public static function setFunds($params){
+        /** @var \mysqli_result $res_user */
 		$res_user = User::get(['user_id' => $params['user_id']]);
+
 		$user = $res_user->fetch_assoc();
 
 		$remainder = $user['bill'] - $params['totalSumm'];
@@ -37,6 +39,7 @@ class OrderValue{
 				'bill' => "`bill` - " . $params['totalSumm']
 			]
 		);
+        return $remainder;
 	}
     
     /**

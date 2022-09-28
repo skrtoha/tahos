@@ -70,13 +70,19 @@ class Issues{
 		}
 		
 		core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
-		
+
+
         if ($totalSumm){
-            core\OrderValue::setFunds([
+            $remainder = core\OrderValue::setFunds([
                 'user_id' => $this->user_id,
                 'issue_id' => $issue_id,
                 'titles' => $titles,
                 'totalSumm' => $totalSumm
+            ]);
+
+            if ($remainder < 0) \core\User::addPaymentList([
+                'issue_id' => $issue_id,
+                'sum' => $totalSumm
             ]);
         }
 		

@@ -315,12 +315,21 @@ header {
     box-sizing: border-box;
     padding: 0 20px;
     width: 100%;
-    height: 75px;
     background: #0081bc;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 999
+}
+header #debt {
+    background: #f45f5f;
+    width: calc(100% + 40px);
+    position: relative;
+    left: -20px;
+    padding: 5px 0;
+    text-align: center;
+    color: white;
+    font-size: 13px;
 }
 
 header .catalog_btn {
@@ -1963,6 +1972,7 @@ footer .partnership{
     body > header > div.wrapper {
         display: flex;
         justify-content: space-between;
+        height: 75px;
     }
 
     body > header > div.wrapper div.clear {
@@ -2035,10 +2045,6 @@ footer .partnership{
         background-size: 180px 33px;
     }
 
-    header {
-        padding: 0 15px;
-    }
-
     .cart-popup {
         width: 100%;
         left: 0;
@@ -2052,6 +2058,7 @@ footer .partnership{
         padding: 20px 20px 0;
         width: 100%;
         margin: 0;
+        flex: 1 1 100%;
     }
 
     footer .item:not(.contacts) h4:after {

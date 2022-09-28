@@ -575,6 +575,7 @@ function form_operations($act){
 		$db->insert('funds', $array);
 		$db->update('users', array('bill' => $curr_bill), '`id`='.$id);
 		core\User::checkOverdue($id, $_POST['sum']);
+        \core\User::checkDebt($id, $_POST['sum']);
 		message('Счет успешно пополнен!');
 		header('Location: ?view=users&act=funds&id='.$id);
 	}

@@ -1,4 +1,6 @@
 <?
+use core\User;
+
 require_once('core/DataBase.php');
 require_once('core/functions.php');
 require_once('vendor/autoload.php');
@@ -29,9 +31,10 @@ switch($label[0]){
     case 'account':
         $user_id = $label[1];
         $bill = $db->getFieldOnID('users', $user_id, 'bill') + $_POST['withdraw_amount'];
-        if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Яндекс.Деньги';
+        if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Yoomoney';
         else $comment = 'Пополнение банковской картой';
-        core\User::checkOverdue($user_id, $_POST['withdraw_amount']);
+        User::checkOverdue($user_id, $_POST['withdraw_amount']);
+        User::checkDebt($user_id, $_POST['withdraw_amount']);
         $db->update('users', array('bill' => $bill), '`id`='.$user_id);
         break;
     case 'order':

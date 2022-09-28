@@ -81,7 +81,7 @@ Breadcrumb::out();
 	<div class="clearfix"></div>
 	<div class="pay-block-wrap">
 		<div class="pay-block show" id="visa-master">
-			<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+			<form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml">
 				<input type="hidden" name="receiver" value="410013982328385">
 				<input type="hidden" name="formcomment" value="<?=$fio?>">
 				<input type="hidden" name="short-dest" value="">
@@ -108,7 +108,7 @@ Breadcrumb::out();
 			</form>
 		</div>
 		<div class="pay-block" id="yandex-money">
-			<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+			<form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml">
 				<input type="hidden" name="receiver" value="410013982328385">
 				<input type="hidden" name="formcomment" value="Пополнение счета пользователя">
 				<input type="hidden" name="short-dest" value="">
@@ -135,7 +135,7 @@ Breadcrumb::out();
 			</form>
 		</div>
 		<div class="pay-block" id="mobile">
-			<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+			<form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml">
 				<input type="hidden" name="receiver" value="410013982328385">
 				<input type="hidden" name="formcomment" value="Пополнение счета пользователя">
 				<input type="hidden" name="short-dest" value="">

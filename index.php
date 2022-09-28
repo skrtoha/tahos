@@ -50,7 +50,11 @@ if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
 
 /** @var mysqli_result $res_user */
 $res_user = core\User::get(['user_id' => $_SESSION['user'] ?: false]);
-if ($res_user->num_rows) $user = $res_user->fetch_assoc();
+
+if ($res_user->num_rows){
+    $user = $res_user->fetch_assoc();
+    $debt = \core\User::getDebt($user);
+}
 else $user = $res_user;
 
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);

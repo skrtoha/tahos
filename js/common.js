@@ -262,6 +262,12 @@ function selectItemByKey(event){
 	} 
 }
 $(function() {
+    const debt = document.querySelector('#debt');
+    if (debt){
+        const rectDebt = debt.getBoundingClientRect();
+        document.querySelector('#main').style.marginTop = 34 + rectDebt.height + 'px';
+    }
+
     const maskPhone = "+7 (999) 999-99-99";
     $.mask.definitions['~']='[9]';
     $('.login input[name=phone]').mask(maskPhone, {

@@ -631,10 +631,6 @@ a.return, a.removeFromOrder {
 }
 
 @media screen and (max-width: 550px) {
-    header {
-        padding: 0 3px;
-    }
-
     .order-filter-form {
         text-align: left;
     }

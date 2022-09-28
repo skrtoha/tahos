@@ -80,10 +80,14 @@ class Issues{
                 'totalSumm' => $totalSumm
             ]);
 
-            if ($remainder < 0) \core\User::addPaymentList([
-                'issue_id' => $issue_id,
-                'sum' => $totalSumm
-            ]);
+            if ($remainder){
+                \core\User::addPaymentList([
+                    'issue_id' => $issue_id,
+                    'sum' => abs($remainder)
+                ]);
+            }
+
+
         }
 		
 		if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
@@ -91,7 +95,7 @@ class Issues{
 			exit();
 		}
 
-	/*	//если запрос пришел с 1С тогда проводить товар там не нужно
+		/*//если запрос пришел с 1С тогда проводить товар там не нужно
 		if (!$isRequestFrom1C){
 			$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
 			core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);	

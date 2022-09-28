@@ -9,12 +9,16 @@ use core\Sms\SmsAero;
 class OrderValue{
 	public static $countOrdered = 0;
 	public static function setFunds($params){
+        $output = 0;
         /** @var \mysqli_result $res_user */
 		$res_user = User::get(['user_id' => $params['user_id']]);
-
 		$user = $res_user->fetch_assoc();
 
-		$remainder = $user['bill'] - $params['totalSumm'];
+        $remainder = $user['bill'] - $params['totalSumm'];
+
+        if ($params['totalSumm'] > $user['bill'] && $user['bill'] > 0) $output = $user['bill'] - $params['totalSumm'];
+        elseif($user['bill'] > $params['totalSumm']) $output = 0;
+        else $output = $params['totalSumm'];
 
 		//вычисление задолженности
 		$overdue = 0;
@@ -39,7 +43,7 @@ class OrderValue{
 				'bill' => "`bill` - " . $params['totalSumm']
 			]
 		);
-        return $remainder;
+        return $output;
 	}
     
     /**

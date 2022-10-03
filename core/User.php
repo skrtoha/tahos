@@ -261,20 +261,20 @@ class User{
         $db->insert('payment_list', $params);
     }
 
-    private static function getQueryDebt($date, $user_id){
+    private static function getQueryGroupDebt($date, $user_id): string
+    {
         return "
             SELECT
-                SUM(ps.sum) - SUM(ps.paid) AS sum 
+                SUM(f.sum) - SUM(f.paid) AS sum 
             FROM
-                #payment_list ps
-            LEFT JOIN
-                tahos_order_issues oi ON oi.id = ps.issue_id
+                #funds f
             WHERE
-                ps.created <= '$date' AND
-                oi.user_id = $user_id AND
-                ps.paid < ps.sum
+                f.created <= '$date' AND
+                f.user_id = $user_id AND
+                f.paid < f.sum AND
+                f.issue_id IS NOT NULL
             GROUP BY
-                oi.user_id
+                f.user_id
         ";
     }
 
@@ -289,14 +289,14 @@ class User{
 
         $currentDate = new \DateTime();
         $currentDate->sub(new \DateInterval("P{$user['defermentOfPayment']}D"));
-        $query = self::getQueryDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
+        $query = self::getQueryGroupDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
         $result = $db->query($query);
 
         if (!$result->num_rows){
             $currentDate = new \DateTime();
             $defermentOfPayment = $user['defermentOfPayment'] - 1;
             $currentDate->sub(new \DateInterval("P{$defermentOfPayment}D"));
-            $query = self::getQueryDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
+            $query = self::getQueryGroupDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
             $result = $db->query($query);
             if (!$result->num_rows) return [];
             $result = $result->fetch_assoc();
@@ -313,25 +313,32 @@ class User{
         ];
     }
 
+    private static function getQueryDebt($where = '', $orderBy = ''): string
+    {
+        $query = "
+            SELECT
+                f.id,
+                f.issue_id,
+                f.sum,
+                f.paid,
+                DATE_FORMAT(f.created, '%m.%d.%Y %H:%i:%s') AS created 
+            FROM
+                #funds f
+        ";
+        if ($where) $query .= " WHERE $where";
+        if ($orderBy) $query .= " ORDER BY $orderBy";
+        return $query;
+    }
+
     public static function checkDebt($user_id, $amount){
         /** @var $db Database  */
         global $db;
 
-        $result = $db->query("
-            SELECT
-                ps.issue_id,
-                ps.sum,
-                ps.paid
-            FROM
-                #payment_list ps
-            LEFT JOIN
-                tahos_order_issues oi ON oi.id = ps.issue_id
-            WHERE
-                ps.paid < ps.sum AND 
-                oi.user_id = $user_id
-            ORDER BY
-                ps.created
-        ");
+        $query = self::getQueryDebt(
+            "f.paid < f.sum AND f.user_id = $user_id AND f.issue_id IS NOT NULL",
+            'f.created'
+        );
+        $result = $db->query($query);
 
         if (!$result->num_rows) return;
 
@@ -340,19 +347,32 @@ class User{
             $difference = $row['sum'] - $row['paid'];
             if ($remain < $difference){
                 $db->update(
-                    'payment_list',
+                    'funds',
                     ['paid' => $row['paid'] + $remain],
-                    "issue_id = {$row['issue_id']}"
+                    "id = {$row['id']}"
                 );
                 break;
             }
             $remain = $remain - $difference;
             $db->update(
-                'payment_list',
+                'funds',
                 ['paid' => $row['paid'] + $difference],
-                "issue_id = {$row['issue_id']}"
+                "id = {$row['id']}"
             );
         }
+    }
+
+    public static function getDebtList($params): array
+    {
+        /** @global $db Database */
+        global $db;
+
+        $where = "f.user_id = {$params['user_id']} AND ";
+        if (isset($params['begin'])) $where .= "f.created > '{$params['begin']}' AND ";
+        if (isset($params['end'])) $where .= "f.created < '{$params['end']}' AND ";
+        $where = substr($where, 0, -5);
+        $query = self::getQueryDebt($where, 'f.created DESC');
+        return $db->query($query)->fetch_all(MYSQLI_ASSOC);
     }
 
 }

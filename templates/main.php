@@ -29,7 +29,7 @@ use core\Setting;
     <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
         <link href="/vendor/pickmeup/pickmeup.css" rel="stylesheet" type="text/css" />
     <?}?>
-    <?if (in_array($view, ['article'])){?>
+    <?if (in_array($view, ['article', 'orders'])){?>
         <link rel="stylesheet" type="text/css" href="/css/provider_info.css">
     <?}?>
     <?if (in_array($view, ['article', 'category', 'favorites'])){?>
@@ -48,6 +48,9 @@ use core\Setting;
     <?}?>
     <?if (in_array($view, ['article', 'category', 'favorites'])){?>
         <link rel="stylesheet" type="text/css" href="/vendor/blueimp/css/blueimp-gallery.min.css">
+    <?}?>
+    <?if (in_array($view, ['garage', 'account', 'favorites', 'orders'])){?>
+        <link rel="stylesheet" type="text/css" href="/css/ionTabs.css">
     <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
 	<meta name="theme-color" content="#0081BC">

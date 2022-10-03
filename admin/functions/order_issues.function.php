@@ -71,25 +71,13 @@ class Issues{
 		
 		core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
 
+        core\OrderValue::setFunds([
+            'user_id' => $this->user_id,
+            'issue_id' => $issue_id,
+            'titles' => $titles,
+            'totalSumm' => $totalSumm
+        ]);
 
-        if ($totalSumm){
-            $remainder = core\OrderValue::setFunds([
-                'user_id' => $this->user_id,
-                'issue_id' => $issue_id,
-                'titles' => $titles,
-                'totalSumm' => $totalSumm
-            ]);
-
-            if ($remainder){
-                \core\User::addPaymentList([
-                    'issue_id' => $issue_id,
-                    'sum' => abs($remainder)
-                ]);
-            }
-
-
-        }
-		
 		if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			echo $issue_id;
 			exit();
@@ -130,10 +118,16 @@ class Issues{
 	protected function commonList(){
 		echo json_encode($this->getOrderIssues());
 	}
-	protected function getIssueValues($user_id){
-		$start = ($_GET['pageNumber'] - 1) * $_GET['pageSize'];
-		return $this->db->select_unique("
-			SELECT
+    public static function getQueryIssueValues($fields){
+        $where = '';
+        if (isset($fields['user_id'])) $where .= "oi.user_id = {$fields['user_id']} AND ";
+        if (isset($fields['issue_id'])) $where .= "oiv.issue_id = {$fields['issue_id']} AND ";
+        if ($where){
+            $where = substr($where, 0, -5);
+            $where = "WHERE $where";
+        }
+        return "
+            SELECT
 				oiv.issue_id,
 				oiv.order_id,
 				oiv.item_id,
@@ -151,12 +145,16 @@ class Issues{
 				#items i ON oiv.item_id=i.id
 			LEFT JOIN
 				#brends b ON b.id=i.brend_id
-			WHERE
-				oi.user_id=$user_id
+			$where
 			ORDER BY
 				oi.created DESC
-			LIMIT $start, {$_GET['pageSize']}
-		", '');
+        ";
+    }
+	protected function getIssueValues($user_id){
+		$start = ($_GET['pageNumber'] - 1) * $_GET['pageSize'];
+        $query = self::getQueryIssueValues(['user_id' => $user_id]);
+        $query .= " LIMIT $start, {$_GET['pageSize']}";
+		return $this->db->select_unique($query, '');
 	}
 	function getAjax(){
 		// debug($_GET);
@@ -169,9 +167,10 @@ class Issues{
 		}
 		exit();
 	}
-	function getIssueWithUser($issue_id){
+	public function getIssueWithUser($issue_id){
 		$res_issue = $this->db->query("
 			SELECT
+			    oiv.issue_id,
 				oiv.order_id,
 				oi.user_id,
 				CONCAT_WS(' ', u.name_1, u.name_2, u.name_3) AS user_name,
@@ -203,6 +202,7 @@ class Issues{
 		$summ = 0;
 		while($row = $res_issue->fetch_assoc()){
 			$issue_values[] = [
+                'issue_id' => $row['issue_id'],
 				'order_id' => $row['order_id'],
 				'item_id' => $row['item_id'],
 				'brend' => $row['brend'],

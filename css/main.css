@@ -49,7 +49,7 @@ body {
     line-height: 1
 }
 
-.breadcrumbs a, .breadcrumbs span, .filter-form h3, .ionTabs__head li, h1, h3, h4, header .catalog a, header .profile a, table th {
+.breadcrumbs a, .breadcrumbs span, .filter-form h3, h1, h3, h4, header .catalog a, header .profile a, table th {
     text-transform: uppercase
 }
 
@@ -1196,7 +1196,7 @@ label[for=w_not_remember_checkbox] {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: inherit;
-    margin-left: 0;
+    margin-left: 2px;
 }
 
 .fa-cart-arrow-down:before {
@@ -1848,18 +1848,14 @@ footer #driving_direction{
     cursor: auto;
 }
 .mfp-content {
-    display: inline-block;
-    text-align: left;
-    z-index: 1045;
-    position: relative;
-}
-.mfp-content {
     position: relative;
     display: inline-block;
     margin: 0 auto;
     text-align: left;
     z-index: 1045;
     vertical-align: middle;
+    background: white;
+    padding: 35px 15px 15px 15px;
 }
 
 .mfp-close-btn-in .mfp-close {
@@ -1903,6 +1899,8 @@ button.mfp-arrow, button.mfp-close {
     text-align: center;
     position: absolute;
 }
+
+
 
 footer .item:not(.contacts) {
     flex: 1;
@@ -2010,6 +2008,34 @@ footer .partnership{
     header .login_btn, header .profile_btn {
         padding: 0;
         width: 24px;
+    }
+
+    table.mobile_view tr.first {
+        position: relative;
+    }
+
+    table.mobile_view tr {
+        display: block;
+        border-bottom: 1px dashed #c8c8c8;
+    }
+
+    table.mobile_view thead {
+        display: none;
+    }
+
+    table.mobile_view td {
+        display: block;
+        text-align: left;
+        padding: 5px 0;
+    }
+
+    table.mobile_view td:before {
+        content: attr(label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+        display: block;
+        padding-right: 5px;
     }
 }
 

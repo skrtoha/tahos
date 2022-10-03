@@ -1,47 +1,50 @@
+#providerInfo div.donut{
+    position: relative;
+    display: inline-block;
+}
+.icon-notification:before {
+    content: "\ea08";
+}
+#providerInfo .information .row span.left {
+    width: 50%;
+    display: inline-block;
+}
 #providerInfo .information .row span.right {
     font-weight: bold;
 }
-
 #providerInfo .informationReturn {
     display: flex;
 }
-
 #providerInfo span.icon-circle-down,
-#providerInfo span.icon-notification {
+#providerInfo span.icon-notification
+{
     line-height: 35px;
     color: #438e53;
     margin: 10px;
     font-size: 20px;
 }
-
-#providerInfo span.icon-notification {
+#providerInfo span.icon-notification{
     color: red;
 }
-
 #providerInfo .informationReturn {
     display: flex;
     background: #ececec;
     margin-top: 10px;
 }
-
-#providerInfo .informationReturn p.returnText {
+#providerInfo .informationReturn p.returnText{
     font-size: 13px;
     line-height: 17px;
 }
-
-#providerInfo .informationReturn p {
+#providerInfo .informationReturn p{
     line-height: 35px;
 }
-
 .information .row {
     font-size: 14px;
     margin-bottom: 8px;
 }
-
-#providerInfo {
+#providerInfo{
     width: 360px;
 }
-
 div.donut div.text {
     position: absolute;
     text-align: center;
@@ -49,31 +52,21 @@ div.donut div.text {
     top: 23px;
     font-size: 20px;
 }
-
 div.donut span.describe {
     font-size: 12px;
     margin-top: 0;
     display: block;
 }
-
 div.donut span.percent {
     display: block;
     font-size: 21px;
 }
-
 div.donut span.percent.green {
     color: #438e53;
 }
-
 div.donut span.percent.red {
     color: red;
 }
-
 div.donut span.percent::after {
     content: '%';
-}
-.mfp-content{
-    padding: 20px 30px 20px 20px;
-    cursor: auto;
-    background: white;
 }

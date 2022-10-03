@@ -55,7 +55,6 @@
 }
 
 .account .sidebar .account-history-block .checkbox-wrap {
-    margin-top: 0;
     display: block;
     margin: 25px 0;
 }
@@ -90,6 +89,24 @@
 
 .balance-block button {
     margin-top: 10px
+}
+.positive-color {
+    color: #00af08;
+    white-space: nowrap;
+}
+.important, .negative-color {
+    color: red;
+    white-space: nowrap;
+    text-align: center;
+}
+tr[data-issue-id]{
+    cursor: pointer;
+}
+#issue_info > p{
+    font-size: 24px;
+}
+#issue_info tr{
+    border-bottom: 1px dashed #c8c8c8;
 }
 
 .pickmeup {
@@ -237,82 +254,7 @@
     display: none;
 }
 
-.ionTabs__head {
-    position: relative;
-    display: block;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    z-index: 1;
-    height: 42px;
-    background: #0082BF;
-    border-bottom: 5px solid #8cdaff;
-}
-
-.ionTabs__head:before, .ionTabs__head:after {
-    content: "";
-    display: table;
-}
-
-.ionTabs__head li.ionTabs__tab_state_active {
-    background: #0069A3;
-    position: relative;
-}
-
-.ionTabs__head:after {
-    clear: both;
-}
-
-.ionTabs__head:before, .ionTabs__head:after {
-    content: "";
-    display: table;
-}
-
-.ionTabs__body {
-    position: relative;
-    z-index: 2;
-}
-
-.ionTabs__item.ionTabs__item_state_active {
-    display: block;
-}
-
-.ionTabs__item {
-    position: relative;
-    display: none;
-}
-
-.ionTabs__body {
-    margin-top: 10px;
-    padding: 10px;
-}
-
-.ionTabs__tab.ionTabs__tab_state_active {
-    cursor: default;
-}
-
-.ionTabs__head li {
-    height: inherit;
-    color: #fff;
-    padding: 0 20px;
-    line-height: 42px;
-    text-align: center;
-}
-
-.ionTabs__head li.ionTabs__tab_state_active:after {
-    cursor: default;
-    width: 0;
-    border-bottom: 8px solid #8cdaff;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    bottom: 0;
-    position: absolute;
-    left: 50%;
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
-}
-
-.info_btn, .input-wrap, .input-wrap input, .input-wrap label, .ionTabs__head li {
+.info_btn, .input-wrap, .input-wrap input, .input-wrap label{
     display: inline-block;
 }
 

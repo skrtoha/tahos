@@ -5,6 +5,7 @@ let countCharactersForSearch = 3;
 var h_win = $(window).height();
 let bigImages = [];
 let countPressBackspace = 0;
+const popup = document.querySelector('#popup')
 function showPopupAddGarage(data){
     let src = `
         <div class="wrapper">

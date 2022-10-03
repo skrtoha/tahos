@@ -123,6 +123,7 @@ if ($_GET['act'] == 'to_offer'){
     
     message('Успешно отправлено в заказы!');
     header('Location: /orders');
+    die();
 }
 $res_basket = core\Basket::get($_SESSION['user']);
 if (!$res_basket->num_rows) return;

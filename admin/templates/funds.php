@@ -101,8 +101,7 @@ function funds(){
 			<td>Комментарий</td>
 		</tr>
 		<?if ($res_funds->num_rows){
-			foreach($res_funds as $fund){
-				//debug($fund)?>
+			foreach($res_funds as $fund){?>
 				<tr class="<?=$fund['is_new'] ? 'is_new' : ''?>">
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
@@ -126,7 +125,7 @@ function funds(){
 			<?}
 		}
 		else{?>
-			<tr><td colspan="6">Движений средст не найдено</td></tr>
+			<tr><td colspan="6">Движений средств не найдено</td></tr>
 		<?}?>
 	</table>
 	<?$db->update('funds', ['is_new' => 0], '`is_new`=1');

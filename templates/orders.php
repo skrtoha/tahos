@@ -587,7 +587,7 @@ Breadcrumb::out();
 			</table>
 		</div>
 		<div class="ionTabs__item" data-name="returns">
-			<table class="orders-table">
+			<table class="orders-table mobile_view">
 				<thead>
 					<tr>
 						<th></th>

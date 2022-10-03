@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 use core\Exceptions\NotFoundException;
 use core\Log;
 use core\Setting;
@@ -14,7 +14,6 @@ require_once('vendor/autoload.php');
 
 $db = new core\Database();
 
-session_start();
 $connection = new core\Connection($db);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');
 $db->connection_id = $connection->connection_id;

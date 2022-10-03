@@ -1,16 +1,9 @@
 <? use core\Breadcrumb;
 
 $title = 'Счет';
-/**
- * Параметры запроса
- * @var array
- */
+
 $params = array();
 
-/**
- * Формирование условия в поиске
- * @var string
- */
 $where = '';
 
 $uri = parse_url($_SERVER['REQUEST_URI']);
@@ -103,19 +96,26 @@ Breadcrumb::out();
 			<?if ($user['bonus_program']){?>
 				<li class="ionTabs__tab" data-target="Tab_2_name">История бонусов</li>
 			<?}?>
+            <li class="ionTabs__tab" data-target="Tab_3_name">Выдачи</li>
 		</ul>
 		<div class="ionTabs__body">
 			<div class="ionTabs__item" data-name="Tab_1_name">
 				<table>
 					<tr>
 						<th>Вид операции</th>
-						<th>Товар</th>
+						<th>Комментарий</th>
 						<th>Дата</th>
 						<th>Сумма</th> 
+						<th>Остаток</th>
 					</tr>
 					<?if (isset($funds) && count($funds)){
-						foreach ($funds as $fund){?>
-							<tr>
+						foreach ($funds as $fund){
+                            if ($fund['issue_id']){?>
+                                <tr data-issue-id="<?=$fund['issue_id']?>">
+                            <?}
+                            else{?>
+                                <tr>
+                            <?}?>
 								<td><?=$operations_types[$fund['type_operation']]?></td>
 								<td class="name-col"><?=stripslashes($fund['comment'])?></td>
 								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
@@ -128,6 +128,7 @@ Breadcrumb::out();
 										<span class="price_format"><?=$fund['sum']?></span><i class="fa fa-rub" aria-hidden="true"></i>
 									</span>
 								</td>
+                                <td><?=$fund['remainder']?><i class="fa fa-rub" aria-hidden="true"></i></td>
 							</tr>
 						<?}
 					}
@@ -144,9 +145,12 @@ Breadcrumb::out();
 					<?if (isset($funds) && count($funds)){
 						foreach ($funds as $fund){
 							if (in_array($fund['type_operation'], [3,4])) continue;
-
-							?>
-							<tr>
+                            if ($fund['issue_id']){?>
+                                <tr data-issue-id="<?=$fund['issue_id']?>">
+                            <?}
+                            else{?>
+                                <tr>
+                            <?}?>
 								<td class="name-col"><?=stripslashes($fund['comment'])?></td>
 								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 								<td>
@@ -240,6 +244,9 @@ Breadcrumb::out();
 					</table>
 				</div>
 			<?}?>
+            <div class="ionTabs__item" data-name="Tab_3_name">
+            </div>
+        </div>
 			<div class="ionTabs__preloader"></div>
 		</div>
 	</div>

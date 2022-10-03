@@ -9,31 +9,31 @@ use core\Sms\SmsAero;
 class OrderValue{
 	public static $countOrdered = 0;
 	public static function setFunds($params){
-        $output = 0;
         /** @var \mysqli_result $res_user */
 		$res_user = User::get(['user_id' => $params['user_id']]);
 		$user = $res_user->fetch_assoc();
 
         $remainder = $user['bill'] - $params['totalSumm'];
 
-        if ($params['totalSumm'] > $user['bill'] && $user['bill'] > 0) $output = $user['bill'] - $params['totalSumm'];
-        elseif($user['bill'] > $params['totalSumm']) $output = 0;
-        else $output = $params['totalSumm'];
-
 		//вычисление задолженности
 		$overdue = 0;
 		if ($user['bill'] < $params['totalSumm']){
 			if ($user['bill'] > 0) $overdue = $params['totalSumm'] - $user['bill'];
 			else $overdue = $params['totalSumm'];
-		} 
-		else $overdue = 0;
+		}
+
+        $paid = 0;
+        if ($user['bill'] - $params['totalSumm'] > 0) $paid = $params['totalSumm'];
+        elseif ($user['bill'] > 0 && $remainder < 0) $paid = $user['bill'];
 
 		Fund::insert(2, [
 			'sum' => $params['totalSumm'],
 			'remainder' => $remainder,
 			'user_id' => $params['user_id'],
+            'issue_id' => $params['issue_id'],
+            'paid' => $paid,
 			'overdue' => $overdue,
-			'comment' => addslashes('Списание средств за покупку ' . implode(', ', $params['titles']))
+			'comment' => 'Реализация товаров'
 		]);
 
 		User::update(
@@ -43,7 +43,6 @@ class OrderValue{
 				'bill' => "`bill` - " . $params['totalSumm']
 			]
 		);
-        return $output;
 	}
     
     /**

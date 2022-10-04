@@ -315,17 +315,20 @@ class User{
 
     private static function getQueryDebt($where = '', $orderBy = ''): string
     {
+        $defaultWhere = 'f.issue_id IS NOT NULL AND ';
+        if ($where) $defaultWhere .= "$where AND ";
+        $defaultWhere = substr($defaultWhere, 0, -5);
         $query = "
             SELECT
                 f.id,
                 f.issue_id,
                 f.sum,
                 f.paid,
-                DATE_FORMAT(f.created, '%m.%d.%Y %H:%i:%s') AS created 
+                DATE_FORMAT(f.created, '%d.%m.%Y %H:%i:%s') AS created 
             FROM
                 #funds f
+            WHERE $defaultWhere
         ";
-        if ($where) $query .= " WHERE $where";
         if ($orderBy) $query .= " ORDER BY $orderBy";
         return $query;
     }

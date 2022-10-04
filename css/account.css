@@ -87,6 +87,10 @@
     border: 1px solid #c8c8c8
 }
 
+div[data-name="Tab_3_name"] table.mobile_view tr {
+    border-bottom: 1px dashed #c8c8c8 !important;
+}
+
 .balance-block button {
     margin-top: 10px
 }
@@ -104,9 +108,6 @@ tr[data-issue-id]{
 }
 #issue_info > p{
     font-size: 24px;
-}
-#issue_info tr{
-    border-bottom: 1px dashed #c8c8c8;
 }
 
 .pickmeup {
@@ -360,7 +361,7 @@ td.name-col b {
 }
 
 @media screen and (max-width: 700px) {
-    .account table {
+    .account table:not(.mobile_view) {
         display: none
     }
 

@@ -31,6 +31,7 @@ if ($view == 'exit'){
 	session_destroy();
 	setcookie('jwt', '');
 	header("Location: ".$_SERVER['HTTP_REFERER']);
+    die();
 }
 if($_GET['act'] == 'unbind'){
 	$db->delete(

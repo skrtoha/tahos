@@ -273,7 +273,7 @@ input, textarea {
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    background: rgba(228, 238, 244, 0.75);
+    /*background: rgba(228, 238, 244, 0.75);*/
 }
 
 #popup img {
@@ -2017,6 +2017,10 @@ footer .partnership{
     table.mobile_view tr {
         display: block;
         border-bottom: 1px dashed #c8c8c8;
+    }
+
+    table.mobile_view tr:last-child{
+        border-bottom: none;
     }
 
     table.mobile_view thead {

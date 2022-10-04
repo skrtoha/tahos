@@ -117,7 +117,12 @@ Breadcrumb::out();
                                 <tr>
                             <?}?>
 								<td><?=$operations_types[$fund['type_operation']]?></td>
-								<td class="name-col"><?=stripslashes($fund['comment'])?></td>
+								<td class="name-col">
+                                    <?=stripslashes($fund['comment'])?>
+                                    <?if ($fund['issue_id']){?>
+                                        за <a href="#">выдачу №<?=$fund['issue_id']?></a>
+                                    <?}?>
+                                </td>
 								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 								<td>
 									<?$color = $fund['type_operation'] == 1 ? 'positive-color' : 'negative-color';

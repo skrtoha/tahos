@@ -268,7 +268,7 @@ input, textarea {
 
 #popup {
     position: fixed;
-    height: 100%;
+    height: calc(100% - 150px);
     width: 100%;
     align-items: center;
     justify-content: center;

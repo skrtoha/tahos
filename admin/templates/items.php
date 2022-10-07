@@ -539,7 +539,7 @@ function history(){
             concat_ws(' ', 'Возврат по заказу №', r.order_id) as comment
         from
             #returns r
-        where r.item_id = 2893817
+        where r.item_id = {$_GET['item_id']}
         
         UNION
         
@@ -567,7 +567,7 @@ function history(){
                 LEFT JOIN
             #organizations_types ot ON ot.id=u.organization_type
         WHERE
-            ov.item_id = 2893817
+            ov.item_id = {$_GET['item_id']}
         
         order by str_to_date(date, '%d.%m.%Y %H:%i:%s') desc
 	", '');

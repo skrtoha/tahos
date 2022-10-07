@@ -584,6 +584,25 @@ function history(){
             #organizations_types ot ON ot.id=u.organization_type
         WHERE
             ov.item_id = {$_GET['item_id']}
+            
+        UNION
+        
+        select
+            DATE_FORMAT(oi.created, '%d.%m.%Y %H:%i:%s') AS date,
+            concat(
+                'Реализация №',
+                '<a target=\"_blank\" href=\"/admin/?view=order_issues&issue_id=',
+                iv.issue_id,
+                '\">',
+                iv.issue_id,
+                '</a>'
+            )
+        from
+            #order_issue_values iv
+        left join
+            #order_issues oi on iv.issue_id = oi.id
+        where
+            iv.item_id = {$_GET['item_id']}
         
         order by str_to_date(date, '%d.%m.%Y %H:%i:%s') desc
 	", '');

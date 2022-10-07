@@ -66,6 +66,12 @@ table th {
     vertical-align: middle;
 }
 
+.noReturn, .noReturn a {
+    cursor: pointer;
+    color: red;
+    font-weight: 800;
+}
+
 a.button, button, input[type=submit], input[type=reset] {
     float: left;
     line-height: 34px;

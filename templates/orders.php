@@ -604,7 +604,7 @@ Breadcrumb::out();
 </div>
 <div id="mgn_popup" class="product-popup mfp-hide">
 	<h1>Оформление возврата</h1>
-	<table class="basket-table">
+	<table class="basket-table mobile_view">
 		<thead>
 			<tr>
 				<th>Наименование</th>

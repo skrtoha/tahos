@@ -276,6 +276,16 @@ span.not_available {
     display: block;
 }
 
+#mgn_popup a.mfp-close.refuse {
+    position: static;
+    color: white;
+    width: auto;
+}
+
+#mgn_popup a.button {
+    margin-top: 10px;
+}
+
 #additional_options {
     padding: 20px;
 }
@@ -315,14 +325,8 @@ span.not_available {
     align-items: center;
     margin: 5px 0;
 }
-
-.mfp-content {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    margin: 0 auto;
-    text-align: left;
-    z-index: 1045;
+.mfp-content{
+    padding: 0;
 }
 
 .jq-radio__div {

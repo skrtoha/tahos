@@ -3,6 +3,10 @@ div.list-view > div {
     flex-direction: column;
 }
 
+div.filter-form li.disabled {
+    display: none;
+}
+
 #perPage a.perPage {
     padding: 0 0;
     line-height: 20px;

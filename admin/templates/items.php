@@ -521,7 +521,7 @@ function history(){
 	global $status, $db, $page_title;
 	$page_title = "История товара";
 	$res_item = $db->query("
-		select
+		SELECT
             DATE_FORMAT(i.created, '%d.%m.%Y %H:%i:%s') AS date,
             IF (
                 i.source is not null,
@@ -534,7 +534,7 @@ function history(){
         
         UNION
         
-        select
+        SELECT
             DATE_FORMAT(r.created, '%d.%m.%Y %H:%i:%s') AS date,
             concat_ws(
                 ' ', 
@@ -587,7 +587,7 @@ function history(){
             
         UNION
         
-        select
+        SELECT
             DATE_FORMAT(oi.created, '%d.%m.%Y %H:%i:%s') AS date,
             concat(
                 'Реализация №',

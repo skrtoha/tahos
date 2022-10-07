@@ -536,7 +536,17 @@ function history(){
         
         select
             DATE_FORMAT(r.created, '%d.%m.%Y %H:%i:%s') AS date,
-            concat_ws(' ', 'Возврат по заказу №', r.order_id) as comment
+            concat_ws(
+                ' ', 
+                'Возврат по заказу №', 
+                concat(
+                    '<a target=\"_blank\" href=\"/admin/?view=orders&id=',
+                    r.order_id,
+                    '&act=change\">',
+                    r.order_id,
+                    '</a>'
+                )
+                ) as comment
         from
             #returns r
         where r.item_id = {$_GET['item_id']}
@@ -556,7 +566,13 @@ function history(){
                     '</a>'
                 ),
                 'в заказе №',
-                ov.user_id
+                concat(
+                    '<a target=\"_blank\" href=\"/admin/?view=orders&id=',
+                    ov.order_id,
+                    '&act=change\">',
+                    ov.order_id,
+                    '</a>'
+                )
             ) as comment
         FROM
             #orders_values ov

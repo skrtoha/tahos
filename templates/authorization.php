@@ -47,5 +47,9 @@ else{
     $db->update('user_ips', ['user_id' => $user['id']], "ip = '{$_SERVER['SERVER_ADDR']}'");
     message('Вы успешно авторизовались!');
 }
-header("Location: {$_SERVER['HTTP_REFERER']}");
+if (strpos($_SERVER['HTTP_REFERER'], 'exceeded_connections') > 0){
+    header('Location: /');
+}
+else header("Location: {$_SERVER['HTTP_REFERER']}");
+die();
 ?>

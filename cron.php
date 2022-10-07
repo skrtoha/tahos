@@ -98,7 +98,7 @@ switch ($params[0]){
         break;
     case 'orderMparts':
         $logger->alert('Отправка заказа в МПартс');
-        core\Provider\Abcp::sendOrder(13);
+        core\Provider\MParts::sendOrder(13);
         break;
     case 'orderFavoriteParts':
         $logger->alert('Отправка заказа Фаворит Партс');

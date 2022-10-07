@@ -96,7 +96,7 @@ switch($_GET['act']){
 		core\Provider\Abcp::sendOrder(6);
 		break;
 	case 'orderMparts':
-		core\Provider\Abcp::sendOrder(13);
+		core\Provider\MParts::sendOrder();
 		break;
 	case 'orderFavoriteParts':
 		echo "<h2>Отправка заказа Фаворит</h2>";

@@ -83,15 +83,6 @@ class Armtek extends Provider{
 	public static function getItemsToOrder(int $provider_id){
 		return Abcp::getItemsToOrder($provider_id);
 	}
-	public static function getDaysDelivery($str){
-		$year = substr($str, 0, 4);
-		$month = substr($str, 4, 2);
-		$day = substr($str, 6, 2);
-		$hour = substr($str, 8, 2);
-		$currentTime = time();
-		$endTime = mktime($hour, 0, 0, $month, $day, $year);
-		return bcdiv($endTime - $currentTime, 86400);
-	}
 		/**
 		* @param $object
 		* @return bool|mixed
@@ -269,13 +260,6 @@ class Armtek extends Provider{
 		}
 		return $coincidences;
 	}
-	private function getStoreIdByKeyzak($keyzak){
-		if (array_key_exists($keyzak, self::$keyzak)) return self::$keyzak[$keyzak];
-		$array = $GLOBALS['db']->select_one('provider_stores', 'id', "`title`='$keyzak` AND `provider_id`= " . self::$provider_id);
-		if (empty($array)) return false;
-		self::$keyzak[$keyzak] = $array['id'];
-		return $array['id'];
-	}
 	public function isKeyzak($store_id){
 		if ($temp = array_search($store_id, self::$keyzak)) return $temp;
 		$array = $GLOBALS['db']->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
@@ -285,29 +269,6 @@ class Armtek extends Provider{
 			return true;
 		} 
 		return false;
-	}
-	private static function getKeyzakByStoreId($store_id){
-		if ($temp = array_search($store_id, self::$keyzak)) return $temp;
-		$array = parent::getInstanceDataBase()->select_one('provider_stores', 'id,title,provider_id', "`id`=$store_id");
-		if (empty($array)) return false;
-		self::$keyzak[$array['title']] = $array['id'];
-		return $array['title'];
-	}
-	public function isOrdered($value, $type = 'armtek'){
-		$where = self::getWhere($value);
-		$where .= " AND `type`='$type'";
-		$ov = $GLOBALS['db']->select_one('other_orders', '*', $where);
-		if (!empty($ov)) return $ov;
-		else return false;
-	}
-	public function deleteFromOrder($value, $type = 'armtek'){
-		$where = self::getWhere($value);
-		$GLOBALS['db']->delete('other_orders', "$where AND `type`='$type'");
-		OrderValue::changeStatus(5, $value);
-	}
-	public static function clearString($str){
-		$str = mb_strtolower($str);
-		return preg_replace('/[^\wА-Яа-я]+/', '', $str);
 	}
 	/**
 	 * executes a sending to order
@@ -356,14 +317,6 @@ class Armtek extends Provider{
 			'responseData' => $json_responce_data
 		];
 	}
-	
-	private static function getUserInfo(){
-        $params = self::$params;
-	    $response = self::getClientArmtek('private')->post([
-	        'VKORG' => $params['VKORG']
-        ]);
-        return $response->json();
-    }
 	private static function parseOrderResponse($input){
 		$items = $input['itemsForSending'];
 		$response = $input['responseData'];

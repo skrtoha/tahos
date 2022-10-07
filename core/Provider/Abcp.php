@@ -119,7 +119,8 @@ class Abcp extends Provider{
 	}
 	private function insertProviderStore($provider_id, $item){
 		if (!$item['distributorId']) return false;
-		$p = & self::getParam($provider_id);
+        $param = self::getParam($provider_id);
+        $p = & $param;
 		$store_id = array_search($item['distributorId'], $p['providerStores']);
 		if ($store_id) return $store_id;
 		$array = $this->db->select_one('provider_stores', 'id', "`title`='{$p['title']}-{$item['distributorId']}' AND provider_id=$provider_id");
@@ -299,17 +300,6 @@ class Abcp extends Provider{
 			]
 		);
 	}
-	private function getBrands(){
-		$queryString = $this->getQueryString('brands', ['number' => $this->number]);
-		$response = file_get_contents($queryString);
-		$response = json_decode($response, true);
-		// debug($response); exit();
-		foreach($response as $value) $brands[] = [
-			'number' => $value['number'],
-			'brand' => $value['brand']
-		];
-		return $brands;
-	}
 	public static function getItemInfoByArticleAndBrend($ov){
 		// debug($ov);
 		$param = self::getParam($ov['provider_id']);
@@ -350,7 +340,9 @@ class Abcp extends Provider{
 		$providerBasket = parent::getProviderBasket($provider_id, '');
 		$param = self::getParam($provider_id);
 		$items = [];
+
 		if (!$providerBasket->num_rows) return false;
+
 		foreach($providerBasket as $value){
 			if (!parent::getIsEnabledApiOrder($provider_id)){
 				Log::insert([
@@ -361,16 +353,14 @@ class Abcp extends Provider{
 			}
 			$items["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value;
 		}
-		$responseAddToBasket = self::addToBasket($items, $value);
-		debug($responseAddToBasket);
+		$responseAddToBasket = self::addToBasket($items);
 		self::parseResponseAddToBasket($responseAddToBasket, $items);
 		self::sendBasketToOrder($provider_id, $value['typeOrganization']);
 	}
-	private static function addToBasket($items, $ov){
-		$param = self::getParam($ov['provider_id'], $ov['typeOrganization']);
+	private static function addToBasket($items){
+		$param = self::getParam($ov['provider_id']);
 		$positions = [];
 		foreach($items as $item){
-			$item['provider_id'] = $ov['provider_id'];
 			$itemInfo = self::getItemInfoByArticleAndBrend($item);
 			if (!$itemInfo){
 				Log::insert([
@@ -398,7 +388,7 @@ class Abcp extends Provider{
 		);
 		return json_decode($response, true);
 	}
-	private static function parseResponseAddToBasket($response, $items){
+	protected static function parseResponseAddToBasket($response, $items){
 		if ($response['error']){
 			foreach($items as $osi => $item){
 					Log::insert([

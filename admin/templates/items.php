@@ -521,64 +521,73 @@ function history(){
 	global $status, $db, $page_title;
 	$page_title = "История товара";
 	$res_item = $db->query("
-		SELECT
-			i.id,
-			i.brend_id,
-			b.title AS brend,
-			i.article,
-			i.title_full,
-			i.source,
-			DATE_FORMAT(i.created, '%d.%m.%Y %H:%i:%s') AS date
-		FROM
-			#items i
-		LEFT JOIN
-			#brends b ON b.id = i.brend_id
-		WHERE
-			i.id = {$_GET['item_id']}
+		select
+            DATE_FORMAT(i.created, '%d.%m.%Y %H:%i:%s') AS date,
+            IF (
+                i.source is not null,
+                concat_ws(' ', 'Добавлен с', i.source),
+                'Добавлен'
+            ) as comment
+        from
+            #items i
+        where i.id = {$_GET['item_id']}
+        
+        UNION
+        
+        select
+            DATE_FORMAT(r.created, '%d.%m.%Y %H:%i:%s') AS date,
+            concat_ws(' ', 'Возврат по заказу №', r.order_id) as comment
+        from
+            #returns r
+        where r.item_id = 2893817
+        
+        UNION
+        
+        SELECT
+            DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS date,
+            concat_ws(
+                ' ',
+                'Заказал',
+                concat(
+                    '<a target=\'_blank\' href=\"/admin/?view=users&act=change&id=',
+                    u.id,
+                    '\">',
+                    ".\core\User::getUserFullNameForQuery().",
+                    '</a>'
+                ),
+                'в заказе №',
+                ov.user_id
+            ) as comment
+        FROM
+            #orders_values ov
+            LEFT JOIN
+            #orders o ON o.id = ov.order_id
+                LEFT JOIN
+            #users u ON u.id = ov.user_id
+                LEFT JOIN
+            #organizations_types ot ON ot.id=u.organization_type
+        WHERE
+            ov.item_id = 2893817
+        
+        order by str_to_date(date, '%d.%m.%Y %H:%i:%s') desc
 	", '');
-	$item = $res_item->fetch_assoc();
-	$resOrderValues = $db->query("
-		SELECT
-			ov.item_id,
-			ov.order_id,
-			ov.store_id,
-			ov.price,
-			DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS date,
-			" . core\User::getUserFullNameForQuery() . " AS name,
-			ov.user_id,
-			ps.cipher
-		FROM
-			#orders_values ov
-		LEFT JOIN
-			#orders o ON o.id = ov.order_id
-		LEFT JOIN
-			#users u ON u.id = ov.user_id
-		LEFT JOIN 
-			#organizations_types ot ON ot.id=u.organization_type
-		LEFT JOIN
-			#provider_stores ps ON ps.id = ov.store_id
-		WHERE
-			ov.item_id = {$_GET['item_id']}
-	", '');
+
+	$query = Item::getQueryItemInfo(['item_id' => $_GET['item_id']]);
+    $query .= " WHERE i.id = {$_GET['item_id']}";
+    $itemInfo = $db->query($query)->fetch_assoc();
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=items'>Номенклатура</a> > ";
-	$status .= "<a href='/admin/?view=items&act=item&id={$_GET['item_id']}'>{$item['brend']} - {$item['article']}</a> > $page_title";
+	$status .= "<a href='/admin/?view=items&act=item&id={$_GET['item_id']}'>{$itemInfo['brend']} - {$itemInfo['article']}</a> > $page_title";
 	?>
 	<table id="itemHistory" class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Дата</td>
 			<td>Действие</td>
 		</tr>
-		<tr>
-			<td label="Дата"><?=$item['date']?></td>
-			<td label="Действие">Добавлен <?=$item['source'] ? "c {$item['source']}" : ''?></td>
-		</tr>
-		<?if ($resOrderValues->num_rows){
-			while($row = $resOrderValues->fetch_assoc()){?>
+		<?if ($res_item->num_rows){
+			while($row = $res_item->fetch_assoc()){?>
 				<tr>
 					<td label="Дата"><?=$row['date']?></td>
-					<td label="Действие">
-						Заказал <a target="_blank" href="/admin/?view=users&act=change&id=<?=$row['user_id']?>"><?=$row['name']?></a> c <?=$row['cipher']?> по цене <?=$row['price']?> руб. <a href="/admin/?view=orders&id=<?=$row['order_id']?>&act=change">Перейти в заказ</a>
-					</td>
+					<td label="Действие"><?=$row['comment']?></td>
 				</tr>
 			<?}
 		}?>

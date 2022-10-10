@@ -66,12 +66,25 @@ class Account{
         const dataIssueId = document.querySelectorAll('[data-issue-id]');
         for(let d of dataIssueId){
             d.addEventListener('click', (e) => {
-                let issue_id = e.target.closest('tr').getAttribute('data-issue-id');
-                this.dataIssueIdEvent(issue_id)
+                const tr = e.target.closest('tr');
+
+                if (tr.classList.contains('active')) return;
+
+                let issue_id = tr.getAttribute('data-issue-id');
+                this.dataIssueIdEvent(issue_id, tr);
+                tr.addEventListener('click', (event) => {
+                    const tr = event.target.closest('tr');
+
+                    if (!tr.classList.contains('active')) return;
+
+                    tr.nextElementSibling.remove();
+                    tr.classList.remove('active');
+                })
             })
         }
     }
-    static dataIssueIdEvent(issue_id){
+    static dataIssueIdEvent(issue_id, obj){
+        const table = obj.closest('table');
         popup.style.display = 'flex';
         let formData = new FormData();
         formData.set('act', 'getOrderIssueInfo');
@@ -81,12 +94,9 @@ class Account{
             body: formData
         }).then(response => response.json()).then(response => {
             popup.style.display = 'none';
-            $.magnificPopup.open({
-                items: {
-                    src: this.getHtmlOrderIssueValues(response.issue_values),
-                    type: 'inline'
-                }
-            })
+            let node = this.getHtmlOrderIssueValues(response.issue_values)
+            table.querySelector('[data-issue-id="' + issue_id + '"]').after(node);
+            obj.classList.add('active');
         })
     }
     static getHtmlOrderIssues(array){
@@ -133,9 +143,9 @@ class Account{
         return table;
     }
     static getHtmlOrderIssueValues(array){
-        let output = `
-        <div id="issue_info">
-            <p><b>ВЫДАЧА №${array[0].issue_id}</b></p>
+        let table = document.createElement('table');
+        table.classList.add('mobile_view');
+        table.innerHTML = `
             <table class="mobile_view">
                 <thead>
                     <tr>
@@ -148,25 +158,26 @@ class Account{
                     </tr>
                 </thead>
                 <tbody>
-    `;
+        `;
         array.forEach((value, index) => {
-            output += `
-            <tr>
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
                 <td label="Бренд">${value.brend}</td>
                 <td label="Артикул">${value.article}</td>
                 <td label="Наименование">${value.title_full}</td>
                 <td label="Цена">${value.price}${this.designation}</td>
                 <td label="Выдано">${value.issued}</td>
                 <td label="Сумма">${value.price * value.issued}${this.designation}</td>
-            </tr>
-        `
+            `
+            table.querySelector('tbody').append(tr);
         })
-        output += `
-                </tbody>
-            </table>
-        </div>
-    `;
-        return output;
+        let tr = document.createElement('tr');
+        tr.classList.add('second');
+        let td = document.createElement('td');
+        td.colSpan = 6;
+        td.append(table);
+        tr.append(td);
+        return tr;
     }
 }
 if (document.readyState !== 'loading') Account.init();

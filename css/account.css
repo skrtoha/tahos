@@ -339,6 +339,47 @@ tr[data-issue-id]{
 td.name-col b {
     font-weight: 800;
 }
+.second .mobile_view {
+    width: calc(100% - 40px);
+    margin: 0 auto;
+}
+.second > td{
+    padding-top: 0;
+}
+.second table.mobile_view tr{
+    border-bottom: 1px dashed #c8c8c8;
+}
+.second table.mobile_view tr:last-child{
+    border-bottom: none;
+}
+tr.active{
+    border-bottom: none;
+}
+.icon-enlarge2:before {
+    content: "\e98b";
+    color: #0082BF;
+    margin-left: 10px;
+}
+tr.active .icon-enlarge2:before {
+    content: "\e98c";
+}
+
+div[data-name="Tab_1_name"] span.status{
+    display: block;
+    font-size: 14px;
+}
+div[data-name="Tab_1_name"] table td:last-child{
+    white-space: nowrap;
+}
+
+span.delay{
+    display: block;
+}
+td[label="Наименование"]{
+    text-align: left;
+    white-space: normal;
+}
+
 
 @media only screen and (max-width: 750px) {
     .account .sidebar{
@@ -372,13 +413,8 @@ td.name-col b {
     .account table.small-view th:nth-child(2), .account table.small-view td:nth-child(2) {
         text-align: center
     }
-
-    .account table.small-view td:first-child {
-        padding-left: 5px
-    }
-
-    .account table.small-view td:last-child {
-        padding-left: 10px
+    .mobile_view td{
+        text-align: left !important;
     }
 }
 

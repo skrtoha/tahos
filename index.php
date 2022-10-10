@@ -4,7 +4,7 @@ use core\Exceptions\NotFoundException;
 use core\Log;
 use core\Setting;
 
-ini_set('error_reporting', E_ERROR | E_PARSE);
+ini_set('error_reporting', E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 

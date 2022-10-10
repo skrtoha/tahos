@@ -2037,6 +2037,7 @@ footer .partnership{
         display: block;
         text-align: left;
         padding: 5px 0;
+        white-space: normal;
     }
 
     table.mobile_view td:before {

@@ -96,7 +96,6 @@ Breadcrumb::out();
 			<?if ($user['bonus_program']){?>
 				<li class="ionTabs__tab" data-target="Tab_2_name">История бонусов</li>
 			<?}?>
-            <li class="ionTabs__tab" data-target="Tab_3_name">Выдачи</li>
 		</ul>
 		<div class="ionTabs__body">
 			<div class="ionTabs__item" data-name="Tab_1_name">
@@ -120,7 +119,7 @@ Breadcrumb::out();
 								<td class="name-col">
                                     <?=stripslashes($fund['comment'])?>
                                     <?if ($fund['issue_id']){?>
-                                        за <a href="#">выдачу №<?=$fund['issue_id']?></a>
+                                        №<?=$fund['issue_id']?>
                                     <?}?>
                                 </td>
 								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
@@ -132,8 +131,32 @@ Breadcrumb::out();
 										<?=$minus_plus?>
 										<span class="price_format"><?=$fund['sum']?></span><i class="fa fa-rub" aria-hidden="true"></i>
 									</span>
+                                    <?if ($fund['issue_id']){?>
+                                        <span class="status">
+                                            <?if ($fund['paid'] < $fund['sum']){?>
+                                                <span class="negative-color">не оплачено</span>
+                                                <?
+                                                $created = DateTime::createFromFormat('Y-m-d H:i:s', $fund['created']);
+                                                $difference = time() - $created->getTimestamp();
+                                                $difference = floor($difference / 24 / 60 / 60);
+
+                                                if ($difference > $user['defermentOfPayment']){?>
+                                                    <span class="delay negative-color">просрок <?=$difference - $user['defermentOfPayment']?> д.</span>
+                                                <?}?>
+                                            <?}
+                                            else{?>
+                                                <span class="positive-color">оплачено</span>
+                                            <?}?>
+                                        </span>
+                                    <?}?>
+
 								</td>
-                                <td><?=$fund['remainder']?><i class="fa fa-rub" aria-hidden="true"></i></td>
+                                <td>
+                                    <?=$fund['remainder']?><i class="fa fa-rub" aria-hidden="true"></i>
+                                    <?if ($fund['issue_id']){?>
+                                        <span class="icon-enlarge2"></span>
+                                    <?}?>
+                                </td>
 							</tr>
 						<?}
 					}
@@ -165,6 +188,24 @@ Breadcrumb::out();
 										<?=$minus_plus?>
 										<span class="price_format"><?=$fund['sum']?></span><i class="fa fa-rub" aria-hidden="true"></i>
 									</span>
+                                    <?if ($fund['issue_id']){?>
+                                        <span class="status">
+                                            <?if ($fund['paid'] < $fund['sum']){?>
+                                                <span class="negative-color">не оплачено</span>
+                                                <?
+                                                $created = DateTime::createFromFormat('Y-m-d H:i:s', $fund['created']);
+                                                $difference = time() - $created->getTimestamp();
+                                                $difference = floor($difference / 24 / 60 / 60);
+
+                                                if ($difference > $user['defermentOfPayment']){?>
+                                                    <span class="delay negative-color">просрок <?=$difference - $user['defermentOfPayment']?> д.</span>
+                                                <?}?>
+                                            <?}
+                                            else{?>
+                                                <span class="positive-color">оплачено</span>
+                                            <?}?>
+                                        </span>
+                                    <?}?>
 								</td>
 							</tr>
 					<?}
@@ -249,8 +290,6 @@ Breadcrumb::out();
 					</table>
 				</div>
 			<?}?>
-            <div class="ionTabs__item" data-name="Tab_3_name">
-            </div>
         </div>
 			<div class="ionTabs__preloader"></div>
 		</div>

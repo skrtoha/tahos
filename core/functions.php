@@ -1,4 +1,4 @@
- <?php
+<?php
 function replace_winword_chars($val){
 			$_r=array(
 						"–"=>"-",
@@ -39,7 +39,6 @@ function debug($obj, $name = ''){?>
 function message($text, $type = true){
 	if (!$type) $type_message = "error";
 	else $type_message = 'ok';
-	// echo "$text $type_message";
 	setcookie('message', $text, 0, '/');
 	setcookie('message_type', $type_message, 0, '/');
 }

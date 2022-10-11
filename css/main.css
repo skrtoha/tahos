@@ -339,7 +339,14 @@ header #debt {
 }
 
 header .catalog_btn {
-    margin: 27px 37px 0 4px;
+    margin: 27px 0 0 0;
+}
+
+header .catalog_btn:before {
+    content: 'Каталог';
+    margin-left: 36px;
+    line-height: 22px;
+    font-size: 17px;
 }
 
 header .wrapper {
@@ -491,11 +498,12 @@ header .logo {
 
 header .catalog_btn {
     float: left;
-    width: 30px;
     height: 22px;
-    background: url(/img/icons/header__catalog.png) center no-repeat;
+    background: url(/img/icons/header__catalog.png) left no-repeat;
     cursor: pointer;
-    position: relative
+    position: relative;
+    color: white;
+    text-transform: uppercase;
 }
 
 #uLogin {
@@ -2051,6 +2059,9 @@ footer .partnership{
 }
 
 @media screen and (max-width: 550px) {
+    header .catalog_btn:before{
+        content: '';
+    }
     header .login .social_buttons{
         margin-top: 10px;
     }

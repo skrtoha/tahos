@@ -163,7 +163,9 @@ class Account{
             let tr = document.createElement('tr');
             tr.innerHTML = `
                 <td label="Бренд">${value.brend}</td>
-                <td label="Артикул">${value.article}</td>
+                <td label="Артикул">
+                    <a href="/article/${value.item_id}-${value.article}">${value.article}</a>
+                </td>
                 <td label="Наименование">${value.title_full}</td>
                 <td label="Цена">${value.price}${this.designation}</td>
                 <td label="Выдано">${value.issued}</td>

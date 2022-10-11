@@ -2,7 +2,7 @@
     color: red
 }
 
-.balance-block .account-total, .balance-block .account-bonus {
+.account-total, .balance-block .account-bonus {
     color: #0081bc;
     font-size: 18px
 }
@@ -367,11 +367,18 @@ tr.active .icon-enlarge2:before {
 div[data-name="Tab_1_name"] span.status{
     display: block;
     font-size: 14px;
+    white-space: nowrap;
 }
 div[data-name="Tab_1_name"] table td:last-child{
     white-space: nowrap;
 }
+div[data-name="Tab_1_name"] .account-total{
+    font-size: 13px;
+}
 
+div[data-name="Tab_1_name"] td{
+    padding: 10px 5px;
+}
 span.delay{
     display: block;
 }
@@ -398,6 +405,18 @@ td[label="Наименование"]{
         margin-left: 0;
         width: 100%;
         margin-top: 20px;
+    }
+    table.mobile_view td:before{
+        font-weight: normal;
+    }
+    table.mobile_view td{
+        font-weight: bold;
+    }
+    div[data-name="Tab_1_name"] td{
+        padding: 5px 0;
+    }
+    .second table.mobile_view tr{
+        padding: 10px 0;
     }
 }
 

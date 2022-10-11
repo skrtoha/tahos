@@ -65,6 +65,7 @@ Breadcrumb::out();
 			<?if ($user['bonus_program']){?>
 				<p>Бонусы: <span class="account-bonus"><?=$user['bonus_count']?><?=$designation?></span></p>
 			<?}?>
+            <p>Отсрочка платежа: <span class="account-total"><?=$user['defermentOfPayment']?> д.</span></p>
 			<button id="payment">Пополнить счет</button>
 		</div>
 		<div class="account-history-block">
@@ -140,12 +141,16 @@ Breadcrumb::out();
                                                 $difference = time() - $created->getTimestamp();
                                                 $difference = floor($difference / 24 / 60 / 60);
 
-                                                if ($difference > $user['defermentOfPayment']){?>
+                                                if ($difference >= $user['defermentOfPayment']){?>
                                                     <span class="delay negative-color">просрок <?=$difference - $user['defermentOfPayment']?> д.</span>
+                                                <?}
+                                                else{
+                                                    $headline = $created->add(new DateInterval("P{$user['defermentOfPayment']}D"));
+                                                    $difference = $headline->getTimestamp() - time();
+                                                    $difference = floor($difference / 24 / 60 / 60);
+                                                    ?>
+                                                    <span class="delay account-total">осталось <?=$difference?> д.</span>
                                                 <?}?>
-                                            <?}
-                                            else{?>
-                                                <span class="positive-color">оплачено</span>
                                             <?}?>
                                         </span>
                                     <?}?>
@@ -179,7 +184,12 @@ Breadcrumb::out();
                             else{?>
                                 <tr>
                             <?}?>
-								<td class="name-col"><?=stripslashes($fund['comment'])?></td>
+								<td class="name-col">
+                                    <?=stripslashes($fund['comment'])?>
+                                    <?if ($fund['issue_id']){?>
+                                        №<?=$fund['issue_id']?>
+                                    <?}?>
+                                </td>
 								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 								<td>
 									<?$color = $fund['type_operation'] == 1 ? 'positive-color' : 'negative-color';
@@ -197,12 +207,16 @@ Breadcrumb::out();
                                                 $difference = time() - $created->getTimestamp();
                                                 $difference = floor($difference / 24 / 60 / 60);
 
-                                                if ($difference > $user['defermentOfPayment']){?>
+                                                if ($difference >= $user['defermentOfPayment']){?>
                                                     <span class="delay negative-color">просрок <?=$difference - $user['defermentOfPayment']?> д.</span>
+                                                <?}
+                                                else{
+                                                    $headline = $created->add(new DateInterval("P{$user['defermentOfPayment']}D"));
+                                                    $difference = $headline->getTimestamp() - time();
+                                                    $difference = floor($difference / 24 / 60 / 60);
+                                                    ?>
+                                                    <span class="delay account-total">осталось <?=$difference?> д.</span>
                                                 <?}?>
-                                            <?}
-                                            else{?>
-                                                <span class="positive-color">оплачено</span>
                                             <?}?>
                                         </span>
                                     <?}?>

@@ -588,6 +588,10 @@ a.return, a.removeFromOrder {
 .status_return_3 {
     color: #65b562;
 }
+span.ordered_return.status_return_1 {
+    display: block;
+    font-size: 13px;
+}
 
 @media only screen and (max-width: 750px) {
     div[data-name=returns] td.icon {

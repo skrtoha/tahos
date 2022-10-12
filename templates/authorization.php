@@ -46,5 +46,4 @@ else{
     message('Вы успешно авторизовались!');
 }
 header("Location: {$_SERVER['HTTP_REFERER']}");
-die('stopped');
 ?>

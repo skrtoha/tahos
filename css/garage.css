@@ -358,6 +358,21 @@
     border-color: transparent #fff;
 }
 
+.switch, .wrapper, form .input_box{
+    position: static;
+}
+.mfp-content{
+    padding: 10px;
+}
+.mfp-content table tr td {
+    padding: 5px 0;
+}
+.mfp-content .wrapper form input {
+    width: 100%;
+}
+.mfp-content table tr {
+    border: none;
+}
 
 @media screen and (max-width: 1100px) {
     .items .content .list-view table.wide-view {

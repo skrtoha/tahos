@@ -100,8 +100,11 @@ form.js-form-address input {
     border: 1px solid #c8c8c8;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    background: #fff;
     color: #5f5f5f;
+}
+#set-address form input[type=button]{
+    background: #0082bf;
+    color: white;
 }
 form.js-form-address > div.input {
     width: 50%;

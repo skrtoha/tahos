@@ -534,12 +534,12 @@ span[class^=icon_] {
     background-size: 18px;
 }
 
-tr.shown.button-row.empty td {
-    padding: 15px 0;
-}
-
 .description-block li i.fa {
     display: none;
+}
+
+.mfp-content{
+    padding: 0;
 }
 
 .description-block li[data-target=Tab_1_name]:before {

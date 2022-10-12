@@ -10,6 +10,11 @@ h3.title_analogies {
     margin-top: 40px
 }
 
+.fa-gear:before, .fa-cog:before {
+    font-size: 19px;
+    content: "\f013";
+}
+
 #analogies {
     display: none
 }
@@ -50,7 +55,7 @@ a.showAllResults {
     padding-bottom: 0
 }
 
-.search-result .mobile-layout .goods-header .fa-camera {
+.articul-table .search-result .mobile-layout .goods-header .fa-camera {
     position: absolute;
     right: 20px;
     top: 10px;

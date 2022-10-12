@@ -99,10 +99,6 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 
-.fa-camera:before {
-    content: "\f030";
-}
-
 b.brend_info {
     font-weight: 700;
     cursor: pointer;
@@ -110,27 +106,7 @@ b.brend_info {
 
 .fa-camera:before {
     content: "\f030";
-    font-size: 19px;
-}
-
-.product-popup {
-    max-width: 900px;
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    background: #fff;
-    padding: 30px;
-    position: relative;
-}
-
-#div_10 {
-    width: calc(100% - 238px);
-    float: left;
-}
-
-.product-popup h2.title {
-    color: #0081bc;
-    text-transform: uppercase;
+    font-size: 22px;
 }
 
 table#item_into {

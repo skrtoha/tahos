@@ -22,6 +22,7 @@
 				var t = e.target;
 				if (t.className == 'brend_info') return false;
 				var item_id = $(this).attr('item_id');
+                popup.style.display = 'flex';
 				$.ajax({
 					type: "POST",
 					url: "/ajax/item_full.php",
@@ -31,6 +32,7 @@
 						// return;
 						// console.log(JSON.parse(msg));
 						$('#mgn_popup').html(item_full.getFullItem(JSON.parse(msg)));
+                        popup.style.display = 'none';
 						$.magnificPopup.open({
 							type: 'inline',
 							preloader: false,

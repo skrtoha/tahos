@@ -188,12 +188,60 @@ table.orders-table td .status-col.status-stoped {
     width: 100%;
 }
 
+.date-wrap {
+    width: 110px;
+    position: relative;
+    margin: 0 auto;
+}
+
+input.data-pic-beg {
+    font-size: 15px;
+    border: 1px solid #C7C7C7;
+    border-radius: 4px;
+    width: 100%;
+}
+.date-wrap .calendar-icon {
+    right: -28px;
+    z-index: 10;
+    height: 34px;
+    top: 0;
+    width: 44px;
+    border-radius: 0 4px 4px 0;
+    position: absolute;
+    background: url(/img/icons/calendar-icon.png) center center no-repeat, #0082BF;
+}
+
 b.brend_info {
     font-weight: 700;
     cursor: pointer;
 }
 dd, strong {
     font-weight: 700;
+}
+
+div[store_id][item_id] {
+    white-space: nowrap;
+    display: flex;
+}
+.count-block .minus, .count-block .plus {
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    background: #0082BF;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0;
+    color: #fff;
+    text-align: center;
+    line-height: 34px;
+    font-size: 30px;
+}
+.count-block input {
+    text-align: center;
+    width: 70px;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    border-color: #0082BF;
 }
 
 @media screen and (max-width: 550px){

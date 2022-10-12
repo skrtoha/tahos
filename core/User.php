@@ -126,8 +126,11 @@ class User{
 	 */
 	public static function setBonusProgram($user_id, $titles, $sum){
 		$db = $GLOBALS['db'];
+
+        /** @var mysqli_result $res_user */
 		$res_user = self::get(['user_id' => $user_id]);
-		$user = $res_user->fetch_assoc();
+        $user = $res_user->fetch_assoc();
+
 		if (!$user['bonus_program']) return false;
 		$current_bonus_count = floor($sum * self::$bonus_size / 100);
 		Fund::insert(3, [
@@ -201,7 +204,7 @@ class User{
         if (!$update['show_all_analogies']) $update['show_all_analogies'] = 0;
         if (!$update['get_notifications']) $update['get_notifications'] = 0;
         if (!$update['get_sms_provider_refuse']) $update['get_sms_provider_refuse'] = 0;
-        if ($update['phone']) $update['phone'] = preg_replace('/[^\d+\+]+/i', '', $update['phone']);
+        if ($update['phone']) $update['phone'] = preg_replace('/[\D]+/i', '', $update['phone']);
     
         if ($update['password']){
             if ($settings['data']['password'] != $_POST['password']['repeat_new_password']){
@@ -217,7 +220,8 @@ class User{
         self::setAddress(
             $user['id'],
             $settings['addressee'] ?? [],
-            $settings['default_address'] ?? []
+            $settings['default_address'] ?? [],
+            $settings['address_id'] ?? []
         );
         
         return $db->update('users', $update, "`id` = {$user['id']}");

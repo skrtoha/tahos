@@ -65,7 +65,6 @@ table.orders-table td .status-col.status-stoped {
 
 #fotos li:hover:before {
     content: " ";
-    background: rgba(58, 56, 56, 0.41) url(/images/no_foto_2.png) no-repeat;
     background-size: 66px;
     height: 200px;
     width: 100%;
@@ -179,6 +178,21 @@ form#send-message .info {
     top: 40px;
     left: 0;
     z-index: 998;
+}
+.info, .info_btn .infotext {
+    padding: 15px;
+    width: 320px;
+    background: #fff;
+    position: absolute;
+}
+
+.info:before {
+    display: block;
+    width: 18px;
+    height: 9px;
+    background: url(/img/icons/header__white_arrow_up.png) center no-repeat;
+    position: absolute;
+    top: -9px;
 }
 
 form#send-message button {

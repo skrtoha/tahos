@@ -10,6 +10,12 @@ if (!$_SESSION['user']) header('Location: /');
 $title = "Корзина";
 $user_id = $_SESSION['user'];
 if ($_GET['act'] == 'to_offer'){
+    $debt = \core\User::getDebt($user);
+    if ($debt['blocked']){
+        message('Возможность отправки заказов ограничена!', false);
+        header('Location: /basket');
+        die();
+    }
     $res_basket = core\Basket::get($user_id, true);
     
     if (!$res_basket->num_rows){
@@ -117,6 +123,7 @@ if ($_GET['act'] == 'to_offer'){
     
     message('Успешно отправлено в заказы!');
     header('Location: /orders');
+    die();
 }
 $res_basket = core\Basket::get($_SESSION['user']);
 if (!$res_basket->num_rows) return;

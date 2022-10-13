@@ -1,4 +1,7 @@
 <?
+
+use core\Exceptions\NotFoundException;
+
 $query = "
 	SELECT
 		mf.id,
@@ -41,6 +44,7 @@ if ($res_modification->num_rows){
 		if ($row['filter']) $modification['filter_values'][$row['filter']] = $row['filter_value'];
 	}
 }
+else throw new NotFoundException('Модификация не найдена');
 // debug($modification);
 $res_nodes = $db->query("
 	SELECT

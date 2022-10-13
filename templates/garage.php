@@ -68,10 +68,10 @@ function garage(){
 				<a class="not-active-switch" href="#">Неактивные</a>
 				<div class="view-switchs">
 					<div class="view-switch mosaic-view-switch active" id="mosaic-view-switch">
-						<img src="img/icons/option-panel_mosaic_view.png" alt="Мозайкой">
+						<img src="/img/icons/option-panel_mosaic_view.png" alt="Мозайкой">
 					</div>
 					<div class="view-switch list-view-switch" id="list-view-switch">
-						<img src="img/icons/option-panel_list-view.png" alt="Списком">
+						<img src="/img/icons/option-panel_list-view.png" alt="Списком">
 					</div>
 				</div>
 

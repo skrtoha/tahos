@@ -13,7 +13,9 @@ class Fund{
 			'sum' => $fields['sum'],
 			'remainder' => $fields['remainder'],
 			'user_id' => $fields['user_id'],
-			'overdue' => isset($fields['overdue']) ? $fields['overdue'] : 0,
+            'paid' => $fields['paid'] ?? 0,
+            'issue_id' => $fields['issue_id'] ?? null,
+			'overdue' => $fields['overdue'] ?? 0,
 			'comment' => $fields['comment']
 		];
 		if ($type_operation == 1) $insert['is_new'] = 1;
@@ -37,6 +39,8 @@ class Fund{
 				#funds f
 			LEFT JOIN
 				#users u ON u.id = f.user_id
+            LEFT JOIN
+                #order_issues oi ON f.issue_id = oi.id
 			LEFT JOIN 
 				#organizations_types ot ON ot.id=u.organization_type		
 			$where			

@@ -1,6 +1,8 @@
 <?php
 namespace core;
 
+use mysqli_result;
+
 class User{
 	public static function noOverdue($user_id){
 		$query = Fund::getQueryListFunds(
@@ -31,12 +33,14 @@ class User{
 	 * @var integer
 	 */
 	public static $bonus_size = 1;
-	/**
-	 * gets common information about user
-	 * @param  [integer] $user_id user id
-	 * @return [type] if no $user_id and $_SESSION['user'] returns default values, if no user_id then by $_SESSION['user']
-	 */
-	public static function get($params = []){
+
+    /**
+     * gets common information about user
+     * @param array $params
+     * @return array [type] if no $user_id and $_SESSION['user'] returns default values, if no user_id then by $_SESSION['user']
+     * @return mysqli_result
+     */
+	public static function get(array $params = []){
 		$db = $GLOBALS['db'];
 		$where = '';
         $having = '';
@@ -122,8 +126,11 @@ class User{
 	 */
 	public static function setBonusProgram($user_id, $titles, $sum){
 		$db = $GLOBALS['db'];
+
+        /** @var mysqli_result $res_user */
 		$res_user = self::get(['user_id' => $user_id]);
-		$user = $res_user->fetch_assoc();
+        $user = $res_user->fetch_assoc();
+
 		if (!$user['bonus_program']) return false;
 		$current_bonus_count = floor($sum * self::$bonus_size / 100);
 		Fund::insert(3, [
@@ -197,6 +204,7 @@ class User{
         if (!$update['show_all_analogies']) $update['show_all_analogies'] = 0;
         if (!$update['get_notifications']) $update['get_notifications'] = 0;
         if (!$update['get_sms_provider_refuse']) $update['get_sms_provider_refuse'] = 0;
+        if ($update['phone']) $update['phone'] = preg_replace('/[\D]+/i', '', $update['phone']);
     
         if ($update['password']){
             if ($settings['data']['password'] != $_POST['password']['repeat_new_password']){
@@ -212,7 +220,8 @@ class User{
         self::setAddress(
             $user['id'],
             $settings['addressee'] ?? [],
-            $settings['default_address'] ?? []
+            $settings['default_address'] ?? [],
+            $settings['address_id'] ?? []
         );
         
         return $db->update('users', $update, "`id` = {$user['id']}");
@@ -249,4 +258,129 @@ class User{
         sort($payType);
         return $payType;
     }
+
+    public static function addPaymentList(array $params){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        $db->insert('payment_list', $params);
+    }
+
+    private static function getQueryGroupDebt($date, $user_id): string
+    {
+        return "
+            SELECT
+                SUM(f.sum) - SUM(f.paid) AS sum 
+            FROM
+                #funds f
+            WHERE
+                f.created <= '$date' AND
+                f.user_id = $user_id AND
+                f.paid < f.sum AND
+                f.issue_id IS NOT NULL
+            GROUP BY
+                f.user_id
+        ";
+    }
+
+    public static function getDebt(array $user): array
+    {
+        /** @global $db Database */
+        global $db;
+
+        $designation = '<i class="fa fa-rub" aria-hidden="true"></i>';
+
+        if (!$user['defermentOfPayment']) return [];
+
+        $currentDate = new \DateTime();
+        $currentDate->sub(new \DateInterval("P{$user['defermentOfPayment']}D"));
+        $query = self::getQueryGroupDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
+        $result = $db->query($query);
+
+        if (!$result->num_rows){
+            $currentDate = new \DateTime();
+            $defermentOfPayment = $user['defermentOfPayment'] - 1;
+            $currentDate->sub(new \DateInterval("P{$defermentOfPayment}D"));
+            $query = self::getQueryGroupDebt($currentDate->format('Y-m-d H:i:s'), $user['id']);
+            $result = $db->query($query);
+            if (!$result->num_rows) return [];
+            $result = $result->fetch_assoc();
+            return [
+                'message' => "До завтра необходимо внести {$result['sum']} $designation, иначе заказы будут заблокированы",
+                'blocked' => false
+            ];
+        }
+
+        $result = $result->fetch_assoc();
+        return [
+            'message' => "Заказы заблокированы. Задолженность составляет {$result['sum']} $designation",
+            'blocked' => true
+        ];
+    }
+
+    private static function getQueryDebt($where = '', $orderBy = ''): string
+    {
+        $defaultWhere = 'f.issue_id IS NOT NULL AND ';
+        if ($where) $defaultWhere .= "$where AND ";
+        $defaultWhere = substr($defaultWhere, 0, -5);
+        $query = "
+            SELECT
+                f.id,
+                f.issue_id,
+                f.sum,
+                f.paid,
+                DATE_FORMAT(f.created, '%d.%m.%Y %H:%i:%s') AS created 
+            FROM
+                #funds f
+            WHERE $defaultWhere
+        ";
+        if ($orderBy) $query .= " ORDER BY $orderBy";
+        return $query;
+    }
+
+    public static function checkDebt($user_id, $amount){
+        /** @var $db Database  */
+        global $db;
+
+        $query = self::getQueryDebt(
+            "f.paid < f.sum AND f.user_id = $user_id AND f.issue_id IS NOT NULL",
+            'f.created'
+        );
+        $result = $db->query($query);
+
+        if (!$result->num_rows) return;
+
+        $remain = $amount;
+        foreach($result as $row){
+            $difference = $row['sum'] - $row['paid'];
+            if ($remain < $difference){
+                $db->update(
+                    'funds',
+                    ['paid' => $row['paid'] + $remain],
+                    "id = {$row['id']}"
+                );
+                break;
+            }
+            $remain = $remain - $difference;
+            $db->update(
+                'funds',
+                ['paid' => $row['paid'] + $difference],
+                "id = {$row['id']}"
+            );
+        }
+    }
+
+    public static function getDebtList($params): array
+    {
+        /** @global $db Database */
+        global $db;
+
+        $where = "f.user_id = {$params['user_id']} AND ";
+        if (isset($params['begin'])) $where .= "f.created > '{$params['begin']}' AND ";
+        if (isset($params['end'])) $where .= "f.created < '{$params['end']}' AND ";
+        $where = substr($where, 0, -5);
+        $query = self::getQueryDebt($where, 'f.created DESC');
+        return $db->query($query)->fetch_all(MYSQLI_ASSOC);
+    }
+
 }

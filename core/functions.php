@@ -1,7 +1,4 @@
-<?php  
-function article_clear($article){
-	return preg_replace('/[^\w_а-яА-Я]+/u', '', $article);
-}
+<?php
 function replace_winword_chars($val){
 			$_r=array(
 						"–"=>"-",
@@ -23,11 +20,6 @@ function replace_winword_chars($val){
 	return $val;
 	debug();
 }
-function uppercase_first_letter($str){
-	$left = substr($str, 0, 1);
-	$right = substr($str, 1, strlen($str) - 1);
-	return mb_strtoupper($left).$right;
-}
 function translite($var){
 	$var = mb_strtolower($var, 'UTF-8');
 	$var = replace_winword_chars($var);
@@ -37,19 +29,6 @@ function translite($var){
 	$var = strtr($var,$alpha);
 	return $var;
 }
-function shot_str($str, $len){
-	$len -= 3;
-	if (mb_strlen($str, "UTF-8") < $len) return $str;
-	$text_cut = mb_substr($str, 0, $len, "UTF-8");
-	$text_explode = explode(" ", $text_cut);
-	unset($text_explode[count($text_explode) - 1]);
-	return implode(" ", $text_explode).'...';
-}
-function toStringKey($array, $key){
-	$str = '';
-	foreach ($array as $k => $v) $str .= $v[$key].',';
-	return substr($str, 0, -1);
-}
 function debug($obj, $name = ''){?>
 	<div style="clear: both"></div>
 	<?if ($name){?>
@@ -57,36 +36,11 @@ function debug($obj, $name = ''){?>
 	<?}?>
 	<pre><?print_r($obj)?></pre>
 <?}
-function print_d($ar, $isOnlyToConsole = true) {
-    if (!$isOnlyToConsole){
-        echo '<pre>';
-        print_r($ar);
-        echo '</pre>';
-    }
-    echo '<script>console.log('.json_encode($ar).');</script>';
-}
 function message($text, $type = true){
 	if (!$type) $type_message = "error";
 	else $type_message = 'ok';
-	// echo "$text $type_message";
 	setcookie('message', $text, 0, '/');
 	setcookie('message_type', $type_message, 0, '/');
-}
-function get_cookie_flilters($cat_id = 0){
-	if ($_COOKIE['filters']){
-		$temp = json_decode($_COOKIE['filters'], true);
-		$temp_2 = $temp['filters'];
-		$category_id = $_GET['category_id'] ? $_GET['category_id'] : $cat_id;
-		foreach ($temp_2 as $value) {
-			if ($value['category_id'] == $category_id){
-	$temp = $value['values'];
-	break;
-			} 
-		}
-		foreach ($temp as $value) $cookie_filters[$value['name']] = $value['value'];
-		return $cookie_filters;
-	}
-	else return false;
 }
 function get_bill(){
 	global $db;
@@ -121,12 +75,6 @@ function payment_funds($type, $user, $difference = false){
 			$result = round($user[$type]/$currency['rate'], 2);
 			return "<span class='price_format_2'>$result</span>";
 	}
-}
-function begin_date(){
-	return date('d.m.Y', time() - 60 * 60 * 24 * 30);
-}
-function end_date(){
-	return date('d.m.Y', time());
 }
 function get_price($provider_item){
 	global $db;
@@ -167,86 +115,7 @@ function getStrTemplate($template){
 	}
 	return substr($str, 0, -2);
 }
-function get_rating($rate, $ratings){
-	if ($rate <= $ratings[1]) return 0;
-	if ($rate >= $ratings[10]) return 10;
-	for ($i = 1; $i <= 9; $i++){
-		if ($rate > $ratings[$i] && $rate <= $ratings[$i + 1]) return $i;
-	}
-	return 10;
-}
 
-function get_filters($category_id){
-	global $db;
-	$query = "
-		SELECT 
-			f.id as filter_id,
-			f.title,
-			fv.id as value_id,
-			fv.title as filter_value,
-			f.slider
-		FROM 
-			#filters as f
-		LEFT JOIN 
-			#filters_values fv
-		ON
-			fv.filter_id=f.id
-		WHERE category_id=$category_id
-		ORDER BY f.pos, fv.title
-	";
-	$filters = $db->select_unique($query, '');
-	if (!empty($filters)){
-		foreach ($filters as $value){
-			$fv = $value['filter_id'];
-			$f = & $t_filters[$fv];
-			$f['title'] = $value['title'];
-			$f['slider'] = $value['slider'];
-			$f['filters_values'][$value['value_id']] = $value['filter_value'];
-		} 
-	}
-	return $t_filters;
-}
-function cat_get_chunks_items($query){
-	global $db, $settings, $res;
-	$res_items = $db->query($query, '');
-	if (!$res_items->num_rows) return false;
-	$res['num_rows'] = $res_items->num_rows;
-	$ch = 0;
-	$bl = true;
-	while($bl){
-		for ($i = 0; $i < $settings['cat_perPage']; $i++){
-			$value = $res_items->fetch_assoc();
-			if ($value) $chunks[$ch][] = $value;
-			else {
-				$bl = false;
-				break;
-			}
-		} 
-		if ($bl) $ch++;
-	}
-	return $chunks;
-}
-function cat_get_items_values($items){
-	global $db, $res;
-	$ids = '';
-	if (empty($items)) return false;
-	foreach ($items as $value) $ids .= "{$value['id']},";
-	$ids = substr($ids, 0, -1);
-	$q_items_values = "
-		SELECT 
-			iv.item_id, fv.title, fv.id, fv.filter_id
-		FROM #items_values iv
-		JOIN #filters_values fv
-		ON fv.id=iv.value_id
-		WHERE iv.item_id IN ($ids)
-	";
-	$res_items_values = $db->query($q_items_values, false);
-	if (!$res_items_values->num_rows) return false;
-	while($row = $res_items_values->fetch_assoc()){
-		$items_values[$row['item_id']][$row['filter_id']] = $row['title'];
-	} 
-	return $items_values;
-}
 function getQueryArticleStoreItems($item_id, $search_type, $filters = []){
 	global $db, $user;
 	if ($_SESSION['user']){

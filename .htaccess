@@ -93,5 +93,7 @@ RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})/([\d]+
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\w{17})/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&node_id=$7&vin=$5 [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/vin/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$5&node_id=$6&vin=vin [L]
 RewriteRule ^original-catalogs/([\w-]+)/([\w-]+)/([\d]+)/([\w-]+)/(\d{4})/([\d]+)/([\d]+)$ index.php?view=node&vehicle=$1&brend=$2&model_id=$3&href=$4&modification_id=$6&node_id=$7&year=$5 [L]
+
+ErrorDocument 404 http://tahos.loc/404.php
 #RewriteRule ^/$ index.php?view=index [L]
 #RewriteRule ^/$ index.php [L]

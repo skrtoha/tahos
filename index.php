@@ -1,8 +1,10 @@
 <?php
+session_start();
+use core\Exceptions\NotFoundException;
 use core\Log;
 use core\Setting;
 
-ini_set('error_reporting', E_ERROR | E_PARSE);
+ini_set('error_reporting', E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -12,7 +14,6 @@ require_once('vendor/autoload.php');
 
 $db = new core\Database();
 
-session_start();
 $connection = new core\Connection($db);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');
 $db->connection_id = $connection->connection_id;
@@ -25,12 +26,12 @@ if ($detect->isTablet()) $device = 'tablet';
 if ($detect->isMobile() && !$detect->isTablet()) $device = 'mobile';
 // echo "$device<br>";
 
-
 $view = $_GET['view'] ?: 'index';
 if ($view == 'exit'){
 	session_destroy();
 	setcookie('jwt', '');
 	header("Location: ".$_SERVER['HTTP_REFERER']);
+    die();
 }
 if($_GET['act'] == 'unbind'){
 	$db->delete(
@@ -47,9 +48,15 @@ if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
     $_SESSION['user'] = $jwtInfo['user_id'];
 }
 
+/** @var mysqli_result $res_user */
 $res_user = core\User::get(['user_id' => $_SESSION['user'] ?: false]);
-if ($res_user->num_rows) $user = $res_user->fetch_assoc();
+
+if ($res_user->num_rows){
+    $user = $res_user->fetch_assoc();
+    $debt = \core\User::getDebt($user);
+}
 else $user = $res_user;
+
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
 
 //blockSite
@@ -79,7 +86,14 @@ $basket = get_basket();
 $path = "templates/$view.php";
 if (file_exists($path)){
 	ob_start();
-	require_once($path);
+    try{
+        require_once($path);
+    }
+    catch (NotFoundException $e){
+        $message = $e->getMessage();
+        require_once ('404.php');
+        die();
+    }
 	$content = ob_get_contents();
 	ob_clean();
 }

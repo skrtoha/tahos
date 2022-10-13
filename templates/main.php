@@ -1,10 +1,17 @@
 <?php
 
+/** @var $title string */
+/** @var $view string */
+/** @var $device string */
+/** @var $content string */
+/** @global $db \core\Database */
+/** @var $user array */
+
 use core\Setting;
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
 	<meta charset="utf-8">
 	<title><?=$title?></title>
@@ -19,7 +26,16 @@ use core\Setting;
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
 	<link href="/css/main.css" rel="stylesheet" type="text/css" />
 	<link href="/css/<?=$view?>.css" rel="stylesheet" type="text/css" />
-		<?if (in_array($view, ['category'])){?>
+    <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
+        <link href="/vendor/pickmeup/pickmeup.css" rel="stylesheet" type="text/css" />
+    <?}?>
+    <?if (in_array($view, ['article', 'orders'])){?>
+        <link rel="stylesheet" type="text/css" href="/css/provider_info.css">
+    <?}?>
+    <?if (in_array($view, ['article', 'category', 'favorites'])){?>
+        <link rel="stylesheet" type="text/css" href="/css/item_full.css">
+    <?}?>
+    <?if (in_array($view, ['category'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css">
 	<?}?>
     <?if (in_array($view, ['settings', 'registration'])){?>
@@ -30,12 +46,15 @@ use core\Setting;
         <link rel="stylesheet" href="/admin/fonts/icomoon.eot">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
-    <?if (in_array($view, ['article', 'category'])){?>
+    <?if (in_array($view, ['article', 'category', 'favorites'])){?>
         <link rel="stylesheet" type="text/css" href="/vendor/blueimp/css/blueimp-gallery.min.css">
+    <?}?>
+    <?if (in_array($view, ['garage', 'account', 'favorites', 'orders'])){?>
+        <link rel="stylesheet" type="text/css" href="/css/ionTabs.css">
     <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
 	<meta name="theme-color" content="#0081BC">
-	<script type="text/javascript" src="/js/libs.min.js"></script>
+	<script src="/js/libs.min.js"></script>
 	<meta name="msapplication-navbutton-color" content="#0081BC">
 	<meta name="apple-mobile-web-app-status-bar-style" content="#0081BC">
 </head>
@@ -48,6 +67,9 @@ use core\Setting;
 		<div><div></div></div>
 	</div>
 	<header>
+        <?if (!empty($debt)){?>
+            <div id="debt"><?=$debt['message']?></div>
+        <?}?>
 		<div class="wrapper">
 			<a href="/" class="logo"></a>
 			<div class="catalog_btn">
@@ -89,7 +111,7 @@ use core\Setting;
 						<label  for="radio2" data-placeholder="Введите штрих-код">Поиск по штрих-коду</label>
 						
 						<input type="radio" <?=$type == 'vin' ? "checked" : ""?> name="type" id="radio3" value="vin">
-						<label for="radio3" type_search="vin" data-placeholder="Введите VIN-номер">Искать по VIN-номеру</label>
+						<label for="radio3" data-placeholder="Введите VIN-номер">Искать по VIN-номеру</label>
 					</div>
 					<button class="search_btn"></button>
 				</form>
@@ -172,6 +194,7 @@ use core\Setting;
 						<input type="hidden" name="form_autorization" value="1">
 						<p>Логин</p>
 						<input type="text" name="login" placeholder="Введите телефон или почту">
+                        <input type="text" name="phone">
 						<p>Пароль</p>
 						<input type="password" name="password">
 						<div class="forgot_password">
@@ -198,7 +221,7 @@ use core\Setting;
                     <div id="restore_password" class="product-popup mfp-hide">
                         <h2>Востановить пароль</h2>
                         <div class="content">
-                            <form action="">
+                            <form action="/">
                                 <div class="wrapper">
                                     <div class="left">Введите ваш email:</div>
                                     <div class="right">
@@ -260,10 +283,10 @@ use core\Setting;
 	<?}
 		else{?>
 			<tr>
-				<td colspan="4">Корзина пуста</td>
+				<td>Корзина пуста</td>
 			</tr>
-			<?}?>
-		</table>
+        <?}?>
+        </table>
 	</div>
 	<!-- <div class="page-wrap"> -->
 		<div id="main"><?=$content?></div>
@@ -325,7 +348,7 @@ use core\Setting;
                         if ($article['column'] != 4) continue; ?>
                         <li><a href="<?=$article['href']?>"><?=$article['title']?></a></li>
                     <?}?>
-					<li><a href="https://vk.com/tahos">Мы Вконтакте</a></li>
+					<li><a target="_blank" rel="nofollow" href="https://vk.com/tahos">Мы Вконтакте</a></li>
 				</ul>
 				<div class="payment_systems"></div>
 			</div>
@@ -364,7 +387,7 @@ use core\Setting;
 						<?}?>
 					</div>
 					<?if ($issue['adres']){?>
-						<a issue_id="<?=$issue['issue_id']?>" href="" id="driving_direction">Схема проезда</a>
+						<a data-issue-id="<?=$issue['issue_id']?>" href="" id="driving_direction">Схема проезда</a>
 					<?}?>
 				</div>
 				<?if (
@@ -376,25 +399,24 @@ use core\Setting;
 					){?>
 					<div class="social_networks">
 						<?if ($issue['twitter']){?>
-							<a target="_blanc" href="<?=$issue['twitter']?>" class="twitter"></a>
+							<a target="_blank" href="<?=$issue['twitter']?>" class="twitter"></a>
 						<?}?>
 						<?if ($issue['vk']){?>
-							<a target="_blanc" href="<?=$issue['vk']?>" class="vk"></a>
+							<a target="_blank" href="<?=$issue['vk']?>" class="vk"></a>
 						<?}?>
 						<?if ($issue['facebook']){?>
-							<a target="_blanc" href="<?=$issue['facebook']?>" class="facebook"></a>
+							<a target="_blank" href="<?=$issue['facebook']?>" class="facebook"></a>
 						<?}?>
 						<?if ($issue['google']){?>
-							<a target="_blanc" href="<?=$issue['google']?>" class="google"></a>
+							<a target="_blank" href="<?=$issue['google']?>" class="google"></a>
 						<?}?>
 						<?if ($issue['ok']){?>
-							<a target="_blanc" href="<?=$issue['ok']?>" class="ok"></a>
+							<a target="_blank" href="<?=$issue['ok']?>" class="ok"></a>
 						<?}?>
 					</div>
 				<?}?>
 				<div class="clear"></div>
 			</div>
-			<div class="clear"></div>
 		</div>
 	</footer>
 	<div class="h_overlay"></div>
@@ -407,7 +429,7 @@ use core\Setting;
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/js/jquery.form.js", "async" : false},
 		// {"src" : "/js/to_top.js", "async" : false},
-		<?if (in_array($view, ['category', 'article'])){?>
+		<?if (in_array($view, ['category', 'article', 'favorites'])){?>
 			{"src" : "/js/item_full.js", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['category'])){?>
@@ -419,7 +441,7 @@ use core\Setting;
         <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
             {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},
         <?}?>
-        <?if (in_array($view, ['article', 'category'])){?>
+        <?if (in_array($view, ['article', 'category', 'favorites'])){?>
             {"src": "/vendor/blueimp/js/jquery.blueimp-gallery.min.js"},
         <?}?>
 		{"src" : "/js/<?=$view?>.js", "async" : false}

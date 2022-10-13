@@ -1,0 +1,37 @@
+#not_found {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+#not_found .left{
+}
+#not_found .left h2 {
+    font-weight: 700;
+    font-size: 170px;
+    text-align: center;
+    color: #0081bc;
+}
+#not_found .right{
+}
+#not_found .right img {
+    width: 100%;
+}
+h2 {
+    font-size: 2em;
+    text-align: center;
+}
+#not_found .left h2 {
+    font-weight: 700;
+    font-size: 17em;
+    text-align: center;
+    color: #0081bc;
+}
+#not_found .left p{
+    font-size: 23px;
+    text-align: center;
+}
+@media screen and (max-width: 700px) {
+    #not_found .left h2{
+        font-size: 40vw;
+    }
+}

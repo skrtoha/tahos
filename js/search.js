@@ -70,12 +70,14 @@ $(function(){
 						},
 						open: function() {
 							//change main pic
-							$("#gallery img").on("click", function(event) {
-								var imgsrc = $(this).attr("data-big-img");
-								$("#main-pic img").attr("src", imgsrc);
-								$("#main-pic img").attr("data-zoom-image", imgsrc);
+                            const $gallery = $("#gallery img");
+                            const $mainPic = $("#main-pic img");
+							$gallery.on("click", function(event) {
+								let imgsrc = $(this).attr("data-big-img");
+								$mainPic.attr("src", imgsrc);
+								$mainPic.attr("data-zoom-image", imgsrc);
 							});
-							$("#main-pic img").elevateZoom({
+							$mainPic.elevateZoom({
 								zoomType: "inner",
 								cursor: "crosshair"
 							});
@@ -89,12 +91,12 @@ $(function(){
 								dots: false,
 								items: 3
 							});
-							$("#gallery img").on("click", function(event) {
+							$gallery.on("click", function(event) {
 								var imgsrc = $(this).attr("data-big-img");
-								$("#main-pic img").attr("src", imgsrc);
-								$("#main-pic img").attr("data-zoom-image", imgsrc);
+								$mainPic.attr("src", imgsrc);
+								$mainPic.attr("data-zoom-image", imgsrc);
 							});
-							$("#main-pic img").elevateZoom({
+							$mainPic.elevateZoom({
 								zoomType: "inner",
 								cursor: "crosshair"
 							});
@@ -120,19 +122,18 @@ $(function(){
 			},
 			success: function(response){
 				show_message('Проверка других складов выполена!');
-				// console.log(response);
 				if (!response){
 					$('tr.notFound.removable td').html('Поиск по поставщикам не дал результатов.');
 					return false;
 				} 
 				var results = JSON.parse(response)
-				// console.log(results);
 				var str = '';
+                let $search = $('input[name=search]');
 				for(var brend in results){
 					str += 
 						'<tr class="searchFromOtherProviders">' +
 							'<td>' + brend + '</td>' +
-							'<td><a class="articul" href="/search/article/' + $('input[name=search]').val() + '">' + $('input[name=search]').val() + '</a></td>' +
+							'<td><a class="articul" href="/search/article/' + $search.val() + '">' + $search.val() + '</a></td>' +
 							'<td style="text-align: left">' + results[brend] + '</td>' +
 							'<td colspan="2">' +
 								'<a href="#">Проверить наличие</a>' +
@@ -141,7 +142,8 @@ $(function(){
 				}
 				$('table.hit-list-table .notFound').remove();
 				$('table.hit-list-table').append(str);
-				if ($('tr.searchFromOtherProviders').size() == 1) $('tr.searchFromOtherProviders').click();
+                $search = $('tr.searchFromOtherProviders');
+				if ($search.size() === 1) $search.click();
 			}
 		})
 	}

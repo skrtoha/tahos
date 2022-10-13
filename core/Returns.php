@@ -136,6 +136,7 @@ class Returns{
 				'quan' => $params['quan'],
 				'user_id' => $return['user_id'],
 			]);
+            User::checkDebt($return['user_id'], $params['return_price'] * $params['quan']);
 		}
 	}
 }

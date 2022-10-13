@@ -135,7 +135,7 @@ function setNewValueCurrentItem(obj){
  * @param {[type]} store_id [description]
  * @param {[type]} item_id  [description]
  * @param {[type]} amount   [addable value]
- * @param {[isReplace]} if value is replacing
+ * @param isReplace
  */
 function setAmountInBasket(store_id, item_id, amount, isReplace = false){
     if (typeof inBasket[store_id + ':' + item_id] == 'undefined') return inBasket[store_id + ':' + item_id] = amount;
@@ -186,8 +186,8 @@ function store_items(store_items, user, search_type = null){
     var c_si = Object.keys(store_items).length;
     if (!c_si) return '<div>Ничего не найдено</div>';
     // console.log(Object.keys(si.list).length);
-    var priceTh;
-    var deliveryTh;
+    let priceTh;
+    let deliveryTh;
     if (search_type == 'analogies'){
         priceTh = '';
         deliveryTh = '';
@@ -196,7 +196,7 @@ function store_items(store_items, user, search_type = null){
         priceTh = '<th>Цена</th>';
         deliveryTh = '<th>Срок</th>';
     }
-    var full =
+    let full =
         '<tr class="shown">' +
         '<th><a class="sortable brend" href="">Бренд</a></th>' +
         '<th>Наименование</th>' +
@@ -207,8 +207,9 @@ function store_items(store_items, user, search_type = null){
         '<th class="quan ' + hidden + '">К заказу</th>' +
         '<th><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></th>' +
         '</tr>';
-    var mobile = '';
-    var i; length = store_items.length;
+    let mobile = '';
+    let i;
+    length = store_items.length;
     for (i = 0; i < length; i++){
         var id = store_items[i].item_id;
         var si = store_items[i].store_item;
@@ -237,13 +238,13 @@ function store_items(store_items, user, search_type = null){
             '<tr class="' + button_row + ' ' + empty + ' shown first-full">' +
             '<td style="padding: 20px 0;text-align:left">' +
             '<b class="brend_info" brend_id="' + si.brend_id + '">' +
-            si.brend +
+                si.brend +
             '</b> ' +
             '<a href="/article/' + si.item_id + '-' + si.article + '" class="articul">' +
-            si.article +
+                si.article +
             '</a>' +
             '</td>' +
-            '<td class="name-col" style="padding-top: 20px;text-align:left">';
+            '<td class="name-col" style="padding-top: 18px;text-align:left">';
         mobile +=
             '<div class="goods-header">' +
             '<p>' +
@@ -268,6 +269,8 @@ function store_items(store_items, user, search_type = null){
                 '<a title="Информация о товаре" href="#">' +
                 '<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +
                 '</a>';
+            mobile +=
+                '<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
         }
         mobile +=
             '</div>' +
@@ -688,7 +691,7 @@ function store_items(store_items, user, search_type = null){
                 si.article +
                 '</a>' +
                 '</td>' +
-                '<td class="name-col" style="padding-top: 20px;text-align:left">';
+                '<td class="name-col" style="padding-top: 18px;text-align:left">';
             if (search_type == 'analogies' && typeof user.id !== 'undefined' && user.allow_request_delete_item == '1' && si.status == '0'){
                 var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
                 mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
@@ -701,8 +704,6 @@ function store_items(store_items, user, search_type = null){
                 var stringClass = '';
                 if (si.is_desc) stringClass = 'fa-cog';
                 if (si.photo) stringClass = 'fa-camera';
-                mobile +=
-                    '<a title="Информация о товаре" href="#"><i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i></a>';
                 full +=
                     '<a title="Информация о товаре" href="#">' +
                     '<i item_id="' + si.item_id + '" class="fa ' + stringClass + ' product-popup-link" aria-hidden="true"></i>' +

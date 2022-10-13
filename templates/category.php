@@ -1,13 +1,16 @@
 <?
 
 use core\Breadcrumb;
+use core\Exceptions\NotFoundException;
 use core\Item;
 $href = $_GET['href'];
 $category = $db->select('categories', '*', "`parent_id`=0 AND `href`='$href'");
+
+if (is_null($category)) throw new NotFoundException('Категория не найдена');
+
 $category = $category[0];
 $category_id = $category['id'];
 $subs = $db->select('categories', '*', "`parent_id`=$category_id", 'pos', true);
-
 
 if (!$_GET['sub']){
     $title = $category['title'];
@@ -24,6 +27,8 @@ else{
 			}
 		}
 	}
+
+    if (is_null($sub_id)) throw new NotFoundException('Категория не найдена');
 
 	$params = ['view' => 'mosaic-view'];
 	$params['comparing'] = isset($_GET['comparing']) && $_GET['comparing'] == 'on';
@@ -241,57 +246,21 @@ Breadcrumb::out();
 				<div class="pagination-container"></div>
 			</div>
 			<div class="list-view <?=$_GET['viewTab'] == 'list-view' ? '' : 'hidden'?>">
-				<div>
-					<?if (!$_GET['sub']){
-						foreach($subs as $value){?>
-						<a href="<?=$href?>/<?=$value['href']?>"><?=$value['title']?></a>
-					<?}?>
-				</div>
+                <?if (!$_GET['sub']){?>
+                    <div>
+                        <?foreach($subs as $value){?>
+                            <a href="<?=$href?>/<?=$value['href']?>"><?=$value['title']?></a>
+                        <?}?>
+                    </div>
 				<?}
 				else{?>
 					<table class="goods"></table>
 					<div class="pagination-container"></div>
-			<?}?>
+			    <?}?>
 			</div>
 		</div>
 	</div>
 </div>
 <div id="mgn_popup" class="product-popup mfp-hide"></div>
 <div class="popup-gallery"></div>
-<div
-    id="blueimp-gallery"
-    class="blueimp-gallery"
-    aria-label="image gallery"
-    aria-modal="true"
-    role="dialog"
->
-    <div class="slides" aria-live="polite"></div>
-    <h3 class="title"></h3>
-    <a
-        class="prev"
-        aria-controls="blueimp-gallery"
-        aria-label="previous slide"
-        aria-keyshortcuts="ArrowLeft"
-    ></a>
-    <a
-        class="next"
-        aria-controls="blueimp-gallery"
-        aria-label="next slide"
-        aria-keyshortcuts="ArrowRight"
-    ></a>
-    <a
-        class="close"
-        aria-controls="blueimp-gallery"
-        aria-label="close"
-        aria-keyshortcuts="Escape"
-    ></a>
-    <a
-        class="play-pause"
-        aria-controls="blueimp-gallery"
-        aria-label="play slideshow"
-        aria-keyshortcuts="Space"
-        aria-pressed="false"
-        role="button"
-    ></a>
-    <ol class="indicator"></ol>
-</div>
+<?require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/blueimp/template.php');?>

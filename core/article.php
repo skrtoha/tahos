@@ -38,7 +38,7 @@ use core\User;
 						</a>
 					</td>
 					<!-- наименование с фотоаппаратом -->
-					<td class="name-col" style="padding-top: 20px;text-align:left">
+					<td class="name-col" style="padding-top: 18px;text-align:left">
 						<?$class = '';
 							if($si['is_desc'] || $si['photo']){
 								if ($si['is_desc']) $class ='fa-cog';
@@ -776,3 +776,4 @@ else{?>
 	var isInBasket = <?=$isInBasket ? 'true' : 'false'?>;
 	var inBasket = JSON.parse('<?=$inBasket?>');
 </script>
+<?require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/blueimp/template.php');?>

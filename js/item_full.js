@@ -22,6 +22,7 @@
 				var t = e.target;
 				if (t.className == 'brend_info') return false;
 				var item_id = $(this).attr('item_id');
+                popup.style.display = 'flex';
 				$.ajax({
 					type: "POST",
 					url: "/ajax/item_full.php",
@@ -31,6 +32,7 @@
 						// return;
 						// console.log(JSON.parse(msg));
 						$('#mgn_popup').html(item_full.getFullItem(JSON.parse(msg)));
+                        popup.style.display = 'none';
 						$.magnificPopup.open({
 							type: 'inline',
 							preloader: false,
@@ -45,9 +47,9 @@
 								},
 								open: function() {
 									$("#gallery img").on("click", function(event) {
-										$("#main-pic img").attr("src", $(this).attr("src"));
-										$("#main-pic img").attr("data-zoom-image", $(this).attr('data-big-img'));
-										// console.log($("#main-pic").html());
+										$("#main-pic img")
+                                            .attr("src", $(this).attr("src"))
+                                            .attr("data-zoom-image", $(this).attr('data-big-img'));
 									});
 									$.ionTabs(".product-popup-tabs",{
 										type: "none"
@@ -83,6 +85,23 @@
 					} 
 				})
 			})
+            $(document).on('click', '#main-pic img', function(event) {
+                const $th = $(this);
+                const currentImage = $th.attr('data-zoom-image');
+                let currentNumber = 0;
+                let counter = 0;
+                $.each(bigImages, function(i, item){
+                    if (item == currentImage) currentNumber = counter;
+                    counter++;
+                })
+                let gallery = blueimp.Gallery(bigImages, {
+                    index: currentNumber,
+                    thumbnailIndicators: true,
+                    onopened: function(){
+                        $('#blueimp-gallery').addClass('blueimp-gallery-controls');
+                    }
+                });
+            });
 		},
 		getFullItem: function (i){
 			var s = '';
@@ -182,10 +201,10 @@
 				if (item.characteristics) str += '<li class="ionTabs__tab" data-target="Tab_2_name"><i class="fa fa-cog" aria-hidden="true"></i></li>';
 				if (item.applicability) str += '<li class="ionTabs__tab" data-target="Tab_3_name"><i class="fa fa-wrench" aria-hidden="true"></i></li>';
 				str += '</ul>';
-				if ($(document).height() > 700){
+				/*if ($(document).height() > 700){
 					if (c_photos) s = 'height: 304px';
 					else s = 'height: 215px';
-				}
+				}*/
 				str += '<div style="' + s + '" class="ionTabs__body">';
 				if (item.full_desc) str += '<div class="ionTabs__item" data-name="Tab_1_name">' + item.full_desc + '</div>';
 				if (item.characteristics) str += '<div class="ionTabs__item" data-name="Tab_2_name">' + item.characteristics + '</div>';

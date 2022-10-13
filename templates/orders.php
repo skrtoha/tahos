@@ -443,7 +443,7 @@ Breadcrumb::out();
 											<a href="<?=core\Item::getHrefArticle($order['article'])?>" class="articul"><?=$order['article']?></a> 
 											<?=$order['title']?>
 										</span>
-										Поставщик: <strong store_id="<?=$order['store_id']?>"><?=$order['cipher']?></strong> <br>
+										Поставщик: <strong <?=$order['noReturn']?> store_id="<?=$order['store_id']?>"><?=$order['cipher']?></strong> <br>
 										Дата заказа: <strong><?=$order['date_from']?></strong> <br>
 										Дата доставки: <strong><?=$order['date_to']?></strong> <br>
 										Количество: <strong class="quan"><?=$order['quan']?></strong> <br>
@@ -461,11 +461,11 @@ Breadcrumb::out();
 										else $href = "
 											/correspond
 											/{$order['order_id']}
-											/{$order['provider_id']}
+											/{$order['store_id']}
 											/{$order['item_id']}
 										";?>
 										<a href="<?=$href?>">
-											<img  class="message <?=$order['message']?>" src="img/icons/message-icon-enable.png" alt="Сообщение">
+											<img  class="message <?=$order['message']?>" src="/img/icons/message-icon-enable.png" alt="Сообщение">
 										</a>
 									</td>
 								</tr>
@@ -587,7 +587,7 @@ Breadcrumb::out();
 			</table>
 		</div>
 		<div class="ionTabs__item" data-name="returns">
-			<table class="orders-table">
+			<table class="orders-table mobile_view">
 				<thead>
 					<tr>
 						<th></th>
@@ -604,7 +604,7 @@ Breadcrumb::out();
 </div>
 <div id="mgn_popup" class="product-popup mfp-hide">
 	<h1>Оформление возврата</h1>
-	<table class="basket-table">
+	<table class="basket-table mobile_view">
 		<thead>
 			<tr>
 				<th>Наименование</th>

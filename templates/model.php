@@ -1,6 +1,7 @@
 <?
 // debug($_GET);
 use core\Breadcrumb;
+use core\Exceptions\NotFoundException;
 
 if ($_GET['to_garage'] && $user['id'] && $_GET['modification_id']){
 	$res = $db->insert(
@@ -157,6 +158,11 @@ $res_modifications = $db->query("
 		mf.model_id={$_GET['model_id']} 
 	GROUP BY mf.id
 ", '');
+
+if(!$res_modifications->num_rows){
+    throw new NotFoundException('Модификация не найдена');
+}
+
 // debug($filters); 
 $needable_filters = array();
 if ($res_modifications->num_rows){

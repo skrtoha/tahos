@@ -21,7 +21,7 @@ $(function(){
 				var brends = JSON.parse(res);
 				// console.log(brends);
 				var str = '<option value=""></option>';
-				for(var key in brends) str += '<option href="' + brends[key].href + '" value="' + brends[key].brend_id + '">' + brends[key].title + '</option>';
+				for(var key in brends) str += '<option>' + brends[key].title + '</option>';
 				$('select.brend_select').prop('disabled', false).html(str).trigger('refresh');
 			}
 		})
@@ -53,7 +53,7 @@ $(function(){
 				// console.log(response); return false;
 				var models = JSON.parse(response);
 				var str = '<option value=""></option>';
-				for (var k in models) str += '<option href="' + models[k].href + '" value="' + models[k].model_id + '">' + models[k].title + '</option>';
+				for (var k in models) str += '<option>' + models[k].title + '</option>';
 				$('select.model_select').prop('disabled', false).html(str).trigger('refresh');
 			}
 		})

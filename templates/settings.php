@@ -1,5 +1,8 @@
 <? use core\Breadcrumb;
 
+/** @var $db \core\Database */
+/** @var $user array */
+
 if (!$_SESSION['user']) header('Location: /');
 $title = 'Настройки';
 if (!empty($_POST)){

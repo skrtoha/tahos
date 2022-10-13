@@ -39,8 +39,6 @@ $res_items = $db->query("
 		ni.node_id={$_GET['node_id']}
 	ORDER BY pos2, pos
 ", '');
-// debug($_GET);
-// debug($model);
 ?>
 <div class="catalogue-original catalogue-original-unit">
 	<div class="item-info-block">
@@ -75,7 +73,9 @@ $res_items = $db->query("
 			</a>
 			<span><?=$title?></span>
 		</div>
-		<?$files = array_shift(glob(core\Config::$imgPath . "/nodes/big/{$model['brend']}/{$_GET['node_id']}.*"));?>
+		<?
+        $glob = glob(core\Config::$imgPath."/nodes/big/{$model['brend']}/{$_GET['node_id']}.*");
+        $files = array_shift($glob);?>
 		<?if ($files){
 			$pathinfo = pathinfo($files);
 			$src = "/nodes/big/{$model['brend']}/{$pathinfo['basename']}";?>

@@ -4,6 +4,8 @@ var cp_api = false;
 let countCharactersForSearch = 3;
 var h_win = $(window).height();
 let bigImages = [];
+let countPressBackspace = 0;
+const popup = document.querySelector('#popup')
 function showPopupAddGarage(data){
     let src = `
         <div class="wrapper">
@@ -261,6 +263,20 @@ function selectItemByKey(event){
 	} 
 }
 $(function() {
+    const debt = document.querySelector('#debt');
+    if (debt){
+        const rectDebt = debt.getBoundingClientRect();
+        document.querySelector('#main').style.marginTop = 34 + rectDebt.height + 'px';
+    }
+
+    const maskPhone = "+7 (999) 999-99-99";
+    $.mask.definitions['~']='[9]';
+    $('.login input[name=phone]').mask(maskPhone, {
+        autoclear: false,
+        completed: () => {
+            document.querySelector('.login input[type=password]').focus()
+        }
+    });
 	cp_init();
 	price_format();
 	$('input[name=remember]').styler();
@@ -285,7 +301,7 @@ $(function() {
 				$.ajax({
 					type: 'post',
 					url: '/ajax/common.php',
-					data: 'act=get_issue_by_id&issue_id=' + th.attr('issue_id'),
+					data: 'act=get_issue_by_id&issue_id=' + th.data('issue-id'),
 					success: function(response){
 						// console.log(response); return false;
 						var issue = JSON.parse(response);
@@ -349,23 +365,6 @@ $(function() {
             }
         })
     })
-	$(document).on('click', '#main-pic img', function(event) {
-        const $th = $(this);
-        const currentImage = $th.attr('data-zoom-image');
-        let currentNumber = 0;
-        let counter = 0;
-        $.each(bigImages, function(i, item){
-            if (item == currentImage) currentNumber = counter;
-            counter++;
-        })
-        let gallery = blueimp.Gallery(bigImages, {
-            index: currentNumber,
-            thumbnailIndicators: true,
-            onopened: function(){
-                $('#blueimp-gallery').addClass('blueimp-gallery-controls');
-            }
-        });
-	});
 	$(document).on('click', '.brend_info', function(e){
 		$.ajax({
 			type: "POST",
@@ -605,6 +604,7 @@ $(function() {
 		$('.overlay').click();
 		// $(".h_overlay, .overlay, .profile, .profile_btn .arrow_up").show();
 		$(".h_overlay, .overlay, header .login, header .login_btn .arrow_up").show();
+        $('input[name=login]').focus();
 	});
 	$(".profile_btn").click(function(){
 		$('.cart-popup').hide();
@@ -692,5 +692,34 @@ $(function() {
                 `)
             }
         })
+    })
+
+    $('.login input[name=login], .login input[name=phone]').on('keyup', (event) => {
+        const t = event.target;
+        switch (t.name){
+            case 'login':
+                countPressBackspace = 0;
+                const started89 = /^8\(?9/.test(t.value);
+                if (/^\+7/.test(t.value) || started89){
+                    t.style.display = 'none';
+                    t.value = '';
+                    const phone = document.querySelector('.login input[name=phone]');
+                    if (started89) phone.value = '+7 9';
+                    phone.style.display = 'block';
+                    phone.focus();
+                }
+                break;
+            case 'phone':
+                if (event.key == 'Backspace' && t.value == '+7 (___) ___-__-__'){
+                    countPressBackspace++;
+                    if (countPressBackspace <= 1) break;
+                    t.style.display = 'none';
+                    const login = document.querySelector('.login input[name=login]');
+                    login.style.display = 'block';
+                    login.value = '';
+                    login.focus();
+                }
+                break;
+        }
     })
 });

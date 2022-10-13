@@ -70,6 +70,34 @@ a.showAllResults {
     cursor: pointer
 }
 
+.articul-table tr.empty td{
+    padding: 20px 0;
+}
+
+#brend_info b{
+    font-weight: 700;
+}
+#brend_info{
+    padding: 10px;;;
+}
+#brend_info table{
+    width: auto;
+    border-spacing: 10px;
+}
+#brend_info table td {
+    text-align: left;
+}
+#brend_info table tr{
+    border: none;
+}
+#brend_info table tr td{
+    padding: 10px;
+}
+b.brend_info{
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .search-result #offers-filter-form .price-wrap, .search-result #offers-filter-form .time-wrap, .search-result #offers-filter-form .instock-wrap {
     display: inline-block;
     margin-right: 40px
@@ -1246,5 +1274,6 @@ div.donut span.describe {
 
     #main {
         padding: 0 10px;
+        margin-top: 10px;
     }
 }

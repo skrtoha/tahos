@@ -51,6 +51,7 @@ function setTabType(tab){
             url: "/ajax/article_filter.php",
             data: data,
             beforeSend: function(){
+                popup.style.display = 'flex';
                 $(tabSelector + ' .articul-table').html(
                     '<tr class="gif">' +
                     '<td colspan="7"></td>' +
@@ -87,6 +88,7 @@ function setTabType(tab){
                 $('a.sortable.brend').addClass('asc');
                 price_format();
                 applyUserMarkup();
+                popup.style.display = 'none';
             }
         });
     }

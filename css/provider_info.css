@@ -44,6 +44,7 @@
 }
 #providerInfo{
     width: 360px;
+    padding: 20px;
 }
 div.donut div.text {
     position: absolute;

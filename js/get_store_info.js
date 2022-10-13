@@ -5,6 +5,7 @@
 				$(document).on('click', 'a[store_id]', function(e){
 					// return false;
 					e.preventDefault();
+                    popup.style.display = 'flex';
 					let th = $(this);
 					$.ajax({
 						type: 'post',
@@ -22,6 +23,7 @@
 							});
 							setInterval(function(){
 								$('div.donut span[data-peity]').peity('donut');
+                                popup.style.display = 'none';
 							}, 200);
 						}
 					})

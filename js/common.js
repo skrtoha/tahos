@@ -370,6 +370,9 @@ $(function() {
 			type: "POST",
 			url: "/ajax/brend_info.php",
 			data: "id=" + $(this).attr('brend_id'),
+            beforeSend: () => {
+                popup.style.display = 'flex';
+            },
 			success: function(msg){
 				var res = JSON.parse(msg);
 				var str = '<div id="brend_info">';
@@ -408,6 +411,7 @@ $(function() {
 				$(document).mouseup(function(e){
 				var container = $("#full-image .img-wrap");
 				if (!container.is(e.target) && container.has(e.target).length === 0) container.parent().hide();
+                popup.style.display = 'none';
 		});
 		$("#full-image .close").click(function(event) {
 			event.preventDefault();

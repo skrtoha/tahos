@@ -1092,6 +1092,9 @@ i[class$=fa-rub], i[class$=fa-usd], i[class$=fa-eur], i[class$=fa-jpy] {
 }
 
 @media screen and (max-width: 550px) {
+    .img-wrap{
+        width: calc(100% - 40px);
+    }
     .ionTabs__head li {
         width: 50px;
         padding: 0 5px;

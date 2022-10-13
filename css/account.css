@@ -87,6 +87,10 @@
     border: 1px solid #c8c8c8
 }
 
+body{
+    color: black;
+}
+
 div[data-name="Tab_3_name"] table.mobile_view tr {
     border-bottom: 1px dashed #c8c8c8 !important;
 }
@@ -97,6 +101,9 @@ div[data-name="Tab_3_name"] table.mobile_view tr {
 .positive-color {
     color: #00af08;
     white-space: nowrap;
+}
+.gray-color {
+    color: #949494;
 }
 .important, .negative-color {
     color: red;

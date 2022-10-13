@@ -126,7 +126,11 @@ Breadcrumb::out();
 								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 								<td>
 									<?$color = $fund['type_operation'] == 1 ? 'positive-color' : 'negative-color';
-									$minus_plus = $fund['type_operation'] == 1 ? '+' : '-';
+                                    $minus_plus = $fund['type_operation'] == 1 ? '+' : '-';
+                                    if ($fund['issue_id']){
+                                        $color = 'gray-colour';
+                                        $minus_plus = '';
+                                    }
 									?>
 									<span class="<?=$color?>">
 										<?=$minus_plus?>
@@ -193,6 +197,7 @@ Breadcrumb::out();
 								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 								<td>
 									<?$color = $fund['type_operation'] == 1 ? 'positive-color' : 'negative-color';
+                                    if ($fund['issue_id']) $color = 'gray-colour';
 									$minus_plus = $fund['type_operation'] == 1 ? '+' : '-';?>
 									<span class="<?=$color?>">
 										<?=$minus_plus?>

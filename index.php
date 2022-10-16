@@ -1,12 +1,14 @@
 <?php
 session_start();
+
+use core\Authorize;
 use core\Exceptions\NotFoundException;
 use core\Log;
 use core\Setting;
 
 ini_set('error_reporting', E_PARSE);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 
 require_once('core/DataBase.php');
 require_once('core/functions.php');
@@ -24,7 +26,6 @@ $detect = new \Mobile_Detect;
 $device = 'desktop';
 if ($detect->isTablet()) $device = 'tablet';
 if ($detect->isMobile() && !$detect->isTablet()) $device = 'mobile';
-// echo "$device<br>";
 
 $view = $_GET['view'] ?: 'index';
 if ($view == 'exit'){
@@ -44,7 +45,7 @@ if($_GET['act'] == 'unbind'){
 
 
 if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
-    $jwtInfo = \core\Authorize::getJWTInfo($_COOKIE['jwt']);
+    $jwtInfo = Authorize::getJWTInfo($_COOKIE['jwt']);
     $_SESSION['user'] = $jwtInfo['user_id'];
 }
 
@@ -59,7 +60,6 @@ else $user = $res_user;
 
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
 
-//blockSite
 $blockData = json_decode(Setting::get('blockSite', 'is_blocked'), true);
 $time_espiration = $blockData['time'] + $blockData['count_seconds'];
 $count_seconds = $time_espiration - time();
@@ -98,4 +98,3 @@ if (file_exists($path)){
 	ob_clean();
 }
 require_once('templates/main.php');
-?>

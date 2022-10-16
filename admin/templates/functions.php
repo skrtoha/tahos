@@ -1,43 +1,13 @@
-<?function message($text, $type = true){
+<?php
+function message($text, $type = true){
 	if (!$type) $type_message = "error";
 	else $type_message = 'ok';
-	// echo "$text $type_message";
 	setcookie('message', $text, time() + 3600, '/');
 	setcookie('message_type', $type_message, time() + 3600, '/');
 }
 function get_from_uri($from = ''){
 	if (!$from) return '/'.str_replace(['&', '/', '?'], ['|', '\\', '^'], $_SERVER['REQUEST_URI']);
 	else return '/'.str_replace(['|', '\\', '^'], ['&', '/', '?'],  $from);
-}
-function article_clear($article){
-	return preg_replace('/[^\w_а-яА-Я]+/u', '', $article);
-}
-function console($str){
-	echo "<script>console.log('$str')</script>";
-}
-function print_d($ar, $isOnlyToConsole = true) {
-    if (!$isOnlyToConsole){
-        echo '<pre>';
-        print_r($ar);
-        echo '</pre>';
-    }
-    echo '<script>console.log('.json_encode($ar).');</script>';
-}
-function accStr($length = 8){
-  $chars = 'abcdefhiknoprstxyzABCDEFGHKNOPQRSTXYZ0123456789';
-  $numChars = strlen($chars);
-  $string = '';
-  for ($i = 0; $i < $length; $i++) {
-    $string .= substr($chars, mt_rand(1, $numChars) - 1, 1);
-  }
-  return $string;
-}
-function getCountLeftMenu($table, $where = 1){
-	global $db;
-	$count = $db->getCount($table, $where);
-	if ($count){?>
-		<span><?=$count?></span>
-	<?}
 }
 function debug($obj, $name = ''){?>
 	<div style="clear: both"></div>
@@ -46,46 +16,6 @@ function debug($obj, $name = ''){?>
 	<?}?>
 	<pre><?print_r($obj)?></pre>
 <?}
-function p_arr($array, $table = true){
-	if ($table){
-		foreach ($array as $key => $value){
-			foreach ($value as $k => $val) $names[] = $k;
-			break;
-		}?>
-		<table style="width: auto">
-			<tr>
-				<?foreach ($names as $value){?>
-					<td style="padding: 10px 10px;vertical-align: middle;text-align: center;border-bottom:1px solid grey"><?=$value?></td>
-				<?}?>
-			</tr>
-			<?foreach ($array as $key => $value) {?>
-				<tr>
-					<?foreach ($value as $val){?>
-						<td style="padding: 10px 10px;vertical-align: middle;text-align: center;border-bottom:1px solid grey"><?=$val?></td>
-					<?}?>
-				</tr>
-			<?}?>
-		</table>
-	<?}
-}
-function show_array($array){
-	foreach ($array as $key => $value) {
-		echo "<b>$key: </b>";
-		print_r($value);
-		echo "<br>";
-	}
-}
-function get_cipher(){
-	global $db;
-	for ($i = 0; $i < 4; $i++) $chiper[] = rand(65, 90);
-	foreach ($chiper as $value) $str .= chr($value);
-	while ($db->getCount('providers', "`cipher`=$str")) {
-		$str = '';
-		for ($i = 0; $i < 4; $i++) $chiper[] = rand(65, 90);
-		foreach ($chiper as $value) $str .= chr($value);
-	}
-	return $str;
-}
 function get_price($provider_item){
 	global $db;
 	$provider = $db->select('providers', 'id,currency_id,percent', '`id`='.$provider_item['provider_id']);
@@ -94,19 +24,6 @@ function get_price($provider_item){
 	$provider_rate = $db->getFieldOnID('currencies', $provider_currency, 'rate');
 	$rubls = $provider_item['price'] * $provider_rate;
 	return round($provider_percent/100*$rubls + $rubls);
-}
-function get_tax($summ){
-	global $db;
-	$tax = $db->getFieldOnID('settings', 1, 'tax');
-	return $summ * $tax / 100;
-}
-function get_sending_status($sendings_values){
-	$bl_expecting = false;
-	foreach ($sendings_values as $key => $value){
-		if ($value['status'] != 10) continue;
-		return 'Ожидает';
-	}
-	return 'Завершен';
 }
 function replace_winword_chars($val){
 			$_r=array(
@@ -127,13 +44,6 @@ function replace_winword_chars($val){
 			);
 	$val = strtr($val,$_r);
 	return $val;
-}
-function uppercase_first_letter($str){
-	$left = substr($str, 0, 1);
-	echo "<p>$left</p>";
-	$right = substr($str, 1, strlen($str) - 1);
-	echo "<p>$right</p>";
-	return mb_strtoupper($left).$right;
 }
 function translite($var){
 	$var = mb_strtolower($var, 'UTF-8');
@@ -221,35 +131,6 @@ function set_image($file, $id){
 		return $array;
 	}
 }
-function get_filters($category_id){
-	global $db;
-	$query = "
-		SELECT 
-			f.id as filter_id,
-			f.title,
-			fv.id as value_id,
-			fv.title as filter_value,
-			f.slider
-		FROM 
-			#filters as f
-		LEFT JOIN 
-			#filters_values fv
-		ON
-			fv.filter_id=f.id
-		WHERE category_id=$category_id
-	";
-	$filters = $db->select_unique($query, false);
-	if (count($filters)){
-		foreach ($filters as $value){
-			$fv = $value['filter_id'];
-			$f = & $t_filters[$fv];
-			$f['title'] = $value['title'];
-			$f['slider'] = $value['slider'];
-			$f['filters_values'][] = $value['value_id'];
-		} 
-	}
-	return $t_filters;
-}
 function set_ratings(){
 	global $db;
 	$min_max = $db->select_unique('
@@ -262,4 +143,3 @@ function set_ratings(){
 	for ($i = 2; $i <=10; $i++) $ratings[$i] = $ratings[$i - 1] + $r;
 	core\Setting::update('items', 'ratings', json_encode($ratings));
 }
-?>

@@ -1,12 +1,14 @@
 <?php
 use core\Authorize;
+use core\Database;
+
 require_once('core/functions.php');
+
+/** @global $db Database */
 
 if ($_POST['token']){
 	$s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
 	$user = json_decode($s, true);
-	// debug($socials);
-	// debug($user);
 	$social_id = $db->getField('socials', 'id', 'title', $user['network']);
 	$res_social = $db->query("
 		SELECT
@@ -50,4 +52,3 @@ if (strpos($_SERVER['HTTP_REFERER'], 'exceeded_connections') > 0){
 }
 else header("Location: {$_SERVER['HTTP_REFERER']}");
 die();
-?>

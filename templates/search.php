@@ -33,7 +33,6 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	
 	setCoincidences(core\Provider\Berg::getCoincidences($_GET['search']));
 	
-	if (empty($coincidences)) exit();
 	echo json_encode($coincidences);
 	exit();
 }

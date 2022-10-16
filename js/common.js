@@ -264,9 +264,10 @@ function selectItemByKey(event){
 }
 $(function() {
     const debt = document.querySelector('#debt');
+    const rectDebt = debt.getBoundingClientRect();
     if (debt){
-        const rectDebt = debt.getBoundingClientRect();
-        document.querySelector('#main').style.marginTop = 34 + rectDebt.height + 'px';
+        document.querySelector('#main').style.marginTop = 10 + rectDebt.height + 'px';
+        document.querySelector('.cart-popup').style.top = 75 + rectDebt.height + 'px';
     }
 
     const maskPhone = "+7 (999) 999-99-99";
@@ -600,6 +601,9 @@ $(function() {
 		$(".overlay").addClass("none_bg");
 		$(".h_overlay, .overlay").show();
 		$("header .search").addClass("show");
+        if (debt && typeof rectDebt !== 'undefined'){
+            document.querySelector('.search.show').style.top = 75 + rectDebt.height + 'px';
+        }
 	})
 	$("button.search_btn").click(function(e){
 		return handlePressedEnterSearch(e);

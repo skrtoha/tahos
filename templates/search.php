@@ -96,51 +96,56 @@ else{
 	<input type="hidden" name="search" value="<?=$_GET['search']?>">
 	<div class="hit-list">
 		<h1>Список совпадений</h1>
-		<table class="hit-list-table">
-			<tr>
-				<th>Бренд</th>
-				<th>Артикул</th>
-				<th>Наименование</th>
-				<th>Цена</th>
-				<th>Срок</th>
-				<?if ($user['allow_request_delete_item']){?>
-					<th></th>
-				<?}?>
-			</tr>
-			<?if ($items){
-					foreach($items as $id => $item){?>
-						<tr is_armtek="<?=$item['is_armtek']?>" item_id="<?=$id?>" article="<?=$item['article']?>">
-							<td><?=$item['brend']?></td>
-							<td><a class="articul" href="/article/<?=$id?>-<?=$item['article']?>"><?=$item['article']?></a></td>
-							<td style="text-align: left"><?=$item['title_full']?></td>
-							<td>
-								<?=$item['price'] ? 'от ' . core\User::getHtmlUserPrice($item['price'], $user['designation']) : 'Нет данных'?>
-							</td>
-							<td>
-								<?=$item['delivery'] ? 'от '.$item['delivery'].' дн.' : 'Нет данных'?>
-							</td>
-							<?if ($user['allow_request_delete_item']){
-								if (!$item['is_blocked']){?>
-									<td><span title="Запрос на удаление" class="icon-bin"></span></td>
-								<?}
-								?>
-							<?}?>
-						</tr>
-					<?}
-				}
-				else{
-					switch($_GET['type']){
-						case 'article': $name = 'Артикул'; break;
-						case 'barcode': $name = 'Штрих-код'; break;
-						case 'vin': $name = 'VIN-номер';
-					}?>
-					<tr class="notFound">
-						<td colspan="5"><?=$name?> <b style="font-weight: 700"><?=$_GET['search']?></b> не найден</td>
-					</tr>
-					<tr class="notFound removable">
-						<td colspan="5">Идёт поиск по поставщикам<img src="/img/gif.gif" alt=""></td>
-					</tr>
-			<?}?>
+		<table class="hit-list-table mobile_view">
+            <thead>
+                <tr>
+                    <th>Бренд</th>
+                    <th>Артикул</th>
+                    <th>Наименование</th>
+                    <th>Цена</th>
+                    <th>Срок</th>
+                    <?if ($user['allow_request_delete_item']){?>
+                        <th></th>
+                    <?}?>
+                </tr>
+            </thead>
+			<tbody>
+                <?if ($items){
+                    foreach($items as $id => $item){?>
+                        <tr is_armtek="<?=$item['is_armtek']?>" item_id="<?=$id?>" article="<?=$item['article']?>">
+                            <td label="Бренд"><?=$item['brend']?></td>
+                            <td label="Артикул"><a class="articul" href="/article/<?=$id?>-<?=$item['article']?>"><?=$item['article']?></a></td>
+                            <td label="Наименование" style="text-align: left">
+                                <?=trimStr($item['title_full'], 50)?>
+                            </td>
+                            <td label="Цена">
+                                <?=$item['price'] ? 'от ' . core\User::getHtmlUserPrice($item['price'], $user['designation']) : 'Нет данных'?>
+                            </td>
+                            <td label="Срок">
+                                <?=$item['delivery'] ? 'от '.$item['delivery'].' дн.' : 'Нет данных'?>
+                            </td>
+                            <?if ($user['allow_request_delete_item']){
+                                if (!$item['is_blocked']){?>
+                                    <td><span title="Запрос на удаление" class="icon-bin"></span></td>
+                                <?}?>
+                            <?}?>
+                        </tr>
+                    <?}
+                }
+                else{
+                    switch($_GET['type']){
+                        case 'article': $name = 'Артикул'; break;
+                        case 'barcode': $name = 'Штрих-код'; break;
+                        case 'vin': $name = 'VIN-номер';
+                    }?>
+                    <tr class="notFound">
+                        <td colspan="5"><?=$name?> <b style="font-weight: 700"><?=$_GET['search']?></b> не найден</td>
+                    </tr>
+                    <tr class="notFound removable">
+                        <td colspan="5">Идёт поиск по поставщикам<img src="/img/gif.gif" alt=""></td>
+                    </tr>
+                <?}?>
+            </tbody>
 		</table>
 	</div>
 <?}

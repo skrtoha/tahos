@@ -122,11 +122,11 @@ $(function(){
 			},
 			success: function(response){
 				show_message('Проверка других складов выполена!');
-				if (!response){
+                let results = JSON.parse(response)
+				if (!results.length){
 					$('tr.notFound.removable td').html('Поиск по поставщикам не дал результатов.');
 					return false;
 				} 
-				var results = JSON.parse(response)
 				var str = '';
                 let $search = $('input[name=search]');
 				for(var brend in results){

@@ -524,7 +524,7 @@ header .search {
     flex: 1;
     width: 100%;
     box-sizing: border-box;
-    margin: 34px auto;
+    margin: 10px auto;
     padding: 0 20px;
     max-width: 1597px;
 }
@@ -2031,6 +2031,7 @@ footer .partnership{
     table.mobile_view tr {
         display: block;
         border-bottom: 1px dashed #c8c8c8;
+        padding: 10px 0;
     }
 
     table.mobile_view tr:last-child{
@@ -2069,7 +2070,7 @@ footer .partnership{
         min-width: auto;
     }
     header .catalog {
-        left: -15px;
+        left: -20px;
     }
     header .login h3 {
         display: none;

@@ -539,4 +539,12 @@ function getInBasket($basket){
 	foreach($basket as $b) $output[$b['store_id'].':'.$b['item_id']] = $b['quan'];
 	return $output;
 }
+function trimStr($string, $length = 200){
+    if (mb_strlen($string) < $length) return $string;
+    $string = strip_tags($string);
+    $string = mb_substr($string, 0, $length);
+    $string = rtrim($string, "!,.-");
+    $string = mb_substr($string, 0, strrpos($string, ' '));
+    return $string."...";
+}
 ?>

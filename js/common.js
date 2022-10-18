@@ -264,10 +264,12 @@ function selectItemByKey(event){
 }
 $(function() {
     const debt = document.querySelector('#debt');
-    const rectDebt = debt.getBoundingClientRect();
     if (debt){
-        document.querySelector('#main').style.marginTop = 10 + rectDebt.height + 'px';
-        document.querySelector('.cart-popup').style.top = 75 + rectDebt.height + 'px';
+        const rectDebt = debt.getBoundingClientRect();
+        if (debt){
+            document.querySelector('#main').style.marginTop = 10 + rectDebt.height + 'px';
+            document.querySelector('.cart-popup').style.top = 75 + rectDebt.height + 'px';
+        }
     }
 
     const maskPhone = "+7 (999) 999-99-99";

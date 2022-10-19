@@ -254,7 +254,13 @@ function store_items(store_items, user, search_type = null){
             '<a href="/article/' + si.item_id + '-' + si.article + '" class="articul">' + si.article + '</a>' +
             '</p>' +
             '<p>' + si.title_full + '</p>';
-        if (search_type == 'analogies' && typeof user.id !== 'undefined' && user.allow_request_delete_item == '1' && si.status == '0'){
+        if (
+            search_type == 'analogies' &&
+            typeof user !== 'undefined' &&
+            typeof user.id !== 'undefined' &&
+            user.allow_request_delete_item == '1' &&
+            si.status == '0'
+        ){
             var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
             mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
             full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'

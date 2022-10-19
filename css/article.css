@@ -6,6 +6,10 @@ table td{
     width: 65px;
 }
 
+.search-result .instock-wrap .jq-checkbox{
+    margin-bottom: 5px;
+}
+
 h3.title_analogies {
     margin-top: 40px
 }
@@ -68,10 +72,6 @@ a.showAllResults {
     text-align: center;
     font-size: 1.6em;
     cursor: pointer
-}
-
-.articul-table tr.empty td{
-    padding: 20px 0;
 }
 
 #brend_info b{

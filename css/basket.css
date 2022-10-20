@@ -138,10 +138,6 @@ table.basket-table td:first-child {
     padding-left: 20px;
 }
 
-table.basket-table td {
-    padding: 30px 0;
-}
-
 td.checkbox {
     padding-left: 0 !important;
     padding-right: 10px !important;
@@ -742,6 +738,9 @@ input[name="vin_input"] {
     table.basket-table {
         display: none;
     }
+    #mgn_popup table.basket-table{
+        display: table;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -753,5 +752,11 @@ input[name="vin_input"] {
 @media screen and (max-width: 550px) {
     #main {
         padding: 0 5px;
+    }
+    #mgn_popup{
+        padding: 10px;
+    }
+    #mgn_popup table.basket-table td{
+        padding: 5px;
     }
 }

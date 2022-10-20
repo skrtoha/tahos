@@ -1,5 +1,4 @@
 <?
-
 use core\Breadcrumb;
 
 require_once('admin/functions/orders.function.php');
@@ -168,7 +167,9 @@ Breadcrumb::out();
 				<button id="apply">Применить</button>
 			</form>
 			<div class="orders">
-				<?if ($device == 'desktop' || $device == 'tablet'){?>
+				<?
+                /** @global $device string */
+                if ($device == 'desktop' || $device == 'tablet'){?>
 					<table class="orders-table">
 						<tr>
 							<th>Наименование</th>
@@ -223,8 +224,6 @@ Breadcrumb::out();
 									<td><?=$order['date_to']?></td>
 									<td class="quan"><?=$order['quan']?></td>
 									<td>
-										<?
-										// debug($order)?>
 										<span class="status-col <?=$order['status_class']?>">
 										<?switch($order['status']){
 											case 'Заказано':
@@ -457,6 +456,13 @@ Breadcrumb::out();
 										<?}?>
 									</td>
 									<td>
+                                    <?if ($order['comment']){?>
+                                        <i title="Комментарий" class="fa fa-pencil-square-o comment-btn" aria-hidden="true"></i>
+                                        <div class="comment-block">
+                                            <textarea class="comment_textarea" readonly placeholder="Комментарий отсутствует"><?=$order['comment']?></textarea>
+                                            <a href="#" class="cancel_comment">Отменить</a>
+                                        </div>
+                                    <?}?>
 										<?if ($order['correspond_id']) $href = "/correspond/{$order['correspond_id']}";
 										else $href = "
 											/correspond

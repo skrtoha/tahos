@@ -667,4 +667,10 @@ span.ordered_return.status_return_1 {
     .status-form {
         left: 0;
     }
+    .comment-btn{
+        margin-bottom: 10px;
+    }
+    .comment-block:before{
+        right: 1px;
+    }
 }

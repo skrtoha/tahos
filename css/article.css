@@ -959,7 +959,9 @@ div.donut span.describe {
     margin-top: 0;
     display: block;
 }
-
+tr.shown.button-row.empty td{
+    padding: 18px 0;
+}
 
 @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
     /**

@@ -47,7 +47,7 @@ $(function(){
         if ($th.is(':checked')) setDateIssueDelivery($('input[name=max_date]').val());
         else setDateIssueDelivery($('input[name=min_date]').val())
     })
-	$(".count-block .minus, .count-block .plus").click(function(event) {
+	$(".count-block .minus, .count-block .plus").click(function() {
 		var e = $(this);
 		var available = + e.closest('.good').find('input[name=available]').val();
 		if (available !== 'undefined'){
@@ -304,7 +304,7 @@ $(function(){
         return false;
     })
 	$('div.basket > a.button').on('click', function(e){
-		var noReturn = new Array();
+		var noReturn = [];
 		if ($(document).width() >= 880){
 			$('table.basket-table input[name=toOrder]:checked').each(function () {
 				var th = $(this).closest('tr');
@@ -334,11 +334,16 @@ $(function(){
 				mainClass: 'product-popup-wrap',
 				callbacks: {
 					open: function(){
-						var str = '<tr>' +
+						var str =
+                            '<thead>' +
+                                '<tr>' +
                                     '<th>Бренд</th>' +
                                     '<th>Артикул</th>' +
                                     '<th>Название</th>' +
-                                '</tr>';
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>'
+                        ;
 						for(var k in noReturn){
 							str += 
 								'<tr>' +
@@ -346,7 +351,8 @@ $(function(){
 									'<td>' + noReturn[k].article + '</td>' +
 									'<td>' + noReturn[k].title + '</td>' +
 								'</tr>';
-						} 
+						}
+                        str += '</tbody>';
 						$('#mgn_popup table.basket-table').html(str);
 					}
 				},

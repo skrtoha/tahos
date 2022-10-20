@@ -118,6 +118,14 @@
     background: #0082BF
 }
 
+#mgn_popup b{
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: block;
+}
+
 .info, .jq-checkbox {
     -webkit-box-sizing: border-box;
 }
@@ -271,9 +279,8 @@ table.basket-table td.price-col {
 span.not_available {
     color: red;
 }
-
-#mgn_popup .basket-table {
-    display: block;
+#mgn_popup{
+    max-width: none;
 }
 
 #mgn_popup a.mfp-close.refuse {

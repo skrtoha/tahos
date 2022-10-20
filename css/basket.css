@@ -759,4 +759,13 @@ input[name="vin_input"] {
     #mgn_popup table.basket-table td{
         padding: 5px;
     }
+
+    #additional_options .jq-selectbox__select-text{
+        white-space: normal;
+        line-height: 15px;
+        padding: 5px 0;
+    }
+    #additional_options .jq-selectbox__select{
+        height: auto;
+    }
 }

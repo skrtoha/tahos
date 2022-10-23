@@ -80,7 +80,7 @@ switch ($_GET['act']){
             addXMLValue($Ad, 'Price', $row['price']);
 
             $Images = $dom->createElement('Images');
-            $photoNames = scandir(core\Config::$imgPath . "/items/small/{$_GET['id']}/");
+            $photoNames = scandir(core\Config::$imgPath . "/items/big/{$row['item_id']}/");
             foreach($photoNames as $name) {
                 if (!preg_match('/.+\.jpg/', $name)) continue;
                 $Image = $dom->createElement('Image');

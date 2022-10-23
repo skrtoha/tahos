@@ -38,8 +38,10 @@ class StoreItem{
 				#required_remains rr ON rr.item_id = si.item_id
 		";
 	}
-	public static function getStoreItemsByStoreID(array $store_ids): \mysqli_result
+	public static function getStoreItemsByStoreID(array $store_ids, $notNulPrice = false): \mysqli_result
 	{
+        $where = "si.store_id IN (" . implode(',', $store_ids) . ")";
+        if ($notNulPrice) $where .= " AND si.price > 0";
 		return $GLOBALS['db']->query("
 			SELECT
 				si.item_id,
@@ -60,7 +62,7 @@ class StoreItem{
 			LEFT JOIN 
 				#currencies c ON c.id=ps.currency_id
 			WHERE
-				si.store_id IN (" . implode(',', $store_ids) . ")
+				$where
 			GROUP BY
 				si.item_id
 		", '');

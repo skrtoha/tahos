@@ -383,7 +383,6 @@ switch ($params[0]){
         switch($emailPrice['clearPrice']){
             case 'onlyStore': Provider::updatePriceUpdated(['store_id' => $price->store_id]); break;
             case 'provider': Provider::updatePriceUpdated(['provider_id' => $_GET['provider_id']]); break;
-                break;
         }
     
         endSuccessfullyProccessing($price->isLogging, $logger, $params[0]);
@@ -678,9 +677,8 @@ switch ($params[0]){
             break;
         }
         
-        $res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
+        $res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id], true);
         foreach($res_users as $user){
-            // debug($user); exit();
             switch($user['subscribe_type']){
                 case 'xls':
                     $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price', $user['discount']);
@@ -715,6 +713,7 @@ switch ($params[0]){
         
         $query = \core\StoreItem::getQueryStoreItem();
         $query .= " WHERE si.store_id = ".\core\Config::MAIN_STORE_ID;
+        $query .= " AND si.price > 0";
         $res_store_items = $db->query($query);
         $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price');
         

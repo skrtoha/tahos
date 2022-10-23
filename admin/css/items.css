@@ -160,3 +160,24 @@ a#clearItemDiff {
     margin-bottom: 10px;
     display: inline-block;
 }
+span.properties {
+    padding: 5px 21px 5px 5px;
+    margin-right: 10px;
+    position: relative;
+}
+.fa-times {
+    font-size: 18px;
+    color: red;
+    -webkit-transition: all ease .2s;
+    transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) .2s;
+    position: absolute;
+    right: 4px;
+    top: 3px;
+    cursor: pointer;
+}
+.fa-remove:before, .fa-close:before, .fa-times:before {
+    content: "x";
+    font-weight: 800;
+    font-style: initial;
+    line-height: 0;
+}

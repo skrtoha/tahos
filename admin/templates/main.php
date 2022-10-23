@@ -2,7 +2,7 @@
 use admin\functions\LeftMenu;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<html lang="ru">
 <head>
 	<title><?=$page_title?></title>
 	<link rel="stylesheet" type="text/css" href="/admin/css/common.css">
@@ -56,7 +56,6 @@ use admin\functions\LeftMenu;
 			});
 		</script>
 	<?}?>
-</head>
 </head>
 <body>
 <div id="message">

@@ -1908,9 +1908,9 @@ form#model_image{
 #category_items .category_item{
 	margin: 5px;
 }
-#properties_categories{
-	display: flex;
-	flex-wrap: wrap;
+#properties_categories {
+    display: flex;
+    flex-direction: row;
 }
 #add_cagegory{
 	display: block;

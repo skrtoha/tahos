@@ -199,5 +199,9 @@ switch($_POST['act']){
 	case 'clearItemDiff':
 		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_id']} OR `item_diff` = {$_POST['item_id']}");
 		break;
+    case 'subSubCategory':
+        $result = $db->select('categories', ['id', 'title'], "`parent_id` = {$_POST['category_id']}");
+        echo json_encode($result);
+        break;
 }
 ?>

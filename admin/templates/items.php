@@ -423,16 +423,19 @@ function item($act){
 					<div class="value">
 						<a href="" id="add_category">Добавить</a>
 						<div id="properties_categories" item_id="<?=$_GET['id']?>">
-							<?$categories = $db->select('categories', '*', '', '', '', '', true);
-							$category_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
+							<?$category_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
 							if (count($category_items)){
 								foreach ($category_items as $category_item) {?>
-										<span title="Удалить" class="properties" category_id="<?=$category_item['category_id']?>">
-											<?$category = $db->select('categories', '*', "`id`=".$category_item['category_id']);
-											$category = $category[0]?>
-											<b><?=$db->getFieldOnID('categories', $category['parent_id'], 'title')?></b> > <?=$category['title']?>
-										</span>
-									<?}?>
+                                    <span class="properties" category_id="<?=$category_item['category_id']?>">
+                                        <?$category = $db->select('categories', '*', "`id`=".$category_item['category_id']);
+                                        $category = $category[0];
+                                        if (in_array($category['parent_id'], [136, 138])){?>
+                                            <b>Авито</b> >
+                                        <?}?>
+                                        <b><?=$db->getFieldOnID('categories', $category['parent_id'], 'title')?></b> > <?=$category['title']?>
+                                         <i title="Удалить" class="fa fa-times"></i>
+                                    </span>
+                                <?}?>
 							<?}?>
 						</div>
 					</div>

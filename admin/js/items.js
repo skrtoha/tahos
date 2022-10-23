@@ -396,9 +396,34 @@ $(function(){
 			}
 		});
 	})
+    $(document).on('change', '#subcategory', (event) => {
+        let val = event.target.value;
+
+        const subsubcategory = document.querySelector('#subsubcategory');
+        if (subsubcategory) subsubcategory.remove();
+        
+        if (val === '136' || val === '138'){
+            let formData = new FormData();
+            formData.set('act', 'subSubCategory');
+            formData.set('category_id', val);
+
+            fetch('/admin/ajax/item.php', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json()).then((response) => {
+                console.log(response);
+                let str = '<select id="subsubcategory" style="margin-left: 10px">';
+                response.forEach((item, key) => {
+                    str += `<option value="${item.id}">${item.title}</option>`
+                })
+                str += '</select>';
+                document.querySelector('#subcategory').insertAdjacentHTML('afterend', str);
+            })
+        }
+    })
 	$(document).on('click', '#apply_category', function(e){
 		e.preventDefault();
-		var category_id = $(this).prev('#subcategory').val();
+		var category_id = $(this).prev().val();
 		if (!category_id){
 			show_message('Выберите подкатегорию!', 'error');
 			return false;
@@ -412,8 +437,7 @@ $(function(){
 				item_id: $('#item_id').val()
 			},
 			success: function(msg){
-				$.cookie('message', 'Категоря успешно применена!', cookieOptions);
-				$.cookie('message_type', 'ok', cookieOptions);
+                show_message('Категория успешно применена!', false)
 				document.location.reload();
 			}
 		});

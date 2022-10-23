@@ -19,7 +19,8 @@ if ($_POST['submit']){
 		'href' => $href,
 		'pos' => $_POST['pos'] ? $_POST['pos'] : 0,
 		'isShowOnMainPage' => $_POST['isShowOnMainPage'] ?? 0,
-        'isShowAtBottom' => $_POST['isShowAtBottom'] ?? 0
+        'isShowAtBottom' => $_POST['isShowAtBottom'] ?? 0,
+        'hidden' => $_POST['hidden'] ?? 0
 	];
 	$bl = true;
 	if ($id) $where = "`href`='{$array['href']}' AND `id`!=$id";
@@ -212,6 +213,14 @@ function show_form(){
                         </label>
 					</div>
 				</div>
+                <div class="field">
+                    <div class="title">Скрыто</div>
+                    <div class="value">
+                        <span>Да</span>
+                        <?$checked = $array['hidden'] ? 'checked' : ''?>
+                        <input <?=$checked?> type="checkbox" name="hidden" value="1">
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Изображение на <br>главной странице</div>
 					<div class="value">

@@ -76,7 +76,7 @@ use core\Setting;
 				<div class="arrow_up"></div>
 			</div>
 			<div class="catalog">
-			<?$categories = $db->select('categories', '*', '`parent_id`=0', 'pos', true);?>
+			<?$categories = $db->select('categories', '*', '`parent_id`=0 AND `hidden` = 0', 'pos', true);?>
 				<ul>
 					<li>
 						<a href="/original-catalogs">

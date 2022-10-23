@@ -77,6 +77,17 @@ switch ($_GET['act']){
             addXMLValue($Ad, 'GoodsType', 'Запчасти');
             addXMLValue($Ad, 'AdType', 'Товар от производителя');
             addXMLValue($Ad, 'ProductType', 'Для автомобилей');
+            addXMLValue($Ad, 'Price', $row['price']);
+
+            $Images = $dom->createElement('Images');
+            $photoNames = scandir(core\Config::$imgPath . "/items/small/{$_GET['id']}/");
+            foreach($photoNames as $name) {
+                if (!preg_match('/.+\.jpg/', $name)) continue;
+                $Image = $dom->createElement('Image');
+                $Image->setAttribute('url', core\Config::$imgUrl . '/items/big/' . $row['item_id'] . '/' . $name);
+                $Images->appendChild($Image);
+            }
+            $Ad->appendChild($Images);
 
             if (in_array($row['parent_id'], [132])){
                 addXMLValue($Ad, 'SparePartType', $row['category']);

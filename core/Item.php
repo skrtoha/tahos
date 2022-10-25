@@ -455,4 +455,61 @@ class Item{
 			if ($isForDeleting) unlink($existingFile);
 		}
 	}
+    private static function tplMenu($category,$str, $category_id = null){
+        $selected = $category_id && $category['id'] == $category_id ? 'selected' : '';
+        if($category['parent_id'] == 0){
+            $menu = '<option '.$selected.' value="'.$category['id'].'">'.$category['title'].'</option>';
+        }else{
+            $menu = '<option '.$selected.' value="'.$category['id'].'">'.$str.' '.$category['title'].'</option>';
+        }
+        if(isset($category['childs'])){
+            $i = 1;
+            for($j = 0; $j < $i; $j++) $str .= '→';
+            $menu .= self::showCat($category['childs'], $str, $category_id);
+        }
+        return $menu;
+    }
+    private static function showCat($data, $str, $category_id = null){
+        $string = '';
+        foreach($data as $item){
+            if (!$item['title']) continue;
+            $string .= self::tplMenu($item, $str, $category_id);
+        }
+        return $string;
+    }
+    private static function getCat(){
+        static $output;
+        global $db;
+
+        if (!empty($output)) return $output;
+
+        $res = $db->query("SELECT * from #categories");
+        $output = array();
+        while($row = $res->fetch_assoc()){
+            $output[$row['id']] = $row;
+        }
+        return $output;
+    }
+    private static function getTree($dataset) {
+        $tree = array();
+        foreach ($dataset as $id => &$node) {
+            //Если нет вложений
+            if (!$node['parent_id']){
+                $tree[$id] = &$node;
+            }else{
+                //Если есть потомки то перебераем массив
+                $dataset[$node['parent_id']]['childs'][$id] = &$node;
+            }
+        }
+        return $tree;
+    }
+    public static function getTplCategory($category_id = null){
+        $cat  = self::getCat();
+        $tree = self::getTree($cat);
+        $cat_menu = self::showCat($tree, '', $category_id);
+        return '
+            <select name="category_id[]"><option value="0">Выберите... '.$cat_menu.'</select>
+            <span class="icon-cancel-circle1"></span>
+        ';
+    }
 }

@@ -55,6 +55,12 @@ function addItemDiffHtml(type, items){
 	$('#itemDiff tr:not(.head)').remove();
 	$('#itemDiff').append(strHtml);
 }
+function eventRemoveCategory(obj){
+    obj.querySelector('.icon-cancel-circle1').addEventListener('click', event => {
+        if (!confirm('Вы уверены?')) return;
+        obj.closest('.category').remove();
+    })
+}
 $(function(){
 	let get = getParams();
 	$('input.intuitive_search').on('keyup focus', function(e){
@@ -362,123 +368,6 @@ $(function(){
 		if (!confirm('Вы действительно хотите удалить?')) return false;
 		$(this).closest('li').remove();
 	})
-	$('#add_category').on('click', function(e){
-		showGif();
-		e.preventDefault();
-		var elem = $(this);
-		$.ajax({
-			type: "POST",
-			url: "/ajax/add_category.php",
-			data: '',
-			success: function(msg){
-				showGif(false);
-				elem.before(msg);
-			}
-		});
-	})
-	$(document).on('change', '#add_subcategories', function(){
-		showGif();
-		elem = $(this);
-		elem.next('select').remove();
-		elem.next('a').remove();
-		var category_id = elem.val();
-		if (!category_id){
-			showGif(false);
-			return false;
-		} 
-		$.ajax({
-			type: "POST",
-			url: "/ajax/add_subcategories.php",
-			data: 'category_id=' + category_id,
-			success: function(msg){
-				showGif(false);
-				elem.after(msg);
-			}
-		});
-	})
-    $(document).on('change', '#subcategory', (event) => {
-        let val = event.target.value;
-
-        const subsubcategory = document.querySelector('#subsubcategory');
-        if (subsubcategory) subsubcategory.remove();
-        
-        if (val === '136' || val === '138'){
-            let formData = new FormData();
-            formData.set('act', 'subSubCategory');
-            formData.set('category_id', val);
-
-            fetch('/admin/ajax/item.php', {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json()).then((response) => {
-                console.log(response);
-                let str = '<select id="subsubcategory" style="margin-left: 10px">';
-                response.forEach((item, key) => {
-                    str += `<option value="${item.id}">${item.title}</option>`
-                })
-                str += '</select>';
-                document.querySelector('#subcategory').insertAdjacentHTML('afterend', str);
-            })
-        }
-    })
-	$(document).on('click', '#apply_category', function(e){
-		e.preventDefault();
-		var category_id = $(this).prev().val();
-		if (!category_id){
-			show_message('Выберите подкатегорию!', 'error');
-			return false;
-		}
-		$.ajax({
-			type: "POST",
-			url: "/admin/ajax/item.php",
-			data: {
-				act: 'applyCategory',
-				category_id: category_id,
-				item_id: $('#item_id').val()
-			},
-			success: function(msg){
-                show_message('Категория успешно применена!', false)
-				document.location.reload();
-			}
-		});
-	})
-	$('#add_subcategory').on('click', function(e){
-		e.preventDefault();
-		var new_value = prompt('Введите название новой подкатегории:');
-		if (new_value){
-			var parent_id = $(this).attr('category_id');
-			$.ajax({
-				type: "POST",
-				url: "/ajax/category.php",
-				data: 'table=add&parent_id=' + parent_id + '&new_value=' + new_value,
-				success: function(msg){
-					// console.log(msg);
-					var res = JSON.parse(msg);
-					if (res.error) show_message(res.error, 'error');
-					else{
-						$('[colspan=4]').remove();
-						var str = '<tr>' +
-						'<td title="Нажмите, чтобы изменить" class="category" data-id="' + res.id + '">' + 
-							res.title +
-						'</td>' + 
-						'<td title="Нажмите, чтобы изменить" class="href" data-id="' + res.id + '">' +
-							res.href +
-						'</td>' + 
-						'<td>' + 
-							'<a href="?view=category&act=items&id=' + res.id + '">Товаров (0)</a> ' + 
-							'<a href="?view=category&act=filters&id=' + res.id + '">Фильров (0)</a>' +
-						'</td>' +
-						'<td>' + 
-							'<a class="delete_item" href="?view=category&act=delete&id=' + res.id + '&parent_id=' + parent_id + '">Удалить</a>' + 
-						'</td>' +
-						'</tr>';
-						$('.t_table').append(str);
-						show_message("Подкатегория '" + new_value + "' успешно добавлена!");
-					}
-				}
-			})
-		}
-	})
 	$(document).on('click', 'a.addItem', function(){
 		let th = $(this);
 		let addAllAnalogies = 0;
@@ -548,4 +437,27 @@ $(function(){
             }
         });
     })
+    document.querySelector('#add_category').addEventListener('click', (event) => {
+        showGif();
+        event.preventDefault();
+        let formData = new FormData();
+        formData.set('act', 'getTplCategory');
+        fetch('/admin/ajax/item.php', {
+            method: 'post',
+            body: formData
+        }).then(response => response.text()).then(response => {
+            let div = document.createElement('div');
+            div.classList.add('category');
+            div.innerHTML = response;
+            document.querySelector('#categories').prepend(div);
+            eventRemoveCategory(div);
+            showGif(false);
+        })
+    })
+
+    const category = document.querySelectorAll('#categories .category');
+    if (category) category.forEach((element, key) => {
+        eventRemoveCategory(element);
+    })
+
 })

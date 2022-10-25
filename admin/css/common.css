@@ -1895,9 +1895,11 @@ form#model_image{
 	display: none;
 }
 #category_items{
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: flex-start;;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
 }
 #category_items .category_item > p{
 	margin-bottom: 5px;

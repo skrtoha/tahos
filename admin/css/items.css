@@ -165,19 +165,18 @@ span.properties {
     margin-right: 10px;
     position: relative;
 }
-.fa-times {
-    font-size: 18px;
-    color: red;
-    -webkit-transition: all ease .2s;
-    transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) .2s;
-    position: absolute;
-    right: 4px;
-    top: 3px;
-    cursor: pointer;
+.icon-cancel-circle1:before {
+    content: "\ea0d";
 }
-.fa-remove:before, .fa-close:before, .fa-times:before {
-    content: "x";
-    font-weight: 800;
-    font-style: initial;
-    line-height: 0;
+span.icon-cancel-circle1 {
+    font-size: 16px;
+    cursor: pointer;
+    position: relative;
+    color: #ed1212;
+    top: 3px;
+}
+.category {
+    float: left;
+    margin-right: 15px;
+    padding: 5px 0;
 }

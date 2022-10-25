@@ -1,6 +1,7 @@
 <?php
 
 use core\Config;
+use core\Item;
 use core\Provider;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
@@ -199,9 +200,8 @@ switch($_POST['act']){
 	case 'clearItemDiff':
 		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_id']} OR `item_diff` = {$_POST['item_id']}");
 		break;
-    case 'subSubCategory':
-        $result = $db->select('categories', ['id', 'title'], "`parent_id` = {$_POST['category_id']}");
-        echo json_encode($result);
+    case 'getTplCategory':
+        echo Item::getTplCategory();
         break;
 }
 ?>

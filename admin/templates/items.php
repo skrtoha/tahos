@@ -14,8 +14,8 @@ $act = $_GET['act'];
 if ($_POST['form_submit']){
 	//если товар заблокирован и пользователь не является администртором
 	if (
-			$_SESSION['manager']['group_id'] != Managers::$administratorGroupID && 
-			$db->getFieldOnID('items', $_GET['id'], 'is_blocked') == 1
+        $_SESSION['manager']['group_id'] != Managers::$administratorGroupID &&
+        $db->getFieldOnID('items', $_GET['id'], 'is_blocked') == 1
 	){
 		Managers::handlerAccessNotAllowed();
 	}
@@ -52,6 +52,7 @@ if ($_POST['form_submit']){
 		if ($key == 'language_id') continue;
 		if ($key == 'translate') continue;
 		if ($key == 'photos') continue;
+		if ($key == 'category_id') continue;
 		$array[$key] = $value;
 	}
 	if ($array['article_cat'] && !$array['article']) $array['article'] = core\Item::articleClear($array['article_cat']);
@@ -109,6 +110,16 @@ if ($_POST['form_submit']){
 				$i++;
 			}
 		}
+
+        $db->delete('categories_items', "`item_id` = $last_id");
+        if (!empty($_POST['category_id'])){
+            foreach($_POST['category_id'] as $value){
+                $db->insert('categories_items', [
+                    'item_id' => $last_id,
+                    'category_id' => $value
+                ]);
+            }
+        }
 		message('Успешно сохранено!');
 		if ($_POST['is_stay']) header("Location: /admin/?view=items&act=item&id=$last_id");
 		else header("Location: /admin/?view=items");
@@ -422,22 +433,16 @@ function item($act){
 					<div class="title">Категории</div>
 					<div class="value">
 						<a href="" id="add_category">Добавить</a>
-						<div id="properties_categories" item_id="<?=$_GET['id']?>">
-							<?$category_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
-							if (count($category_items)){
-								foreach ($category_items as $category_item) {?>
-                                    <span class="properties" category_id="<?=$category_item['category_id']?>">
-                                        <?$category = $db->select('categories', '*', "`id`=".$category_item['category_id']);
-                                        $category = $category[0];
-                                        if (in_array($category['parent_id'], [136, 138])){?>
-                                            <b>Авито</b> >
-                                        <?}?>
-                                        <b><?=$db->getFieldOnID('categories', $category['parent_id'], 'title')?></b> > <?=$category['title']?>
-                                         <i title="Удалить" class="fa fa-times"></i>
-                                    </span>
+                        <div id="categories">
+                            <?$category_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
+                            if (count($category_items)){
+                                foreach ($category_items as $category_item) {?>
+                                    <div class="category">
+                                        <?=Item::getTplCategory($category_item['category_id'])?>
+                                    </div>
                                 <?}?>
-							<?}?>
-						</div>
+                            <?}?>
+                        </div>
 					</div>
 				</div>
 				<?}?>

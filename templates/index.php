@@ -1,5 +1,7 @@
 <?
-use core\Category;
+/** @var string $title */
+/** @var \core\Database $db */
+/** @var array $categories */
 
 $title="Торговая площадка Тахос";
 $res_vehicles = $db->query("
@@ -11,7 +13,6 @@ $res_vehicles = $db->query("
 		#vehicles v
 	ORDER BY v.title
 ");
-$categories = Category::getAll('c.isShowOnMainPage = 1 AND sc.isShowOnMainPage = 1');
 ?>
 <div id="selection">
 	<div class="selection">
@@ -45,11 +46,13 @@ $categories = Category::getAll('c.isShowOnMainPage = 1 AND sc.isShowOnMainPage =
 	</div>
 	<div class="selection">
 		<div class="categories">
-			<?foreach($categories as $category_title => $value){?>
+			<?foreach($categories as $category_title => $value){
+                if (!$value['isShowOnMainPage']) continue;?>
 				<div class="category">
 					<h3 class="title"><a href="/category/<?=$value['href']?>"><?=$category_title?></a></h3>
 					<ul class="left">
-						<?foreach($value['subcategories'] as $sc){?>
+						<?foreach($value['subcategories'] as $sc){
+                            if (!$sc['isShowOnMainPage']) continue;?>
 							<li>
 								<a href="/category/<?=$value['href']?>/<?=$sc['href']?>"><?=$sc['title']?></a>
 							</li>

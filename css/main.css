@@ -746,7 +746,7 @@ header .arrow_up {
     top: 41px !important;
 }
 
-header .catalog_btn .arrow_up, .cart .arrow_up {
+header .catalog_btn .arrow_up, .cart .arrow_up, .catalog .arrow_up {
     top: 39px;
     background: url(/img/icons/header__white_arrow_up.png) center no-repeat;
 }
@@ -774,9 +774,58 @@ header .catalog {
     left: 75px
 }
 
+header .catalog ul li{
+    position: relative;
+}
+
+header .catalog ul.subcategory{
+    display: none;
+}
+
+header .catalog ul.subcategory{
+    position: absolute;
+    left: 375px;
+    width: max-content;
+}
+header .catalog ul.subcategory li{
+    display: block;
+}
+header .catalog ul.subcategory li:last-child a{
+    border-bottom: none;
+}
+header .catalog ul.subcategory li a{
+    padding: 0 10px;
+}
+header .catalog ul.subcategory li a{
+    height: 30px;
+    line-height: 30px;
+}
+header .catalog .jspPane > ul > li:hover > a{
+    color: white;
+
+}
+header .catalog .jspPane > ul li:hover ul.subcategory{
+    display: flex;
+    top: 0;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+header .catalog .jspPane > ul li:hover ul.subcategory li:hover a{
+    color: white
+}
+header .catalog .jspPane > ul li:hover .arrow_up{
+    display: block;
+    top: 22px;
+    left: calc(100% + -4px);
+    transform: rotate(270deg);
+}
 header .catalog ul {
     width: 375px;
     background: #fff
+}
+
+header .catalog{
+    overflow: visible !important;
 }
 
 header .catalog a {
@@ -792,7 +841,7 @@ header .catalog a {
     cursor: pointer
 }
 
-header .catalog a:hover {
+header .catalog li:hover {
     background: #0099de;
     color: #fff
 }
@@ -811,7 +860,7 @@ header .catalog .icon span {
     opacity: 0
 }
 
-header .catalog a:hover .icon span {
+header .catalog li:hover .icon span {
     opacity: 1
 }
 
@@ -997,7 +1046,7 @@ header span.icon.original_catalogs {
     background: url(/img/icons/original_catalogs.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.original_catalogs {
+header .catalog li:hover span.icon.original_catalogs {
     background: url(/img/icons/original_catalogs-hover.png) no-repeat center;
 }
 
@@ -1005,7 +1054,7 @@ header span.icon.cat_2 {
     background: url(/img/icons/cat_2.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.cat_2 {
+header .catalog li:hover span.icon.cat_2 {
     background: url(/img/icons/cat_2-hover.png) no-repeat center;
 }
 
@@ -1013,7 +1062,7 @@ header span.icon.cat_6 {
     background: url(/img/icons/cat_6.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.cat_6 {
+header .catalog li:hover span.icon.cat_6 {
     background: url(/img/icons/cat_6-hover.png) no-repeat center;
 }
 
@@ -1021,7 +1070,7 @@ header span.icon.cat_62 {
     background: url(/img/icons/cat_6.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.cat_62 {
+header .catalog li:hover span.icon.cat_62 {
     background: url(/img/icons/cat_6-hover.png) no-repeat center;
 }
 
@@ -1040,7 +1089,7 @@ header span.icon.cat_4 {
 }
 
 
-header .catalog a:hover span.icon.cat_4 {
+header .catalog li:hover span.icon.cat_4 {
     background: url(/img/icons/cat_4-hover.png) no-repeat center;
 }
 
@@ -1048,7 +1097,7 @@ header span.icon.cat_9 {
     background: url(/img/icons/cat_9.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.cat_9 {
+header .catalog li:hover span.icon.cat_9 {
     background: url(/img/icons/cat_9-hover.png) no-repeat center;
 }
 
@@ -1056,7 +1105,7 @@ header span.icon.cat_8 {
     background: url(/img/icons/cat_8.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.cat_8 {
+header .catalog li:hover span.icon.cat_8 {
     background: url(/img/icons/cat_8-hover.png) no-repeat center;
 }
 
@@ -1064,7 +1113,7 @@ header span.icon.cat_20 {
     background: url(/img/icons/cat_20.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.cat_20 {
+header .catalog li:hover span.icon.cat_20 {
     background: url(/img/icons/cat_20-hover.png) no-repeat center;
 }
 
@@ -1072,7 +1121,7 @@ header span.icon.cat_37 {
     background: url(/img/icons/cat_37.png) no-repeat center;
 }
 
-header .catalog a:hover span.icon.cat_37 {
+header .catalog li:hover span.icon.cat_37 {
     background: url(/img/icons/cat_37-hover.png) no-repeat center;
 }
 
@@ -1437,6 +1486,10 @@ footer input[name=telephone] {
     border: none;
     padding: 0;
     outline: none;
+}
+
+.catalog .jspContainer{
+    overflow: visible;
 }
 
 footer, footer .item {

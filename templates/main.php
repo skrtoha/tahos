@@ -76,7 +76,6 @@ use core\Setting;
 				<div class="arrow_up"></div>
 			</div>
 			<div class="catalog">
-			<?$categories = $db->select('categories', '*', '`parent_id`=0 AND `hidden` = 0', 'pos', true);?>
 				<ul>
 					<li>
 						<a href="/original-catalogs">
@@ -84,14 +83,28 @@ use core\Setting;
 							Оригинальные каталоги
 						</a>
 					</li>
-					<?if (count($categories))
-					foreach ($categories as $value) {
+					<?
+                    /** @var array $categories */
+                    if (count($categories))
+					foreach ($categories as $key => $value) {
 						if (!$value['href']) continue;?>
 						<li>
 							<a href="/category/<?=$value['href']?>">
 								<span class="icon cat_<?=$value['id']?>"></span>
-								<?=$value['title']?>
+								<?=$key?>
 							</a>
+                            <?if (!empty($value['subcategories'])){?>
+                                <div class="arrow_up"></div>
+                                <ul class="subcategory">
+                                    <?foreach ($value['subcategories'] as $v){?>
+                                        <li>
+                                            <a href="/category/<?=$value['href']?>/<?=$v['href']?>">
+                                                <?=$v['title']?>
+                                            </a>
+                                        </li>
+                                    <?}?>
+                                </ul>
+                            <?}?>
 						</li>
 					<?}?>
 				</ul>

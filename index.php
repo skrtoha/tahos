@@ -3,8 +3,8 @@ session_start();
 
 use core\Authorize;
 use core\Exceptions\NotFoundException;
-use core\Log;
 use core\Setting;
+use core\Category;
 
 ini_set('error_reporting', E_PARSE);
 ini_set('display_errors', 0);
@@ -82,6 +82,8 @@ core\UserIPS::registerIP([
 ]);
 
 $basket = get_basket();
+
+$categories = Category::getAll('c.hidden = 0 AND sc.hidden = 0');
 
 $path = "templates/$view.php";
 if (file_exists($path)){

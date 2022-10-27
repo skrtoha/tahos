@@ -713,7 +713,7 @@ switch ($params[0]){
         
         $query = \core\StoreItem::getQueryStoreItem();
         $query .= " WHERE si.store_id = ".\core\Config::MAIN_STORE_ID;
-        $query .= " AND si.price > 0";
+        $query .= " AND si.in_stock > 0";
         $res_store_items = $db->query($query);
         $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price');
         

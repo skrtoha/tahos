@@ -797,6 +797,7 @@ header .catalog ul.subcategory li a{
     padding: 0 10px;
 }
 header .catalog ul.subcategory li a{
+    text-transform: none;
     height: 30px;
     line-height: 30px;
 }

@@ -149,13 +149,15 @@ function view(){
 					</form>
 				</td>
 				<td>
-					<?$items = $db->select('categories_items', 'item_id', "`category_id`=".$category['id']." GROUP BY `item_id`")?>
-					<a href="?view=category&act=items&id=<?=$category['id']?>">Товаров (<?=count($items)?>)</a> 
+					<?$items = $db->getCount('categories_items', "`category_id`=".$category['id']." GROUP BY `item_id`")?>
+					<a href="?view=category&act=items&id=<?=$category['id']?>">Товаров (<?=$items?>)</a>
 					<?$filters = $db->getCount('filters', "`category_id`=".$category['id'])?>
 					<a href="?view=category&act=filters&id=<?=$category['id']?>">Фильтров(<?=$filters?>)</a>
+                    <?$subcategories = $db->getCount('categories', "`parent_id` = {$category['id']}")?>
+                    <a href="?view=category&id=<?=$category['id']?>">Подкатегорий (<?=$subcategories?>)</a>
 				</td>
 				<td>
-					<a class="delete_item" href="?view=category&act=delete&id=<?=$category['id']?>&parent_id=<?=$_GET['id']?>">Удалить</a>
+					<a class="delete_category" href="#">Удалить</a>
 				</td>
 			</tr>
 		<?}

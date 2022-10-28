@@ -1897,9 +1897,9 @@ form#model_image{
 #category_items{
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
 }
 #category_items .category_item > p{
 	margin-bottom: 5px;

@@ -203,5 +203,17 @@ switch($_POST['act']){
     case 'getTplCategory':
         echo Item::getTplCategory();
         break;
+    case 'deleteCategory':
+        $db->query("
+            delete 
+                f
+            from
+                tahos_filters f
+            left join tahos_categories c on c.id = f.category_id
+            where
+                c.id = {$_POST['id']} or c.parent_id = {$_POST['id']}
+        ");
+        $db->delete('categories', "`id` = {$_POST['id']} or `parent_id` = {$_POST['id']}");
+        break;
 }
 ?>

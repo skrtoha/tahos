@@ -17,12 +17,14 @@
 							showGif();
 			  			},
 						success: function(msg){
-							// console.log(msg);
 							var res = JSON.parse(msg);
 							if (res.error) show_message(res.error, 'error');
 							else{
 								$('[colspan=4]').remove();
-								var str = '<tr class="subcategory">' +
+                                let tr = document.createElement('tr');
+                                tr.classList.add('subcategory');
+                                tr.setAttribute('data-id', res.category_id);
+								tr.innerHTML =
 								'<td title="Нажмите, чтобы изменить" class="category" data-id="' + res.id + '">' + 
 									res.title +
 								'</td>' + 
@@ -42,14 +44,16 @@
 									</form>
 								</td>` +
 								'<td>' + 
-									'<a href="?view=category&act=items&id=' + res.category_id + '">Товаров (0)</a> ' + 
-									'<a href="?view=category&act=filters&id=' + res.category_id + '">Фильров (1)</a>' +
+									'<a href="?view=category&act=items&id=' + res.category_id + '">Товаров (0)</a> ' +
+									'<a href="?view=category&act=filters&id=' + res.category_id + '">Фильров (1)</a> ' +
+									'<a href="?view=category&id=' + res.category_id + '">Подкатегории (0)</a>' +
 								'</td>' +
 								'<td>' + 
-									'<a class="delete_item" href="?view=category&act=delete&id=' + res.id + '&parent_id=' + parent_id + '">Удалить</a>' + 
+									'<a class="delete_category" href="?view=category&act=delete&id=' + res.id + '&parent_id=' + parent_id + '">Удалить</a>' +
 								'</td>' +
 								'</tr>';
-								$('.t_table').append(str);
+                                document.querySelector('.t_table').append(tr);
+                                category.eventDeleteItem(tr);
 								show_message("Подкатегория '" + new_value + "' успешно добавлена!");
 							}
 							showGif(false);
@@ -153,6 +157,14 @@
 					title: title.trim()
 				});
 			})
+
+            const delete_item = document.querySelectorAll('.delete_category');
+            if (delete_item){
+                delete_item.forEach((element, key) => {
+                    this.eventDeleteItem(element.closest('tr'));
+                })
+            }
+
 		},
 		sendAjaxAddFilterValue: function(obj){
 			$.ajax({
@@ -164,7 +176,26 @@
 					else show_message(msg, 'error');
 				}
 			})
-		}
+		},
+        eventDeleteItem: function(obj){
+            obj.querySelector('.delete_category').addEventListener('click', e => {
+                e.preventDefault();
+
+                if (!confirm('Действительно удалить?')) return;
+
+                let formData = new FormData;
+                formData.set('act', 'deleteCategory');
+                formData.set('id', obj.getAttribute('data-id'));
+                showGif();
+                fetch('/admin/ajax/item.php', {
+                    method: 'post',
+                    body: formData
+                }).then(response => response.text()).then(response => {
+                    obj.remove();
+                    showGif(false);
+                })
+            })
+        }
 	}
 })(jQuery)
 $(function(){

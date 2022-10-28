@@ -113,7 +113,6 @@ function view(){
 		LIMIT
 			$start,$perPage
 	", '');
-	// $providers = $db->select_query('providers', 'id,title,cipher,price_updated', $where, 'price_updated', false, "$start,$perPage");
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions" style="">
@@ -224,12 +223,22 @@ function items(){
 		}
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}
-	$where = '';
+	$where = "si.store_id = $id AND ";
 	if (isset($_GET['article'])){
-        $article = \core\Item::articleClear($_GET['article']);
-        $where = "(i.article='$article') AND ";
+        switch($_GET['type_search']){
+            case 'article':
+                $article = \core\Item::articleClear($_GET['article']);
+                $where .= "(i.article='$article') AND ";
+                break;
+            case 'brend':
+                $where .= "b.title LIKE '{$_GET['article']}%' AND ";
+                break;
+            case 'title':
+                $where .= "i.title_full LIKE '{$_GET['article']}%' AND ";
+                break;
+        }
     }
-	$where .= "si.store_id=$id";
+    $where = substr($where, 0, -5);
 	$query = "
 		SELECT 
 			si.item_id,
@@ -264,6 +273,7 @@ function items(){
 		FROM
 			#store_items si
 		LEFT JOIN #items i ON si.item_id=i.id
+		LEFT JOIN #brends b ON b.id=i.brend_id
 		WHERE 
 			$where
 	", '');
@@ -309,15 +319,18 @@ function items(){
             <div class="type_search">
                 <div>
                     <label>
-                        <input checked type="radio" name="type_search" value="article">
+                        <?$checked = !isset($_GET['type_search']) || $_GET['type_search'] == 'article' ? 'checked' : '';?>
+                        <input <?=$checked?> type="radio" name="type_search" value="article">
                         <span>артикулу</span>
                     </label>
                     <label>
-                        <input type="radio" name="type_search" value="title">
+                        <?$checked = $_GET['type_search'] == 'title' ? 'checked' : '';?>
+                        <input <?=$checked?> type="radio" name="type_search" value="title">
                         <span>наименованию</span>
                     </label>
                     <label>
-                        <input type="radio" name="type_search" value="brend">
+                        <?$checked = $_GET['type_search'] == 'brend' ? 'checked' : '';?>
+                        <input <?=$checked?> type="radio" name="type_search" value="brend">
                         <span>бренду</span>
                     </label>
                 </div>
@@ -377,7 +390,7 @@ function items(){
 		<?}?>
 	</table>
 	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
-	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=prices&act=items&id=$id&search=$search&sort={$_GET['sort']}&direction={$_GET['direction']}&page=");
+	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=prices&act=items&id=$id&article={$_GET['article']}&sort={$_GET['sort']}&direction={$_GET['direction']}&type_search={$_GET['type_search']}&page=");
 }
 function search_add(){
 	global $status, $db, $page_title;

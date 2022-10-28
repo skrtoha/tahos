@@ -786,6 +786,7 @@ header .catalog ul.subcategory{
     position: absolute;
     left: 375px;
     width: max-content;
+    height: 671px;
 }
 header .catalog ul.subcategory li{
     display: block;
@@ -795,6 +796,7 @@ header .catalog ul.subcategory li:last-child a{
 }
 header .catalog ul.subcategory li a{
     padding: 0 10px;
+    border-bottom: none;
 }
 header .catalog ul.subcategory li a{
     text-transform: none;
@@ -807,9 +809,11 @@ header .catalog .jspPane > ul > li:hover > a{
 }
 header .catalog .jspPane > ul li:hover ul.subcategory{
     display: flex;
-    top: 0;
     flex-wrap: wrap;
     flex-direction: column;
+    align-content: flex-start;
+    justify-content: flex-start;
+    background: #fff;;
 }
 header .catalog .jspPane > ul li:hover ul.subcategory li:hover a{
     color: white
@@ -822,7 +826,63 @@ header .catalog .jspPane > ul li:hover .arrow_up{
 }
 header .catalog ul {
     width: 375px;
-    background: #fff
+    background: #fbfbfb;
+}
+
+header .catalog .jspPane > ul > li:nth-child(1) ul.subcategory{
+
+}
+
+header .catalog .jspPane > ul > li:nth-child(2) ul.subcategory{
+    top: -61px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(3) ul.subcategory{
+    top: -122px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(4) ul.subcategory{
+    top: -183px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(5) ul.subcategory{
+    top: -244px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(6) ul.subcategory{
+    top: -305px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(7) ul.subcategory{
+    top: -366px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(8) ul.subcategory{
+    top: -427px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(9) ul.subcategory{
+    top: -488px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(10) ul.subcategory{
+    top: -549px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(11) ul.subcategory{
+    top: -610px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(12) ul.subcategory{
+    top: -671px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(13) ul.subcategory{
+    top: -732px;
+}
+
+header .catalog .jspPane > ul > li:nth-child(14) ul.subcategory{
+    top: -793px;
 }
 
 header .catalog{
@@ -833,7 +893,7 @@ header .catalog a {
     display: block;
     clear: both;
     height: 60px;
-    border-bottom: 1px solid #e3e3e3;
+    /*border-bottom: 1px solid #e3e3e3;*/
     font-size: 16px;
     line-height: 61px;
     color: #475055;

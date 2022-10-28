@@ -306,7 +306,23 @@ function items(){
             <input type="hidden" name="view" value="prices">
             <input type="hidden" name="act" value="items">
             <input type="hidden" name="id" value="<?=$_GET['id']?>">
-            <input class="intuitive_search" style="width: 264px;" type="text" name="article" value="<?=$_GET['article']?>" placeholder="Поиск по артикулу" required>
+            <div class="type_search">
+                <div>
+                    <label>
+                        <input checked type="radio" name="type_search" value="article">
+                        <span>артикулу</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="type_search" value="title">
+                        <span>наименованию</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="type_search" value="brend">
+                        <span>бренду</span>
+                    </label>
+                </div>
+            </div>
+            <input class="intuitive_search" style="width: 264px; margin-top: 5px" type="text" name="article" value="<?=$_GET['article']?>" placeholder="Поиск по артикулу" required>
             <input type="submit" value="Искать">
         </form>
         <input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">

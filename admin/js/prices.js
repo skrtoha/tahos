@@ -48,7 +48,8 @@ function set_intuitive_search(e, tableName){
 		event: e,
 		value: val,
 		additionalConditions: {
-			store_id: $('table.t_table').attr('store_id')
+			store_id: $('table.t_table').attr('store_id'),
+            type_search: document.querySelector('input[name=type_search]:checked').value
 		},
 		minLength: minLength,
 		tableName: tableName
@@ -339,4 +340,13 @@ $(function(){
 		let store_id = $('table.t_table').attr('store_id');
 		deleteStoreItem(item_id, store_id);
 	})
+
+    const type_search = document.querySelectorAll('input[name=type_search]');
+    type_search.forEach((element, key) => {
+        element.addEventListener('change', (event) => {
+            let text = event.target.closest('label').querySelector('span').innerText;
+            event.target.closest('form').querySelector('input.intuitive_search').placeholder = `Поиск по ${text}`;
+        })
+    })
+
 })

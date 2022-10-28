@@ -45,10 +45,12 @@ a.delete_item{
 }
 form.add_item_to_store a.deleteStoreItem {
     font-weight: 400;
-    /* position: absolute; */
     float: right;
     margin-top: 15px;
 }
 div.actions a {
     margin-left: 10px;
+}
+div.actions > form{
+    margin-bottom: 10px;
 }

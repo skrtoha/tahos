@@ -893,13 +893,13 @@ header .catalog a {
     display: block;
     clear: both;
     height: 60px;
-    /*border-bottom: 1px solid #e3e3e3;*/
+    border-bottom: 1px solid #fbfbfb;
     font-size: 16px;
     line-height: 61px;
     color: #475055;
     text-decoration: none;
     position: relative;
-    cursor: pointer
+    cursor: pointer;
 }
 
 header .catalog li:hover {

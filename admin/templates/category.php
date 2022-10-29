@@ -119,6 +119,7 @@ function view(){
 			<td>Позиция</td>
 			<td>Ссылка</td>
 			<td>Отображать<br>на главной</td>
+			<td>Скрыто</td>
 			<td></td>
 			<td></td>
 		</tr>
@@ -148,6 +149,12 @@ function view(){
 						</select>
 					</form>
 				</td>
+                <td>
+                    <select name="hidden">
+                        <option <?=$category['hidden'] == 0 ? 'selected' : ''?> value="0">нет</option>
+                        <option <?=$category['hidden'] == 1 ? 'selected' : ''?> value="1">да</option>
+                    </select>
+                </td>
 				<td>
 					<?$items = $db->getCount('categories_items', "`category_id`=".$category['id']." GROUP BY `item_id`")?>
 					<a href="?view=category&act=items&id=<?=$category['id']?>">Товаров (<?=$items?>)</a>

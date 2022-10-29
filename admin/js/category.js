@@ -43,6 +43,12 @@
 										</select>
 									</form>
 								</td>` +
+                                `<td>
+                                    <select name="hidden">
+                                        <option selected value="0">нет</option>
+                                        <option value="1">да</option>
+                                    </select>								
+                                </td>` +
 								'<td>' + 
 									'<a href="?view=category&act=items&id=' + res.category_id + '">Товаров (0)</a> ' +
 									'<a href="?view=category&act=filters&id=' + res.category_id + '">Фильров (1)</a> ' +
@@ -54,6 +60,7 @@
 								'</tr>';
                                 document.querySelector('.t_table').append(tr);
                                 category.eventDeleteItem(tr);
+                                category.eventChangeHidden(tr);
 								show_message("Подкатегория '" + new_value + "' успешно добавлена!");
 							}
 							showGif(false);
@@ -165,7 +172,26 @@
                 })
             }
 
+            const hidden = document.querySelectorAll('select[name=hidden]');
+            if (hidden){
+                hidden.forEach((element, key) => {
+                    this.eventChangeHidden(element.closest('tr'));
+                })
+            }
 		},
+        eventChangeHidden: obj => {
+            const selector = obj.querySelector('select[name=hidden]');
+            selector.addEventListener('change', e => {
+                let formData = new FormData();
+                formData.set('act', 'setHidden');
+                formData.set('id', obj.getAttribute('data-id'));
+                formData.set('hidden', selector.value);
+                fetch('/admin/ajax/item.php', {
+                    method: 'post',
+                    body: formData
+                }).then(response => response.text()).then(response => {})
+            })
+        },
 		sendAjaxAddFilterValue: function(obj){
 			$.ajax({
 				type: "POST",

@@ -215,5 +215,12 @@ switch($_POST['act']){
         ");
         $db->delete('categories', "`id` = {$_POST['id']} or `parent_id` = {$_POST['id']}");
         break;
+    case 'setHidden':
+        $db->update(
+            'categories',
+            ['hidden' => $_POST['hidden']],
+            "`id` = {$_POST['id']}"
+        );
+        break;
 }
 ?>

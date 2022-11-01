@@ -1,5 +1,9 @@
 <?php
+use core\Database;
 use core\Managers;
+
+/** @global Database $db */
+
 $act = $_GET['act'];
 switch ($act) {
 	case 'delete':
@@ -114,64 +118,62 @@ function view(){
 	<div id="total" style="margin: 0">Всего: <?=count($subcategories)?></div>
 	<div class="actions"><a id="add_subcategory" category_id="<?=$id?>" href="">Добавить</a></div>
 	<table class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Заголовок</td>
-			<td>Позиция</td>
-			<td>Ссылка</td>
-			<td>Отображать<br>на главной</td>
-			<td>Скрыто</td>
-			<td></td>
-			<td></td>
-		</tr>
-		<?if (count($subcategories)){
-			foreach ($subcategories as $category) {?>
-			<tr class="subcategory" data-id="<?=$category['id']?>">
-				<td title="Нажмите, чтобы изменить" class="category" data-id="<?=$category['id']?>">
-					<?=$category['title']?>
-				</td>
-				<td class="pos" data-id="<?=$category['id']?>"><?=$category['pos']?></td>
-				<td title="Нажмите, чтобы изменить" class="href" >
-					<?if ($category['href']){?>
-						<?=$category['href']?>
-					<?}
-					else{?>
-						Ссылка не задана
-					<?}?>
-				</td>
-				<td>
-					<form>
-						<input type="hidden" name="view" value="category">
-						<input type="hidden" name="act" value="changeIsShowOnMainPage">
-						<input type="hidden" name="id" value="<?=$category['id']?>">
-						<select name="isShowOnMainPage">
-							<option <?=$category['isShowOnMainPage'] == 0 ? 'selected' : ''?> value="0">нет</option>
-							<option <?=$category['isShowOnMainPage'] == 1 ? 'selected' : ''?> value="1">да</option>
-						</select>
-					</form>
-				</td>
-                <td>
-                    <select name="hidden">
-                        <option <?=$category['hidden'] == 0 ? 'selected' : ''?> value="0">нет</option>
-                        <option <?=$category['hidden'] == 1 ? 'selected' : ''?> value="1">да</option>
-                    </select>
-                </td>
-				<td>
-					<?$items = $db->getCount('categories_items', "`category_id`=".$category['id']." GROUP BY `item_id`")?>
-					<a href="?view=category&act=items&id=<?=$category['id']?>">Товаров (<?=$items?>)</a>
-					<?$filters = $db->getCount('filters', "`category_id`=".$category['id'])?>
-					<a href="?view=category&act=filters&id=<?=$category['id']?>">Фильтров(<?=$filters?>)</a>
-                    <?$subcategories = $db->getCount('categories', "`parent_id` = {$category['id']}")?>
-                    <a href="?view=category&id=<?=$category['id']?>">Подкатегорий (<?=$subcategories?>)</a>
-				</td>
-				<td>
-					<a class="delete_category" href="#">Удалить</a>
-				</td>
-			</tr>
-		<?}
-		}
-		else{?>
-			<tr><td colspan="4">Для данной категории подкатегорий не найдено</td></tr>
-		<?}?>
+        <thead>
+            <tr class="head">
+                <td>Заголовок</td>
+                <td>Позиция</td>
+                <td>Ссылка</td>
+                <td>Отображать<br>на главной</td>
+                <td>Скрыто</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </thead>
+		<tbody>
+            <?if (count($subcategories)){
+                foreach ($subcategories as $category) {?>
+                    <tr class="subcategory" data-id="<?=$category['id']?>">
+                        <td label="Наименование:" title="Нажмите, чтобы изменить" class="category" data-id="<?=$category['id']?>">
+                            <?=$category['title']?>
+                        </td>
+                        <td label="Позиция:" class="pos" data-id="<?=$category['id']?>"><?=$category['pos']?></td>
+                        <td label="Ссылка:" title="Нажмите, чтобы изменить" class="href" >
+                            <?if ($category['href']){?>
+                                <?=$category['href']?>
+                            <?}
+                            else{?>
+                                Ссылка не задана
+                            <?}?>
+                        </td>
+                        <td label="Отображать на главной:">
+                            <form>
+                                <input type="hidden" name="view" value="category">
+                                <input type="hidden" name="act" value="changeIsShowOnMainPage">
+                                <input type="hidden" name="id" value="<?=$category['id']?>">
+                                <input name="isShowOnMainPage"<?=$category['isShowOnMainPage'] == 1 ? 'checked' : ''?> type="checkbox" value="1">
+                            </form>
+                        </td>
+                        <td label="Скрыто:">
+                            <input type="checkbox" name="hidden" <?=$category['hidden'] == 1 ? 'checked' : ''?> value="1">
+                        </td>
+                        <td>
+                            <?$items = $db->getCount('categories_items', "`category_id`=".$category['id']." GROUP BY `item_id`")?>
+                            <a href="?view=category&act=items&id=<?=$category['id']?>">Товаров (<?=$items?>)</a>
+                            <?$filters = $db->getCount('filters', "`category_id`=".$category['id'])?>
+                            <a href="?view=category&act=filters&id=<?=$category['id']?>">Фильтров(<?=$filters?>)</a>
+                            <?$subcategories = $db->getCount('categories', "`parent_id` = {$category['id']}")?>
+                            <a href="?view=category&id=<?=$category['id']?>">Подкатегорий (<?=$subcategories?>)</a>
+                        </td>
+                        <td>
+                            <a class="delete_category" href="#">Удалить</a>
+                        </td>
+                    </tr>
+                <?}
+            }
+            else{?>
+                <tr><td colspan="4">Для данной категории подкатегорий не найдено</td></tr>
+            <?}?>
+        </tbody>
 	</table>
 <?}
 function items(){

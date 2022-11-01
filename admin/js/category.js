@@ -1,7 +1,7 @@
 (function($){
 	window['category'] = {
 		init: function(){
-			$(document).on('change', 'select[name=isShowOnMainPage]', function(){
+			$(document).on('change', 'input[name=isShowOnMainPage]', function(){
 				$(this).closest('form').submit();
 			})
 			$('#add_subcategory').on('click', function(e){
@@ -37,17 +37,11 @@
 										<input type="hidden" name="view" value="category">
 										<input type="hidden" name="act" value="changeIsShowOnMainPage">
 										<input type="hidden" name="id" value="${res.id}">
-										<select name="isShowOnMainPage">
-											<option selected value="0">нет</option>
-											<option value="1">да</option>
-										</select>
+										<input type="checkbox" name="isShowOnMainPage" value="1">
 									</form>
 								</td>` +
                                 `<td>
-                                    <select name="hidden">
-                                        <option selected value="0">нет</option>
-                                        <option value="1">да</option>
-                                    </select>								
+								    <input type="checkbox" name="hidden" value="1">
                                 </td>` +
 								'<td>' + 
 									'<a href="?view=category&act=items&id=' + res.category_id + '">Товаров (0)</a> ' +
@@ -172,7 +166,7 @@
                 })
             }
 
-            const hidden = document.querySelectorAll('select[name=hidden]');
+            const hidden = document.querySelectorAll('input[name=hidden]');
             if (hidden){
                 hidden.forEach((element, key) => {
                     this.eventChangeHidden(element.closest('tr'));
@@ -180,12 +174,12 @@
             }
 		},
         eventChangeHidden: obj => {
-            const selector = obj.querySelector('select[name=hidden]');
+            const selector = obj.querySelector('input[name=hidden]');
             selector.addEventListener('change', e => {
                 let formData = new FormData();
                 formData.set('act', 'setHidden');
                 formData.set('id', obj.getAttribute('data-id'));
-                formData.set('hidden', selector.value);
+                formData.set('hidden', selector.checked ? 1 : 0);
                 fetch('/admin/ajax/item.php', {
                     method: 'post',
                     body: formData

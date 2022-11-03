@@ -18,6 +18,7 @@ class Category{
                 sc.id AS subcategory_id,
                 c.href AS category_href,
                 sc.href AS subcategory_href,
+                c.isShowAtBottom,
                 sc.isShowOnMainPage as subcategory_isShowOnMainPage,
                 c.isShowOnMainPage as category_isShowOnMainPage
             FROM #categories c
@@ -31,6 +32,7 @@ class Category{
             $c['id'] = $row['category_id'];
             $c['href'] = $row['category_href'];
             $c['isShowOnMainPage'] = $row['category_isShowOnMainPage'];
+            $c['isShowAtBottom'] = $row['isShowAtBottom'];
             $c['subcategories'][] = [
                 'title' => $row['subcategory'],
                 'href' => $row['subcategory_href'],

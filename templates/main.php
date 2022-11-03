@@ -369,9 +369,9 @@ use core\Setting;
 				<h4><?=$titles[3]?></h4>
 				<ul>
 					<?if (!empty($categories)){
-                        foreach ($categories as $value){
+                        foreach ($categories as $key => $value){
                             if (!$value['isShowAtBottom']) continue; ?>
-                            <li><a href="/category/<?=$value['href']?>"><?=$value['title']?></a></li>
+                            <li><a href="/category/<?=$value['href']?>"><?=$key?></a></li>
                         <?}?>
                     <?}?>
 				</ul>

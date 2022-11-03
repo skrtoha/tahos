@@ -96,14 +96,36 @@ use core\Setting;
                             <?if (!empty($value['subcategories'])){?>
                                 <div class="arrow_up"></div>
                                 <ul class="subcategory">
-                                    <?foreach ($value['subcategories'] as $v){?>
+                                    <?for ($i = 0; $i < 22; $i++){?>
                                         <li>
-                                            <a href="/category/<?=$value['href']?>/<?=$v['href']?>">
-                                                <?=$v['title']?>
+                                            <a href="/category/<?=$value['href']?>/<?=$value['subcategories'][$i]['href']?>">
+                                                <?=$value['subcategories'][$i]['title']?>
                                             </a>
                                         </li>
                                     <?}?>
                                 </ul>
+                                <?if (count($value['subcategories']) > 22){?>
+                                    <ul class="subcategory">
+                                        <?for ($i = 22; $i < 44; $i++){?>
+                                            <li>
+                                                <a href="/category/<?=$value['href']?>/<?=$value['subcategories'][$i]['href']?>">
+                                                    <?=$value['subcategories'][$i]['title']?>
+                                                </a>
+                                            </li>
+                                        <?}?>
+                                    </ul>
+                                <?}?>
+                                <?if (count($value['subcategories']) > 44){?>
+                                    <ul class="subcategory">
+                                        <?for ($i = 44; $i < 66; $i++){?>
+                                            <li>
+                                                <a href="/category/<?=$value['href']?>/<?=$value['subcategories'][$i]['href']?>">
+                                                    <?=$value['subcategories'][$i]['title']?>
+                                                </a>
+                                            </li>
+                                        <?}?>
+                                    </ul>
+                                <?}?>
                             <?}?>
 						</li>
 					<?}?>

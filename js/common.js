@@ -197,15 +197,15 @@ function cookie_message(){
 	}
 }
 function cp_init(){
-	var b = $('.cart-popup').height() >= h_win * 0.75;
-	if (b){
+    const b = $('.cart-popup').height() >= h_win * 0.75;
+    if (b){
 		if (!cp_api){
 			cp_api = $('.cart-popup').jScrollPane({
 				showArrows: true,
 				verticalGutter: 0,
 			}).data('jsp')
 		}
-	};
+	}
 	price_format();
 }
 function getImgUrl(){
@@ -495,7 +495,8 @@ $(function() {
 			$('.page-wrap').css('position', 'relative');
 		}
 	});
-	$('.search_input').on('focus', function(e){
+	$('.search_input')
+        .on('focus', function(e){
 		let text = $('input.search_input').val();
 		let user_id = $('input[name=user_id]').val();
 
@@ -525,75 +526,75 @@ $(function() {
 		}
 		$('.hints').show();
 	})
-	$('.search_input').on('keyup input', function(event){
-        if (ajaxIsProcessing) return;
+        .on('keyup input', function(event){
+            if (ajaxIsProcessing) return;
 
-		if (event.keyCode == 38 || event.keyCode == 40){
-			return selectItemByKey(event);
-		}
-		if (event.keyCode == 13){
-			return handlePressedEnterSearch(event);
-		}
-		let inputValue = $(this).val();
-		
-		if (inputValue.length < countCharactersForSearch){
-			$('.hints .previous_search').show();
-			if (!$('.hints .previous_search tr.active').size()){
-				$('.hints .previous_search tr:first-child').addClass('active');
-			}
-			$('.hints .coincidences').hide();
-			return false;
-		} 
-		else{
-			$('.hints .previous_search').hide();
-			$('.hints .previous_search tr').removeClass('active');
-			$('.hints .coincidences').show();
-		} 
+            if (event.keyCode == 38 || event.keyCode == 40){
+                return selectItemByKey(event);
+            }
+            if (event.keyCode == 13){
+                return handlePressedEnterSearch(event);
+            }
+            let inputValue = $(this).val();
 
-		let htmlArticleBarcole = '';
-		if (inputValue.length == 13 || inputValue.length == 17){
-			htmlArticleBarcole += `
+            if (inputValue.length < countCharactersForSearch){
+                $('.hints .previous_search').show();
+                if (!$('.hints .previous_search tr.active').size()){
+                    $('.hints .previous_search tr:first-child').addClass('active');
+                }
+                $('.hints .coincidences').hide();
+                return false;
+            }
+            else{
+                $('.hints .previous_search').hide();
+                $('.hints .previous_search tr').removeClass('active');
+                $('.hints .coincidences').show();
+            }
+
+            let htmlArticleBarcole = '';
+            if (inputValue.length == 13 || inputValue.length == 17){
+                htmlArticleBarcole += `
 				<tr class="active">
 					<td colspan="2">
 						<a href="/search/article/${inputValue}">${inputValue} - искать артикул</a>
 					</td>
 				</tr>
 			`;
-			if (inputValue.length == 13) htmlArticleBarcole += `
+                if (inputValue.length == 13) htmlArticleBarcole += `
 				<tr>
 					<td colspan="2">
 						<a href="/search/barcode/${inputValue}">${inputValue} - искать штрихкод</a>
 					</td>
 				</tr>
 			`;
-			if (inputValue.length == 17) htmlArticleBarcole += `
+                if (inputValue.length == 17) htmlArticleBarcole += `
 				<tr>
 					<td colspan="2">
 						<a href="/original-catalogs/legkovie-avtomobili#/carInfo?q=${inputValue}">${inputValue} - искать VIN</a>
 					</td>
 				</tr>
 			`;
-		}
+            }
 
-		$('.hints table.coincidences').html(htmlArticleBarcole);
-		$.ajax({
-			type: 'post',
-			url: '/ajax/common.php',
-			data: {
-				act: 'searchArticles',
-				value: inputValue,
-				maxCountResults: 10
-			},
-            beforeSend: function(){
-                ajaxIsProcessing = true;
-            },
-			success: function(response){
-                ajaxIsProcessing = false;
-				$('table.coincidences tr.item').remove();
-				$('table.coincidences').append(response);
-			}
-		})
-	})
+            $('.hints table.coincidences').html(htmlArticleBarcole);
+            $.ajax({
+                type: 'post',
+                url: '/ajax/common.php',
+                data: {
+                    act: 'searchArticles',
+                    value: inputValue,
+                    maxCountResults: 10
+                },
+                beforeSend: function(){
+                    ajaxIsProcessing = true;
+                },
+                success: function(response){
+                    ajaxIsProcessing = false;
+                    $('table.coincidences tr.item').remove();
+                    $('table.coincidences').append(response);
+                }
+            })
+        })
 	$(document).on('click', '.hints table tr', function(e){
 		let tr = $(this);
 		rememberUserSearch(tr.attr('item_id'));
@@ -624,13 +625,43 @@ $(function() {
 		$(".h_overlay, .overlay, .settings_overlay, .settings, .settings_btn .arrow_up").show();
 	});
 	$(".catalog_btn").click(function(){
+        const $catalog = $(".catalog");
 		var height = h_win-75;
-		$(".catalog").css({"height":height+"px"});
+		$catalog.css({"height":height+"px"});
 		$(".h_overlay, .overlay, .catalog, .catalog_btn .arrow_up").show();
-		$(".catalog").jScrollPane({
+		$catalog.jScrollPane({
 			showArrows: true,
 			verticalGutter: 0
 		});
+
+        const categories = document.querySelectorAll('.jspPane > ul > li');
+        if (categories){
+            categories.forEach((category, index) => {
+                const subcategories = category.querySelectorAll('ul.subcategory');
+                if (subcategories){
+                    let counter = 0;
+                    let left = 375;
+                    let rect = {};
+                    subcategories.forEach((sc, key) => {
+                        sc.style.display = 'flex';
+
+                        if (counter == 0){
+                            rect = sc.getBoundingClientRect();
+                            counter++;
+                            sc.style.display = 'none';
+                            return;
+                        }
+
+                        left += Math.floor(rect.width);
+                        rect = sc.getBoundingClientRect();
+                        sc.style.left = left + 'px';
+                        sc.style.display = 'none';
+                        counter++;
+                    })
+                }
+            })
+        }
+
 	});
 	function ResizeCatalog() {
 		var height = h_win-75;

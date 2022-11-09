@@ -117,7 +117,7 @@ class Item{
 	public static function getHrefArticle($article){
 		return "/search/article/$article";
 	}
-	public function getFiltersByItemID($item_id){
+	public static function getFiltersByItemID($item_id){
 		$res_filters = self::getInstanceDataBase()->query("
 			SELECT
 				c.title AS category,
@@ -146,7 +146,7 @@ class Item{
 		if(!$res_filters->num_rows) return false;
 		$output = [];
 		foreach($res_filters as $v){
-			$c = & $output[$v['category']];
+			$c = & $output[$v['category_id']];
 			$c['id'] = $v['category_id'];
 			$c['title'] = $v['category'];
 			$f = & $c['filters'][$v['filter_id']];
@@ -421,7 +421,8 @@ class Item{
 		FROM
 			#item_$type diff
 		LEFT JOIN
-			#items i ON i.id = diff.item_diff
+			#items i
+		ON i.id = diff.item_diff
 		LEFT JOIN
 			#brends b ON b.id = i.brend_id
 		LEFT JOIN
@@ -469,47 +470,86 @@ class Item{
         }
         return $menu;
     }
-    private static function showCat($data, $str, $category_id = null){
+    public static function showCat($data, $str, $category_id = null){
         $string = '';
         foreach($data as $item){
-            if (!$item['title']) continue;
             $string .= self::tplMenu($item, $str, $category_id);
         }
         return $string;
     }
-    private static function getCat(){
-        static $output;
+    public static function getCat($where = ''){
         global $db;
+        static $output;
 
-        if (!empty($output)) return $output;
+        if (!empty($output[$where])) return $output[$where];
 
-        $res = $db->query("SELECT * from #categories");
-        $output = array();
+        $query = "SELECT * from #categories";
+        if ($where) $query .= " WHERE $where";
+        $res = $db->query($query);
+        $output[$where] = array();
         while($row = $res->fetch_assoc()){
-            $output[$row['id']] = $row;
+            $output[$where][$row['id']] = $row;
         }
-        return $output;
+        return $output[$where];
     }
-    private static function getTree($dataset) {
+    public static function getTree($dataset) {
         $tree = array();
         foreach ($dataset as $id => &$node) {
             //Если нет вложений
             if (!$node['parent_id']){
                 $tree[$id] = &$node;
             }else{
-                //Если есть потомки то перебераем массив
+                //Если есть потомки, то перебираем массив
                 $dataset[$node['parent_id']]['childs'][$id] = &$node;
             }
         }
         return $tree;
     }
-    public static function getTplCategory($category_id = null){
+    public static function getTplCategory($category_id = null, $parent_id = null){
         $cat  = self::getCat();
         $tree = self::getTree($cat);
-        $cat_menu = self::showCat($tree, '', $category_id);
-        return '
-            <select name="category_id[]"><option value="0">Выберите... '.$cat_menu.'</select>
-            <span class="icon-cancel-circle1"></span>
-        ';
+
+        if (is_null($parent_id)) return self::showCat($tree, '', $category_id);
+
+        foreach($tree as $key => & $value){
+            if ($key != $parent_id) continue;
+            return self::showCat($value['childs'], '', $category_id);
+        }
+        return false;
+    }
+    public static function getMainCategory($selectedCategory = null): string
+    {
+        $cat  = Item::getCat('`parent_id` = 0');
+        $tree = Item::getTree($cat);
+        $cat_menu = Item::showCat($tree, '', $selectedCategory);
+        return "
+            <select class='main_category'>
+                <option value=''>выберите...</option>
+                $cat_menu
+            </select>
+        ";
+    }
+    public static function getSubCategory($parent_id, $selected = null): string
+    {
+        $tpl = Item::getTplCategory($selected, $parent_id);
+        return "
+            <select name='category_id[]'>
+                $tpl
+            </select>
+            <span class='icon-cancel-circle1'></span>
+        ";
+    }
+
+    //todo реализация не оптимальна, нужна доработка
+    public static function getParentMainCategory($initital){
+        global $db;
+        $output = null;
+        $value = $initital;
+        while(!$output){
+            $result = $db->select_one('categories', '*', "`id` = $value");
+            if ($result['parent_id'] == 0) return $result['id'];
+            else $value = $result['parent_id'];
+        }
+        return false;
     }
 }

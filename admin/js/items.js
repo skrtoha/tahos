@@ -61,6 +61,34 @@ function eventRemoveCategory(obj){
         obj.closest('.category').remove();
     })
 }
+function eventChangeMainCategory(obj){
+    const select = obj.querySelector('select.main_category');
+
+    select.addEventListener('change', event => {
+        showGif();
+
+        const objects = obj.querySelectorAll('select[name="category_id[]"]');
+        if (objects){
+            objects.forEach((element, key) => {
+                element.closest('div').querySelector('span').remove();
+                element.remove();
+            })
+        }
+
+        let formData = new FormData();
+        formData.set('act', 'getSubCategory');
+        formData.set('parent_id', select.value);
+
+        fetch('/admin/ajax/item.php', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.text()).then(response => {
+            select.insertAdjacentHTML('afterend', response);
+            eventRemoveCategory(obj);
+            showGif(false);
+        })
+    })
+}
 $(function(){
 	let get = getParams();
 	$('input.intuitive_search').on('keyup focus', function(e){
@@ -441,7 +469,7 @@ $(function(){
         showGif();
         event.preventDefault();
         let formData = new FormData();
-        formData.set('act', 'getTplCategory');
+        formData.set('act', 'getMainCategory');
         fetch('/admin/ajax/item.php', {
             method: 'post',
             body: formData
@@ -450,12 +478,12 @@ $(function(){
             div.classList.add('category');
             div.innerHTML = response;
             document.querySelector('#categories').prepend(div);
-            eventRemoveCategory(div);
+            eventChangeMainCategory(div);
             showGif(false);
         })
     })
 
-    const category = document.querySelectorAll('#categories .category');
+    const category = document.querySelectorAll('#categories div.category');
     if (category) category.forEach((element, key) => {
         eventRemoveCategory(element);
     })

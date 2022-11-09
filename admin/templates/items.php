@@ -2,6 +2,8 @@
 use core\Managers;
 use core\Item;
 
+/** @global \core\Database $db */
+
 if (isset($_FILES['photo'])){
 	$name = preg_replace('/[а-яА-Я]+/u', "", $_FILES['photo']['name']);
 	copy($_FILES['photo']['tmp_name'], core\Config::$tmpFolderPath . '/' . $name);?>
@@ -191,8 +193,6 @@ switch ($act) {
 }
 function item($act){
 	global $db, $page_title, $status;
-	$category_id = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
-	$category_id = $category_id[0]['category_id'];
 	$languages = $db->select('languages', "*", '', 'title');
 	switch($act){
 		case 's_add': 
@@ -216,7 +216,7 @@ function item($act){
 					ON
 						l.id=it.language_id
 					WHERE 
-						`item_id`=$id
+						it.item_id=$id
 				", '');
 				if ($res_translates->num_rows){
 					while ($row = $res_translates->fetch_assoc()) {
@@ -410,23 +410,23 @@ function item($act){
 				</div>
 				<div class="field">
 					<div class="title">Количество в упаковке</div>
-					<div class="value"><input type=text name="amount_package" value="<?=$_POST['amount_package'] ? $_POST['amount_package'] : $item['amount_package']?>"></div>
+					<div class="value"><input type=text name="amount_package" value="<?=$_POST['amount_package'] ?: $item['amount_package']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Метаданные</div>
-					<div class="value"><input type=text name="meta_desc" value="<?=$_POST['meta_desc'] ? $_POST['meta_desc'] : $item['meta_desc']?>"></div>
+					<div class="value"><input type=text name="meta_desc" value="<?=$_POST['meta_desc'] ?: $item['meta_desc']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Ключевые слова</div>
-					<div class="value"><input type=text name="meta_key" value="<?=$_POST['meta_key'] ? $_POST['meta_key'] : $item['meta_key']?>"></div>
+					<div class="value"><input type=text name="meta_key" value="<?=$_POST['meta_key'] ?: $item['meta_key']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Рейтинг</div>
-					<div class="value"><input type=text name="rating" value="<?=$_POST['rating'] ? $_POST['rating'] : $item['rating']?>"></div>
+					<div class="value"><input type=text name="rating" value="<?=$_POST['rating'] ?: $item['rating']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Примечание</div>
-					<div class="value"><input type=text name="comment" value="<?=$_POST['comment'] ? $_POST['comment'] : $item['comment']?>"></div>
+					<div class="value"><input type=text name="comment" value="<?=$_POST['comment'] ?: $item['comment']?>"></div>
 				</div>
 				<? if ($act != 's_add'){?>
 				<div class="field">
@@ -435,10 +435,48 @@ function item($act){
 						<a href="" id="add_category">Добавить</a>
                         <div id="categories">
                             <?$category_items = $db->select('categories_items', 'category_id', "`item_id`=".$item['id']);
+                            $filterList = Item::getFiltersByItemID($_GET['id']);
                             if (count($category_items)){
-                                foreach ($category_items as $category_item) {?>
+                                foreach ($category_items as $category_item) {
+                                    $parentMainCategory = Item::getParentMainCategory($category_item['category_id']); ?>
                                     <div class="category">
-                                        <?=Item::getTplCategory($category_item['category_id'])?>
+                                        <?=Item::getMainCategory($parentMainCategory);?>
+                                        <?=Item::getSubCategory($parentMainCategory, $category_item['category_id'])?>
+                                        <?$category = & $filterList[$category_item['category_id']];
+                                        if (!is_null($category)){?>
+                                            <div class="category_item">
+                                                <table class="category" category_id="<?=$category['id']?>">
+                                                    <?foreach($category['filters'] as $filter){
+                                                        $checked = [];
+                                                        ?>
+                                                        <tr>
+                                                            <td><?=$filter['title']?></td>
+                                                            <td>
+                                                                <select filter_id="<?=$filter['id']?>">
+                                                                    <option value="">...выберите</option>
+                                                                    <?foreach($filter['filter_values'] as $fv){
+                                                                        if($fv['checked']) $checked[] = $fv;
+                                                                        ?>
+                                                                        <option  <?=$fv['checked'] ? 'disabled' : ''?> value="<?=$fv['id']?>"><?=$fv['title']?></option>
+                                                                    <?}?>
+                                                                </select>
+                                                                <div class="checked" filter_id="<?=$filter['id']?>">
+                                                                    <?if (!empty($checked)){
+                                                                        foreach($checked as $ch){?>
+                                                                            <label class="filter_value">
+                                                                                <input type="hidden" name="fv[]" value="<?=$ch['id']?>">
+                                                                                <?=$ch['title']?>
+                                                                                <span class="icon-cross1"></span>
+                                                                            </label>
+                                                                        <?}?>
+                                                                    <?}?>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <?}?>
+                                                </table>
+                                            </div>
+                                        <?}?>
                                     </div>
                                 <?}?>
                             <?}?>
@@ -446,56 +484,7 @@ function item($act){
 					</div>
 				</div>
 				<?}?>
-				<? if ($act != 's_add'){?> 
-					<div class="field">
-						<div class="title">Свойства</div>
-						<div class="value" id="properties">
-							<?$array = Item::getFiltersByItemID($_GET['id']);
-							if (!empty($array)){?>
-								<div id="category_items" item_id="<?=$_GET['id']?>">
-									<?foreach($array as $category){?>
-										<div class="category_item">
-											<table class="category" category_id="<?=$category['id']?>">
-												<?foreach($category['filters'] as $filter){
-													$checked = [];
-													?>
-													<tr>
-														<td><?=$filter['title']?></td>
-														<td>
-															<select filter_id="<?=$filter['id']?>">
-																<option value="">...выберите</option>
-																<?foreach($filter['filter_values'] as $fv){
-																	if($fv['checked']) $checked[] = $fv;
-																	?>
-																	<option  <?=$fv['checked'] ? 'disabled' : ''?> value="<?=$fv['id']?>"><?=$fv['title']?></option>
-																<?}?>
-															</select>
-															<div class="checked" filter_id="<?=$filter['id']?>">
-																<?if (!empty($checked)){
-																	foreach($checked as $ch){?>
-																		<label class="filter_value">
-																			<input type="hidden" name="fv[]" value="<?=$ch['id']?>">
-																			<?=$ch['title']?>
-																			<span class="icon-cross1"></span>
-																		</label>
-																	<?}?>
-																<?}?>
-															</div>
-														</td>
-													</tr>
-												<?}?>
-											</table>
-										</div>
-									<?}?>
-								</div>
-							<?}
-							else{?>
-								<p>Свойства не найдены либо не выбраны категории товара</p>
-							<?}?>
-						</div>
-					</div>
-				<?}?>
-				<? if ($act != 's_add'){?> 
+				<? if ($act != 's_add'){?>
 					<div class="field">
 						<div class="title">Заблокировано</div>
 						<div class="value">
@@ -795,7 +784,7 @@ function items(){
 	$all = core\Setting::get('commonCount');
 	$perPage = core\Setting::get('perPage');
 	$linkLimit = core\Setting::get('linkLimit');
-	$page = $_GET['page'] ? $_GET['page'] : 1;
+	$page = $_GET['page'] ?: 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$query = core\Item::getQueryItemInfo();

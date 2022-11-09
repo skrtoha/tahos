@@ -126,9 +126,9 @@ span.icon-cross.translate_delete{
 	display: inline-block;
 }
 table.category select{
-	width: 200px;
+	width: 100%;
 	display: block;
-	    border: none;
+    border: none;
 }
 label.filter_value {
    padding: 2px;
@@ -175,8 +175,23 @@ span.icon-cancel-circle1 {
     color: #ed1212;
     top: 3px;
 }
-.category {
+div.category {
     float: left;
-    margin-right: 15px;
-    padding: 5px 0;
+    margin: 0 15px 10px 0;
+    padding: 5px;
+    border: solid 1px #c1bfbf;
+}
+table.category{
+    width: 100%;
+}
+.category_item {
+    margin-top: 10px;
+}
+#categories::after {
+    content: '';
+    clear: left;
+    display: block;
+}
+div#categories {
+    margin-top: 10px;
 }

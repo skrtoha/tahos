@@ -200,8 +200,8 @@ switch($_POST['act']){
 	case 'clearItemDiff':
 		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_id']} OR `item_diff` = {$_POST['item_id']}");
 		break;
-    case 'getTplCategory':
-        echo Item::getTplCategory();
+    case 'getSubCategory':
+        echo Item::getSubCategory($_POST['parent_id']);
         break;
     case 'deleteCategory':
         $db->query("
@@ -221,6 +221,9 @@ switch($_POST['act']){
             ['hidden' => $_POST['hidden']],
             "`id` = {$_POST['id']}"
         );
+        break;
+    case 'getMainCategory':
+        echo Item::getMainCategory();
         break;
 }
 ?>

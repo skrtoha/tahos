@@ -27,7 +27,7 @@ switch ($_GET['act']){
                 b.title AS brend,
                 i.article,
                 i.title_full,
-                i.full_desc,
+                ad.description,
                 si.in_stock,
                 MIN(CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100)) as price,
                 si.packaging,
@@ -38,6 +38,8 @@ switch ($_GET['act']){
                 #store_items si
                     LEFT JOIN
                 #categories_items ci on ci.item_id = si.item_id
+                    LEFT JOIN
+                #avito_description ad ON ad.item_id = si.item_id
                     LEFT JOIN
                 #categories cat on cat.id = ci.category_id
                     LEFT JOIN
@@ -54,8 +56,8 @@ switch ($_GET['act']){
                     si.store_id IN (23) AND
                     si.price > 0 AND
                     i.is_blocked = 1 AND
-                    i.full_desc is not null AND
-                    cat.parent_id in (132, 136, 138)
+                    ad.description is not null AND
+                    cat.parent_id in (200, 197, 132, 136, 138)
             GROUP BY
                 si.item_id
         ";
@@ -73,7 +75,7 @@ switch ($_GET['act']){
             addXMLValue($Ad, 'Address', $issue['adres']);
             addXMLValue($Ad, 'Category', 'Запчасти и аксессуары');
             addXMLValue($Ad, 'Title', $row['title_full']);
-            addXMLValue($Ad, 'Description', $row['full_desc']);
+            addXMLValue($Ad, 'Description', $row['description']);
             addXMLValue($Ad, 'GoodsType', 'Запчасти');
             addXMLValue($Ad, 'AdType', 'Товар от производителя');
             addXMLValue($Ad, 'ProductType', 'Для автомобилей');

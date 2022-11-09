@@ -77,7 +77,7 @@ switch ($_GET['act']){
             addXMLValue($Ad, 'Title', $row['title_full']);
             addXMLValue($Ad, 'Description', $row['description']);
             addXMLValue($Ad, 'GoodsType', 'Запчасти');
-            addXMLValue($Ad, 'AdType', 'Товар от производителя');
+            addXMLValue($Ad, 'AdType', 'Товар приобретен на продажу');
             addXMLValue($Ad, 'ProductType', 'Для автомобилей');
             addXMLValue($Ad, 'Price', $row['price']);
 

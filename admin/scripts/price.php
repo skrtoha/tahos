@@ -92,7 +92,7 @@ switch ($_GET['act']){
             }
             $Ad->appendChild($Images);
 
-            if (in_array($row['parent_id'], [132])){
+            if (in_array($row['parent_id'], [132, 200])){
                 addXMLValue($Ad, 'SparePartType', $row['category']);
             }
             else{

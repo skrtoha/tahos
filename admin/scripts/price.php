@@ -72,7 +72,7 @@ switch ($_GET['act']){
             $Ad = $dom->createElement('Ad');
 
             addXMLValue($Ad, 'Id', $row['item_id']);
-            addXMLValue($Ad, 'OriginalOEM', $row['article']);
+            addXMLValue($Ad, 'OEM', $row['article']);
             addXMLValue($Ad, 'Address', $issue['adres']);
             addXMLValue($Ad, 'Category', 'Запчасти и аксессуары');
             addXMLValue($Ad, 'Title', $row['title_full']);

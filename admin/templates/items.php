@@ -33,9 +33,21 @@ if ($_POST['form_submit']){
 
 	core\Item::deleteMissingPhoto($filesBig, $_POST['photos'], 'big');
 	core\Item::deleteMissingPhoto($filesSmall, $_POST['photos'], 'small');
-	// exit();
 
 	$db->update('items', ['photo' => NULL], "'id' = {$_GET['id']}");
+
+    if ($_POST['avito_desc']){
+        $db->insert(
+            'avito_description',
+            [
+                'item_id' => $_GET['id'],
+                'description' => $_POST['avito_desc']
+            ],
+            ['duplicate' => [
+                'description' => $_POST['avito_desc']
+            ]]
+        );
+    }
 
 	$db->delete('items_values', "`item_id` = {$_GET['id']}");
 	
@@ -55,6 +67,7 @@ if ($_POST['form_submit']){
 		if ($key == 'translate') continue;
 		if ($key == 'photos') continue;
 		if ($key == 'category_id') continue;
+		if ($key == 'avito_desc') continue;
 		$array[$key] = $value;
 	}
 	if ($array['article_cat'] && !$array['article']) $array['article'] = core\Item::articleClear($array['article_cat']);
@@ -332,7 +345,7 @@ function item($act){
 				<div class="field">
 					<div class="title">Описание</div>
 					<div class="value">
-						<?$full_desc = $_POST['full_desc'] ? $_POST['full_desc'] : $item['full_desc'];
+						<?$full_desc = $_POST['full_desc'] ?: $item['full_desc'];
 						$active = $full_desc ? 'active' : ''?>
 						<a href="#" class="hide <?=$active?>">Показать</a>
 						<div style="margin-top: 10px;display: none">
@@ -340,6 +353,17 @@ function item($act){
 						</div>
 					</div>
 				</div>
+                <div class="field">
+                    <div class="title">Описание для Авито</div>
+                    <div class="value">
+                        <?$avito_desc = $_POST['avito_desc'] ?: $item['avito_desc'];
+                        $active = $avito_desc ? 'active' : ''?>
+                        <a href="#" class="hide <?=$active?>">Показать</a>
+                        <div style="margin-top: 10px;display: none">
+                            <textarea  class="need" name="avito_desc" class="htmlarea" style=""><?=$avito_desc?></textarea>
+                        </div>
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Характеристики</div>
 					<div class="value">

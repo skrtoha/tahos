@@ -367,7 +367,8 @@ class Item{
 			SELECT
 				i.*,
 				ib.barcode,
-				b.title AS brend
+				b.title AS brend,
+				ad.description AS avito_desc
 			";
         if (in_array('itemVin', $params)){
             $query .= ",
@@ -385,6 +386,8 @@ class Item{
 				#brends b ON b.id = i.brend_id
 			LEFT JOIN
 				#item_barcodes ib ON ib.item_id = i.id
+            LEFT JOIN
+                #avito_description ad ON ad.item_id = i.id 
 		";
 		if (in_array('withCategories', $params)){
 			$query .= "

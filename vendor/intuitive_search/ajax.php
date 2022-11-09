@@ -87,9 +87,20 @@ switch($_GET['tableName']){
 		break;
 	case 'store_items':
 		$query = core\StoreItem::getQueryStoreItem();
-		$query .= "
-			WHERE
-				i.article LIKE '{$_GET['value']}%' AND si.store_id = {$_GET['additionalConditions']['store_id']}
+		$query .= " WHERE si.store_id = {$_GET['additionalConditions']['store_id']} AND ";
+        switch ($_GET['additionalConditions']['type_search']){
+            case 'article':
+                $query .= "i.article LIKE '{$_GET['value']}%'";
+                break;
+            case 'brend':
+                $query .= "b.title LIKE '{$_GET['value']}%'";
+                break;
+                break;
+            case 'title':
+                $query .= "i.title_full LIKE '{$_GET['value']}%'";
+                break;
+        }
+        $query .= "
 			LIMIT
 				0, {$_GET['maxCountResults']}
 		";

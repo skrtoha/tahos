@@ -38,7 +38,7 @@ if ($_POST['form_submit']){
 
     if ($_POST['avito_desc']){
         $db->insert(
-            'avito_description',
+            'item_avito_description',
             [
                 'item_id' => $_GET['id'],
                 'description' => $_POST['avito_desc']

@@ -55,8 +55,8 @@ class Item{
 	public static function getInstanceDataBase(){
 		return $GLOBALS['db'];
 	}
-	public static function getByID($item_id){
-		$query = self::getQueryItemInfo();
+	public static function getByID($item_id, $params){
+		$query = self::getQueryItemInfo($params);
 		$query .= "
 			WHERE
 				i.id = $item_id
@@ -367,14 +367,16 @@ class Item{
 			SELECT
 				i.*,
 				ib.barcode,
-				b.title AS brend,
-				ad.description AS avito_desc
+				b.title AS brend
 			";
         if (in_array('itemVin', $params)){
             $query .= ",
                 iv.vin,
                 DATE_FORMAT(iv.created, '%d.%m.%Y %H:%i:%s') AS created
             ";
+        }
+        if (in_array('avito_desc', $params)){
+            $query .= ",ad.description AS avito_desc";
         }
 		if (in_array('withCategories', $params)){
 			$query .= ",GROUP_CONCAT(c.title SEPARATOR '; ') AS categories";
@@ -386,9 +388,13 @@ class Item{
 				#brends b ON b.id = i.brend_id
 			LEFT JOIN
 				#item_barcodes ib ON ib.item_id = i.id
-            LEFT JOIN
-                #avito_description ad ON ad.item_id = i.id 
 		";
+        if (in_array('avito_desc', $params)){
+            $query .= "
+                LEFT JOIN
+                    #item_avito_description ad ON ad.item_id = i.id 
+            ";
+        }
 		if (in_array('withCategories', $params)){
 			$query .= "
 				LEFT JOIN	

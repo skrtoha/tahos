@@ -213,7 +213,7 @@ function item($act){
 			break;
 		case 's_change':
 			$id = $_GET['id'];
-			$item = core\Item::getByID($id);
+			$item = core\Item::getByID($id, ['avito_desc']);
 			$page_title = 'Редактирование товара';
 			$translates = array();
 			if (empty($_POST['translate'])){
@@ -810,7 +810,7 @@ function items(){
 	$linkLimit = core\Setting::get('linkLimit');
 	$page = $_GET['page'] ?: 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
-	$start = $chank[$page] ? $chank[$page] : 0;
+	$start = $chank[$page] ?: 0;
 	$query = core\Item::getQueryItemInfo();
 	$article = core\Item::articleClear($_GET['items']);
 	if (isset($_GET['items'])) $query .= "

@@ -55,7 +55,7 @@ class Item{
 	public static function getInstanceDataBase(){
 		return $GLOBALS['db'];
 	}
-	public static function getByID($item_id, $params){
+	public static function getByID($item_id, $params = []){
 		$query = self::getQueryItemInfo($params);
 		$query .= "
 			WHERE

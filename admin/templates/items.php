@@ -48,6 +48,7 @@ if ($_POST['form_submit']){
             ]]
         );
     }
+    else $db->delete('item_avito_description', "`item_id` = {$_GET['id']}");
 
 	$db->delete('items_values', "`item_id` = {$_GET['id']}");
 	

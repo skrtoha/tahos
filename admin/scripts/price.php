@@ -39,7 +39,7 @@ switch ($_GET['act']){
                     LEFT JOIN
                 #categories_items ci on ci.item_id = si.item_id
                     LEFT JOIN
-                #avito_description ad ON ad.item_id = si.item_id
+                #item_avito_description ad ON ad.item_id = si.item_id
                     LEFT JOIN
                 #categories cat on cat.id = ci.category_id
                     LEFT JOIN

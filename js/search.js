@@ -123,7 +123,7 @@ $(function(){
 			success: function(response){
 				show_message('Проверка других складов выполена!');
                 let results = JSON.parse(response)
-				if (!results.length){
+				if (!Object.keys(results).length){
 					$('tr.notFound.removable td').html('Поиск по поставщикам не дал результатов.');
 					return false;
 				} 

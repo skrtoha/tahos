@@ -20,7 +20,9 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	$rossko = new core\Provider\Rossko($db);
 	setCoincidences($rossko->getSearch($_GET['search']));
 
-	setCoincidences(core\Provider\Autoeuro::getSearch($_GET['search']));
+    //из-за того, что изменилось АПИ поставщика, теперь для поска товара
+    //стало обязательно передавать бренд
+//	setCoincidences(core\Provider\Autoeuro::getSearch($_GET['search']));
 
 	$abcp = new core\Provider\Abcp(NULL, $db);
 	setCoincidences($abcp->getSearch($_GET['search']));

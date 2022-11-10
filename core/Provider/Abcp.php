@@ -160,8 +160,8 @@ class Abcp extends Provider{
 	public function getSearch($search){
 		$coincidences = array();
 		$params = [
-			6 => self::getParam(6)/*, 
-			13 => self::getParam(13)*/
+			6 => self::getParam(6),
+			13 => self::getParam(13)
 		];
 		foreach($params as $provider_id => $value){
 			if (!parent::getIsEnabledApiSearch($provider_id)) continue;

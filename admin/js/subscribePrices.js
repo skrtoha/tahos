@@ -9,7 +9,7 @@
 					phone: ''
 				});
 			})
-			$('tr.edit').on('click', function(e){
+			$('tr.edit:not(.user_id)').on('click', function(e){
 				if (
 					$(e.target).hasClass('icon-cancel-circle1') ||
 					$(e.target).closest('a').hasClass('subscribeHandy')

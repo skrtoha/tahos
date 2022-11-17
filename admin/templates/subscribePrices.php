@@ -47,7 +47,8 @@ switch($_GET['act']){
 			    '' as id,
 			    email,
                 title,
-                phone
+                phone,
+                '' as date
             FROM 
                 tahos_subscribe_prices
             
@@ -72,11 +73,12 @@ switch($_GET['act']){
                         ''
                     )
                 ) as title,
-                phone
+                phone,
+                (select created from tahos_orders where user_id = u.id order by created desc limit 1) as date
             FROM tahos_users u
             LEFT JOIN tahos_organizations_types ot ON ot.id = u.organization_type
             WHERE u.is_subscribe = 1
-            order by email
+            order by `date` DESC
             LIMIT $start, {$params['perPage']}
 		", '');
 		commonList($res_common_list, $params);
@@ -95,6 +97,7 @@ function commonList($res_common_list, $params){?>
 			<td>Email</td>
 			<td>Название</td>
 			<td>Телефон</td>
+			<td>Дата заказа</td>
 			<td></td>
 		</tr>
 		<?if ($res_common_list->num_rows){
@@ -103,6 +106,7 @@ function commonList($res_common_list, $params){?>
 					<td label="Email"><?=$item['email']?></td>
 					<td label="Название"><?=$item['title']?></td>
 					<td label="Телефон"><?=$item['phone']?></td>
+					<td label="Телефон"><?=$item['date']?></td>
 					<td label="">
 						<a tooltip="Удалить" class="delete" href="?view=subscribePrices&act=delete&email=<?=$item['email']?>&user_id=<?=$item['id']?>">
 							<span class="icon-cancel-circle1"></span>

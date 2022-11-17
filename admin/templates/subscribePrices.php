@@ -57,21 +57,10 @@ switch($_GET['act']){
             SELECT
                 u.id,                
                 email,
-                concat(
-                   IF(
-                       u.organization_name <> '',
-                       CONCAT_WS(' ', ot.title, u.organization_name),
-                       CONCAT_WS(' ', u.name_1, u.name_2, u.name_3)
-                    ),
-                    IF(
-                        @date := (select created from tahos_orders where user_id = u.id order by created desc limit 1),
-                        concat(
-                            ' (заказ <b>',
-                            @date,
-                            '</b>)'
-                        ),
-                        ''
-                    )
+                IF(
+                   u.organization_name <> '',
+                   CONCAT_WS(' ', ot.title, u.organization_name),
+                   CONCAT_WS(' ', u.name_1, u.name_2, u.name_3)
                 ) as title,
                 phone,
                 (select created from tahos_orders where user_id = u.id order by created desc limit 1) as date

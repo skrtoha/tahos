@@ -53,4 +53,10 @@ span.icon-arrow-up2.rotated {
     .t_table tr.head td:last-child{
         display: none;
     }
+    span.icon-envelop::before, span.icon-cancel-circle1::before{
+        font-size: 20px;
+    }
+    .t_table tr td:last-child{
+        text-align: center;
+    }
 }

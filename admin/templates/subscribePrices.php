@@ -34,7 +34,7 @@ switch($_GET['act']){
 		$params['search'] = '';
 		if (isset($_GET['search']) && $_GET['search']){
 			$params['search'] = $_GET['search'];
-			$string = "email LIKE '%{$_GET['search']}%' OR title LIKE '%{$_GET['search']}%' OR phone LIKE '%{$_GET['search']}%' AND ";
+			$string = "(email LIKE '%{$_GET['search']}%' OR title LIKE '%{$_GET['search']}%' OR phone LIKE '%{$_GET['search']}%') AND ";
             $where_u .= $string;
             $where_sp .= $string;
 		}

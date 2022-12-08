@@ -12,9 +12,6 @@ use core\Managers;
 // 	Log::insertThroughException($e);
 // }
 
-
-
-
 require_once('../core/DataBase.php');
 require_once('templates/functions.php');
 session_start();

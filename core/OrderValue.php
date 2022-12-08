@@ -237,7 +237,7 @@ class OrderValue{
 					case 'item_id':
 					case 'store_id':
 					case 'status_id':
-					case 'is_synchronized':
+					case 'synchronized':
 						$where .= "ov.$key = '$value' AND ";
 						break;
 					case 'user_id':

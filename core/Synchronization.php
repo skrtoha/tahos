@@ -4,7 +4,7 @@ namespace core;
 class Synchronization{
 	private static $url = 'http://134.249.158.237/trade/hs';
 	public static function getNoneSynchronizedOrders(){
-		return self::getOrders(['is_synchronized' => 0], '');
+		return self::getOrders(['synchronized' => 0], '');
 	}
 	public static function getOrders($params, $flag = ''){
 		$output = [];
@@ -50,7 +50,7 @@ class Synchronization{
 	}
 	public static function setOrdersSynchronized($orders){
 		return $GLOBALS['db']->query("
-			UPDATE #orders_values SET is_synchronized = 1 WHERE order_id IN ($orders) AND is_synchronized = 0
+			UPDATE #orders_values SET synchronized = 1 WHERE order_id IN ($orders) AND synchronized = 0
 		", '');
 	}
 	public static function getArrayOSIFromString($osi){

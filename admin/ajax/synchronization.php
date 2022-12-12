@@ -22,40 +22,48 @@ switch($request['act']){
 		$output = Synchronization::getNoneSynchronizedOrders();
 		echo json_encode($output, JSON_UNESCAPED_UNICODE);
 		break;
-	case 'setSynchronizedOrders':
-		Synchronization::setOrdersSynchronized($request['orders']);
+	case 'setSynchronizedOSI':
+		Synchronization::setOrdersSynchronized(json_decode($_POST['data'], true));
 		break;
 	//в 1С создает заказ поставщику и отправляет в "Заказано"
 	case 'createOrderAndSendOrdered':
-		$countOrdered = 0;
-		$osiArray = explode(',', $request['osi']);
-		foreach($osiArray as $osiString){
-			$osi = Synchronization::getArrayOSIFromString($osiString);
-			$ov_result = core\OrderValue::get($osi, '');
-			core\OrderValue::setStatusInWork($ov_result->fetch_assoc(), true);
-			$countOrdered = core\OrderValue::$countOrdered;
+		$changedOrders = [];
+		$osiArray = json_decode($request['data'], true);
+        $orderValues = core\OrderValue::get(['osi' => $osiArray], '');
+        foreach($orderValues as $ov){
+			core\OrderValue::setStatusInWork($ov, true);
+            $changedOrders[] = $ov;
 		}
-		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
-		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
-		echo $countOrdered;
+		echo json_encode($changedOrders);
 		break;
 	case 'setStatusArrived':
-		$orders = Synchronization::getOrders(Synchronization::getArrayOSIFromString($request['osi']));
+        $changedOrders = [];
+        $data = json_decode($request['data'], true);
+		$orders = Synchronization::getOrders(['osi' => array_keys($data)]);
 		$order = array_shift($orders);
 		foreach($order['values'] as $ov){
-			$ov['quan'] = $request['quan'];
+            $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+			$ov['quan'] = $data[$osi];
 			core\OrderValue::changeStatus(3, $ov);
+            $changedOrders[] = $osi;
 		}
+        echo json_encode($changedOrders);
 		break;
 	case 'setStatusIssued':
-		$issues = new \Issues($request['user_id'], $db);
-		$income = [];
-
-		for ($i = 0; $i < count($request['osi']); $i++) { 
-			$osi = Synchronization::getArrayOSIFromString($request['osi'][$i]);
-			$income["{$osi['order_id']}:{$osi['item_id']}:{$osi['store_id']}"] = $request['quan'][$i];
-		}
-		var_dump($issues->setIncome($income, true));
+        $data = json_decode($_POST['data'], true);
+        $orderValues = [];
+        $orderValuesResult = \core\OrderValue::get(['osi' => array_keys($data)]);
+        foreach($orderValuesResult as $ov){
+            $user_id = $ov['user_id'];
+            break;
+        }
+        $income = [];
+        foreach($data as $key => $value){
+            $array = explode('-', $key);
+            $income["{$array[0]}:{$array[2]}:{$array[1]}"] = $value;
+        }
+		$issues = new \Issues($user_id, $db);
+		$issues->setIncome($income, true);
 		break;
 	case 'cancelItemsFromOrder':
 		$osiArray = explode(',', $request['osi']);

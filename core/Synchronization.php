@@ -4,7 +4,7 @@ namespace core;
 class Synchronization{
 	private static $url = 'http://localhost/trade/hs';
 	public static function getNoneSynchronizedOrders(){
-		return self::getOrders(['is_synchronized' => 0], '');
+		return self::getOrders(['synchronized' => 0], '');
 	}
 	public static function getOrders($params, $flag = ''){
 		$output = [];
@@ -34,8 +34,10 @@ class Synchronization{
 				'ordered' => $ov['ordered'],
 				'arrived' => $ov['arrived'],
 				'issued' => $ov['issued'],
+                'issue_id' => $ov['issue_id'],
+                'issued_date' => $ov['issued_date'],
 				'returned' => $ov['returned'],
-				'updated' => $ov['updated'] ? $ov['updated'] : $ov['created'],
+				'updated' => $ov['updated'] ?: $ov['created'],
 				'typeOrganization' => $ov['typeOrganization'],
 				'withoutMarkup' => $ov['withoutMarkup'],
 			];
@@ -48,10 +50,19 @@ class Synchronization{
 			json_encode($array, JSON_UNESCAPED_UNICODE)
 		);
 	}
-	public static function setOrdersSynchronized($orders){
-		return $GLOBALS['db']->query("
-			UPDATE #orders_values SET is_synchronized = 1 WHERE order_id IN ($orders) AND is_synchronized = 0
-		", '');
+	public static function setOrdersSynchronized($osi){
+        foreach($osi as $row){
+            $array = explode('-', $row);
+            $GLOBALS['db']->query("
+                UPDATE 
+                    #orders_values 
+                SET 
+                    synchronized = 1 
+                WHERE 
+                    (`order_id` = {$array[0]} AND `store_id` = {$array[1]} AND `item_id` = {$array[2]}) AND 
+                    synchronized = 0
+	    	");
+        }
 	}
 	public static function getArrayOSIFromString($osi){
 		$array = explode('-', $osi);

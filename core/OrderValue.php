@@ -305,11 +305,20 @@ class OrderValue{
 		if (!empty($params)){
 			foreach($params as $key => $value){
 				switch($key){
+                    case 'osi':
+                        $where .= "(";
+                        foreach($value as $v){
+                            $array = explode('-', $v);
+                            $where .= "(ov.order_id = {$array[0]} AND ov.store_id = {$array[1]} AND ov.item_id = {$array[2]}) OR ";
+                        }
+                        $where = substr($where, 0, -4);
+                        $where .= ") AND ";
+                        break;
 					case 'order_id':
 					case 'item_id':
 					case 'store_id':
 					case 'status_id':
-					case 'is_synchronized':
+					case 'synchronized':
 						$where .= "ov.$key = '$value' AND ";
 						break;
 					case 'user_id':
@@ -349,6 +358,8 @@ class OrderValue{
 				ov.ordered,
 				ov.arrived,
 				ov.issued,
+				oiv.issue_id,
+				DATE_FORMAT(oi.created, '%d.%m.%Y %H:%i:%s') AS issued_date, 
 				ov.declined,
 				ov.returned,
 				IF(ov.withoutMarkup > 0, ov.withoutMarkup, ov.price + ov.price * 0.1) AS withoutMarkup,
@@ -386,6 +397,9 @@ class OrderValue{
 				) as count
 			FROM
 				#orders_values ov
+            LEFT JOIN #order_issue_values oiv ON
+                oiv.order_id = ov.order_id AND oiv.store_id = ov.store_id AND oiv.item_id = ov.item_id
+            LEFT JOIN #order_issues oi ON oi.id = oiv.issue_id 
 			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
 			LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
 			LEFT JOIN #returns r ON r.order_id = ov.order_id AND r.store_id=ov.store_id AND r.item_id=ov.item_id

@@ -440,6 +440,7 @@ abstract class Provider{
 		if (!in_array($params['provider_id'], self::$ignoreProvidersForMarkups)){
 			$price['price'] = self::getPriceWithMarkups($price['price'], $params['store_id'], $params['user_id']);
 		}
+        $price['price'] = floor($price['price']);
 		// debug($price, get_class($provider) . " {$params['article']}");
 		return $price;
 	}

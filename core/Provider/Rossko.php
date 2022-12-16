@@ -326,7 +326,8 @@ class Rossko extends Provider{
         $delivery = [];
         if ($orderInfo['delivery'] == 'Доставка'){
             $delivery['delivery_id'] = '000000002';
-            $delivery['address_id'] = $orderInfo['address_provider_id'];
+            if ($orderInfo['address_provider_id']) $delivery['address_id'] = $orderInfo['address_provider_id'];
+            else $delivery['address_id'] = 56653;
         }
         else $delivery = [
             'delivery_id' => '000000001',

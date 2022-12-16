@@ -249,7 +249,8 @@ class Mikado extends Provider{
 			if ($this->compareBrends($r->Source->SourceProducer, $brend)){
 				$this->parseCodeListRow($r);
 			}
-		} 
+		}
+        return true;
 	}
 	private function compareBrends($b1, $b2){
 		if (self::getComparableString($b1) == self::getComparableString($b2)) return true;

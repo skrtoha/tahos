@@ -16,8 +16,10 @@
         "ext-imap": "*",
         "firebase/php-jwt": "^5.4",
         "phpoffice/phpspreadsheet": "^1.18",
-      "ext-dom": "*"
-    },
+      "ext-dom": "*",
+	  "ext-simplexml": "*",
+	  "ext-libxml": "*"
+	},
     "autoload": {
         "psr-4": {
             "core\\": "core"

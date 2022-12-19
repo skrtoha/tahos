@@ -40,15 +40,11 @@ class Synchronization{
 				'updated' => $ov['updated'] ?: $ov['created'],
 				'typeOrganization' => $ov['typeOrganization'],
 				'withoutMarkup' => $ov['withoutMarkup'],
+                'return_price' => $ov['return_price'],
+                'return_data' => $ov['return_data']
 			];
 		}
 		return $output;
-	}
-	public static function sendRequest($method, $array){
-		return Provider::getCurlUrlData(
-			self::$url . "/$method",
-			json_encode($array, JSON_UNESCAPED_UNICODE)
-		);
 	}
 	public static function setOrdersSynchronized($osi){
         foreach($osi as $row){
@@ -72,4 +68,43 @@ class Synchronization{
 			'item_id' => $array[2]
 		]; 
 	}
+    public static function createItem($data){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        $output = [
+            'error' => '',
+            'result' => []
+        ];
+
+        if ($data['brend']['id'] == 0){
+            $result = $db->insert('brends', [
+                'title' => $data['brend']['title'],
+                'href' => translite($data['brend']['title']),
+                'parent_id' => 0
+            ]);
+            if ($result !== true){
+                $output['error'] = $result;
+                return $output;
+            }
+            $data['brend_id'] = $db->last_id();
+            $output['result']['created_brend_id'] = $data['brend_id'];
+        }
+        else $data['brend_id'] = $data['brend']['id'];
+
+        unset($data['brend']);
+
+        if ($data['id']) $result = Item::update($data, ['id' => $data['id']]);
+        else{
+            $result = Item::insert($data);
+            if ($result === true) $output['result']['created_item_id'] = Item::$lastInsertedItemID;
+        }
+
+        if ($result !== true){
+            $output['error'] = $result;
+            return $output;
+        }
+
+        return $output;
+    }
 }

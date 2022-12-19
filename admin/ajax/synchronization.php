@@ -10,7 +10,6 @@ require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/order_issues.function.php");
 
-
 $db = new core\Database();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
@@ -44,6 +43,7 @@ switch($request['act']){
 		foreach($order['values'] as $ov){
             $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 			$ov['quan'] = $data[$osi];
+            $ov['synchronized'] = 1;
 			core\OrderValue::changeStatus(3, $ov);
             $changedOrders[] = $osi;
 		}
@@ -80,7 +80,10 @@ switch($request['act']){
 			$osi = Synchronization::getArrayOSIFromString($request['osi'][$i]);
 			$ov_result = core\OrderValue::get($osi);
 			$ov = $ov_result->fetch_assoc();
-			$items[] = [
+
+            if ($ov['returned'] >= $request['quan'][$i]) continue;
+
+            $items[] = [
 				'order_id' => $ov['order_id'],
 				'store_id' => $ov['store_id'],
 				'item_id' => $ov['item_id'],
@@ -105,6 +108,10 @@ switch($request['act']){
 			core\Returns::processReturn($paramsReturn, $return);
 		}
 		break;
+    case 'createItem':
+        $data = json_decode($request['data'], true);
+        echo json_encode(Synchronization::createItem($data));
+        break;
 }
 
 ?>

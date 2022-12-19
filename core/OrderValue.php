@@ -63,7 +63,10 @@ class OrderValue{
 	 */
 	public static function changeStatus($status_id, $params){
 		$values = ['status_id' => $status_id];
-		switch ($status_id){
+		if (isset($params['synchronized']) && $params['synchronized']){
+            $values['synchronized'] = 1;
+        }
+        switch ($status_id){
 			//выдано
 			case 1:
 				$quan = $params['issued'];
@@ -388,6 +391,8 @@ class OrderValue{
 				o.is_payed,
 				IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
 				IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
+				r.return_price,
+				DATE_FORMAT(r.created, '%d.%m.%Y %H:%i:%s') AS return_data,
 				(
 					SELECT 
 						COUNT(id)
@@ -400,9 +405,13 @@ class OrderValue{
             LEFT JOIN #order_issue_values oiv ON
                 oiv.order_id = ov.order_id AND oiv.store_id = ov.store_id AND oiv.item_id = ov.item_id
             LEFT JOIN #order_issues oi ON oi.id = oiv.issue_id 
+            LEFT JOIN #returns r ON 
+                r.order_id = ov.order_id AND 
+                r.store_id = ov.store_id AND 
+                r.item_id = ov.item_id AND
+                r.status_id = 3
 			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
 			LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
-			LEFT JOIN #returns r ON r.order_id = ov.order_id AND r.store_id=ov.store_id AND r.item_id=ov.item_id
 			LEFT JOIN #providers p ON p.id=ps.provider_id
 			LEFT JOIN #items i ON i.id=ov.item_id
 			LEFT JOIN #brends b ON b.id=i.brend_id

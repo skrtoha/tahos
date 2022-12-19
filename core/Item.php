@@ -22,7 +22,7 @@ class Item{
 	}
 	public static function insert($fields){
 		$db = self::getInstanceDataBase();
-		$barcode = $fields['barcode'] ? $fields['barcode'] : false;
+		$barcode = $fields['barcode'] ?: false;
 		unset($fields['barcode']);
 		$resItems = $db->insert('items', $fields/*, ['print' => true]*/);
 		if ($resItems !== true) return $resItems;

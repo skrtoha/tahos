@@ -96,6 +96,16 @@ class Synchronization{
 
         if ($data['id']) $result = Item::update($data, ['id' => $data['id']]);
         else{
+            $query = Item::getQueryItemInfo();
+            $query .= " WHERE i.article = '{$data['article']}' AND i.brend_id = {$data['brend_id']}";
+
+            $result = $db->query($query);
+            if ($result->num_rows){
+                $row = $result->fetch_assoc();
+                $output['result']['created_item_id'] = $row['id'];
+                return $output;
+            }
+
             $result = Item::insert($data);
             if ($result === true) $output['result']['created_item_id'] = Item::$lastInsertedItemID;
         }

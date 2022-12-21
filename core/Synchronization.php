@@ -27,6 +27,7 @@ class Synchronization{
 				'brend_id' => $ov['brend_id'],
 				'item_id' => $ov['item_id'],
 				'article' => $ov['article'],
+				'article_cat' => $ov['article_cat'] ?: $ov['article'],
 				'title_full' => $ov['title_full'],
 				'packaging' => $ov['packaging'],
 				'price' => $ov['price'],
@@ -78,17 +79,28 @@ class Synchronization{
         ];
 
         if ($data['brend']['id'] == 0){
-            $result = $db->insert('brends', [
-                'title' => $data['brend']['title'],
-                'href' => translite($data['brend']['title']),
-                'parent_id' => 0
-            ]);
-            if ($result !== true){
-                $output['error'] = $result;
-                return $output;
+            $result = $db->select_one(
+                'brends',
+                'id',
+                "`title` = '{$data['brend']['title']}' AND `parent_id` = 0"
+            );
+            if (!empty($result)){
+                $data['brend_id'] = $result['id'];
+                $output['result']['created_brend_id'] = $result['id'];
             }
-            $data['brend_id'] = $db->last_id();
-            $output['result']['created_brend_id'] = $data['brend_id'];
+            else{
+                $result = $db->insert('brends', [
+                    'title' => $data['brend']['title'],
+                    'href' => translite($data['brend']['title']),
+                    'parent_id' => 0
+                ]);
+                if ($result !== true){
+                    $output['error'] = $result;
+                    return $output;
+                }
+                $data['brend_id'] = $db->last_id();
+                $output['result']['created_brend_id'] = $data['brend_id'];
+            }
         }
         else $data['brend_id'] = $data['brend']['id'];
 

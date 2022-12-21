@@ -343,15 +343,8 @@ class OrderValue{
 				i.brend_id,
 				b.title AS brend,
 				IF (i.title_full != '', i.title_full, i.title) AS title_full,
-				IF (
-					i.article_cat != '', 
-					i.article_cat, 
-					IF (
-						i.article !='',
-						i.article,
-						ib.barcode
-					)
-				) AS article,
+				i.article,
+				i.article_cat,
 				IF (si.packaging IS NOT NULL, si.packaging, 1) AS packaging,
 				ov.order_id,
 				ov.store_id,

@@ -30,7 +30,8 @@ switch($request['act']){
 		$osiArray = json_decode($request['data'], true);
         $orderValues = core\OrderValue::get(['osi' => $osiArray], '');
         foreach($orderValues as $ov){
-			core\OrderValue::setStatusInWork($ov, true);
+            core\OrderValue::setStatusInWork($ov, true);
+            $ov['ordered'] = $ov['quan'];
             $changedOrders[] = $ov;
 		}
 		echo json_encode($changedOrders);

@@ -40,14 +40,16 @@ switch($request['act']){
         $changedOrders = [];
         $data = json_decode($request['data'], true);
 		$orders = Synchronization::getOrders(['osi' => array_keys($data)]);
-		$order = array_shift($orders);
-		foreach($order['values'] as $ov){
-            $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
-			$ov['quan'] = $data[$osi];
-            $ov['synchronized'] = 1;
-			core\OrderValue::changeStatus(3, $ov);
-            $changedOrders[] = $osi;
-		}
+
+        foreach($orders as $order){
+            foreach($order['values'] as $ov){
+                $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+                $ov['quan'] = $data[$osi];
+                $ov['synchronized'] = 1;
+                core\OrderValue::changeStatus(3, $ov);
+                $changedOrders[] = $osi;
+            }
+        }
         echo json_encode($changedOrders);
 		break;
 	case 'setStatusIssued':

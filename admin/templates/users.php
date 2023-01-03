@@ -1,7 +1,7 @@
 <?php
 /** @var $db \core\Database $act */
 
-use core\UserAddress;
+use core\Basket;
 
 $act = $_GET['act'];
 $id = $_GET['id'];
@@ -114,7 +114,6 @@ switch ($act) {
 	case 'add': show_form('s_add'); break;
 	case 'change': show_form('s_change'); break;
 	case 'funds': funds(); break;
-	case 'user_order_add': user_order_add(); break;
 	case 'form_operations': form_operations('add'); break;
 	case 'search_history':
         $totalCount = getTotalCount($_GET);
@@ -674,10 +673,11 @@ function funds(){
 	</table>
 	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=users&act=funds&id={$_GET['id']}&page=");
 }
-function user_order_add(){
+function basket(){
 	global $status, $db, $page_title;
 	if (!empty($_POST)) setUserOrder();
-	$page_title = 'Добавить заказ';
+	$page_title = 'Корзина';
+
 	$status = "
 		<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > 
 		<a href='/admin/?view=users&act=change&id={$_GET['id']}'>Редактирование пользователя</a> > $page_title
@@ -689,7 +689,7 @@ function user_order_add(){
 				<a href="#" class="show_form_search">Добавить</a>
 				Наценка: <input form="added_items" style="width: 38px" type="text" readonly name="markup" value="<?=$db->getFieldOnID('users', $_GET['id'], 'markup_handle_order')?>">
 				<input class="intuitive_search" style="width: 264px;" type="text" name="items" value="<?=$_GET['items']?>" placeholder="Поиск по артикулу, vid и названию" required>
-				<form id="added_items" method="post">
+				<form id="added_items" method="post" act="">
 					<p><strong>Добавленные товары:</strong></p>
 					<table class="t_table">
 						<thead>
@@ -714,13 +714,15 @@ function user_order_add(){
 					<p>Итого: <span class="total">0</span> руб.</p>
 					<div class="value">
 						<input type="hidden" name="is_draft" value="0">
-						<input is_draft="1" user_id="<?=$_GET['id']?>" type="submit" class="button" value="Сохранить как черновик">
-						<input user_id="<?=$_GET['id']?>" type="submit" class="button" value="Сохранить и добавить">
+						<input type="submit" class="button" value="Отправить в заказ">
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
+    <script>
+        let items = JSON.parse('<?=json_encode(Basket::getWithFullListOfStoreItems($_GET['id']))?>');
+    </script>
 <?}
 function setUserOrder(){
 	global $db;
@@ -732,8 +734,7 @@ function setUserOrder(){
 	}
 	$db->insert('orders', [
 		'user_id' => $_GET['id'],
-		'is_draft' => $_POST['is_draft'],
-		'is_new' => $_POST['is_draft'] ? 0 : 1
+		'is_new' => 1
 	]);
 	$order_id = $db->last_id();
 	foreach($array as $item_id => $value){
@@ -832,49 +833,5 @@ function search_history($totalCount){
     </div>
     <table id="history_search" class="t_table" cellspacing="1"></table>
     <div id="pagination-container"></div>
-<?}
-function basket(){
-	global $db, $status, $page_title;
-	$basket = core\Basket::get($_GET['id']);
-	$res_user = core\User::get(['user_id' => $_GET['id']]);
-	if (is_object($res_user)) $user = $res_user->fetch_assoc();
-	else $user = $res_user;
-	$page_title = 'Корзина';
-	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > ";
-	$status .= "<a href='?view=users&act=change&id={$_GET['id']}'>{$user['full_name']}</a> > $page_title";
-	?>
-	<table style="margin-top: 10px;" class="t_table" cellspacing="1">
-		<tr class="head">
-			<td>Бренд</td>
-			<td>Артикул</td>
-			<td>Наименование</td>
-			<td>Поставщик</td>
-			<td>Срок</td>
-			<td>Количество</td>
-			<td>Цена</td>
-			<td>Сумма</td>
-		</tr>
-		<?if (count($basket)){
-			foreach($basket as $value){?>
-				<tr>
-					<td><?=$value['brend']?></td>
-					<td>
-                        <a href="/admin/?view=items&act=item&id=<?=$value['item_id']?>">
-                            <?=$value['article']?>
-                        </a>
-                    </td>
-					<td><?=$value['title']?></td>
-					<td><?=$value['cipher']?></td>
-					<td><?=$value['delivery']?></td>
-					<td><?=$value['quan']?></td>
-					<td><?=$value['price']?></td>
-					<td><?=$value['quan'] * $value['price']?></td>
-				</tr>
-			<?}
-		}
-		else{?>
-			<tr><td colspan="4">Историю поиска не найдено</td></tr>
-		<?}?>
-	</table>
 <?}
 ?>

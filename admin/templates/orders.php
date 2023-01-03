@@ -368,8 +368,8 @@ function show_form($act){
 			</td>
 			<td>Комментарий</td>
 			<?if (!$order['is_draft']){?>
-				<td>Статус</td>
-				<td></td>
+            <td>Статус</td>
+            <td></td>
 			<?}?>
 		</tr>
 		<?if (!$res_order_values->num_rows){?>

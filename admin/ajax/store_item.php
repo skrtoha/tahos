@@ -100,6 +100,7 @@ switch ($_POST['column']) {
 			$item['stores'][$row['store_id']]['in_stock'] = $row['in_stock'];
 			$item['stores'][$row['store_id']]['cipher'] = $row['cipher'];
 			$item['stores'][$row['store_id']]['provider'] = $row['provider'];
+			$item['stores'][$row['store_id']]['withoutMarkup'] = $row['priceWithoutMarkup'];
 		}
 		echo json_encode($item);
 		break;

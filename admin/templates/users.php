@@ -2,6 +2,7 @@
 /** @var $db \core\Database $act */
 
 use core\Basket;
+use core\User;
 
 $act = $_GET['act'];
 $id = $_GET['id'];
@@ -53,7 +54,7 @@ if ($_POST['form_submit']){
 	if ($saveble) {
 		if ($_POST['form_submit'] == 1){
 			if (core\User::update($id, $array)){
-                \core\User::setAddress(
+                User::setAddress(
                         $_GET['id'],
                         $_POST['addressee'],
                         $_POST['default_address'],
@@ -327,7 +328,7 @@ function show_form($act){
 	}
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > $page_title";
 	if ($act == 's_change'){?>
-		<?=User::getHtmlActions($id)?>
+		<?=\User::getHtmlActions($id)?>
 	<?}?>
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
 	<div class="t_form">
@@ -574,7 +575,7 @@ function form_operations($act){
 		$db->insert('funds', $array);
 		$db->update('users', array('bill' => $curr_bill), '`id`='.$id);
 		core\User::checkOverdue($id, $_POST['sum']);
-        \core\User::checkDebt($id, $_POST['sum']);
+        User::checkDebt($id, $_POST['sum']);
 		message('Счет успешно пополнен!');
 		header('Location: ?view=users&act=funds&id='.$id);
 	}
@@ -617,6 +618,7 @@ function funds(){
 	$id = $_GET['id'];
 	require_once('templates/pagination.php');
 
+    /** @var mysqli_result $res_user */
 	$res_user = core\User::get(['user_id' => $id]);
 	$user = $res_user->fetch_assoc();
 
@@ -627,14 +629,14 @@ function funds(){
 	$all = $db->getCount('funds', $where);
 	$perPage = 30;
 	$linkLimit = 10;
-	$page = $_GET['page'] ? $_GET['page'] : 1;
+	$page = $_GET['page'] ?: 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ? $chank[$page] : 0;
 	$funds = $db->select('funds', '*', $where, 'id', false, "$start,$perPage", true);?>
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
 
-	<?=User::getHtmlActions($id)?>
+	<?=\User::getHtmlActions($id)?>
 
 	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>
@@ -675,7 +677,24 @@ function funds(){
 }
 function basket(){
 	global $status, $db, $page_title;
-	if (!empty($_POST)) setUserOrder();
+	if (!empty($_POST)){
+        /** @var mysqli_result $res_user */
+        $res_user = User::get(['user_id' => $_GET['id']]);
+
+        if ($res_user->num_rows){
+            $user = $res_user->fetch_assoc();
+            $debt = User::getDebt($user);
+        }
+        if ($debt['blocked']){
+            message('Возможность отправки заказов ограничена!', false);
+            header("Location: {$_SERVER['HTTP_REFERER']}");
+            die();
+        }
+        $order_id = Basket::sendToOrder($user);
+        message('Успешно отправлено в заказы!');
+        header("Location: /admin/?view=orders&id={$order_id}&act=change");
+        die();
+    }
 	$page_title = 'Корзина';
 
 	$status = "
@@ -683,6 +702,7 @@ function basket(){
 		<a href='/admin/?view=users&act=change&id={$_GET['id']}'>Редактирование пользователя</a> > $page_title
 		";
 	?>
+    <input type="hidden" value="<?=$_GET['id']?>" name="user_id">
 	<div class="bg">
 		<div class="field">
 			<div class="value" id="user_order_add">
@@ -723,35 +743,10 @@ function basket(){
     <script>
         let items = JSON.parse('<?=json_encode(Basket::getWithFullListOfStoreItems($_GET['id']))?>');
     </script>
+    <?
+    $user_id = $_GET['id'];
+    require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/basketAdditionalOptions/template.php')?>
 <?}
-function setUserOrder(){
-	global $db;
-	//debug($_POST); exit();
-	foreach($_POST as $name => $value){
-		foreach($value as $item_id => $v){
-			$array[$item_id][$name] = $v;
-		}
-	}
-	$db->insert('orders', [
-		'user_id' => $_GET['id'],
-		'is_new' => 1
-	]);
-	$order_id = $db->last_id();
-	foreach($array as $item_id => $value){
-		$db->insert('orders_values', [
-			'order_id' => $order_id,
-			'store_id' => $value['store_id'],
-			'item_id' => $item_id,
-			'user_id' => $_GET['id'],
-			'withoutMarkup' => $value['withoutMarkup'],
-			'price' => $value['price'],
-			'quan' => $value['quan'],
-			'comment' => $value['comment']
-		]);
-	};
-	message('Заказ успешно сохранен!');
-	header("Location: /admin/?view=orders&act=change&id=$order_id");
-}
 function buildQuery($params, $type){
     $queryVin = '
         SELECT

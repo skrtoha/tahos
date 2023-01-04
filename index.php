@@ -54,6 +54,7 @@ $res_user = core\User::get(['user_id' => $_SESSION['user'] ?: false]);
 
 if ($res_user->num_rows){
     $user = $res_user->fetch_assoc();
+    \core\User::$fetched = $user;
     $debt = \core\User::getDebt($user);
 }
 else $user = $res_user;

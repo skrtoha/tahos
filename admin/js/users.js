@@ -19,15 +19,14 @@
 
             if (typeof items !== 'undefined'){
                 uoa.items = items;
-            }
-
-            if (Object.keys(uoa.items).length){
-                $('tr.hiddable').hide();
-                $.each(items, (item_id, item) => {
-                    let htmlStores = uoa.getStringHtmlStores(item_id);
-                    $('#added_items table tbody').append(uoa.getTableRow(item_id, htmlStores))
-                })
-                uoa.setTotal();
+                if (Object.keys(uoa.items).length){
+                    $('tr.hiddable').hide();
+                    $.each(items, (item_id, item) => {
+                        let htmlStores = uoa.getStringHtmlStores(item_id);
+                        $('#added_items table tbody').append(uoa.getTableRow(item_id, htmlStores))
+                    })
+                    uoa.setTotal();
+                }
             }
 
 			if ($('#history_search').size()) this.history_search();
@@ -167,6 +166,15 @@
                 e.preventDefault();
                 modal_show();
             })
+            $('#added_items input[type=submit]').on('click', e => {
+                e.preventDefault();
+                eventClickToOrder(e);
+            })
+            $('#mgn_popup a[href="/basket/to_offer"]').on('click', function(e){
+                e.preventDefault();
+                showAdditionalOptions();
+                return false;
+            })
 		},
         history_search: function(params = {}){
             let uoa = this;
@@ -280,7 +288,7 @@
 		},
         addToBasket: function(object){
             let formData = new FormData;
-            formData.set('user_id', document.querySelector('input[user_id]').getAttribute('user_id'));
+            formData.set('user_id', document.querySelector('input[name=user_id]').value);
             formData.set('store_id', object.store_id);
             formData.set('item_id', object.item_id);
             formData.set('quan', object.quan);

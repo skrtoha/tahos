@@ -291,5 +291,5 @@ Breadcrumb::out();
 	<?}?>
 </div>
 <?
-if ($noReturnIsExists) Basket::getHtmlNoReturn();
-Basket::getHtmlAdditionalOptions($user, $minDelivery, $maxDelivery);
+$user_id = $_SESSION['user'];
+require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/basketAdditionalOptions/template.php');

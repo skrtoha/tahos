@@ -19,6 +19,7 @@ use admin\functions\LeftMenu;
     <?if (in_array($_GET['view'], ['users'])){?>
         <link rel="stylesheet" type="text/css" href="/vendor/addressee/style.css">
         <link rel="stylesheet" type="text/css" href="/vendor/addressee/jquery.fias.min.css">
+        <link rel="stylesheet" type="text/css" href="/vendor/basketAdditionalOptions/style.css">
     <?}?>
 	<?if (in_array($_GET['view'], ['connections', 'index', 'brends'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/chosen/chosen.css">

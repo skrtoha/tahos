@@ -4,6 +4,7 @@ namespace core;
 use mysqli_result;
 
 class User{
+    public static $fetched;
 	public static function noOverdue($user_id){
 		$query = Fund::getQueryListFunds(
 			"f.user_id = $user_id AND f.overdue > 0",
@@ -41,6 +42,10 @@ class User{
      * @return mysqli_result
      */
 	public static function get(array $params = []){
+        static $output;
+        $paramsString = json_encode($params);
+        if (isset($output[$paramsString])) return $output[$paramsString];
+
 		$db = $GLOBALS['db'];
 		$where = '';
         $having = '';
@@ -100,7 +105,8 @@ class User{
 			$having
 			$limit
 		";
-		return $db->query($q_user, '');
+        $output[$paramsString] = $db->query($q_user, '');
+		return $output[$paramsString];
 	}
 
 	/**
@@ -287,6 +293,9 @@ class User{
     {
         /** @global $db Database */
         global $db;
+        static $output;
+        $userString = json_encode($user);
+        if (isset($output)) return $output[$userString];
 
         $designation = '<i class="fa fa-rub" aria-hidden="true"></i>';
 
@@ -305,17 +314,19 @@ class User{
             $result = $db->query($query);
             if (!$result->num_rows) return [];
             $result = $result->fetch_assoc();
-            return [
+            $output[$userString] = [
                 'message' => "До завтра необходимо внести {$result['sum']} $designation, иначе заказы будут заблокированы",
                 'blocked' => false
             ];
+            return $output[$userString];
         }
 
         $result = $result->fetch_assoc();
-        return [
+        $output[$userString] = [
             'message' => "Заказы заблокированы. Задолженность составляет {$result['sum']} $designation",
             'blocked' => true
         ];
+        return $output[$userString];
     }
 
     private static function getQueryDebt($where = '', $orderBy = ''): string

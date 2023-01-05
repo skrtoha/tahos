@@ -167,8 +167,7 @@
                 modal_show();
             })
             $('#added_items input[type=submit]').on('click', e => {
-                e.preventDefault();
-                eventClickToOrder(e);
+                $.cookie('additional_options', '');
             })
             $('#mgn_popup a[href="/basket/to_offer"]').on('click', function(e){
                 e.preventDefault();

@@ -743,9 +743,6 @@ function basket(){
     <script>
         let items = JSON.parse('<?=json_encode(Basket::getWithFullListOfStoreItems($_GET['id']))?>');
     </script>
-    <?
-    $user_id = $_GET['id'];
-    require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/basketAdditionalOptions/template.php')?>
 <?}
 function buildQuery($params, $type){
     $queryVin = '

@@ -116,7 +116,10 @@ class Basket{
         }
 
         $additional_options = json_decode($_COOKIE['additional_options'], true);
-        $dateTimeObject = \DateTime::createFromFormat('d.m.Y', $additional_options['date_issue']);
+        if ($additional_options){
+            $dateTimeObject = \DateTime::createFromFormat('d.m.Y', $additional_options['date_issue']);
+        }
+        else $dateTimeObject = new \DateTime();
 
         $body = "<h1>Заказанные товары:</h1><table style='width: 100%;border-collapse: collapse;''>";
 
@@ -178,7 +181,7 @@ class Basket{
 
             if ($res !== true) die("$res | $db->last_query");
 
-            $db->delete('basket', "`user_id`={$user_id} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
+            $db->delete('basket', "`user_id`={$user['id']} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
         }
         $body .= "</table>";
 

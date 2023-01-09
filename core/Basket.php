@@ -63,12 +63,18 @@ class Basket{
                 'store_id' => $row['store_id'],
                 'quan' => $row['quan'],
                 'price' => $row['price'],
-                'comment' => $row['comment']
+                'comment' => $row['comment'],
+                'isToOrder' => $row['isToOrder']
             ];
         }
 
         $storeItems = [];
-        $query = StoreItem::getQueryStoreItem();
+
+        /** @var \mysqli_result $result */
+        $result = User::get(['id' => $user_id]);
+        $userInfo = $result->fetch_assoc();
+
+        $query = StoreItem::getQueryStoreItem($userInfo['discount']);
         $query .= " WHERE si.item_id IN (".implode(',', $itemIdList).")";
         $result = $GLOBALS['db']->query($query);
         foreach($result as $row){
@@ -87,7 +93,7 @@ class Basket{
             $row['stores'] = $storeItems[$item_id];
             foreach($storeItems[$item_id] as $store_id => $store){
                 if ($store_id == $row['store_id']){
-                    $row['price'] = $store['price'];
+                    if ($store['price'] > $row['price']) $row['price'] = $store['price'];
                     $row['withoutMarkup'] = $store['withoutMarkup'];
                 }
             }

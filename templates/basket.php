@@ -5,6 +5,8 @@
 use core\Basket;
 use core\Breadcrumb;
 
+$title = 'Корзина';
+
 if (!$_SESSION['user']) header('Location: /');
 $title = "Корзина";
 $user_id = $_SESSION['user'];

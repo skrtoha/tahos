@@ -174,6 +174,25 @@
                 showAdditionalOptions();
                 return false;
             })
+            $(document).on('change', 'input[name=toOrder]', (e) => {
+                const th = $(e.target);
+                let data = [];
+                let act = th.is(':checked') ? 'isToOrder' : 'noToOrder';
+                data.push({
+                    store_id: th.closest('tr').find('select[name^=store_id]').val(),
+                    item_id: th.closest('tr').attr('item_id')
+                })
+                $.ajax({
+                    type: 'post',
+                    url: "/ajax/basket.php",
+                    data: {
+                        act: act,
+                        user_id: $('input[name=user_id]').val(),
+                        items: data
+                    },
+                    success: function(response){}
+                })
+            })
 		},
         history_search: function(params = {}){
             let uoa = this;
@@ -233,8 +252,16 @@
             let valueSumm = typeof item.price === 'undefined' ? 0 : item.price * item.quan;
             let priceDisabled = valuePrice ? 'disabled' : '';
             let comment = typeof item.comment === 'undefined' ? '' : item.comment;
+            let checkedToOrder = '';
+            if (typeof item.isToOrder !== 'undefined' && +item.isToOrder){
+                checkedToOrder = 'checked';
+            }
+
 			str =
 				'<tr class="item" item_id="' + item_id + '">' +
+                    `<td>
+                        <input title="Отправлять в заказ" type="checkbox" name="toOrder" ${checkedToOrder}>
+                    </td>` +
 					'<td label="Поставищик">' + htmlStores +  '</td>' +
 					'<td label="Бренд">' + item.brend + '</td>' +
 					'<td label="Артикул">' + item.article + '</td>' +

@@ -714,6 +714,7 @@ function basket(){
 					<table class="t_table">
 						<thead>
 							<tr class="head">
+								<th></th>
 								<th>Поставщик</th>
 								<th>Бренд</th>
 								<th>Артикул</th>

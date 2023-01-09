@@ -52,7 +52,7 @@ $(function(){
 		var store_id = e.attr('store_id');
 		var item_id = e.attr('item_id');
 		var packaging = + e.attr('packaging');
-		if (act == 'minus' && + e.find('input').val() - packaging == 0) return false;
+		if (act == 'minus' && + e.find('input').val() - packaging < 0) return false;
 		if (act == 'plus' && + e.find('input').val() + packaging > available) {
 			e.closest('div').nextAll('span.available').addClass('active');
 			return show_message('Превышено доступное количество!', 'error');

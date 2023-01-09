@@ -99,6 +99,7 @@
 						.val(0)
 						.prop('disabled', false);
 				}
+                uoa.addToBasket(uoa.items[item_id])
 				uoa.setTotal();
 			})
 			$(document).on('change', uoa.getSelector('input[name^=price]'), function(){
@@ -120,7 +121,22 @@
 				let item_id = $(this).closest('tr').attr('item_id');
 				$(this).closest('tr').remove();
 				if (!$(uoa.getSelector('tr.item')).size()) $(uoa.getSelector('tr.hiddable')).show();
-				delete uoa.items[item_id];
+
+                let item = uoa.items[item_id];
+                $.ajax({
+                    url: '/ajax/basket.php',
+                    type: 'post',
+                    data: {
+                        act: 'delete',
+                        store_id: item.store_id,
+                        user_id: document.querySelector('input[name=user_id]').value,
+                        item_id: item.item_id
+                    },
+                    success: function(){}
+                })
+
+                delete uoa.items[item_id];
+
 				uoa.setTotal();
 			})
 			$('.users_box').on('click', function(){
@@ -252,9 +268,9 @@
             let valueSumm = typeof item.price === 'undefined' ? 0 : item.price * item.quan;
             let priceDisabled = valuePrice ? 'disabled' : '';
             let comment = typeof item.comment === 'undefined' ? '' : item.comment;
-            let checkedToOrder = '';
-            if (typeof item.isToOrder !== 'undefined' && +item.isToOrder){
-                checkedToOrder = 'checked';
+            let checkedToOrder = 'checked';
+            if (typeof item.isToOrder !== 'undefined' && item.isToOrder == "0"){
+                checkedToOrder = '';
             }
 
 			str =
@@ -290,7 +306,7 @@
 				data: {
 					column: 'getStoreItemsByItemID',
 					item_id: item_id,
-                    user_id: $('div.value input[type=submit]').attr('user_id')
+                    user_id: $('input[name=user_id]').val()
 				},
 				beforeSend: function(){
 					showGif();
@@ -317,7 +333,7 @@
             formData.set('user_id', document.querySelector('input[name=user_id]').value);
             formData.set('store_id', object.store_id);
             formData.set('item_id', object.item_id);
-            formData.set('quan', object.quan);
+            formData.set('quan', typeof object.quan === 'undefined' ? 0 : object.quan);
             formData.set('price', object.price);
 
             showGif(true);

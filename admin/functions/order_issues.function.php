@@ -60,14 +60,16 @@ class Issues{
             if (!$orderValue['is_payed']){
                 $totalSumm += $issued * $orderValue['price'];
             }
+
+            $array = [
+                'order_id' => $a[0],
+                'store_id' => $a[2],
+                'item_id' => $a[1],
+                'issued' => $issued
+            ];
+            if ($isRequestFrom1C) $array['synchronized'] = 1;
 			
-			core\OrderValue::changeStatus(1, [
-				'order_id' => $a[0],
-				'store_id' => $a[2],
-				'item_id' => $a[1], 
-				'issued' => $issued,
-                'synchronized' => 1
-			]);
+			core\OrderValue::changeStatus(1, $array);
 		}
 		
 		core\User::setBonusProgram($this->user_id, $titles, $totalSumm);

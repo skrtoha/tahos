@@ -56,15 +56,25 @@ switch($request['act']){
         $data = json_decode($_POST['data'], true);
         $orderValues = [];
         $orderValuesResult = \core\OrderValue::get(['osi' => array_keys($data)]);
+        $isAllItemsIssued = [];
         foreach($orderValuesResult as $ov){
+            $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+            if ($ov['issued'] >= $data[$osi]) $isAllItemsIssued[$osi] = true;
+            else $isAllItemsIssued = false;
+
             $user_id = $ov['user_id'];
             break;
         }
+
         $income = [];
         foreach($data as $key => $value){
             $array = explode('-', $key);
+            if ($isAllItemsIssued[$key]) continue;
             $income["{$array[0]}:{$array[2]}:{$array[1]}"] = $value;
         }
+
+        if (empty($income)) break;
+
 		$issues = new \Issues($user_id, $db);
 		$issues->setIncome($income, true);
 		break;

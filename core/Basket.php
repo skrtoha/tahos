@@ -55,7 +55,7 @@ class Basket{
         $itemIdList = [];
         foreach($res_basket as $row){
             $itemIdList[] = $row['item_id'];
-            $output[$row['item_id']] = [
+            $output["{$row['item_id']}-{$row['store_id']}"] = [
                 'article' => $row['article'],
                 'brend' => $row['brend'],
                 'item_id' => $row['item_id'],
@@ -89,9 +89,10 @@ class Basket{
             ];
         }
 
-        foreach($output as $item_id => & $row){
-            $row['stores'] = $storeItems[$item_id];
-            foreach($storeItems[$item_id] as $store_id => $store){
+        foreach($output as $value => & $row){
+            $array = explode('-', $value);
+            $row['stores'] = $storeItems[$array[0]];
+            foreach($storeItems[$array[0]] as $store_id => $store){
                 if ($store_id == $row['store_id']){
                     if ($store['price'] > $row['price']) $row['price'] = $store['price'];
                     $row['withoutMarkup'] = $store['withoutMarkup'];

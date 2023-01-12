@@ -11,7 +11,7 @@ $db->setProfiling();
 
 $user_id = $_POST['user_id'] ?? $_SESSION['user'];
 
-$db->insert(
+$res = $db->insert(
 	'basket',
 	[
 		'user_id' => $user_id,
@@ -24,6 +24,7 @@ $db->insert(
 		'quan' => "{$_POST['quan']}"
 	]]
 );
+
 echo (json_encode(get_basket()));
 ?>
 		

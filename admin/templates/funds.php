@@ -1,4 +1,8 @@
 <?php
+/** @global Database $db */
+
+use core\Database;
+
 $act = $_GET['act'];
 $id = $_GET['id'];
 switch ($act) {

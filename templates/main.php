@@ -29,6 +29,9 @@ use core\Setting;
     <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
         <link href="/vendor/pickmeup/pickmeup.css" rel="stylesheet" type="text/css" />
     <?}?>
+    <?if (in_array($view, ['basket'])){?>
+        <link href="/vendor/basketAdditionalOptions/style.css" rel="stylesheet" type="text/css" />
+    <?}?>
     <?if (in_array($view, ['article', 'orders'])){?>
         <link rel="stylesheet" type="text/css" href="/css/provider_info.css">
     <?}?>

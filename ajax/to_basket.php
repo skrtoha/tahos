@@ -9,10 +9,12 @@ $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
-$db->insert(
+$user_id = $_POST['user_id'] ?? $_SESSION['user'];
+
+$res = $db->insert(
 	'basket',
 	[
-		'user_id' => $_SESSION['user'], 
+		'user_id' => $user_id,
 		'store_id' => $_POST['store_id'], 
 		'item_id' => $_POST['item_id'],
 		'quan' => $_POST['quan'], 
@@ -22,6 +24,7 @@ $db->insert(
 		'quan' => "{$_POST['quan']}"
 	]]
 );
+
 echo (json_encode(get_basket()));
 ?>
 		

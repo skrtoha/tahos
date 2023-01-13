@@ -10,7 +10,7 @@ $db->setProfiling();
 
 $store_id = $_POST['store_id'];
 $item_id = $_POST['item_id'];
-$user_id = $_SESSION['user'];
+$user_id = $_SESSION['user'] ?? $_POST['user_id'];
 // print_r($_POST);
 switch ($_POST['act']){
 	case 'delete':

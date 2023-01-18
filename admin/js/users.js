@@ -59,10 +59,6 @@
 				e.preventDefault();
 				uoa.getHtmlStores($(this).attr('item_id'));
 			})
-			$(uoa.getSelector('input[type=submit]')).on('click', function(){
-				if ($(this).attr('is_draft')) $('input[name=is_draft]').val(1);
-				else $('input[name=is_draft]').val(0);
-			})
 			$(uoa.getSelector('#added_items')).on('submit', function(e){
 				var is_valid = true;
 				$(this).find('input[name^=price]').each(function(){
@@ -85,26 +81,32 @@
                 let item_id = tr.attr('item_id');
                 let store_id = th.val();
                 let store = uoa.items[item_id].stores[store_id];
-                uoa.items[item_id].store_id = store_id;
-                uoa.items[item_id].price = store.price;
-                uoa.items[item_id].withoutMarkup = store.withoutMarkup;
-				if (typeof store !== 'undefined'){
-					tr.find('input[name^=withoutMarkup]').val(store.withoutMarkup);
-					tr.find('input[name^=price]')
-						.val(store.price)
-						.prop('disabled', true);
-				}
-				else{
-					tr.find('input[name^=price]')
-						.val(0)
-						.prop('disabled', false);
-				}
-                uoa.addToBasket(uoa.items[item_id])
+                if ( typeof store === 'undefined'){
+                    uoa.items[item_id].store_id = 0;
+                    uoa.items[item_id].price = 0;
+                    uoa.items[item_id].withoutMarkup = 0;
+
+                    tr.find('input[name^=price]')
+                        .val(0)
+                        .prop('disabled', false);
+                }
+                else {
+                    uoa.items[item_id].store_id = store_id;
+                    uoa.items[item_id].price = store.price;
+                    uoa.items[item_id].withoutMarkup = store.withoutMarkup;
+                    tr.find('input[name^=withoutMarkup]').val(store.withoutMarkup);
+                    tr.find('input[name^=price]')
+                        .val(store.price)
+                        .prop('disabled', true);
+                }
+                // uoa.addToBasket(uoa.items[item_id])
 				uoa.setTotal();
+                uoa.setChangesExist();
 			})
 			$(document).on('change', uoa.getSelector('input[name^=price]'), function(){
 				if (!uoa.reg_int.test($(this).val())) return show_message('Значение цены задано неккоректно!', 'error');
 				uoa.setTotal();
+                uoa.setChangesExist();
 			})
 			$(document).on('change', uoa.getSelector('input[name^=quan]'), function(){
 				let th = $(this);
@@ -112,9 +114,13 @@
                 if (!uoa.reg_int.test(quan)) return show_message('Значение количества задано неккоректно!', 'error');
 				let item_id = th.closest('tr').attr('item_id');
                 uoa.items[item_id].quan = quan;
-                uoa.addToBasket(uoa.items[item_id]);
+                // uoa.addToBasket(uoa.items[item_id]);
                 uoa.setTotal();
+                uoa.setChangesExist();
 			})
+            $(document).on('change', uoa.getSelector('input[name^=toOrder]'), function(){
+                uoa.setChangesExist();
+            })
 			$(document).on('click', uoa.getSelector('span.icon-cancel-circle1'), function(e){
 				e.preventDefault();
 				if (!confirm('Вы действительно хотите удалить?')) return false;
@@ -122,22 +128,9 @@
 				$(this).closest('tr').remove();
 				if (!$(uoa.getSelector('tr.item')).size()) $(uoa.getSelector('tr.hiddable')).show();
 
-                let item = uoa.items[item_id];
-                $.ajax({
-                    url: '/ajax/basket.php',
-                    type: 'post',
-                    data: {
-                        act: 'delete',
-                        store_id: item.store_id,
-                        user_id: document.querySelector('input[name=user_id]').value,
-                        item_id: item.item_id
-                    },
-                    success: function(){}
-                })
-
                 delete uoa.items[item_id];
-
 				uoa.setTotal();
+                uoa.setChangesExist();
 			})
 			$('.users_box').on('click', function(){
 				document.location.href = "?view=users&act=funds&id=" + $(this).attr('user_id');
@@ -182,34 +175,20 @@
                 e.preventDefault();
                 modal_show();
             })
-            $('#added_items input[type=submit]').on('click', e => {
-                $.cookie('additional_options', '');
-            })
-            $('#mgn_popup a[href="/basket/to_offer"]').on('click', function(e){
-                e.preventDefault();
-                showAdditionalOptions();
-                return false;
-            })
-            $(document).on('change', 'input[name=toOrder]', (e) => {
-                const th = $(e.target);
-                let data = [];
-                let act = th.is(':checked') ? 'isToOrder' : 'noToOrder';
-                data.push({
-                    store_id: th.closest('tr').find('select[name^=store_id]').val(),
-                    item_id: th.closest('tr').attr('item_id')
-                })
-                $.ajax({
-                    type: 'post',
-                    url: "/ajax/basket.php",
-                    data: {
-                        act: act,
-                        user_id: $('input[name=user_id]').val(),
-                        items: data
-                    },
-                    success: function(response){}
-                })
+            $('input.save').on('click', (e) => {
+                $('input[name=save_basket]').val(1);
             })
 		},
+        setChangesExist: () => {
+            $('input.save').prop('disabled', false);
+            $('input.send').prop('disabled', true);
+            $('input[name^=price]').each((i, item) => {
+                if (item.value == "0") $('input.save').prop('disabled', true);
+            })
+            $('input[name^=quan]').each((i, item) => {
+                if (item.value == "0") $('input.save').prop('disabled', true);
+            })
+        },
         history_search: function(params = {}){
             let uoa = this;
             let dataSource = '/admin/?view=users&id=' + $('input[name=user_id]').val() + '&ajax=history_search';
@@ -266,8 +245,8 @@
             let valuePrice = typeof item.price === 'undefined' ? 0 : item.price;
             let valueQuan = typeof item.quan === 'undefined' ? 0 : item.quan;
             let valueSumm = typeof item.price === 'undefined' ? 0 : item.price * item.quan;
-            let priceDisabled = valuePrice ? 'disabled' : '';
-            let comment = typeof item.comment === 'undefined' ? '' : item.comment;
+            let priceDisabled = htmlStores ? 'disabled' : '';
+            let comment = typeof item.comment === 'undefined' || item.comment == null ? '' : item.comment;
             let checkedToOrder = 'checked';
             if (typeof item.isToOrder !== 'undefined' && item.isToOrder == "0"){
                 checkedToOrder = '';
@@ -276,7 +255,7 @@
 			str =
 				'<tr class="item" item_id="' + item_id + '">' +
                     `<td>
-                        <input title="Отправлять в заказ" type="checkbox" name="toOrder" ${checkedToOrder}>
+                        <input title="Отправлять в заказ" value="1" type="checkbox" name="toOrder[${item_id}]" ${checkedToOrder}>
                     </td>` +
 					'<td label="Поставищик">' + htmlStores +  '</td>' +
 					'<td label="Бренд">' + item.brend + '</td>' +
@@ -286,10 +265,10 @@
 						<input value="${valueWithoutMarkup}" type="hidden" name="withoutMarkup[${item_id}]">
 						<input ${priceDisabled} value="${valuePrice}" type="text" name="price[${item_id}]">
 					</td>` +
-					`<td label="Количество"><input value="${valueQuan}" type="text" name="quan[' + item_id + ']"></td>` +
+					`<td label="Количество"><input value="${valueQuan}" type="text" name="quan[${item_id}]"></td>` +
 					`<td label="Сумма"><span value="0" class="summ">${valueSumm}</span></td>` +
 					`<td label="Комментарий">
-					    <textarea name="comment[' + item_id + ']">${comment}</textarea>
+					    <textarea name="comment[${item_id}]">${comment}</textarea>
                     </td>` +
 					`<td>
 						<span class="icon-cancel-circle1 delete"></span>

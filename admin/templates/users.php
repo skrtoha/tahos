@@ -678,6 +678,26 @@ function funds(){
 function basket(){
 	global $status, $db, $page_title;
 	if (!empty($_POST)){
+        if ($_POST['save_basket']){
+            $db->delete('basket', "`user_id` = {$_GET['id']}");
+            foreach($_POST['comment'] as $key => $value){
+                $array = explode('-', $key);
+                $item_id = $array[0];
+                $store_id = $array[1];
+                $db->insert('basket', [
+                    'user_id' => $_GET['id'],
+                    'store_id' => $_POST['store_id'][$key],
+                    'item_id' => $item_id,
+                    'quan' => $_POST['quan'][$key],
+                    'price' => $_POST['price'][$key],
+                    'comment' => $_POST['comment'][$key],
+                    'isToOrder' => $_POST['toOrder'][$key] ?? "0"
+                ]);
+            }
+            header("Location: {$_SERVER['HTTP_REFERER']}");
+            die();
+        }
+
         /** @var mysqli_result $res_user */
         $res_user = User::get(['user_id' => $_GET['id']]);
 
@@ -734,8 +754,9 @@ function basket(){
 					</table>
 					<p>Итого: <span class="total">0</span> руб.</p>
 					<div class="value">
-						<input type="hidden" name="is_draft" value="0">
-						<input type="submit" class="button" value="Отправить в заказ">
+                        <input type="hidden" name="save_basket" value="0">
+                        <input type="submit" class="save" disabled value="Сохранить">
+						<input type="submit" class="send" class="button" value="Отправить в заказ">
 					</div>
 				</form>
 			</div>

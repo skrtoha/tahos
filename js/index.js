@@ -1,4 +1,6 @@
 $(function(){
+    $.mask.definitions['~'] = '[+-]';
+    $("input[name=phone]").mask("+7 (999) 999-99-99");
 	/* actions slider */
 	$(".actions_slider").owlCarousel({
 		items: 1,

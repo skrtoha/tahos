@@ -96,4 +96,8 @@ $(function(){
 		more.closest('ul').find('li').removeClass('hidden');
 		more.remove();
 	})
+    $('div.selection.spare_parts_request > div.left > form').on('submit', (e) => {
+        e.preventDefault();
+        document.location.href = "/original-catalogs/legkovie-avtomobili#/carInfo?q=" + $('input[name=q]').val();
+    })
 });

@@ -93,6 +93,10 @@
 }
 
 #spare_parts_request .selection input::placeholder{
+    text-transform: uppercase;
+}
+
+#spare_parts_request .selection input::placeholder{
     color: #bbbbbb;
 }
 
@@ -114,6 +118,14 @@
 
 #spare_parts_request label.description textarea{
     height: 34px;
+}
+#spare_parts_request label.description textarea::after{
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-bottom: 100px solid red;
+    border-left: 100px solid transparent;
 }
 
 #spare_parts_request label.phone {
@@ -264,6 +276,8 @@
     #spare_parts_request textarea{
         max-width: none;
         width: 100%;
+        resize: none;
+        height: 66px !important;
     }
     #spare_parts_request label input{
         width: 100%;

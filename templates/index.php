@@ -97,11 +97,11 @@ $res_vehicles = $db->query("
                     <div class="selection car_issue_year">
                         <label class="car">
                             <span>автомобиль</span>
-                            <input placeholder="Renault Sandero II" type="text" name="car">
+                            <input placeholder="Suzuki SX4" type="text" name="car">
                         </label>
                         <label class="issue_year">
                             <span>год</span>
-                            <input placeholder="2003" type="text" name="issue_year">
+                            <input placeholder="2021" type="text" name="issue_year">
                         </label>
                     </div>
                     <div class="selection">
@@ -123,6 +123,7 @@ $res_vehicles = $db->query("
                         <label class="description">
                             <span>требуемые запчасти</span>
                             <textarea required name="description"></textarea>
+
                         </label>
                     </div>
                     <input type="submit" value="Отправить">

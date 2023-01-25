@@ -122,7 +122,7 @@ $res_vehicles = $db->query("
                     <div class="selection">
                         <label class="description">
                             <span>требуемые запчасти</span>
-                            <input required name="description">
+                            <textarea required name="description"></textarea>
                         </label>
                     </div>
                     <input type="submit" value="Отправить">

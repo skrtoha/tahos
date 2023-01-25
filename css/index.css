@@ -108,6 +108,10 @@
     display: block;
 }
 
+#spare_parts_request label.description textarea{
+    height: 34px;
+}
+
 #spare_parts_request label.phone {
     width: 142px;
     display: block;

@@ -6,6 +6,10 @@
     position: relative
 }
 
+#selection .selection:first-child{
+    border: none;
+}
+
 .selection p {
     font-size: 14px;
     line-height: 18px;

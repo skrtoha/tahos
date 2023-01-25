@@ -236,6 +236,8 @@
     }
     .selection.spare_parts_request{
         display: block;
+        padding: 0;
+        border: none;
     }
     .selection > .left{
         float: none;

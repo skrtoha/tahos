@@ -232,7 +232,7 @@ function store_items(store_items, user, search_type = null){
          * @type {[string]}
          */
         var button_row = (csi <= 2) ? 'button-row' : '';
-        var empty = !csi ? 'empty' : '';
+        var empty = '';
         var si_price = si.min_price;
         if (csi > 1) var si_delivery = si.min_delivery;
         else si_delivery = false;

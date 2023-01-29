@@ -1,5 +1,6 @@
 <?php
 namespace core;
+use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
@@ -20,8 +21,14 @@ class Mailer{
         $this->password = $settings->password;
         $this->host = $settings->host;
     }
-    
-	public function send($params, $attachments = []){
+
+    /**
+     * @param array $params emails, body, subject
+     * @param array $attachments
+     * @return string|true
+     * @throws Exception
+     */
+	public function send($params, array $attachments = []){
 		if (!Config::$isSendEmails) return true;
   
 		$mail = new PHPMailer();

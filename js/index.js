@@ -1,4 +1,6 @@
 $(function(){
+    $.mask.definitions['~'] = '[+-]';
+    $("input[name=phone]").mask("+7 (999) 999-99-99");
 	/* actions slider */
 	$(".actions_slider").owlCarousel({
 		items: 1,
@@ -94,4 +96,8 @@ $(function(){
 		more.closest('ul').find('li').removeClass('hidden');
 		more.remove();
 	})
+    $('div.selection.spare_parts_request > div.left > form').on('submit', (e) => {
+        e.preventDefault();
+        document.location.href = "/original-catalogs/legkovie-avtomobili#/carInfo?q=" + $('input[name=q]').val();
+    })
 });

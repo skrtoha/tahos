@@ -6,13 +6,17 @@
     position: relative
 }
 
+#selection .selection:first-child{
+    border: none;
+}
+
 .selection p {
     font-size: 14px;
     line-height: 18px;
     color: #5f5f5f;
 }
 
-.selection form {
+.selection > form {
     display: flex;
     justify-content: space-between;
 }
@@ -22,6 +26,138 @@
     height: 34px;
     position: relative;
     cursor: pointer
+}
+
+.selection > .left{
+    float: left;
+}
+
+.selection.spare_parts_request{
+    display: flex;
+    justify-content: space-between;
+}
+
+.selection.spare_parts_request .right{
+    width: 760px;
+    margin-left: 20px;
+}
+
+.selection.spare_parts_request .left{
+}
+
+.icon-search:before {
+    content: "\e986";
+}
+
+.selection.spare_parts_request .left button{
+    display: block;
+    outline: 0;
+    cursor: pointer;
+    padding: 0;
+    position: absolute;
+    right: 10px;
+    top: 0;
+    font-size: 20px;
+    background: none;
+    color: #727272;
+}
+
+.selection.spare_parts_request .left .description{
+    padding: 20px 0;
+}
+
+#spare_parts_request .selection{
+    padding: 5px;
+    border: none;
+    margin: 0;
+}
+
+#spare_parts_request .selection label.vin{
+    width: 300px;
+    display: block;
+    min-width: 340px;
+}
+
+#spare_parts_request .selection label.car,
+#spare_parts_request .selection label.issue_year{
+    display: inline-block;
+}
+
+#spare_parts_request .selection label.issue_year{
+    width: 57px;
+}
+
+#spare_parts_request .selection input{
+    font-size: 14px;
+    width: 100%;
+}
+
+#spare_parts_request .selection input::placeholder{
+    text-transform: uppercase;
+}
+
+#spare_parts_request .selection input::placeholder{
+    color: #bbbbbb;
+}
+
+#spare_parts_request input[type=submit]{
+    float: none;
+    margin-top: 25px;
+}
+
+#spare_parts_request .selection label span{
+    font-size: 15px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+#spare_parts_request label.description {
+    width: 210px;
+    display: block;
+}
+
+#spare_parts_request label.description textarea{
+    height: 34px;
+}
+#spare_parts_request label.description textarea::after{
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-bottom: 100px solid red;
+    border-left: 100px solid transparent;
+}
+
+#spare_parts_request label.phone {
+    width: 142px;
+    display: block;
+}
+
+#spare_parts_request{
+    background: #ebf0f1;
+    padding: 20px;
+}
+#spare_parts_request .flex{
+    display: flex;
+    background: #ebf0f1;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.selection.spare_parts_request span.example {
+    border-bottom: 1px dashed;
+}
+
+.selection.spare_parts_request form.spare_parts_request{
+    position: relative;
+}
+
+.selection.spare_parts_request form.spare_parts_request label{
+    width: 100%;
+}
+
+.selection.spare_parts_request form.spare_parts_request input{
+    width: 100%;
 }
 
 #selection .categories {
@@ -62,6 +198,12 @@
     margin-top: 10px;
 }
 
+@media screen and (max-width: 835px){
+    #spare_parts_request .selection:first-child{
+        display: none;
+    }
+}
+
 @media screen and (max-width:1100px) {
     .selection form {
         flex-wrap: wrap;
@@ -92,6 +234,19 @@
     .selection .select:nth-child(4) {
         margin: 0 0 22px
     }
+    .selection.spare_parts_request{
+        display: block;
+        padding: 0;
+        border: none;
+    }
+    .selection > .left{
+        float: none;
+    }
+    .selection.spare_parts_request .right{
+        width: auto;
+        margin-left: 0;
+        margin-top: 20px;
+    }
 }
 
 @media screen and (max-width: 550px){
@@ -111,5 +266,33 @@
 
     #selection .categories .category .right {
         display: none;
+    }
+}
+@media screen and (max-width: 500px){
+    #spare_parts_request .selection{
+        width: 100%;
+    }
+    #spare_parts_request label{
+        width: 100%;
+    }
+    #spare_parts_request textarea{
+        max-width: none;
+        width: 100%;
+        resize: none;
+        height: 66px !important;
+    }
+    #spare_parts_request label input{
+        width: 100%;
+    }
+    #spare_parts_request .selection label.vin,
+    #spare_parts_request .selection label.phone,
+    #spare_parts_request .selection label.name,
+    #spare_parts_request .selection label.description
+    {
+        width: 100%;
+        min-width: auto;
+    }
+    #spare_parts_request .selection label.car{
+        width: calc(100% - 61px);
     }
 }

@@ -1,5 +1,7 @@
 <?
 namespace admin\functions;
+use core\Database;
+
 class LeftMenu{
 	public static $commonPermisions = [
 		'Номенклатура' => [
@@ -153,16 +155,34 @@ class LeftMenu{
 
 	public static function getCountNew(string $view): int
 	{
+        /** @global Database  $db */
+        $db = $GLOBALS['db'];
 		switch($view){
 			case 'returns':
 			case 'orders':
 			case 'funds':
-				return $GLOBALS['db']->getCount($view, '`is_new` = 1');
-				break;
+				return $db->getCount($view, '`is_new` = 1');
 			case 'messages':
-				return $GLOBALS['db']->getCount('messages', '`is_read` = 0 AND sender = 1');
-				break;
-			default: return 0;
+                $result = $db->query("
+                    select
+                        count(*) as cnt
+                    from
+                        #messages
+                    where `is_read` = 0 AND sender = 1
+                    
+                    union
+                    
+                    select
+                        count(*) as cnt
+                    from
+                        #spare_parts_request
+                    where is_new = 1
+                ");
+                $count = 0;
+                foreach($result as $row) $count += $row['cnt'];
+				return $count;
+			default:
+                return 0;
 		}
 	}
 }

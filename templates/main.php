@@ -19,7 +19,6 @@ use core\Setting;
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<!-- Template Basic Images Start -->
-	<meta property="og:image" content="path/to/image.jpg">
 	<link rel="shortcut icon" href="/img/favicon/favicon.png" type="image/x-icon">
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-touch-icon-72x72.png">
@@ -45,7 +44,7 @@ use core\Setting;
         <link rel="stylesheet" href="/vendor/addressee/jquery.fias.min.css">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>
-    <?if (in_array($view, ['basket'])){?>
+    <?if (in_array($view, ['basket', 'index', 'article'])){?>
         <link rel="stylesheet" href="/admin/fonts/icomoon.eot">
         <link rel="stylesheet" href="/vendor/addressee/style.css">
     <?}?>

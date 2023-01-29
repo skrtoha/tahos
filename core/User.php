@@ -394,4 +394,32 @@ class User{
         return $db->query($query)->fetch_all(MYSQLI_ASSOC);
     }
 
+
+    public static function setSparePartsRequest($params){
+        /** @var \core\Database $db */
+        $db = $GLOBALS['db'];
+
+        $params['ip'] = $_SERVER['REMOTE_ADDR'];
+
+        $result = $db->insert('spare_parts_request', $params);
+
+        if ($result !== true) return false;
+
+        $mailer = new Mailer(Mailer::TYPE_INFO);
+        $body = "Пришел запрос с сайта на подбор запчастей:<br>";
+        $body .= "<b>vin:</b> {$params['vin']}<br>";
+        $body .= "<b>автомобить:</b> {$params['car']}<br>";
+        $body .= "<b>год выпуска</b>: {$params['issue_year']}<br>";
+        $body .= "<b>описание</b>: {$params['description']}<br>";
+        $body .= "<b>телефон</b>: {$params['phone']}<br>";
+        $body .= "<b>имя</b>: {$params['name']}<br>";
+        $mailer->send([
+            'emails' => 'info@tahos.ru',
+            'body' => $body,
+            'subject' => 'Запрос на подбор запчастей'
+        ]);
+
+        return $result;
+    }
+
 }

@@ -83,6 +83,7 @@ $res_vehicles = $db->query("
             <h2>Подбор запчастей экспертом</h2>
             <p></p>
             <form id="spare_parts_request" action="#" method="post">
+                <input type="hidden" name="user_id" value="<?= $_SESSION['user'] ?? '' ?>">
                 <div class="flex">
                     <div class="selection">
                         <img src="/img/icons/spare_parts_icon.svg" alt="">
@@ -115,7 +116,7 @@ $res_vehicles = $db->query("
                     <div class="selection">
                         <label class="name">
                             <span>имя</span>
-                            <?$value = isset($user['name']) && $user['name'] ? $user['name'] : '';?>
+                            <?$value = isset($user['full_name']) && $user['full_name'] ? $user['full_name'] : '';?>
                             <input required type="text" name="name" value="<?=$value?>">
                         </label>
                     </div>

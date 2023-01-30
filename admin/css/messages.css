@@ -5,7 +5,3 @@ span.count_spare_parts_request{
 table.spare_parts_request tr{
     cursor: pointer;
 }
-#spare_parts_request a{
-    display: block;
-    margin: 10px;
-}

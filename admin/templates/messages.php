@@ -186,6 +186,17 @@ function spare_parts_request(){
                     <?=DateTime::createFromFormat('Y-m-d H:i:s', $requestInfo['created'])->format('d.m.Y H:i:s')?>
                 </div>
             </div>
+            <?if ($requestInfo['user_id']){?>
+                <div class="field">
+                    <div class="title">Пользователь</div>
+                    <div class="value">
+                        <a href="/admin/?view=users&act=change&id=<?=$requestInfo['user_id']?>">
+                            Карточка пользователя
+                        </a>
+                    </div>
+                </div>
+            <?}?>
+            
 		</div>
         <a href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
 	</div>

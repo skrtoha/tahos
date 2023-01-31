@@ -553,15 +553,15 @@ abstract class Provider{
 		", '');
 		$items = array();
 		foreach($res_providers as $p){
-			switch($p['title']){
-				case 'М Партс':
-				case 'Армтек':
-				case 'Авторусь':
-				case 'Rossko':
-				case 'Forum-Avto':
-				case 'Autoeuro':
-					$output = Provider\Abcp::getItemsToOrder($p['id']);
-					break;
+			switch($p['id']){
+				case 13://'М Партс'
+				case 2://'Армтек':
+				case 6://'Авторусь':
+				case 15://'Rossko':
+				case 17://'Forum-Avto':
+                case 18://'Autoeuro':
+                    $output = Provider\Abcp::getItemsToOrder($p['id']);
+                    break;
 				default:
 					eval("\$output = core\\Provider\\".$p['api_title']."::getItemsToOrder(".$p['id'].");");
 			}

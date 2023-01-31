@@ -9,40 +9,48 @@ use core\Sms\SmsAero;
 class OrderValue{
 	public static $countOrdered = 0;
 	public static function setFunds($params){
+        $update = ['reserved_funds' => "`reserved_funds` - " .$params['totalSumm']];
         /** @var \mysqli_result $res_user */
 		$res_user = User::get(['user_id' => $params['user_id']]);
-		$user = $res_user->fetch_assoc();
+        foreach($res_user as $value) $user = $value;
 
-        $remainder = $user['bill'] - $params['totalSumm'];
+        if ($user['user_type'] == 'private'){
+            $remainder = $user['bill_cash'] - $params['totalSumm'];
+            $bill = $user['bill_cash'];
+            $bill_type = User::BILL_TYPE_CASH;
+            $update['bill_cash'] = "`bill_cash` - " . $params['totalSumm'];
+        }
+        else{
+            $remainder = $user['bill_cashless'] - $params['totalSumm'];
+            $bill = $user['bill_cashless'];
+            $bill_type = User::BILL_TYPE_CASHLESS;
+            $update['bill_cashless'] = "`bill_cashless` - " . $params['totalSumm'];
+        }
+
 
 		//вычисление задолженности
 		$overdue = 0;
-		if ($user['bill'] < $params['totalSumm']){
-			if ($user['bill'] > 0) $overdue = $params['totalSumm'] - $user['bill'];
+		if ($bill < $params['totalSumm']){
+			if ($bill > 0) $overdue = $params['totalSumm'] - $bill;
 			else $overdue = $params['totalSumm'];
 		}
 
         $paid = 0;
-        if ($user['bill'] - $params['totalSumm'] > 0) $paid = $params['totalSumm'];
-        elseif ($user['bill'] > 0 && $remainder < 0) $paid = $user['bill'];
+        if ($bill - $params['totalSumm'] > 0) $paid = $params['totalSumm'];
+        elseif ($bill > 0 && $remainder < 0) $paid = $bill;
 
 		Fund::insert(2, [
-			'sum' => $params['totalSumm'],
-			'remainder' => $remainder,
-			'user_id' => $params['user_id'],
+            'sum' => $params['totalSumm'],
+            'remainder' => $remainder,
+            'user_id' => $params['user_id'],
             'issue_id' => $params['issue_id'],
             'paid' => $paid,
-			'overdue' => $overdue,
-			'comment' => 'Реализация товаров'
-		]);
+            'overdue' => $overdue,
+            'comment' => 'Реализация товаров',
+            'bill_type' => $bill_type
+        ]);
 
-		User::update(
-			$params['user_id'],
-			[
-				'reserved_funds' => "`reserved_funds` - " .$params['totalSumm'],
-				'bill' => "`bill` - " . $params['totalSumm']
-			]
-		);
+        User::update($params['user_id'], $update);
 	}
     
     /**
@@ -368,7 +376,8 @@ class OrderValue{
 				o.user_id,
 				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS created,
 				" . User::getUserFullNameForQuery() . " AS userName,
-				u.bill,
+				u.bill_cash,
+				u.bill_cashless,
 				u.email,
 				u.reserved_funds,
 				u.user_type AS typeOrganization,
@@ -540,7 +549,8 @@ class OrderValue{
                 min(ps.delivery) as min_delivery,
                 max(ps.delivery) as max_delivery,
                 o.user_id,
-                u.bill,
+                u.bill_cash,
+                u.bill_cashless,
                 u.reserved_funds,
                 u.defermentOfPayment,
                 o.pay_type,

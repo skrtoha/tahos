@@ -531,9 +531,17 @@ function show_form($act){
 					<div class="value"><input type=text name="markup" value="<?=$_POST['markup'] ? $_POST['markup'] : $user['markup']?>"></div>
 				</div>
 				<div class="field">
-					<div class="title">Кредитный лимит</div>
-					<div class="value"><input type="text" name="credit_limit" value="<?=$_POST['credit_limit'] ? $_POST['credit_limit'] : $user['credit_limit']?>"></div>
+					<div class="title">Кредитный лимит<br>наличные</div>
+					<div class="value">
+                        <input type="text" name="credit_limit_cash" value="<?=$_POST['credit_limit_cash'] ?: $user['credit_limit_cash']?>">
+                    </div>
 				</div>
+                <div class="field">
+                    <div class="title">Кредитный лимит<br>безналичные</div>
+                    <div class="value">
+                        <input type="text" name="credit_limit_cashless" value="<?=$_POST['credit_limit_cashless'] ?: $user['credit_limit_cashless']?>">
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Отсрочка платежа</div>
 					<div class="value">
@@ -561,19 +569,31 @@ function show_form($act){
 function form_operations($act){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];
-	$user = $db->select('users', 'name_1,name_2,name_3,bill', '`id`='.$id);
+
+    /** @var mysqli_result $user */
+	$user = User::get(['user_id' => $id]);
+    $user = $user->fetch_assoc();
+
 	if ($_POST['form_operations_submit']){
 		$_POST['sum'] = str_replace(array(' ', ','), '', $_POST['sum']);
-		$curr_bill = $user[0]['bill'] + $_POST['sum'];
-		$array = array(
-			'sum' => $_POST['sum'], 
-			'remainder' => $curr_bill, 
-			'user_id' => $id, 
-			'comment' => 'Пополнение '.$_POST['replenishment']
-		);
+        $array = array(
+            'sum' => $_POST['sum'],
+            'user_id' => $id,
+            'comment' => 'Пополнение '.$_POST['replenishment'],
+            'bill_type' => $_POST['bill_type']
+        );
+		if($_POST['bill_type'] == User::BILL_TYPE_CASH){
+            $array['remainder'] = $user['bill_cash'] + $_POST['sum'];
+            $arrayUser = ['bill_cash' => $array['remainder']];
+        }
+        else{
+            $array['remainder'] = $user['bill_cashless'] + $_POST['sum'];
+            $arrayUser = ['bill_cashless' => $array['remainder']];
+        }
+
 		core\Fund::insert(1, $array);
 		$db->insert('funds', $array);
-		$db->update('users', array('bill' => $curr_bill), '`id`='.$id);
+		$db->update('users', $arrayUser, '`id`='.$id);
 		core\User::checkOverdue($id, $_POST['sum']);
         User::checkDebt($id, $_POST['sum']);
 		message('Счет успешно пополнен!');
@@ -594,16 +614,25 @@ function form_operations($act){
 					<div class="value"><input class="price_format" type="text" name="sum" required value="<?=$_POST['sum']?>"></div>
 				</div>
 				<div class="field">
-					<div class="title">Источник пополнеия</div>
+					<div class="title">Источник пополнения</div>
 					<div class="value">
 						<?$replenishments = $db->select('replenishments', '*');?>
 						<select name="replenishment">
-						<?foreach($replenishments as $replenishment){?>
-							<option value="<?=$replenishment['title']?>"><?=$replenishment['title']?></option>
-						<?}?>
+                            <?foreach($replenishments as $replenishment){?>
+                                <option value="<?=$replenishment['title']?>"><?=$replenishment['title']?></option>
+                            <?}?>
 						</select>
 					</div>
 				</div>
+                <div class="field">
+                    <div class="title">Тип счета</div>
+                    <div class="value">
+                        <select name="bill_type">
+                            <option value="<?=User::BILL_TYPE_CASH?>">наличный</option>
+                            <option value="<?=User::BILL_TYPE_CASHLESS?>">безналичный</option>
+                        </select>
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title"></div>
 					<div class="value"><input type="submit" value="Сохранить"></div>

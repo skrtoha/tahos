@@ -4,6 +4,9 @@ namespace core;
 use mysqli_result;
 
 class User{
+    const BILL_TYPE_CASH = 1;
+    const BILL_TYPE_CASHLESS = 2;
+
     public static $fetched;
 	public static function noOverdue($user_id){
 		$query = Fund::getQueryListFunds(

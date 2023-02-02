@@ -44,37 +44,13 @@ function message($text, $type = true){
 }
 function get_bill(){
 	global $db;
-	$user = $db->select('users', 'currency_id,bill', '`id`='.$_SESSION['user']); $user = $user[0];
-	if (!$user['bill']) return 'нет средств';
-	$currency = $db->select('currencies', 'rate,designation', '`id`='.$user['currency_id']); $currency = $currency[0];
-	switch ($user['currency_id']){
-		case 1:
-			$result = round($user['bill']/$currency['rate']);
-			return "<span class='price_format'>$result</span>".$currency['designation'];
-			break;
-		case 6:
-			$result = round($user['bill']/$currency['rate']*10);
-			return "<span class='price_format'>$result</span>".$currency['designation'];
-			break;
-		default:
-			$result = round($user['bill']/$currency['rate'], 2);
-			return "<span class='price_format_2'>$result</span>".$currency['designation'];
-	}
-}
-function payment_funds($type, $user, $difference = false){
-	global $db;
-	if (!$user[$type]) return '0';
-	if ($difference) $user[$type] = $user['bill'] - $user['reserved_funds'];
-	$currency = $db->select('currencies', 'rate,designation', '`id`='.$user['currency_id']); $currency = $currency[0];
-	switch ($user['currency_id']){
-		case 1:
-			$result = round($user[$type]/$currency['rate']);
-			return "<span class='price_format'>$result</span>";
-			break;
-		default:
-			$result = round($user[$type]/$currency['rate'], 2);
-			return "<span class='price_format_2'>$result</span>";
-	}
+
+    $res_user = \core\User::get(['user_id' => $_SESSION['user']]);
+    foreach($res_user as $value) $user = $value;
+
+	if (!$user['bill_total']) return 'нет средств';
+
+    return "<span class='price_format_2'>{$user['bill_total']}</span>".$user['designation'];
 }
 function get_price($provider_item){
 	global $db;

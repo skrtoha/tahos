@@ -83,6 +83,12 @@ class User{
 		$q_user = "
 			SELECT 
 				u.*,
+				@total_bill := u.bill_cash + u.bill_cashless,
+				CASE
+                    WHEN u.currency_id = 1 THEN ROUND(@total_bill / c.rate, 0)
+                    WHEN u.currency_id = 6 THEN ROUND(@total_bill / c.rate * 10)
+                    ELSE ROUND(@total_bill / c.rate, 2)
+                END as bill_total,
 				c.designation, 
 				c.rate, 
 				i.title AS issue_title,
@@ -266,13 +272,6 @@ class User{
         if ($type_organization == 'entity') $payType[] = 'Безналичный';
         sort($payType);
         return $payType;
-    }
-
-    public static function addPaymentList(array $params){
-        /** @var Database $db */
-        $db = $GLOBALS['db'];
-
-        $db->insert('payment_list', $params);
     }
 
     private static function getQueryGroupDebt($date, $user_id): string

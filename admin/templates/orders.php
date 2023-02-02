@@ -43,7 +43,7 @@ switch ($act) {
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
-		$order = \core\OrderValue::getOrderInfo($_GET['id']);
+		$order = OrderValue::getOrderInfo($_GET['id']);
 		$res_order_values = OrderValue::get(['order_id' => $_GET['id']]);
 		order_print($order, $res_order_values);
 		break;
@@ -205,7 +205,7 @@ function show_form($act){
 	$db->update('orders', array('is_new' => 0), "`id`=$id");
 	switch($act){
 		case 's_change':
-			$order = \core\OrderValue::getOrderInfo($_GET['id'], '');
+			$order = OrderValue::getOrderInfo($_GET['id'], '');
 			$res_order_values = core\OrderValue::get(['order_id' => $_GET['id']], '');
 			$page_title = "Просмотр заказа";
 			break;
@@ -232,8 +232,10 @@ function show_form($act){
 			<td label="Пользователь">
 				<a href="?view=users&act=funds&id=<?=$order['user_id']?>">
 					<?=$order['fio']?>
-				</a> 
-				(<b class="price_format"><?=$order['bill'] - $order['reserved_funds']?></b> руб.)
+				</a>
+                <?if ($order['pay_type'] == 'Безналичный') $available = $order['bill_cashless'] - $order['reserved_funds'];
+                else $available = $order['bill_cash'] - $order['reserved_funds'];?>
+				(<b class="price_format"><?=$available?></b> руб.)
 			</td>
 			<td label="Сумма" class="price_format total">
                 <?=get_summ([

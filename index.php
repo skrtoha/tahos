@@ -82,7 +82,10 @@ core\UserIPS::registerIP([
 	'view' => $view
 ]);
 
-$basket = get_basket();
+if ($_SESSION['user']){
+    $basket = \core\Basket::get($_SESSION['user']);
+}
+
 
 $categories = Category::getAll('c.hidden = 0 AND sc.hidden = 0');
 

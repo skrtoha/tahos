@@ -683,6 +683,7 @@ function funds(){
 		<tr class="head">
 			<td>Дата</td>
 			<td>Тип операции</td>
+            <td>Счет</td>
 			<td>Сумма</td>
 			<td>Отстаток</td>
 			<td>Комментарий</td>
@@ -692,6 +693,14 @@ function funds(){
 				<tr>
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
+                    <td label="Счет">
+                        <?if ($fund['bill_type'] == User::BILL_TYPE_CASH){?>
+                            наличный
+                        <?}
+                        else{?>
+                            безналичный
+                        <?}?>
+                    </td>
 					<td label="Сумма" class="price_format"><?=$fund['sum']?> руб.</td>
 					<td label="Остаток" class="price_format"><?=$fund['remainder']?></td>
 					<td label="Комментарий"><?=stripslashes($fund['comment'])?></td>

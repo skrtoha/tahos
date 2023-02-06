@@ -342,6 +342,7 @@ class Autoeuro extends Provider{
         }
 
         foreach($providerBasketPayType as $pay_type => $providerBasket){
+            if (empty($providerBasket)) continue;
             $sentStockItems = [];
             $stock_items = [];
             foreach($providerBasket as $pb){

@@ -401,7 +401,11 @@ class OrderValue{
 					FROM 
 						#messages
 					WHERE correspond_id=c.id
-				) as count
+				) as count,
+				CASE
+                    WHEN o.pay_type = 'Наличный' OR o.pay_type = 'Онлайн' THEN 1
+                    WHEN o.pay_type = 'Безналичный' THEN 2
+                END AS bill_type
 			FROM
 				#orders_values ov
             LEFT JOIN #order_issue_values oiv ON

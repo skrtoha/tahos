@@ -204,7 +204,7 @@ class User{
 		return "
 			IF(
 				u.organization_name <> '',
-				CONCAT_WS (' ', ot.title, u.organization_name),
+				CONCAT_WS (' ', u.organization_name, ot.title),
 				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
 			)
 		";

@@ -2,11 +2,10 @@
 namespace core;
 
 class Synchronization{
-	private static $url = 'http://localhost/trade/hs';
 	public static function getNoneSynchronizedOrders(){
 		return self::getOrders(['synchronized' => 0], '');
 	}
-	public static function getOrders($params, $flag = ''){
+	public static function getOrders($params, $flag){
 		$output = [];
 		$res_order_values = OrderValue::get($params, $flag);
 		foreach($res_order_values as $ov){
@@ -17,7 +16,7 @@ class Synchronization{
 			$output[$ov['order_id']]['values'][] = [
 				'status_id' => $ov['status_id'],
 				'provider_id' => $ov['provider_id'],
-				'provider' => $ov['provider'],
+				'provider' => strtoupper($ov['provider']),
 				'cipher' => $ov['cipher'],
 				'order_id' => $ov['order_id'],
 				'user_id' => $ov['user_id'],
@@ -42,7 +41,8 @@ class Synchronization{
 				'typeOrganization' => $ov['typeOrganization'],
 				'withoutMarkup' => $ov['withoutMarkup'],
                 'return_price' => $ov['return_price'],
-                'return_data' => $ov['return_data']
+                'return_data' => $ov['return_data'],
+                'bill_type' => $ov['bill_type']
 			];
 		}
 		return $output;

@@ -530,6 +530,23 @@ function show_form($act){
 					<div class="title">Наценка</div>
 					<div class="value"><input type=text name="markup" value="<?=$_POST['markup'] ? $_POST['markup'] : $user['markup']?>"></div>
 				</div>
+                <div class="field">
+                    <div class="title">Режим расчетов</div>
+                    <div class="value">
+                        <label>
+                            <span>Только наличный</span>
+                            <input type="radio" value="<?=User::BILL_MODE_CASH?>">
+                        </label>
+                        <label>
+                            <span>Только безналичный</span>
+                            <input type="radio" value="<?=User::BILL_MODE_CASHLESS?>">
+                        </label>
+                        <label>
+                            <span>Наличный и безналичный</span>
+                            <input type="radio" value="<?=User::BILL_MODE_CASH_AND_CASHLESS?>">
+                        </label>
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Кредитный лимит<br>наличные</div>
 					<div class="value">

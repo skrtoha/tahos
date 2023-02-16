@@ -408,6 +408,29 @@ class User{
         return $db->query($query)->fetch_all(MYSQLI_ASSOC);
     }
 
+    public static function replenishBill($params){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        $res_user = User::get(['user_id' => $params['user_id']]);
+        foreach ($res_user as $value) $user = $value;
+
+        if (empty($user)) return;
+
+        if($params['bill_type'] == User::BILL_TYPE_CASH){
+            $params['remainder'] = $user['bill_cash'] + $params['sum'];
+            $arrayUser = ['bill_cash' => $params['remainder']];
+        }
+        else{
+            $params['remainder'] = $user['bill_cashless'] + $params['sum'];
+            $arrayUser = ['bill_cashless' => $params['remainder']];
+        }
+
+        Fund::insert(1, $params);
+        $db->update('users', $arrayUser, '`id`='.$params['user_id']);
+        User::checkOverdue($params['user_id'], $params['sum']);
+        User::checkDebt($params['user_id'], $_POST['sum']);
+    }
 
     public static function setSparePartsRequest($params){
         /** @var \core\Database $db */

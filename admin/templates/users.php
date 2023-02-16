@@ -593,26 +593,12 @@ function form_operations($act){
 
 	if ($_POST['form_operations_submit']){
 		$_POST['sum'] = str_replace(array(' ', ','), '', $_POST['sum']);
-        $array = array(
-            'sum' => $_POST['sum'],
+        User::replenishBill([
             'user_id' => $id,
+            'sum' => $_POST['sum'],
             'comment' => 'Пополнение '.$_POST['replenishment'],
             'bill_type' => $_POST['bill_type']
-        );
-		if($_POST['bill_type'] == User::BILL_TYPE_CASH){
-            $array['remainder'] = $user['bill_cash'] + $_POST['sum'];
-            $arrayUser = ['bill_cash' => $array['remainder']];
-        }
-        else{
-            $array['remainder'] = $user['bill_cashless'] + $_POST['sum'];
-            $arrayUser = ['bill_cashless' => $array['remainder']];
-        }
-
-		core\Fund::insert(1, $array);
-		$db->insert('funds', $array);
-		$db->update('users', $arrayUser, '`id`='.$id);
-		core\User::checkOverdue($id, $_POST['sum']);
-        User::checkDebt($id, $_POST['sum']);
+        ]);
 		message('Счет успешно пополнен!');
 		header('Location: ?view=users&act=funds&id='.$id);
 	}

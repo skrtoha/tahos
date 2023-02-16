@@ -155,6 +155,15 @@ switch($request['act']){
         $data = json_decode($request['data'], true);
         echo json_encode(Synchronization::createItem($data));
         break;
+    case 'replenishBill':
+        $data = json_decode($_POST['data'], true);
+        User::replenishBill([
+            'user_id' => $data['user_id'],
+            'sum' => $data['sum'],
+            'comment' => 'Поступление безналичных денежных средств (УТ)',
+            'bill_type' => User::BILL_TYPE_CASHLESS
+        ]);
+        break;
 }
 
 ?>

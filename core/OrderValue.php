@@ -381,6 +381,7 @@ class OrderValue{
 				u.email,
 				u.reserved_funds,
 				u.user_type AS typeOrganization,
+				DATE_FORMAT(u.created, '%d.%m.%Y %H:%i:%s') AS userCreated, 
 				ps.delivery,
 				p.api_title,
 				p.title AS provider,

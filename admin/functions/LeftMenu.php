@@ -68,7 +68,7 @@ class LeftMenu{
 		'Тест API поставщиков',
 		'Рассылки прайсов',
         'Настройки почты',
-		'Блокировка сайта',
+		'Настройки сайта',
 		'Настройки'
 	];
 
@@ -101,7 +101,7 @@ class LeftMenu{
 		'Тест API поставщиков' => ['test_api_providers'],
         'Настройки почты' => ['email_settings'],
 		'Рассылки прайсов' => ['subscribePrices'],
-		'Блокировка сайта' => ['blockSite']
+		'Настройки сайта' => ['site_settings']
 	];
 
 	public static $defaultPermissions = [
@@ -121,7 +121,7 @@ class LeftMenu{
 			'Тест API поставщиков' => 'test_api_providers',
 			'Рассылки прайсов' => 'subscribePrices',
             'Настройки почты' => 'email_settings',
-			'Блокировка сайта' => 'blockSite'
+			'Настройки сайта' => 'site_settings'
 		],
 		'Финансовые операции' => 'funds',
 		'Отчеты' => [

@@ -1,6 +1,6 @@
 <?php
 use core\Managers;
-$page_title = 'Блокировка сайта';
+$page_title = 'Настройки сайта';
 if (!empty($_POST)){
     $data = $_POST;
     $data['time'] = time();
@@ -8,7 +8,8 @@ if (!empty($_POST)){
 	core\Setting::update('is_blocked', json_encode($data));
 	header("Location: /admin/?view=blockSite");
 }
-$data = json_decode(core\Setting::get('is_blocked'), true);
+$data = core\Setting::get('site_settings', null, 'all');
+$data['is_blocked'] = json_decode($data['is_blocked'], true);
 $act = $_GET['act'];?>
 <div class="t_form">
 	<div class="bg">
@@ -23,8 +24,14 @@ $act = $_GET['act'];?>
                     Количество минут:
                     <input name="count_seconds" type="text" value="<?=$data['count_seconds'] / 60?>" placeholder="Кол-во секунд">
 				</div>
-				<input type="submit" value="Сохранить">
 			</div>
+            <div class="field">
+                <div class="title">Токен синхронизации</div>
+                <div class="value">
+                    <input name="synchronization_token" value="<?=$data['synchronization_token']?>">
+                </div>
+            </div>
+            <input type="submit" value="Сохранить">
 		</form>
 	</div>
 </div>

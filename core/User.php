@@ -57,6 +57,9 @@ class User{
 		$where = '';
         $having = '';
         $limit = '';
+        $order = '';
+        $dir = 'ASC';
+        if (isset($params['order_by'])) $dir = $params['dir'];
 		if (!empty($params)){
 			if (isset($params['user_id']) && !$params['user_id']) return [
 				'markup' => 0,
@@ -71,6 +74,10 @@ class User{
 					case 'withWithdraw': $where .= "u.bill < 0 AND "; break;
                     case 'full_name': $having .= "full_name LIKE '%{$value}%' AND "; break;
                     case 'limit': $limit = "LIMIT $value"; break;
+                    case 'order':
+                    case 'dir':
+                        $order = "ORDER BY {$params['order']} $dir";
+                        break;
                     default:
                         $where .= "u.$key = '$value' AND ";
 				}
@@ -116,6 +123,7 @@ class User{
 				#organizations_types ot ON ot.id=u.organization_type
 			$where
 			$having
+			$order
 			$limit
 		";
         $output[$paramsString] = $db->query($q_user, '');

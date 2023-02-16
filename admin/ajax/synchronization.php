@@ -3,7 +3,9 @@ ini_set('error_reporting', E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+use core\Setting;
 use core\Synchronization;
+use core\User;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
@@ -16,7 +18,35 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 $request = !empty($_POST) ? $_POST : $_GET;
 
+$synchronization_token = Setting::get('site_settings', 'synchronization_token');
+if ($synchronization_token != $request['synchronization_token']) die("Неверный токен");
+
 switch($request['act']){
+    case "synchronizeUsers":
+        $output = [];
+        $res_query = $db->query("
+            SELECT
+                u.id,
+                'user' AS type,
+                ".User::getUserFullNameForQuery()." AS name
+            FROM
+                #users u
+            LEFT JOIN
+                #organizations_types ot on ot.id = u.organization_type
+            
+            UNION
+            
+            SELECT
+                p.id,
+                'provider' AS type,
+                p.title AS name
+            FROM
+                #providers p
+            
+            ORDER BY name
+        ")->fetch_all(MYSQLI_ASSOC);
+        echo json_encode($res_query, JSON_UNESCAPED_UNICODE);
+        break;
 	case 'getOrders':
 		$output = Synchronization::getNoneSynchronizedOrders();
 		echo json_encode($output, JSON_UNESCAPED_UNICODE);

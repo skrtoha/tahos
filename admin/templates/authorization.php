@@ -1,8 +1,16 @@
 <?
 /* @var $db \core\Database */
 
+use core\Managers;
+
 $act = $_GET['act'];
-if (isset($_GET['auth']) && in_array($_SERVER['REMOTE_ADDR'], core\Config::$allowedIpForAuthorization)) $_SESSION['user'] = $_GET['auth'];
+if (isset($_GET['auth'])){
+    if (Managers::isActionForbidden('Пользователи', 'Авторизация')) die('Действие запрещено');
+    $_SESSION['user'] = $_GET['auth'];
+    message('Авторизация прошла успешно');
+    header("Location: /");
+    die();
+}
 if (!empty($_POST)){
 	$login = $_POST['login'];
 	$password = md5($_POST['password']);

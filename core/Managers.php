@@ -1,6 +1,8 @@
 <?php
 namespace core;
 use admin\functions\LeftMenu;
+use mysqli_result;
+
 class Managers{
 	public static $permissions;
 
@@ -95,8 +97,8 @@ class Managers{
 	public static function getPermissions($group_id){
 		return self::getInstanceDatabase()->getFieldOnID('manager_groups', $group_id, 'permissions');
 	}
-	public static function isActionForbidden(string $view, string $action)
-	{
+	public static function isActionForbidden(string $view, string $action): bool
+    {
 		if (isset(self::$permissions[$view][$action])) return false;
 		else return true;
 	}

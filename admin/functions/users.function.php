@@ -1,4 +1,7 @@
 <?php
+
+use core\Managers;
+
 class User{
 	public static function getHtmlActions($user_id){
 		ob_start();?>
@@ -10,6 +13,9 @@ class User{
 		<a href="?view=order_issues&user_id=<?=$user_id?>&issued=1">Выданные</a>
 		<a href="?view=users&id=<?=$user_id?>&act=search_history">История поиска</a>
 		<a href="?view=users&id=<?=$user_id?>&act=basket">Товары в корзине</a>
+        <?if (!Managers::isActionForbidden('Пользователи', 'Авторизация')){?>
+            <a href="/admin/?view=authorization&auth=<?=$_GET['id']?>">Авторизоваться</a>
+        <?}?>
 		<a class="return_money" href="#">Вернуть средства</a>
 		<a href="?view=users&id=<?=$user_id?>&act=delete" class="delete_item">Удалить</a>
 		<div style="width: 100%; height: 10px"></div>

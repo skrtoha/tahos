@@ -7,10 +7,9 @@ use core\User;
 $act = $_GET['act'];
 $id = $_GET['id'];
 $GLOBALS['user'] = $_GET['id'];
+$array = [];
 if ($_POST['form_submit']){
 	$saveble = true;
-	$id = $_GET['id'];
-	// debug($_POST); //exit();
 	foreach($_POST as $key => $value){
 		// if (!$value) continue;
 		// var_dump($value); //continue;
@@ -31,7 +30,12 @@ if ($_POST['form_submit']){
 			case 'phone':
 				$array['phone'] = str_replace(array('(', ')', ' ', '-'), '', $value);
 				break;
-			default: 
+            case 'pay_type':
+                if ($_POST['bill_mode'] == User::BILL_MODE_CASHLESS) $array['pay_type'] = 'Безналичный';
+                elseif ($_POST['bill_mode'] == User::BILL_MODE_CASH && $_POST['pay_type'] != 'Онлайн') $array['pay_type'] = 'Наличный';
+                else $array['pay_type'] = $_POST['pay_type'];
+                break;
+			default:
 				if ($key != 'pass' and $key != 'form_submit') $array[$key] = $value;
 		}
 	}
@@ -48,9 +52,6 @@ if ($_POST['form_submit']){
 		message('Выберите точку выдачи!', false);
 		$saveble = false;
 	}
-    if ($array['user_type'] == 'private' && $array['pay_type'] == 'Безналичный'){
-        $array['pay_type'] = 'Наличный';
-    }
 	if ($saveble) {
 		if ($_POST['form_submit'] == 1){
 			if (core\User::update($id, $array)){
@@ -315,15 +316,13 @@ function show_form($act){
 	$id = $_GET['id'];
 	switch($act){
 		case 's_change':
-			$user = $db->select('users', '*', "`id`=$id");
-			$user = $user[0];
-			$array = $user;
-			// debug($user);
-			// print_r($user); echo "<br><br>";
+            if (!empty($_POST)) $user = $_POST;
+			else $user = $db->select_one('users', '*', "`id`=$id");
 			$page_title = "Редактирование пользователя";
 			break;
 		case 's_add':
 			$page_title = "Добавление пользователя";
+            $user = $_POST;
 			break;
 	}
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > $page_title";
@@ -337,31 +336,25 @@ function show_form($act){
 				<input type="hidden" name="form_submit" value="<?=$act == 's_change' ? 1 : 2?>">
 				<div class="field">
 					<div class="title">Фамилия</div>
-					<div class="value"><input type=text name="name_1" value="<?=$_POST['name_1'] ?: $user['name_1']?>"></div>
+					<div class="value"><input type=text name="name_1" value="<?=$user['name_1'] ?? ''?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Имя</div>
-					<div class="value"><input type=text name="name_2" value="<?=$_POST['name_2'] ?: $user['name_2']?>"></div>
+					<div class="value"><input type=text name="name_2" value="<?=$user['name_2'] ?? ''?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Отчество</div>
-					<div class="value"><input type=text name="name_3" value="<?=$_POST['name_3'] ? $_POST['name_3'] : $user['name_3']?>"></div>
+					<div class="value"><input type=text name="name_3" value="<?=$user['name_3'] ?? ''?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Тип</div>
 					<div class="value">
-						<?if ($_POST['form_submit']){
-							$checked_1 = $_POST['user_type'] == 'private' ? 'checked' : '';
-							$checked_2 = $_POST['user_type'] == 'entity' ? 'checked' : '';
-							$disabled = $_POST['user_type'] == 'private' ? 'disabled' : ''; 
-							$organization_name = $_POST['organization_name'];
-						}
-						else{
+						<?
 							$checked_1 = $user['user_type'] == 'private' ? 'checked' : '';
 							$checked_2 = $user['user_type'] == 'entity' ? 'checked' : '';
 							$disabled = $user['user_type'] == 'private' ? 'disabled' : ''; 
 							$organization_name = $user['organization_name'];
-						}?>
+						?>
 						<input type="radio" <?=$act == 's_add' ? 'checked' : ''?> value="private" name="user_type" id="user_type_1" <?=$checked_1?>>
 						<label for="user_type_1">Физическое лицо</label><br>
 						<div style="height: 10px"></div>
@@ -373,8 +366,7 @@ function show_form($act){
 						<select <?=$disabled?> name="organization_type">
 						<option value="">ничего не выбрано</option>
 							<?foreach($organizations_types as $organization_type){
-								if ($_POST['form_submit']) $selected = $_POST['organization_type'] == $organization_type['id'] ? 'selected' : '';
-								else $selected = $user['organization_type'] == $organization_type['id'] ? 'selected' : '';
+								$selected = $user['organization_type'] == $organization_type['id'] ? 'selected' : '';
 								?>
 								<option <?=$selected?> value="<?=$organization_type['id']?>"><?=$organization_type['title']?></option>
 							<?}?>
@@ -383,55 +375,70 @@ function show_form($act){
 					</div>
 				</div>
 				<div class="field">
-					<div class="title">Тип расчета</div>
+					<div class="title">Вид платежа<br>по умолчанию</div>
 					<div class="value">
 						<select name="pay_type">
 							<?$array = empty($_POST) ? $user : $_POST;
 							$selected = $array['pay_type'] == 'Наличный' ? 'selected' : '';?>
 							<option <?=$selected?> value="Наличный">Наличный</option>
-							<?$selected = $array['pay_type'] == 'Безналичный' ? 'selected' : '';
-							$disabled = $array['organization_name'] ? '' : 'disabled';?>
-							<option <?=$disabled?> <?=$selected?> value="Безналичный">Безналичный</option>
+							<?$selected = $array['pay_type'] == 'Безналичный' ? 'selected' : '';?>
+							<option <?=$selected?> value="Безналичный">Безналичный</option>
                             <?$selected = $array['pay_type'] == 'Онлайн' ? 'selected' : '';?>
                             <option <?=$selected?> value="Онлайн">Онлайн</option>
 						</select>
 					</div>
 				</div>
+                <div class="field">
+                    <div class="title">Режим расчетов</div>
+                    <div class="value">
+                        <label>
+                            <?$checked = $user['bill_mode'] == User::BILL_MODE_CASH ? 'checked' : ''?>
+                            <input <?=$checked?> name="bill_mode" type="radio" value="<?=User::BILL_MODE_CASH?>">
+                            <span>Только наличный</span>
+                        </label>
+                        <label>
+                            <?$checked = $user['bill_mode'] == User::BILL_MODE_CASHLESS ? 'checked' : ''?>
+                            <input <?=$checked?> name="bill_mode" type="radio" value="<?=User::BILL_MODE_CASHLESS?>">
+                            <span>Только безналичный</span>
+                        </label>
+                        <label>
+                            <?$checked = $user['bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS ? 'checked' : ''?>
+                            <input <?=$checked?> name="bill_mode" type="radio" value="<?=User::BILL_MODE_CASH_AND_CASHLESS?>">
+                            <span>Наличный и безналичный</span>
+                        </label>
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Наценка при заказе вручную</div>
-					<div class="value"><input type=text name="markup_handle_order" value="<?=$array['markup_handle_order']?>"></div>
+					<div class="value"><input type=text name="markup_handle_order" value="<?=$user['markup_handle_order'] ?? ''?>"></div>
 				</div>
                 <div class="field">
                     <div class="title">Максимальное кол-во соединений</div>
-                    <div class="value"><input type="text" name="max_connections" value="<?=$array['max_connections']?>"></div>
+                    <div class="value"><input type="text" name="max_connections" value="<?=$user['max_connections'] ?? ''?>"></div>
                 </div>
 				<div class="field">
 					<div class="title">Скидка</div>
-					<div class="value"><input type=text name="discount" value="<?=$array['discount']?>"></div>
+					<div class="value"><input type=text name="discount" value="<?=$user['discount'] ?? ''?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">E-mail</div>
-					<div class="value"><input type=text name="email" value="<?=$_POST['email'] ? $_POST['email'] : $user['email']?>"></div>
+					<div class="value"><input type=text name="email" value="<?=$user['email'] ?? ''?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Телефон</div>
-					<div class="value"><input type=text name="phone" value="<?=$_POST['phone'] ? $_POST['phone'] : $user['phone']?>"></div>
+					<div class="value"><input type=text name="phone" value="<?=$user['phone'] ?? ''?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Фактический адрес</div>
-					<div class="value"><input type=text name="address" value="<?=$_POST['address'] ? $_POST['address'] : $user['address']?>"></div>
+					<div class="value"><input type=text name="address" value="<?=$user['address'] ?? ''?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Тип доставки</div>
 					<div class="value">
-						<?if ($_POST['form_submit'] == 1){
-							$checked_1 = $_POST['delivery_type'] == 'Доставка' ? 'checked' : '';
-							$checked_2 = $_POST['delivery_type'] == 'Самовывоз' ? 'checked' : '';
-						}
-						else{
-							$checked_1 = $user['delivery_type'] == 'Доставка' ? 'checked' : '';
-							$checked_2 = $user['delivery_type'] == 'Самовывоз' ? 'checked' : '';
-						}?>
+                        <?
+                        $checked_1 = $user['delivery_type'] == 'Доставка' ? 'checked' : '';
+                        $checked_2 = $user['delivery_type'] == 'Самовывоз' ? 'checked' : '';
+                        ?>
 						<input <?=$act == 's_add' ? 'checked' : ''?> type="radio" value="Доставка" name="delivery_type" id="delivery_type_1" <?=$checked_1?>>
 						<label for="delivery_type_1">Доставка</label>
 						<input type="radio" value="Самовывоз" name="delivery_type" id="delivery_type_2" <?=$checked_2?>>
@@ -441,16 +448,14 @@ function show_form($act){
 				<div class="field">
 					<div class="title">Точка выдачи</div>
 					<div class="value">
-						<?if ($_POST['form_submit'] == 1) $disabled = $_POST['delivery_type'] == 'Доставка' ? 'disabled' : '';
-						else $disabled = $user['delivery_type'] == 'Доставка' ? 'disabled' : '';?>
+						<?$disabled = $user['delivery_type'] == 'Доставка' ? 'disabled' : '';?>
 						<select <?=$act == 's_add' ? 'disabled' : ''?> <?=$disabled?> name="issue_id">
 							<option value="">ничего не выбрано</option>
 							<?$issues = $db->select('issues', 'id,title', '', '', '', '');
 							if (count($issues)){
 								foreach($issues as $issue){
-									if ($_POST['form_submit'] == 1) $selected = $_POST['issue_id'] == $issue['id'] ? 'selected' : '';
-									else $selected = $user['issue_id'] == $issue['id'] ? 'selected' : ''?>
-									<option <?=$selected?> value="<?=$issue['id']?>"><?=$issue['title']?></option>
+									$selected = isset($user['issue_id']) && $user['issue_id'] == $issue['id'] ? 'selected' : ''?>
+									<option <?=$selected?> value="<?=$issue['id']?>"><?=$issue['title'] ?? ''?></option>
 								<?}
 							}?>
 						</select>
@@ -462,8 +467,7 @@ function show_form($act){
 						<?$currencies = $db->select('currencies', '*');?>
 						<select name="currency_id">
 							<?foreach($currencies as $currency){
-								if ($_POST['form_submit']) $selected = $_POST['currency_id'] == $currency['id'] ? 'selected' : '';
-								else $selected = $user['currency_id'] == $currency['id'] ? 'selected' : ''?>
+								$selected = isset($user['currency_id']) && $user['currency_id'] == $currency['id'] ? 'selected' : ''?>
 								<option <?=$selected?> value="<?=$currency['id']?>"><?=$currency['title']?></option>
 							<?}?>
 						</select>
@@ -472,16 +476,14 @@ function show_form($act){
 				<div class="field">
 					<div class="title">Показывать все аналоги</div>
 					<div class="value">
-						<?if ($_POST['show_all_analogies']) $checked = $_POST['show_all_analogies'] ? 'checked' : '';
-						else $checked = $user['show_all_analogies'] ? 'checked' : '';?>
+						<?$checked = $user['show_all_analogies'] ? 'checked' : '';?>
 						<input type="checkbox" name="show_all_analogies" <?=$checked?> value="1">
 					</div>
 				</div>
 				<div class="field">
-					<div class="title">Разрешить отправлять запрос на удаление товара</div>
+					<div class="title">Запрос на удаление товара</div>
 					<div class="value">
-						<?if ($_POST['allow_request_delete_item']) $checked = $_POST['allow_request_delete_item'] ? 'checked' : '';
-						else $checked = $user['allow_request_delete_item'] ? 'checked' : '';?>
+						<?$checked = $user['allow_request_delete_item'] ? 'checked' : '';?>
 						<input type="checkbox" name="allow_request_delete_item" <?=$checked?> value="1">
 					</div>
 				</div>
@@ -489,24 +491,22 @@ function show_form($act){
 					<div class="title">Автоматически <br>отправлять в заказ</div>
 					<div class="value">
 						<select name="isAutomaticOrder">
-							<option <?=$array['isAutomaticOrder'] == 0 ? 'selected' : ''?> value="0">нет</option>
-							<option <?=$array['isAutomaticOrder'] == 1 ? 'selected' : ''?> value="1">да</option>
+							<option <?=$user['isAutomaticOrder'] == 0 ? 'selected' : ''?> value="0">нет</option>
+							<option <?=$user['isAutomaticOrder'] == 1 ? 'selected' : ''?> value="1">да</option>
 						</select>
 					</div>
 				</div>
 				<div class="field">
 					<div class="title">Показывать поставщика</div>
 					<div class="value">
-						<?if ($_POST['showProvider']) $checked = $_POST['showProvider'] ? 'checked' : '';
-						else $checked = $user['showProvider'] ? 'checked' : '';?>
+						<?$checked = isset($user['showProvider']) && $user['showProvider'] ? 'checked' : '';?>
 						<input type="checkbox" name="showProvider" <?=$checked?> value="1">
 					</div>
 				</div>
 				<div class="field">
 					<div class="title">Бонусная программа</div>
 					<div class="value">
-						<?if ($_POST['bonus_program']) $checked = $_POST['bonus_program'] ? 'checked' : '';
-						else $checked = $user['bonus_program'] ? 'checked' : '';?>
+						<?$checked = isset($user['bonus_program']) && $user['bonus_program'] ? 'checked' : '';?>
 						<input type="checkbox" name="bonus_program" <?=$checked?> value="1">
 					</div>
 				</div>
@@ -521,48 +521,30 @@ function show_form($act){
 				<div class="field">
 					<div class="title">Количество бонусов</div>
 					<div class="value">
-						<?if ($_POST['bonus_count']) $bonus_count = $_POST['bonus_program'] ? $_POST['bonus_count'] : '0';
-						else $bonus_count = $user['bonus_program'] ? $user['bonus_count'] : '0'?>
+						<?$bonus_count = $user['bonus_program'] ? $user['bonus_count'] : '0'?>
 						<input type="text" name="bonus_count" value="<?=$bonus_count?>">
 					</div>
 				</div>
 				<div class="field">
 					<div class="title">Наценка</div>
-					<div class="value"><input type=text name="markup" value="<?=$_POST['markup'] ? $_POST['markup'] : $user['markup']?>"></div>
+					<div class="value"><input type=text name="markup" value="<?=$user['markup'] ?? ''?>"></div>
 				</div>
-                <div class="field">
-                    <div class="title">Режим расчетов</div>
-                    <div class="value">
-                        <label>
-                            <span>Только наличный</span>
-                            <input type="radio" value="<?=User::BILL_MODE_CASH?>">
-                        </label>
-                        <label>
-                            <span>Только безналичный</span>
-                            <input type="radio" value="<?=User::BILL_MODE_CASHLESS?>">
-                        </label>
-                        <label>
-                            <span>Наличный и безналичный</span>
-                            <input type="radio" value="<?=User::BILL_MODE_CASH_AND_CASHLESS?>">
-                        </label>
-                    </div>
-                </div>
 				<div class="field">
 					<div class="title">Кредитный лимит<br>наличные</div>
 					<div class="value">
-                        <input type="text" name="credit_limit_cash" value="<?=$_POST['credit_limit_cash'] ?: $user['credit_limit_cash']?>">
+                        <input type="text" name="credit_limit_cash" value="<?=$user['credit_limit_cash'] ?? ''?>">
                     </div>
 				</div>
                 <div class="field">
                     <div class="title">Кредитный лимит<br>безналичные</div>
                     <div class="value">
-                        <input type="text" name="credit_limit_cashless" value="<?=$_POST['credit_limit_cashless'] ?: $user['credit_limit_cashless']?>">
+                        <input type="text" name="credit_limit_cashless" value="<?=$user['credit_limit_cashless'] ?? ''?>">
                     </div>
                 </div>
 				<div class="field">
 					<div class="title">Отсрочка платежа</div>
 					<div class="value">
-						<input type="text" name="defermentOfPayment" value="<?=$_POST['defermentOfPayment'] ? $_POST['defermentOfPayment'] : $user['defermentOfPayment']?>">
+						<input type="text" name="defermentOfPayment" value="<?=$user['defermentOfPayment'] ?? ''?>">
 					</div>
 				</div>
 				<div class="field">
@@ -631,8 +613,8 @@ function form_operations($act){
                     <div class="title">Тип счета</div>
                     <div class="value">
                         <select name="bill_type">
-                            <option value="<?=User::BILL_TYPE_CASH?>">наличный</option>
-                            <option value="<?=User::BILL_TYPE_CASHLESS?>">безналичный</option>
+                            <option value="<?=User::BILL_CASH?>">наличный</option>
+                            <option value="<?=User::BILL_CASHLESS?>">безналичный</option>
                         </select>
                     </div>
                 </div>
@@ -663,7 +645,7 @@ function funds(){
 	$linkLimit = 10;
 	$page = $_GET['page'] ?: 1;
 	$chank = getChank($all, $perPage, $linkLimit, $page);
-	$start = $chank[$page] ? $chank[$page] : 0;
+	$start = $chank[$page] ?: 0;
 	$funds = $db->select('funds', '*', $where, 'id', false, "$start,$perPage", true);?>
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
@@ -672,8 +654,9 @@ function funds(){
 
 	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>
-		<?$bill = $user['bill'] ? '<span class="price_format">'.$user['bill'].'</span> руб.' : 'пусто';?>
-		<span>На счету: <b><?=$bill?></b></span>
+		<span>
+            На счету: <b> <span class="price_format"><?=$user['bill_cash'] + $user['bill_cashless']?></span> руб.</b>
+        </span>
 		<?$reserved_funds = $user['reserved_funds'] ? '<span class="price_format">'.$user['reserved_funds'].'</span> руб.' : 'пусто';?>
 		<span>Зарезервировано: <b><?=$reserved_funds?></b></span>
 		<?$value = $user['bill'] - $user['reserved_funds'];
@@ -697,7 +680,7 @@ function funds(){
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
                     <td label="Счет">
-                        <?if ($fund['bill_type'] == User::BILL_TYPE_CASH){?>
+                        <?if ($fund['bill_type'] == User::BILL_CASH){?>
                             наличный
                         <?}
                         else{?>

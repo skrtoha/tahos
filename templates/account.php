@@ -3,6 +3,7 @@
 /** @global array $user */
 
 use core\Breadcrumb;
+use core\User;
 
 $title = 'Счет';
 
@@ -23,12 +24,15 @@ Breadcrumb::out();
 	<div class="sidebar">
 		<div class="balance-block">
 			<h1>Баланс</h1>
-            <div class="balance">
-                <h2>Наличный</h2>
-                <p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit_cash']?></span><?=$designation?></p>
-                <p>Средств на счету: <span class="account-money "><?=$user['bill_cash']?></span><?=$user['designation']?></p>
-            </div>
-            <?if ($user['user_type'] == 'entity'){?>
+            <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){?>
+                <div class="balance">
+                    <h2>Наличный</h2>
+                    <p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit_cash']?></span><?=$designation?></p>
+                    <p>Средств на счету: <span class="account-money "><?=$user['bill_cash']?></span><?=$user['designation']?></p>
+                </div>
+            <?}?>
+
+            <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){?>
                 <div class="balance">
                     <h2>Безналичный</h2>
                     <p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit_cashless']?></span><?=$designation?></p>
@@ -36,7 +40,12 @@ Breadcrumb::out();
                 </div>
             <?}?>
 			<p>Зарезервировано: <span class="account-debts "><?=$user['reserved_funds']?></span><span style="color: red"><?=$designation?></span></p>
-			<p>Итого: <span class="account-total "><?=$user['bill_total'] - $user['reserved_funds']?></span><span style="color: #0081bc"><?=$designation?></span></p>
+			<p>
+                Итого:
+                <span class="account-total">
+                    <?=$user['bill_total'] - $user['reserved_funds']?>
+                </span>
+                <span style="color: #0081bc"><?=$designation?></span></p>
 			<?if ($user['bonus_program']){?>
 				<p>Бонусы: <span class="account-bonus"><?=$user['bonus_count']?><?=$designation?></span></p>
 			<?}?>
@@ -47,7 +56,8 @@ Breadcrumb::out();
 			<h1>История счета</h1>
 			<form>
 				<div class="checkbox-wrap">
-					<input type="radio" name="period" id="order-filter-period-all" value="all">
+                    <?$checked = isset($params['period']) && $params['period'] == 'all' ? 'checked' : ''?>
+					<input <?=$checked?> type="radio" name="period" id="order-filter-period-all" value="all">
 					<label for="order-filter-period-all">за все время</label>
 					<br><br>
 					<input type="radio" name="period" id="order-filter-period-selected" value="selected" checked>
@@ -70,7 +80,7 @@ Breadcrumb::out();
 		<ul class="ionTabs__head">
 			<li class="ionTabs__tab" data-target="common">История счета</li>
 
-            <?if ($user['user_type'] == 'entity'){?>
+            <?if ($user['bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS){?>
                 <li class="ionTabs__tab" data-target="cash">Наличные</li>
                 <li class="ionTabs__tab" data-target="cashless">Безналичные</li>
             <?}?>
@@ -80,7 +90,7 @@ Breadcrumb::out();
 		</ul>
 		<div class="ionTabs__body">
 			<div class="ionTabs__item" data-name="common"></div>
-            <?if ($user['user_type'] == 'entity'){?>
+            <?if ($user['bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS){?>
                 <div class="ionTabs__item" data-name="cash"></div>
                 <div class="ionTabs__item" data-name="cashless"></div>
             <?}?>

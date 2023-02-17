@@ -38,7 +38,7 @@ switch ($act) {
 		}
 		if (isset($_GET['automaticOrder'])){
 			header("Location: /orders");
-			exit();
+			die();
 		} 
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;

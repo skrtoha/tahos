@@ -17,13 +17,13 @@ class OrderValue{
         if ($user['user_type'] == 'private'){
             $remainder = $user['bill_cash'] - $params['totalSumm'];
             $bill = $user['bill_cash'];
-            $bill_type = User::BILL_TYPE_CASH;
+            $bill_type = User::BILL_CASH;
             $update['bill_cash'] = "`bill_cash` - " . $params['totalSumm'];
         }
         else{
             $remainder = $user['bill_cashless'] - $params['totalSumm'];
             $bill = $user['bill_cashless'];
-            $bill_type = User::BILL_TYPE_CASHLESS;
+            $bill_type = User::BILL_CASHLESS;
             $update['bill_cashless'] = "`bill_cashless` - " . $params['totalSumm'];
         }
 

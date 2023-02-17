@@ -23,10 +23,10 @@ switch($_POST['act']){
         $where = "`type_operation` IN (1,2) AND `user_id` = {$_SESSION['user']} AND ";
         switch ($_POST['bill_type']){
             case 'cash':
-                $where .= "`bill_type` = ".\core\User::BILL_TYPE_CASH." AND ";
+                $where .= "`bill_type` = ".\core\User::BILL_CASH." AND ";
                 break;
             case 'cashless':
-                $where .= "`bill_type` = ".\core\User::BILL_TYPE_CASHLESS." AND ";
+                $where .= "`bill_type` = ".\core\User::BILL_CASHLESS." AND ";
                 break;
             }
             if ($_POST['period'] == 'selected'){

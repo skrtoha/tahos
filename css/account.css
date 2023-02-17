@@ -31,6 +31,9 @@
     border: 1px solid #c8c8c8;
     margin-bottom: 20px;
 }
+.account table td:first-child {
+    padding-right: 10px;
+}
 
 .account table th:nth-child(2), .account table td:nth-child(2) {
     text-align: left

@@ -4,8 +4,8 @@ namespace core;
 use mysqli_result;
 
 class User{
-    const BILL_TYPE_CASH = 1;
-    const BILL_TYPE_CASHLESS = 2;
+    const BILL_CASH = 1;
+    const BILL_CASHLESS = 2;
 
     const BILL_MODE_CASH = 1;
     const BILL_MODE_CASHLESS = 2;
@@ -94,11 +94,15 @@ class User{
 		$q_user = "
 			SELECT 
 				u.*,
-				@total_bill := u.bill_cash + u.bill_cashless,
 				CASE
-                    WHEN u.currency_id = 1 THEN ROUND(@total_bill / c.rate, 0)
-                    WHEN u.currency_id = 6 THEN ROUND(@total_bill / c.rate * 10)
-                    ELSE ROUND(@total_bill / c.rate, 2)
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH_AND_CASHLESS." THEN @bill_total := u.bill_cash + u.bill_cashless
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH." THEN @bill_total := u.bill_cash
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASHLESS." THEN @bill_total := u.bill_cashless
+                END,
+				CASE
+                    WHEN u.currency_id = 1 THEN ROUND(@bill_total / c.rate, 0)
+                    WHEN u.currency_id = 6 THEN ROUND(@bill_total / c.rate * 10)
+                    ELSE ROUND(@bill_total / c.rate, 2)
                 END as bill_total,
 				c.designation, 
 				c.rate, 
@@ -395,19 +399,6 @@ class User{
         }
     }
 
-    public static function getDebtList($params): array
-    {
-        /** @global $db Database */
-        global $db;
-
-        $where = "f.user_id = {$params['user_id']} AND ";
-        if (isset($params['begin'])) $where .= "f.created > '{$params['begin']}' AND ";
-        if (isset($params['end'])) $where .= "f.created < '{$params['end']}' AND ";
-        $where = substr($where, 0, -5);
-        $query = self::getQueryDebt($where, 'f.created DESC');
-        return $db->query($query)->fetch_all(MYSQLI_ASSOC);
-    }
-
     public static function replenishBill($params){
         /** @var Database $db */
         $db = $GLOBALS['db'];
@@ -420,7 +411,7 @@ class User{
 
         if (empty($user)) return;
 
-        if($params['bill_type'] == User::BILL_TYPE_CASH){
+        if($params['bill_type'] == User::BILL_CASH){
             $params['remainder'] = $user['bill_cash'] + $params['sum'];
             $arrayUser = ['bill_cash' => $params['remainder']];
         }

@@ -412,6 +412,9 @@ class User{
         /** @var Database $db */
         $db = $GLOBALS['db'];
 
+        $count = $db->getCount('funds', "`comment` = '{$params['comment']}' and sum = {$params['sum']}");
+        if ($count) return;
+
         $res_user = User::get(['user_id' => $params['user_id']]);
         foreach ($res_user as $value) $user = $value;
 

@@ -157,10 +157,12 @@ switch($request['act']){
         break;
     case 'replenishBill':
         $data = json_decode($_POST['data'], true);
+        $data['comment'] = mb_substr($data['comment'], 0, -8);
+
         User::replenishBill([
             'user_id' => $data['user_id'],
             'sum' => $data['sum'],
-            'comment' => 'Поступление безналичных денежных средств (УТ)',
+            'comment' => $data['comment'],
             'bill_type' => User::BILL_TYPE_CASHLESS
         ]);
         break;

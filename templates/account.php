@@ -13,9 +13,19 @@ $designation = $user['designation'];
 
 $bonuses_exist = false;
 
-$dateTime = new DateTime();
-$params['end'] = $dateTime->format('d.m.Y');
-$params['begin'] = $dateTime->sub(new DateInterval('P30D'))->format('d.m.Y');
+$params = [];
+$parts = parse_url($_SERVER['REQUEST_URI']);
+parse_str($parts['query'], $query);
+if (!empty($query)){
+    if (isset($query['end'])) $params['end'] = $query['end'];
+    if (isset($query['begin'])) $params['begin'] = $query['begin'];
+    if (isset($query['period'])) $params['period'] = $query['period'];
+}
+else{
+    $dateTime = new DateTime();
+    $params['end'] = $dateTime->format('d.m.Y');
+    $params['begin'] = $dateTime->sub(new DateInterval('P30D'))->format('d.m.Y');
+}
 
 Breadcrumb::add('/account', 'Счет');
 Breadcrumb::out();
@@ -60,7 +70,8 @@ Breadcrumb::out();
 					<input <?=$checked?> type="radio" name="period" id="order-filter-period-all" value="all">
 					<label for="order-filter-period-all">за все время</label>
 					<br><br>
-					<input type="radio" name="period" id="order-filter-period-selected" value="selected" checked>
+                    <?$checked = $params['period'] != 'all' ? 'checked' : '';?>
+					<input <?=$checked?> type="radio" name="period" id="order-filter-period-selected" value="selected">
 					<label for="order-filter-period-selected">за период </label>
 				</div>
 				<div class="date-wrap">

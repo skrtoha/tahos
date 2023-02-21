@@ -2,27 +2,30 @@
 namespace core;
 
 class Synchronization{
-	private static $url = 'http://localhost/trade/hs';
 	public static function getNoneSynchronizedOrders(){
 		return self::getOrders(['synchronized' => 0], '');
 	}
-	public static function getOrders($params, $flag = ''){
+	public static function getOrders($params, $flag){
 		$output = [];
 		$res_order_values = OrderValue::get($params, $flag);
 		foreach($res_order_values as $ov){
 			$o = & $output[$ov['order_id']];
 			$o['user_id'] = $ov['user_id'];
-			$o['userName'] = $ov['userName'];
+			$o['userName'] = mb_strtoupper($ov['userName']);
 			$o['created'] = $ov['created'];
+            $o['billType'] = $ov['bill_type'];
+            $o['typeOrganization'] = $ov['typeOrganization'];
+            $o['userCreated'] = $ov['userCreated'];
 			$output[$ov['order_id']]['values'][] = [
 				'status_id' => $ov['status_id'],
 				'provider_id' => $ov['provider_id'],
-				'provider' => $ov['provider'],
+				'provider' => strtoupper($ov['provider']),
 				'cipher' => $ov['cipher'],
 				'order_id' => $ov['order_id'],
 				'user_id' => $ov['user_id'],
 				'store_id' => $ov['store_id'],
 				'providerStore' => $ov['providerStore'],
+                'typeOrganization' => $ov['typeOrganization'],
 				'brend' => $ov['brend'],
 				'brend_id' => $ov['brend_id'],
 				'item_id' => $ov['item_id'],
@@ -39,7 +42,6 @@ class Synchronization{
                 'issued_date' => $ov['issued_date'],
 				'returned' => $ov['returned'],
 				'updated' => $ov['updated'] ?: $ov['created'],
-				'typeOrganization' => $ov['typeOrganization'],
 				'withoutMarkup' => $ov['withoutMarkup'],
                 'return_price' => $ov['return_price'],
                 'return_data' => $ov['return_data']

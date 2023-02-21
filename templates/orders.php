@@ -31,11 +31,11 @@ else{
 	foreach($_GET as $key => $value){
 		switch($key){
 			case 'status_id':
-				foreach($_GET['status_id'] as $key => $value) $statuses[$value] = 1;
+				foreach($_GET['status_id'] as $k => $v) $statuses[$v] = 1;
 				$params['status_id'] = $statuses;
 				break;
 			case 'status':
-				foreach($_GET['status'] as $key => $value) $statuses[$value] = 1;
+				foreach($_GET['status'] as $k => $v) $statuses[$v] = 1;
 				$params['status'] = $statuses;
 				break;
 			default:

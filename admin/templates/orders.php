@@ -38,12 +38,12 @@ switch ($act) {
 		}
 		if (isset($_GET['automaticOrder'])){
 			header("Location: /orders");
-			exit();
+			die();
 		} 
 		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
 		break;
 	case 'print':
-		$order = \core\OrderValue::getOrderInfo($_GET['id']);
+		$order = OrderValue::getOrderInfo($_GET['id']);
 		$res_order_values = OrderValue::get(['order_id' => $_GET['id']]);
 		order_print($order, $res_order_values);
 		break;
@@ -205,7 +205,7 @@ function show_form($act){
 	$db->update('orders', array('is_new' => 0), "`id`=$id");
 	switch($act){
 		case 's_change':
-			$order = \core\OrderValue::getOrderInfo($_GET['id'], '');
+			$order = OrderValue::getOrderInfo($_GET['id'], '');
 			$res_order_values = core\OrderValue::get(['order_id' => $_GET['id']], '');
 			$page_title = "Просмотр заказа";
 			break;
@@ -232,8 +232,10 @@ function show_form($act){
 			<td label="Пользователь">
 				<a href="?view=users&act=funds&id=<?=$order['user_id']?>">
 					<?=$order['fio']?>
-				</a> 
-				(<b class="price_format"><?=$order['bill'] - $order['reserved_funds']?></b> руб.)
+				</a>
+                <?if ($order['pay_type'] == 'Безналичный') $available = $order['bill_cashless'] - $order['reserved_cashless'];
+                else $available = $order['bill_cash'] - $order['reserved_cash'];?>
+				(<b class="price_format"><?=$available?></b> руб.)
 			</td>
 			<td label="Сумма" class="price_format total">
                 <?=get_summ([
@@ -572,11 +574,14 @@ function show_form($act){
 								<input type="hidden" name="returned" value="<?=$ov['returned']?>">
 
 								<input type="hidden" name="price" value="<?=$ov['price']?>">
-								<input type="hidden" name="bill" value="<?=$ov['bill']?>">
-								<input type="hidden" name="reserved_funds" value="<?=$ov['reserved_funds']?>">
+								<input type="hidden" name="bill_cash" value="<?=$ov['bill_cash']?>">
+								<input type="hidden" name="bill_cashless" value="<?=$ov['bill_cashless']?>">
+								<input type="hidden" name="reserved_cash" value="<?=$ov['reserved_cash']?>">
+								<input type="hidden" name="reserved_cashless" value="<?=$ov['reserved_cashless']?>">
 								<input type="hidden" name="brend" value="<?=$ov['brend']?>">
 								<input type="hidden" name="article" value="<?=$ov['article']?>">
 								<input type="hidden" name="title" value="<?=$ov['title_full']?>">
+								<input type="hidden" name="pay_type" value="<?=$order['pay_type']?>">
 								<b><?=$ov['status']?></b>
 								<?$no_show = array(9, 6, 8, 10, 12);
 								if (!in_array($ov['status_id'], $no_show)){

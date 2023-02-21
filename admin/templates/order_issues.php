@@ -1,4 +1,6 @@
 <?php
+/** @global \core\Database $db */
+
 require_once("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
 $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
 $issues = new Issues($user_id, $db);

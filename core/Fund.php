@@ -16,7 +16,8 @@ class Fund{
             'paid' => $fields['paid'] ?? 0,
             'issue_id' => $fields['issue_id'] ?? null,
 			'overdue' => $fields['overdue'] ?? 0,
-			'comment' => $fields['comment']
+			'comment' => $fields['comment'],
+            'bill_type' => $fields['bill_type']
 		];
 		if ($type_operation == 1) $insert['is_new'] = 1;
 		return $GLOBALS['db']->insert('funds', $insert);

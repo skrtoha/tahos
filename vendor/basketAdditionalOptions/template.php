@@ -1,5 +1,6 @@
 <?php
 use core\UserAddress;
+use core\User;
 
 /** @global string $user_id */
 
@@ -7,12 +8,12 @@ use core\UserAddress;
 $db = $GLOBALS['db'];
 
 /** @var mysqli_result $res_user */
-if (\core\User::$fetched) $user = \core\User::$fetched;
+if (User::$fetched) $user = User::$fetched;
 else{
     $res_user = core\User::get(['user_id' => $user_id]);
     $user = $res_user->fetch_assoc();
 }
-$debt = \core\User::getDebt($user);
+$debt = User::getDebt($user);
 
 
 $res_basket = core\Basket::get($user['id']);
@@ -62,26 +63,25 @@ $addresses = $db->select('user_addresses', '*', "`user_id` = {$user['id']}");
             <div class="wrapper">
                 <div class="left">Выберите способ оплаты</div>
                 <div class="right">
-                    <?if ($user['user_type'] == 'entity'){?>
+                    <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){?>
                         <label>
                             <?$checked = $user['pay_type'] == 'Безналичный' ? 'checked' : ''?>
                             <input <?=$checked?> type="radio" name="pay_type" value="Безналичный">
                             <span>Безналичный</span>
                         </label>
                     <?}
-                    else{
-                        if ($user['pay_type'] == 'Безналичный') $user['pay_type'] = 'Наличный';
-                    }?>
-                    <label>
-                        <?$checked = $user['pay_type'] == 'Наличный' ? 'checked' : ''?>
-                        <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
-                        <span>Наличный</span>
-                    </label>
-                    <label>
-                        <?$checked = $user['pay_type'] == 'Онлайн' ? 'checked' : ''?>
-                        <input <?=$checked?> type="radio" name="pay_type" value="Онлайн">
-                        <span>Онлайн оплата</span>
-                    </label>
+                    if (in_array($user['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){?>
+                        <label>
+                            <?$checked = $user['pay_type'] == 'Наличный' ? 'checked' : ''?>
+                            <input <?=$checked?> type="radio" name="pay_type" value="Наличный">
+                            <span>Наличный</span>
+                        </label>
+                        <label>
+                            <?$checked = $user['pay_type'] == 'Онлайн' ? 'checked' : ''?>
+                            <input <?=$checked?> type="radio" name="pay_type" value="Онлайн">
+                            <span>Онлайн оплата</span>
+                        </label>
+                    <?}?>
                 </div>
             </div>
             <div class="wrapper">

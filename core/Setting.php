@@ -2,7 +2,7 @@
 namespace core;
 class Setting{
 	private static $tableName = 'settings';
-	public static function get($param1, $param2 = ''){
+	public static function get($param1, $param2 = null, $type = null){
 		static $defaultSettingsOfView;
 		if ($param2){
 			$view = $param1;
@@ -16,8 +16,9 @@ class Setting{
 			if (!$defaultSettingsOfView){
 				$resArray = $GLOBALS['db']->select(self::$tableName, ['name', 'value'], "`view` = '$view'");
 				foreach($resArray as $value) $defaultSettingsOfView[$value['name']] = $value['value'];
-			} 
-			return $defaultSettingsOfView[$name];
+			}
+            if ($type == 'all') return $defaultSettingsOfView;
+            return $defaultSettingsOfView[$name];
 		}
 	}
 	public static function update($param1, $param2, $param3 = ''){

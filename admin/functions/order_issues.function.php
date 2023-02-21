@@ -177,7 +177,11 @@ class Issues{
 				oiv.order_id,
 				oi.user_id,
 				CONCAT_WS(' ', u.name_1, u.name_2, u.name_3) AS user_name,
-				u.bill - u.reserved_funds AS user_available,
+				IF(
+				    u.user_type = 'private',
+				    u.bill_cash - u.reserved_funds,
+				    u.bill_cashless - u.reserved_funds
+				) AS user_available,
 				oiv.item_id,
 				i.brend_id,
 				b.title AS brend,

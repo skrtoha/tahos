@@ -39,17 +39,32 @@ class Account{
         $.ionTabs('#account-history-tabs', {
             type: 'none',
             onChange: (obj) => {
-                if (obj.tab != 'Tab_3_name') return;
-
                 const objTab = document.querySelector([`div[data-name=${obj.tab}]`]);
 
                 let innerHtml = objTab.innerHTML;
                 innerHtml = innerHtml.trim();
-                if (innerHtml.length > 0) return;
+
+                const balanceCashless = document.querySelector('div.balance-cashless');
+                const balanceCash = document.querySelector('div.balance-cash');
+                switch(obj.tab){
+                    case 'cash':
+                        if (balanceCashless !== null) balanceCashless.style.display = 'none';
+                        if (balanceCash !== null) balanceCash.style.display = 'block';
+                        break;
+                    case 'cashless':
+                        if (balanceCash !== null) balanceCash.style.display = 'none';
+                        if (balanceCashless !== null)balanceCashless.style.display = 'block';
+                        break;
+                    case 'common':
+                        if (balanceCashless !== null) balanceCashless.style.display = 'block';
+                        if (balanceCash !== null) balanceCash.style.display = 'block';
+                        break;
+                }
 
                 const url = '/ajax/account.php';
                 let formData = new FormData(document.querySelector('.account-history-block form'));
-                formData.set('act', 'getDebtList');
+                formData.set('act', 'get_bill');
+                formData.set('bill_type', obj.tab);
 
                 popup.style.display = 'flex';
 
@@ -57,31 +72,39 @@ class Account{
                     method: 'POST',
                     body: formData
                 }).then(response => response.json()).then((response) => {
-                    objTab.append(this.getHtmlOrderIssues(response));
+                    // const parser = new DOMParser();
+                    // let htmlContent = parser.parseFromString(response, 'text/html');
+                    // objTab.innerHTML = response;
+                    objTab.innerHTML = response.html;
+                    document.querySelector('span.account-debts').innerHTML = response.reserved;
+                    document.querySelector('span.account-total').innerHTML = response.total;
+
+                    const dataIssueId = document.querySelectorAll('[data-issue-id]');
+                    for(let d of dataIssueId){
+                        d.addEventListener('click', (e) => {
+                            const tr = e.target.closest('tr');
+
+                            if (tr.classList.contains('active')) return;
+
+                            let issue_id = tr.getAttribute('data-issue-id');
+                            this.dataIssueIdEvent(issue_id, tr);
+                            tr.addEventListener('click', (event) => {
+                                const tr = event.target.closest('tr');
+
+                                if (!tr.classList.contains('active')) return;
+
+                                tr.nextElementSibling.remove();
+                                tr.classList.remove('active');
+                            })
+                        })
+                    }
+
                     popup.style.display = 'none';
                 })
             }
         });
 
-        const dataIssueId = document.querySelectorAll('[data-issue-id]');
-        for(let d of dataIssueId){
-            d.addEventListener('click', (e) => {
-                const tr = e.target.closest('tr');
 
-                if (tr.classList.contains('active')) return;
-
-                let issue_id = tr.getAttribute('data-issue-id');
-                this.dataIssueIdEvent(issue_id, tr);
-                tr.addEventListener('click', (event) => {
-                    const tr = event.target.closest('tr');
-
-                    if (!tr.classList.contains('active')) return;
-
-                    tr.nextElementSibling.remove();
-                    tr.classList.remove('active');
-                })
-            })
-        }
     }
     static dataIssueIdEvent(issue_id, obj){
         const table = obj.closest('table');

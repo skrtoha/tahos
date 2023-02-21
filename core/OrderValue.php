@@ -9,40 +9,48 @@ use core\Sms\SmsAero;
 class OrderValue{
 	public static $countOrdered = 0;
 	public static function setFunds($params){
+        $update = ['reserved_funds' => "`reserved_funds` - " .$params['totalSumm']];
         /** @var \mysqli_result $res_user */
 		$res_user = User::get(['user_id' => $params['user_id']]);
-		$user = $res_user->fetch_assoc();
+        foreach($res_user as $value) $user = $value;
 
-        $remainder = $user['bill'] - $params['totalSumm'];
+        if ($user['user_type'] == 'private'){
+            $remainder = $user['bill_cash'] - $params['totalSumm'];
+            $bill = $user['bill_cash'];
+            $bill_type = User::BILL_CASH;
+            $update['bill_cash'] = "`bill_cash` - " . $params['totalSumm'];
+        }
+        else{
+            $remainder = $user['bill_cashless'] - $params['totalSumm'];
+            $bill = $user['bill_cashless'];
+            $bill_type = User::BILL_CASHLESS;
+            $update['bill_cashless'] = "`bill_cashless` - " . $params['totalSumm'];
+        }
+
 
 		//вычисление задолженности
 		$overdue = 0;
-		if ($user['bill'] < $params['totalSumm']){
-			if ($user['bill'] > 0) $overdue = $params['totalSumm'] - $user['bill'];
+		if ($bill < $params['totalSumm']){
+			if ($bill > 0) $overdue = $params['totalSumm'] - $bill;
 			else $overdue = $params['totalSumm'];
 		}
 
         $paid = 0;
-        if ($user['bill'] - $params['totalSumm'] > 0) $paid = $params['totalSumm'];
-        elseif ($user['bill'] > 0 && $remainder < 0) $paid = $user['bill'];
+        if ($bill - $params['totalSumm'] > 0) $paid = $params['totalSumm'];
+        elseif ($bill > 0 && $remainder < 0) $paid = $bill;
 
 		Fund::insert(2, [
-			'sum' => $params['totalSumm'],
-			'remainder' => $remainder,
-			'user_id' => $params['user_id'],
+            'sum' => $params['totalSumm'],
+            'remainder' => $remainder,
+            'user_id' => $params['user_id'],
             'issue_id' => $params['issue_id'],
             'paid' => $paid,
-			'overdue' => $overdue,
-			'comment' => 'Реализация товаров'
-		]);
+            'overdue' => $overdue,
+            'comment' => 'Реализация товаров',
+            'bill_type' => $bill_type
+        ]);
 
-		User::update(
-			$params['user_id'],
-			[
-				'reserved_funds' => "`reserved_funds` - " .$params['totalSumm'],
-				'bill' => "`bill` - " . $params['totalSumm']
-			]
-		);
+        User::update($params['user_id'], $update);
 	}
     
     /**
@@ -80,9 +88,12 @@ class OrderValue{
 				$values['returned'] = "`returned` + {$params['quan']}";
 				self::update($values, $params);
 				self::changeInStockStoreItem($params['quan'], $params, 'plus');
+
+                /** @var \mysqli_result $res_user */
 				$res_user = User::get(['user_id' => $params['user_id']]);
-				$user = $res_user->fetch_assoc();
-				$title = self::getTitleComment($params['item_id']);
+                foreach ($res_user as $value) $user = $value;
+
+                $title = self::getTitleComment($params['item_id']);
 				Fund::insert(1, [
 					'sum' => $params['quan'] * $params['price'],
 					'remainder' => $user['bill'] + $params['quan'] * $params['price'],
@@ -102,20 +113,13 @@ class OrderValue{
                 foreach($arrived as $value){
                     if ($value == 0) $isAllArrived = false;
                 }
-                if (self::allItemsArrived($params)){
-                    
-                    /*$mailer = new Mailer(Mailer::TYPE_INFO);
-                    $mailer->send([
-                    
-                    ]);*/
-                }
 				$values['arrived'] = $params['quan'];
 				self::update($values, $params);
 				break;
 			//отменен
 			case 10:
 				self::update($values, $params);
-				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'minus');
+				User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'minus', $params['pay_type']);
 				self::changeInStockStoreItem($params['quan'], $params, 'plus');
 				break;
 			//заказано
@@ -123,7 +127,7 @@ class OrderValue{
 				$values['ordered'] = "`ordered` + {$params['quan']}";
 				self::update($values, $params);
                 if (!$params['is_payed']){
-                    User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price']);
+                    User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'plus', $params['pay_type']);
                 }
 				self::changeInStockStoreItem($params['quan'], $params);
 				break;
@@ -135,14 +139,16 @@ class OrderValue{
 				
 				//если предыдущий статус был заказано
 				if ($ov['status_id'] == 11){
-					User::updateReservedFunds($params['user_id'], $params['price'], 'minus');
+					User::updateReservedFunds($params['user_id'], $params['price'], 'minus', $params['pay_type']);
 				}
 
 				//если отменено поставщиком
 				if ($status_id == 8){
 					$GLOBALS['db']->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
+                    /** @var \mysqli_result $res_user */
                     $res_user = User::get(['id' => $ov['user_id']]);
-                    $userInfo = $res_user->fetch_assoc();
+                    foreach($res_user as $value) $userInfo = $value;
+
                     if ($userInfo['get_sms_provider_refuse'] && $userInfo['phone']){
                         $smsAero = new SmsAero();
                         $query = Item::getQueryItemInfo();
@@ -368,10 +374,13 @@ class OrderValue{
 				o.user_id,
 				DATE_FORMAT(o.created, '%d.%m.%Y %H:%i:%s') AS created,
 				" . User::getUserFullNameForQuery() . " AS userName,
-				u.bill,
+				u.bill_cash,
+				u.bill_cashless,
 				u.email,
-				u.reserved_funds,
+				u.reserved_cash,
+				u.reserved_cashless,
 				u.user_type AS typeOrganization,
+				DATE_FORMAT(u.created, '%d.%m.%Y %H:%i:%s') AS userCreated, 
 				ps.delivery,
 				p.api_title,
 				p.title AS provider,
@@ -392,7 +401,11 @@ class OrderValue{
 					FROM 
 						#messages
 					WHERE correspond_id=c.id
-				) as count
+				) as count,
+				CASE
+                    WHEN o.pay_type = 'Наличный' OR o.pay_type = 'Онлайн' THEN 1
+                    WHEN o.pay_type = 'Безналичный' THEN 2
+                END AS bill_type
 			FROM
 				#orders_values ov
             LEFT JOIN #order_issue_values oiv ON
@@ -540,7 +553,8 @@ class OrderValue{
                 min(ps.delivery) as min_delivery,
                 max(ps.delivery) as max_delivery,
                 o.user_id,
-                u.bill,
+                u.bill_cash,
+                u.bill_cashless,
                 u.reserved_funds,
                 u.defermentOfPayment,
                 o.pay_type,

@@ -2,6 +2,12 @@
 .paginationjs .paginationjs-pages li{
     padding: 0;
 }
+.bill {
+    padding: 5px;
+    border: 1px solid gray;
+    margin: 0 10px 10px 0;
+    width: fit-content;
+}
 div.intuitiveSearch_wrap{
 	display: block;
 	margin: 10px 0;

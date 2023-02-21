@@ -21,6 +21,20 @@
     margin-top: 20px;
 }
 
+.account .balance > h2 {
+    text-transform: uppercase;
+    font-size: 19px;
+}
+
+.account .balance {
+    padding: 10px;
+    border: 1px solid #c8c8c8;
+    margin-bottom: 20px;
+}
+.account table td:first-child {
+    padding-right: 10px;
+}
+
 .account table th:nth-child(2), .account table td:nth-child(2) {
     text-align: left
 }
@@ -79,7 +93,7 @@
 }
 
 .balance-block {
-    padding: 20px;
+    padding: 20px 0;
     width: 320px;
     float: left;
     display: inline-block;
@@ -109,6 +123,7 @@ div[data-name="Tab_3_name"] table.mobile_view tr {
     color: red;
     white-space: nowrap;
     text-align: center;
+    display: block;
 }
 tr[data-issue-id]{
     cursor: pointer;
@@ -361,6 +376,9 @@ td.name-col b {
 }
 tr.active{
     border-bottom: none;
+}
+table.mobile_view td {
+    padding: 10px 0;
 }
 .icon-enlarge2:before {
     content: "\e98b";

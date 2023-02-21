@@ -214,7 +214,7 @@ use core\Setting;
 					<li>
 						<a href="/account">
 							<span class="account_title">На вашем счету</span>
-							<span class="account_sum"><?=get_bill()?></span>
+							<span class="account_sum"><?=round($user['bill_total'])?> <i class="fa fa-rub" aria-hidden="true"></i></span>
 						</a>
 					</li>
 				</ul>

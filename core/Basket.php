@@ -115,8 +115,17 @@ class Basket{
         }
 
         //проверяем превышение лимита
-        $available = $user['bill'] - $user['reserved_funds'];
-        if ($available < 0 && abs($available) > $user['credit_limit']){
+        $limitExceeded = false;
+        if ($user['user_type'] == 'private'){
+            $available = $user['bill_cash'] - $user['reserved_funds'];
+            if ($available < 0 && abs($available) > $user['credit_limit_cash']) $limitExceeded = true;
+        }
+        else{
+            $available = $user['bill_cashless'] - $user['reserved_funds'];
+            if ($available < 0 && abs($available) > $user['credit_limit_cashless']) $limitExceeded = true;
+        }
+
+        if ($limitExceeded){
             message('Превышен кредитный лимит!', false);
             header("Location: {$_SERVER['HTTP_REFERER']}");
             exit();

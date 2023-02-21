@@ -1,53 +1,31 @@
-<? use core\Breadcrumb;
+<?
+/** @global \core\Database $db */
+/** @global array $user */
+
+use core\Breadcrumb;
+use core\User;
 
 $title = 'Счет';
 
-$params = array();
+if (!$_SESSION['user']) header("Location: /");
 
-$where = '';
+$designation = $user['designation'];
 
-$uri = parse_url($_SERVER['REQUEST_URI']);
-parse_str($uri['query'], $params);
+$bonuses_exist = false;
 
-if (isset($params['period'])){
-	switch ($params['period']){
-		case 'all': $where = ''; break;
-		case 'selected':
-			$begin = date('Y-m-d', strtotime($params['begin']));
-			$end = date('Y-m-d', strtotime($params['end']));
-			$where .= "`created` BETWEEN '$begin' AND '$end 23:59:59' AND";
-			break;
-	}
+$params = [];
+$parts = parse_url($_SERVER['REQUEST_URI']);
+parse_str($parts['query'], $query);
+if (!empty($query)){
+    if (isset($query['end'])) $params['end'] = $query['end'];
+    if (isset($query['begin'])) $params['begin'] = $query['begin'];
+    if (isset($query['period'])) $params['period'] = $query['period'];
 }
 else{
-	$params['end'] = date('d.m.Y', time());
-	$date = new DateTime($params['end']);
-	$end = $date->format('Y-m-d');
-	$date->sub(new DateInterval('P30D'));
-	$begin = $date->format('Y-m-d');
-	$params['begin'] = $date->format('d.m.Y');
-	$where = "`created` BETWEEN '$begin' AND '$end 23:59:59' AND";
+    $dateTime = new DateTime();
+    $params['end'] = $dateTime->format('d.m.Y');
+    $params['begin'] = $dateTime->sub(new DateInterval('P30D'))->format('d.m.Y');
 }
-
-if (!$_SESSION['user']) header("Location: /");
-$designation = $user['designation'];
-$funds = $db->select('funds', '*', "`type_operation` IN (1,2) AND $where `user_id`=".$_SESSION['user'], 'created', false);
-$operations_types = array(
-	1 => 'Пополнение счета', 
-	2 => 'Списание средств',
-	3 => 'Зачисление бонусов',
-	4 => 'Списание бонусов'
-);
-$bonuses_exist = false;
-$res_bonuses = $db->query("
-	SELECT 
-		* FROM 
-		#funds 
-	WHERE 
-		`type_operation` IN (3,4) AND 
-		`user_id`={$_SESSION['user']} AND
-		transfered=1
-", '');
 
 Breadcrumb::add('/account', 'Счет');
 Breadcrumb::out();
@@ -56,12 +34,28 @@ Breadcrumb::out();
 	<div class="sidebar">
 		<div class="balance-block">
 			<h1>Баланс</h1>
-			<p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit']?></span><?=$designation?></p>
-			<?$bill = payment_funds('bill', $user);?>
-			<p>Средств на счету: <span class="account-money "><?=$bill?></span><?=$designation?></p>
-			<?$reserved_funds = payment_funds('reserved_funds', $user);?>
-			<p>Зарезервировано: <span class="account-debts "><?=$reserved_funds?></span><span style="color: red"><?=$designation?></span></p>
-			<p>Итого: <span class="account-total "><?=payment_funds('bill', $user, true)?></span><span style="color: #0081bc"><?=$designation?></span></p>
+            <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){?>
+                <div class="balance balance-cash">
+                    <h2>Наличный</h2>
+                    <p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit_cash']?></span><?=$designation?></p>
+                    <p>Средств на счету: <span class="account-money "><?=$user['bill_cash']?></span><?=$user['designation']?></p>
+                </div>
+            <?}?>
+
+            <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){?>
+                <div class="balance balance-cashless">
+                    <h2>Безналичный</h2>
+                    <p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit_cashless']?></span><?=$designation?></p>
+                    <p>Средств на счету: <span class="account-money "><?=$user['bill_cashless']?></span><?=$designation?></p>
+                </div>
+            <?}?>
+			<p>Зарезервировано: <span class="account-debts "><?=$user['reserved_cash'] + $user['reserved_cashless']?></span><span style="color: red"><?=$designation?></span></p>
+			<p>
+                Итого:
+                <span class="account-total">
+                    <?=$user['bill_total'] - $user['reserved_cash'] - $user['reserved_cashless']?>
+                </span>
+                <span style="color: #0081bc"><?=$designation?></span></p>
 			<?if ($user['bonus_program']){?>
 				<p>Бонусы: <span class="account-bonus"><?=$user['bonus_count']?><?=$designation?></span></p>
 			<?}?>
@@ -72,10 +66,12 @@ Breadcrumb::out();
 			<h1>История счета</h1>
 			<form>
 				<div class="checkbox-wrap">
-					<input type="radio" name="period" id="order-filter-period-all" value="all" <?=$params['period'] == 'all' ? 'checked' : ''?>>
+                    <?$checked = isset($params['period']) && $params['period'] == 'all' ? 'checked' : ''?>
+					<input <?=$checked?> type="radio" name="period" id="order-filter-period-all" value="all">
 					<label for="order-filter-period-all">за все время</label>
 					<br><br>
-					<input type="radio" name="period" id="order-filter-period-selected" value="selected" <?=$params['period'] == 'selected' || !isset($params['period']) ? 'checked' : ''?>>
+                    <?$checked = $params['period'] != 'all' ? 'checked' : '';?>
+					<input <?=$checked?> type="radio" name="period" id="order-filter-period-selected" value="selected">
 					<label for="order-filter-period-selected">за период </label>
 				</div>
 				<div class="date-wrap">
@@ -93,145 +89,33 @@ Breadcrumb::out();
 	</div>
 	<div class="ionTabs" id="account-history-tabs" data-name="account-history-tabs">
 		<ul class="ionTabs__head">
-			<li class="ionTabs__tab" data-target="Tab_1_name">История счета</li>
+			<li class="ionTabs__tab" data-target="common">История счета</li>
+
+            <?if ($user['bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS){?>
+                <li class="ionTabs__tab" data-target="cash">Наличные</li>
+                <li class="ionTabs__tab" data-target="cashless">Безналичные</li>
+            <?}?>
 			<?if ($user['bonus_program']){?>
 				<li class="ionTabs__tab" data-target="Tab_2_name">История бонусов</li>
 			<?}?>
 		</ul>
 		<div class="ionTabs__body">
-			<div class="ionTabs__item" data-name="Tab_1_name">
-				<table>
-					<tr>
-						<th>Вид операции</th>
-						<th>Комментарий</th>
-						<th>Дата</th>
-						<th>Сумма</th> 
-						<th>Остаток</th>
-					</tr>
-					<?if (isset($funds) && count($funds)){
-						foreach ($funds as $fund){
-                            if ($fund['issue_id']){?>
-                                <tr data-issue-id="<?=$fund['issue_id']?>">
-                            <?}
-                            else{?>
-                                <tr>
-                            <?}?>
-								<td><?=$operations_types[$fund['type_operation']]?></td>
-								<td class="name-col">
-                                    <?=stripslashes($fund['comment'])?>
-                                    <?if ($fund['issue_id']){?>
-                                        №<?=$fund['issue_id']?>
-                                    <?}?>
-                                </td>
-								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
-								<td>
-									<?$color = $fund['type_operation'] == 1 ? 'positive-color' : 'negative-color';
-                                    $minus_plus = $fund['type_operation'] == 1 ? '+' : '-';
-                                    if ($fund['issue_id']){
-                                        $color = 'gray-colour';
-                                        $minus_plus = '';
-                                    }
-									?>
-									<span class="<?=$color?>">
-										<?=$minus_plus?>
-										<span class="price_format"><?=$fund['sum']?></span><i class="fa fa-rub" aria-hidden="true"></i>
-									</span>
-                                    <?if ($fund['issue_id']){?>
-                                        <span class="status">
-                                            <?if ($fund['paid'] < $fund['sum']){?>
-                                                <span class="negative-color">не оплачено</span>
-                                                <?
-                                                $created = DateTime::createFromFormat('Y-m-d H:i:s', $fund['created']);
-                                                $difference = time() - $created->getTimestamp();
-                                                $difference = floor($difference / 24 / 60 / 60);
-
-                                                if ($difference >= $user['defermentOfPayment']){?>
-                                                    <span class="delay negative-color">просрок <?=$difference - $user['defermentOfPayment']?> д.</span>
-                                                <?}
-                                                else{
-                                                    $headline = $created->add(new DateInterval("P{$user['defermentOfPayment']}D"));
-                                                    $difference = $headline->getTimestamp() - time();
-                                                    $difference = floor($difference / 24 / 60 / 60);
-                                                    ?>
-                                                    <span class="delay account-total">осталось <?=$difference?> д.</span>
-                                                <?}?>
-                                            <?}?>
-                                        </span>
-                                    <?}?>
-
-								</td>
-                                <td>
-                                    <?=$fund['remainder']?><i class="fa fa-rub" aria-hidden="true"></i>
-                                    <?if ($fund['issue_id']){?>
-                                        <span class="icon-enlarge2"></span>
-                                    <?}?>
-                                </td>
-							</tr>
-						<?}
-					}
-					else{?>
-						<tr><td colspan="4">Операций со счетом не найдено</td></tr>
-					<?}?>
-				</table>
-				<table class="small-view">
-					<tr>
-						<th>Операция</th>
-						<th>Дата</th>
-						<th>Сумма</th>
-					</tr>
-					<?if (isset($funds) && count($funds)){
-						foreach ($funds as $fund){
-							if (in_array($fund['type_operation'], [3,4])) continue;
-                            if ($fund['issue_id']){?>
-                                <tr data-issue-id="<?=$fund['issue_id']?>">
-                            <?}
-                            else{?>
-                                <tr>
-                            <?}?>
-								<td class="name-col">
-                                    <?=stripslashes($fund['comment'])?>
-                                    <?if ($fund['issue_id']){?>
-                                        №<?=$fund['issue_id']?>
-                                    <?}?>
-                                </td>
-								<td><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
-								<td>
-									<?$color = $fund['type_operation'] == 1 ? 'positive-color' : 'negative-color';
-                                    if ($fund['issue_id']) $color = 'gray-colour';
-									$minus_plus = $fund['type_operation'] == 1 ? '+' : '-';?>
-									<span class="<?=$color?>">
-										<?=$minus_plus?>
-										<span class="price_format"><?=$fund['sum']?></span><i class="fa fa-rub" aria-hidden="true"></i>
-									</span>
-                                    <?if ($fund['issue_id']){?>
-                                        <span class="status">
-                                            <?if ($fund['paid'] < $fund['sum']){?>
-                                                <span class="negative-color">не оплачено</span>
-                                                <?
-                                                $created = DateTime::createFromFormat('Y-m-d H:i:s', $fund['created']);
-                                                $difference = time() - $created->getTimestamp();
-                                                $difference = floor($difference / 24 / 60 / 60);
-
-                                                if ($difference >= $user['defermentOfPayment']){?>
-                                                    <span class="delay negative-color">просрок <?=$difference - $user['defermentOfPayment']?> д.</span>
-                                                <?}
-                                                else{
-                                                    $headline = $created->add(new DateInterval("P{$user['defermentOfPayment']}D"));
-                                                    $difference = $headline->getTimestamp() - time();
-                                                    $difference = floor($difference / 24 / 60 / 60);
-                                                    ?>
-                                                    <span class="delay account-total">осталось <?=$difference?> д.</span>
-                                                <?}?>
-                                            <?}?>
-                                        </span>
-                                    <?}?>
-								</td>
-							</tr>
-					<?}
-					}?>
-				</table>
-			</div>
-			<?if ($user['bonus_program']){?>
+			<div class="ionTabs__item" data-name="common"></div>
+            <?if ($user['bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS){?>
+                <div class="ionTabs__item" data-name="cash"></div>
+                <div class="ionTabs__item" data-name="cashless"></div>
+            <?}?>
+			<?if ($user['bonus_program']){
+                $res_bonuses = $db->query("
+                    SELECT 
+                        * FROM 
+                        #funds 
+                    WHERE 
+                        `type_operation` IN (3,4) AND 
+                        `user_id`={$_SESSION['user']} AND
+                        transfered=1
+                ", '');
+                ?>
 				<div class="ionTabs__item" data-name="Tab_2_name">
 					<table>
 						<tr>

@@ -4,6 +4,13 @@ namespace core;
 use mysqli_result;
 
 class User{
+    const BILL_CASH = 1;
+    const BILL_CASHLESS = 2;
+
+    const BILL_MODE_CASH = 1;
+    const BILL_MODE_CASHLESS = 2;
+    const BILL_MODE_CASH_AND_CASHLESS = 3;
+
     public static $fetched;
 	public static function noOverdue($user_id){
 		$query = Fund::getQueryListFunds(
@@ -50,6 +57,9 @@ class User{
 		$where = '';
         $having = '';
         $limit = '';
+        $order = '';
+        $dir = 'ASC';
+        if (isset($params['order_by'])) $dir = $params['dir'];
 		if (!empty($params)){
 			if (isset($params['user_id']) && !$params['user_id']) return [
 				'markup' => 0,
@@ -64,6 +74,10 @@ class User{
 					case 'withWithdraw': $where .= "u.bill < 0 AND "; break;
                     case 'full_name': $having .= "full_name LIKE '%{$value}%' AND "; break;
                     case 'limit': $limit = "LIMIT $value"; break;
+                    case 'order':
+                    case 'dir':
+                        $order = "ORDER BY {$params['order']} $dir";
+                        break;
                     default:
                         $where .= "u.$key = '$value' AND ";
 				}
@@ -80,6 +94,16 @@ class User{
 		$q_user = "
 			SELECT 
 				u.*,
+				CASE
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH_AND_CASHLESS." THEN @bill_total := u.bill_cash + u.bill_cashless
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH." THEN @bill_total := u.bill_cash
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASHLESS." THEN @bill_total := u.bill_cashless
+                END,
+				CASE
+                    WHEN u.currency_id = 1 THEN ROUND(@bill_total / c.rate, 0)
+                    WHEN u.currency_id = 6 THEN ROUND(@bill_total / c.rate * 10)
+                    ELSE ROUND(@bill_total / c.rate, 2)
+                END as bill_total,
 				c.designation, 
 				c.rate, 
 				i.title AS issue_title,
@@ -103,6 +127,7 @@ class User{
 				#organizations_types ot ON ot.id=u.organization_type
 			$where
 			$having
+			$order
 			$limit
 		";
         $output[$paramsString] = $db->query($q_user, '');
@@ -115,11 +140,15 @@ class User{
 	 * @param  [inter] $price value for increase|reduse reserved_funds
 	 * @return true if successfully updated
 	 */
-	public static function updateReservedFunds($user_id, $price, $act = 'plus'){
+	public static function updateReservedFunds($user_id, $price, $act, $pay_type){
 		$sign = $act == 'plus' ? '+' : '-';
+
+        $columnPayType = '';
+        if ($pay_type == 'Наличный' || $pay_type == 'Онлайн') $columnPayType = 'reserved_cash';
+        if ($pay_type == 'Безналичный') $columnPayType = 'reserved_cashless';
 		return self::update(
 			$user_id,
-			['reserved_funds' => "`reserved_funds` $sign {$price}"]
+			[$columnPayType => "`$columnPayType` $sign {$price}"]
 		);
 	}
 
@@ -195,7 +224,7 @@ class User{
 		return "
 			IF(
 				u.organization_name <> '',
-				CONCAT_WS (' ', ot.title, u.organization_name),
+				CONCAT_WS (' ', u.organization_name, ot.title),
 				CONCAT_WS (' ', u.name_1, u.name_2, u.name_3)
 			)
 		";
@@ -263,13 +292,6 @@ class User{
         if ($type_organization == 'entity') $payType[] = 'Безналичный';
         sort($payType);
         return $payType;
-    }
-
-    public static function addPaymentList(array $params){
-        /** @var Database $db */
-        $db = $GLOBALS['db'];
-
-        $db->insert('payment_list', $params);
     }
 
     private static function getQueryGroupDebt($date, $user_id): string
@@ -381,19 +403,32 @@ class User{
         }
     }
 
-    public static function getDebtList($params): array
-    {
-        /** @global $db Database */
-        global $db;
+    public static function replenishBill($params){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
 
-        $where = "f.user_id = {$params['user_id']} AND ";
-        if (isset($params['begin'])) $where .= "f.created > '{$params['begin']}' AND ";
-        if (isset($params['end'])) $where .= "f.created < '{$params['end']}' AND ";
-        $where = substr($where, 0, -5);
-        $query = self::getQueryDebt($where, 'f.created DESC');
-        return $db->query($query)->fetch_all(MYSQLI_ASSOC);
+        $count = $db->getCount('funds', "`comment` = '{$params['comment']}' and sum = {$params['sum']}");
+        if ($count) return;
+
+        $res_user = User::get(['user_id' => $params['user_id']]);
+        foreach ($res_user as $value) $user = $value;
+
+        if (empty($user)) return;
+
+        if($params['bill_type'] == User::BILL_CASH){
+            $params['remainder'] = $user['bill_cash'] + $params['sum'];
+            $arrayUser = ['bill_cash' => $params['remainder']];
+        }
+        else{
+            $params['remainder'] = $user['bill_cashless'] + $params['sum'];
+            $arrayUser = ['bill_cashless' => $params['remainder']];
+        }
+
+        Fund::insert(1, $params);
+        $db->update('users', $arrayUser, '`id`='.$params['user_id']);
+        User::checkOverdue($params['user_id'], $params['sum']);
+        User::checkDebt($params['user_id'], $_POST['sum']);
     }
-
 
     public static function setSparePartsRequest($params){
         /** @var \core\Database $db */

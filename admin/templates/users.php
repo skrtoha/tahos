@@ -126,7 +126,8 @@ switch ($act) {
 		$res = $db->query("
 			SELECT
 				o.user_id,
-				SUM(ov.price * ov.ordered) AS sum
+				SUM(ov.price * ov.ordered) AS sum,
+				o.pay_type
 			FROM
 				#orders_values ov
 			LEFT JOIN
@@ -134,14 +135,31 @@ switch ($act) {
 			WHERE
 				ov.status_id IN (11, 3)
 			GROUP BY
-				o.user_id
+				o.user_id,
+				o.pay_type
 		", '');
 		$updatedUsers = [];
 		foreach($res as $row){
-			$updatedUsers[] = $row['user_id'];
-			core\User::update($row['user_id'], ['reserved_funds' => $row['sum']]);
+            if ($row['pay_type'] == 'Наличный' || $row['pay_type'] = 'Онлайн'){
+                core\User::update($row['user_id'], ['reserved_cash' => $row['sum']]);
+                $updatedUsers['cash'][] = $row['user_id'];
+            }
+            else{
+                core\User::update($row['user_id'], ['reserved_cashless' => $row['sum']]);
+                $updatedUsers['cashless'][] = $row['user_id'];
+            }
+
 		}
-		$db->update('users', ['reserved_funds' => 0], '`id` NOT IN (' . implode(',', $updatedUsers) . ')');
+        if (!empty($updatedUsers['cash'])) $db->update(
+            'users',
+            ['reserved_cash' => 0],
+            '`id` NOT IN ('.implode(',', $updatedUsers['cash']).')'
+        );
+        if (!empty($updatedUsers['cashless'])) $db->update(
+            'users',
+            ['reserved_cashless' => 0],
+            '`id` NOT IN ('.implode(',', $updatedUsers['cashless']).')'
+        );
 		message('Успешно обновлено!');
 		header("Location: /admin/?view=users");
 		break;
@@ -154,7 +172,10 @@ switch ($act) {
 	case 'usersWithWithdraw':
 		$page_title = 'Отрицательный баланс';
 		$status = '<a href="/">Главная</a> > <a href="/admin/?view=users">Пользователи</a> > ' . $page_title;
-		$res_users = core\User::get(['withWithdraw' => true]);
+
+        /** @var mysqli_result $res_users */
+        $res_users = core\User::get(['withWithdraw' => true]);
+
 		usersWithWithdraw($res_users);
 		break;
 	default:

@@ -123,7 +123,6 @@ div[data-name="Tab_3_name"] table.mobile_view tr {
     color: red;
     white-space: nowrap;
     text-align: center;
-    display: block;
 }
 tr[data-issue-id]{
     cursor: pointer;
@@ -376,6 +375,9 @@ td.name-col b {
 }
 tr.active{
     border-bottom: none;
+}
+table.mobile_view td {
+    padding: 10px 0;
 }
 .icon-enlarge2:before {
     content: "\e98b";

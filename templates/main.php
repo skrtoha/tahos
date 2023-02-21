@@ -214,7 +214,7 @@ use core\Setting;
 					<li>
 						<a href="/account">
 							<span class="account_title">На вашем счету</span>
-							<span class="account_sum"><?=get_bill()?></span>
+							<span class="account_sum"><?=$user['bill_total']?></span>
 						</a>
 					</li>
 				</ul>

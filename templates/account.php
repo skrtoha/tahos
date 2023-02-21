@@ -35,7 +35,7 @@ Breadcrumb::out();
 		<div class="balance-block">
 			<h1>Баланс</h1>
             <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){?>
-                <div class="balance">
+                <div class="balance balance-cash">
                     <h2>Наличный</h2>
                     <p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit_cash']?></span><?=$designation?></p>
                     <p>Средств на счету: <span class="account-money "><?=$user['bill_cash']?></span><?=$user['designation']?></p>
@@ -43,17 +43,17 @@ Breadcrumb::out();
             <?}?>
 
             <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){?>
-                <div class="balance">
+                <div class="balance balance-cashless">
                     <h2>Безналичный</h2>
                     <p>Кредитный лимит: <span class="credit_limit"><?=$user['credit_limit_cashless']?></span><?=$designation?></p>
                     <p>Средств на счету: <span class="account-money "><?=$user['bill_cashless']?></span><?=$designation?></p>
                 </div>
             <?}?>
-			<p>Зарезервировано: <span class="account-debts "><?=$user['reserved_funds']?></span><span style="color: red"><?=$designation?></span></p>
+			<p>Зарезервировано: <span class="account-debts "><?=$user['reserved_cash'] + $user['reserved_cashless']?></span><span style="color: red"><?=$designation?></span></p>
 			<p>
                 Итого:
                 <span class="account-total">
-                    <?=$user['bill_total'] - $user['reserved_funds']?>
+                    <?=$user['bill_total'] - $user['reserved_cash'] - $user['reserved_cashless']?>
                 </span>
                 <span style="color: #0081bc"><?=$designation?></span></p>
 			<?if ($user['bonus_program']){?>

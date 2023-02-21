@@ -140,11 +140,15 @@ class User{
 	 * @param  [inter] $price value for increase|reduse reserved_funds
 	 * @return true if successfully updated
 	 */
-	public static function updateReservedFunds($user_id, $price, $act = 'plus'){
+	public static function updateReservedFunds($user_id, $price, $act, $pay_type){
 		$sign = $act == 'plus' ? '+' : '-';
+
+        $columnPayType = '';
+        if ($pay_type == 'Наличный' || $pay_type == 'Онлайн') $columnPayType = 'reserved_cash';
+        if ($pay_type == 'Безналичный') $columnPayType = 'reserved_cashless';
 		return self::update(
 			$user_id,
-			['reserved_funds' => "`reserved_funds` $sign {$price}"]
+			[$columnPayType => "`$columnPayType` $sign {$price}"]
 		);
 	}
 

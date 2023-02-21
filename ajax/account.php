@@ -11,6 +11,7 @@ $db->setProfiling();
 
 switch($_POST['act']){
     case 'get_bill':
+        $output = [];
         $res_user = \core\User::get(['user_id' => $_SESSION['user']]);
         foreach ($res_user as $value) $user = $value;
 
@@ -37,7 +38,9 @@ switch($_POST['act']){
                 $where .= "`created` BETWEEN '$begin' AND '$end' AND ";
             }
         $where = substr($where, 0, -5);
-        $funds = $db->select('funds', '*', $where , 'created', false);?>
+        $funds = $db->select('funds', '*', $where , 'created', false);
+        ob_start();
+        ?>
         <table>
             <tr>
                 <th>Вид операции</th>
@@ -169,7 +172,24 @@ switch($_POST['act']){
             }?>
         </table>
 
-        <?break;
+        <?
+        $output['html'] = ob_get_clean();
+        switch($_POST['bill_type']){
+            case 'common':
+                $output['total'] = $user['bill_cash'] + $user['bill_cashless'];
+                $output['reserved'] = $user['reserved_cash'] + $user['reserved_cashless'];
+                break;
+            case 'cash':
+                $output['total'] = $user['bill_cash'] - $user['reserved_cash'];
+                $output['reserved'] = $user['reserved_cash'];
+                break;
+            case 'cashless':
+                $output['total'] = $user['bill_cashless'] - $user['reserved_cashless'];
+                $output['reserved'] = $user['reserved_cashless'];
+                break;
+        }
+        echo json_encode($output);
+        break;
     case 'getOrderIssueInfo':
         $issuesClass = new Issues(null, $db);
         $res = json_encode($issuesClass->getIssueWithUser($_POST['issue_id']));

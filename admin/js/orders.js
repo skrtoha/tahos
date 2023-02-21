@@ -164,87 +164,91 @@ $(function(){
 			}
 		})
 	})
-	$('select.change_status').on('change', function(){
-		var th = $(this);
-		var status_id = + th.val();
-		if (status_id != 2) return false;
-		if (!confirm('Подтверждаете действие?')) return false;
-		var form = th.closest('form');
-		var issued = form.find('input[name=issued]').val();
-		var returned = form.find('input[name=returned]').val();
-		var tr = form.closest('tr');
-		modal_show(
-			'<form id="askForQuanAndPrice">' +
-				'<input type="hidden" name="store_id" value="' + tr.attr('store_id') + '">' +
-				'<input type="hidden" name="item_id" value="' + tr.attr('item_id') + '">' +
-				'<table>' +
-					'<tr>' +
-						'<td>Количество:</td>' +
-						'<td><input type="text" name="quan" value="' + (issued - returned) + '"></td>' +
-					'</tr>' +
-					'<tr>' +
-						'<td>Цена:</td>' +
-						'<td><input type="text" name="price" value="' + form.find('input[name=price]').val() + '"></td>' +
-					'</tr>' +
-					'<tr>' +
-						'<td colspan="2"><input type="submit" value="Отправить"></td>' +
-					'</tr>' +
-				'</table>' +
-			'</form>'
-		);
-	})
-	$('select.change_status').on('change', function(){
-		var th = $(this);
-		var status_id = + th.val();
-		//добавлено, т.к. обработка идет в другом месте
-		if (status_id == 2) return false;
-		if (status_id == 6 || status_id == 8){
-			if (!confirm('Вы подтверждаете действие?')) return false;
-		}
-		th = th.closest('form');
-		var order_id = + th.find('input[name=order_id]').val();
-		var store_id = + th.find('input[name=store_id]').val();
-		var item_id = + th.find('input[name=item_id]').val();
-		var data = 'status_id=' + status_id + '&order_id=' + order_id + '&store_id=' + store_id + '&item_id=' + item_id;
-		data += '&user_id=' + th.find('input[name=user_id]').val();
-		data += '&price=' + th.find('input[name=price]').val();
-		data += '&bill=' + th.find('input[name=bill]').val();
-		data += '&reserved_funds=' + th.find('input[name=reserved_funds]').val();
-		switch(status_id){
-			case 1:
-				data += '&arrived=' + th.find('input[name=arrived]').val();
-				break;
-			//выделено в отдельную функцию
-			case 2:break;
-			case 3:
-				ordered = + th.find('input[name=ordered]').val();
-				if (ordered == 1) arrived = ordered;
-				else arrived = prompt('Укажите количество:', ordered);
-				if (!check_value(th, arrived, ordered)) return false;
-				data += '&arrived=' + arrived;
-				break;
-			case 8:
-				ordered = + th.find('input[name=ordered]').val();
-				data += '&ordered=' + ordered;
-				break;
-			case 11:
-				var quan = + th.find('input[name=quan]').val();
-				if (quan > 1) var ordered = prompt('Укажите количество:', quan);
-				else ordered = quan;
-				if (!check_value(th, ordered, quan)) return false;
-				data += '&ordered=' + ordered;
-				break;
-		}
-		$.ajax({
-			type: 'post',
-			url: ajax_url,
-			data: data,
-			success: function(response){
-				// console.log(response); return false;
-				if (is_reload) document.location.reload();
-			}
-		})
-	})
+	$('select.change_status')
+        .on('change', function(){
+            var th = $(this);
+            var status_id = + th.val();
+            if (status_id != 2) return false;
+            if (!confirm('Подтверждаете действие?')) return false;
+            var form = th.closest('form');
+            var issued = form.find('input[name=issued]').val();
+            var returned = form.find('input[name=returned]').val();
+            var tr = form.closest('tr');
+            modal_show(
+                '<form id="askForQuanAndPrice">' +
+                    '<input type="hidden" name="store_id" value="' + tr.attr('store_id') + '">' +
+                    '<input type="hidden" name="item_id" value="' + tr.attr('item_id') + '">' +
+                    '<table>' +
+                        '<tr>' +
+                            '<td>Количество:</td>' +
+                            '<td><input type="text" name="quan" value="' + (issued - returned) + '"></td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td>Цена:</td>' +
+                            '<td><input type="text" name="price" value="' + form.find('input[name=price]').val() + '"></td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td colspan="2"><input type="submit" value="Отправить"></td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</form>'
+            );
+        })
+        .on('change', function(){
+            var th = $(this);
+            var status_id = + th.val();
+            //добавлено, т.к. обработка идет в другом месте
+            if (status_id == 2) return false;
+            if (status_id == 6 || status_id == 8){
+                if (!confirm('Вы подтверждаете действие?')) return false;
+            }
+            th = th.closest('form');
+            var order_id = + th.find('input[name=order_id]').val();
+            var store_id = + th.find('input[name=store_id]').val();
+            var item_id = + th.find('input[name=item_id]').val();
+            var data = 'status_id=' + status_id + '&order_id=' + order_id + '&store_id=' + store_id + '&item_id=' + item_id;
+            data += '&user_id=' + th.find('input[name=user_id]').val();
+            data += '&price=' + th.find('input[name=price]').val();
+            data += '&bill_cash=' + th.find('input[name=bill_cash]').val();
+            data += '&bill_cashless=' + th.find('input[name=bill_cashless]').val();
+            data += '&reserved_cash=' + th.find('input[name=reserved_cash]').val();
+            data += '&reserved_cashless=' + th.find('input[name=reserved_cashless]').val();
+            data += '&pay_type=' + th.find('input[name=pay_type]').val();
+            switch(status_id){
+                case 1:
+                    data += '&arrived=' + th.find('input[name=arrived]').val();
+                    break;
+                //выделено в отдельную функцию
+                case 2:break;
+                case 3:
+                    ordered = + th.find('input[name=ordered]').val();
+                    if (ordered == 1) arrived = ordered;
+                    else arrived = prompt('Укажите количество:', ordered);
+                    if (!check_value(th, arrived, ordered)) return false;
+                    data += '&arrived=' + arrived;
+                    break;
+                case 8:
+                    ordered = + th.find('input[name=ordered]').val();
+                    data += '&ordered=' + ordered;
+                    break;
+                case 11:
+                    var quan = + th.find('input[name=quan]').val();
+                    if (quan > 1) var ordered = prompt('Укажите количество:', quan);
+                    else ordered = quan;
+                    if (!check_value(th, ordered, quan)) return false;
+                    data += '&ordered=' + ordered;
+                    break;
+            }
+            $.ajax({
+                type: 'post',
+                url: ajax_url,
+                data: data,
+                success: function(response){
+                    // console.log(response); return false;
+                    if (is_reload) document.location.reload();
+                }
+            })
+        })
 	$('a.arrived_change').on('click', function(e){
 		e.preventDefault();
 		var th = $(this);

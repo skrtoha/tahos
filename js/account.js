@@ -43,7 +43,23 @@ class Account{
 
                 let innerHtml = objTab.innerHTML;
                 innerHtml = innerHtml.trim();
-                if (innerHtml.length > 0) return;
+
+                const balanceCashless = document.querySelector('div.balance-cashless');
+                const balanceCash = document.querySelector('div.balance-cash');
+                switch(obj.tab){
+                    case 'cash':
+                        balanceCashless.style.display = 'none';
+                        balanceCash.style.display = 'block';
+                        break;
+                    case 'cashless':
+                        balanceCash.style.display = 'none';
+                        balanceCashless.style.display = 'block';
+                        break;
+                    case 'common':
+                        balanceCashless.style.display = 'block';
+                        balanceCash.style.display = 'block';
+                        break;
+                }
 
                 const url = '/ajax/account.php';
                 let formData = new FormData(document.querySelector('.account-history-block form'));
@@ -55,10 +71,13 @@ class Account{
                 fetch(url, {
                     method: 'POST',
                     body: formData
-                }).then(response => response.text()).then((response) => {
-                    const parser = new DOMParser();
-                    let htmlContent = parser.parseFromString(response, 'text/html');
-                    objTab.innerHTML = response;
+                }).then(response => response.json()).then((response) => {
+                    // const parser = new DOMParser();
+                    // let htmlContent = parser.parseFromString(response, 'text/html');
+                    // objTab.innerHTML = response;
+                    objTab.innerHTML = response.html;
+                    document.querySelector('span.account-debts').innerHTML = response.reserved;
+                    document.querySelector('span.account-total').innerHTML = response.total;
 
                     const dataIssueId = document.querySelectorAll('[data-issue-id]');
                     for(let d of dataIssueId){

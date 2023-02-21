@@ -654,17 +654,26 @@ function funds(){
 
 	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>
-		<span>
-            На счету: <b> <span class="price_format"><?=$user['bill_cash'] + $user['bill_cashless']?></span> руб.</b>
-        </span>
-		<?$reserved_funds = $user['reserved_funds'] ? '<span class="price_format">'.$user['reserved_funds'].'</span> руб.' : 'пусто';?>
-		<span>Зарезервировано: <b><?=$reserved_funds?></b></span>
-		<?$value = $user['bill'] - $user['reserved_funds'];
-		$available =  $value ? '<span class="price_format">'.$value.'</span> руб.' : 'пусто';?>
-		<span>Доступно: <b><?=$available?></b></span>
-		<span>Кредитный лимит: <b><?=$user['credit_limit']?> руб.</b></span>
 	</div>
-	</div>
+    <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){?>
+        <div class="bill">
+            <span class="title">НАЛИЧНЫЙ:</span>
+            <span class="bill_describe"><b>На счету:</b> <?=$user['bill_cash']?></span>
+            <span class="bill_describe"><b>Зарезервировано: </b><?=$user['reserved_cash']?></span>
+            <span class="bill_describe"><b>Доступно:</b> <?=$user['bill_cash'] - $user['reserved_cash']?></span>
+            <span class="bill_describe"><b>Кредитный лимит: </b><?=$user['credit_limit_cash']?></span>
+        </div>
+    <?}?>
+    <?if (in_array($user['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){?>
+        <div class="bill">
+            <span class="title">БЕЗНАЛИЧНЫЙ:</span>
+            <span class="bill_describe"><b>На счету:</b> <?=$user['bill_cashless']?></span>
+            <span class="bill_describe"><b>Зарезервировано: </b><?=$user['reserved_cashless']?></span>
+            <span class="bill_describe"><b>Доступно:</b> <?=$user['bill_cashless'] - $user['reserved_cashless']?></span>
+            <span class="bill_describe"><b>Кредитный лимит: </b><?=$user['credit_limit_cashless']?></span>
+        </div>
+    <?}?>
+
 	<table class="t_table" cellspacing="1">
 		<tr class="head">
 			<td>Дата</td>

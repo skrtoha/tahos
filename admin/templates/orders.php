@@ -233,8 +233,8 @@ function show_form($act){
 				<a href="?view=users&act=funds&id=<?=$order['user_id']?>">
 					<?=$order['fio']?>
 				</a>
-                <?if ($order['pay_type'] == 'Безналичный') $available = $order['bill_cashless'] - $order['reserved_funds'];
-                else $available = $order['bill_cash'] - $order['reserved_funds'];?>
+                <?if ($order['pay_type'] == 'Безналичный') $available = $order['bill_cashless'] - $order['reserved_cashless'];
+                else $available = $order['bill_cash'] - $order['reserved_cash'];?>
 				(<b class="price_format"><?=$available?></b> руб.)
 			</td>
 			<td label="Сумма" class="price_format total">
@@ -574,11 +574,14 @@ function show_form($act){
 								<input type="hidden" name="returned" value="<?=$ov['returned']?>">
 
 								<input type="hidden" name="price" value="<?=$ov['price']?>">
-								<input type="hidden" name="bill" value="<?=$ov['bill']?>">
-								<input type="hidden" name="reserved_funds" value="<?=$ov['reserved_funds']?>">
+								<input type="hidden" name="bill_cash" value="<?=$ov['bill_cash']?>">
+								<input type="hidden" name="bill_cashless" value="<?=$ov['bill_cashless']?>">
+								<input type="hidden" name="reserved_cash" value="<?=$ov['reserved_cash']?>">
+								<input type="hidden" name="reserved_cashless" value="<?=$ov['reserved_cashless']?>">
 								<input type="hidden" name="brend" value="<?=$ov['brend']?>">
 								<input type="hidden" name="article" value="<?=$ov['article']?>">
 								<input type="hidden" name="title" value="<?=$ov['title_full']?>">
+								<input type="hidden" name="pay_type" value="<?=$order['pay_type']?>">
 								<b><?=$ov['status']?></b>
 								<?$no_show = array(9, 6, 8, 10, 12);
 								if (!in_array($ov['status_id'], $no_show)){

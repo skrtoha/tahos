@@ -123,6 +123,7 @@ div[data-name="Tab_3_name"] table.mobile_view tr {
     color: red;
     white-space: nowrap;
     text-align: center;
+    display: block;
 }
 tr[data-issue-id]{
     cursor: pointer;

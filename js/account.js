@@ -48,16 +48,16 @@ class Account{
                 const balanceCash = document.querySelector('div.balance-cash');
                 switch(obj.tab){
                     case 'cash':
-                        balanceCashless.style.display = 'none';
-                        balanceCash.style.display = 'block';
+                        if (balanceCashless !== null) balanceCashless.style.display = 'none';
+                        if (balanceCash !== null) balanceCash.style.display = 'block';
                         break;
                     case 'cashless':
-                        balanceCash.style.display = 'none';
-                        balanceCashless.style.display = 'block';
+                        if (balanceCash !== null) balanceCash.style.display = 'none';
+                        if (balanceCashless !== null)balanceCashless.style.display = 'block';
                         break;
                     case 'common':
-                        balanceCashless.style.display = 'block';
-                        balanceCash.style.display = 'block';
+                        if (balanceCashless !== null) balanceCashless.style.display = 'block';
+                        if (balanceCash !== null) balanceCash.style.display = 'block';
                         break;
                 }
 

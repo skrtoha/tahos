@@ -10,7 +10,11 @@ if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
 $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
 	if (!empty($_POST['income'])){
-		$issue_id = $issues->setIncome($_POST['income']);
+		$issueIdList = $issues->setIncome($_POST['income']);
+        $issue_id = 0;
+        if ($issueIdList[User::BILL_CASHLESS]) $issue_id = $issueIdList[User::BILL_CASHLESS];
+        if ($issueIdList[User::BILL_CASH]) $issue_id = $issueIdList[User::BILL_CASH];
+
 		message('Успешно сохранено');
 		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
 	} 
@@ -129,6 +133,7 @@ elseif($_GET['issue_id']){?>
 			<td>Пользователь</td>
 			<td>Сумма</td>
 			<td>Дата заказа</td>
+            <td>Вид счета</td>
 		</tr>
 		<tr>
 			<td><?=$_GET['issue_id']?></td>
@@ -140,6 +145,14 @@ elseif($_GET['issue_id']){?>
 			</td>
 			<td class="price_format"><?=$array['summ']?></td>
 			<td><?=$array['created']?></td>
+            <td>
+                <?if ($array['bill_type'] == User::BILL_CASH){?>
+                    Наличный
+                <?}
+                if ($array['bill_type'] == User::BILL_CASHLESS){?>
+                    Безналичный
+                <?}?>
+            </td>
 		</tr>
 	</table>
 	<h3 style="margin-top: 10px">Товары в выдаче</h3>

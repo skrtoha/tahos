@@ -6,13 +6,21 @@ class Issues{
 		if ($user_id) $this->user_id = $user_id;
 		$this->db = $db;
 	}
-	function setIncome($incomeList, $isRequestFrom1C = false){
+    //todo метод модернизирован только при использовании из админки, также нужна модифмкация для 1С
+	function setIncome($incomeList, $isRequestFrom1C = false): array
+    {
         $output = [
             User::BILL_CASH => 0,
             User::BILL_CASHLESS => 0
         ];
-		foreach($incomeList as $pay_type => $income){
-            $insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id]);
+		foreach($incomeList as $bill_type => $income){
+            $insert_order_issue = $this->db->insert(
+                'order_issues',
+                [
+                    'user_id' => $this->user_id,
+                    'bill_type' => $bill_type
+                ]
+            );
             if ($insert_order_issue !== true) die("Ошибка: {$this->db->last_query} | $insert_order_issue");
             $issue_id = $this->db->last_id();
 
@@ -57,7 +65,7 @@ class Issues{
 
                 core\OrderValue::changeStatus(1, $array);
 
-                $totalSumm[$orderValue['bill_type']] += $totalSumm;
+                $totalSumm += $totalSumm;
             }
 
             core\OrderValue::setFunds([
@@ -65,7 +73,7 @@ class Issues{
                 'issue_id' => $issue_id,
                 'titles' => $titles,
                 'totalSumm' => $totalSumm,
-                'bill_type' => $pay_type
+                'bill_type' => $bill_type
             ]);
 
             core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
@@ -81,7 +89,7 @@ class Issues{
                 core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
             }*/
 
-            $output[$pay_type] = $issue_id;
+            $output[$bill_type] = $issue_id;
 
         }
         return $output;
@@ -183,7 +191,8 @@ class Issues{
 				ov.price,
 				oiv.issued,
 				ov.comment,
-				DATE_FORMAT(oi.created, '%d.%m.%Y') AS created
+				DATE_FORMAT(oi.created, '%d.%m.%Y') AS created,
+				oi.bill_type
 			FROM
 				#order_issue_values oiv
 			LEFT JOIN
@@ -214,6 +223,7 @@ class Issues{
 			];
 			$summ += $row['price'] * $row['issued'];
 			$created = $row['created'];
+            $bill_type = $row['bill_type'];
 			$user = [
 				'id' => $row['user_id'],
 				'name' => $row['user_name'],
@@ -223,6 +233,7 @@ class Issues{
 		return [
 			'issue_values' => $issue_values,
 			'summ' => $summ,
+            'bill_type' => $bill_type,
 			'created' => $created,
 			'user' => $user
 		];

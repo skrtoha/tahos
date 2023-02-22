@@ -105,7 +105,7 @@ switch($request['act']){
 
         if (empty($income)) break;
 
-		$issues = new \Issues($user_id, $db);
+		$issues = new \Issues($db, $user_id);
 		$issues->setIncome($income, true);
 		break;
 	case 'cancelItemsFromOrder':

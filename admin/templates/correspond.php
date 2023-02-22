@@ -116,9 +116,7 @@ if ($order_id){
 			ov.comment,
 			os.title AS status,
 			os.id AS status_id,
-			o.user_id,
-			u.bill,
-			u.reserved_funds
+			o.user_id
 		FROM
 			#orders_values ov
 		LEFT JOIN #provider_stores ps ON ps.id=ov.store_id

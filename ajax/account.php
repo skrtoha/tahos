@@ -191,7 +191,7 @@ switch($_POST['act']){
         echo json_encode($output);
         break;
     case 'getOrderIssueInfo':
-        $issuesClass = new Issues(null, $db);
+        $issuesClass = new Issues($db, null);
         $res = json_encode($issuesClass->getIssueWithUser($_POST['issue_id']));
         break;
 

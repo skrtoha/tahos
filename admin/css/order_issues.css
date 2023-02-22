@@ -15,3 +15,6 @@
 #issue_print table td{
 	border: 1px solid black;
 }
+td.bill_type{
+    font-weight: bold;
+}

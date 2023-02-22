@@ -1,9 +1,10 @@
 <?php
+use core\User;
 /** @global \core\Database $db */
 
 require_once("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
 $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
-$issues = new Issues($user_id, $db);
+$issues = new Issues($db, $user_id);
 if (isset($_GET['ajax'])) $issues->getAjax();
 if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
 $status = "<a href='/admin'>Главная</a> > ";
@@ -14,11 +15,20 @@ if ($_GET['user_id'] && !$_GET['issued']){
 		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
 	} 
 
+    /** @var mysqli_result $res_user */
 	$res_user = core\User::get(['user_id' => $issues->user_id]);
-	if (is_object($res_user)) $user = $res_user->fetch_assoc();
-	else $user = $res_user;
+	foreach ($res_user as $value) $user = $value;
+
 	$page_title = "Выдача товара";
-	$res_orders_values = core\OrderValue::get(['user_id' => $issues->user_id, 'status_id' => 3], '');
+	$res_orders_values = core\OrderValue::get(['user_id' => $issues->user_id, 'status_id' => 3], '')->fetch_all(MYSQLI_ASSOC);
+    $order_values = [
+        User::BILL_CASH => [],
+        User::BILL_CASHLESS => []
+    ];
+    foreach($res_orders_values as $ov){
+        $order_values[$ov['bill_type']][] = $ov;
+    }
+
 	$status .= "
 		<a href='?view=users'>Пользователи</a> >
 		<a href='?view=users&act=change&id={$_GET['user_id']}'>
@@ -67,33 +77,41 @@ else{
 				<td>Дата</td>
 				<td><input type="checkbox" name="all" value="1"></td>
 			</tr>
-			<?if (!$res_orders_values->num_rows){?>
-				<tr>
-					<td colspan="12">Товаров для выдачи не найдено</td>
-				</tr>
-			<?}
-			else{
-				while ($v = $res_orders_values->fetch_assoc()){?>
-					<tr class="status_<?=$v['class']?>">
-						<td><?=$v['cipher']?></td>
-						<td><?=$v['brend']?></td>
-						<td><?=$v['article']?></td>
-						<td><?=$v['title_full']?></td>
-						<td><span class="price_format"><?=$v['price']?></span></td>
-						<td class="amount">
-							<?=$v['arrived'] - $v['issued']?>
-						</td>
-						<td><span class="price_format"><?=$v['price'] * ($v['arrived'] - $v['issued'])?></span></td>
-						<td><?=$v['comment']?></td>
-						<td><a href="?view=orders&id=<?=$v['order_id']?>&act=change"><?=$v['order_id']?></a></td>
-						<td><?=$v['created']?></td>
-						<td>
-							<input type="hidden" value="<?=$v['arrived'] - $v['issued']?>">
-							<input type="checkbox" name="income[<?=$v['order_id']?>:<?=$v['item_id']?>:<?=$v['store_id']?>]" value="<?=$v['arrived'] - $v['issued']?>">
-						</td>
-					</tr>
-				<?}
-			}?>
+            <?foreach($order_values as $bill_type => $order_value){
+                if ($bill_type == User::BILL_CASH){?>
+                    <td colspan="11" class="bill_type">Наличный расчет</td>
+                <?}
+                if ($bill_type == User::BILL_CASHLESS){?>
+                    <td colspan="11" class="bill_type">Безналичный расчет</td>
+                <?}
+                if (empty($order_value)){?>
+                    <tr>
+                        <td colspan="12">Товаров для выдачи не найдено</td>
+                    </tr>
+                <?}
+                else{
+                    foreach ($order_value as $v){?>
+                        <tr class="status_<?=$v['class']?>">
+                            <td><?=$v['cipher']?></td>
+                            <td><?=$v['brend']?></td>
+                            <td><?=$v['article']?></td>
+                            <td><?=$v['title_full']?></td>
+                            <td><span class="price_format"><?=$v['price']?></span></td>
+                            <td class="amount">
+                                <?=$v['arrived'] - $v['issued']?>
+                            </td>
+                            <td><span class="price_format"><?=$v['price'] * ($v['arrived'] - $v['issued'])?></span></td>
+                            <td><?=$v['comment']?></td>
+                            <td><a href="?view=orders&id=<?=$v['order_id']?>&act=change"><?=$v['order_id']?></a></td>
+                            <td><?=$v['created']?></td>
+                            <td>
+                                <input type="hidden" value="<?=$v['arrived'] - $v['issued']?>">
+                                <input type="checkbox" name="income[<?=$bill_type?>][<?=$v['order_id']?>:<?=$v['item_id']?>:<?=$v['store_id']?>]" value="<?=$v['arrived'] - $v['issued']?>">
+                            </td>
+                        </tr>
+                    <?}
+                }?>
+            <?}?>
 			<tr>
 				<td style="text-align: right" colspan="12"><input  type="submit" value="Отправлено"></td>
 			</tr>

@@ -73,16 +73,21 @@ switch($_POST['status_id']){
 				`declined` = 1
 			WHERE $where
 		", '');
+
+        if ($post['pay_type'] == 'Наличный' || $post['pay_type'] == 'Онлайн') $tableColumn = 'reserved_cash';
+        if ($post['pay_type'] == 'Безналичный') $tableColumn = 'reserved_cashless';
+
 		$db->query("
 			UPDATE
 				#users
 			SET
-				`reserved_funds` = `reserved_funds` - {$_POST['current']} * {$_POST['price']}
+				`$tableColumn` = `$tableColumn` - {$_POST['current']} * {$_POST['price']}
 			WHERE
-				`id`={$_POST['user_id']}
+				`id`={$post['user_id']}
 		", '');
 		break;
-	case 'issued_new':
+    //todo удалить действие, реализовано в другом месте
+	/*case 'issued_new':
 		$db->query("
 			UPDATE 
 				#orders_values 
@@ -110,7 +115,7 @@ switch($_POST['status_id']){
 			WHERE
 				`id`={$_POST['user_id']}
 		", '');
-		break;
+		break;*/
 	case 'return_to_basket':
 		// print_r($_POST);
 		$values = explode(',', $_POST['str']);

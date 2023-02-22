@@ -1,5 +1,7 @@
 <?php
 namespace core;
+use function Matrix\add;
+
 class Basket{
 	public static function get($user_id, $isToOrder = false, $flag = ''){
         static $output;
@@ -106,6 +108,12 @@ class Basket{
         /** @var Database $db */
         $db = $GLOBALS['db'];
 
+        $additional_options = json_decode($_COOKIE['additional_options'], true);
+        if ($additional_options){
+            $dateTimeObject = \DateTime::createFromFormat('d.m.Y', $additional_options['date_issue']);
+        }
+        else $dateTimeObject = new \DateTime();
+
         $res_basket = self::get($user['id'], true);
 
         if (!$res_basket->num_rows){
@@ -116,26 +124,19 @@ class Basket{
 
         //проверяем превышение лимита
         $limitExceeded = false;
-        if ($user['user_type'] == 'private'){
-            $available = $user['bill_cash'] - $user['reserved_funds'];
+        if ($additional_options['pay_type'] == 'Наличный' || $additional_options['pay_type'] == 'Онлайн'){
+            $available = $user['bill_cash'] - $user['reserved_cash'];
             if ($available < 0 && abs($available) > $user['credit_limit_cash']) $limitExceeded = true;
         }
-        else{
-            $available = $user['bill_cashless'] - $user['reserved_funds'];
+        if ($additional_options['pay_type'] == 'Безналичный'){
+            $available = $user['bill_cashless'] - $user['reserved_cashless'];
             if ($available < 0 && abs($available) > $user['credit_limit_cashless']) $limitExceeded = true;
         }
-
         if ($limitExceeded){
             message('Превышен кредитный лимит!', false);
             header("Location: {$_SERVER['HTTP_REFERER']}");
             exit();
         }
-
-        $additional_options = json_decode($_COOKIE['additional_options'], true);
-        if ($additional_options){
-            $dateTimeObject = \DateTime::createFromFormat('d.m.Y', $additional_options['date_issue']);
-        }
-        else $dateTimeObject = new \DateTime();
 
         $body = "<h1>Заказанные товары:</h1><table style='width: 100%;border-collapse: collapse;''>";
 

@@ -127,7 +127,10 @@ switch ($act) {
 			SELECT
 				o.user_id,
 				SUM(ov.price * ov.ordered) AS sum,
-				o.pay_type
+				CASE
+                    WHEN o.pay_type = 'Наличный' or o.pay_type = 'Онлайн' THEN 'Наличный'
+                    WHEN o.pay_type = 'Безналичный' THEN 'Безналичный'
+                END as type_pay
 			FROM
 				#orders_values ov
 			LEFT JOIN
@@ -136,30 +139,32 @@ switch ($act) {
 				ov.status_id IN (11, 3)
 			GROUP BY
 				o.user_id,
-				o.pay_type
+				type_pay
 		", '');
 		$updatedUsers = [];
 		foreach($res as $row){
-            if ($row['pay_type'] == 'Наличный' || $row['pay_type'] = 'Онлайн'){
+            $updatedUsers[$row['type_pay']][] = $row['user_id'];
+            if ($row['type_pay'] == 'Наличный'){
                 core\User::update($row['user_id'], ['reserved_cash' => $row['sum']]);
-                $updatedUsers['cash'][] = $row['user_id'];
             }
-            else{
+            elseif ($row['type_pay'] = 'Безналичный'){
                 core\User::update($row['user_id'], ['reserved_cashless' => $row['sum']]);
-                $updatedUsers['cashless'][] = $row['user_id'];
             }
-
 		}
-        if (!empty($updatedUsers['cash'])) $db->update(
-            'users',
-            ['reserved_cash' => 0],
-            '`id` NOT IN ('.implode(',', $updatedUsers['cash']).')'
-        );
-        if (!empty($updatedUsers['cashless'])) $db->update(
-            'users',
-            ['reserved_cashless' => 0],
-            '`id` NOT IN ('.implode(',', $updatedUsers['cashless']).')'
-        );
+        foreach($updatedUsers as $type_pay => $userListID){
+            if ($type_pay == 'Наличный') $db->update(
+                'users',
+                ['reserved_cash' => 0],
+                '`id` NOT IN ('.implode(',', $userListID).')'
+            );
+            if ($type_pay == 'Безналичный') $db->update(
+                'users',
+                ['reserved_cashless' => 0],
+                '`id` NOT IN ('.implode(',', $userListID).')'
+            );
+        }
+        if (!empty($updatedUsers['Наличный']))
+
 		message('Успешно обновлено!');
 		header("Location: /admin/?view=users");
 		break;

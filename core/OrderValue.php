@@ -9,24 +9,25 @@ use core\Sms\SmsAero;
 class OrderValue{
 	public static $countOrdered = 0;
 	public static function setFunds($params){
-        $update = ['reserved_funds' => "`reserved_funds` - " .$params['totalSumm']];
+        $update = [];
+        $bill = 0;
+        $remainder = 0;
+        $user = [];
+
         /** @var \mysqli_result $res_user */
 		$res_user = User::get(['user_id' => $params['user_id']]);
         foreach($res_user as $value) $user = $value;
 
-        if ($user['user_type'] == 'private'){
+        if ($params['bill_type'] == User::BILL_CASH){
             $remainder = $user['bill_cash'] - $params['totalSumm'];
             $bill = $user['bill_cash'];
-            $bill_type = User::BILL_CASH;
             $update['bill_cash'] = "`bill_cash` - " . $params['totalSumm'];
         }
-        else{
+        if ($params['bill_type'] == User::BILL_CASHLESS){
             $remainder = $user['bill_cashless'] - $params['totalSumm'];
             $bill = $user['bill_cashless'];
-            $bill_type = User::BILL_CASHLESS;
             $update['bill_cashless'] = "`bill_cashless` - " . $params['totalSumm'];
         }
-
 
 		//вычисление задолженности
 		$overdue = 0;
@@ -47,7 +48,7 @@ class OrderValue{
             'paid' => $paid,
             'overdue' => $overdue,
             'comment' => 'Реализация товаров',
-            'bill_type' => $bill_type
+            'bill_type' => $params['bill_type']
         ]);
 
         User::update($params['user_id'], $update);
@@ -303,12 +304,13 @@ class OrderValue{
 		return $res->fetch_assoc();
 	}
 
-	/**
-	 * gets common information of order value
-	 * @param  array  $fields user_id|status_id|order_id|store_id|item_id
-	 * @return object mysqli object
-	 */
-	public static function get($params = array(), $flag = ''){
+    /**
+     * gets common information of order value
+     * @param array $params
+     * @param string $flag
+     * @return \mysqli_result mysqli object
+     */
+	public static function get(array $params = array(), string $flag = ''){
 		$where = '';
 		$limit = '';
 		if (!empty($params)){
@@ -343,7 +345,10 @@ class OrderValue{
 			$where = substr($where, 0, -5);
 			$where = "WHERE $where";
 		}
-		return $GLOBALS['db']->query("
+
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+		return $db->query("
 			SELECT
 				ps.cipher,
 				i.brend_id,

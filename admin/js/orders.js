@@ -1,33 +1,37 @@
 var ajax_url = '/admin/ajax/orders.php';
 var reg_integer = /^\d+$/;
 var is_reload = true;
+const getQuery = getParams();
 function first_option(obj){
 	obj.find('option').prop('selected', false);
 	obj.find('option:first-child').prop('selected', true);
 }
 function set_items_to_order(){
-    $.ajax({
-        type: 'post',
-        url: '/admin/ajax/orders.php',
-        data: {
-            status_id: 'getItemsToOrder'
-        },
-        success: function (response){
-            $('#itemsToOrder').html(response)
-        }
-    })
+    if (typeof getQuery.act === 'undefined' && typeof getQuery.id === 'undefined'){
+        $.ajax({
+            type: 'post',
+            url: '/admin/ajax/orders.php',
+            data: {
+                status_id: 'getItemsToOrder'
+            },
+            success: function (response){
+                $('#itemsToOrder').html(response)
+            }
+        })
+    }
 }
 function arrived_new(obj){
-	var th = obj.closest('#arrived_change');
-	var type = th.find('input[name=new_value_radio]:checked').val();
-	var current = + th.find('input[name=value]').val();
-	var store_id = + th.attr('store_id');
-	var item_id = + th.attr('item_id');
-	var tr = $('tr[store_id=' + store_id + '][item_id=' + item_id + ']');
-	var arrived = + tr.find('input[name=arrived]').val();
-	var order_id = + tr.find('input[name=order_id]').val();
-	var quan = + tr.find('input[name=quan]').val();
-	if (type == 'arrived_new'){
+    const th = obj.closest('#arrived_change');
+    const type = th.find('input[name=new_value_radio]:checked').val();
+    const current = +th.find('input[name=value]').val();
+    const store_id = +th.attr('store_id');
+    const item_id = +th.attr('item_id');
+    const pay_type = th.attr('pay_type');
+    const tr = $('tr[store_id=' + store_id + '][item_id=' + item_id + ']');
+    const arrived = +tr.find('input[name=arrived]').val();
+    const order_id = +tr.find('input[name=order_id]').val();
+    const quan = +tr.find('input[name=quan]').val();
+    if (type == 'arrived_new'){
 		// console.log(current, arrived);
 		if (current + arrived > quan || !reg_integer.test(current) || !current){
 			show_message('Значение задано неккоректно!', 'error');
@@ -40,6 +44,7 @@ function arrived_new(obj){
 		url: '/admin/ajax/orders.php',
 		data: 'status_id=' + type + '&order_id=' + order_id + '&store_id=' + store_id + 
 					'&item_id=' + item_id + '&current=' + current + '&user_id=' + tr.find('input[name=user_id]').val() +
+                    '&pay_type=' + pay_type +
 					'&price=' + tr.find('input[name=price]').val(),
 		success: function(response){
 			// console.log(response); return false;
@@ -253,7 +258,12 @@ $(function(){
 		e.preventDefault();
 		var th = $(this);
 		modal_show(
-			'<div id="arrived_change" store_id="' + th.closest('tr').attr('store_id') + '" item_id="' + th.closest('tr').attr('item_id') + '">' +
+			'<div ' +
+            '           id="arrived_change" ' +
+            '           store_id="' + th.closest('tr').attr('store_id') + '" ' +
+            '           item_id="' + th.closest('tr').attr('item_id') + '"' +
+                        `pay_type="${th.closest('tr').find('input[name=pay_type]').val()}"` +
+            '       >' +
 				'<label>' +
 					'<input checked type="radio" name="new_value_radio" value="arrived_new">' +
 					'Еще пришло: <input type="text" name="value" value="' + th.html() + '"/>' +

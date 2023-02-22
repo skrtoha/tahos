@@ -1,98 +1,91 @@
 <?
+use core\User;
 class Issues{
 	public $user_id;
-	function __construct($user_id = null, $db){
+	function __construct($db, $user_id = null){
 		if ($user_id) $this->user_id = $user_id;
 		$this->db = $db;
 	}
-	protected function getTitleForFund($item_id){
-		$item = $this->db->select_unique("
-			SELECT
-				i.article,
-				i.title_full,
-				b.title as brend
-			FROM
-				#items i
-			LEFT JOIN
-				#brends b ON b.id=i.brend_id
-			WHERE
-				i.id={$item_id}
-		", '');
-		$item = $item[0];
-		return '<a href="/admin/?view=items&act=item&id='.$item_id.'">'.$item['brend'].' - '.$item['article'].' - '.$item['title_full'].'</a>';
-	}
-	protected function getOrderValue($order_id, $item_id){
-		return $this->db->select_one('orders_values', '*', "`order_id`={$order_id} AND `item_id`={$item_id}");
-	}
-	function setIncome($income, $isRequestFrom1C = false){
-		$insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id]);
-		if ($insert_order_issue !== true) die("Ошибка: {$this->db->last_query} | $insert_order_issue");
-		$issue_id = $this->db->last_id();
+	function setIncome($incomeList, $isRequestFrom1C = false){
+        $output = [
+            User::BILL_CASH => 0,
+            User::BILL_CASHLESS => 0
+        ];
+		foreach($incomeList as $pay_type => $income){
+            $insert_order_issue = $this->db->insert('order_issues', ['user_id' => $this->user_id]);
+            if ($insert_order_issue !== true) die("Ошибка: {$this->db->last_query} | $insert_order_issue");
+            $issue_id = $this->db->last_id();
 
-		$titles = [];
-		$totalSumm = 0;
-		foreach($income as $key => $issued){
-			$a = explode(':', $key);
-			$insert_order_issue_values = $this->db->insert(
-				'order_issue_values',
-				[
-					'issue_id' => $issue_id,
-					'order_id' => $a[0],
-					'store_id' => $a[2],
-					'item_id' => $a[1],
-					'issued' => $issued
-				]/*,
-				['print' => true]*/
-			);
+            $titles = [];
+            $totalSumm = 0;
+            foreach($income as $key => $issued){
+                $a = explode(':', $key);
+                $insert_order_issue_values = $this->db->insert(
+                    'order_issue_values',
+                    [
+                        'issue_id' => $issue_id,
+                        'order_id' => $a[0],
+                        'store_id' => $a[2],
+                        'item_id' => $a[1],
+                        'issued' => $issued
+                    ]
+                );
 
-			if ($insert_order_issue_values !== true){
-				die("Ошибка: {$this->db->last_query} | $insert_order_issue_values");
-			}
-			
-			$res_orderValue = core\OrderValue::get([
-				'order_id' => $a[0],
-				'store_id' => $a[2],
-				'item_id' => $a[1],
-			]);
-			$orderValue = $res_orderValue->fetch_assoc();
-			$titles[] = "<b>{$orderValue['brend']} {$orderValue['article']}</b>";
-            
-            if (!$orderValue['is_payed']){
-                $totalSumm += $issued * $orderValue['price'];
+                if ($insert_order_issue_values !== true){
+                    die("Ошибка: {$this->db->last_query} | $insert_order_issue_values");
+                }
+
+                $res_orderValue = core\OrderValue::get([
+                    'order_id' => $a[0],
+                    'store_id' => $a[2],
+                    'item_id' => $a[1],
+                ]);
+                $orderValue = $res_orderValue->fetch_assoc();
+                $titles[] = "<b>{$orderValue['brend']} {$orderValue['article']}</b>";
+
+                if (!$orderValue['is_payed']){
+                    $totalSumm += $issued * $orderValue['price'];
+                }
+
+                $array = [
+                    'order_id' => $a[0],
+                    'store_id' => $a[2],
+                    'item_id' => $a[1],
+                    'issued' => $issued
+                ];
+                if ($isRequestFrom1C) $array['synchronized'] = 1;
+
+                core\OrderValue::changeStatus(1, $array);
+
+                $totalSumm[$orderValue['bill_type']] += $totalSumm;
             }
 
-            $array = [
-                'order_id' => $a[0],
-                'store_id' => $a[2],
-                'item_id' => $a[1],
-                'issued' => $issued
-            ];
-            if ($isRequestFrom1C) $array['synchronized'] = 1;
-			
-			core\OrderValue::changeStatus(1, $array);
-		}
-		
-		core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
+            core\OrderValue::setFunds([
+                'user_id' => $this->user_id,
+                'issue_id' => $issue_id,
+                'titles' => $titles,
+                'totalSumm' => $totalSumm,
+                'bill_type' => $pay_type
+            ]);
 
-        core\OrderValue::setFunds([
-            'user_id' => $this->user_id,
-            'issue_id' => $issue_id,
-            'titles' => $titles,
-            'totalSumm' => $totalSumm
-        ]);
+            core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
 
-		if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
-			echo $issue_id;
-			exit();
-		}
+            if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
+                echo $issue_id;
+                exit();
+            }
 
-		/*//если запрос пришел с 1С тогда проводить товар там не нужно
-		if (!$isRequestFrom1C){
-			$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
-			core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);	
-		}*/
+            /*//если запрос пришел с 1С тогда проводить товар там не нужно
+            if (!$isRequestFrom1C){
+                $nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
+                core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
+            }*/
 
-		return $issue_id;
+            $output[$pay_type] = $issue_id;
+
+        }
+        return $output;
+
 	}
 	protected function getOrderIssues(){
 		if ($_GET['user_id']) $where = "WHERE oi.user_id={$_GET['user_id']}";
@@ -179,8 +172,8 @@ class Issues{
 				CONCAT_WS(' ', u.name_1, u.name_2, u.name_3) AS user_name,
 				IF(
 				    u.user_type = 'private',
-				    u.bill_cash - u.reserved_funds,
-				    u.bill_cashless - u.reserved_funds
+				    u.bill_cash - u.reserved_cash,
+				    u.bill_cashless - u.reserved_cashless
 				) AS user_available,
 				oiv.item_id,
 				i.brend_id,

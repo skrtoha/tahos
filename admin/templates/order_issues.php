@@ -48,10 +48,11 @@ elseif($_GET['issue_id']){
 	$user = $array['user'];
 }
 elseif ($_GET['issued']){
-	$res_user = core\User::get($_GET['user_id']);
-	if (is_object($res_user)) $user = $res_user->fetch_assoc();
-	else $user = $res_user;
-	$page_title = 'Выданные товары';
+    /** @var mysqli_result $res_user */
+	$res_user = core\User::get(['user_id' => $_GET['user_id']]);
+	foreach ($res_user as $value) $user = $value;
+
+    $page_title = 'Выданные товары';
 	$status .= "
 		<a href='?view=users'>Пользователи</a> >
 		<a href='?view=users&act=change&id={$_GET['user_id']}'>

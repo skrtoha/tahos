@@ -64,8 +64,6 @@ class Issues{
                 if ($isRequestFrom1C) $array['synchronized'] = 1;
 
                 core\OrderValue::changeStatus(1, $array);
-
-                $totalSumm += $totalSumm;
             }
 
             core\OrderValue::setFunds([

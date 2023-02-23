@@ -562,7 +562,6 @@ class OrderValue{
                 o.user_id,
                 u.bill_cash,
                 u.bill_cashless,
-                u.reserved_funds,
                 u.defermentOfPayment,
                 o.pay_type,
                 o.delivery,

@@ -76,6 +76,10 @@ class Issues{
 
             core\User::setBonusProgram($this->user_id, $titles, $totalSumm);
 
+            if ($bill_type == User::BILL_CASH) $pay_type = 'Наличный';
+            if ($bill_type == User::BILL_CASHLESS) $pay_type = 'Безналичный';
+            User::updateReservedFunds($this->user_id, $totalSumm, 'minus', $pay_type);
+
             if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
                 echo $issue_id;
                 exit();

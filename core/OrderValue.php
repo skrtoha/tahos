@@ -4,6 +4,7 @@ namespace core;
 use core\Provider\Autoeuro;
 use core\Provider\Berg;
 use core\Sms\SmsAero;
+use PHPMailer\PHPMailer\Exception;
 
 
 class OrderValue{
@@ -80,7 +81,7 @@ class OrderValue{
 			case 1:
 				$quan = $params['issued'];
 				$values['issued'] = "`issued` + $quan";
-				self::update($values, $params);				
+				self::update($values, $params);
 				break;
 			//возврат
 			case 2:
@@ -224,14 +225,15 @@ class OrderValue{
 				i.id = $item_id
 		", '');
 		return $item->fetch_assoc();
-	}	
+	}
 
-	/**
-	 * updates order values
-	 * @param  [array] $values for update
-	 * @param  [type] $params for condition (order_id, store_id, item_id)
-	 * @return [boolean] true if updated successfully else error of update
-	 */
+    /**
+     * updates order values
+     * @param  [array] $values for update
+     * @param  [type] $params for condition (order_id, store_id, item_id)
+     * @return \mysqli_result
+     * @throws Exception
+     */
 	public static function update($values, $params){
 		if ($values['status_id'] == 6){
 		    $orderValuerResult = self::get([

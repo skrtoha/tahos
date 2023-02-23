@@ -138,7 +138,7 @@ class User{
 	 * updates reserved funds for user
 	 * @param  [integer] $user_id user_id
 	 * @param  [inter] $price value for increase|reduse reserved_funds
-	 * @return true if successfully updated
+	 * @return mysqli_result
 	 */
 	public static function updateReservedFunds($user_id, $price, $act, $pay_type){
 		$sign = $act == 'plus' ? '+' : '-';

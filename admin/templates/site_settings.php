@@ -3,10 +3,15 @@ use core\Managers;
 $page_title = 'Настройки сайта';
 if (!empty($_POST)){
     $data = $_POST;
-    $data['time'] = time();
-    $data['count_seconds'] = $data['count_seconds'] * 60;
-	core\Setting::update('is_blocked', json_encode($data));
-	header("Location: /admin/?view=blockSite");
+    $update['is_blocked'] = json_encode([
+        'time' => time(),
+        'count_seconds' => $data['count_seconds'] * 60,
+        'is_blocked' => $data['is_blocked']
+    ]);
+    $update['1c_url'] = $data['1c_url'];
+    $update['synchronization_token'] = $data['synchronization_token'];
+    foreach($update as $key => $value) core\Setting::update('site_settings', $key, $value);
+	header("Location: /admin/?view=site_settings");
 }
 $data = core\Setting::get('site_settings', null, 'all');
 $data['is_blocked'] = json_decode($data['is_blocked'], true);
@@ -29,6 +34,12 @@ $act = $_GET['act'];?>
                 <div class="title">Токен синхронизации</div>
                 <div class="value">
                     <input name="synchronization_token" value="<?=$data['synchronization_token']?>">
+                </div>
+            </div>
+            <div class="field">
+                <div class="title">Веб адрес 1С</div>
+                <div class="value">
+                    <input name="1c_url" value="<?=$data['1c_url']?>">
                 </div>
             </div>
             <input type="submit" value="Сохранить">

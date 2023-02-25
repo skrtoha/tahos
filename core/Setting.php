@@ -11,7 +11,7 @@ class Setting{
 			return $resArray['value'];
 		}
 		else{
-			$view = $_GET['view'];
+			$view = $type == null ? $_GET['view'] : $param1;
 			$name = $param1;
 			if (!$defaultSettingsOfView){
 				$resArray = $GLOBALS['db']->select(self::$tableName, ['name', 'value'], "`view` = '$view'");

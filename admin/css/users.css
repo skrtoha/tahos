@@ -116,6 +116,9 @@ form.js-form-address .half .input{
 input[disabled] {
     background: #f7f7f7;
 }
+.ut_arrangement {
+    display: inline-block;
+}
 @media screen and (max-width: 948px){
     form.js-form-address input {
         width: 100% !important;

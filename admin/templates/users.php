@@ -2,6 +2,7 @@
 /** @var $db \core\Database $act */
 
 use core\Basket;
+use core\Setting;
 use core\User;
 
 $act = $_GET['act'];
@@ -356,6 +357,7 @@ function show_form($act){
 		<?=\User::getHtmlActions($id)?>
 	<?}?>
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
+    <input type="hidden" name="1c_url" value="<?= Setting::get('site_settings', '1c_url')?>">
 	<div class="t_form">
 		<div class="bg">
 			<form method="post" enctype="multipart/form-data" id="user">
@@ -432,6 +434,24 @@ function show_form($act){
                             <input <?=$checked?> name="bill_mode" type="radio" value="<?=User::BILL_MODE_CASH_AND_CASHLESS?>">
                             <span>Наличный и безналичный</span>
                         </label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="title">Связь с договорами 1С</div>
+                    <div class="value">
+                        <a href="#" class="get_arrangements">Обновить список</a>
+                        <div class="ut_arrangement cash">
+                            <span>Наличный</span>
+                            <select name="arrangement_<?=User::BILL_CASH?>">
+
+                            </select>
+                        </div>
+                        <div class="ut_arrangement cashless">
+                            <span>Безналичный</span>
+                            <select name="arrangement_<?=User::BILL_CASHLESS?>">
+
+                            </select>
+                        </div>
                     </div>
                 </div>
 				<div class="field">

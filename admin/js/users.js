@@ -178,6 +178,19 @@
             $('input.save').on('click', (e) => {
                 $('input[name=save_basket]').val(1);
             })
+            document.querySelector('a.get_arrangements').addEventListener('click', (e) => {
+                let formData = new FormData();
+                formData.set('TahosID', document.querySelector('input[name="user_id"]').value);
+                formData.set('userType', 'Пользователь');
+                formData.set('act', 'getArrangements');
+                // showGif();
+                fetch('/admin/ajax/user.php', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json()).then(response => {
+                    showGif(false);
+                })
+            })
 		},
         setChangesExist: () => {
             $('input.save').prop('disabled', false);

@@ -37,13 +37,30 @@ if ($_POST['form_submit']){
                 else $array['pay_type'] = $_POST['pay_type'];
                 break;
             case 'arrangement':
-                if (!$_POST['arrangement'][User::BILL_CASH] && !$_POST['arrangement'][User::BILL_CASHLESS]){
+                if (empty($value['list'])) break;
+
+                if (
+                    !$_POST['arrangement'][User::BILL_CASH] && !$_POST['arrangement'][User::BILL_CASHLESS] ||
+                    $_POST['bill_mode'] == 1 && !$_POST['arrangement'][1] ||
+                    $_POST['bill_mode'] == 2 && !$_POST['arrangement'][2] ||
+                    $_POST['bill_mode'] == 3 && (!$_POST['arrangement'][1] || !$_POST['arrangement'][2]) ||
+                    $_POST['arrangement'][1] == $_POST['arrangement'][2]
+                ){
                     $saveble = false;
                     message('Неверно указан договор(ы)!', false);
+                    break;
                 }
-                $arrangements = json_decode($value['list'], true);
+                $db->delete('user_1c_arrangements', "`user_id` = {$_GET['id']}");
+
                 $arrangementList = [];
-                foreach($arrangements as $v) $arrangementList[$v['uid']] = $v['title'];
+                if ($value['list']){
+                    $arrangements = json_decode($value['list'], true);
+                    foreach($arrangements as $v) $arrangementList[$v['uid']] = $v['title'];
+                }
+                else {
+                    if (isset($value[User::BILL_CASH])) $arrangementList[User::BILL_CASH] = $value[User::BILL_CASH];
+                    if (isset($value[User::BILL_CASHLESS])) $arrangementList[User::BILL_CASHLESS] = $value[User::BILL_CASHLESS];
+                }
 
                 if (in_array($_POST['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){
                     $uid = $_POST['arrangement'][User::BILL_CASH];
@@ -470,10 +487,10 @@ function show_form($act){
                     <div class="title">Связь с договорами 1С</div>
                     <div class="value">
                         <a href="#" class="get_arrangements">Обновить список</a>
-                        <input type="hidden" name="arrangement[list]" value="">
                         <?$db->indexBy = 'bill_type';
                         $arrangements = $db->select('user_1c_arrangements', '*', "`user_id` = {$_GET['id']}");
                         ?>
+                        <input type="hidden" name="arrangement[list]" value="">
                         <div class="ut_arrangement cash">
                             <span>Наличный</span>
                             <?$disabled = in_array($user['bill_mode'], [User::BILL_CASH, User::BILL_MODE_CASH_AND_CASHLESS]) ? '' : 'disabled';?>

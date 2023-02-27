@@ -1,4 +1,7 @@
 <?
+/** @global array $user */
+/** @global \core\Database $db */
+
 use core\Breadcrumb;
 
 require_once('admin/functions/orders.function.php');

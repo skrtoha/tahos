@@ -30,12 +30,12 @@ if ($sha1 != $_POST['sha1_hash']) exit();
 switch($label[0]){
     case 'account':
         $user_id = $label[1];
-        $bill = $db->getFieldOnID('users', $user_id, 'bill') + $_POST['withdraw_amount'];
+        $bill = $db->getFieldOnID('users', $user_id, 'bill_cash') + $_POST['withdraw_amount'];
         if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Yoomoney';
         else $comment = 'Пополнение банковской картой';
         User::checkOverdue($user_id, $_POST['withdraw_amount']);
         User::checkDebt($user_id, $_POST['withdraw_amount']);
-        $db->update('users', array('bill' => $bill), '`id`='.$user_id);
+        $db->update('users', array('bill_cash' => $bill), '`id`='.$user_id);
         break;
     case 'order':
         $comment = "Онлайн оплата заказа №{$label[1]}";

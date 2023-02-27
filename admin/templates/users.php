@@ -36,6 +36,36 @@ if ($_POST['form_submit']){
                 elseif ($_POST['bill_mode'] == User::BILL_MODE_CASH && $_POST['pay_type'] != 'Онлайн') $array['pay_type'] = 'Наличный';
                 else $array['pay_type'] = $_POST['pay_type'];
                 break;
+            case 'arrangement':
+                if (!$_POST['arrangement'][User::BILL_CASH] && !$_POST['arrangement'][User::BILL_CASHLESS]){
+                    $saveble = false;
+                    message('Неверно указан договор(ы)!', false);
+                }
+                $arrangements = json_decode($value['list'], true);
+                $arrangementList = [];
+                foreach($arrangements as $v) $arrangementList[$v['uid']] = $v['title'];
+
+                if (in_array($_POST['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){
+                    $uid = $_POST['arrangement'][User::BILL_CASH];
+                    User::setUserArrangement1C([
+                        'user_id' => $_GET['id'],
+                        'bill_type' => User::BILL_CASH,
+                        'uid' => $uid,
+                        'title' => $arrangementList[$uid]
+                    ]);
+                }
+
+                if (in_array($_POST['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){
+                    $uid = $_POST['arrangement'][User::BILL_CASHLESS];
+                    User::setUserArrangement1C([
+                        'user_id' => $_GET['id'],
+                        'bill_type' => User::BILL_CASHLESS,
+                        'uid' => $uid,
+                        'title' => $arrangementList[$uid]
+                    ]);
+                }
+
+                break;
 			default:
 				if ($key != 'pass' and $key != 'form_submit') $array[$key] = $value;
 		}
@@ -440,16 +470,30 @@ function show_form($act){
                     <div class="title">Связь с договорами 1С</div>
                     <div class="value">
                         <a href="#" class="get_arrangements">Обновить список</a>
+                        <input type="hidden" name="arrangement[list]" value="">
+                        <?$db->indexBy = 'bill_type';
+                        $arrangements = $db->select('user_1c_arrangements', '*', "`user_id` = {$_GET['id']}");
+                        ?>
                         <div class="ut_arrangement cash">
                             <span>Наличный</span>
-                            <select name="arrangement_<?=User::BILL_CASH?>">
-
+                            <?$disabled = in_array($user['bill_mode'], [User::BILL_CASH, User::BILL_MODE_CASH_AND_CASHLESS]) ? '' : 'disabled';?>
+                            <select <?=$disabled?> name="arrangement[<?=User::BILL_CASH?>]">
+                                <?if (!empty($arrangements[User::BILL_CASH])){?>
+                                    <option selected value="<?=$arrangements[User::BILL_CASH]['uid']?>">
+                                        <?=$arrangements[User::BILL_CASH]['title']?>
+                                    </option>
+                                <?}?>
                             </select>
                         </div>
                         <div class="ut_arrangement cashless">
                             <span>Безналичный</span>
-                            <select name="arrangement_<?=User::BILL_CASHLESS?>">
-
+                            <?$disabled = in_array($user['bill_mode'], [User::BILL_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS]) ? '' : 'disabled';?>
+                            <select <?=$disabled?> name="arrangement[<?=User::BILL_CASHLESS?>]">
+                                <?if (!empty($arrangements[User::BILL_CASHLESS]['uid'])){?>
+                                    <option selected value="<?=$arrangements[User::BILL_CASHLESS]['uid']?>">
+                                        <?=$arrangements[User::BILL_CASHLESS]['title']?>
+                                    </option>
+                                <?}?>
                             </select>
                         </div>
                     </div>

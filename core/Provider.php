@@ -9,7 +9,7 @@ abstract class Provider{
 	public static $todayIssue;
 
 	protected abstract static function getItemsToOrder(int $provider_id);
-    
+
     public static function getProviderAddressList($provider_id){
         $output = "";
         switch ($provider_id){
@@ -31,9 +31,9 @@ abstract class Provider{
 		foreach($providers as $provider){
 			if ($provider['api_title'] == $api_title) return $provider['id'];
 		}
-		return false; 
+		return false;
 	}
-	
+
 	/**
 	 * @param  array provider_id | api_title, typeOrganization
 	 * @return [type]
@@ -56,16 +56,16 @@ abstract class Provider{
 		$typeOrganization = $inputData['typeOrganization'];
 
 		if (!$provider_id) return false;
-		
+
 		if ($debugMode){
 			debug($params, 'params');
 		}
 
 		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
-		
+
 		//если private отключен то ставим в него entity
 		if (isset($params[$provider_id]) && !$params[$provider_id]->$typeOrganization->isActive){
-			$params[$provider_id]->private = $params[$provider_id]->entity; 
+			$params[$provider_id]->private = $params[$provider_id]->entity;
 		}
 
 		return $params[$provider_id]->$typeOrganization;
@@ -146,7 +146,7 @@ abstract class Provider{
                     SET `price_updated` = CURRENT_TIMESTAMP
                     WHERE id = {$params['store_id']}", ''
             );
-		if (isset($params['provider_id'])) return 
+		if (isset($params['provider_id'])) return
 			self::getInstanceDataBase()->query("UPDATE #provider_stores SET `price_updated` = CURRENT_TIMESTAMP WHERE provider_id = {$params['provider_id']}", '');
 	    return false;
 	}
@@ -174,7 +174,7 @@ abstract class Provider{
 				if ($dateTimeNow >= $dateTimeInterval){
 					self::$counterDaysDelivery = - 1;
 					self::$todayIssue = false;
-				} 
+				}
 			}
 			else{
 				self::$counterDaysDelivery = - 1;
@@ -190,7 +190,7 @@ abstract class Provider{
 				if ($dateTimeNow >= $dateTimeInterval){
 					self::$counterDaysDelivery = - 1;
 					self::$todayIssue = false;
-				} 
+				}
 			}
 			else{
 				self::$counterDaysDelivery = - 1;
@@ -222,7 +222,7 @@ abstract class Provider{
 		if (!$counter){
 			$dateTime = new \DateTime();
 			$counter = $dateTime->format('N');
-		} 
+		}
 		$output = $workSchedule[$counter];
 		$counter++;
 		if ($counter > 7) $counter = 1;
@@ -252,7 +252,7 @@ abstract class Provider{
 			if (!$res->num_rows) return false;
 			foreach($res as $value) $output[] = $value['id'];
 			$enabledArrayApiSearch = $output;
-		}	
+		}
 		if (in_array($provider_id, $enabledArrayApiSearch)) return true;
 		else return false;
 	}
@@ -282,7 +282,7 @@ abstract class Provider{
 			if (!$res->num_rows) return false;
 			foreach($res as $value) $output[] = $value['id'];
 			$enabledArrayApiOrder = $output;
-		}	
+		}
 		if (in_array($provider_id, $enabledArrayApiOrder)) return true;
 		else return false;
 	}
@@ -301,7 +301,7 @@ abstract class Provider{
 	/**
 	 * gets response from remote server by url
 	 * @param  [string] $url remote url server
-	 * @param  [array] $data if is null then method is get 
+	 * @param  [array] $data if is null then method is get
 	 * @return [string] response from server
 	 */
 	public static function getUrlData($url, $data = array(), $header = null){
@@ -311,7 +311,7 @@ abstract class Provider{
 		if (empty($data)){
 			$array['ssl']['verify_peer'] = false;
 			$array['http']['method'] = 'GET';
-		} 
+		}
 		else{
 			$array['http']['method'] = 'POST';
 			if (is_array($data)) $array['http']['content'] = http_build_query($data);
@@ -338,11 +338,13 @@ abstract class Provider{
 			curl_setopt($curl, CURLOPT_POST, true);
 			if (is_array($data)) curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
 			else curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-		} 
+		}
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		if ($header){
-			curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+            $arrayHeader = [];
+            foreach ($header as $key => $value) $arrayHeader[] = "$key: $value";
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $arrayHeader);
 		}
 
 		$fileOut = fopen(Config::$tmpFolderPath . '/curl_out.txt', "w");
@@ -400,11 +402,11 @@ abstract class Provider{
 		", $params['flag']);
 		if (!$res->num_rows) return false;
 		$storeInfo[$store_id]  = $res->fetch_assoc();
-		return $storeInfo[$store_id]; 
+		return $storeInfo[$store_id];
 	}
 	/**
 	 * increases price taking into account markup of provider and discount of user
-	 * @param  double $price 
+	 * @param  double $price
 	 * @param  int $store_id
 	 * @param  int $user_id
 	 * @return int
@@ -431,7 +433,7 @@ abstract class Provider{
 		$provider = self::getInstanceProvider($params['provider_id']);
 		if (!$provider || !self::getIsEnabledApiOrder($params['provider_id'])){
 			return self::getStoreItem($params['store_id'], $params['item_id']);
-		} 
+		}
 		$price = $provider::getPrice($params);
 		if (!$price) return [
 			'price' => 0,
@@ -517,7 +519,7 @@ abstract class Provider{
 	    if (isset($params['provider_id']) && $params['provider_id']){
             $where .= "ps.provider_id = {$params['provider_id']} AND ";
         }
-        
+
         if (!empty($params)){
 			foreach($params as $key => $value){
 				switch($key){
@@ -527,18 +529,18 @@ abstract class Provider{
 				}
 			}
 		}
-		
+
 		if ($where){
             $where = substr($where, 0, -5);
             $where = "WHERE $where";
         }
-		
+
 		self::getInstanceDataBase()->query("
 			DELETE si FROM #store_items si
 			LEFT JOIN #provider_stores ps ON ps.id = si.store_id
 			$where
 		", '');
-        
+
         self::getInstanceDataBase()->query("
 		    UPDATE
                 #provider_stores ps

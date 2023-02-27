@@ -181,15 +181,34 @@
             document.querySelector('a.get_arrangements').addEventListener('click', (e) => {
                 let formData = new FormData();
                 formData.set('TahosID', document.querySelector('input[name="user_id"]').value);
-                formData.set('userType', 'Пользователь');
+                formData.set('userType', 'Покупатель');
                 formData.set('act', 'getArrangements');
-                // showGif();
+                showGif();
                 fetch('/admin/ajax/user.php', {
                     method: 'POST',
                     body: formData
                 }).then(response => response.json()).then(response => {
+                    document.querySelector('input[name="arrangement[list]"]').value = JSON.stringify(response);
+                    let htmlString = '';
+                    response.forEach((item, i) => {
+                        htmlString += `<option value="${item.uid}">${item.title}</option>`
+                    })
+                    document.querySelectorAll('div.ut_arrangement select').forEach((item, i) => {
+                        item.innerHTML = htmlString;
+                    })
                     showGif(false);
                 })
+            })
+            document.querySelector('input[name="bill_mode"]').addEventListener('change', (e) => {
+                switch (e.target.value){
+                    case '2':
+                    case '1':
+                        let arrangement = document.querySelector(`input[name="arrangement[${e.target.value}]"]`);
+                        arrangement.setAttribute('disabled', true);
+                        break;
+                    case '3':
+                        break;
+                }
             })
 		},
         setChangesExist: () => {

@@ -5,6 +5,7 @@ class Database {
 	public $config;
 	public $mysqli;
 	public $last_query;
+    public $indexBy = '';
 	public $isProfiling = false;
 	private $profiling;
 	public $connection_id;
@@ -299,6 +300,15 @@ class Database {
 			}
 			return $array;
 		}
+        if ($this->indexBy){
+            $output = [];
+            foreach($data as $value){
+                $field = $value[$this->indexBy];
+                $output[$field] = $value;
+            }
+            $this->indexBy = '';
+            return $output;
+        }
 		return $data;
 	}
 	/**

@@ -409,10 +409,8 @@ class OrderValue{
 						#messages
 					WHERE correspond_id=c.id
 				) as count,
-				CASE
-                    WHEN o.pay_type = 'Наличный' OR o.pay_type = 'Онлайн' THEN 1
-                    WHEN o.pay_type = 'Безналичный' THEN 2
-                END AS bill_type
+				o.bill_type,
+				ua.uid AS arrangement_uid
 			FROM
 				#orders_values ov
             LEFT JOIN #order_issue_values oiv ON
@@ -431,6 +429,8 @@ class OrderValue{
 			LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
 			LEFT JOIN #orders o ON ov.order_id=o.id
+			LEFT JOIN
+			    #user_1c_arrangements ua ON ua.user_id = ov.user_id and ua.bill_type = o.bill_type
 			LEFT JOIN #users u ON u.id=o.user_id
 			LEFT JOIN #corresponds c 
 			ON

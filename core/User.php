@@ -403,12 +403,13 @@ class User{
         }
     }
 
+    //todo метод требует доработки, если запрос пришел из 1С то проверять по дате, пользователю, сумме и типу счета
     public static function replenishBill($params){
         /** @var Database $db */
         $db = $GLOBALS['db'];
 
-        $count = $db->getCount('funds', "`comment` = '{$params['comment']}' and sum = {$params['sum']}");
-        if ($count) return;
+        /*$count = $db->getCount('funds', "`comment` = '{$params['comment']}' and sum = {$params['sum']}");
+        if ($count) return;*/
 
         $res_user = User::get(['user_id' => $params['user_id']]);
         foreach ($res_user as $value) $user = $value;

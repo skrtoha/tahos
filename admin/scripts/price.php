@@ -24,7 +24,11 @@ switch ($_GET['act']){
         $query = "
             SELECT
                 si.item_id,
-                b.title AS brend,
+                IF (
+                    pb.title IS NOT NULL,
+                    pb.title,
+                    b.title
+                ) AS brend,
                 i.article,
                 i.title_full,
                 ad.description,
@@ -49,6 +53,8 @@ switch ($_GET['act']){
                     LEFT JOIN
                 #brends b ON b.id = i.brend_id
                     LEFT JOIN
+                #provider_brends pb ON pb.brend_id = i.brend_id AND pb.provider_id = 36
+                    LEFT JOIN
                 #provider_stores ps ON ps.id = si.store_id
                     LEFT JOIN
                 #currencies c ON c.id=ps.currency_id
@@ -72,6 +78,7 @@ switch ($_GET['act']){
             $Ad = $dom->createElement('Ad');
 
             addXMLValue($Ad, 'Id', $row['item_id']);
+            addXMLValue($Ad, 'Brand', $row['brend']);
             addXMLValue($Ad, 'OEM', $row['article']);
             addXMLValue($Ad, 'Address', $issue['adres']);
             addXMLValue($Ad, 'Category', 'Запчасти и аксессуары');

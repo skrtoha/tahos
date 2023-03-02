@@ -168,7 +168,7 @@ switch($request['act']){
         break;
     case 'setUserArrangement':
         $data = json_decode($request['data'], true);
-        User::setUserArrangement1C($data);
+        foreach($data as $d) User::setUserArrangement1C($d);
         break;
 }
 

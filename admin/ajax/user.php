@@ -1,6 +1,8 @@
 <?php
 
 use core\Mailer;
+use core\Provider;
+use core\Setting;
 use core\UserAddress;
 require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/DataBase.php");
 
@@ -199,6 +201,13 @@ switch($_POST['act']){
         break;
     case 'deleteAddress':
         $db->delete('user_addresses', "`id` = {$_POST['address_id']}");
+        break;
+    case 'getArrangements':
+        $settings = Setting::get('site_settings', null, 'all');
+        $url = $settings['1c_url'];
+        $url .= "get-user-arrangements/?TahosID={$_POST['TahosID']}&userType={$_POST['userType']}";
+        $result = Provider::getCurlUrlData($url, [], ['synchronization_token' => $settings['synchronization_token']]);
+        echo $result;
         break;
 }
 

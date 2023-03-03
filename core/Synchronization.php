@@ -16,10 +16,11 @@ class Synchronization{
             $o['billType'] = $ov['bill_type'];
             $o['typeOrganization'] = $ov['typeOrganization'];
             $o['userCreated'] = $ov['userCreated'];
+            $o['arrangement_uid'] = $ov['arrangement_uid'];
 			$output[$ov['order_id']]['values'][] = [
 				'status_id' => $ov['status_id'],
 				'provider_id' => $ov['provider_id'],
-				'provider' => strtoupper($ov['provider']),
+				'provider' => mb_strtoupper($ov['provider']),
 				'cipher' => $ov['cipher'],
 				'order_id' => $ov['order_id'],
 				'user_id' => $ov['user_id'],

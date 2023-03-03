@@ -127,10 +127,12 @@ class Basket{
         if ($additional_options['pay_type'] == 'Наличный' || $additional_options['pay_type'] == 'Онлайн'){
             $available = $user['bill_cash'] - $user['reserved_cash'];
             if ($available < 0 && abs($available) > $user['credit_limit_cash']) $limitExceeded = true;
+            $bill_type = User::BILL_CASH;
         }
         if ($additional_options['pay_type'] == 'Безналичный'){
             $available = $user['bill_cashless'] - $user['reserved_cashless'];
             if ($available < 0 && abs($available) > $user['credit_limit_cashless']) $limitExceeded = true;
+            $bill_type = User::BILL_CASHLESS;
         }
         if ($limitExceeded){
             message('Превышен кредитный лимит!', false);
@@ -155,7 +157,8 @@ class Basket{
                     'address_id' => $additional_options['address_id'],
                     'pay_type' => $additional_options['pay_type'],
                     'date_issue' => $dateTimeObject->format('Y-m-d'),
-                    'entire_order' => $additional_options['entire_order']
+                    'entire_order' => $additional_options['entire_order'],
+                    'bill_type' => $bill_type
                 ];
 
                 $res = $db->insert('orders', $insertOrder);

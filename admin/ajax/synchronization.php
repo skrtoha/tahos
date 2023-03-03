@@ -69,7 +69,7 @@ switch($request['act']){
 	case 'setStatusArrived':
         $changedOrders = [];
         $data = json_decode($request['data'], true);
-		$orders = Synchronization::getOrders(['osi' => array_keys($data)]);
+		$orders = Synchronization::getOrders(['osi' => array_keys($data)], '');
 
         foreach($orders as $order){
             foreach($order['values'] as $ov){
@@ -163,8 +163,12 @@ switch($request['act']){
             'user_id' => $data['user_id'],
             'sum' => $data['sum'],
             'comment' => $data['comment'],
-            'bill_type' => User::BILL_TYPE_CASHLESS
+            'bill_type' => User::BILL_CASHLESS
         ]);
+        break;
+    case 'setUserArrangement':
+        $data = json_decode($request['data'], true);
+        foreach($data as $d) User::setUserArrangement1C($d);
         break;
 }
 

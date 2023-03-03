@@ -2,6 +2,7 @@
 /** @var $db \core\Database $act */
 
 use core\Basket;
+use core\Setting;
 use core\User;
 
 $act = $_GET['act'];
@@ -34,6 +35,53 @@ if ($_POST['form_submit']){
                 if ($_POST['bill_mode'] == User::BILL_MODE_CASHLESS) $array['pay_type'] = 'Безналичный';
                 elseif ($_POST['bill_mode'] == User::BILL_MODE_CASH && $_POST['pay_type'] != 'Онлайн') $array['pay_type'] = 'Наличный';
                 else $array['pay_type'] = $_POST['pay_type'];
+                break;
+            case 'arrangement':
+                if (empty($value['list'])) break;
+
+                if (
+                    !$_POST['arrangement'][User::BILL_CASH] && !$_POST['arrangement'][User::BILL_CASHLESS] ||
+                    $_POST['bill_mode'] == 1 && !$_POST['arrangement'][1] ||
+                    $_POST['bill_mode'] == 2 && !$_POST['arrangement'][2] ||
+                    $_POST['bill_mode'] == 3 && (!$_POST['arrangement'][1] || !$_POST['arrangement'][2]) ||
+                    $_POST['arrangement'][1] == $_POST['arrangement'][2]
+                ){
+                    $saveble = false;
+                    message('Неверно указан договор(ы)!', false);
+                    break;
+                }
+                $db->delete('user_1c_arrangements', "`user_id` = {$_GET['id']}");
+
+                $arrangementList = [];
+                if ($value['list']){
+                    $arrangements = json_decode($value['list'], true);
+                    foreach($arrangements as $v) $arrangementList[$v['uid']] = $v['title'];
+                }
+                else {
+                    if (isset($value[User::BILL_CASH])) $arrangementList[User::BILL_CASH] = $value[User::BILL_CASH];
+                    if (isset($value[User::BILL_CASHLESS])) $arrangementList[User::BILL_CASHLESS] = $value[User::BILL_CASHLESS];
+                }
+
+                if (in_array($_POST['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){
+                    $uid = $_POST['arrangement'][User::BILL_CASH];
+                    User::setUserArrangement1C([
+                        'user_id' => $_GET['id'],
+                        'bill_type' => User::BILL_CASH,
+                        'uid' => $uid,
+                        'title' => $arrangementList[$uid]
+                    ]);
+                }
+
+                if (in_array($_POST['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){
+                    $uid = $_POST['arrangement'][User::BILL_CASHLESS];
+                    User::setUserArrangement1C([
+                        'user_id' => $_GET['id'],
+                        'bill_type' => User::BILL_CASHLESS,
+                        'uid' => $uid,
+                        'title' => $arrangementList[$uid]
+                    ]);
+                }
+
                 break;
 			default:
 				if ($key != 'pass' and $key != 'form_submit') $array[$key] = $value;
@@ -356,6 +404,7 @@ function show_form($act){
 		<?=\User::getHtmlActions($id)?>
 	<?}?>
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
+    <input type="hidden" name="1c_url" value="<?= Setting::get('site_settings', '1c_url')?>">
 	<div class="t_form">
 		<div class="bg">
 			<form method="post" enctype="multipart/form-data" id="user">
@@ -432,6 +481,38 @@ function show_form($act){
                             <input <?=$checked?> name="bill_mode" type="radio" value="<?=User::BILL_MODE_CASH_AND_CASHLESS?>">
                             <span>Наличный и безналичный</span>
                         </label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="title">Связь с договорами 1С</div>
+                    <div class="value">
+                        <a href="#" class="get_arrangements">Обновить список</a>
+                        <?$db->indexBy = 'bill_type';
+                        $arrangements = $db->select('user_1c_arrangements', '*', "`user_id` = {$_GET['id']}");
+                        ?>
+                        <input type="hidden" name="arrangement[list]" value="">
+                        <div class="ut_arrangement cash">
+                            <span>Наличный</span>
+                            <?$disabled = in_array($user['bill_mode'], [User::BILL_CASH, User::BILL_MODE_CASH_AND_CASHLESS]) ? '' : 'disabled';?>
+                            <select <?=$disabled?> name="arrangement[<?=User::BILL_CASH?>]">
+                                <?if (!empty($arrangements[User::BILL_CASH])){?>
+                                    <option selected value="<?=$arrangements[User::BILL_CASH]['uid']?>">
+                                        <?=$arrangements[User::BILL_CASH]['title']?>
+                                    </option>
+                                <?}?>
+                            </select>
+                        </div>
+                        <div class="ut_arrangement cashless">
+                            <span>Безналичный</span>
+                            <?$disabled = in_array($user['bill_mode'], [User::BILL_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS]) ? '' : 'disabled';?>
+                            <select <?=$disabled?> name="arrangement[<?=User::BILL_CASHLESS?>]">
+                                <?if (!empty($arrangements[User::BILL_CASHLESS]['uid'])){?>
+                                    <option selected value="<?=$arrangements[User::BILL_CASHLESS]['uid']?>">
+                                        <?=$arrangements[User::BILL_CASHLESS]['title']?>
+                                    </option>
+                                <?}?>
+                            </select>
+                        </div>
                     </div>
                 </div>
 				<div class="field">

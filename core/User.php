@@ -458,4 +458,18 @@ class User{
         return $result;
     }
 
+    public static function setUserArrangement1C($params){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        $db->insert(
+            'user_1c_arrangements',
+            $params,
+            ['duplicate' => [
+                'uid' => $params['uid'],
+                'title' => $params['title']
+            ]]
+        );
+    }
+
 }

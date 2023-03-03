@@ -386,7 +386,10 @@ class OrderValue{
 				u.email,
 				u.reserved_cash,
 				u.reserved_cashless,
-				u.user_type AS typeOrganization,
+				CASE
+				    WHEN o.bill_type = ".User::BILL_CASH." THEN 'private'
+				    WHEN o.bill_type = ".User::BILL_CASHLESS." THEN 'entity'
+				END AS typeOrganization,
 				DATE_FORMAT(u.created, '%d.%m.%Y %H:%i:%s') AS userCreated, 
 				ps.delivery,
 				p.api_title,

@@ -860,7 +860,7 @@ function itemsToOrder(){
 						<td><?=$i['price']?></td>
 						<td><?=$i['count']?></td>
 						<td>
-							<a href="?view=providers&act=removeFromBasket&<?=http_build_query($i)?>" class="remove">
+							<a title="Удалить" href="?view=providers&act=removeFromBasket&<?=http_build_query($i)?>" class="remove">
 								<span class="icon-cancel-circle1"></span>
 							</a>
 						</td>

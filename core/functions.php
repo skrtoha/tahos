@@ -339,6 +339,7 @@ function get_basket(){
 				)
 			) as article_cat,
             i.article,
+            b.item_id,
 			br.title as brend,
 			IF (i.title_full != '', i.title_full, i.title) as title
 			FROM
@@ -352,7 +353,7 @@ function get_basket(){
 	foreach($basket as $key => $value){
 		$b = & $basket[$key];
 		unset($b['user_id'], $b['comment']);
-		$b['href'] = core\Item::getHrefArticle($b['article']);
+		$b['href'] = "/article/{$value['item_id']}-{$value['article']}/noUseAPI";
 	} 
 	return $basket;
 }

@@ -412,7 +412,7 @@ class Mikado extends Provider{
 				if (!$DeliveryType) throw new Exception("Ошибка получения DeliveryType по $ZakazCode");
 			} catch(Exception $e){
 				Log::insertThroughException($e, ['additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"]);
-				return fase;
+				return false;
 			}
 		} 
 		else $DeliveryType = 0;

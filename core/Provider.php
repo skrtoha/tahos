@@ -111,7 +111,10 @@ abstract class Provider{
 				u.id AS user_id,
 				p.title AS provider,
 				p.api_title,
-				u.user_type as typeOrganization,
+				CASE
+				    WHEN o.bill_type = ".User::BILL_CASH." THEN 'private' 
+				    WHEN o.bill_type = ".User::BILL_CASHLESS." THEN 'entity' 
+				END as typeOrganization,
 				o.pay_type
 			FROM
 				#provider_basket pb
@@ -600,4 +603,13 @@ abstract class Provider{
 	public static function isJSON($string){
 		return is_string($string) && is_array(json_decode($string, true)) ? true : false;
 	}
+
+    public static function getTypeOrganizationFromPayType($typeOrganization){
+        switch($typeOrganization){
+            case 'entity':
+                return User::BILL_CASHLESS;
+            case 'private':
+                return User::BILL_CASH;
+        }
+    }
 }

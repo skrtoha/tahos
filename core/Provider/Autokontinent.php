@@ -215,13 +215,6 @@ class Autokontinent extends Provider{
 		$stores[$part->warehouse_id] = $store_id;
 		return $store_id;
 	}
-	private static function clearStoreItems($item_id){
-		parent::getInstanceDataBase()->query("
-			DELETE si FROM #store_items si
-			LEFT JOIN #provider_stores ps ON ps.id = si.store_id
-			WHERE si.item_id = $item_id AND ps.provider_id = " . self::getParams()->provider_id
-		, '');
-	}
 	private static function getPartIdByBrandAndArticle($brand, $article, $params = []){
 		$items = self::getItemsByArticle($article);
 		if (!$items) return false;

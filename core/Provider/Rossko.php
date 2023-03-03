@@ -211,14 +211,6 @@ class Rossko extends Provider{
 		}
 		return $soap;
 	}
-	private function getDeliveryID(){
-		$query = self::getSoap('GetCheckoutDetails');
-		$result = $query->GetCheckoutDetails([
-			'KEY1' => self::getParams()->KEY1,
-			'KEY2' => self::getParams()->KEY2,
-		]);
-		debug($result);
-	}
 	public function getResult($search){
 		$query = self::getSoap('GetSearch');
 		if (!$query) return false;
@@ -268,7 +260,6 @@ class Rossko extends Provider{
 	public static function sendOrder($store_id = NULL){
 		if ($store_id) $stock = parent::getInstanceDataBase()->getFieldOnID('provider_stores', $store_id, 'title');
 		$partsList = self::getPartsForSending();
-		$items = [];
 		if (!$partsList){
 			if (!empty($ov)) $additional = "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
 			else $additional = NULL;

@@ -276,7 +276,6 @@ class Autopiter extends Provider{
 			]);
 			return false;
 		}
-		debug($model);
 		$item = [
 			'DetailUid' => $model->DetailUid,
 			'Comment' => Autoeuro::getStringBasketComment($params),

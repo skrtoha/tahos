@@ -188,7 +188,6 @@ class Basket{
             $res = $db->insert(
                 'orders_values',
                 [
-                    'user_id' => $user['id'],
                     'order_id' => $order_id,
                     'store_id' => $value['store_id'],
                     'item_id' => $value['item_id'],

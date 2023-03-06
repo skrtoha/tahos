@@ -433,7 +433,7 @@ class OrderValue{
 			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
 			LEFT JOIN #orders o ON ov.order_id=o.id
 			LEFT JOIN
-			    #user_1c_arrangements ua ON ua.user_id = ov.user_id and ua.bill_type = o.bill_type
+			    #user_1c_arrangements ua ON ua.user_id = o.user_id and ua.bill_type = o.bill_type
 			LEFT JOIN #users u ON u.id=o.user_id
 			LEFT JOIN #corresponds c 
 			ON

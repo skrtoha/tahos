@@ -9,6 +9,8 @@ class Synchronization{
 		$output = [];
 		$res_order_values = OrderValue::get($params, $flag);
 		foreach($res_order_values as $ov){
+            if (!$ov['bill_type']) continue;
+
 			$o = & $output[$ov['order_id']];
 			$o['user_id'] = $ov['user_id'];
 			$o['userName'] = mb_strtoupper($ov['userName']);

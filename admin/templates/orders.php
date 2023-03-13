@@ -658,8 +658,8 @@ function user_orders(){
 	$where = "o.user_id=$id";
     $page_title = 'Заказы пользователя';
     $status .= $page_title;
-    
-    $all = $db->getCount('orders_values', "`user_id` = $id");
+
+    $all = OrderValue::getCount(['user_id' => $id]);
     $perPage = core\Setting::get('items', 'perPage');
     $linkLimit = core\Setting::get('items', 'linkLimit');
     $page = $_GET['page'] ?: 1;

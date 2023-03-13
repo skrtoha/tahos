@@ -265,11 +265,16 @@ class OrderValue{
 	 * @param  [integer] $quan value for decline
 	 * @param  [array] $condition (store_id, item_id)
 	 * @param  string $act plus|minus (+|-) minus as default
-	 * @return none
+	 * @return true everything is ok
+     * @return string if there is an error
+     * @return false if there is no 'where' conditions
 	 */
-	private static function changeInStockStoreItem($quan, $condition, $act = 'minus'){
+	private static function changeInStockStoreItem($quan, $condition, string $act = 'minus'){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
 		$sign = $act == 'minus' ? '-' : '+';
-		$GLOBALS['db']->update(
+		return $db->update(
 			'store_items',
 			['in_stock' => "`in_stock` $sign $quan"],
 			"`store_id`= {$condition['store_id']} AND `item_id` = {$condition['item_id']}"
@@ -309,6 +314,95 @@ class OrderValue{
 		return $res->fetch_assoc();
 	}
 
+    private static function getLeftJoin(): string
+    {
+        return "
+            LEFT JOIN #order_issue_values oiv ON
+                oiv.order_id = ov.order_id AND oiv.store_id = ov.store_id AND oiv.item_id = ov.item_id
+            LEFT JOIN #order_issues oi ON oi.id = oiv.issue_id 
+            LEFT JOIN #returns r ON 
+                r.order_id = ov.order_id AND 
+                r.store_id = ov.store_id AND 
+                r.item_id = ov.item_id AND
+                r.status_id = 3
+			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
+			LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
+			LEFT JOIN #providers p ON p.id=ps.provider_id
+			LEFT JOIN #items i ON i.id=ov.item_id
+			LEFT JOIN #brends b ON b.id=i.brend_id
+			LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
+			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
+			LEFT JOIN #orders o ON ov.order_id=o.id
+			LEFT JOIN
+			    #user_1c_arrangements ua ON ua.user_id = o.user_id and ua.bill_type = o.bill_type
+			LEFT JOIN #users u ON u.id=o.user_id
+			LEFT JOIN #corresponds c 
+			ON
+				c.order_id=ov.order_id AND
+				c.store_id=ov.store_id AND
+				c.item_id=ov.item_id
+			LEFT JOIN
+				#mikado_zakazcode mzc ON mzc.item_id = ov.item_id 
+			LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
+        ";
+    }
+
+    public static function getCount($params){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        $query = "
+            SELECT 
+                COUNT(*) as cnt
+            FROM
+				#orders_values ov
+            ".self::getLeftJoin()."
+            ".self::getWhere($params)."
+        ";
+        $result = $db->query($query)->fetch_assoc();
+        return $result['cnt'];
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    private static function getWhere(array $params): string
+    {
+        $where = '';
+        foreach($params as $key => $value){
+            switch($key){
+                case 'osi':
+                    $where .= "(";
+                    foreach($value as $v){
+                        $array = explode('-', $v);
+                        $where .= "(ov.order_id = {$array[0]} AND ov.store_id = {$array[1]} AND ov.item_id = {$array[2]}) OR ";
+                    }
+                    $where = substr($where, 0, -4);
+                    $where .= ") AND ";
+                    break;
+                case 'order_id':
+                case 'item_id':
+                case 'store_id':
+                case 'status_id':
+                case 'synchronized':
+                    $where .= "ov.$key = '$value' AND ";
+                    break;
+                case 'user_id':
+                    $where .= "o.user_id = $value AND ";
+                    break;
+                case 'limit':
+                    $limit = "LIMIT $value";
+                    break;
+            }
+        }
+        if ($where){
+            $where = substr($where, 0, -5);
+            $where = "WHERE $where";
+        }
+        return $where;
+    }
+
     /**
      * gets common information of order value
      * @param array $params
@@ -316,40 +410,12 @@ class OrderValue{
      * @return \mysqli_result mysqli object
      */
 	public static function get(array $params = array(), string $flag = ''){
-		$where = '';
 		$limit = '';
-		if (!empty($params)){
-			foreach($params as $key => $value){
-				switch($key){
-                    case 'osi':
-                        $where .= "(";
-                        foreach($value as $v){
-                            $array = explode('-', $v);
-                            $where .= "(ov.order_id = {$array[0]} AND ov.store_id = {$array[1]} AND ov.item_id = {$array[2]}) OR ";
-                        }
-                        $where = substr($where, 0, -4);
-                        $where .= ") AND ";
-                        break;
-					case 'order_id':
-					case 'item_id':
-					case 'store_id':
-					case 'status_id':
-					case 'synchronized':
-						$where .= "ov.$key = '$value' AND ";
-						break;
-					case 'user_id':
-						$where .= "o.user_id = $value AND ";
-						break;
-					case 'limit':
-						$limit = "LIMIT $value";
-						break;
-				}
-			}
-		}
-		if ($where){
-			$where = substr($where, 0, -5);
-			$where = "WHERE $where";
-		}
+
+        $where = '';
+		if (!empty($params)) {
+            $where = self::getWhere($params);
+        }
 
         /** @var Database $db */
         $db = $GLOBALS['db'];
@@ -420,33 +486,7 @@ class OrderValue{
 				ua.uid AS arrangement_uid
 			FROM
 				#orders_values ov
-            LEFT JOIN #order_issue_values oiv ON
-                oiv.order_id = ov.order_id AND oiv.store_id = ov.store_id AND oiv.item_id = ov.item_id
-            LEFT JOIN #order_issues oi ON oi.id = oiv.issue_id 
-            LEFT JOIN #returns r ON 
-                r.order_id = ov.order_id AND 
-                r.store_id = ov.store_id AND 
-                r.item_id = ov.item_id AND
-                r.status_id = 3
-			LEFT JOIN #provider_stores ps ON ps.id=ov.store_id
-			LEFT JOIN #store_items si ON si.store_id=ov.store_id AND si.item_id=ov.item_id
-			LEFT JOIN #providers p ON p.id=ps.provider_id
-			LEFT JOIN #items i ON i.id=ov.item_id
-			LEFT JOIN #brends b ON b.id=i.brend_id
-			LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
-			LEFT JOIN #orders_statuses os ON os.id=ov.status_id
-			LEFT JOIN #orders o ON ov.order_id=o.id
-			LEFT JOIN
-			    #user_1c_arrangements ua ON ua.user_id = o.user_id and ua.bill_type = o.bill_type
-			LEFT JOIN #users u ON u.id=o.user_id
-			LEFT JOIN #corresponds c 
-			ON
-				c.order_id=ov.order_id AND
-				c.store_id=ov.store_id AND
-				c.item_id=ov.item_id
-			LEFT JOIN
-				#mikado_zakazcode mzc ON mzc.item_id = ov.item_id 
-			LEFT JOIN #organizations_types ot ON ot.id=u.organization_type
+            ".self::getLeftJoin()."
 			$where
 			ORDER BY o.created DESC
 			$limit

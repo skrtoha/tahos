@@ -46,6 +46,7 @@ class Database {
 	}
 	function query($query, $show_query = ''){
 		$query = str_replace('#', $this->db_prefix, $query);
+        $this->last_query = $query;
 		if ($show_query == 'get') return $query;
 		if ($show_query == 'print'){
 			echo "<pre>$query</pre>";

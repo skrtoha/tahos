@@ -682,11 +682,17 @@ function form_operations($act){
 
 	if ($_POST['form_operations_submit']){
 		$_POST['sum'] = str_replace(array(' ', ','), '', $_POST['sum']);
+
+        $bill_type = 0;
+        if ($_POST['pay_type'] == 'Наличный') $bill_type = 1;
+        if ($_POST['pay_type'] == 'Безналичный') $bill_type = 2;
+        if (!$bill_type) die('Ошибка пополнения счета');
+
         User::replenishBill([
             'user_id' => $id,
             'sum' => $_POST['sum'],
             'comment' => 'Пополнение '.$_POST['replenishment'],
-            'bill_type' => $_POST['bill_type']
+            'bill_type' => $bill_type
         ]);
 		message('Счет успешно пополнен!');
 		header('Location: ?view=users&act=funds&id='.$id);
@@ -719,7 +725,7 @@ function form_operations($act){
                 <div class="field">
                     <div class="title">Тип счета</div>
                     <div class="value">
-                        <select name="bill_type">
+                        <select name="pay_type">
                             <?foreach(User::getListByBillMode($user['bill_mode']) as $pay_type){?>
                                 <option value="<?=$pay_type?>"><?=$pay_type?></option>
                             <?}?>

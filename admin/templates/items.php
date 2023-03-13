@@ -355,7 +355,7 @@ function item($act){
 					</div>
 				</div>
                 <div class="field">
-                    <div class="title">Описание для Авито</div>
+                    <div class="title">Маркетплейсы</div>
                     <div class="value">
                         <?$avito_desc = $_POST['avito_desc'] ?: $item['avito_desc'];
                         $active = $avito_desc ? 'active' : ''?>

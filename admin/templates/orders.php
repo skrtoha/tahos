@@ -285,19 +285,8 @@ function show_form($act){
         <tr>
             <td label="Тип оплаты">
                 <?if (isset($_GET['additionalInformation'])){
-                    $payTypeList = [];
-                    if (in_array($order['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){
-                        $payTypeList = ['Наличный'];
-                    }
-                    if (in_array($order['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){
-                        $payTypeList = ['Безналичный'];
-                    }
-                    if ($order['bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS){
-                        $payTypeList = [
-                            'Наличный',
-                            'Безналичный'
-                        ];
-                    }?>
+                    $payTypeList = User::getListByBillMode($order['bill_mode']);
+                    ?>
                     <select name="pay_type">
                         <?foreach($payTypeList as $pay_type){
                             $selected = $order['pay_type'] == $pay_type ? 'selected' : '';?>

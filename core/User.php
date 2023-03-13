@@ -361,6 +361,28 @@ class User{
         return $output[$userString];
     }
 
+    /**
+     * @param integer $bill_mode
+     * @return array|string[]
+     */
+    public static function getListByBillMode($bill_mode): array
+    {
+        $payTypeList = [];
+        if (in_array($bill_mode, [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){
+            $payTypeList = ['Наличный'];
+        }
+        if (in_array($bill_mode, [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){
+            $payTypeList = ['Безналичный'];
+        }
+        if ($bill_mode == User::BILL_MODE_CASH_AND_CASHLESS){
+            $payTypeList = [
+                'Наличный',
+                'Безналичный'
+            ];
+        }
+        return $payTypeList;
+    }
+
     private static function getQueryDebt($where = '', $orderBy = ''): string
     {
         $defaultWhere = 'f.issue_id IS NOT NULL AND ';

@@ -676,9 +676,9 @@ function form_operations($act){
 	global $status, $db, $page_title;
 	$id = $_GET['id'];
 
-    /** @var mysqli_result $user */
-	$user = User::get(['user_id' => $id]);
-    $user = $user->fetch_assoc();
+    /** @var mysqli_result $res_user */
+	$res_user = User::get(['user_id' => $id]);
+    foreach($res_user as $value) $user = $value;
 
 	if ($_POST['form_operations_submit']){
 		$_POST['sum'] = str_replace(array(' ', ','), '', $_POST['sum']);
@@ -720,8 +720,9 @@ function form_operations($act){
                     <div class="title">Тип счета</div>
                     <div class="value">
                         <select name="bill_type">
-                            <option value="<?=User::BILL_CASH?>">наличный</option>
-                            <option value="<?=User::BILL_CASHLESS?>">безналичный</option>
+                            <?foreach(User::getListByBillMode($user['bill_mode']) as $pay_type){?>
+                                <option value="<?=$pay_type?>"><?=$pay_type?></option>
+                            <?}?>
                         </select>
                     </div>
                 </div>

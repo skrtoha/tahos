@@ -504,4 +504,20 @@ class User{
         );
     }
 
+    /**
+     * Проверяет на наличие заказов по виду счета
+     * @param integer $user_id
+     * @param int $bill_type
+     * @return bool true, если есть неоплаченные заказы
+     *              false - если нет
+     */
+    public static function checkOrdersBillModeExists(int $user_id, int $bill_type): bool
+    {
+        /** @global Database $db */
+        $db = $GLOBALS['db'];
+
+        $count = $db->getCount('funds', "`user_id` = $user_id AND `paid` < `sum` AND `bill_type` = $bill_type");
+        if ($count) return false;
+        return true;
+    }
 }

@@ -23,6 +23,12 @@ class Fund{
 		return $GLOBALS['db']->insert('funds', $insert);
 	}
 
+    /**
+     * @param $where
+     * @param $having
+     * @param $order
+     * @return string
+     */
 	public static function getQueryListFunds($where = '', $having = '', $order = ''){
 		if ($where) $where = "WHERE $where";
 		if (!$order) $order = "f.id DESC";

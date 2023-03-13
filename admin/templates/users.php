@@ -11,9 +11,43 @@ $GLOBALS['user'] = $_GET['id'];
 $array = [];
 if ($_POST['form_submit']){
 	$saveble = true;
+
+    if (
+        $_POST['bill_mode'] != User::BILL_MODE_CASH_AND_CASHLESS &&
+        $_POST['previous_bill_mode'] != $_POST['bill_mode'] &&
+        in_array($_POST['bill_mode'], [User::BILL_CASH, User::BILL_MODE_CASHLESS])
+    ){
+        if ($_POST['bill_mode'] == User::BILL_MODE_CASH) $bill_mode = User::BILL_CASHLESS;
+        if ($_POST['bill_mode'] == User::BILL_MODE_CASHLESS) $bill_mode = User::BILL_CASH;
+        if (!User::checkOrdersBillModeExists($_GET['id'], $bill_mode)){
+            $saveble = false;
+        };
+    }
+
+    if (
+        $_POST['previous_bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS &&
+        $_POST['bill_mode'] == User::BILL_MODE_CASH
+    ){
+        if (!User::checkOrdersBillModeExists($_GET['id'], User::BILL_CASHLESS)){
+            $saveble = false;
+        }
+    }
+    if (
+        $_POST['previous_bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS &&
+        $_POST['bill_mode'] == User::BILL_MODE_CASHLESS
+    ){
+        if (!User::checkOrdersBillModeExists($_GET['id'], User::BILL_CASH)){
+            $saveble = false;
+        }
+    }
+    if (!$saveble){
+        message('Имеются не оплаченные заказы!', false);
+        header("Location: /admin/?view=users&act=change&id={$_GET['id']}");
+        die();
+    }
+    unset($_POST['previous_bill_mode']);
+
 	foreach($_POST as $key => $value){
-		// if (!$value) continue;
-		// var_dump($value); //continue;
 		switch ($key) {
 			case 'user_type':
 				$array['user_type'] = $value;
@@ -91,8 +125,8 @@ if ($_POST['form_submit']){
 	if (!isset($array['bonus_program'])) $array['bonus_program'] = 0;
 	if (!isset($array['allow_request_delete_item'])) $array['allow_request_delete_item'] = 0;
 	if (!isset($array['showProvider'])) $array['showProvider'] = 0;
-	// debug($array, 'array'); exit();
-	if ($array['user_type'] == 'entity' and !$array['organization_name']){
+
+    if ($array['user_type'] == 'entity' and !$array['organization_name']){
 		message('Введите название организации!', false);
 		$saveble = false;
 	}
@@ -339,7 +373,6 @@ function view(){
 	";
 	$query = str_replace('SQL_CALC_FOUND_ROWS', '', $query);
 	$users = $db->query($query, '');
-    $direction = $_GET['direction'] == 'asc' ? 'desc' : 'asc';
     $urlSort = "/admin/?view=users&direction=$directionHref";
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
@@ -465,6 +498,7 @@ function show_form($act){
 				</div>
                 <div class="field">
                     <div class="title">Режим расчетов</div>
+                    <input type="hidden" name="previous_bill_mode" value="<?=$user['bill_mode']?>">
                     <div class="value">
                         <label>
                             <?$checked = $user['bill_mode'] == User::BILL_MODE_CASH ? 'checked' : ''?>

@@ -176,8 +176,8 @@ switch($_POST['act']){
         $output['html'] = ob_get_clean();
         switch($_POST['bill_type']){
             case 'common':
-                $output['total'] = $user['bill_cash'] + $user['bill_cashless'];
-                $output['reserved'] = $user['reserved_cash'] + $user['reserved_cashless'];
+                $output['total'] = $user['bill_available'];
+                $output['reserved'] = $user['reserved_total'];
                 break;
             case 'cash':
                 $output['total'] = $user['bill_cash'] - $user['reserved_cash'];

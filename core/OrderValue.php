@@ -85,7 +85,7 @@ class OrderValue{
 				break;
 			//возврат
 			case 2:
-				$ov = $GLOBALS['db']->select_one('orders_values', '*', Provider::getWhere($params));
+				$ov = OrderValue::get($params)->fetch_assoc();
 				if ($ov['returned'] + $params['quan'] < $ov['issued']) $values['status_id'] = 1;
 				$values['returned'] = "`returned` + {$params['quan']}";
 				self::update($values, $params);
@@ -102,9 +102,12 @@ class OrderValue{
 					'user_id' => $params['user_id'],
 					'comment' => addslashes('Возврат средств за "'.$title.'"')
 				]);
+                $billColumn = '';
+                if ($ov['bill_type'] == 1) $billColumn = 'bill_cash';
+                if ($ov['bill_type'] == 2) $billColumn = 'bill_cashless';
 				User::update(
 					$params['user_id'],
-					['bill' => "`bill` + ".$params['quan'] * $params['price']]
+					[$billColumn => "`$billColumn` + ".$params['quan'] * $params['price']]
 				);
 				break;
 			//пришло
@@ -401,6 +404,7 @@ class OrderValue{
 				IF (ps.noReturn, 'class=\"noReturn\" title=\"Возврат поставщику невозможен!\"', '') AS noReturn,
 				c.id AS correspond_id,
 				o.is_payed,
+				o.pay_type,
 				IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
 				IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
 				r.return_price,
@@ -512,7 +516,7 @@ class OrderValue{
 				Provider\Autopiter::addToBasket($ov); 
 				if ($automaticOrder) self::$countOrdered = Provider\Autopiter::sendOrder();
 				break;
-		case Provider\Tahos::$provider_id:
+		    case Provider\Tahos::$provider_id:
 				OrderValue::changeStatus(11, $ov);
 				self::$countOrdered += 1; 
 				break;
@@ -566,6 +570,7 @@ class OrderValue{
                 u.bill_cash,
                 u.bill_cashless,
                 u.defermentOfPayment,
+                u.bill_mode,
                 o.pay_type,
                 o.delivery,
                 $selectAddressId,

@@ -72,9 +72,6 @@ class Account{
                     method: 'POST',
                     body: formData
                 }).then(response => response.json()).then((response) => {
-                    // const parser = new DOMParser();
-                    // let htmlContent = parser.parseFromString(response, 'text/html');
-                    // objTab.innerHTML = response;
                     objTab.innerHTML = response.html;
                     document.querySelector('span.account-debts').innerHTML = response.reserved;
                     document.querySelector('span.account-total').innerHTML = response.total;

@@ -108,8 +108,8 @@ class Basket{
         /** @var Database $db */
         $db = $GLOBALS['db'];
 
-        $additional_options = json_decode($_COOKIE['additional_options'], true);
-        if ($additional_options){
+        if (strpos($_SERVER['REQUEST_URI'], 'view=users') === false){
+            $additional_options = json_decode($_COOKIE['additional_options'], true);
             $dateTimeObject = \DateTime::createFromFormat('d.m.Y', $additional_options['date_issue']);
         }
         else $dateTimeObject = new \DateTime();

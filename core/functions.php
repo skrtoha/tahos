@@ -433,7 +433,7 @@ function get_orders($params, $flag = ''){
 				c.item_id = c.item_id
 		WHERE 
 			o.is_draft = 0 AND
-			ov.user_id = {$_SESSION['user']} 
+			o.user_id = {$_SESSION['user']} 
 	";
 	if ($params['period'] == 'custom'){
 		$begin = DateTime::createFromFormat('d.m.Y', $params['begin']);

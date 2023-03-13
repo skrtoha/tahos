@@ -208,6 +208,12 @@ $(function(){
                 if (!confirm('Вы подтверждаете действие?')) return false;
             }
             th = th.closest('form');
+
+            if (!th.find('input[name=pay_type]').val()){
+                show_message('Не указан способ оплаты!', 'error');
+                return false;
+            }
+
             var order_id = + th.find('input[name=order_id]').val();
             var store_id = + th.find('input[name=store_id]').val();
             var item_id = + th.find('input[name=item_id]').val();

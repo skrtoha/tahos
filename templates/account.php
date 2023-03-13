@@ -53,7 +53,7 @@ Breadcrumb::out();
 			<p>
                 Итого:
                 <span class="account-total">
-                    <?=$user['bill_total'] - $user['reserved_cash'] - $user['reserved_cashless']?>
+                    <?=$user['bill_available']?>
                 </span>
                 <span style="color: #0081bc"><?=$designation?></span></p>
 			<?if ($user['bonus_program']){?>

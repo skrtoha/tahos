@@ -8,13 +8,9 @@ use core\User;
 $db = $GLOBALS['db'];
 
 /** @var mysqli_result $res_user */
-if (User::$fetched) $user = User::$fetched;
-else{
-    $res_user = core\User::get(['user_id' => $user_id]);
-    $user = $res_user->fetch_assoc();
-}
+$res_user = User::get(['user_id' => $user_id]);
+foreach($res_user as $value) $user = $value;
 $debt = User::getDebt($user);
-
 
 $res_basket = core\Basket::get($user['id']);
 $noReturnIsExists = false;

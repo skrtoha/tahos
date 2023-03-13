@@ -53,8 +53,7 @@ if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
 $res_user = core\User::get(['user_id' => $_SESSION['user'] ?: false]);
 
 if ($res_user->num_rows){
-    $user = $res_user->fetch_assoc();
-    \core\User::$fetched = $user;
+    foreach($res_user as $value) $user = $value;
     $debt = \core\User::getDebt($user);
 }
 else $user = $res_user;

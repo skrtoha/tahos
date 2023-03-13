@@ -1,4 +1,6 @@
 <?php
+/** @global \core\Database $db */
+
 use core\Returns;
 use core\Managers;
 switch ($_GET['act']){

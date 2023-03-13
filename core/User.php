@@ -11,7 +11,8 @@ class User{
     const BILL_MODE_CASHLESS = 2;
     const BILL_MODE_CASH_AND_CASHLESS = 3;
 
-    public static $fetched;
+    private static $userGet;
+
 	public static function noOverdue($user_id){
 		$query = Fund::getQueryListFunds(
 			"f.user_id = $user_id AND f.overdue > 0",
@@ -49,9 +50,8 @@ class User{
      * @return mysqli_result
      */
 	public static function get(array $params = []){
-        static $output;
         $paramsString = json_encode($params);
-        if (isset($output[$paramsString])) return $output[$paramsString];
+        if (isset(self::$userGet[$paramsString])) return self::$userGet[$paramsString];
 
 		$db = $GLOBALS['db'];
 		$where = '';
@@ -100,10 +100,20 @@ class User{
 				    WHEN u.bill_mode = ".User::BILL_MODE_CASHLESS." THEN @bill_total := u.bill_cashless
                 END,
 				CASE
-                    WHEN u.currency_id = 1 THEN ROUND(@bill_total / c.rate, 0)
-                    WHEN u.currency_id = 6 THEN ROUND(@bill_total / c.rate * 10)
-                    ELSE ROUND(@bill_total / c.rate, 2)
+                    WHEN u.currency_id = 1 THEN @bill_total := ROUND(@bill_total / c.rate, 0)
+                    WHEN u.currency_id = 6 THEN @bill_total := ROUND(@bill_total / c.rate * 10)
+                    ELSE @bill_total := ROUND(@bill_total / c.rate, 2)
                 END as bill_total,
+                CASE
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH_AND_CASHLESS." THEN @bill_total - u.reserved_cash - u.reserved_cashless
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH." THEN @bill_total - u.reserved_cash
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASHLESS." THEN @bill_total - u.reserved_cashless
+                END AS bill_available,
+                CASE
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH_AND_CASHLESS." THEN u.reserved_cash + u.reserved_cashless
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASH." THEN u.reserved_cash
+				    WHEN u.bill_mode = ".User::BILL_MODE_CASHLESS." THEN u.reserved_cashless
+                END AS reserved_total,
 				c.designation, 
 				c.rate, 
 				i.title AS issue_title,
@@ -130,8 +140,8 @@ class User{
 			$order
 			$limit
 		";
-        $output[$paramsString] = $db->query($q_user, '');
-		return $output[$paramsString];
+        self::$userGet[$paramsString] = $db->query($q_user, '');
+		return self::$userGet[$paramsString];
 	}
 
 	/**

@@ -1,6 +1,7 @@
 ﻿<?php
 use core\Provider;
 use core\OrderValue;
+use core\User;
 
 /* @var $db \core\Database */
 
@@ -16,6 +17,12 @@ switch ($act) {
             $dateTimeObject = DateTime::createFromFormat('d.m.Y', $post['date_issue']);
             $post['date_issue'] = $dateTimeObject->format('Y-m-d');
             $post['address_id'] = $post['address_id'] ?? null;
+            if ($post['pay_type'] == 'Наличный' || $post['pay_type'] == 'Онлайн'){
+                $post['bill_type'] = User::BILL_CASH;
+            }
+            if ($post['pay_type'] == 'Безналичный'){
+                $post['bill_type'] = User::BILL_CASHLESS;
+            }
             $db->update(
                 'orders',
                 $post,
@@ -32,7 +39,13 @@ switch ($act) {
 		break;
 	case 'allInWork':
 		$res_order_values = OrderValue::get(['order_id' => $_GET['id']], '');
+        $redirectString = "Location: /admin/?view=orders&id={$_GET['id']}&act=change";
 		while($ov = $res_order_values->fetch_assoc()){
+            if (!$ov['bill_type']){
+                message('Не указан способ оплаты!', false);
+                header($redirectString);
+                break;
+            }
 			$automaticOrder = isset($_GET['automaticOrder']) ? true : false;
 			OrderValue::setStatusInWork($ov, $automaticOrder);
 		}
@@ -40,7 +53,7 @@ switch ($act) {
 			header("Location: /orders");
 			die();
 		} 
-		header("Location: /admin/?view=orders&id={$_GET['id']}&act=change");
+		header($redirectString);
 		break;
 	case 'print':
 		$order = OrderValue::getOrderInfo($_GET['id']);
@@ -271,12 +284,25 @@ function show_form($act){
         </tr>
         <tr>
             <td label="Тип оплаты">
-                <?if (isset($_GET['additionalInformation'])){?>
+                <?if (isset($_GET['additionalInformation'])){
+                    $payTypeList = [];
+                    if (in_array($order['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){
+                        $payTypeList = ['Наличный'];
+                    }
+                    if (in_array($order['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){
+                        $payTypeList = ['Безналичный'];
+                    }
+                    if ($order['bill_mode'] == User::BILL_MODE_CASH_AND_CASHLESS){
+                        $payTypeList = [
+                            'Наличный',
+                            'Безналичный'
+                        ];
+                    }?>
                     <select name="pay_type">
-                        <?$selected = $order['pay_type'] == 'Наличный' ? 'selected' : ''?>
-                        <option <?=$selected?> value="Наличный">Наличный</option>
-                        <?$selected = $order['pay_type'] == 'Безналичный' ? 'selected' : ''?>
-                        <option  <?=$selected?> value="Безналичный">Безналичный</option>
+                        <?foreach($payTypeList as $pay_type){
+                            $selected = $order['pay_type'] == $pay_type ? 'selected' : '';?>
+                            <option <?=$selected?> value="<?=$pay_type?>"><?=$pay_type?></option>
+                        <?}?>
                     </select>
                 <?}
                 else{?>

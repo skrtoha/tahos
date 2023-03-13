@@ -920,6 +920,7 @@ function items_status(array $params = []){
 								<input type="hidden" name="brend" value="<?=$ov['brend']?>">
 								<input type="hidden" name="article" value="<?=$ov['article']?>">
 								<input type="hidden" name="title" value="<?=$ov['title_full']?>">
+								<input type="hidden" name="pay_type" value="<?=$ov['pay_type']?>">
 								<b><?=$ov['status']?></b>
 								<?$no_show = array(9, 6, 8, 10);
 								if (!in_array($ov['status_id'], $no_show)){

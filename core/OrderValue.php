@@ -96,18 +96,30 @@ class OrderValue{
                 foreach ($res_user as $value) $user = $value;
 
                 $title = self::getTitleComment($params['item_id']);
+
+                $bill = 0;
+                $billColumn = '';
+                if ($ov['bill_type'] == 1){
+                    $bill = $user['bill_cash'];
+                    $billColumn = 'bill_cash';
+                }
+                if ($ov['bill_type'] == 2){
+                    $bill = $user['bill_cashless'];
+                    $billColumn = 'bill_cashless';
+                }
+
+                if (!$bill) die('Ошибка получения остатка счета или данных запроса');
+
+                $remainder = $bill + $params['quan'] * $params['price'];
 				Fund::insert(1, [
 					'sum' => $params['quan'] * $params['price'],
-					'remainder' => $user['bill'] + $params['quan'] * $params['price'],
+					'remainder' => $remainder,
 					'user_id' => $params['user_id'],
 					'comment' => addslashes('Возврат средств за "'.$title.'"')
 				]);
-                $billColumn = '';
-                if ($ov['bill_type'] == 1) $billColumn = 'bill_cash';
-                if ($ov['bill_type'] == 2) $billColumn = 'bill_cashless';
 				User::update(
 					$params['user_id'],
-					[$billColumn => "`$billColumn` + ".$params['quan'] * $params['price']]
+					[$billColumn => $remainder]
 				);
 				break;
 			//пришло

@@ -434,7 +434,7 @@ function show_form($act){
 	}
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=users'>Пользователи</a> > $page_title";
 	if ($act == 's_change'){?>
-		<?=\User::getHtmlActions($id)?>
+		<?=\User::getHtmlActions($user)?>
 	<?}?>
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
     <input type="hidden" name="1c_url" value="<?= Setting::get('site_settings', '1c_url')?>">
@@ -798,7 +798,7 @@ function funds(){
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
 	<div id="total" style="margin-top: 10px;">Всего операций: <?=$all?></div>
 
-	<?=\User::getHtmlActions($id)?>
+	<?=\User::getHtmlActions($user)?>
 
 	<div class="actions users">
 		<a href="?view=users&act=form_operations&id=<?=$id?>">Пополнить счет</a>

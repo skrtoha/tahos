@@ -34,7 +34,7 @@ switch($label[0]){
         if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Yoomoney';
         else $comment = 'Пополнение банковской картой';
         User::checkOverdue($user_id, $_POST['withdraw_amount']);
-        User::checkDebt($user_id, $_POST['withdraw_amount']);
+        User::checkDebt($user_id, $_POST['withdraw_amount'], User::BILL_CASH);
         $db->update('users', array('bill_cash' => $bill), '`id`='.$user_id);
         break;
     case 'order':

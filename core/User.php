@@ -403,12 +403,18 @@ class User{
         return $query;
     }
 
-    public static function checkDebt($user_id, $amount){
-        /** @var $db Database  */
+    /**
+     * @param $user_id - id пользователя
+     * @param $amount - проверяемая сумма
+     * @param $bill_type 1 или 2
+     * @return void
+     */
+    public static function checkDebt($user_id, $amount, $bill_type){
+        /** @global $db Database  */
         global $db;
 
         $query = self::getQueryDebt(
-            "f.paid < f.sum AND f.user_id = $user_id AND f.issue_id IS NOT NULL",
+            "f.paid < f.sum AND f.user_id = $user_id AND f.issue_id IS NOT NULL AND `bill_type` = $bill_type",
             'f.created'
         );
         $result = $db->query($query);
@@ -460,7 +466,7 @@ class User{
         Fund::insert(1, $params);
         $db->update('users', $arrayUser, '`id`='.$params['user_id']);
         User::checkOverdue($params['user_id'], $params['sum']);
-        User::checkDebt($params['user_id'], $_POST['sum']);
+        User::checkDebt($params['user_id'], $_POST['sum'], $params['bill_type']);
     }
 
     public static function setSparePartsRequest($params){

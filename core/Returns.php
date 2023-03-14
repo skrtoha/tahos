@@ -58,6 +58,7 @@ class Returns{
 				rs.title AS status,
 				rr.title AS reason,
 				" . User::getUserFullNameForQuery() . " AS fio,
+				o.bill_type,
 				DATE_FORMAT(r.created, '%d.%m.%Y') AS created
 			FROM
 				#returns r
@@ -136,7 +137,7 @@ class Returns{
 				'quan' => $params['quan'],
 				'user_id' => $return['user_id'],
 			]);
-            User::checkDebt($return['user_id'], $params['return_price'] * $params['quan']);
+            User::checkDebt($return['user_id'], $params['return_price'] * $params['quan'], $return['bill_type']);
 		}
 	}
 }

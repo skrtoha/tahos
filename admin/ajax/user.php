@@ -4,6 +4,7 @@ use core\Mailer;
 use core\Provider;
 use core\Setting;
 use core\UserAddress;
+use core\User;
 require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/DataBase.php");
 
 session_start();
@@ -178,17 +179,21 @@ switch($_POST['act']){
 		echo (true);
 		break;
 	case 'return_money':
-		$res_user = core\User::get(['user_id' => $_POST['user_id']]);
-		$user = $res_user->fetch_assoc();
+        $user = [];
+		$res_user = User::get(['user_id' => $_POST['user_id']]);
+        foreach ($res_user as $value) $user = $value;
+
+        $remainder = $user['bill_cash'] - $_POST['amount'];
 		core\Fund::insert(2, [
 			'sum' => $_POST['amount'],
-			'remainder' => $user['bill'] - $_POST['amount'],
+			'remainder' => $remainder,
 			'user_id' => $_POST['user_id'],
-			'comment' => 'Возврат средств'
+			'comment' => 'Возврат средств',
+            'bill_type' => User::BILL_CASH
 		]);
-		core\User::update(
+		User::update(
 			$_POST['user_id'],
-			['bill' => "`bill` - ".$_POST['amount']]
+			['bill_cash' => $remainder]
 		);
 		break;
     case 'changeAddress':

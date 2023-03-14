@@ -342,14 +342,18 @@ class Database {
 		$query .= ")";
 		if (isset($insert_params['duplicate'])){
 			$query .= " ON DUPLICATE KEY UPDATE ";
-			foreach($insert_params['duplicate'] as $key => $value){
-				$query .= "`$key` = ";
-				if ($value == '') $query .= 'DEFAULT,';
-				elseif (!is_numeric($value)) $query .= "'".$this->mysqli->real_escape_string($value) ."',";
-				else $query .= "'".$value."',";
-				// $query .= "`$key` = $value, ";
-			} 
-			$query = substr($query, 0, -1);
+            if (is_array($insert_params['duplicate'])){
+                foreach($insert_params['duplicate'] as $key => $value){
+                    $query .= "`$key` = ";
+                    if ($value == '') $query .= 'DEFAULT,';
+                    elseif (!is_numeric($value)) $query .= "'".$this->mysqli->real_escape_string($value) ."',";
+                    else $query .= "'".$value."',";
+                    // $query .= "`$key` = $value, ";
+                }
+                $query = substr($query, 0, -1);
+            }
+            if (is_string($insert_params['duplicate'])) $query .= $insert_params['duplicate'];
+
 		}
 		if (isset($insert_params['print'])){
 			echo "<pre>$query</pre>";

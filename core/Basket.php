@@ -231,4 +231,21 @@ class Basket{
         }
         return $order_id;
     }
+
+    public static function addToBasket($params){
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        return $db->insert(
+            'basket',
+            [
+                'user_id' => $params['user_id'],
+                'store_id' => $params['store_id'],
+                'item_id' => $params['item_id'],
+                'quan' => $params['quan'],
+                'price' => $params['price'],
+            ],
+            ['duplicate' => "`quan` = `quan` + {$params['quan']}"]
+        );
+    }
 }

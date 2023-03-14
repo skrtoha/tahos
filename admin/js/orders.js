@@ -324,29 +324,42 @@ $(function(){
 		arrived_new($(this));
 	})
 	$('#to_basket').on('click', function(){
-		var str = '';
-		$('input[name=return_to_basket]').each(function(){
+
+        let formData = {
+            status_id: 'return_to_basket',
+            data: []
+        };
+        $('input[name=return_to_basket]').each(function(){
 			if (!$(this).is(':checked')) return true;
-			var form = $(this).closest('tr').find('td.change_status form');
-			var order_id = form.find('input[name=order_id]').val();
-			var store_id = form.find('input[name=store_id]').val();
-			var item_id = form.find('input[name=item_id]').val();
-			$('tr[store_id=' + store_id + '][item_id=' + item_id + ']').remove();
-			str += form.find('input[name=user_id]').val() + ':' + order_id + ':' + store_id + ':' + item_id + ',';
+
+            const form = $(this).closest('tr').find('td.change_status form');
+
+            const store_id = form.find('input[name=store_id]').val();
+            const item_id = form.find('input[name=item_id]').val();
+
+            $('tr[store_id=' + store_id + '][item_id=' + item_id + ']').remove();
+
+            formData.data.push({
+                order_id: form.find('input[name=order_id]').val(),
+                store_id: store_id,
+                item_id: item_id,
+                user_id: form.find('input[name=user_id]').val(),
+                quan: form.find('input[name=quan]').val(),
+                price: form.find('input[name=price]').val()
+            })
 		});
-		str = str.substr(0, str.length - 1);
+
+        if (formData.data.length == 0) return show_message('Нечего возвращать!', 'error');
+
 		$.ajax({
 			type: 'post',
 			url: '/admin/ajax/orders.php',
-			data: 'status_id=return_to_basket&str=' + str,
+			data: formData,
 			success: function(response){
-				// console.log(response); return;
-				if (!$('tr[store_id][item_id]').size()){
-					$.cookie('message', 'Успешно возвращено', cookieOptions);
-					$.cookie('message_type', 'ok', cookieOptions);
-					document.location.href = '/admin/?view=orders';
-				}
-				else show_message('Успешно возвращено!');
+                show_message('Успешно возвращено', 'ok');
+                if (response == 0){
+                    document.location.href = '/admin/?view=orders';
+                }
 			}
 		})
 	})
@@ -416,7 +429,7 @@ $(function(){
 			}
 		})
 	})
-	$('button').on('click', function(){
+	/*$('button').on('click', function(){
 		var is_valid = true;
 		$('tr[store_id][item_id]').each(function(){
 			var th = $(this);
@@ -438,7 +451,7 @@ $(function(){
 				// console.log(response); return false;
 			}
 		})
-	})
+	})*/
 	$('a.editOrderValue').on('click', function(e){
 		e.preventDefault();
 		var th = $(this);

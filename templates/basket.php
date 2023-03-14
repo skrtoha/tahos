@@ -8,7 +8,6 @@ use core\Breadcrumb;
 $title = 'Корзина';
 
 if (!$_SESSION['user']) header('Location: /');
-$title = "Корзина";
 $user_id = $_SESSION['user'];
 if ($_GET['act'] == 'to_offer'){
     $debt = \core\User::getDebt($user);

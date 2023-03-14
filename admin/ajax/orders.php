@@ -1,5 +1,7 @@
 <?
 ini_set('error_reporting', E_PARSE | E_ERROR);
+
+use core\Basket;
 use core\OrderValue;
 
 require_once('../../core/DataBase.php');
@@ -117,35 +119,17 @@ switch($_POST['status_id']){
 		", '');
 		break;*/
 	case 'return_to_basket':
-		// print_r($_POST);
-		$values = explode(',', $_POST['str']);
-		foreach($values as $value){
-			$str = explode(':', $value);
-			$where = "`user_id`={$str[0]} AND `order_id`={$str[1]} AND `store_id`={$str[2]} AND `item_id`={$str[3]}";
-			$s = $db->select_one('orders_values', '*', $where);
-			$ov = [
-				'user_id' => $s['user_id'],
-				'order_id' => $s['order_id'],
-				'store_id' => $s['store_id'],
-				'item_id' => $s['item_id'],
-				'quan' => $s['quan'],
-				'price' => $s['price'],
-				'comment' => $s['comment']
-			];
-			// print_r($ov); exit();
-			$db->delete('orders_values', $where);
-			if (!$db->getCount('orders_values', "`order_id`={$ov['order_id']}")){
-				$db->delete('orders', "`id`={$ov['order_id']}");
-			}
-			$db->insert('basket', [
-				'user_id' => $ov['user_id'],
-				'store_id' => $ov['store_id'],
-				'item_id' => $ov['item_id'],
-				'quan' => $ov['quan'],
-				'price' => $ov['price'],
-				'comment' => $ov['comment']
-			]);
+		foreach($post['data'] as $row){
+            $order_id = $row['order_id'];
+            Basket::addToBasket($row);
+			$db->delete('orders_values', core\Provider::getWhere($row));
 		}
+        if (!$db->getCount('orders_values', "`order_id` = $order_id")){
+            $db->delete('orders', "`id` = $order_id");
+            echo 0;
+            break;
+        }
+        echo 1;
 		break;
 	case 'comment':
 		$db->query("

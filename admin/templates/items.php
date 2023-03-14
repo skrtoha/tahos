@@ -601,7 +601,7 @@ function history(){
             LEFT JOIN
             #orders o ON o.id = ov.order_id
                 LEFT JOIN
-            #users u ON u.id = ov.user_id
+            #users u ON u.id = o.user_id
                 LEFT JOIN
             #organizations_types ot ON ot.id=u.organization_type
         WHERE

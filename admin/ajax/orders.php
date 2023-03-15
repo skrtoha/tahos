@@ -121,7 +121,7 @@ switch($_POST['status_id']){
 	case 'return_to_basket':
 		foreach($post['data'] as $row){
             $order_id = $row['order_id'];
-            Basket::addToBasket($row);
+            Basket::addToBasket($row, false);
 			$db->delete('orders_values', core\Provider::getWhere($row));
 		}
         if (!$db->getCount('orders_values', "`order_id` = $order_id")){

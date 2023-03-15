@@ -856,6 +856,10 @@ function funds(){
 	</table>
 	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=users&act=funds&id={$_GET['id']}&page=");
 }
+
+/**
+ * @throws Exception
+ */
 function basket(){
 	global $status, $db, $page_title;
 	if (!empty($_POST)){
@@ -864,8 +868,7 @@ function basket(){
             foreach($_POST['comment'] as $key => $value){
                 $array = explode('-', $key);
                 $item_id = $array[0];
-                $store_id = $array[1];
-                $db->insert('basket', [
+                Basket::addToBasket([
                     'user_id' => $_GET['id'],
                     'store_id' => $_POST['store_id'][$key],
                     'item_id' => $item_id,

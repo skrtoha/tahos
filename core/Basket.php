@@ -232,9 +232,25 @@ class Basket{
         return $order_id;
     }
 
-    public static function addToBasket($params){
+    /**
+     * Добавляет товар в корзину
+     * @param $params - массив с user_id, store_id, item_id, quan и price - обязательные
+     *              comment и isToOrder - опционально
+     * @param bool $replace - если false, то quan прибавляется к предыдущему, иначе заменяется
+     *                      на новое значение
+     * @return bool|mixed|string
+     * @throws \Exception
+     */
+    public static function addToBasket($params, bool $replace = true){
         /** @var Database $db */
         $db = $GLOBALS['db'];
+
+        self::checkParams($params);
+
+        if ($replace) $duplicate = ['duplicate' => [
+            'quan' => $params['quan']]
+        ];
+        else $duplicate = ['duplicate' => "`quan` = `quan` + {$params['quan']}"];
 
         return $db->insert(
             'basket',
@@ -244,8 +260,27 @@ class Basket{
                 'item_id' => $params['item_id'],
                 'quan' => $params['quan'],
                 'price' => $params['price'],
+                'comment' => $params['comment'] ?? null,
+                'isToOrder' => $params['isToOrder'] ?? 1
             ],
-            ['duplicate' => "`quan` = `quan` + {$params['quan']}"]
+            $duplicate
         );
+    }
+
+    /**
+     * @param $params
+     * @return void
+     * @throws \Exception
+     */
+    private static function checkParams($params){
+        $absentParams = [];
+        if (!isset($params['user_id'])) $absentParams[] = 'user_id';
+        if (!isset($params['store_id'])) $absentParams[] = 'store_id';
+        if (!isset($params['item_id'])) $absentParams[] = 'item_id';
+        if (!isset($params['quan'])) $absentParams[] = 'quan';
+        if (!isset($params['price'])) $absentParams[] = 'price';
+        if (!empty($absentParams)){
+            throw new \Exception('Отсутвуют параметры:'.implode(', ', $absentParams));
+        }
     }
 }

@@ -119,6 +119,15 @@ input[disabled] {
 .ut_arrangement {
     display: inline-block;
 }
+#checkDebts_form input[type=text]{
+    width: 95px;
+}
+tr[data-issue-id]{
+    cursor: pointer;
+}
+tr.second > td table {
+    margin: 0 auto;
+}
 @media screen and (max-width: 948px){
     form.js-form-address input {
         width: 100% !important;

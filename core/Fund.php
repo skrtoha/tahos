@@ -1,13 +1,24 @@
 <?php
 namespace core;
 class Fund{
-	/**
-	 * inserts fund into funds
-	 * @param  [interger] $type_operation type_operation
-	 * @param  [array] $fields sum, remainder, user_id, comment
-	 * @return [boolean] true if inserted successfully 
-	 */
-	public static function insert($type_operation, $fields){
+    /**
+     * Для получения последнего id
+     * @var integer
+     */
+    public static $last_id;
+
+    /**
+     * inserts fund into funds
+     * @param $type_operation
+     * @param $fields
+     * @return true [boolean] true if inserted successfully
+     * @throws \Exception
+     */
+	public static function insert($type_operation, $fields): bool
+    {
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
 		$insert = [
 			'type_operation' => $type_operation,
 			'sum' => $fields['sum'],
@@ -20,7 +31,13 @@ class Fund{
             'bill_type' => $fields['bill_type']
 		];
 		if ($type_operation == 1) $insert['is_new'] = 1;
-		return $GLOBALS['db']->insert('funds', $insert);
+
+        $result = $db->insert('funds', $insert);
+        if ($result !== true) throw new \Exception('Ошибка вставки funds');
+
+        self::$last_id = $db->last_id();
+
+		return true;
 	}
 
     /**

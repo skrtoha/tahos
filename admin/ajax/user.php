@@ -214,6 +214,53 @@ switch($_POST['act']){
         $result = Provider::getCurlUrlData($url, [], ['synchronization_token' => $settings['synchronization_token']]);
         echo $result;
         break;
+    case 'checkDebts':
+        $output = [];
+
+        $dateFrom = DateTime::createFromFormat('d.m.Y H:i:s', "{$_POST['dateFrom']} 00:00:00");
+        $dateTo = DateTime::createFromFormat('d.m.Y H:i:s', "{$_POST['dateTo']} 23:59:59");
+
+        $data = [];
+        $res = $db->query("
+            SELECT
+                id,
+                type_operation,
+                sum,
+                paid,
+                remainder,
+                user_id,
+                issue_id
+            FROM
+                #funds
+            WHERE
+                created BETWEEN '$dateFrom' AND '$dateTo' AND
+                type_operation in (1,2)
+            ORDER BY created
+        ");
+        foreach($res as $value){
+
+        }
+
+        echo json_encode($output);
+        break;
+    case 'getFundDistribution':
+        $result = $db->query("
+            SELECT
+                fd.replenishment_id,
+                fd.sum,
+                DATE_FORMAT(f2.created, '%d.%m.%Y %H:%i:%s') AS created,
+                f2.comment
+            FROM
+                #funds f1
+            LEFT JOIN
+                #fund_distribution fd ON fd.debit_id = f1.id
+            LEFT JOIN
+                #funds f2 ON fd.replenishment_id = f2.id
+            where
+                f1.issue_id = {$_POST['issue_id']}
+        ")->fetch_all(MYSQLI_ASSOC);
+        echo json_encode($result);
+        break;
 }
 
 ?>

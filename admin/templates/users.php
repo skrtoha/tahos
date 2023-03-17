@@ -280,7 +280,7 @@ function usersWithWithdraw(mysqli_result $res_users){?>
 				<tr class="users_box" user_id="<?=$user['id']?>">
 					<td label="ФИО"><?=$user['full_name']?></td>
 					<td label="E-mail"><?=$user['email']?></td>
-					<td label="Баланс"><?=$user['bill']?></td>
+					<td label="Баланс"><?=$user['bill_total']?></td>
 				</tr>
 			<?}
 		}
@@ -828,12 +828,13 @@ function funds(){
 			<td>Тип операции</td>
             <td>Счет</td>
 			<td>Сумма</td>
+			<td>Оплачено</td>
 			<td>Отстаток</td>
 			<td>Комментарий</td>
 		</tr>
 		<?if (count($funds)){
 			foreach($funds as $id => $fund){?>
-				<tr>
+				<tr <?=$fund['issue_id'] ? "data-issue-id='{$fund['issue_id']}'" : ''?>>
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
                     <td label="Счет">
@@ -844,7 +845,12 @@ function funds(){
                             безналичный
                         <?}?>
                     </td>
-					<td label="Сумма" class="price_format"><?=$fund['sum']?> руб.</td>
+					<td label="Сумма" class="price_format"><?=$fund['sum']?></td>
+					<td label="Оплачено" class="price_format">
+                        <?if ($fund['issue_id']){?>
+                            <?=$fund['paid']?>
+                        <?}?>
+                    </td>
 					<td label="Остаток" class="price_format"><?=$fund['remainder']?></td>
 					<td label="Комментарий"><?=stripslashes($fund['comment'])?></td>
 				</tr>

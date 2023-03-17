@@ -2,7 +2,7 @@
 	window['connections'] = {
 		tab: null,
 		pageSize: 30,
-		commonListFilters: new Array(),
+		commonListFilters: [],
 		commonListPageNumber: 1,
 		init: function(){
 			connections.commonListFilters.isHiddenAdminPages = 1;

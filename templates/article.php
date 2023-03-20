@@ -1,9 +1,10 @@
 <?
+/** @global \core\Database $db */
+
 use core\Breadcrumb;
 use core\Exceptions\NotFoundException;
 use core\Provider\Autoeuro;
 
-/** @var \core\Database $db */
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
 if (is_null($abcp->item)) throw new NotFoundException('Товар не найден');

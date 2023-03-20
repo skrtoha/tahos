@@ -119,9 +119,13 @@ class ForumAuto extends Provider{
 		if(!isset($stores[$key])) throw new EForumAuto\ErrorStoreID('Ошибка получения strore_id');
 		return $stores[$key];
 	}
-	private static function getItemsByBrendAndArticle($brend, $article){
+	private static function getItemsByBrendAndArticle($brend, $article, $typeOrganization = 'private'){
 		try{
-			$queryString = self::getStringQuery('listGoods', ['art' => $article, 'br' => $brend, 'cross' => 1]);
+			$queryString = self::getStringQuery(
+                'listGoods',
+                ['art' => $article, 'br' => $brend, 'cross' => 1],
+                $typeOrganization
+            );
 			$json = Provider::getUrlData($queryString);
 			$response = json_decode($json);
 			if (isset($response->errors)) throw new EForumAuto\ErrorFindArticle;
@@ -201,7 +205,7 @@ class ForumAuto extends Provider{
 		$providerBasket = parent::getProviderBasket(self::getParams()->provider_id, '');
 		if (!$providerBasket->num_rows) return false;
 		foreach($providerBasket as $pb){
-			$itemsList = self::getItemsByBrendAndArticle($pb['brend'], $pb['article']);
+			$itemsList = self::getItemsByBrendAndArticle($pb['brend'], $pb['article'], $pb['typeOrganization']);
 			$delivery = str_replace(self::getParams($pb['typeOrganization'])->storePrefix, '', $pb['cipher']);
 			$requiredItem = NULL;
 			try{

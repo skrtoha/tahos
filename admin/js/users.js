@@ -175,9 +175,14 @@ class User{
         $('input.save').on('click', (e) => {
             $('input[name=save_basket]').val(1);
         })
-        document.querySelector('a.get_arrangements').addEventListener('click', (e) => {
-            User.getArrangementList().then(response => {});
-        })
+
+        const get_arrangements = document.querySelector('a.get_arrangements');
+        if (get_arrangements !== null){
+            get_arrangements.addEventListener('click', (e) => {
+                User.getArrangementList().then(response => {});
+            })
+        }
+
         document.querySelectorAll('input[name="bill_mode"]').forEach((item, i) => {
             item.addEventListener('change', (e) => {
                 if (User.arrangementList.value == ''){
@@ -200,6 +205,62 @@ class User{
                         break;
                 }
             })
+        })
+
+        const dataIssueId = document.querySelectorAll('tr[data-issue-id]');
+        if (dataIssueId){
+            dataIssueId.forEach((item, i) => {
+                item.addEventListener('click', User.eventFundDistribution)
+            })
+        }
+    }
+    static eventFundDistribution = (e) => {
+        let formData = new FormData;
+        const trDataIssueId = e.target.closest(['tr[data-issue-id]']);
+
+        const nextSibling = trDataIssueId.nextElementSibling;
+        if (nextSibling && trDataIssueId.nextElementSibling.classList.contains('second')){
+            nextSibling.remove();
+            return;
+        }
+
+        formData.set('act', 'getFundDistribution');
+        formData.set('issue_id', trDataIssueId.getAttribute('data-issue-id'));
+        showGif();
+        fetch('/admin/ajax/user.php', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json()).then(response => {
+            let tdBaseElement = document.createElement('tr');
+            tdBaseElement.classList.add('second');
+            tdBaseElement.innerHTML = `
+                            <td colspan="7">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Тип операции</th>
+                                            <th>Сумма</th>
+                                            <th>Комментарий</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>                            
+                            </td>
+                        `;
+            let tbody = tdBaseElement.querySelector('tbody');
+            for (let row of response){
+                let trElement = document.createElement('tr');
+                trElement.innerHTML = `
+                                <td>${row.created}</td>
+                                <td>Пополнение счета</td>
+                                <td>${row.sum}</td>
+                                <td>${row.comment}</td>
+                            `;
+                tbody.append(trElement);
+            }
+            trDataIssueId.after(tdBaseElement);
+            showGif(false);
         })
     }
     static async getArrangementList(){

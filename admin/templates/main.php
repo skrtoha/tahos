@@ -1,4 +1,7 @@
 <?
+/** @var string $view */
+/** @var string $page_title */
+
 use admin\functions\LeftMenu;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -135,36 +138,36 @@ use admin\functions\LeftMenu;
 		{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
 		<?if (in_array($view, ['connections', 'reports', 'returns', 'index', 'orders'])){?>
 			{"src" : "/vendor/datetimepicker/jquery.datetimepicker.full.min.js", "async" : false},
-		<?}?>
-		<?if (in_array($view, ['items', 'orders', 'returns', 'brends', 'providers'])){?>
+                <?}?>
+                <?if (in_array($view, ['items', 'orders', 'returns', 'brends', 'providers'])){?>
 			{"src" : "/admin/js/show_store_info.js", "async" : false},
-		<?}?>
-		<?if (in_array($view, ['items', 'categories'])){?>
+                <?}?>
+                <?if (in_array($view, ['items', 'categories'])){?>
 			{"src" : "/vendor/cropper/cropper.js", "async" : false},
-		<?}?>
-		<?if (in_array($view, ['prices'])){?>
+                <?}?>
+                <?if (in_array($view, ['prices'])){?>
 			{"src" : "/admin/js/add_item_to_store.js", "async" : false},
-		<?}?>
-		<?if (in_array($view, ['connections', 'index', 'brends'])){?>
+                <?}?>
+                <?if (in_array($view, ['connections', 'index', 'brends'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
-		<?}?>
-		<?
-		$arrayIntuitiveSearch = [
-			'items', 
-			'prices', 
-			'test_api_providers', 
-			'brends',
-			'goods_arrival',
-			'users',
-			'category',
-            'providers'
-		];
-		if (in_array($view, $arrayIntuitiveSearch)){?>
+                <?}?>
+                <?
+                $arrayIntuitiveSearch = [
+                    'items',
+                    'prices',
+                    'test_api_providers',
+                    'brends',
+                    'goods_arrival',
+                    'users',
+                    'category',
+                    'providers'
+                ];
+                if (in_array($view, $arrayIntuitiveSearch)){?>
 			{"src" : "/vendor/intuitive_search/script.js", "async" : false},
-		<?}?>
+                <?}?>
 		<?if (file_exists("js/$view.js")){
 			echo '{"src" : "/admin/js/'.$view.'.js", "async" : false},';
-		}?>
+            }?>
 		]};!function(t,n,r){"use strict";var c=function(t){if("[object Array]"!==Object.prototype.toString.call(t))return!1;for(var r=0;r<t.length;r++){var c=n.createElement("script"),e=t[r];c.src=e.src,c.async=e.async,n.body.appendChild(c)}return!0};t.addEventListener?t.addEventListener("load",function(){c(r.scripts);},!1):t.attachEvent?t.attachEvent("onload",function(){c(r.scripts)}):t.onload=function(){c(r.scripts)}}(window,document,scr);
 	</script>
 	<?if ($_GET['view'] == 'issues' and ($_GET['act'] == 'add' or $_GET['act'] == 'change')){?>

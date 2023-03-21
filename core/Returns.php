@@ -136,8 +136,14 @@ class Returns{
 				'price' => $params['return_price'],
 				'quan' => $params['quan'],
 				'user_id' => $return['user_id'],
+                'bill_type' => $return['bill_type']
 			]);
-            User::checkDebt($return['user_id'], $params['return_price'] * $params['quan'], $return['bill_type']);
+            User::checkDebt(
+                $return['user_id'],
+                $params['return_price'] * $params['quan'],
+                $return['bill_type'],
+                Fund::$last_id
+            );
 		}
 	}
 }

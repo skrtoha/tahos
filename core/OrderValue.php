@@ -115,8 +115,10 @@ class OrderValue{
 					'sum' => $params['quan'] * $params['price'],
 					'remainder' => $remainder,
 					'user_id' => $params['user_id'],
-					'comment' => addslashes('Возврат средств за "'.$title.'"')
+					'comment' => addslashes('Возврат средств за "'.$title.'"'),
+                    'bill_type' => $params['bill_type']
 				]);
+
 				User::update(
 					$params['user_id'],
 					[$billColumn => $remainder]

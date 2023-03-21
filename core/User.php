@@ -71,7 +71,13 @@ class User{
 			foreach($params as $key => $value){
 				switch($key){
 					case 'user_id': $where .= "u.id = {$value} AND "; break;
-					case 'withWithdraw': $where .= "u.bill < 0 AND "; break;
+					case 'withWithdraw': $where .= "
+                        CASE
+                            WHEN u.bill_mode = 1 THEN u.bill_cash < 0
+                            WHEN u.bill_mode = 2 THEN u.bill_cashless < 0
+                            WHEN u.bill_mode = 3 THEN u.bill_cash < 0 or u.bill_cashless < 0
+                        END AND ";
+                        break;
                     case 'full_name': $having .= "full_name LIKE '%{$value}%' AND "; break;
                     case 'limit': $limit = "LIMIT $value"; break;
                     case 'order':
@@ -409,7 +415,7 @@ class User{
      * @param $bill_type 1 или 2
      * @return void
      */
-    public static function checkDebt($user_id, $amount, $bill_type){
+    public static function checkDebt($user_id, $amount, $bill_type, $replenishment_id){
         /** @global $db Database  */
         global $db;
 
@@ -430,6 +436,11 @@ class User{
                     ['paid' => $row['paid'] + $remain],
                     "id = {$row['id']}"
                 );
+                $db->insert('fund_distribution', [
+                    'debit_id' => $row['id'],
+                    'replenishment_id' => $replenishment_id,
+                    'sum' => $remain
+                ]);
                 break;
             }
             $remain = $remain - $difference;
@@ -438,6 +449,11 @@ class User{
                 ['paid' => $row['paid'] + $difference],
                 "id = {$row['id']}"
             );
+            $db->insert('fund_distribution', [
+                'debit_id' => $row['id'],
+                'replenishment_id' => $replenishment_id,
+                'sum' => $difference
+            ]);
         }
     }
 
@@ -466,7 +482,7 @@ class User{
         Fund::insert(1, $params);
         $db->update('users', $arrayUser, '`id`='.$params['user_id']);
         User::checkOverdue($params['user_id'], $params['sum']);
-        User::checkDebt($params['user_id'], $_POST['sum'], $params['bill_type']);
+        User::checkDebt($params['user_id'], $_POST['sum'], $params['bill_type'], Fund::$last_id);
     }
 
     public static function setSparePartsRequest($params){

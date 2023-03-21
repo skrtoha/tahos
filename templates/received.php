@@ -1,4 +1,7 @@
 <?
+
+use core\Fund;
+use core\OrderValue;
 use core\User;
 
 require_once('core/DataBase.php');
@@ -34,26 +37,25 @@ switch($label[0]){
         if ($_POST['notification_type'] == 'p2p-incoming') $comment = 'Пополнение с Yoomoney';
         else $comment = 'Пополнение банковской картой';
         User::checkOverdue($user_id, $_POST['withdraw_amount']);
-        User::checkDebt($user_id, $_POST['withdraw_amount'], User::BILL_CASH);
-        $db->update('users', array('bill_cash' => $bill), '`id`='.$user_id);
         break;
     case 'order':
         $comment = "Онлайн оплата заказа №{$label[1]}";
-        $orderInfo = \core\OrderValue::getOrderInfo($label[1]);
+        $orderInfo = OrderValue::getOrderInfo($label[1]);
         $user_id = $orderInfo['user_id'];
-        $bill = $db->getFieldOnID('users', $user_id, 'bill');
+        $bill = $db->getFieldOnID('users', $user_id, 'bill_cash') + $_POST['withdraw_amount'];
         $db->update('orders', ['is_payed' => 1], "`id` = {$label[1]}");
         break;
 }
-$db->insert(
-    'funds',
-    [
-        'type_operation' => 1,
-        'sum' => $_POST['withdraw_amount'],
-        'remainder' => $bill,
-        'user_id' => $user_id,
-        'comment' => $comment
-    ]
-);
+
+User::checkOverdue($user_id, $_POST['withdraw_amount']);
+$db->update('users', array('bill_cash' => $bill), '`id`='.$user_id);
+Fund::insert(1, [
+    'sum' => $_POST['withdraw_amount'],
+    'remainder' => $bill,
+    'user_id' => $user_id,
+    'comment' => $comment,
+    'bill_type' => User::BILL_CASH
+]);
+User::checkDebt($user_id, $_POST['withdraw_amount'], User::BILL_CASH, Fund::$last_id);
 die();
 ?>

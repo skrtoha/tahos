@@ -915,7 +915,6 @@ function items_status(array $params = []){
 								<input type="hidden" name="returned" value="<?=$ov['returned']?>">
 
 								<input type="hidden" name="price" value="<?=$ov['price']?>">
-								<input type="hidden" name="bill" value="<?=$ov['bill']?>">
 								<input type="hidden" name="reserved_funds" value="<?=$ov['reserved_funds']?>">
 								<input type="hidden" name="brend" value="<?=$ov['brend']?>">
 								<input type="hidden" name="article" value="<?=$ov['article']?>">

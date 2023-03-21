@@ -833,8 +833,9 @@ function funds(){
 			<td>Комментарий</td>
 		</tr>
 		<?if (count($funds)){
-			foreach($funds as $id => $fund){?>
-				<tr <?=$fund['issue_id'] ? "data-issue-id='{$fund['issue_id']}'" : ''?>>
+			foreach($funds as $id => $fund){
+                $class = $fund['issue_id'] && $fund['paid'] < $fund['sum'] ? 'not-paid' : ''?>
+				<tr class="<?=$class?>" <?=$fund['issue_id'] ? "data-issue-id='{$fund['issue_id']}'" : ''?>>
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
                     <td label="Счет">

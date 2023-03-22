@@ -20,6 +20,7 @@ class UserIPS{
 	}
 
 	public static function registerIP($params){
+        global $view;
         if (in_array($params['view'], self::$noRenderView)) return false;
 
         $IPInfo = self::getIPInfo($params['ip']);
@@ -41,7 +42,14 @@ class UserIPS{
             self::$isBlockedUser = false;
         }
 
-        if ($hours > self::MaxPeriodHours) return self::resetFirstDate($params['ip']);
+        if ($hours > self::MaxPeriodHours){
+            $result = self::resetFirstDate($params['ip']);
+            if ($view == 'exceeded_connections' && !self::$isBlockedUser){
+                header('Location: /');
+                die();
+            }
+            return $result;
+        }
 
 		if ($params['view'] == 'exceeded_connections' && self::$isBlockedUser){
             self::setMessage();

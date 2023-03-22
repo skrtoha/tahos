@@ -2,6 +2,7 @@
 session_start();
 
 use core\Authorize;
+use core\Basket;
 use core\Exceptions\NotFoundException;
 use core\Setting;
 use core\Category;
@@ -82,7 +83,7 @@ core\UserIPS::registerIP([
 ]);
 
 if ($_SESSION['user']){
-    $basket = \core\Basket::get($_SESSION['user']);
+    $basket = Basket::get($_SESSION['user']);
 }
 
 

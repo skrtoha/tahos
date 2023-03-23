@@ -454,8 +454,10 @@ $(function(){
 	})*/
 	$('a.editOrderValue').on('click', function(e){
 		e.preventDefault();
-		var th = $(this);
-		$.ajax({
+        const th = $(this);
+        let status_id = + th.closest('tr').data('status-id');
+        let inputDisable = status_id == 1 ? 'readonly' : '';
+        $.ajax({
 			type: 'post',
 			url: '/admin/ajax/orders.php',
 			data: {
@@ -465,6 +467,7 @@ $(function(){
 			success: function(response){
 				let ov = JSON.parse(response);
 				ov.comment = ov.comment ? ov.comment : '';
+
 				modal_show(
 					'<form class="editOrderValue">' +
 						'<input type="hidden" name="status_id" value="editOrderValue">' +
@@ -472,11 +475,11 @@ $(function(){
 						'<table>' +
 							'<tr>' +
 								'<td>Цена:</td>' +
-								'<td><input type="text" name="price" value="' + ov.price + '"></td>' +
+								'<td><input ' + inputDisable + ' type="text" name="price" value="' + ov.price + '"></td>' +
 							'</tr>' +
 							'<tr>' +
 								'<td>Количество:</td>' +
-								'<td><input type="text" name="quan" value="' + ov.quan + '"></td>' +
+								'<td><input ' + inputDisable + ' type="text" name="quan" value="' + ov.quan + '"></td>' +
 							'</tr>' +
 							'<tr>' +
 								'<td>Комментарий:</td>' +

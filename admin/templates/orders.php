@@ -397,7 +397,7 @@ function show_form($act){
 				$res_stringLog = core\Provider::getStringLog($ov);
 				$selector = "store_id='{$ov['store_id']}' item_id='{$ov['item_id']}'";?>
 				<?if (!$order['is_draft']){?>
-					<tr <?=$selector?>>
+					<tr <?=$selector?> data-status-id="<?=$ov['status_id']?>">
 						<td colspan="10">
 							<?$v = 0;
 							if ($ov['correspond_id']){
@@ -415,7 +415,7 @@ function show_form($act){
 							<?if ($ov['return_ordered']){?>
 								<a href="/admin/?view=returns&act=form&osi=<?=$ov['order_id']?>-<?=$ov['store_id']?>-<?=$ov['item_id']?>">Заявка на возврат</a>
 							<?}?>
-							<?if (in_array($ov['status_id'], [5, 7, 11])){?>
+							<?if (in_array($ov['status_id'], [5, 7, 11, 1])){?>
 								<a class="editOrderValue" href="#" osi="<?=$ov['order_id']?>-<?=$ov['store_id']?>-<?=$ov['item_id']?>">Редактировать</a>
 							<?}?>
 						</td>

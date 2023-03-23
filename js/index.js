@@ -1,3 +1,4 @@
+let count_click = 0;
 $(function(){
     $.mask.definitions['~'] = '[+-]';
     $("input[name=phone]").mask("+7 (999) 999-99-99");
@@ -37,4 +38,11 @@ $(function(){
         e.preventDefault();
         document.location.href = "/original-catalogs/legkovie-avtomobili#/carInfo?q=" + $('input[name=q]').val();
     })
+    $('div.selection.spare_parts_request > div.right > form')
+        .on('submit', (e) => {
+            if (count_click < 2) e.preventDefault();
+        })
+        .on('click', (e) => {
+            count_click++;
+        })
 });

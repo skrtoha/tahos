@@ -63,10 +63,18 @@ abstract class Provider{
 
 		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
 
+        if (!$params[$provider_id]->entity->isActive && $params[$provider_id]->private->isActive){
+            $params[$provider_id]->entity = $params[$provider_id]->private;
+        }
+        if (!$params[$provider_id]->private->isActive && $params[$provider_id]->entity->isActive){
+            $params[$provider_id]->private = $params[$provider_id]->entity;
+        }
+
+        //это фрагмент закоментирован в связи фрагментом выше
 		//если private отключен то ставим в него entity
-		if (isset($params[$provider_id]) && !$params[$provider_id]->$typeOrganization->isActive){
+		/*if (isset($params[$provider_id]) && !$params[$provider_id]->$typeOrganization->isActive){
 			$params[$provider_id]->private = $params[$provider_id]->entity;
-		}
+		}*/
 
 		return $params[$provider_id]->$typeOrganization;
 	}

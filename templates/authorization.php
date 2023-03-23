@@ -2,8 +2,6 @@
 use core\Authorize;
 use core\Database;
 
-require_once('core/functions.php');
-
 /** @global $db Database */
 
 if ($_POST['token']){
@@ -44,11 +42,11 @@ else{
         ]);
         setcookie('jwt', $jwt, time()+60*60*24*30);
     }
-    $db->update('user_ips', ['user_id' => $user['id']], "ip = '{$_SERVER['SERVER_ADDR']}'");
+    $db->update('user_ips', ['user_id' => $user['id']], "ip = '{$_SERVER['REMOTE_ADDR']}'");
     message('Вы успешно авторизовались!');
 }
 if (strpos($_SERVER['HTTP_REFERER'], 'exceeded_connections') > 0){
     header('Location: /');
 }
-else header("Location: {$_SERVER['HTTP_REFERER']}");
+else header("Location: ".$_SERVER['HTTP_REFERER']);
 die();

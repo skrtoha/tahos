@@ -23,6 +23,10 @@ $db->connection_id = $connection->connection_id;
 $settings = $db->select('settings', '*', '`id`=1'); $settings = $settings[0];
 $db->setProfiling();
 
+$emex = new \core\Provider\Emex();
+$result = $emex->testConnection();
+die();
+
 $detect = new \Mobile_Detect;
 $device = 'desktop';
 if ($detect->isTablet()) $device = 'tablet';

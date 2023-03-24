@@ -17,26 +17,24 @@ class Emex extends Provider{
      * @param $method
      * @return false|\SoapClient
      */
-    private function getSoap($method){
+    private function getResponse($service, $method, $params = null){
         try{
             $soap = new \SoapClient(
-                "{$this->connect['wsdl']}/$method.asmx?WSDL"
+                "{$this->connect['wsdl']}/$service.asmx?wsdl"
             );
         }
         catch (\SoapFault $e){
             return false;
         }
-        return $soap;
+
+        if (!$params) return $soap->$method();
+
+        return $soap->$method($params);
     }
 
 
-    public function testConnection(){
-        $soap = $this->getSoap('TestConnect');
-        $result = $soap->TestConnect([
-            'login' => '3275108',
-            'password' => 'bc75b5f0'
-        ]);
-        return $result;
+    public function testConnect(){
+        return $this->getResponse('EmExService', 'TestConnect', ['some string']);
     }
 
     public function __construct(){

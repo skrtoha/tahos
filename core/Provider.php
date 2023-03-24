@@ -38,10 +38,8 @@ abstract class Provider{
 	 * @param  array provider_id | api_title, typeOrganization
 	 * @return [type]
 	 */
-	public static function getApiParams($inputData, $debugMode = false){
+	public static function getApiParams($inputData){
 		static $params;
-
-		if ($debugMode) debug($inputData, 'inputData');
 
 		if (!$inputData['api_title']) $api_title = self::getProviderAPITitle($inputData['provider_id']);
 		else $api_title = $inputData['api_title'];
@@ -49,17 +47,11 @@ abstract class Provider{
 		if (!isset($inputData['provider_id'])) $provider_id = self::getProviderIDByAPITitle($api_title);
 		else $provider_id = $inputData['provider_id'];
 
-		if ($debugMode){
-			debug($provider_id, 'provider_id');
-		}
-
 		$typeOrganization = $inputData['typeOrganization'];
 
-		if (!$provider_id) return false;
+        if (isset($params[$provider_id]->$typeOrganization)) return $params[$provider_id]->$typeOrganization;
 
-		if ($debugMode){
-			debug($params, 'params');
-		}
+		if (!$provider_id) return false;
 
 		$params[$provider_id] = json_decode(\core\Setting::get('api_settings', $provider_id));
 

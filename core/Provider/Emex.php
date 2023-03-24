@@ -4,11 +4,25 @@ namespace core\Provider;
 use core\Provider;
 
 class Emex extends Provider{
-    private $connect = [
-        'wsdl' => 'http://ws.emex.ru',
-        'login' => '3275108',
-        'password' => 'bc75b5f0'
+    private $type_organization;
+
+    private $error;
+
+    const SERVICE_SEARCH = 'EmExService';
+
+    public static $fieldsForSettings = [
+        'isActive',
+        'login',
+        'password',
+        'provider_id',
+        'wsdl'
     ];
+
+    public function __construct($type_organization = 'entity'){
+        ini_set('soap.wsdl_cache_enabled',0);
+        ini_set('soap.wsdl_cache_ttl',0);
+        $this->type_organization = $type_organization;
+    }
     public static function getItemsToOrder(int $provider_id){
         // TODO: Implement getItemsToOrder() method.
     }
@@ -20,25 +34,61 @@ class Emex extends Provider{
     private function getResponse($service, $method, $params = null){
         try{
             $soap = new \SoapClient(
-                "{$this->connect['wsdl']}/$service.asmx?wsdl"
+                "{$apiParams->wsdl}/$service.asmx?wsdl"
             );
         }
         catch (\SoapFault $e){
-            return false;
+            $this->error = $e->getMessage();
+            return [];
         }
 
         if (!$params) return $soap->$method();
 
-        return $soap->$method($params);
+        $resultName = $method."Result";
+        $result = $soap->$method($params)->{$resultName};
+
+        if (!$result->IsSuccess){
+            $this->error = $result->ErrorMessage;
+            return [];
+        }
+
+        return $result->Details->DetailItem;
     }
 
-
-    public function testConnect(){
-        return $this->getResponse('EmExService', 'TestConnect', ['some string']);
+    public function testConnect(): array
+    {
+        return $this->getResponse(self::SERVICE_SEARCH, 'TestConnect', ['some string']);
     }
 
-    public function __construct(){
-        ini_set('soap.wsdl_cache_enabled',0);
-        ini_set('soap.wsdl_cache_ttl',0);
+    /**
+     * Получает список совпадений по номеру детали. Возвращает массив вида [бренд => имя детали]
+     * @param string $detailNum
+     * @return array
+     */
+    public static function getCoincidences(string $detailNum): array
+    {
+        $output = [];
+        $self = new self();
+        $params = [];
+        $params['detailNum'] = $detailNum;
+        $params['substLevel'] = 'OriginalOnly';
+        $params['substFilter'] = 'None';
+        $params['deliveryRegionType'] = 'PRI';
+        $params['minDeliveryPercent'] = null;
+        $params['maxADDays'] = null;
+        $params['minQuantity'] = null;
+        $params['maxResultPrice'] = null;
+        $params['maxOneDetailOffersCount'] = null;
+        $params['detailNumsToLoad'] = null;
+
+        $response = $self->getResponse(self::SERVICE_SEARCH, 'FindDetailAdv5', $params);
+        if ($self->error) return [];
+
+        foreach($response as $row){
+            $output[$row->MakeName] = $row->DetailNameRus;
+        }
+
+        return $output;
     }
+
 }

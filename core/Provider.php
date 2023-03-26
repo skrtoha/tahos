@@ -570,6 +570,9 @@ abstract class Provider{
 		", '');
 		$items = array();
 		foreach($res_providers as $p){
+            //todo временно на время разработки Emex
+            if ($p['id'] == 38) continue;
+
 			switch($p['id']){
 				case 13://'М Партс'
 				case 2://'Армтек':

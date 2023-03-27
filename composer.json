@@ -18,8 +18,9 @@
         "phpoffice/phpspreadsheet": "^1.18",
       "ext-dom": "*",
 	  "ext-simplexml": "*",
-	  "ext-libxml": "*"
-	},
+	  "ext-libxml": "*",
+      "ext-memcache": "*"
+    },
     "autoload": {
         "psr-4": {
             "core\\": "core"

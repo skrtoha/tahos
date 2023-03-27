@@ -9,7 +9,7 @@ class Brend{
 	 *         provider_id - adds table provider_brends and search through it
 	 * @param  array  $additionalFields fields that have to be added to output results
 	 * @param string for debugging (result, print)
-	 * @return mixed false in no results, else mysli object
+	 * @return mixed false in no results, else mysqli object
 	 */
 	public static function get($conditions = array(), $additionalFields = array(), $flag = ''){
 		if ($additionalFields) self::$additionalFields = $additionalFields;

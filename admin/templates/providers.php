@@ -197,6 +197,38 @@ switch ($act) {
         else $userInfo = [];
         setAddress($params);
         break;
+    case 'emex_brands':
+        $ourBrends = [];
+        $params = [];
+        /** @var mysqli_result $result */
+        $result = \core\Brend::get(['parent_id' => 0]);
+        foreach ($result as $row) $ourBrends[$row['id']] = $row['title'];
+
+        $emexBrends = [];
+        $emexObject = new Provider\Emex();
+        $makesDictResult = $emexObject->getResponse(Provider\Emex::SERVICE_DICTIONARY, 'GetMakesDict');
+        $params['all'] = count($makesDictResult);
+
+        /** @var mysqli_result $emexBrands_result */
+        $params['emexBrands_db'] = [];
+        $emexBrands_db_result = $db->query("
+            SELECT
+                *
+            FROM
+                #emex_brands
+            ORDER BY logo
+        ");
+        foreach($emexBrands_db_result as $row){
+            $params['emexBrands_db'][$row['logo']] = $row['brend_id'];
+        }
+
+        $params['perPage'] = 10;
+        $params['linkLimit'] = 10;
+        $params['page'] = $_GET['page'] ?? 1;
+        $params['chunk'] = getChank($params['all'], $params['perPage'], $params['linkLimit'], $params['page']);
+        $params['start'] = $params['chunk'][$params['page']] ?: 0;
+        emex_brands($params);
+        break;
     default:
 		view();
 } 
@@ -463,6 +495,9 @@ function provider(){
 		<?}?>
         <?if ($_GET['id'] == 15){?>
             <a href="/admin/?view=providers&act=set_address&id=<?=$_GET['id']?>">Сопоставить адреса</a>
+        <?}?>
+        <?if ($_GET['id'] == Provider\Emex::PROVIDER_ID){?>
+            <a href="/admin/?view=providers&act=emex_brands">Сопоставить бренды</a>
         <?}?>
 		<div style="width: 100%; height: 10px"></div>
 	<?}?>
@@ -929,5 +964,34 @@ function setAddress($params){?>
             </table>
         </form>
     <?}?>
+<?}
+function emex_brands($params){?>
+    <div id="total" style="margin-top: 10px;">Всего: <?=$params['all']?></div>
+    <form>
+        <table class="t_table" cellspacing="1">
+                <thead>
+                <tr class="head">
+                    <th>Logo</th>
+                    <th>Наименование<br>Emex</th>
+                    <th>Наш бренд</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <?for($i = $params['start']; $i < $params['start'] + $params['perPage']; $i++){?>
+                        <tr>
+                            <td><?=$params[$i]['MakeName']?></td>
+                            <td><?=$params[$i]['MakeLogo']?></td>
+                            <td></td>
+                        </tr>
+                    <?}?>
+                </tbody>
+            </table>
+    </form>
+    <?pagination(
+        $params['chunk'],
+        $params['page'],
+        ceil($params['all'] / $params['perPage']),
+        "?view=providers&act=emex_brands&page="
+    );?>
 <?}?>
 

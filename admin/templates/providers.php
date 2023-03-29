@@ -198,35 +198,42 @@ switch ($act) {
         setAddress($params);
         break;
     case 'emex_brands':
-        $ourBrends = [];
+        require_once "{$_SERVER['DOCUMENT_ROOT']}/admin/templates/pagination.php";
         $params = [];
-        /** @var mysqli_result $result */
-        $result = \core\Brend::get(['parent_id' => 0]);
-        foreach ($result as $row) $ourBrends[$row['id']] = $row['title'];
 
-        $emexBrends = [];
-        $emexObject = new Provider\Emex();
-        $makesDictResult = $emexObject->getResponse(Provider\Emex::SERVICE_DICTIONARY, 'GetMakesDict');
-        $params['all'] = count($makesDictResult);
-
-        /** @var mysqli_result $emexBrands_result */
-        $params['emexBrands_db'] = [];
-        $emexBrands_db_result = $db->query("
-            SELECT
-                *
-            FROM
-                #emex_brands
-            ORDER BY logo
-        ");
-        foreach($emexBrands_db_result as $row){
-            $params['emexBrands_db'][$row['logo']] = $row['brend_id'];
-        }
-
-        $params['perPage'] = 10;
+        $params['makesDictResult'] = Provider\Emex::getMakesDict();
+        $params['all'] = count($params['makesDictResult']);
+        $params['perPage'] = 30;
         $params['linkLimit'] = 10;
         $params['page'] = $_GET['page'] ?? 1;
         $params['chunk'] = getChank($params['all'], $params['perPage'], $params['linkLimit'], $params['page']);
         $params['start'] = $params['chunk'][$params['page']] ?: 0;
+
+        $in = "";
+        for($i = $params['start']; $i < $params['start'] + $params['perPage']; $i++){
+            $in .= "'".$params['makesDictResult'][$i]->MakeLogo."',";
+        }
+        $in = substr($in, 0, -1);
+
+        /** @var mysqli_result $emexBrands_result */
+        $params['emexBrands_db'] = [];
+        $emexBrends_db_result = $db->query("
+            select
+                eb.brend_id,
+                eb.logo,
+                tb.title
+            from
+                #emex_brends eb
+            left join tahos_brends tb on eb.brend_id = tb.id
+            where eb.logo in ($in)
+        ");
+        foreach($emexBrends_db_result as $row){
+            $params['emexBrends_db'][$row['logo']] = [
+                'brend_id' => $row['brend_id'],
+                'title' => $row['title']
+            ];
+        }
+
         emex_brands($params);
         break;
     default:
@@ -971,17 +978,21 @@ function emex_brands($params){?>
         <table class="t_table" cellspacing="1">
                 <thead>
                 <tr class="head">
-                    <th>Logo</th>
                     <th>Наименование<br>Emex</th>
+                    <th>Logo</th>
                     <th>Наш бренд</th>
                 </tr>
                 </thead>
                 <tbody>
                     <?for($i = $params['start']; $i < $params['start'] + $params['perPage']; $i++){?>
                         <tr>
-                            <td><?=$params[$i]['MakeName']?></td>
-                            <td><?=$params[$i]['MakeLogo']?></td>
-                            <td></td>
+                            <td><?=$params['makesDictResult'][$i]->MakeName?></td>
+                            <td><?=$params['makesDictResult'][$i]->MakeLogo?></td>
+                            <td>
+                                <?if (isset($params['emexBrends_db'][$params['makesDictResult'][$i]->MakeLogo])){?>
+                                    <?=$params['emexBrends_db'][$params['makesDictResult'][$i]->MakeLogo]['title']?>
+                                <?}?>
+                            </td>
                         </tr>
                     <?}?>
                 </tbody>

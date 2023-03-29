@@ -1,6 +1,7 @@
 <?php
 namespace core\Provider;
 
+use core\Common;
 use core\Database;
 use core\Provider;
 
@@ -111,10 +112,7 @@ class Emex extends Provider{
 
     public static function getMakesDict(){
         $self = new static();
-        $output = [];
-        $response = $self->getResponse(self::SERVICE_DICTIONARY, 'GetMakesDict');
-        foreach($response as $row) $output[$row->MakeName] = $row->MakeLogo;
-        return $output;
+        return $self->getResponse(self::SERVICE_DICTIONARY, 'GetMakesDict');
     }
 
     /**
@@ -125,7 +123,9 @@ class Emex extends Provider{
         /** @var Database $db */
         $db = $GLOBALS['db'];
 
-        $emexBrands = Provider\Emex::getMakesDict();
+        $response = Provider\Emex::getMakesDict();
+        $emexBrands = [];
+        foreach($response as $row) $emexBrands[$row->MakeName] = $row->MakeLogo;
         $resultGetBrends = $db->query("
             SELECT b.id,
                    b.title,

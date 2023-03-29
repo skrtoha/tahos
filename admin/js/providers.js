@@ -1,19 +1,20 @@
-var store = {
-	id: '',
-	title: '',
-	city: '',
-	cipher: '',
-	currency_id: '',
-	percent: '0.00',
-	provider_id: '',
-	delivery: '',
-	delivery_max: '',
-	under_order: '',
-	workSchedule: '',
-	noReturn: 0,
+let store = {
+    id: '',
+    title: '',
+    city: '',
+    cipher: '',
+    currency_id: '',
+    percent: '0.00',
+    provider_id: '',
+    delivery: '',
+    delivery_max: '',
+    under_order: '',
+    workSchedule: '',
+    noReturn: 0,
     block: 0
 };
-var reg_interger = /^\d+$/;
+const reg_interger = /^\d+$/;
+
 function set_store(store_id){
 	var array = new Array();
 	$.ajax({
@@ -133,7 +134,7 @@ function set_empty_store(){
 	}
 }
 $(function(){
-    $('input.intuitive_search').on('keyup focus', function(e){
+    $('#select-user.intuitive_search').on('keyup focus', function(e){
         e.preventDefault();
         let val = $(this).val();
         let minLength = 1;
@@ -267,4 +268,84 @@ $(function(){
 	$('input[type=file][name=items]').on('change', function(){
 		$('input[type=submit]').prop('disabled', false);
 	})
+    $('span.icon-pencil').on('click', (e) => {
+        let $target = $(e.target);
+        $target.hide();
+        $target.prevAll('.our-brend').hide();
+        $target.prevAll('div.search-brend').show();
+
+        if (!$target.prevAll('.our-brend').size()){
+            $target.closest('td').find('span.icon-bin').hide();
+        }
+
+        setTimeout(() => {
+            $target.closest('td').find('input.intuitive_search').focus();
+        }, 1)
+    })
+    $('span.icon-cross1').on('click', (e) => {
+        const $target = $(e.target).closest('td');
+        $target.find('span.icon-pencil').show();
+        $target.find('div.search-brend').hide();
+        $target.find('.our-brend').show();
+    })
+    $('#emex_brends input.intuitive_search').on('keyup focus', e => {
+        e.preventDefault();
+        let val = e.target.value;
+        let minLength = 1;
+        intuitive_search.getResults({
+            event: e,
+            value: val,
+            minLength: minLength,
+            additionalConditions: {},
+            tableName: 'brends',
+        })
+    })
+
+    $(document).on('click', 'a.resultBrend', e => {
+        let $this = $(e.target);
+        $.ajax({
+            type: 'post',
+            url: '/admin/ajax/providers.php',
+            data: {
+                act: 'setEmexBrend',
+                brend_id: $this.attr('brend_id'),
+                logo: $this.closest('tr').find('td.logo').text()
+            },
+            beforeSend: () => {
+                showGif();
+            },
+            success: (response) => {
+                showGif(false);
+                $this.closest('.search-brend').hide();
+                $this.closest('td').prepend(`<span class="our-brend">${$this.text()}</span>`);
+                $this.closest('td').find('.icon-pencil').show();
+                $this.closest('td').find('.icon-bin').show();
+
+            }
+        })
+    })
+
+    $('span.icon-bin').on('click', e => {
+        if (!confirm('Уверены, что хотите удалить?')) return;
+        let $this = $(e.target);
+        $.ajax({
+            type: 'post',
+            url: '/admin/ajax/providers.php',
+            data: {
+                act: 'removeEmexBrend',
+                logo: $this.closest('tr').find('td.logo').text()
+            },
+            beforeSend: () => {
+                showGif();
+            },
+            success: (response) => {
+                showGif(false);
+                $this.closest('.search-brend').hide();
+                $this.closest('td').find('.our-brend').remove();
+                $this.closest('td').find('.icon-pencil').show();
+
+            }
+        })
+    })
+
 })

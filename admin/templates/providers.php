@@ -197,6 +197,61 @@ switch ($act) {
         else $userInfo = [];
         setAddress($params);
         break;
+    case 'emex_brands':
+        require_once "{$_SERVER['DOCUMENT_ROOT']}/admin/templates/pagination.php";
+        $params = [];
+
+        //todo изменить после разработки
+        $makesDictResult = Provider\Emex::getMakesDict();
+//        $makesDictResult = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/makesDict.json'));
+
+        if (isset($_GET['search_text']) && $_GET['search_text']){
+            $params['makesDictResult'] = [];
+            foreach ($makesDictResult as $row){
+                $makeName = strtolower($row->MakeName);
+                $search_text = strtolower($_GET['search_text']);
+                if (mb_strpos($makeName, $search_text) !== false){
+                    $params['makesDictResult'][] = $row;
+                }
+            }
+        }
+        else $params['makesDictResult'] = $makesDictResult;
+        unset($makesDictResult);
+
+        $params['all'] = count($params['makesDictResult']);
+        $params['perPage'] = 30;
+        $params['linkLimit'] = 10;
+        $params['page'] = $_GET['page'] ?? 1;
+        $params['chunk'] = getChank($params['all'], $params['perPage'], $params['linkLimit'], $params['page']);
+        $params['start'] = $params['chunk'][$params['page']] ?: 0;
+
+        $in = "";
+        for($i = $params['start']; $i < $params['start'] + $params['perPage']; $i++){
+            $in .= "'".$params['makesDictResult'][$i]->MakeLogo."',";
+        }
+        $in = substr($in, 0, -1);
+
+        /** @var mysqli_result $emexBrands_result */
+        $params['emexBrands_db'] = [];
+        $emexBrends_db_result = $db->query("
+            select
+                eb.brend_id,
+                eb.logo,
+                tb.title
+            from
+                #emex_brends eb
+            left join tahos_brends tb on eb.brend_id = tb.id
+            where eb.logo in ($in)
+        ");
+        foreach($emexBrends_db_result as $row){
+            $params['emexBrends_db'][$row['logo']] = [
+                'brend_id' => $row['brend_id'],
+                'title' => $row['title']
+            ];
+        }
+
+        emex_brands($params);
+        break;
     default:
 		view();
 } 
@@ -463,6 +518,9 @@ function provider(){
 		<?}?>
         <?if ($_GET['id'] == 15){?>
             <a href="/admin/?view=providers&act=set_address&id=<?=$_GET['id']?>">Сопоставить адреса</a>
+        <?}?>
+        <?if ($_GET['id'] == Provider\Emex::PROVIDER_ID){?>
+            <a href="/admin/?view=providers&act=emex_brands">Сопоставить бренды</a>
         <?}?>
 		<div style="width: 100%; height: 10px"></div>
 	<?}?>
@@ -885,7 +943,7 @@ function setAddress($params){?>
         </div>
     </div>
 
-    <input class="intuitive_search" type="text" name="items" value="" placeholder="Выбрать пользователя" required>
+    <input id="select-user" class="intuitive_search" type="text" name="items" value="" placeholder="Выбрать пользователя" required>
     
     <?if ($params['userInfo']['id']){?>
         <form method="post" action="/admin/?view=providers&act=set_address&id=<?=$_GET['id']?>">
@@ -929,5 +987,55 @@ function setAddress($params){?>
             </table>
         </form>
     <?}?>
+<?}
+function emex_brands($params){?>
+    <div id="total" style="margin-top: 10px;">Всего: <?=$params['all']?></div>
+    <div id="actions">
+        <form method="get" action="/admin/?view=providers&act=emex_brands">
+            <input type="hidden" name="view" value="providers">
+            <input type="hidden" name="act" value="emex_brands">
+            <input type="text" name="search_text" value="<?=$_GET['search_text'] ?? ''?>">
+            <input type="submit" value="Найти">
+        </form>
+    </div>
+    <table id="emex_brends" class="t_table" cellspacing="1">
+            <thead>
+            <tr class="head">
+                <th>Наименование<br>Emex</th>
+                <th>Logo</th>
+                <th>Наш бренд</th>
+            </tr>
+            </thead>
+            <tbody>
+                <?$end = $params['start'] + $params['perPage'];
+                $count = count($params['makesDictResult']);
+                if ($params['perPage'] >= $count) $end = $count;
+                for($i = $params['start']; $i < $end; $i++){?>
+                    <tr>
+                        <td><?=$params['makesDictResult'][$i]->MakeName?></td>
+                        <td class="logo"><?=$params['makesDictResult'][$i]->MakeLogo?></td>
+                        <td>
+                            <?if (isset($params['emexBrends_db'][$params['makesDictResult'][$i]->MakeLogo])){?>
+                                <span class="our-brend">
+                                    <?=$params['emexBrends_db'][$params['makesDictResult'][$i]->MakeLogo]['title']?>
+                                </span>
+                            <?}?>
+                            <div class="search-brend">
+                                <input type="text" class="intuitive_search" placeholder="Поиск по бренду" name="brends">
+                                <span title="Отмена" class="icon-cross1"></span>
+                                <span title="Удалить" class="icon-bin"></span>
+                            </div>
+                            <span title="Изменить" class="icon-pencil"></span>
+                        </td>
+                    </tr>
+                <?}?>
+            </tbody>
+        </table>
+    <?pagination(
+        $params['chunk'],
+        $params['page'],
+        ceil($params['all'] / $params['perPage']),
+        "?view=providers&act=emex_brands&page="
+    );?>
 <?}?>
 

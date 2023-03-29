@@ -1,6 +1,9 @@
 <?
+/** @global \core\Database $db */
+/** @global stdClass $connection */
 
 use core\Breadcrumb;
+use core\Provider\Emex;
 
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	if (!core\Config::$isUseApiProviders){
@@ -34,6 +37,8 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 	setCoincidences(core\Provider\Autopiter::getCoincidences($_GET['search']));
 	
 	setCoincidences(core\Provider\Berg::getCoincidences($_GET['search']));
+
+    setCoincidences(Emex::getCoincidences($_GET['search']));
 	
 	echo json_encode($coincidences);
 	exit();

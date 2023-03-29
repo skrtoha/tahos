@@ -4,6 +4,7 @@
 use core\Breadcrumb;
 use core\Exceptions\NotFoundException;
 use core\Provider\Autoeuro;
+use core\Provider\Emex;
 
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
@@ -35,6 +36,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
 	core\Provider\Autopiter::setArticle($abcp->item['brand'], $abcp->item['article']);
 	
 	core\Provider\Berg::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+
+    Emex::setArticle($abcp->item['brand'], $abcp->item['article']);
 
 	exit();
 }

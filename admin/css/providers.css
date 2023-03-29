@@ -58,3 +58,38 @@ span.icon-cancel-circle1{
 a.remove{
 	text-decoration: none;
 }
+.icon-pencil:before {
+    content: "\e905";
+    cursor: pointer;
+    float: right;
+}
+.icon-cross1:before {
+    content: "\ea0f";
+    cursor: pointer;
+    font-size: 15px;
+    margin-left: 5px;
+    position: relative;
+    top: 2px;
+}
+.icon-checkmark1:before {
+    content: "\ea10";
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 5px;
+    position: relative;
+    top: 2px;
+}
+.search-brend{
+    display: none;
+    float: left;
+}
+div.intuitiveSearch_wrap{
+    margin-top: 0;
+}
+.icon-bin:before {
+    content: "\e9ac";
+    font-size: 17px;
+    position: relative;
+    top: 2px;
+    left: 2px;
+}

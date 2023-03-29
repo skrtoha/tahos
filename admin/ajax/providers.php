@@ -97,6 +97,16 @@ switch($_POST['act']){
         );
         echo json_encode($output);
         break;
+    case 'setEmexBrend':
+        $db->query("
+            INSERT INTO tahos_emex_brends (`logo`, `brend_id`) 
+                values ('{$_POST['logo']}', {$_POST['brend_id']})
+            ON DUPLICATE KEY UPDATE `brend_id` = {$_POST['brend_id']}
+        ", '', false);
+        break;
+    case 'removeEmexBrend':
+        $db->query("DELETE FROM tahos_emex_brends where `logo` = '{$_POST['logo']}'");
+        break;
 }
 function getStoreInfo($storeInfo){?>
 	<div id="providerInfo">

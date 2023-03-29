@@ -44,8 +44,8 @@ class Database {
 		$res = $this->mysqli->query("SELECT SUM(duration) FROM information_schema.profiling GROUP BY query_id LIMIT 1;");
 		foreach($res as $value) return ($value['SUM(duration)']);
 	}
-	function query($query, $show_query = ''){
-		$query = str_replace('#', $this->db_prefix, $query);
+	function query($query, $show_query = '', $replaceSymbols = true){
+		if ($replaceSymbols) $query = str_replace('#', $this->db_prefix, $query);
         $this->last_query = $query;
 		if ($show_query == 'get') return $query;
 		if ($show_query == 'print'){
@@ -348,7 +348,6 @@ class Database {
                     if ($value == '') $query .= 'DEFAULT,';
                     elseif (!is_numeric($value)) $query .= "'".$this->mysqli->real_escape_string($value) ."',";
                     else $query .= "'".$value."',";
-                    // $query .= "`$key` = $value, ";
                 }
                 $query = substr($query, 0, -1);
             }

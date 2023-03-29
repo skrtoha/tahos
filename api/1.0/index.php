@@ -31,7 +31,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 $queryParams = [];
 if ($_GET['params']){
-    $queryParams = explode('/', $_GET['params']);
+    $params = $_GET['params'];
+    $params = substr($params, 0, -1);
+    $queryParams = explode('/', $params);
 }
 if ($method == 'POST'){
     $body = file_get_contents('php://input');

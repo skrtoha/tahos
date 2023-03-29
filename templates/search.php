@@ -1,40 +1,10 @@
 <?
 
 use core\Breadcrumb;
+use core\Search;
 
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
-	if (!core\Config::$isUseApiProviders){
-		echo json_encode([]);
-		exit();
-	}
-	$coincidences = array();
-
-	$mikado = new core\Provider\Mikado($db);
-	setCoincidences($mikado->getCoincidences($_GET['search']));
-
-	$armtek = new core\Provider\Armtek($db);
-	setCoincidences($armtek->getSearch($_GET['search']));
-
-	setCoincidences(core\Provider\FavoriteParts::getSearch($_GET['search']));
-
-	$rossko = new core\Provider\Rossko($db);
-	setCoincidences($rossko->getSearch($_GET['search']));
-
-    //из-за того, что изменилось АПИ поставщика, теперь для поска товара
-    //стало обязательно передавать бренд
-//	setCoincidences(core\Provider\Autoeuro::getSearch($_GET['search']));
-
-	$abcp = new core\Provider\Abcp(NULL, $db);
-	setCoincidences($abcp->getSearch($_GET['search']));
-
-	setCoincidences(core\Provider\Autokontinent::getCoincidences($_GET['search']));
-
-	setCoincidences(core\Provider\ForumAuto::getCoincidences($_GET['search']));
-
-	setCoincidences(core\Provider\Autopiter::getCoincidences($_GET['search']));
-	
-	setCoincidences(core\Provider\Berg::getCoincidences($_GET['search']));
-	
+    $coincidences = Search::searchItemProviders($_GET['search']);
 	echo json_encode($coincidences);
 	exit();
 }
@@ -76,7 +46,7 @@ if ($_GET['type'] == 'vin'){
 }
 else{
 	core\Provider\Impex::setSearch($_GET);
-	$items = search_items('');
+	$items = Search::searchItemDatabase($_GET['search'], $_GET['type']);
 	if (!empty($items) && count($items) == 1){
 		foreach($items as $id => $item) break;
 		// debug($item, $id); exit();
@@ -159,84 +129,3 @@ function get_brend($title){
 	}
 	else return $brend['parent_id'] ? $brend['parent_id'] : $brend['id'];
 }
-function setCoincidences($c){
-	global $coincidences;
-	if (empty($c)) return false;
-	foreach($c as $key => $value){
-		if (!$key || !$value) continue;
-		$coincidences[$key] = $value;
-	} 
-}
-function search_items($flag = ''){
-	global $db, $res_items;
-	$for_search = core\Item::articleClear($_GET['search']);
-	$ucs = 100; //user_count_search
-	// print_r($_GET);
-	switch ($_GET['type']){
-		case 'article': 
-			$where = "i.`article`='$for_search'";
-            $where .= " OR (i.title_full LIKE '{$_GET['search']}%' AND si.price IS NOT NULL)";
-			$type_search = 1;
-			break;
-		case 'barcode':
-			$where =  "ib.`barcode`='$for_search'";
-			$type_search = 2;
-			break;
-	}
-	$res_items = $db->query("
-		SELECT
-			i.id,
-			b.title as brend,
-			i.brend_id AS brend_id,
-			IF (
-                i.article_cat != '', 
-                i.article_cat, 
-                IF (
-                    i.article !='',
-                    i.article,
-                    ib.barcode
-                )
-			) AS article,
-			IF (i.title_full!='', i.title_full, i.title) AS title_full,
-			FLOOR(si.price * c.rate + si.price * c.rate * (ps.percent/100)) AS price,
-			si.store_id,
-			IF (si.in_stock, ps.delivery, ps.under_order) AS delivery,
-			ps.cipher AS cipher,
-			i.is_blocked,
-			IF (
-				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.photo != '',
-				1,
-				0
-			) as is_desc
-		FROM #items i
-		LEFT JOIN #brends b ON b.id=i.brend_id
-		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
-		LEFT JOIN #store_items si ON si.item_id=i.id
-		LEFT JOIN #provider_stores ps ON ps.id=si.store_id
-		LEFT JOIN #currencies c ON ps.currency_id=c.id
-		WHERE $where
-        LIMIT 0, $ucs
-	", $flag);
-	if (!$res_items->num_rows) return false;
-	$price_min = 0;
-	$delivery_min = 0;
-	while($item = $res_items->fetch_assoc()){
-		$i = & $items[$item['id']];
-		$i['brend'] = $item['brend'];
-		$i['brend_id'] = $item['brend_id'];
-		$i['article'] = $item['article'];
-		$i['title_full'] = $item['title_full'];
-		$i['is_blocked'] = $item['is_blocked'];
-		//for displaying coincided items
-		if (in_array($item['provider_id'], [11, 12, 18, 20, 21])) $i['is_armtek'] = 1;
-		if (isset($i['price'])){
-			if ($item['price'] < $i['price']) $i['price'] = $item['price'];
-		}
-		else $i['price'] = $item['price'];
-		if (isset($i['delivery'])){
-			if ($item['delivery'] < $i['delivery']) $i['delivery'] = $item['delivery'];
-		}
-		else $i['delivery'] = $item['delivery'];
-	}
-	return $items;
-}?>

@@ -15,7 +15,6 @@ switch ($act){
         break;
     case 'setSynchronizedOSI':
         Synchronization::setOrdersSynchronized($queryParams);
-
         break;
     case 'createOrderAndSendOrdered':
         $changedOrders = [];

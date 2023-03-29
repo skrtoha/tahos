@@ -1,6 +1,7 @@
 <?php
 namespace core;
 class Item{
+
 	public static $lastInsertedItemID = false;
 
 	public static function articleClear($article){
@@ -52,9 +53,15 @@ class Item{
 		if (!$res_items->num_rows) return false;
 		return $res_items->fetch_assoc();
 	}
-	public static function getInstanceDataBase(){
+
+    /**
+     * @return Database
+     */
+    public static function getInstanceDataBase(): Database
+    {
 		return $GLOBALS['db'];
 	}
+
 	public static function getByID($item_id, $params = []){
 		$query = self::getQueryItemInfo($params);
 		$query .= "
@@ -561,4 +568,6 @@ class Item{
         }
         return false;
     }
+
+
 }

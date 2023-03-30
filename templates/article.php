@@ -6,8 +6,6 @@ use core\Exceptions\NotFoundException;
 use core\Provider\Autoeuro;
 use core\Provider\Emex;
 
-Emex::parseBrends(); die();
-
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
 if (is_null($abcp->item)) throw new NotFoundException('Товар не найден');

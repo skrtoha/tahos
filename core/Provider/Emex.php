@@ -168,9 +168,10 @@ class Emex extends Provider{
      */
     public static function parseBrends(){
         $response = Provider\Emex::getMakesDict();
+
         $emexBrands = [];
-        foreach($response as $row) $emexBrands[$row->MakeName] = $row->MakeLogo;
-        $resultGetBrends = $db->query("
+        foreach($response as $row) $emexBrands[Provider::getComparableString($row->MakeName)] = $row->MakeLogo;
+        $resultGetBrends = self::getInfstance()->db->query("
             SELECT b.id,
                    b.title,
                    b.parent_id
@@ -180,8 +181,9 @@ class Emex extends Provider{
 
         $ourBrands = [];
         foreach($resultGetBrends as $row){
-            $ourBrands[$row['title']]['id'] = $row['id'];
-            $ourBrands[$row['title']]['parent_id'] = $row['parent_id'];
+            $title = Provider::getComparableString($row['title']);
+            $ourBrands[$title]['id'] = $row['id'];
+            $ourBrands[$title]['parent_id'] = $row['parent_id'];
         }
         foreach($emexBrands as $title => $logo){
             if (array_key_exists($title, $ourBrands)){

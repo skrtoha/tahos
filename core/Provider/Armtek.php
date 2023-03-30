@@ -48,8 +48,8 @@ class Armtek extends Provider{
 		if ($isReturnObject) return $config;
 		else return (array) $config;
 	}
-	public function __construct(){
-		$this->armtek_client = self::getClientArmtek();
+	public function __construct($getArmtekClient = true){
+        if ($getArmtekClient) $this->armtek_client = self::getClientArmtek();
 	}
 	public static function getPrice(array $fields){
 		$params = self::$params;
@@ -178,7 +178,7 @@ class Armtek extends Provider{
 				'article_cat' => $object->PIN,
 				'title' => $object->NAME,
 				'title_full' => $object->NAME,
-				'source' => 'Армтек'
+				'source' => $from
 			], ['print_query' => false]);
 			if ($res === true){
 				$item_id = $GLOBALS['db']->last_id();

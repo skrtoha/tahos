@@ -6,6 +6,8 @@ use core\Exceptions\NotFoundException;
 use core\Provider\Autoeuro;
 use core\Provider\Emex;
 
+Emex::parseBrends(); die();
+
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
 if (is_null($abcp->item)) throw new NotFoundException('Товар не найден');
@@ -15,7 +17,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
 	$abcp->render(13);
 	$abcp->render(6);
 
-	core\Provider\Impex::getData(['article' => $abcp->item['article']]);
+	/*core\Provider\Impex::getData(['article' => $abcp->item['article']]);
 
     $mikado = new core\Provider\Mikado($db);
     $mikado->setArticle($abcp->item['brand'], $abcp->item['article']);
@@ -35,11 +37,14 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
 
 	core\Provider\Autopiter::setArticle($abcp->item['brand'], $abcp->item['article']);
 	
-	core\Provider\Berg::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+	core\Provider\Berg::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);*/
 
-    Emex::setArticle($abcp->item['brand'], $abcp->item['article']);
+    try {
+        Emex::setArticle($abcp->item['brend_id'], $abcp->item['article'], $_GET['item_id']);
+    }
+    catch (\PHPMailer\PHPMailer\Exception $e){}
 
-	exit();
+    exit();
 }
 
 $title = "Список предложений";

@@ -3,6 +3,7 @@ namespace core;
 
 use core\Provider\Autoeuro;
 use core\Provider\Berg;
+use core\Provider\Emex;
 use core\Sms\SmsAero;
 use PHPMailer\PHPMailer\Exception;
 
@@ -574,6 +575,10 @@ class OrderValue{
 				OrderValue::changeStatus(11, $ov);
 				self::$countOrdered += 1; 
 				break;
+            case Emex::PROVIDER_ID:
+                Emex::addToBasket($ov);
+                if ($automaticOrder) self::$countOrdered = Emex::sendOrder();
+                break;
 			default:
 				OrderValue::changeStatus(7, $ov);
 		}

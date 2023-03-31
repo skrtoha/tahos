@@ -37,9 +37,12 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
 	
 	core\Provider\Berg::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
-    Emex::setArticle($abcp->item['brand'], $abcp->item['article']);
+    try {
+        Emex::setArticle($abcp->item['brend_id'], $abcp->item['article'], $_GET['item_id']);
+    }
+    catch (\Throwable $e){}
 
-	exit();
+    exit();
 }
 
 $title = "Список предложений";

@@ -113,6 +113,9 @@ switch($_GET['act']){
 	case 'orderAutopiter':
 		core\Provider\Autopiter::sendOrder();
 		break;
+    case 'orderEmex':
+        $ordered = Provider\Emex::sendOrder();
+        break;
 	case 'getItemsVoshod':
 		$abcp = new core\Provider\Abcp(NULL, $db);
 		$countTransaction = 50;

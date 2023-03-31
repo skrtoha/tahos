@@ -412,7 +412,7 @@ class Emex extends Provider{
             $globalIdOsi[$row->GlobalId] = $row->Reference;
 
             $array['queryList'][] = [
-                'cmd' => 'InOrderTest',
+                'cmd' => 'InOrder',
                 'Id' => $row->GlobalId
             ];
         }

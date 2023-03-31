@@ -3,7 +3,9 @@ namespace core\Provider;
 
 use core\Brend;
 use core\Database;
+use core\Log;
 use core\Mailer;
+use core\OrderValue;
 use core\Provider;
 use PHPMailer\PHPMailer\Exception;
 
@@ -19,6 +21,7 @@ class Emex extends Provider{
     const PROVIDER_ID = 38;
     const SERVICE_SEARCH = 'EmExService';
     const SERVICE_DICTIONARY = 'EmExDictionaries';
+    const SERVICE_BASKET = 'EmEx_Basket';
 
     const GROUP_ORIGINAL = 'Original';
     const GROUP_ANALOGY = 'ReplacementNonOriginal';
@@ -46,17 +49,38 @@ class Emex extends Provider{
         if (self::$_self) return self::$_self;
         return self::$_self = new self();
     }
+
     public static function getItemsToOrder(int $provider_id){
-        // TODO: Implement getItemsToOrder() method.
+        $output = [];
+        $basketContent = self::getInfstance()->getBasket();
+        $osiList = array_column($basketContent, 'Reference');
+        $orderInfoList = OrderValue::get(['osi' => $osiList], '');
+
+        foreach($orderInfoList as $ov){
+            $output[] = [
+                'provider_id' => $ov['provider_id'],
+                'provider' => $ov['provider'],
+                'store_id' => $ov['store_id'],
+                'store' => $ov['cipher'],
+                'order_id' => $ov['order_id'],
+                'brend' => $ov['brend'],
+                'item_id' => $ov['item_id'],
+                'article' => $ov['article'],
+                'title_full' => $ov['title_full'],
+                'price' => $ov['price'],
+                'count' => $ov['quan']
+            ];
+        }
+        return $output;
     }
 
     /**
      * @param $service
      * @param $method
      * @param array $params
-     * @return array
+     * @return mixed
      */
-    public function getResponse($service, $method, array $params = []): array
+    public function getResponse($service, $method, array $params = [])
     {
         $apiParams = parent::getApiParams([
             'provider_id' => self::PROVIDER_ID,
@@ -79,6 +103,12 @@ class Emex extends Provider{
 
         $resultName = $method."Result";
         $result = $soap->$method($params)->{$resultName};
+
+        if (isset($result->BasketData)) return $result->BasketData;
+
+        if (isset($result->BasketChangingResult)) return $result->BasketChangingResult;
+
+        if (isset($result->BasketReturnData)) return $result->BasketReturnData;
 
         if (isset($result->IsSuccess) && !$result->IsSuccess){
             $this->error = $result->ErrorMessage;
@@ -144,6 +174,10 @@ class Emex extends Provider{
      * @throws Exception при ошибке отправки email
      */
     public function getMakeLogo($brend_id){
+        static $output = [];
+
+        if (isset($output[$brend_id])) return $output[$brend_id];
+
         $result = $this->db->select('emex_brends', '*', "`brend_id` = $brend_id");
         if (!$result){
             $brendInfo = Brend::get(['id' => $brend_id])->fetch_assoc();
@@ -155,7 +189,8 @@ class Emex extends Provider{
             ]);
             return false;
         }
-        return $result[0]['logo'];
+        $output[$brend_id] = $result[0]['logo'];
+        return $output[$brend_id];
     }
 
     public static function getMakesDict(){
@@ -212,7 +247,8 @@ class Emex extends Provider{
             'detailNum' => $article,
             'substLevel' => 'All',
             'substFilter' => 'FilterOriginalAndAnalogs',
-            'minQuantity' => 1
+            'minQuantity' => 1,
+            'maxOneDetailOffersCount' => 5
         ]);
 
         if (self::getInfstance()->error) return;
@@ -277,5 +313,133 @@ class Emex extends Provider{
         $last_id = self::getInfstance()->db->last_id();
         $priceLogoList[$title] = $last_id;
         return $last_id;
+    }
+
+    public static function getPrice(array $params)
+    {
+        $makeLogo = self::getInfstance()->getMakeLogo($params['brend_id']);
+
+        $result = self::getInfstance()->FindDetailAdv([
+            'makeLogo' => $makeLogo,
+            'detailNum' => $params['article'],
+            'substLevel' => 'OriginalOnly',
+            'substFilter' => 'None'
+        ]);
+
+        foreach($result as $detail){
+            $title = "{$detail->PriceLogo}({$detail->PriceCountry})";
+            if ($title == $params['providerStore']) return [
+                'price' => $detail->ResultPrice,
+                'available' => $detail->Quantity,
+            ];
+        }
+        return false;
+    }
+
+    private function getBasket(){
+        $result = self::getInfstance()->getResponse(
+            self::SERVICE_BASKET,
+            'GetBasket',
+            ['basketPart' => 'Basket']
+        );
+        if (!is_array($result)) $result = [$result];
+        return $result;
+    }
+
+    public static function isInBasket($ov){
+        $result = self::getInfstance()->getBasket();
+        $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+        if (is_array($result)){
+            foreach($result as $row){
+                if ($row->Reference == $osi) return true;
+            }
+        }
+        else{
+            if ($result->Reference == $osi) return true;
+        }
+
+        return false;
+    }
+
+    public static function removeFromBasket($ov){
+        $basketContent = self::getInfstance()->getBasket();
+        $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+        $array = [];
+        $array['queryList'] = [];
+
+        foreach ($basketContent as $row){
+            if ($row->Reference == $osi) $array['queryList'][] = [
+                'cmd' => 'Delete',
+                'Id' => $row->GlobalId
+            ];
+        }
+        self::getInfstance()->getResponse(self::SERVICE_BASKET, 'Basket_ChangeStatus_ById', $array);
+
+        OrderValue::changeStatus(5, $ov);
+    }
+
+    public static function addToBasket($ov): void
+    {
+        $array = [];
+        $array['ePrices'][] = [
+            'MLogo' => self::getInfstance()->getMakeLogo($ov['brend_id']),
+            'DNum' => $ov['article'],
+            'Name' => $ov['title_full'],
+            'Quan' => $ov['quan'],
+            'Price' => $ov['price'],
+            'PLogo' => $ov['cipher'],
+            'DLogo' => 'AFL',
+            'Ref' => "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}",
+            'Com' => '',
+            'Notc' => $ov['typeOrganization'] == 'entity' ? 1 : 0
+        ];
+        self::getInfstance()->getResponse(self::SERVICE_BASKET, 'InsertToBasket3', $array);
+        OrderValue::changeStatus(7, $ov);
+    }
+
+    public static function sendOrder(): int
+    {
+        $ordered = 0;
+        $basketContent = self::getInfstance()->getBasket();
+        $globalIdOsi = [];
+        $array = [];
+        $array['queryList'] = [];
+
+        foreach ($basketContent as $row){
+            if (!isset($row->Reference)) continue;
+            if (!preg_match("/^\d+-\d+-\d+$/", $row->Reference)) continue;
+
+            $globalIdOsi[$row->GlobalId] = $row->Reference;
+
+            $array['queryList'][] = [
+                'cmd' => 'InOrderTest',
+                'Id' => $row->GlobalId
+            ];
+        }
+        $result = self::getInfstance()->getResponse(self::SERVICE_BASKET, 'Basket_ChangeStatus_ById', $array);
+        if(!is_array($result)) $result = [$result];
+
+        foreach($result as $row){
+            $osi = explode('-', $globalIdOsi[$row->Id]);
+            if ($row->res == 'res_OK'){
+                $resOrderValue = OrderValue::get([
+                    'order_id' => $osi[0],
+                    'store_id' => $osi[1],
+                    'item_id' => $osi[2]
+                ]);
+                $orderValue = $resOrderValue->fetch_assoc();
+                OrderValue::changeStatus(11, $orderValue);
+                $ordered += $orderValue['quan'];
+            }
+            else{
+                Log::insert([
+                    'text' => "Ошибка отправки в заказ. Код ошибки: {$row->res}",
+                    'additional' => "osi: {$globalIdOsi[$row->Id]}"
+                ]);
+            }
+
+        }
+
+        return $ordered;
     }
 }

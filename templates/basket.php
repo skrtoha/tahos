@@ -69,6 +69,7 @@ Breadcrumb::out();
 						'item_id' => $val['item_id'],
 						'price' => $val['price'],
 						'article' => $val['article'],
+                        'brend_id' => $val['brend_id'],
 						'brend' => $val['provider_brend'],
 						'in_stock' => $val['in_stock'],
 						'user_id' => $_SESSION['user'],

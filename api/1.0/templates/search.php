@@ -11,7 +11,8 @@ use core\Search;
 
 switch ($act){
     case 'article':
-        $result = Search::searchItemDatabase($queryParams[0], Search::TYPE_SEARCH_ARTICLE);
+        $article = \core\Item::articleClear($queryParams[0]);
+        $result = Search::searchItemDatabase($article, Search::TYPE_SEARCH_ARTICLE);
         break;
     case 'articleDetail':
         $result = Search::articleStoreItems($queryParams[0], $queryParams[1]);

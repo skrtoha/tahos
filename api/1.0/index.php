@@ -45,7 +45,7 @@ $result = [];
 try{
     require_once($path);
 }
-catch (NotFoundException $e){
+catch (Exception $e){
     $output['errors'][] = $e->getMessage();
 }
 if (!isset($output['errors'])){

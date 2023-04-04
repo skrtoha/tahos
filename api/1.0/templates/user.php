@@ -47,6 +47,27 @@ switch ($act){
             ORDER BY name
         ")->fetch_all(MYSQLI_ASSOC);
         break;
+    case 'getArrangement':
+        $bill_type = '';
+        if ($queryParams[1] == 'Наличный') $bill_type = User::BILL_CASH;
+        if ($queryParams[1] == 'Безналичный') $bill_type = User::BILL_CASHLESS;
+        $result = $db->select_one(
+            'user_1c_arrangements',
+            '*',
+            "`user_id` = {$queryParams[0]} AND `bill_type` = $bill_type"
+        );
+        break;
+    case 'getAddresses':
+        $result = [];
+        $addressList = $db->select('user_addresses', '*', "`user_id` = {$queryParams[0]}");
+        foreach($addressList as $value){
+            $addressData = json_decode($value['json'], true);
+            $result[] = [
+                'address_id' => $value['id'],
+                'title' => \core\UserAddress::getString($value['id'], $addressData)
+            ];
+        }
+        break;
     default:
         throw new NotFoundException('Действие не найдено');
 }

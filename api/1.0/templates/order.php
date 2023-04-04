@@ -7,6 +7,7 @@
 
 use core\Database;
 use core\Exceptions\NotFoundException;
+use core\StoreItem;
 use core\Synchronization;
 
 switch ($act){
@@ -108,6 +109,48 @@ switch ($act){
             $return = $res_return->fetch_assoc();
             core\Returns::processReturn($paramsReturn, $return);
         }
+        break;
+    case 'create':
+        $dateTime = DateTime::createFromFormat('d.m.Y 00:00:00', "{$queryParams['date_issue']} 00:00:00");
+        $resOrder = $db->insert('orders', [
+            'user_id' => $queryParams['user_id'],
+            'delivery' => $queryParams['delivery'],
+            'pay_type' => $queryParams['pay_type'],
+            'address_id' => $queryParams['address_id'],
+            'date_issue' => $dateTime->format('Y-m-d H:i:s'),
+            'entire_order' => $queryParams['entire_order'] == 'Да' ? 1 : 0,
+            'bill_type' => $queryParams['bill_type']
+        ]);
+
+        if ($resOrder !== true){
+            throw new Exception('Ошибка создания заказа');
+        }
+
+        $order_id = $db->last_id();
+        foreach($queryParams['order_values'] as $row){
+            $array = explode('-', $row['osi']);
+            $query = StoreItem::getQueryStoreItem();
+            $query .= "
+                WHERE si.store_id = {$array[1]} AND si.item_id = {$array[2]}
+            ";
+            $resultQuery = $db->query($query, '');
+            $storeItemInfo = $resultQuery->fetch_assoc();
+
+            $res = $db->insert(
+                'orders_values',
+                [
+                    'order_id' => $order_id,
+                    'store_id' => $array[1],
+                    'item_id' => $array[2],
+                    'withoutMarkup' => $storeItemInfo['priceWithoutMarkup'],
+                    'price' => $storeItemInfo['price'],
+                    'quan' => $row['quan'],
+                    'synchronized' => 1
+                ]
+            );
+            $result['order_id'] = $order_id;
+        }
+
         break;
     default:
         throw new NotFoundException('Действие не найдено');

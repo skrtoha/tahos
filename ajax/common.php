@@ -80,7 +80,7 @@ switch($_POST['act']){
     case 'saveVin':
         $arrayInsert = [
             'vin' => $_POST['vin'],
-            'title' => "{$_POST['brend']} {$_POST['model']} {$_POST['year']}",
+            'title' => $_POST['title'],
             'user_id' => $_POST['user_id']
         ];
         $db->insert('search_vin', $arrayInsert);

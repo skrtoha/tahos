@@ -199,27 +199,44 @@ $(function(){
 			})
 		}
 
-        if (isPageVin && !isProccessedVin){
-            let data = {};
-            $tbody = $('div.LjoJ3TC3QBG0Gj1e1y18m tbody._2s4Zlis3TQ_ERIPo_5CYhW');
-            $tr = $tbody.find('tr._2ra47Mt1RDDKqGLLJbQWkG:first-child');
-            let brend = $tr.find('td:nth-child(1)').html();
-            data.brend = brend.trim();
-            data.model = $tr.find('td:nth-child(2)').html();
-            data.model = data.model.trim();
-            data.year = $tr.find('td:nth-child(3)').html();
-            data.year = data.year.trim();
-            data.vin = urlParams.get('q');
-            data.act = "saveVin";
-            data.user_id = $('input[name=user_id]').val();
-            $.ajax({
-                "type": "post",
-                "url": "/ajax/common.php",
-                "data": data,
-                success: function(response){
-                    isProccessedVin = true;
-                }
-            })
+        if (isPageVin && !isProccessedVin) {
+            const getQuery = getParams();
+            console.log(getQuery);
+            const $inputFrameSearch = $('#id-vin-frame-search');
+            if ($inputFrameSearch.size()) {
+                let currentVIN = $inputFrameSearch.val();
+                setTimeout(() => {
+                    $inputFrameSearch.click();
+                    $inputFrameSearch.focus();
+                    setTimeout(() => {
+                        const $ul = $inputFrameSearch.parent().parent().next();
+                        if ($ul.size()){
+                            isProccessedVin = true;
+                            $.each($ul.find('li'), (i, item) => {
+                                if (item.querySelector('div').innerText == currentVIN){
+                                    let text = item.innerText;
+                                    text = text.replace(currentVIN, '');
+                                    $.ajax({
+                                        "type": "post",
+                                        "url": "/ajax/common.php",
+                                        "data": {
+                                            act: "saveVin",
+                                            vin: urlParams.get('q'),
+                                            title: text.trim(),
+                                            user_id: $('input[name=user_id]').val()
+                                        },
+                                        success: function(response){
+                                            $ul.hide();
+                                        }
+                                    })
+                                }
+                            })
+                        }
+
+                    }, 10)
+                }, 10)
+
+            }
         }
 	}, 500);
 })

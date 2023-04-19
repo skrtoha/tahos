@@ -16,6 +16,10 @@ switch ($act){
         break;
     case 'articleDetail':
         $result = Search::articleStoreItems($queryParams[0], $queryParams[1]);
+        foreach($result['store_items'] as $item_id => & $value){
+            if ($item_id == $queryParams[0]) $value['is_main'] = 1;
+            else $value['is_main'] = 0;
+        }
         break;
     default:
         throw new NotFoundException('Действие не найдено');

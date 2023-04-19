@@ -28,6 +28,14 @@ switch ($act){
             ];
         }
         break;
+    case 'getAnalogies':
+        $result = core\Search::articleStoreItems(
+            $queryParams[0],
+            $queryParams[1],
+            [],
+            'analogies'
+        );
+        break;
     default:
         throw new NotFoundException('Действие не найдено');
 }

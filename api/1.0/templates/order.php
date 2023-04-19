@@ -9,6 +9,7 @@ use core\Database;
 use core\Exceptions\NotFoundException;
 use core\StoreItem;
 use core\Synchronization;
+use core\User;
 
 switch ($act){
     case 'get':
@@ -25,7 +26,7 @@ switch ($act){
             $ov['ordered'] = $ov['quan'];
             $changedOrders[] = $ov;
         }
-        echo json_encode($changedOrders);
+        $result = $changedOrders;
         break;
     case 'setStatusArrived':
         $changedOrders = [];
@@ -126,10 +127,13 @@ switch ($act){
             throw new Exception('Ошибка создания заказа');
         }
 
+        $res_user = User::get(['user_id' => $queryParams['user_id']]);
+        foreach($res_user as $value) $user = $value;
+
         $order_id = $db->last_id();
         foreach($queryParams['order_values'] as $row){
             $array = explode('-', $row['osi']);
-            $query = StoreItem::getQueryStoreItem();
+            $query = StoreItem::getQueryStoreItem($user['discount']);
             $query .= "
                 WHERE si.store_id = {$array[1]} AND si.item_id = {$array[2]}
             ";

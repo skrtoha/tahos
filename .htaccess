@@ -32,6 +32,7 @@ RewriteRule (.*) - [F,L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^admin/(.*)$ admin/$1 [L]
+RewriteRule ^api/(\d.\d)/(\w+)/(\w+)/(.*)$ api/$1/index.php?view=$2&act=$3&version=$1&params=$4 [L]
 RewriteRule ^page/(.*)$ index.php?view=page&type=$1 [L]
 RewriteRule ^new/([0-9]+)$ index.php?view=new&id=$1 [L]
 RewriteRule ^category/([a-z0-9-]+)$ index.php?view=category&href=$1 [L]

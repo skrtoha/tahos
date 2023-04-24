@@ -15,7 +15,7 @@ class Synchronization{
 			$o['user_id'] = $ov['user_id'];
 			$o['userName'] = mb_strtoupper($ov['userName']);
 			$o['created'] = $ov['created'];
-            $o['billType'] = $ov['bill_type'];
+            $o['bill_type'] = $ov['bill_type'];
             $o['typeOrganization'] = $ov['typeOrganization'];
             $o['userCreated'] = $ov['userCreated'];
             $o['arrangement_uid'] = $ov['arrangement_uid'];

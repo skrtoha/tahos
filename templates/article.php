@@ -49,7 +49,11 @@ $title = "Список предложений";
 
 $filters = [];
 
-$array = article_store_items($_GET['item_id'], $filters, 'articles');
+$array = core\Search::articleStoreItems(
+    $_GET['item_id'],
+    $_SESSION['user'] ?? null,
+    $filters
+);
 $store_items = array();
 foreach($array['store_items'] as $key => $value){
 	$store_items[] = [

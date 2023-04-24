@@ -1,11 +1,7 @@
 <?php
-ini_set('error_reporting', E_ERROR | E_PARSE);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 
-use core\Setting;
-use core\Synchronization;
-use core\User;
+
+
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");

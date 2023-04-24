@@ -1,9 +1,13 @@
 <?php
+/** @property \core\Database $db */
+
 namespace core\Provider;
+
 use core\Provider;
 use core\OrderValue;
 use core\Log;
 use core\Item;
+
 class Rossko extends Provider{
 	public static $fieldsForSettings = [
 		'isActive',
@@ -71,6 +75,7 @@ class Rossko extends Provider{
 		ini_set('soap.wsdl_cache_enabled',0);
 		ini_set('soap.wsdl_cache_ttl',0);
 		if ($db) $this->db = $db;
+        else $db = $GLOBALS['db'];
 	}
 	public function isRossko($store_id){
 		$array = $this->db->select_one('provider_stores', 'id,provider_id', "`id`=$store_id");

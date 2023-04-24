@@ -3,43 +3,10 @@
 /** @global stdClass $connection */
 
 use core\Breadcrumb;
-use core\Provider\Emex;
+use core\Search;
 
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
-	if (!core\Config::$isUseApiProviders){
-		echo json_encode([]);
-		exit();
-	}
-	$coincidences = array();
-
-	$mikado = new core\Provider\Mikado($db);
-	setCoincidences($mikado->getCoincidences($_GET['search']));
-
-	$armtek = new core\Provider\Armtek($db);
-	setCoincidences($armtek->getSearch($_GET['search']));
-
-	setCoincidences(core\Provider\FavoriteParts::getSearch($_GET['search']));
-
-	$rossko = new core\Provider\Rossko($db);
-	setCoincidences($rossko->getSearch($_GET['search']));
-
-    //из-за того, что изменилось АПИ поставщика, теперь для поска товара
-    //стало обязательно передавать бренд
-//	setCoincidences(core\Provider\Autoeuro::getSearch($_GET['search']));
-
-	$abcp = new core\Provider\Abcp(NULL, $db);
-	setCoincidences($abcp->getSearch($_GET['search']));
-
-	setCoincidences(core\Provider\Autokontinent::getCoincidences($_GET['search']));
-
-	setCoincidences(core\Provider\ForumAuto::getCoincidences($_GET['search']));
-
-	setCoincidences(core\Provider\Autopiter::getCoincidences($_GET['search']));
-	
-	setCoincidences(core\Provider\Berg::getCoincidences($_GET['search']));
-
-    setCoincidences(Emex::getCoincidences($_GET['search']));
-	
+    $coincidences = Search::searchItemProviders($_GET['search']);
 	echo json_encode($coincidences);
 	exit();
 }
@@ -81,7 +48,7 @@ if ($_GET['type'] == 'vin'){
 }
 else{
 	core\Provider\Impex::setSearch($_GET);
-	$items = search_items('');
+	$items = Search::searchItemDatabase($_GET['search'], $_GET['type']);
 	if (!empty($items) && count($items) == 1){
 		foreach($items as $id => $item) break;
 		// debug($item, $id); exit();

@@ -1,5 +1,8 @@
 <?
+/** @property \core\Database $db */
+
 namespace core\Provider;
+use core\Database;
 use core\Provider;
 use core\Brend;
 use core\Log;
@@ -25,10 +28,23 @@ class Abcp extends Provider{
 		'shipmentAddress',
 		'getAnalogies'
 	];
-	private $providerStores = [];
-	public function __construct($item_id = NULL, $db = NULL){
-		// if (!$_SESSION['user']) return false;
+    public $isCheckedFromAbcp;
+    private $providerStores = [];
+
+    /**
+     * @var Database
+     */
+
+    private $db;
+    /**
+     * @var array
+     */
+    public $item;
+
+    public function __construct($item_id = NULL, $db = NULL){
 		if ($db) $this->db = $db;
+        else $this->db = $GLOBALS['db'];
+
 		if ($item_id){
 			$this->item_id = $item_id;
 			$this->item = $this->db->select_unique("

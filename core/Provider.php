@@ -220,17 +220,6 @@ abstract class Provider{
 		}
 		return $dateTimeOut->format('d.m');
 	}
-	private static function isDayOff($array)
-	{
-		if (!$counter){
-			$dateTime = new \DateTime();
-			$counter = $dateTime->format('N');
-		}
-		$output = $workSchedule[$counter];
-		$counter++;
-		if ($counter > 7) $counter = 1;
-		return $output;
-	}
 	public static function addToProviderBasket($ov){
 		self::getInstanceDataBase()->insert('provider_basket', [
 			'order_id' => $ov['order_id'],

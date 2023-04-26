@@ -187,6 +187,7 @@ class Berg extends Provider{
                 $order['order']['payment_type'] = $type_organization == 'private' ? 1 : 2;
                 $order['order']['dispatch_type'] = 3;
                 $order['order']['dispatch_time'] = 2;
+                $order['order']['shipment_address_id'] = self::getParams($type_organization)->address_id;
 
                 //todo при развертывании закоментировать
 //            $order['order']['is_test'] = 1;
@@ -215,6 +216,16 @@ class Berg extends Provider{
                 $json = parent::getCurlUrlData($url, $order);
                 $result = json_decode($json);
 
+                if (isset($result->errors) && $result->errors){
+                    $str = "Ошибки отправки заказа: ";
+                    foreach($result->errors as $r) $str .= mb_strtolower($r->text)." ({$r->code}); ";
+                    $str = mb_substr($str, 0, -2);
+                    Log::insert([
+                        'text' => $str,
+                        'additional' => "osi: {$row['order_id']}-{$row['store_id']}-{$row['item_id']}"
+                    ]);
+                    continue;
+                }
                 OrderValue::changeStatus(11, [
                     'order_id' => $row['order_id'],
                     'store_id' => $row['store_id'],

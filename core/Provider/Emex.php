@@ -59,7 +59,7 @@ class Emex extends Provider{
         foreach($orderInfoList as $ov){
             $output[] = [
                 'provider_id' => $ov['provider_id'],
-                'provider' => $ov['provider'],
+                'provider' => $ov['api_title'],
                 'store_id' => $ov['store_id'],
                 'store' => $ov['cipher'],
                 'order_id' => $ov['order_id'],

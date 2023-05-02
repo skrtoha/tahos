@@ -54,3 +54,14 @@ div.actions a {
 div.actions > form{
     margin-bottom: 10px;
 }
+li.show_all {
+    margin-top: 10px;
+    border-top: 1px solid #a8e4ff;
+    line-height: 27px;
+}
+li.show_all a{
+    cursor: pointer;
+}
+.modal{
+    text-align: left;
+}

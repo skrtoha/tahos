@@ -55,8 +55,8 @@ class Database {
 		if ($this->isProfiling) $this->mysqli->query("SET profiling=1");
 		$res = $this->mysqli->query($query);
 		if (preg_match('/SQL_CALC_FOUND_ROWS/', $query)) {
-			$res = $this->query("SELECT FOUND_ROWS()", '');
-			$array = $res->fetch_assoc();
+			$res_found_ros = $this->query("SELECT FOUND_ROWS()", '');
+			$array = $res_found_ros->fetch_assoc();
 			$this->found_rows = $array['FOUND_ROWS()'];
 		}
 		if (preg_match('/^INSERT INTO/', $query) && $res == true) $this->last_id = $this->mysqli->insert_id;
@@ -189,38 +189,6 @@ class Database {
 			$result_set->close();
 			return $data[0]['count'];
 		}
-	}
-	function select_query($table_name, $fields, $where = "", $order = "", $up = true, $limit = ""){
-		$table_name = $this->db_prefix.$table_name;
-		if (is_array($fields)){
-			$str = "";
-			foreach ($fields as $field) $str .= "`$field`,";
-			$str = substr($str, 0, -1);
-			$fields = $str;
-		}
-		elseif (strpos($fields, ",")){
-			$fields = explode(",", $fields);
-			$str = "";
-			for ($i = 0; $i < count($fields); $i++) $str .= "`".$fields[$i]."`,";
-			$str = substr($str, 0, -1);
-			$fields = $str;
-		}
-		elseif ($fields =="*") $fields = "*";
-		elseif (preg_match("/MAX/", $fields)) $fields = $fields; 
-		else $fields = "`".$fields."`";
-		if (!$order) $order = "";
-		else {
-			if ($order != "RAND()"){
-				$order = "ORDER BY $order";
-				if (!$up) $order .= " DESC";
-			}
-			else $order = "ORDER BY $order";
-		}
-		if ($limit) $limit = "LIMIT $limit";
-		if($where) $query = "SELECT $fields FROM $table_name WHERE $where $order $limit";
-		else $query = "SELECT $fields FROM $table_name $order $limit";
-		$this->last_query = $query;
-		echo $query."<br>";
 	}
 
 		/**
@@ -377,23 +345,6 @@ class Database {
 		elseif ($res === false) return $this->error();
 		else return true;
 	}
-	function update_query($table_name, $upd_fields, $where, $iconv = false){
-		$table_name = $this->db_prefix.$table_name;
-		$query = "UPDATE `$table_name` SET ";
-		if (!$iconv) foreach ($upd_fields as $field => $value){
-			if (preg_match("/`$field`/", $value)) $query .= "`$field` = $value,";
-			elseif (!$value && $value != '0') $query .= "`$field` = DEFAULT,";
-			else $query .= "`$field` = '".$this->mysqli->real_escape_string($value)."',";
-		} 
-		else foreach ($upd_fields as $field => $value) $query .= "`$field` = '".iconv("UTF-8", "WINDOWS-1251", $value)."',";
-		$query = substr($query, 0, -1);
-		$this->last_query = $query;
-		if ($where){
-			$query.=" WHERE $where";
-			// return $this->query($query);
-		}
-		echo "$query";
-	}
 	function update ($table_name, $upd_fields, $where, $iconv = false){
 		$table_name = $this->db_prefix.$table_name;
 		$query = "UPDATE `$table_name` SET ";
@@ -412,12 +363,6 @@ class Database {
 			else return $this->error();
 		}
 		else return false;
-	}
-	function delete_query($table_name, $where = ""){
-		$table_name = $this->db_prefix.$table_name;
-		$query = "DELETE FROM $table_name WHERE $where";
-		$this->last_query = $query;
-		echo $query;
 	}
 	function delete ($table_name, $where = ""){
 		$table_name = $this->db_prefix.$table_name;
@@ -458,10 +403,6 @@ class Database {
 		}
 		return $data[0][$field_out];
 	}	
-	function getField_query($table_name, $field_out, $field_in, $value_in){
-		$table_name = $this->db_prefix.$table_name;
-		return "SELECT `$field_out` FROM `$table_name` WHERE $field_in = '$value_in'<br>";
-	}	
 	function getFieldOnID($table_name, $id, $field){
 		return $this->getField($table_name, $field, 'id', $id);
 	}
@@ -480,12 +421,6 @@ class Database {
 		$result_set->close();
 		return $data[0]["COUNT($field)"];
 	}
-	function getCount_query($table_name, $where = "", $field = '*'){
-		$table_name = $this->db_prefix.$table_name;
-		if (!$where) $query = "SELECT COUNT($field) FROM $table_name";
-		else $query = "SELECT COUNT($field) FROM $table_name WHERE $where";
-		echo $query;
-	}
 	public function getMax($table_name, $field, $where = ''){
 		$table_name = $this->db_prefix.$table_name;
 		$query = "SELECT MAX($field) FROM $table_name";
@@ -501,38 +436,6 @@ class Database {
 		$result_set->close();
 		return $data[0]["MAX($field)"];
 	}
-	public function getMax_query($table_name, $field, $where){
-		$table_name = $this->db_prefix.$table_name;
-		$query = "SELECT MAX($field) FROM $table_name";
-		if ($where) $query .= " WHERE $where";
-		$this->last_query = $query;
-		echo "$query<br>";
-	}
-	public function getMin($table_name, $field, $where = ''){
-		$table_name = $this->db_prefix.$table_name;
-		$query = "SELECT MIN($field) FROM $table_name";
-		if ($where) $query .= " WHERE $where";
-		$this->last_query = $query;
-		$result_set = $this->query($query);
-		if (!$result_set) return false;
-		$i = 0;
-		while ($row = $result_set->fetch_assoc()) {
-			$data[$i] = $row;
-			$i++;
-		}
-		$result_set->close();
-		return $data[0]["MIN($field)"];
-	}
-	public function getMin_query($table_name, $field, $where = ""){
-		$table_name = $this->db_prefix.$table_name;
-		$query = "SELECT MIN($field) FROM $table_name";
-		if ($where) $query .= " WHERE $where";
-		$this->last_query = $query;
-		echo "$query<br>";
-	}
-	// public function __destruct(){
-	// 	if ($this->mysqli) $this->mysqli->close();
-	// }
 }
 
 spl_autoload_register(function($class){

@@ -349,4 +349,28 @@ $(function(){
         })
     })
 
+	$(document).on('click', 'li.show_all a', (e) => {
+		let $th = $(e.target);
+		showGif();
+		$.ajax({
+			type: 'get',
+			url: '/vendor/intuitive_search/ajax.php',
+			data: {
+				tableName: 'storeItemsForAdding',
+				value: $th.data('article'),
+				additionalConditions: {
+					store_id: $th.data('store-id'),
+				},
+				show_all: 1
+			},
+			success: (response) => {
+				modal_show(`
+					<ul class="show_all">
+						${response}
+					</ul>
+				`)
+				showGif(false);
+			}
+		})
+	})
 })

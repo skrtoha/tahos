@@ -116,15 +116,17 @@ switch($_GET['tableName']){
 		}
 		break;
 	case 'storeItemsForAdding':
+        $showAll = isset($_GET['show_all']) && $_GET['show_all'];
 		$query = core\Item::getQueryItemInfo();
+        if (!$showAll) $query = str_replace('SELECT', 'SELECT SQL_CALC_FOUND_ROWS', $query);
 		$query .= "
 			LEFT JOIN
 				#store_items si ON si.item_id = i.id AND si.store_id = {$_GET['additionalConditions']['store_id']}
 			WHERE
 				i.article LIKE '{$_GET['value']}%' AND si.store_id IS NULL
-			LIMIT
-				0, {$_GET['maxCountResults']}
 		";
+
+        if (!$showAll) $query .= " LIMIT 0, {$_GET['maxCountResults']}";
 		$res_items = $db->query($query);
 		if (!$res_items->num_rows) break;
 		foreach($res_items as $item){
@@ -135,6 +137,13 @@ switch($_GET['tableName']){
 					</a>
 				</li>";
 		}
+        if ($db->found_rows > $_GET['maxCountResults'] && !$showAll){
+            $output .= "
+                <li class='show_all'>
+					<a data-article='{$_GET["value"]}' data-store-id='{$_GET["additionalConditions"]["store_id"]}' href='#'>Показать все</a>
+				</li>
+            ";
+        }
 		break;
 	case 'brendItems':
 		$query = core\Item::getQueryItemInfo();

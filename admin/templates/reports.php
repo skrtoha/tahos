@@ -156,6 +156,8 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				WHERE
 					si.in_stock < rr.requiredRemain AND
 					si.store_id = " . core\Provider\Tahos::$store_id . "
+				ORDER BY 
+					b.title
 			", '');
 			if ($res->num_rows){
 				foreach($res as $value) $output[] = $value;

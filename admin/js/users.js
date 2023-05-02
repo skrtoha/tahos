@@ -57,13 +57,13 @@ class User{
             User.getHtmlStores($(this).attr('item_id'));
         })
         $(User.getSelector('#added_items')).on('submit', function(e){
-            var is_valid = true;
+            let is_valid = true;
             $(this).find('input[name^=price]').each(function(){
-                var val = $(this).val();
+                const val = $(this).val();
                 if (!parseInt(val)) is_valid = false;
             })
             $(this).find('input[name^=quan]').each(function(){
-                var val = $(this).val();
+                const val = $(this).val();
                 if (!parseInt(val)) is_valid = false;
             })
             if (!is_valid){
@@ -77,7 +77,10 @@ class User{
             let tr = th.closest('tr');
             let item_id = tr.attr('item_id');
             let store_id = th.val();
-            let store = User.items[item_id].stores[store_id];
+            let store = User.items[item_id].stores.find((item, index, array) => {
+                if (item.store_id == store_id) return item;
+            })
+
             if ( typeof store === 'undefined'){
                 User.items[item_id].store_id = 0;
                 User.items[item_id].price = 0;
@@ -359,16 +362,16 @@ class User{
 
         return '<tr class="item" item_id="' + item_id + '">' +
                     `<td>
-                                    <input title="Отправлять в заказ" value="1" type="checkbox" name="toOrder[${item_id}]" ${checkedToOrder}>
-                                </td>` +
+                        <input title="Отправлять в заказ" value="1" type="checkbox" name="toOrder[${item_id}]" ${checkedToOrder}>
+                    </td>` +
                     '<td label="Поставищик">' + htmlStores + '</td>' +
                     '<td label="Бренд">' + item.brend + '</td>' +
                     '<td label="Артикул">' + item.article + '</td>' +
                     '<td label="Наименование">' + item.title_full + '</td>' +
                     `<td label="Цена">
-                                    <input value="${valueWithoutMarkup}" type="hidden" name="withoutMarkup[${item_id}]">
-                                    <input ${priceDisabled} value="${valuePrice}" type="text" name="price[${item_id}]">
-                                </td>` +
+                        <input value="${valueWithoutMarkup}" type="hidden" name="withoutMarkup[${item_id}]">
+                        <input ${priceDisabled} value="${valuePrice}" type="text" name="price[${item_id}]">
+                    </td>` +
                     `<td label="Количество"><input value="${valueQuan}" type="text" name="quan[${item_id}]"></td>` +
                     `<td label="Сумма"><span value="0" class="summ">${valueSumm}</span></td>` +
                     `<td label="Комментарий">
@@ -438,9 +441,9 @@ class User{
             $.each(User.items[item_id].stores, function(i, store){
                 let selected = '';
                 if (User.items[item_id].store_id != undefined){
-                    if (i == User.items[item_id].store_id) selected = 'selected';
+                    if (store.store_id == User.items[item_id].store_id) selected = 'selected';
                 }
-                htmlStores += `<option ${selected} value="${i}">${store.cipher} - (${store.price}р.)</option>`;
+                htmlStores += `<option ${selected} value="${store.store_id}">${store.cipher} - (${store.price}р.)</option>`;
             })
             htmlStores += '</select>';
         }

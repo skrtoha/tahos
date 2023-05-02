@@ -82,6 +82,7 @@ class Basket{
         foreach($result as $row){
             $si = & $storeItems[$row['item_id']];
             $si[$row['store_id']] = [
+                'store_id' => $row['store_id'],
                 'cipher' => $row['cipher'],
                 'in_stock' => $row['in_stock'],
                 'packaging' => $row['packaging'],
@@ -89,6 +90,13 @@ class Basket{
                 'withoutMarkup' => $row['priceWithoutMarkup'],
                 'provider' => $row['provider']
             ];
+        }
+
+        foreach($storeItems as & $row){
+            usort($row, function($a, $b){
+                if ($a['price'] <  $b['price']) return false;
+                return true;
+            });
         }
 
         foreach($output as $value => & $row){

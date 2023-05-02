@@ -96,12 +96,17 @@ switch ($_POST['column']) {
 			$item['article'] = $row['article'];
 			$item['title_full'] = $row['title_full'];
 			$item['stores'][$row['store_id']]['price'] = $row['price'];
+			$item['stores'][$row['store_id']]['store_id'] = $row['store_id'];
 			$item['stores'][$row['store_id']]['packaging'] = $row['packaging'];
 			$item['stores'][$row['store_id']]['in_stock'] = $row['in_stock'];
 			$item['stores'][$row['store_id']]['cipher'] = $row['cipher'];
 			$item['stores'][$row['store_id']]['provider'] = $row['provider'];
 			$item['stores'][$row['store_id']]['withoutMarkup'] = $row['priceWithoutMarkup'];
 		}
+		usort($item['stores'], function($a, $b){
+			if ($a['price'] <  $b['price']) return false;
+			return true;
+		});
 		echo json_encode($item);
 		break;
 }

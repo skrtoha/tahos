@@ -1,4 +1,8 @@
 <?
+/** @global Database $db */
+
+use core\Database;
+
 $page_title = 'Отчеты';
 $status = '<a href="/">Главная</a> > Отчеты';
 $tab = isset($_GET['tab']) ? 'nomenclature' : $_GET['tab'];
@@ -30,6 +34,9 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			if ($_POST['act'] == 'hideWrongAnalogy'){
 				$reports->hideWrongAnalogy();
 				break;
+			}
+			if ($_POST['act'] == 'deleteAnalogy'){
+				$reports->deteleAnalogy($_POST);
 			}
 			$values = $reports->getWrongAnalogies();
 			wrongAnalogy($values);
@@ -304,7 +311,14 @@ function wrongAnalogy($values){?>
 					<tr>
 						<td><?=$v['text']?></td>
 						<td><?=$v['from']?></td>
-						<td><a class="hideWrongAnalogy" item_id="<?=$v['param1']?>" item_diff="<?=$v['param2']?>" href="">Скрыть</a></td>
+						<td>
+							<a class="hideWrongAnalogy" item_id="<?=$v['param1']?>" item_diff="<?=$v['param2']?>" href="">
+								<span title="Скрыть" class="icon-eye-blocked"></span>
+							</a>
+							<a class="deleteAnalogy" item_id="<?=$v['param1']?>" item_diff="<?=$v['param2']?>" href="">
+								<span title="Удалить" class="icon-cross1"></span>
+							</a>
+						</td>
 					</tr>
 				<?}
 			}

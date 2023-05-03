@@ -47,16 +47,16 @@ $(function(){
 					}
 				})
 			})
-			$(document).on('click', '.hideWrongAnalogy', function(e){
+			$(document).on('click', '.hideWrongAnalogy, .deleteAnalogy', function(e){
 				e.preventDefault();
 				if (!confirm('Вы уверены?')) return false;
-				var th = $(this);
+				const th = $(this);
 				$.ajax({
 					method: 'post',
 					url: reports.ajaxUrl,
 					data:{
 						tab: reports.tab,
-						act: 'hideWrongAnalogy',
+						act: th.attr('class'),
 						item_id: th.attr('item_id'),
 						item_diff: th.attr('item_diff')
 					},

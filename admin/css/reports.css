@@ -114,3 +114,15 @@ div[data-name=searchHistory] input.datetimepicker
 [data-name=remainsMainStore] table{
     margin-top: 10px;
 }
+.icon-eye-blocked:before {
+    content: "\e9d1";
+    font-size: 17px;
+    position: relative;
+    top: 2px;
+}
+a.hideWrongAnalogy, a.deleteAnalogy{
+    text-decoration: none;
+}
+.icon-cross1:before {
+    content: "\ea0f";
+}

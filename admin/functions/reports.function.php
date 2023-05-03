@@ -86,4 +86,10 @@
             "`item_id`={$_POST['item_diff']} AND `item_diff`={$_POST['item_id']}"
         );
 	}
+    public function deteleAnalogy($params){
+        $this->db->delete(
+            'log_diff',
+            "`type`='wrongAnalogy' AND `param1`={$params['item_id']} AND `param2`={$params['item_diff']}"
+        );
+    }
 }?>

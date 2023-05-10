@@ -426,7 +426,7 @@ else{?>
 			<div class="goods-header">
 				<p>
 					<b class="brend_info" brend_id="<?=$si['brend_id']?>"><?=$si['brend']?></b>
-					<a href="<?=core\Item::getHrefArticle($si['article'])?>" class="articul"><?=$si['article']?></a>
+					<a href="/article/<?=$si['item_id']?>-<?=$si['article']?>" class="articul"><?=$si['article']?></a>
 				</p>
 				<p><?=$si['title_full']?></p>
 			</div>

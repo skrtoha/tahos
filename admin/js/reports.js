@@ -105,6 +105,10 @@ $(function(){
                 tab = th.closest('[data-name]').attr('data-name');
                 reports.processAjaxQuery(tab);
             })
+            $(document).on('click', 'tr[data-item-id]', e => {
+                let item_id = $(e.target).closest('tr').data('item-id')
+                document.location.href = `http://test.tahos.ru/admin/?view=items&act=item&id=${item_id}`
+            })
 		},
         processAjaxQuery: function(tab){
 		    const form = $('div[data-name=' + tab + ']').find('form.filter-form');
@@ -152,6 +156,18 @@ $(function(){
 						data: data,
 						success: function(response){
 							switch(obj.tab){
+                                case 'goodsAvito':
+                                    let $tbody = $('[data-name=' + obj.tab + '] table tbody');
+                                    $.each(JSON.parse(response), (i, item) => {
+                                        $tbody.append(`
+                                            <tr data-item-id="${item.item_id}">
+                                                <td>${item.brend}</td>
+                                                <td>${item.article}</td>
+                                                <td>${item.title_full}</td>
+                                            </tr>                                        
+                                        `);
+                                    });
+                                    break;
 								case 'remainsMainStore':
 									let itemRemains = JSON.parse(response);
 									$('[data-name=' + obj.tab + '] table tbody').empty();

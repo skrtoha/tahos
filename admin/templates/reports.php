@@ -2,6 +2,7 @@
 /** @global Database $db */
 
 use core\Database;
+use core\Item;
 
 $page_title = 'Отчеты';
 $status = '<a href="/">Главная</a> > Отчеты';
@@ -171,6 +172,10 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			}
 			echo json_encode($output);
 			break;
+        case 'goodsAvito':
+            $query = Item::getQueryGoodsAvito();
+            echo json_encode($db->query($query)->fetch_all(MYSQLI_ASSOC));
+            break;
 	}
 	exit();
 }?>
@@ -183,6 +188,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		<li class="ionTabs__tab" data-target="purchaseability">Покупаемость</li>
 		<li class="ionTabs__tab" data-target="searchHistory">История поиска</li>
 		<li class="ionTabs__tab" data-target="remainsMainStore">Остатки</li>
+		<li class="ionTabs__tab" data-target="goodsAvito">Товары Авито</li>
 	</ul>
 	<div class="ionTabs__body">
 		<div class="ionTabs__item" data-name="nomenclature"></div>
@@ -248,6 +254,18 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				<tbody></tbody>
 			</table>
 		</div>
+        <div class="ionTabs__item" data-name="goodsAvito">
+            <table class="t_table" cellspacing="1">
+                <thead>
+                    <tr class="head">
+                        <td>Бренд</td>
+                        <td>Артикул</td>
+                        <td>Наименование</td>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 		<div class="ionTabs__preloader"></div>
 	</div>
 </div>

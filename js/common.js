@@ -237,6 +237,7 @@ function handlePressedEnterSearch(event){
 	else{
         let val = $('input[name=search_input]').val();
         if (!val) val = '9091901122';
+		val = val.replace(/\//, '');
         document.location.href = '/search/article/' + val;
     }
 }

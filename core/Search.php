@@ -100,14 +100,11 @@ class Search{
                 b.title as brend,
                 i.brend_id AS brend_id,
                 IF (
-                    i.article_cat != '', 
-                    i.article_cat, 
-                    IF (
-                        i.article !='',
-                        i.article,
-                        ib.barcode
-                    )
-                ) AS article,
+                    i.article !='',
+                    i.article,
+                    ib.barcode
+                )
+                AS article,
                 IF (i.title_full!='', i.title_full, i.title) AS title_full,
                 FLOOR(si.price * c.rate + si.price * c.rate * (ps.percent/100)) AS price,
                 si.store_id,

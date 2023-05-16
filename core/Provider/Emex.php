@@ -273,6 +273,10 @@ class Emex extends Provider{
                 'item_id' => $mainItemID,
                 'item_diff' => $item_id
             ]);
+            self::getInfstance()->db->insert('item_analogies', [
+                'item_id' => $item_id,
+                'item_diff' => $mainItemID
+            ]);
         }
 
         $store_id = self::getInfstance()->getStoreID($detail);

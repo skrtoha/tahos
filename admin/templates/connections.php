@@ -1,4 +1,6 @@
 <?php
+/** @global \core\Database $db */
+
 $page_title = "Соединения";
 $status = '<a href="">Главная</a> > Соединения';
 
@@ -14,16 +16,21 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		case 'getCommonListTotalNumber':
 			echo core\Connection::getCommonList(null, null, array_merge($_GET, ['getCount' => true]));
 			break;
-		case 'denied_addresses':
-			echo json_encode($db->select('denied_addresses', '*', '', 'ip', true));
+        case 'allowed_ip':
+        case 'denied_addresses':
+			echo json_encode($db->select($_GET['tab'], '*', '', 'ip', true));
 			break;
-		case 'add_denied_address':
-			$res = $db->insert('denied_addresses', ['ip' => $_GET['text']]);
+		case 'add_denied_addresses':
+        case 'add_allowed_ip':
+            $table = str_replace('add_', '', $_GET['tab']);
+			$res = $db->insert($table, ['ip' => $_GET['text']]);
 			if ($res === true) echo "ok";
 			else echo $res;
 			break;
-		case 'remove_denied_address':
-			$db->delete('denied_addresses', "`ip` = '{$_GET['text']}'");
+		case 'remove_denied_addresses':
+		case 'remove_allowed_ip':
+            $table = str_replace('remove_', '', $_GET['tab']);
+			$db->delete($table, "`ip` = '{$_GET['text']}'");
 			break;
 		case 'remove_forbidden_page':
 			$db->delete('forbidden_pages', "`page` = '{$_GET['page']}'");
@@ -67,6 +74,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 		<li class="ionTabs__tab" data-target="statistics">Статистика</li>
 		<li class="ionTabs__tab" data-target="common_list">Общий список</li>
 		<li class="ionTabs__tab" data-target="denied_addresses">Запрещенные ip</li>
+		<li class="ionTabs__tab" data-target="allowed_ip">"Белые" ip</li>
 		<li class="ionTabs__tab" data-target="forbidden_pages">Запрещенные страницы</li>
 	</ul>
 	<div class="ionTabs__body">
@@ -167,8 +175,11 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			<div class="pagination-container"></div>
 		</div>
 		<div class="ionTabs__item" data-name="denied_addresses">
-			<a href="#" id="add_denied_address">Добавить</a>
+			<a href="#" id="add_denied_addresses">Добавить</a>
 		</div>
+        <div class="ionTabs__item" data-name="allowed_ip">
+            <a href="#" id="add_allowed_ip">Добавить</a>
+        </div>
 		<div class="ionTabs__item" data-name="forbidden_pages">
 			<a href="#" id="add_forbidden_page">Добавить</a>
 		</div>

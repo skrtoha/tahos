@@ -26,23 +26,26 @@
 				$('#common_list tbody').empty();
 				connections.common_list();
 			})
-			$(document).on('click', '#add_denied_address', function(e){
-				var text = prompt('Введите ip-адрес:'); 
+			$(document).on('click', '#add_denied_addresses, #add_allowed_ip', function(e){
+				let text = prompt('Введите ip-адрес:');
 				if (!text) return false;
-				connections.add_denied_address(text);
+				connections.add_ip(text, e.target.id);
 				return false;
 			})
-			$(document).on('click', 'span.denied_address', function(){
-				var th = $(this);
+			$(document).on('click', 'span.denied_addresses, span.allowed_ip', function(e){
 				if (!confirm('Вы действительно хотите удалить?')) return false;
+				let $th = $(e.target);
+				let classText = $th.attr('class');
+				classText = classText.replace(' icon-cross1', '');
+				classText = classText.trim();
 				$.ajax({
 					type: 'get',
-					url: '/admin/?view=connections&tab=remove_denied_address',
+					url: '/admin/?view=connections&tab=remove_' + classText,
 					data: {
-						text: th.text()
+						text: $th.text()
 					},
 					success: function(response){
-						th.remove();
+						$th.remove();
 						show_message('Успешно удалено!');
 					}
 				})
@@ -148,18 +151,19 @@
 				}
 			})
 		},
-		add_denied_address: function(text){
+		add_ip: function(text, type){
 			if (!/^\d+\.\d+\.\d+\.\d+$/.test(text)) return show_message('Адрес введен некоректно!', 'error');
+			type = type.replace('add_', '');
 			$.ajax({
 				type: 'get',
-				url: '/admin/?view=connections&tab=add_denied_address',
+				url: '/admin/?view=connections&tab=add_' + type,
 				data: {
 					text: text
 				},
 				success: function(response){
 					if (response != 'ok') return show_message(response, 'error');
-					$('div[data-name=denied_addresses]').append(
-						'<span class="denied_address icon-cross1">' + text + '</span>'
+					$('div[data-name=' + type + ']').append(
+						`<span class="${type} icon-cross1">${text}</span>`
 					);
 					show_message('Успешно добавлено!');
 				}
@@ -168,19 +172,25 @@
 		setTabs: function(){
 			$.ionTabs("#tabs_1",{
 				type: "hash",
+				beforeSend: () => {
+					showGif();
+				},
 				onChange: function(obj){
 					window.connections.tab = obj.tab;
 					var str = '/admin/?view=connections&tab=' + obj.tab;
 					str += '#tabs|connections:' + obj.tab;
 					window.history.pushState(null, null, str);
-					if ($('div[data-name=' + obj.tab + ']').hasClass('viewed')) return false;
+					const $tab = $('div[data-name=' + obj.tab + ']');
+					if ($tab.hasClass('viewed')) return false;
 					switch(obj.tab){
 						case 'common_list': connections.common_list(); break;
-						case 'denied_addresses': connections.denied_addresses(); break;
+						case 'denied_addresses': connections.get_list_ip('denied_addresses'); break;
+						case 'allowed_ip': connections.get_list_ip('allowed_ip'); break;
 						case 'forbidden_pages': connections.forbidden_pages(); break;
 						case 'statistics': connections.statistics(); break;
 					}
-					$('div[data-name=' + obj.tab + ']').addClass('viewed');
+					$tab.addClass('viewed');
+					showGif(false);
 				}
 			});
 		},
@@ -294,19 +304,19 @@
 			$('div[data-name=common_list] input[name=totalNumber]').val(output);
 			return output;
 		},
-		denied_addresses: function(){
-			var $tab = $('div[data-name=denied_addresses]');
-			$tab.find('.denied_address').remove();
+		get_list_ip: function(type){
+			var $tab = $(`div[data-name=${type}]`);
+			$tab.find(`.${type}`).remove();
 			$.ajax({
 				type: 'get',
-				url: '/admin/?view=connections&tab=denied_addresses',
+				url: '/admin/?view=connections&tab=' + type,
 				data: '',
 				success: function(response){
 					if (!response) return false;
-					var addresses = JSON.parse(response);
-					for(var key in addresses){
+					let list = JSON.parse(response);
+					for(let key in list){
 						$tab.append(
-							'<span class="denied_address icon-cross1">' + addresses[key].ip + '</span>'
+							`<span class="${type} icon-cross1">${list[key].ip}</span>`
 						);
 					}
 				}

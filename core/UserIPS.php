@@ -19,9 +19,20 @@ class UserIPS{
 		return $diff->h + ($diff->days * 24);
 	}
 
+    public static function isAllowedIP($ip): bool
+    {
+        /** @var Database $db */
+        $db = $GLOBALS['db'];
+
+        if ($db->getCount('allowed_ip', "`ip` = '$ip'")) return true;
+        return false;
+    }
+
 	public static function registerIP($params){
         global $view;
         if (in_array($params['view'], self::$noRenderView)) return false;
+
+        if (self::isAllowedIP($params['ip'])) return true;
 
         $IPInfo = self::getIPInfo($params['ip']);
 		if (!$params['user_id']){

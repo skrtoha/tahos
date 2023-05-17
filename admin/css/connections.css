@@ -107,25 +107,29 @@ span.total{
 td[label="Страница"]{
     word-break: break-all;
 }
-span.denied_address, 
+span.denied_addresses,
+span.allowed_ip,
 span.forbidden_page {
     border: 1px solid black;
     padding: 5px 25px 5px 5px;
     display: inline-block;
     margin-left: 5px;
+    margin-top: 3px;
 }
 div[data-name=denied_addresses],
 div[data-name=forbidden_pages]
 {
     margin-top: 10px;
 }
-span.denied_address.icon-cross1,
+span.denied_addresses.icon-cross1,
+span.allowed_ip.icon-cross1,
 span.forbidden_page.icon-cross1
 {
     position: relative;
     font-size: 17px;
 }
-span.denied_address:hover,
+span.denied_addresses:hover,
+span.allowed_ip:hover,
 span.forbidden_page:hover{
     cursor: pointer;
     color: red;

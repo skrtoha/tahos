@@ -107,7 +107,7 @@ $(function(){
             })
             $(document).on('click', 'tr[data-item-id]', e => {
                 let item_id = $(e.target).closest('tr').data('item-id')
-                document.location.href = `http://test.tahos.ru/admin/?view=items&act=item&id=${item_id}`
+                document.location.href = `/admin/?view=items&act=item&id=${item_id}`
             })
 		},
         processAjaxQuery: function(tab){

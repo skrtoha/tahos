@@ -332,8 +332,11 @@ class User{
         /** @global $db Database */
         global $db;
         static $output;
-        $userString = json_encode($user);
-        if (isset($output)) return $output[$userString];
+        $userString = json_encode([
+            'id' => $user['id'],
+            'defermentOfPayment' => $user['defermentOfPayment'],
+        ]);
+        if (isset($output[$userString])) return $output[$userString];
 
         $designation = '<i class="fa fa-rub" aria-hidden="true"></i>';
 

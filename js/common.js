@@ -244,7 +244,7 @@ function handlePressedEnterSearch(event){
 function selectItemByKey(event){
 	let $input = $(event.target);
 	let tableClass;
-	if ($input.val().length < countCharactersForSearch) tableClass = 'previous_search';
+	if ($input.val().length <= countCharactersForSearch) tableClass = 'previous_search';
 	else tableClass = 'coincidences';
 
 	let activeTable = $('.hints table.' + tableClass);
@@ -501,7 +501,7 @@ $(function() {
 		let text = $('input.search_input').val();
 		let user_id = $('input[name=user_id]').val();
 
-		if (text.length < countCharactersForSearch){
+		if (text.length <= countCharactersForSearch){
 			if ($('.hints .previous_search').is(':empty') && user_id.length){
 				$.ajax({
 					type: "POST",
@@ -538,7 +538,7 @@ $(function() {
             }
             let inputValue = $(this).val();
 
-            if (inputValue.length < countCharactersForSearch){
+            if (inputValue.length <= countCharactersForSearch){
                 $('.hints .previous_search').show();
                 if (!$('.hints .previous_search tr.active').size()){
                     $('.hints .previous_search tr:first-child').addClass('active');

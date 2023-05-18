@@ -103,7 +103,7 @@
 			$(document).on('click', 'a.addToBlockedIP', function(){
 				var th = $(this);
 				if (!confirm('Заблокировать это IP?')) return false;
-				connections.add_denied_address(th.text());
+				connections.add_ip(th.text(), 'denied_addresses');
 				return false;
 			})
 			$(document).on('click', '#statistics span[class^=icon-circle]', function(){

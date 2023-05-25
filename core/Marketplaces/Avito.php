@@ -56,6 +56,7 @@ class Avito extends Marketplaces{
                     cat.parent_id in (200, 197, 132, 136, 138)
             GROUP BY
                 si.item_id
+            ORDER BY b.title
         ";
     return $query;
 }

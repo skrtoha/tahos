@@ -137,9 +137,13 @@ switch($_GET['tableName']){
 		if (!$res_items->num_rows) break;
 
         $class = !$isMarketplace ? 'addStoreItem' : 'addItem';
+
+        if (isset($_GET['tab'])) $dataTab = 'data-tab="'.$_GET['tab'].'"';
+        else $dataTab = '';
+
 		foreach($res_items as $item){
 			$output .= "
-				<li>
+				<li $dataTab>
 					<a class=\"$class\" item_id=\"{$item['id']}\">
 						{$item['brend']} - {$item['article']} - {$item['title_full']}
 					</a>

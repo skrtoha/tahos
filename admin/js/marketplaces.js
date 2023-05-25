@@ -31,7 +31,11 @@ class Marketplaces{
             Marketplaces.set_intuitive_search(e, 'itemsForAdding');
         })
         $(document).on('click', 'a.addItem', e => {
-            let tab = e.target.closest('.ionTabs__item').dataset.name
+            let tab;
+            let ionTab = e.target.closest('.ionTabs__item');
+            if (ionTab) tab = ionTab.dataset.name
+            else tab = e.target.closest('li').dataset.tab
+
             switch(tab){
                 case 'avito':
                     Marketplaces.showAvitoModal(e.target.getAttribute('item_id'));
@@ -46,8 +50,12 @@ class Marketplaces{
                 data: {
                     tableName: 'itemsForAdding',
                     value: e.target.dataset.article,
-                    additionalConditions: {},
-                    show_all: 1
+                    additionalConditions: {
+                        marketplace: 1,
+                        store_id: 23
+                    },
+                    show_all: 1,
+                    tab: e.target.closest('div[data-name]').dataset.name
                 },
                 success: (response) => {
                     modal_show(`

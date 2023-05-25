@@ -160,7 +160,8 @@ use admin\functions\LeftMenu;
                     'goods_arrival',
                     'users',
                     'category',
-                    'providers'
+                    'providers',
+                    'marketplaces'
                 ];
                 if (in_array($view, $arrayIntuitiveSearch)){?>
 			{"src" : "/vendor/intuitive_search/script.js", "async" : false},

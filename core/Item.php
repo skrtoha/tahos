@@ -369,7 +369,8 @@ class Item{
 	 *         withCategories - add info about categories, after it's nessesary add "GROUP BY i.id"
 	 * @return [type]         [description]
 	 */
-	public static function getQueryItemInfo($params = []){
+	public static function getQueryItemInfo($params = []): string
+    {
 		$query = "
 			SELECT
 				i.*,
@@ -382,8 +383,8 @@ class Item{
                 DATE_FORMAT(iv.created, '%d.%m.%Y %H:%i:%s') AS created
             ";
         }
-        if (in_array('avito_desc', $params)){
-            $query .= ",ad.description AS avito_desc";
+        if (in_array('marketplace_description', $params)){
+            $query .= ",ad.description AS marketplace_description";
         }
 		if (in_array('withCategories', $params)){
 			$query .= ",GROUP_CONCAT(c.title SEPARATOR '; ') AS categories";
@@ -396,10 +397,10 @@ class Item{
 			LEFT JOIN
 				#item_barcodes ib ON ib.item_id = i.id
 		";
-        if (in_array('avito_desc', $params)){
+        if (in_array('marketplace_description', $params)){
             $query .= "
                 LEFT JOIN
-                    #item_avito_description ad ON ad.item_id = i.id 
+                    #item_marketplace_description ad ON ad.item_id = i.id 
             ";
         }
 		if (in_array('withCategories', $params)){
@@ -545,11 +546,13 @@ class Item{
             </select>
         ";
     }
-    public static function getSubCategory($parent_id, $selected = null): string
+    public static function getSubCategory($parent_id, $selected = null, $multipleCategory = false): string
     {
         $tpl = Item::getTplCategory($selected, $parent_id);
+        $name = 'category_id';
+        if (!$multipleCategory) $name .= '[]';
         return "
-            <select name='category_id[]'>
+            <select name='$name'>
                 $tpl
             </select>
             <span class='icon-cancel-circle1'></span>
@@ -569,52 +572,5 @@ class Item{
         return false;
     }
 
-    public static function getQueryGoodsAvito(){
-        $query = "
-            SELECT
-                si.item_id,
-                IF (
-                    pb.title IS NOT NULL,
-                    pb.title,
-                    b.title
-                ) AS brend,
-                i.article,
-                i.title_full,
-                ad.description,
-                si.in_stock,
-                MIN(CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100)) as price,
-                si.packaging,
-                cat.parent_id,
-                cat.title as category,
-                cat_parent.title as category_parent
-            FROM
-                #store_items si
-                    LEFT JOIN
-                #categories_items ci on ci.item_id = si.item_id
-                    LEFT JOIN
-                #item_avito_description ad ON ad.item_id = si.item_id
-                    LEFT JOIN
-                #categories cat on cat.id = ci.category_id
-                    LEFT JOIN
-                #categories cat_parent on cat_parent.id = cat.parent_id
-                    LEFT JOIN
-                #items i ON i.id = si.item_id
-                    LEFT JOIN
-                #brends b ON b.id = i.brend_id
-                    LEFT JOIN
-                #provider_brends pb ON pb.brend_id = i.brend_id AND pb.provider_id = 36
-                    LEFT JOIN
-                #provider_stores ps ON ps.id = si.store_id
-                    LEFT JOIN
-                #currencies c ON c.id=ps.currency_id
-            WHERE
-                    si.store_id IN (23) AND
-                    si.price > 0 AND
-                    ad.description is not null AND
-                    cat.parent_id in (200, 197, 132, 136, 138)
-            GROUP BY
-                si.item_id
-        ";
-        return $query;
-    }
+
 }

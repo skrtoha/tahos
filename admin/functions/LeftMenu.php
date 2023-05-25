@@ -70,7 +70,8 @@ class LeftMenu{
 		'Рассылки прайсов',
         'Настройки почты',
 		'Настройки сайта',
-		'Настройки'
+		'Настройки',
+		'Маркетплейсы'
 	];
 
 	public static $pagesViews = [
@@ -102,7 +103,8 @@ class LeftMenu{
 		'Тест API поставщиков' => ['test_api_providers'],
         'Настройки почты' => ['email_settings'],
 		'Рассылки прайсов' => ['subscribePrices'],
-		'Настройки сайта' => ['site_settings']
+		'Настройки сайта' => ['site_settings'],
+		'Маркетплейсы' => ['marketplaces']
 	];
 
 	public static $defaultPermissions = [
@@ -122,7 +124,8 @@ class LeftMenu{
 			'Тест API поставщиков' => 'test_api_providers',
 			'Рассылки прайсов' => 'subscribePrices',
             'Настройки почты' => 'email_settings',
-			'Настройки сайта' => 'site_settings'
+			'Настройки сайта' => 'site_settings',
+			'Маркетплейсы' => 'marketplaces'
 		],
 		'Финансовые операции' => 'funds',
 		'Отчеты' => [
@@ -132,8 +135,7 @@ class LeftMenu{
 			'Удаление товара' => 'reports&tab=request_delete_item',
 			'Покупаемость' => 'reports&tab=purchaseability',
 			'История поиска' => 'reports&tab=searchHistory',
-			'Остатки на основном складе' => 'reports&tab=remainsMainStore',
-            'Товары Авито' => 'reports&tab=goodsAvito'
+			'Остатки на основном складе' => 'reports&tab=remainsMainStore'
 		],
 		'Настройки' => [
 			'Настройки организации' => 'settings&act=organization',

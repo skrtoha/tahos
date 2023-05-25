@@ -1,6 +1,7 @@
 <?
 use core\Managers;
 use core\Item;
+use core\Marketplaces\Marketplaces;
 
 /** @global \core\Database $db */
 
@@ -36,19 +37,10 @@ if ($_POST['form_submit']){
 
 	$db->update('items', ['photo' => NULL], "'id' = {$_GET['id']}");
 
-    if ($_POST['avito_desc']){
-        $db->insert(
-            'item_avito_description',
-            [
-                'item_id' => $_GET['id'],
-                'description' => $_POST['avito_desc']
-            ],
-            ['duplicate' => [
-                'description' => $_POST['avito_desc']
-            ]]
-        );
+    if ($_POST['marketplace_description']){
+        Marketplaces::setItemDescription($_GET['id'], $_POST['marketplace_description']);
     }
-    else $db->delete('item_avito_description', "`item_id` = {$_GET['id']}");
+    else $db->delete('item_marketplace_description', "`item_id` = {$_GET['id']}");
 
 	$db->delete('items_values', "`item_id` = {$_GET['id']}");
 	
@@ -68,7 +60,7 @@ if ($_POST['form_submit']){
 		if ($key == 'translate') continue;
 		if ($key == 'photos') continue;
 		if ($key == 'category_id') continue;
-		if ($key == 'avito_desc') continue;
+		if ($key == 'marketplace_description') continue;
 		$array[$key] = $value;
 	}
 	if ($array['article_cat'] && !$array['article']) $array['article'] = core\Item::articleClear($array['article_cat']);
@@ -214,7 +206,7 @@ function item($act){
 			break;
 		case 's_change':
 			$id = $_GET['id'];
-			$item = core\Item::getByID($id, ['avito_desc']);
+			$item = core\Item::getByID($id, ['marketplace_description']);
 			$page_title = 'Редактирование товара';
 			$translates = array();
 			if (empty($_POST['translate'])){
@@ -357,11 +349,11 @@ function item($act){
                 <div class="field">
                     <div class="title">Маркетплейсы</div>
                     <div class="value">
-                        <?$avito_desc = $_POST['avito_desc'] ?: $item['avito_desc'];
-                        $active = $avito_desc ? 'active' : ''?>
+                        <?$marketplace_description = $_POST['marketplace_description'] ?: $item['marketplace_description'];
+                        $active = $marketplace_description ? 'active' : ''?>
                         <a href="#" class="hide <?=$active?>">Показать</a>
                         <div style="margin-top: 10px;display: none">
-                            <textarea  class="need" name="avito_desc" class="htmlarea" style=""><?=$avito_desc?></textarea>
+                            <textarea  class="need" name="marketplace_description" class="htmlarea" style=""><?=$marketplace_description?></textarea>
                         </div>
                     </div>
                 </div>

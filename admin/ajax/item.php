@@ -2,6 +2,7 @@
 
 use core\Config;
 use core\Item;
+use core\Marketplaces\Marketplaces;
 use core\Provider;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
@@ -91,6 +92,10 @@ switch($_POST['act']){
 		break;
 	case 'applyCategory':
 		$db->insert('categories_items', ['item_id' => $_POST['item_id'], 'category_id' => $_POST['category_id']]);
+
+		if (isset($_POST['marketplace_description'])){
+			Marketplaces::setItemDescription($_POST['item_id'], $_POST['marketplace_description']);
+		}
 		break;
 	case 'getStoreItem':
         $query = "
@@ -145,7 +150,9 @@ switch($_POST['act']){
 		echo json_encode($store_items);
 		break;
 	case 'getItemInfo':
-        $itemInfo = core\Item::getByID($_POST['item_id']);
+		$params = [];
+		if (isset($_POST['marketplace_description'])) $params[] = 'marketplace_description';
+        $itemInfo = core\Item::getByID($_POST['item_id'], $params);
         echo json_encode($itemInfo);
 		break;
 	case 'addItem':
@@ -201,7 +208,7 @@ switch($_POST['act']){
 		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_id']} OR `item_diff` = {$_POST['item_id']}");
 		break;
     case 'getSubCategory':
-        echo Item::getSubCategory($_POST['parent_id']);
+        echo Item::getSubCategory($_POST['parent_id'], $_POST['category_id'], true);
         break;
     case 'deleteCategory':
         $db->query("

@@ -115,32 +115,41 @@ switch($_GET['tableName']){
 				</li>";
 		}
 		break;
+	case 'itemsForAdding':
 	case 'storeItemsForAdding':
+        $query = core\Item::getQueryItemInfo();
+
         $showAll = isset($_GET['show_all']) && $_GET['show_all'];
-		$query = core\Item::getQueryItemInfo();
         if (!$showAll) $query = str_replace('SELECT', 'SELECT SQL_CALC_FOUND_ROWS', $query);
+
+        $isMarketplace = isset($_GET['additionalConditions']['marketplace']) && $_GET['additionalConditions']['marketplace'];
 		$query .= "
 			LEFT JOIN
 				#store_items si ON si.item_id = i.id AND si.store_id = {$_GET['additionalConditions']['store_id']}
 			WHERE
-				i.article LIKE '{$_GET['value']}%' AND si.store_id IS NULL
+				i.article LIKE '{$_GET['value']}%'
 		";
+        if (!$isMarketplace) $query .= " AND si.store_id IS NULL";
+        else $query .= " AND si.store_id = {$_GET['additionalConditions']['store_id']}";
 
         if (!$showAll) $query .= " LIMIT 0, {$_GET['maxCountResults']}";
 		$res_items = $db->query($query);
 		if (!$res_items->num_rows) break;
+
+        $class = !$isMarketplace ? 'addStoreItem' : 'addItem';
 		foreach($res_items as $item){
 			$output .= "
 				<li>
-					<a class=\"addStoreItem\" item_id=\"{$item['id']}\">
+					<a class=\"$class\" item_id=\"{$item['id']}\">
 						{$item['brend']} - {$item['article']} - {$item['title_full']}
 					</a>
 				</li>";
 		}
+
         if ($db->found_rows > $_GET['maxCountResults'] && !$showAll){
             $output .= "
                 <li class='show_all'>
-					<a data-article='{$_GET["value"]}' data-store-id='{$_GET["additionalConditions"]["store_id"]}' href='#'>Показать все</a>
+					<a data-article='{$_GET["value"]}' data-store-id='{$_GET['additionalConditions']['store_id']}' href='#'>Показать все</a>
 				</li>
             ";
         }

@@ -208,7 +208,8 @@ switch($_POST['act']){
 		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_id']} OR `item_diff` = {$_POST['item_id']}");
 		break;
     case 'getSubCategory':
-        echo Item::getSubCategory($_POST['parent_id'], $_POST['category_id'], true);
+		$multipleCategory = isset($_POST['marketplace_description']) ? true : false;
+        echo Item::getSubCategory($_POST['parent_id'], $_POST['category_id'], $multipleCategory);
         break;
     case 'deleteCategory':
         $db->query("

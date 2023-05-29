@@ -14,6 +14,14 @@ if (!$view) header("Location: /admin/?view=index");
 
 $db = new core\Database();
 
+$res = $db->query("SELECT * from #items where weight > 0 or amount_package > 0");
+foreach($res as $value) $db->insert('item_options', [
+    'item_id' => $value['id'],
+    'weight' => $value['weight'] ?: null,
+    'measure_id' => $value['measure_id'] ?: null,
+    'amount_package' => $value['amount_package'] > 0 ? $value['amount_package'] : null
+]);
+
 $connection = new core\Connection($db);
 $db->setProfiling($connection->connection_id);
 // $settings = $db->select('settings', '*'); $settings = $settings[0];

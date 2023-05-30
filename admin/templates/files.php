@@ -59,8 +59,8 @@ if ($_POST['items_submit']){
 				'barcode' => $value[3],
 				'title_full' => $value[4],
 				'title' => $value[4],
-				'amount_package' => $value[5] ? $value[5] : 0,
-				'weight' => $value[6] ? $value[6] : 0,
+				'amount_package' => $value[5] ?: 0,
+				'weight' => $value[6] ? $value[6] / 1000 : 0,
 				'full_desc' => $value[7],
 				'characteristics' => $value[8],
 				'applicability' => $value[9]
@@ -82,8 +82,8 @@ if ($_POST['items_submit']){
 					'barcode' => $value[3],
 					'title_full' => $value[4],
 					'title' => $value[4],
-					'amount_package' => $value[5] ? $value[5] : 0,
-					'weight' => $value[6] ? $value[6] : 0,
+					'amount_package' => $value[5] ?: 0,
+					'weight' => $value[6] ? $value[6] / 1000 : 0,
 					'full_desc' => $value[7],
 					'characteristics' => $value[8],
 					'applicability' => $value[9]

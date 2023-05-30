@@ -117,7 +117,7 @@ class Impex extends Provider{
 						'brend_id' => $brend_id,
 						'article' => $item['part_no_raw'],
 						'article_cat' => $item['part'],
-						'weight' => $item['weight'] * 1000
+						'weight' => $item['weight']
 					],
 					['deincrement_dublicate' => 1]
 				);
@@ -157,7 +157,7 @@ class Impex extends Provider{
 								'brend_id' => $brend_id,
 								'article' => $item['part_no_raw'],
 								'article_cat' => $item['part'],
-								'weight' => $item['weight'] * 1000
+								'weight' => $item['weight']
 							]
 						);
 						if ($res === true) $last_sub = $db->last_id();

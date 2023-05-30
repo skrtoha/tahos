@@ -221,9 +221,9 @@ class Abcp extends Provider{
 				'brend_id' => $brend_id,
 				'article' => $item['numberFix'],
 				'article_cat' => $item['number'],
-				'title' => $item['description'] ? $item['description'] : 'Деталь',
-				'title_full' => $item['description'] ? $item['description'] : 'Деталь',
-				'weight' => $item['weight'] ? $item['weight'] * 1000 : null
+				'title' => $item['description'] ?: 'Деталь',
+				'title_full' => $item['description'] ?: 'Деталь',
+				'weight' => $item['weight'] ?: null
 			]);
 			if (!$item_id) return false;
 			if (self::getComparableString($this->item['article']) != self::getComparableString($item['numberFix'])){
@@ -259,12 +259,9 @@ class Abcp extends Provider{
 	public function insertItem($provider_id, $array, & $insertedItems = NULL){
 		$param = self::getParam($provider_id);
 		$array['source'] = $param['title'];
-		$res = $this->db->insert('items', $array, ['print_query' => false]);
-		$last_query = $this->db->last_query;
-		$last_res = $res;
+		$res = Item::insert($array);
 		if ($res === true){
 			$last_id = $this->db->last_id();
-			$res2 = $this->db->insert('item_articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
 			if ($insertedItems !== NULL){
 				$this->db->insert('rendered_voshod', ['item_id' => $last_id], ['print_query' => false]);
 				$insertedItems++;

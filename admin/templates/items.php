@@ -53,6 +53,7 @@ if ($_POST['form_submit']){
 		}
 		unset($_POST['fv']);
 	}
+
 	foreach($_POST as $key => $value){
 		if ($key == 'form_submit') continue;
 		if ($key == 'is_stay') continue;
@@ -406,28 +407,6 @@ function item($act){
 							<input type="button" accept="image/*" value="Загрузить фото" id="buttonLoadPhoto">
 						</div>
 					</div>
-				</div>
-				<div class="field">
-					<div class="title">Вес, гр.</div>
-					<div class="value"><input type=text name="weight" value="<?=$_POST['weight'] ? $_POST['weight'] : $item['weight']?>"></div>
-				</div>
-				<div class="field">
-					<div class="title">Тип упаковки</div>
-					<div class="value">
-						<?$measures = $db->select('measures', '*');?>
-						<select name="measure_id">
-							<option value="0">ничего не выбрано</option>
-							<?foreach($measures as $measure){
-								if ($_POST['form_submit']) $selected = $_POST['measure_id'] == $measure['id'] ? 'selected' : '';
-								else $selected = $item['measure_id'] == $measure['id'] ? 'selected' : ''?>
-								<option <?=$selected?> value="<?=$measure['id']?>"><?=$measure['title']?></option>
-							<?}?>
-						</select>
-					</div>
-				</div>
-				<div class="field">
-					<div class="title">Количество в упаковке</div>
-					<div class="value"><input type=text name="amount_package" value="<?=$_POST['amount_package'] ?: $item['amount_package']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Метаданные</div>

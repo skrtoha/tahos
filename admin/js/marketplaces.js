@@ -36,10 +36,15 @@ class Marketplaces{
             if (ionTab) tab = ionTab.dataset.name
             else tab = e.target.closest('li').dataset.tab
 
+            const item_id = e.target.getAttribute('item_id');
             switch(tab){
                 case 'avito':
-                    Marketplaces.showAvitoModal(e.target.getAttribute('item_id'));
+                    Marketplaces.showAvitoModal(item_id);
                     break;
+                case 'ozon':
+                    Marketplaces.showOzonModal(item_id)
+                    break;
+
             }
         })
         $(document).on('click', 'li.show_all a', (e) => {
@@ -119,6 +124,39 @@ class Marketplaces{
                 showGif(false)
             })
         })
+        $(document).on('change', '#modal_ozon select[name="category_id"]', e => {
+            let formData = new FormData();
+            formData.set('act', 'ozon_get_type')
+            formData.set('category_id', e.target.value)
+            showGif();
+            fetch(Marketplaces.marketplaceUrl, {
+                method: 'post',
+                body: formData
+            }).then(response => response.json()).then(response => {
+                let htmlString = '';
+                for(let v of response){
+                    htmlString += `
+                        <label class="type_good">
+                            <input name="type[]" type="checkbox" value="${v.id}">
+                            ${v.value}
+                        </label>
+                    `
+                }
+                document.querySelector('#modal_ozon td.type_good').innerHTML = htmlString
+                showGif(false)
+            })
+        })
+        $(document).on('submit', '#modal_ozon', e => {
+            e.preventDefault()
+            let formData = new FormData(e.target)
+            formData.set('act', 'ozon_product_import')
+            fetch(Marketplaces.marketplaceUrl, {
+                method: 'post',
+                body: formData
+            }).then(response => response.json()).then(response => {
+
+            })
+        })
     }
 
     static showAvitoModal(item_id, category_id = null){
@@ -168,6 +206,111 @@ class Marketplaces{
                                     <textarea required name="marketplace_description" cols="30" rows="10">
                                         ${itemInfo.marketplace_description}
                                     </textarea>
+                                </td>
+                            </tr>
+                        </table>
+                        <input type="submit" value="Сохранить">
+                    </form>                    
+                `)
+                showGif(false)
+            })
+        })
+    }
+
+    static showOzonModal(item_id, category_id = null){
+        showGif();
+
+        let formData = new FormData();
+        formData.set('act', 'getItemInfo')
+        formData.set('item_id', item_id)
+        formData.set('category_id', category_id)
+        formData.set('marketplace_description', 1)
+        formData.set('additional_options', 1)
+        formData.set('store_id', 23)
+        fetch(Marketplaces.itemAjaxUrl, {
+            method: 'post',
+            body: formData
+        }).then(response => response.json()).then(itemInfo => {
+            formData.set('act', 'getCategoryOzon')
+
+            fetch(Marketplaces.marketplaceUrl, {
+                method: 'post',
+                body: formData
+            }).then(response => response.text()).then(categoryTree => {
+                modal_show(`
+                    <form id="modal_ozon">
+                        <input type="hidden" name="offer_id" value="${item_id}">
+                        <table>
+                            <tr>
+                                <td>Бренд</td>
+                                <td><input type="text" name="brend" readonly value="${itemInfo.brend}"></td>
+                            </tr>
+                            <tr>
+                                <td>Артикул</td>
+                                <td>
+                                    <input type="hidden" name="article" value="${itemInfo.article}">
+                                    <a target="_blank" href="/admin/?view=items&act=item&id=${itemInfo.id}">${itemInfo.article}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Название</td>
+                                <td><input type="text" readonly name="name" value="${itemInfo.title_full}"></td>
+                            </tr>
+                             <tr>
+                                <td>Цена, руб</td>
+                                <td><input type="text" name="price" value="${itemInfo.price}"></td>
+                            </tr>
+                            <tr>
+                                <td>Категория</td>
+                                <td>${categoryTree}</td>
+                            </tr>
+                            <tr>
+                                <td>Тип</td>
+                                <td class="type_good"></td>
+                            </tr>
+                            <tr>
+                                <td>Размер НДС</td>
+                                <td>
+                                    <label class="type_good">
+                                        <input checked type="radio" name="vat" value="0">
+                                        0%
+                                    </label>   
+                                    <label class="type_good">
+                                        <input type="radio" name="vat" value="0.1">
+                                        10%
+                                    </label> 
+                                    <label class="type_good">
+                                        <input type="radio" name="vat" value="0.2">
+                                        20%
+                                    </label>                                  
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Размеры, мм</td>
+                                <td>
+                                    <label class="type_good">
+                                        Ширина
+                                        <input type="text" name="width" value="${itemInfo.width}">
+                                    </label>
+                                    <label class="type_good">
+                                        Высота
+                                        <input type="text" name="height" value="${itemInfo.height}">
+                                    </label>
+                                    <label class="type_good">
+                                        Глубина
+                                        <input type="text" name="depth" value="${itemInfo.depth}">
+                                    </label>
+                                </td>                            
+                            </tr>
+                            <tr>
+                                <td>Вес, г</td>                            
+                                <td><input type="text" name="weight" value="${itemInfo.weight * 1000}"></td>                            
+                            </tr>
+                            <tr>
+                                <td>Описание</td>
+                                <td>
+                                    <input type="hidden" name="marketplace_description" value="${itemInfo.marketplace_description}">
+                                    ${itemInfo.marketplace_description}
                                 </td>
                             </tr>
                         </table>

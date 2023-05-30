@@ -207,7 +207,7 @@ function item($act){
 			break;
 		case 's_change':
 			$id = $_GET['id'];
-			$item = core\Item::getByID($id, ['marketplace_description']);
+			$item = core\Item::getByID($id, ['marketplace_description', 'additional_options']);
 			$page_title = 'Редактирование товара';
 			$translates = array();
 			if (empty($_POST['translate'])){
@@ -336,6 +336,50 @@ function item($act){
 						</script>
 					</div>
 				</div>
+                <div class="field">
+                    <div class="title">Дополнительно</div>
+                    <div class="value">
+                        <a href="#" class="hide">Показать</a>
+                        <div style="margin-top: 10px;display: none">
+                            <table>
+                                <tr>
+                                    <td>Глубина, мм</td>
+                                    <td><input type="text" name="depth" value="<?= $_POST['depth'] ?? $item['depth'] ?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>Ширина, мм</td>
+                                    <td><input type="text" name="width" value="<?= $_POST['width'] ?? $item['width'] ?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>Высота, мм</td>
+                                    <td><input type="text" name="height" value="<?= $_POST['height'] ?? $item['height'] ?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>Вес, кг</td>
+                                    <td><input type="text" name="weight" value="<?= $_POST['weight'] ?? $item['weight'] ?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>Единица измерения</td>
+                                    <td>
+                                        <?$measures = $db->select('measures', '*');?>
+                                        <select name="measure_id">
+                                            <option value="0">ничего не выбрано</option>
+                                            <?foreach($measures as $measure){
+                                                if ($_POST['form_submit']) $selected = $_POST['measure_id'] == $measure['id'] ? 'selected' : '';
+                                                else $selected = $item['measure_id'] == $measure['id'] ? 'selected' : ''?>
+                                                <option <?=$selected?> value="<?=$measure['id']?>"><?=$measure['title']?></option>
+                                            <?}?>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Количество в упаковке</td>
+                                    <td><input type="text" name="amount_package" value="<?= $_POST['amount_package'] ?? $item['amount_package'] ?>"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 				<div class="field">
 					<div class="title">Описание</div>
 					<div class="value">

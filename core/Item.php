@@ -1,6 +1,7 @@
 <?php
 namespace core;
 class Item{
+    private static $fieldsAdditionalOptions = [];
 
 	public static $lastInsertedItemID = false;
 
@@ -15,6 +16,7 @@ class Item{
 	 * @return boolean true if updated sucessfully
 	 */
 	public static function update($fields, $where){
+        self::$fieldsAdditionalOptions = [];
 		if (!$where) return false;
 		if (strpos($_SERVER['REQUEST_URI'], '/admin/?view=items') === false){
 			$where['is_blocked'] = 0;
@@ -22,12 +24,15 @@ class Item{
 		return self::processUpdate($fields, $where);
 	}
 	public static function insert($fields){
+        self::$fieldsAdditionalOptions = [];
 		$db = self::getInstanceDataBase();
 		$barcode = $fields['barcode'] ?: false;
 		unset($fields['barcode']);
-		$resItems = $db->insert('items', $fields/*, ['print' => true]*/);
+        self::setAdditionalOptions($fields);
+		$resItems = $db->insert('items', $fields);
 		if ($resItems !== true) return $resItems;
 		$last_id = $db->last_id();
+        self::setAdditionalOptions($fields, $last_id);
 		$db->insert('item_articles', ['item_id' => $last_id, 'item_diff' => $last_id]);
 		if ($barcode){
 			$resBarcode = $db->insert('item_barcodes', [
@@ -42,6 +47,32 @@ class Item{
 		self::$lastInsertedItemID = $last_id;
 		return true;
 	}
+
+    private static function getColumnItemOptions(){
+        static $output;
+        if ($output) return $output;
+        $result = self::getInstanceDataBase()->query("SHOW COLUMNS FROM #item_options");
+        $output = $result;
+        return $output;
+    }
+
+    private static function setAdditionalOptions(& $fields, $item_id = null){
+        if (empty(self::$fieldsAdditionalOptions)){
+            $res_columns = self::getColumnItemOptions();
+            foreach($res_columns as $column){
+                if (!array_key_exists($column['Field'], $fields)) continue;
+                self::$fieldsAdditionalOptions[$column['Field']] = $fields[$column['Field']];
+                unset($fields[$column['Field']]);
+            }
+        }
+
+        if (empty(self::$fieldsAdditionalOptions) || is_null($item_id)) return;
+        self::getInstanceDataBase()->insert(
+            'item_options',
+            array_merge(['item_id' => $item_id], self::$fieldsAdditionalOptions),
+            ['duplicate' => self::$fieldsAdditionalOptions]
+        );
+    }
 	public static function getByBrendIDAndArticle($brend_id, $article){
 		$article = self::articleClear($article);
 		$query = self::getQueryItemInfo();
@@ -90,6 +121,7 @@ class Item{
 		", '');
 	}
 	private static function processUpdate($fields, $where){
+        self::$fieldsAdditionalOptions = [];
 		$conditions = '';
 		foreach($where as $key => $value) $conditions .= "`{$key}` = '{$value}' AND ";
 		$conditions = substr($conditions, 0, -5);
@@ -106,6 +138,7 @@ class Item{
 				else $res = true;
 				if ($res !== true) throw new \Exception($res);
 				unset($fields['barcode']);
+                self::setAdditionalOptions($fields, $where['id']);
 			}
 			$res = $GLOBALS['db']->update('items', $fields, $conditions);
 			if ($res !== true) throw new \Exception($res);
@@ -377,6 +410,17 @@ class Item{
 				ib.barcode,
 				b.title AS brend
 			";
+        if (in_array('additional_options', $params)){
+            $query .= ",
+                io.depth,
+                io.width,
+                io.height,
+                io.weight,
+                io.measure_id,
+                m.title,
+                io.amount_package          
+            ";
+        }
         if (in_array('itemVin', $params)){
             $query .= ",
                 iv.vin,
@@ -397,6 +441,14 @@ class Item{
 			LEFT JOIN
 				#item_barcodes ib ON ib.item_id = i.id
 		";
+        if (in_array('additional_options', $params)){
+            $query .= "
+                LEFT JOIN
+                    #item_options io ON io.item_id = i.id
+                LEFT JOIN
+                    #measures m ON m.id = io.measure_id
+            ";
+        }
         if (in_array('marketplace_description', $params)){
             $query .= "
                 LEFT JOIN

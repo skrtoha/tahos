@@ -17,8 +17,7 @@ $status_classes = [
 	'Ожидает' => 'status-stoped',
 	'Завершен' => 'status-delivery',
 	'В работе' => 'status-sended'
-];
-?>
+];?>
 
 <h1><?=$title?></h1>
 <div class="clearfix"></div>

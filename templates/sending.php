@@ -40,16 +40,17 @@ if (!$_GET['id']){
 			i.title_full AS title,
 			IF(i.article_cat != '', i.article_cat, i.article) AS article,
 			@quan := (ov.arrived - ov.issued) AS quan,
-			(i.weight * @quan) AS weight,
+			(io.weight * @quan * 1000) AS weight,
 			b.title AS brend,
 			(ov.price * @quan) AS price,
 			ov.comment,
 			DATE_FORMAT(ov.updated, '%d.%m.%Y %H:%i') AS date
 		FROM
 			#orders_values ov
+		LEFT JOIN #item_options io on io.item_id = ov.item_id
 		LEFT JOIN #items i ON i.id=ov.item_id
 		LEFT JOIN #brends b ON b.id=i.brend_id
-		LEFT JOIN tahos_orders o ON o.id = ov.order_id
+		LEFT JOIN #orders o ON o.id = ov.order_id
 		WHERE
 			ov.user_id={$_SESSION['user']} AND
 			ov.status_id=3 AND o.delivery = 'Доставка' AND

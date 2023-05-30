@@ -83,11 +83,12 @@
     content: "\e9ac";
     font-size: 16px;
 }
-#modal_avito table tr td{
+#modal_avito table tr td,
+#modal_ozon table tr td{
     text-align: left;
     padding: 5px 5px 5px 0
 }
-#modal_avito table tr td:nth-child(1){
+#modal_avito table tr td:nth-child(1), #modal_ozon table tr td:nth-child(1){
     font-weight: 800;
 }
 .ionTabs__item {
@@ -120,6 +121,27 @@ ul.searchResult_list li{
 tr[data-item-id][data-category-id] td:last-child{
     text-align: center;
 }
-#modal_avito textarea{
+#modal_avito textarea,
+#modal_ozon textarea
+{
     padding: 10px;
+}
+#modal_ozon label.type_good {
+    display: inline-block;
+    border: 1px #d3ccc7 solid;
+    padding: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+#modal_ozon input[name="title"] {
+    width: 100%;
+    display: block;
+}
+#modal_ozon textarea[name=marketplace_description] {
+    width: 100%;
+}
+input[readonly]{
+    border: none;
+    padding-left: 0;
 }

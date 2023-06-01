@@ -1,8 +1,8 @@
 <?php
 /** @global \core\Database $db */
 
-use core\Item;
 use core\Marketplaces\Avito;
+use core\Marketplaces\Ozon;
 
 $page_title = "Маркетплейсы";
 $status = '<a href="">Главная</a> > Маркетплейсы';
@@ -14,9 +14,15 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
                 'items' => Avito::getCommonList(),
                 'totalCount' => $db->found_rows()
             ];
-            echo json_encode($output);
+            break;
+        case 'ozon':
+            $output = [
+                'items' => Ozon::getProductList(),
+                'totalCount' => Ozon::$countProduct
+            ];
             break;
     }
+    echo json_encode($output);
     exit();
 }?>
 <div class="ionTabs" id="tabs_1" data-name="marketplaces">
@@ -59,7 +65,6 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
                     <th>Бренд</th>
                     <th>Артикул</th>
                     <th>Наименование</th>
-                    <th>Категория</th>
                     <th></th>
                 </tr>
                 </thead>

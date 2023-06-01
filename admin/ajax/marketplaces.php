@@ -1,5 +1,6 @@
 <?php
 
+use core\Item;
 use core\Marketplaces\Ozon;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
@@ -24,7 +25,8 @@ switch($_POST['act']){
     case 'getCategoryOzon':
 //        $tree = Ozon::getTreeCategories();
         $tree = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/tmp/ozon_tree.json'), true);
-        $tpl = Ozon::getTplCategory($tree['result'][0]['children']);
+        $category_id = $_POST['category_id'] ?? null;
+        $tpl = Ozon::getTplCategory($tree['result'][0]['children'], $category_id);
         echo "<select name='category_id'>
                 <option selected value='0'>выберите...</option>
                 $tpl
@@ -32,20 +34,22 @@ switch($_POST['act']){
         break;
     case 'ozon_get_type':
         $result = Ozon::getType($_POST['category_id']);
-        echo json_encode($result['result']);
+        echo json_encode($result);
         break;
     case 'ozon_product_import':
         $items = [];
         $attributes = [];
 
-        $attributeType = [];
-        $attributeType['id'] = Ozon::ATTRIBUTE_TYPE;
-        foreach($_POST['type'] as $type){
-            $attributeType['values'][] = [
-                'dictionary_value_id' => $type
-            ];
+        if (!empty($_POST['type'])){
+            $attributeType = [];
+            $attributeType['id'] = Ozon::ATTRIBUTE_TYPE;
+            foreach($_POST['type'] as $type){
+                $attributeType['values'][] = [
+                    'dictionary_value_id' => $type
+                ];
+            }
+            $attributes[] = $attributeType;
         }
-        $attributes[] = $attributeType;
 
         $attributeBrend = [];
         $attributeBrend['id'] = Ozon::ATTRIBUTE_BREND;
@@ -84,19 +88,55 @@ switch($_POST['act']){
         $item['name'] = $_POST['name'];
         $item['offer_id'] = $_POST['offer_id'];
         $item['price'] = $_POST['price'];
+        $item['old_price'] = $_POST['old_price'];
         $item['vat'] = $_POST['vat'];
         $item['weight'] = $_POST['weight'];
-        $item['weight_unit'] = 'g';
+        $item['weight_unit'] = 'kg';
         $item['width'] = $_POST['width'];
 
-        $item['images'] = [];
+        $fields = $item;
+        Item::setAdditionalOptions($fields, $item['offer_id']);
+        unset($fields);
+
+        /*$item['images'] = [];
         $photoNames = scandir(core\Config::$imgPath . "/items/big/{$_POST['offer_id']}/");
         foreach($photoNames as $name) {
             if (!preg_match('/.+\.jpg/', $name)) continue;
             $item['images'][] = core\Config::$imgUrl . '/items/big/'.$_POST['offer_id'].'/'.$name;
-        }
+        }*/
 
         $items[] = $item;
-        $result = Ozon::getResponse('v2/product/import', ['items' => $items]);
+        $resultImport = Ozon::getResponse('v2/product/import', ['items' => $items]);
+
+        if ($resultImport['code'] == 3){
+            echo json_encode([
+                'success' => false,
+                'errors' => $resultImport['message']
+            ]);
+            break;
+        }
+
+        $task_id = $resultImport['result']['task_id'];
+
+        $checkStatus = Ozon::getResponse('v1/product/import/info', [
+            'task_id' => $task_id
+        ]);
+
+        $output = [
+            'success' => true,
+            'errors' => ''
+        ];
+        foreach($checkStatus['result']['items'] as $row){
+            if ($row['status'] == 'imported') {
+                Ozon::addProductId($row['offer_id'], $row['product_id']);
+                continue;
+            }
+            $output['success'] = false;
+            foreach($row['errors'] as $e){
+                $output['errors'] .= $e['message'];
+            }
+        }
+
+        echo json_encode($output);
         break;
 }

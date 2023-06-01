@@ -3,6 +3,7 @@
 use core\Config;
 use core\Item;
 use core\Marketplaces\Marketplaces;
+use core\Marketplaces\Ozon;
 use core\Provider;
 use core\StoreItem;
 
@@ -154,14 +155,14 @@ switch($_POST['act']){
 		$params = [];
 		if (isset($_POST['marketplace_description'])) $params[] = 'marketplace_description';
 		if (isset($_POST['additional_options'])) $params[] = 'additional_options';
-        $itemInfo = core\Item::getByID($_POST['item_id'], $params);
 
-		if (isset($_POST['store_id']) && $_POST['store_id']){
-			$query = StoreItem::getQueryStoreItem();
-			$query .= " WHERE si.store_id = {$_POST['store_id']} && i.id = {$_POST['item_id']}";
-			$result = $db->query($query)->fetch_assoc();
-			$itemInfo['price'] = $result['price'];
+		$itemInfo = core\Item::getByID($_POST['item_id'], $params);
+
+		if (isset($_POST['ozon_product_info']) && $_POST['ozon_product_info']){
+			$ozonProductInfo = Ozon::getProductInfo($_POST['item_id']);
+			$itemInfo = array_merge($itemInfo, $ozonProductInfo);
 		}
+
         echo json_encode($itemInfo);
 		break;
 	case 'addItem':

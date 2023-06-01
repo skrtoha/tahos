@@ -56,7 +56,7 @@ class Item{
         return $output;
     }
 
-    private static function setAdditionalOptions(& $fields, $item_id = null){
+    public static function setAdditionalOptions(& $fields, $item_id = null){
         if (empty(self::$fieldsAdditionalOptions)){
             $res_columns = self::getColumnItemOptions();
             foreach($res_columns as $column){

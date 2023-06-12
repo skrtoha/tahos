@@ -149,3 +149,9 @@ input[readonly]{
 div.modal{
     max-width: 1000px;
 }
+.icon-loop2:before {
+    content: "\ea2f";
+}
+.icon-loop2{
+    cursor: pointer;
+}

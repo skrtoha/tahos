@@ -20,6 +20,14 @@ switch($_POST['act']){
                     "`item_id` = {$_POST['item_id']} AND `category_id` = {$_POST['category_id']}"
                 );
                 break;
+            case 'ozon':
+                $product_id = Ozon::getProductIdByOfferId($_POST['item_id']);
+                if ($product_id){
+                    Ozon::archiveProduct($product_id);
+                    Ozon::deleteProduct($_POST['item_id']);
+                }
+                $db->delete('item_ozon', "`offer_id` = {$_POST['item_id']}");
+                break;
         }
         break;
     case 'getCategoryOzon':
@@ -98,43 +106,79 @@ switch($_POST['act']){
         Item::setAdditionalOptions($fields, $item['offer_id']);
         unset($fields);
 
-        /*$item['images'] = [];
+        $ozonItemArray = [];
+        $ozonItemArray[$item['offer_id']]['offer_id'] = $item['offer_id'];
+
+        $item['images'] = [];
         $photoNames = scandir(core\Config::$imgPath . "/items/big/{$_POST['offer_id']}/");
         foreach($photoNames as $name) {
             if (!preg_match('/.+\.jpg/', $name)) continue;
             $item['images'][] = core\Config::$imgUrl . '/items/big/'.$_POST['offer_id'].'/'.$name;
-        }*/
-
-        $items[] = $item;
-        $resultImport = Ozon::getResponse('v2/product/import', ['items' => $items]);
-
-        if ($resultImport['code'] == 3){
-            echo json_encode([
-                'success' => false,
-                'errors' => $resultImport['message']
-            ]);
-            break;
         }
 
-        $task_id = $resultImport['result']['task_id'];
+        $items[] = $item;
 
-        $checkStatus = Ozon::getResponse('v1/product/import/info', [
-            'task_id' => $task_id
-        ]);
+        $product_id = Ozon::getProductIdByOfferId($item['offer_id']);
+        if ($product_id){
+            Ozon::archiveProduct($product_id);
+            Ozon::deleteProduct($item['offer_id']);
+            $ozonItemArray[$item['offer_id']]['product_id'] = $product_id;
+        }
+
+        $resultImport = Ozon::getResponse('v2/product/import', ['items' => $items]);
+
+        Ozon::checkResult($resultImport);
+
+        $task_id = $resultImport['result']['task_id'];
+        $ozonItemArray[$item['offer_id']]['task_id'] = $task_id;
+
+        $checkStatus = Ozon::importInfo($task_id);
 
         $output = [
             'success' => true,
-            'errors' => ''
+            'errors' => '',
+            'status' => ''
         ];
         foreach($checkStatus['result']['items'] as $row){
-            if ($row['status'] == 'imported') {
-                Ozon::addProductId($row['offer_id'], $row['product_id']);
-                continue;
-            }
+            $ozonItemArray[$row['offer_id']]['status'] = $row['status'];
+            $ozonItemArray[$row['offer_id']]['product_id'] = $row['product_id'];
+            $output['status'] = $row['status'];
+            if (in_array($row['status'], [Ozon::STATUS_IMPORTED, Ozon::STATUS_PENDING])) continue;
             $output['success'] = false;
             foreach($row['errors'] as $e){
                 $output['errors'] .= $e['message'];
             }
+            $ozonItemArray[$row['offer_id']]['error_message'] = $output['errors'];
+        }
+
+        Ozon::setItemOzon($ozonItemArray);
+
+        echo json_encode($output);
+        break;
+    case 'ozonGetStatus':
+        $itemOzon = $db->select_one('item_ozon', 'task_id', "`offer_id` = {$_POST['item_id']}");
+        $resultStatus = Ozon::importInfo($itemOzon['task_id']);
+        $output = [
+            'success' => false,
+            'result' => ''
+        ];
+        foreach($resultStatus['result']['items'] as $row){
+            if ($row['offer_id'] == $_POST['item_id']){
+                $output['result'] = $row['status'];
+                $output['success'] = true;
+                break;
+            }
+        }
+
+        if (!$output['result']){
+            $output['error'] = 'Произошла ошибка!';
+        }
+        else{
+            $item = [
+                'offer_id' => $_POST['item_id'],
+                'status' => $output['result']
+            ];
+            Ozon::setItemOzon([$item]);
         }
 
         echo json_encode($output);

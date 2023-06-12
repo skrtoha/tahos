@@ -412,13 +412,13 @@ class Item{
 			";
         if (in_array('additional_options', $params)){
             $query .= ",
-                io.depth,
-                io.width,
-                io.height,
-                io.weight,
-                io.measure_id,
-                m.title,
-                io.amount_package          
+                IF(ISNULL(io.depth), 0, io.depth) AS depth,
+                IF(ISNULL(io.width), 0, io.width) AS width,
+                IF(ISNULL(io.height), 0, io.height) AS height,
+                IF(ISNULL(io.weight), 0, io.weight) AS weight,
+                IF(ISNULL(io.measure_id), 0, io.measure_id) AS measure_id,
+                IF(ISNULL(io.amount_package), 0, io.amount_package) AS amount_package,
+                m.title
             ";
         }
         if (in_array('itemVin', $params)){

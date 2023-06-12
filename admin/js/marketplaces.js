@@ -99,6 +99,7 @@ class Marketplaces{
         })
         $(document).on('click', 'tr[data-item-id]', e => {
             if(e.target.classList.contains('icon-bin')) return
+            if(e.target.classList.contains('icon-loop2')) return
             let tab = e.target.closest('div[data-name]').dataset.name
             let item_id = e.target.closest('tr').dataset.itemId
             switch(tab){
@@ -164,8 +165,41 @@ class Marketplaces{
                 }
                 show_message('Успешно добавлено!')
                 document.getElementById('modal-container').classList.remove('active')
+
+                Marketplaces.itemInfo.status = response.status
+
+                const toRemove = document.querySelector([`tr[data-item-id="${Marketplaces.itemInfo.offer_id}"]`]);
+                if (toRemove) toRemove.remove()
+
+                $(Marketplaces.getTabElement('ozon')).find('tbody').append(
+                    Marketplaces.ozonGetElementRow(Marketplaces.itemInfo)
+                )
             })
         })
+        $(document).on('click', '.icon-loop2', e => {
+            showGif();
+
+            let formData = new FormData;
+            formData.set('act', 'ozonGetStatus')
+            formData.set('item_id', e.target.closest('tr').dataset.itemId)
+            fetch(Marketplaces.marketplaceUrl, {
+                method: 'post',
+                body: formData
+            }).then(response => response.json()).then(response => {
+                showGif(false);
+                if (response.success){
+                    show_message('Успешно обновлено')
+                    e.target.closest('td').innerHTML = response.result
+                }
+                else{
+                    show_message(response.error)
+                }
+            })
+        })
+    }
+
+    static getTabElement(type){
+        return document.querySelector(`div[data-name="${type}"]`)
     }
 
     static showAvitoModal(item_id, category_id = null){
@@ -239,6 +273,7 @@ class Marketplaces{
             method: 'post',
             body: formData
         }).then(response => response.json()).then(itemInfo => {
+            Marketplaces.itemInfo = itemInfo
             formData.set('act', 'getCategoryOzon')
             if (typeof itemInfo.category_id !== 'undefined'){
                 formData.set('category_id', itemInfo.category_id)
@@ -258,10 +293,10 @@ class Marketplaces{
                 }
                 if (typeof itemInfo.vat !== 'undefined'){
                     vat.null = '';
-                    switch(itemInfo.vat){
-                        case '0.0': vat.null  = 'checked'; break
-                        case '0.1': vat.ten  = 'checked'; break
-                        case '0.2': vat.twenty  = 'checked'; break
+                    switch(parseFloat(itemInfo.vat)){
+                        case 0: vat.null  = 'checked'; break
+                        case 0.1: vat.ten  = 'checked'; break
+                        case 0.2: vat.twenty  = 'checked'; break
                     }
                 }
                 modal_show(`
@@ -410,14 +445,7 @@ class Marketplaces{
                                 break;
                             case 'ozon':
                                 $.each(response.items, (i, item) => {
-                                    $tbody.append(`
-                                            <tr data-item-id="${item.offer_id}">
-                                                <td>${item.brend}</td>
-                                                <td>${item.article}</td>
-                                                <td>${item.title_full}</td>
-                                                <td><span class="icon-bin"></span></td>
-                                            </tr>                                        
-                                        `);
+                                    $tbody.append(Marketplaces.ozonGetElementRow(item));
                                 })
                                 Marketplaces.totalSelector(obj.tab).html(response.totalCount);
                                 break
@@ -426,6 +454,21 @@ class Marketplaces{
                 });
             }
         });
+    }
+
+    static ozonGetElementRow(item){
+        return `
+            <tr data-item-id="${item.offer_id}">
+                <td>${item.brend}</td>
+                <td>${item.article}</td>
+                <td>${item.title_full}</td>
+                <td>
+                    ${item.status}
+                    <span class="icon-loop2" title="Обновить"></span>
+                </td>
+                <td><span class="icon-bin"></span></td>
+            </tr>                                        
+        `
     }
 }
 

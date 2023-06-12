@@ -344,7 +344,7 @@ class Database {
 		}
 		elseif ($res === false) return $this->error();
 		else return true;
-	}
+    }
 	function update ($table_name, $upd_fields, $where, $iconv = false){
 		$table_name = $this->db_prefix.$table_name;
 		$query = "UPDATE `$table_name` SET ";

@@ -163,6 +163,16 @@ switch($_POST['act']){
 			$itemInfo = array_merge($itemInfo, $ozonProductInfo);
 		}
 
+		if (!isset($itemInfo['offer_id'])) $itemInfo['offer_id'] = $itemInfo['id'];
+
+		if (!isset($itemInfo['price'])){
+			$query = StoreItem::getQueryStoreItem();
+			$query .= " WHERE si.item_id = {$itemInfo['id']} AND si.store_id = ".Provider\Tahos::$store_id;
+			$result = $db->query($query)->fetch_assoc();
+			$itemInfo['price'] = $result['price'];
+			$itemInfo['old_price'] = 0;
+		}
+
         echo json_encode($itemInfo);
 		break;
 	case 'addItem':

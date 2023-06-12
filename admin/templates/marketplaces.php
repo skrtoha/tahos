@@ -65,6 +65,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
                     <th>Бренд</th>
                     <th>Артикул</th>
                     <th>Наименование</th>
+                    <th>Статус</th>
                     <th></th>
                 </tr>
                 </thead>

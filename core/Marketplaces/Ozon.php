@@ -12,6 +12,9 @@ class Ozon extends Marketplaces{
     const ATTRIBUTE_DESCRIPTION = 4191;
     const ATTRIBUTE_ARTICLE = 7236;
 
+    const STATUS_IMPORTED = 'imported';
+    const STATUS_PENDING = 'pending';
+
     public static $countProduct = 0;
 
     public static function getTreeCategories($category_id = self::CATEGORY_AUTO_GOODS){
@@ -52,6 +55,7 @@ class Ozon extends Marketplaces{
 
     public static function getType($category_id, $selected = []){
         $output = [];
+        if (!$category_id) return $output;
         $types = self::getResponse('v2/category/attribute/values', [
                 "attribute_id" => self::ATTRIBUTE_TYPE,
                 "category_id" => $category_id,
@@ -82,30 +86,39 @@ class Ozon extends Marketplaces{
             self::API_URL.$method,
             json_encode($params),
             [
-                'Api-Key' => 'c7836d34-9ead-4199-a038-1803da0d897a',
+                'Api-Key' => '6b92b35b-fa41-46e7-9ca3-b22c5d6f73af',
                 'Client-Id' => '259990'
             ]
         );
         return json_decode($json, true);
     }
 
-    public static function addProductId($offer_id, $product_id){
-        return self::getDBInstance()->insert(
-            'item_ozon',
-            [
-                'offer_id' => $offer_id,
-                'product_id' => $product_id
-            ],
-            ['duplicate' => [
-                'product_id' => $product_id
-            ]]
-        );
+    public static function setItemOzon($items){
+        foreach($items as $item){
+            $duplicate = $item;
+            unset($duplicate['offer_id']);
+            self::getDBInstance()->insert(
+                'item_ozon',
+                $item,
+                ['duplicate' => $duplicate]
+            );
+        }
+    }
+
+    public static function updateAttributes($offer_id, $attributes){
+        $items = [];
+        $items[] = [
+            'attributes' => $attributes,
+            'offer_id' => $offer_id
+        ];
+        $result = self::getResponse('v1/product/attributes/update', ['items' => $items]);
+        return $result;
     }
 
     public static function getProductList(){
         $itemOzonResult = self::getDBInstance()->query("
             SELECT 
-                io.offer_id,
+                io.*,
                 i.id,
                 b.title AS brend,
                 i.brend_id,
@@ -120,6 +133,12 @@ class Ozon extends Marketplaces{
         return $itemOzonResult->fetch_all(MYSQLI_ASSOC);
     }
 
+    public static function importInfo($task_id){
+        return Ozon::getResponse('v1/product/import/info', [
+            'task_id' => $task_id
+        ]);
+    }
+
     public static function getProductInfo($offer_id){
         $productInfo = self::getResponse('v2/product/info', [
             'offer_id' => $offer_id
@@ -128,8 +147,10 @@ class Ozon extends Marketplaces{
         unset($productInfo);
 
         $productAttributes = self::getProductAttributes($offer_id);
-        foreach($productAttributes['attributes'] as $row){
-            $output['attributes'][$row['attribute_id']] = $row;
+        if (!empty($productAttributes)){
+            foreach($productAttributes['attributes'] as $row){
+                $output['attributes'][$row['attribute_id']] = $row;
+            }
         }
         unset($productAttributes);
 
@@ -141,6 +162,16 @@ class Ozon extends Marketplaces{
         return $output;
     }
 
+    public static function checkResult($result){
+        if (isset($result['code'])){
+            echo json_encode([
+                'success' => false,
+                'errors' => $result['message']
+            ]);
+            die();
+        }
+    }
+
     public static function getProductAttributes($offer_id){
         $result = self::getResponse('v3/products/info/attributes', [
             'filter' => [
@@ -150,5 +181,29 @@ class Ozon extends Marketplaces{
             'limit' => 1000
         ]);
         return $result['result'][0];
+    }
+
+    public static function getProductIdByOfferId($offer_id){
+        $result = self::getDBInstance()->select_one('item_ozon', '*', "`offer_id` = $offer_id");
+        if ($result) return $result['product_id'];
+        return false;
+    }
+
+    public static function archiveProduct($product_id){
+        if (!is_array($product_id)) $product_id = [$product_id];
+        return Ozon::getResponse(
+            'v1/product/archive',
+            ['product_id' => $product_id]
+        );
+    }
+
+    public static function deleteProduct($offer_id){
+        return Ozon::getResponse('v2/products/delete', [
+            'products' => [
+                [
+                    'offer_id' => $offer_id
+                ]
+            ]
+        ]);
     }
 }

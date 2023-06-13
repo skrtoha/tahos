@@ -418,7 +418,7 @@ class Item{
                 IF(ISNULL(io.weight), 0, io.weight) AS weight,
                 IF(ISNULL(io.measure_id), 0, io.measure_id) AS measure_id,
                 IF(ISNULL(io.amount_package), 0, io.amount_package) AS amount_package,
-                m.title
+                m.title AS measure_title
             ";
         }
         if (in_array('itemVin', $params)){

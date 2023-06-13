@@ -292,24 +292,24 @@ function item($act){
 				</div>
 				<div class="field">
 					<div class="title">Артикул</div>
-					<div class="value"><input type=text name="article" value="<?=$_POST['article'] ? $_POST['article'] : $item['article']?>"></div>
+					<div class="value"><input type=text name="article" value="<?=$_POST['article'] ?: $item['article']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Артикул по каталогу</div>
-					<div class="value"><input type=text name="article_cat" value="<?=$_POST['article_cat'] ? $_POST['article_cat'] : $item['article_cat']?>"></div>
+					<div class="value"><input type=text name="article_cat" value="<?=$_POST['article_cat'] ?: $item['article_cat']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Штрих-код<br>
 					<span style="margin-top: 5px;display: block;font-size: 12px;color:grey">(13 цифр)</span></div>
-					<div class="value"><input type="text" pattern="[0-9]{9,13}" name="barcode" value="<?=$_POST['barcode'] ? $_POST['barcode'] : $item['barcode']?>"></div>
+					<div class="value"><input type="text" pattern="[0-9]{9,13}" name="barcode" value="<?=$_POST['barcode'] ?: $item['barcode']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Название</div>
-					<div class="value"><input type=text name="title_full" value="<?=htmlspecialchars($_POST['title_full'] ? $_POST['title_full'] : $item['title_full'])?>"></div>
+					<div class="value"><input type=text name="title_full" value="<?=htmlspecialchars($_POST['title_full'] ?: $item['title_full'])?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Короткое название</div>
-					<div class="value"><input type=text name="title" value="<?=$_POST['title'] ? $_POST['title'] : $item['title']?>"></div>
+					<div class="value"><input type=text name="title" value="<?=$_POST['title'] ?: $item['title']?>"></div>
 				</div>
 				<div class="field">
 					<div class="title">Перевод</div>

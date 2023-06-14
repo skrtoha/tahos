@@ -302,6 +302,7 @@ class Marketplaces{
                 modal_show(`
                     <form id="modal_ozon">
                         <input type="hidden" name="offer_id" value="${item_id}">
+                        <input type="hidden" name="barcode" value="${itemInfo.barcode ? itemInfo.barcode : ''}">
                         <textarea style="visibility: hidden; height: 0" type="hidden" name="marketplace_description">
                             ${itemInfo.marketplace_description}
                         </textarea>
@@ -327,7 +328,7 @@ class Marketplaces{
                             </tr>
                             <tr>
                                 <td>Цена, руб</td>
-                                <td><input type="text" name="price" value="${Math.floor(itemInfo.price)}"></td>
+                                <td><input type="text" name="price" value="${Math.floor(+itemInfo.price + itemInfo.price * 0.0)}"></td>
                             </tr>
                             <tr>
                                 <td>Категория</td>
@@ -372,7 +373,7 @@ class Marketplaces{
                                 </td>                            
                             </tr>
                             <tr>
-                                <td>Вес, кг</td>                            
+                                <td>Вес, г</td>                            
                                 <td><input type="text" name="weight" value="${itemInfo.weight}"></td>                            
                             </tr>
                         </table>
@@ -380,6 +381,12 @@ class Marketplaces{
                     </form>                    
                 `)
                 showGif(false)
+                $('select[name="category_id"]').chosen({
+                    disable_search_threshold: 5,
+                    no_results_text: "не найден",
+                    allow_single_deselect: true,
+                    width: "100%"
+                });
             })
         })
     }

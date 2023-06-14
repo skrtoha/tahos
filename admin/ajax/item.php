@@ -173,6 +173,7 @@ switch($_POST['act']){
 			$itemInfo['old_price'] = 0;
 		}
 
+        $itemInfo['weight'] = $itemInfo['weight'] * 1000;
         echo json_encode($itemInfo);
 		break;
 	case 'addItem':

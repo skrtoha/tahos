@@ -2,6 +2,7 @@
 
 use core\Item;
 use core\Marketplaces\Ozon;
+use core\Setting;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
@@ -110,6 +111,8 @@ switch($_POST['act']){
         Item::setAdditionalOptions($fields, $item['offer_id']);
         unset($fields);
 
+        Setting::update('marketplaces', 'markup', $_POST['ozon_markup']);
+
         $ozonItemArray = [];
         $ozonItemArray[$item['offer_id']]['offer_id'] = $item['offer_id'];
 
@@ -159,32 +162,43 @@ switch($_POST['act']){
 
         echo json_encode($output);
         break;
-    case 'ozonGetStatus':
-        $itemOzon = $db->select_one('item_ozon', 'task_id', "`offer_id` = {$_POST['item_id']}");
-        $resultStatus = Ozon::importInfo($itemOzon['task_id']);
+    case 'ozonGetProductInfo':
+        $productInfo = Ozon::getProductInfo($_POST['offer_id']);
+        echo json_encode($productInfo);
+        break;
+    case 'ozonGetInStock':
+        $itemOzon = Ozon::getItemOzon(['offer_id' => $_POST['offer_id']]);
+        $fbs_sku = $itemOzon['fbs_sku'];
+        if (!$fbs_sku){
+            $productInfo = Ozon::getProductInfo($_POST['offer_id'], false);
+            Ozon::setItemOzon([
+                [
+                    'offer_id' => $_POST['offer_id'],
+                    'fbs_sku' => $productInfo['fbs_sku']
+                ]
+            ]);
+            $fbs_sku = $productInfo['fbs_sku'];
+        }
+        $result = Ozon::getInStock($fbs_sku);
+        echo json_encode([
+            'success' => true,
+            'result' => $result[0]['present']
+        ]);
+        break;
+    case 'ozonSetInStock':
         $output = [
             'success' => false,
             'result' => ''
         ];
-        foreach($resultStatus['result']['items'] as $row){
-            if ($row['offer_id'] == $_POST['item_id']){
-                $output['result'] = $row['status'];
-                $output['success'] = true;
-                break;
-            }
-        }
-
-        if (!$output['result']){
-            $output['error'] = 'Произошла ошибка!';
+        $result = Ozon::setInStock($_POST['offer_id'], $_POST['amount']);
+        if ($result[0]['updated']){
+            $output['success'] = true;
         }
         else{
-            $item = [
-                'offer_id' => $_POST['item_id'],
-                'status' => $output['result']
-            ];
-            Ozon::setItemOzon([$item]);
+            foreach($result[0]['errors'] as $row){
+                $output['result'] .= $row."<br>";
+            }
         }
-
         echo json_encode($output);
         break;
 }

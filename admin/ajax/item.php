@@ -5,6 +5,7 @@ use core\Item;
 use core\Marketplaces\Marketplaces;
 use core\Marketplaces\Ozon;
 use core\Provider;
+use core\Setting;
 use core\StoreItem;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
@@ -162,6 +163,10 @@ switch($_POST['act']){
 			$ozonProductInfo = Ozon::getProductInfo($_POST['item_id']);
 			$itemInfo = array_merge($itemInfo, $ozonProductInfo);
 		}
+
+        if (isset($_POST['ozon_markup']) && $_POST['ozon_markup']){
+            $itemInfo['ozon_markup'] = Setting::get('marketplaces', 'markup');
+        }
 
 		if (!isset($itemInfo['offer_id'])) $itemInfo['offer_id'] = $itemInfo['id'];
 

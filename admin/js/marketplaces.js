@@ -100,6 +100,8 @@ class Marketplaces{
         $(document).on('click', 'tr[data-item-id]', e => {
             if(e.target.classList.contains('icon-bin')) return
             if(e.target.classList.contains('icon-loop2')) return
+            if(e.target.classList.contains('icon-info1')) return
+            if(e.target.classList.contains('icon-upload')) return
             let tab = e.target.closest('div[data-name]').dataset.name
             let item_id = e.target.closest('tr').dataset.itemId
             switch(tab){
@@ -113,8 +115,6 @@ class Marketplaces{
                     Marketplaces.showOzonModal(item_id, 1)
                     break
             }
-
-
         })
         $(document).on('click', 'span.icon-bin', e => {
             if (!confirm('Действительно удалить?')) return
@@ -176,26 +176,148 @@ class Marketplaces{
                 )
             })
         })
-        $(document).on('click', '.icon-loop2', e => {
-            showGif();
-
-            let formData = new FormData;
-            formData.set('act', 'ozonGetStatus')
-            formData.set('item_id', e.target.closest('tr').dataset.itemId)
+        $(document).on('keyup', 'input[name="ozon_markup"]', e => {
+            let elementPrice = document.querySelector('input[name="price"]')
+            let currentPrice = + elementPrice.dataset.clearPrice;
+            let markup = + e.target.value;
+            elementPrice.value = Math.floor(currentPrice + currentPrice * (markup / 100))
+        })
+        $(document).on('click', 'span.icon-info1', e => {
+            showGif()
+            let formData = new FormData()
+            formData.set('act', 'ozonGetProductInfo')
+            formData.set('offer_id', e.target.closest('tr').dataset.itemId)
             fetch(Marketplaces.marketplaceUrl, {
                 method: 'post',
                 body: formData
             }).then(response => response.json()).then(response => {
-                showGif(false);
-                if (response.success){
-                    show_message('Успешно обновлено')
-                    e.target.closest('td').innerHTML = response.result
-                }
-                else{
-                    show_message(response.error)
-                }
+                Marketplaces.showModalOzonProductInfo(response)
             })
         })
+        $(document).on('click', 'span.icon-upload', e => {
+            showGif()
+            let formData = new FormData;
+            formData.set('act', 'ozonGetInStock')
+            formData.set('offer_id', e.target.closest('tr').dataset.itemId)
+            showGif()
+            fetch(Marketplaces.marketplaceUrl, {
+                method: 'post',
+                body: formData
+            }).then(response => response.json()).then(response => {
+                showGif(false)
+                let answer = prompt('Укажите количество:', response.result)
+                if (!answer) return;
+                showGif()
+                let formData = new FormData;
+                formData.set('act', 'ozonSetInStock')
+                formData.set('amount', answer)
+                formData.set('offer_id', e.target.closest('tr').dataset.itemId)
+                fetch(Marketplaces.marketplaceUrl, {
+                    method: 'post',
+                    body: formData
+                }).then(response => response.json()).then(response => {
+                    showGif(false)
+                    if (response.success){
+                        show_message('Успешно обновлено!')
+                    }
+                    else{
+                        show_message(response.error)
+                    }
+                })
+            })
+        })
+    }
+
+    static showModalOzonProductInfo(object){
+        modal_show(`
+            <div id="modal_ozon">
+                <table>
+                    <tr>
+                        <td>Цена</td>
+                        <td>${object.price}</td>
+                    </tr>
+                    <tr>
+                        <td>Цена до скидки</td>
+                        <td>${object.old_price}</td>
+                    </tr>
+                    <tr>
+                        <td>В наличии</td>
+                        <td>${object.stocks.present}</td>
+                    </tr>
+                    <tr>
+                        <td>Ошибки</td>
+                        <td>${Marketplaces.getStringByArray(object.errors)}</td>
+                    </tr>
+                    <tr>
+                        <td>Статус</td>
+                        <td>
+                            <table>
+                                <tr>
+                                    <td>Состояние товара</td>
+                                    <td>${object.status.state}</td>
+                                </tr>
+                                <tr>
+                                    <td>Состояние товара, на переходе <br>в которое произошла ошибка.</td>
+                                    <td>${object.status.state_failed}</td>
+                                </tr>
+                                <tr>
+                                    <td>Статус модерации</td>
+                                    <td>${object.status.moderate_status}</td>
+                                </tr>
+                                <tr>
+                                    <td>Причины отклонения товара</td>
+                                    <td>${Marketplaces.getStringByArray(object.status.decline_reasons)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Статус валидации</td>
+                                    <td>${object.status.validation_state}</td>
+                                </tr>
+                                <tr>
+                                    <td>Название состояния товара</td>
+                                    <td>${object.status.state_name}</td>
+                                </tr>
+                                <tr>
+                                    <td>Описание состояния товара</td>
+                                    <td>${object.status.state_description}</td>
+                                </tr>
+                                <tr>
+                                    <td>Признак, что при создании<br> товара возникли ошибки</td>
+                                    <td>${object.status.is_failed}</td>
+                                </tr>
+                                <tr>
+                                    <td>Признак, что товар создан</td>
+                                    <td>${object.status.is_created}</td>
+                                </tr>
+                                <tr>
+                                    <td>Подсказки для текущего состояния товара</td>
+                                    <td>${object.status.state_tooltip}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ошибки при загрузке товаров</td>
+                                    <td>${Marketplaces.getStringByArray(object.status.item_errors, 'description')}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Выставлен на продажу</td>
+                        <td>${object.visible}</td>
+                    </tr>
+                </table>
+            </div>
+        `)
+        showGif(false)
+    }
+
+    static getStringByArray(array, field = null){
+        let output = '';
+        array.forEach((item, i) => {
+            let val
+            if (field) val = item[field]
+            else val = item
+            output += `<span class="string">${val}</span>`
+        })
+        return output
     }
 
     static getTabElement(type){
@@ -269,6 +391,7 @@ class Marketplaces{
         formData.set('marketplace_description', 1)
         formData.set('additional_options', 1)
         formData.set('ozon_product_info', ozonProductInfo)
+        formData.set('ozon_markup', 1)
         fetch(Marketplaces.itemAjaxUrl, {
             method: 'post',
             body: formData
@@ -327,8 +450,12 @@ class Marketplaces{
                                 <td><input type="text" name="old_price" value="${Math.floor(itemInfo.old_price)}"></td>
                             </tr>
                             <tr>
+                                <td>Наценка, %</td>
+                                <td><input type="text" name="ozon_markup" value="${itemInfo.ozon_markup}"></td>
+                            </tr>
+                            <tr>
                                 <td>Цена, руб</td>
-                                <td><input type="text" name="price" value="${Math.floor(+itemInfo.price + itemInfo.price * 0.0)}"></td>
+                                <td><input type="text" name="price" data-clear-price="${itemInfo.price}" value="${Math.floor(+itemInfo.price + itemInfo.price * (itemInfo.ozon_markup / 100))}"></td>
                             </tr>
                             <tr>
                                 <td>Категория</td>
@@ -470,10 +597,10 @@ class Marketplaces{
                 <td>${item.article}</td>
                 <td>${item.title_full}</td>
                 <td>
-                    ${item.status}
-                    <span class="icon-loop2" title="Обновить"></span>
+                    <span title="Удалить" class="icon-bin"></span>
+                    <span title="Получение информации" class="icon-info1"></span>
+                    <span title="Загрузить остатки" class="icon-upload"></span>
                 </td>
-                <td><span class="icon-bin"></span></td>
             </tr>                                        
         `
     }

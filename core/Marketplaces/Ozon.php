@@ -105,6 +105,34 @@ class Ozon extends Marketplaces{
         }
     }
 
+    public static function getInStock($fbs_sku){
+        $result = self::getResponse('v1/product/info/stocks-by-warehouse/fbs', [
+            'fbs_sku' => [$fbs_sku]
+        ]);
+        return $result['result'];
+    }
+
+    public static function setInStock($offer_id, $amount){
+        $result = self::getResponse('v1/product/import/stocks', [
+            'stocks' => [
+                [
+                    'offer_id' => $_POST['offer_id'],
+                    'stock' => $_POST['amount']
+                ]
+            ]
+        ]);
+        return $result['result'];
+    }
+
+    public static function getItemOzon($params){
+        $where = "";
+        foreach($params as $field => $value){
+            $where .= "`$field` = {$value} AND ";
+        }
+        $where = str_replace($where, 0, -5);
+        return parent::getDBInstance()->select_one('item_ozon', '*', $where);
+    }
+
     public static function updateAttributes($offer_id, $attributes){
         $items = [];
         $items[] = [
@@ -139,25 +167,34 @@ class Ozon extends Marketplaces{
         ]);
     }
 
-    public static function getProductInfo($offer_id){
+    public static function getProductInfo($offer_id, $withAttributes = true){
         $productInfo = self::getResponse('v2/product/info', [
             'offer_id' => $offer_id
         ]);
         $output = $productInfo['result'];
         unset($productInfo);
 
-        $productAttributes = self::getProductAttributes($offer_id);
-        if (!empty($productAttributes)){
-            foreach($productAttributes['attributes'] as $row){
-                $output['attributes'][$row['attribute_id']] = $row;
-            }
-        }
-        unset($productAttributes);
+        Ozon::setItemOzon([
+            [
+                'offer_id' => $offer_id,
+                'fbs_sku' => $output['fbs_sku']
+            ]
+        ]);
 
-        $output['types'] = Ozon::getType(
-            $output['category_id'],
-            $output['attributes'][self::ATTRIBUTE_TYPE]['values']
-        );
+        if($withAttributes){
+            $productAttributes = self::getProductAttributes($offer_id);
+            if (!empty($productAttributes)){
+                foreach($productAttributes['attributes'] as $row){
+                    $output['attributes'][$row['attribute_id']] = $row;
+                }
+            }
+            unset($productAttributes);
+
+            $output['types'] = Ozon::getType(
+                $output['category_id'],
+                $output['attributes'][self::ATTRIBUTE_TYPE]['values']
+            );
+        }
 
         return $output;
     }

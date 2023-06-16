@@ -33,8 +33,8 @@ switch($_POST['act']){
         break;
     case 'getCategoryOzon':
         //todo изменить при релизе
-//        $tree = Ozon::getTreeCategories();
-        $tree = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/tmp/ozon_tree.json'), true);
+        $tree = Ozon::getTreeCategories();
+//        $tree = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/tmp/ozon_tree.json'), true);
 
         $category_id = $_POST['category_id'] ?? null;
         $tpl = Ozon::getTplCategory($tree['result'][0]['children'], $category_id);

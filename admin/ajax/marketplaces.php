@@ -129,7 +129,6 @@ switch($_POST['act']){
         if ($product_id){
             Ozon::archiveProduct($product_id);
             Ozon::deleteProduct($item['offer_id']);
-            $ozonItemArray[$item['offer_id']]['product_id'] = $product_id;
         }
 
         $resultImport = Ozon::getResponse('v2/product/import', ['items' => $items]);
@@ -147,15 +146,12 @@ switch($_POST['act']){
             'status' => ''
         ];
         foreach($checkStatus['result']['items'] as $row){
-            $ozonItemArray[$row['offer_id']]['status'] = $row['status'];
-            $ozonItemArray[$row['offer_id']]['product_id'] = $row['product_id'];
             $output['status'] = $row['status'];
             if (in_array($row['status'], [Ozon::STATUS_IMPORTED, Ozon::STATUS_PENDING])) continue;
             $output['success'] = false;
             foreach($row['errors'] as $e){
                 $output['errors'] .= $e['message'];
             }
-            $ozonItemArray[$row['offer_id']]['error_message'] = $output['errors'];
         }
 
         Ozon::setItemOzon($ozonItemArray);

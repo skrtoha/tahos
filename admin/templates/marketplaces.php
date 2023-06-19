@@ -25,6 +25,9 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
     echo json_encode($output);
     exit();
 }?>
+<form class="search" action="">
+    <input placeholder="Поиск" type="text" name="search">
+</form>
 <div class="ionTabs" id="tabs_1" data-name="marketplaces">
 	<ul class="ionTabs__head">
 		<li class="ionTabs__tab" data-target="avito">Авито</li>

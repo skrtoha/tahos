@@ -226,7 +226,24 @@ class Marketplaces{
                 })
             })
         })
+        $(document).on('keyup', 'input[name="search"]', e => {
+            let currentTab = document.querySelector('li.ionTabs__tab_state_active')
+            let tabName = currentTab.dataset.target
+            let search = e.target.value.toLowerCase()
+            let hide
+            document.querySelectorAll(`div[data-name="${tabName}"] tbody tr`).forEach((nodeTr, counter) => {
+                hide = true
+                nodeTr.querySelectorAll('td').forEach((tdNode, i) => {
+                    let currentValue = tdNode.innerText.toLowerCase()
+                    if (currentValue.indexOf(search) !== -1) hide = false
+                })
+                if (hide) nodeTr.style.display = 'none'
+                else nodeTr.style.display = 'table-row'
+            })
+        })
     }
+
+
 
     static showModalOzonProductInfo(object){
         modal_show(`
@@ -237,7 +254,7 @@ class Marketplaces{
                         <td>${object.price}</td>
                     </tr>
                     <tr>
-                        <td>Цена до скидки</td>
+                        <td>Цена <br>до скидки</td>
                         <td>${object.old_price}</td>
                     </tr>
                     <tr>
@@ -289,7 +306,7 @@ class Marketplaces{
                                     <td>${object.status.is_created}</td>
                                 </tr>
                                 <tr>
-                                    <td>Подсказки для текущего состояния товара</td>
+                                    <td>Подсказки для<br> текущего состояния товара</td>
                                     <td>${object.status.state_tooltip}</td>
                                 </tr>
                                 <tr>
@@ -300,7 +317,7 @@ class Marketplaces{
                         </td>
                     </tr>
                     <tr>
-                        <td>Выставлен на продажу</td>
+                        <td>Выставлен<br> на продажу</td>
                         <td>${object.visible}</td>
                     </tr>
                 </table>

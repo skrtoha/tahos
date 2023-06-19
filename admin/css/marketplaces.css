@@ -171,3 +171,6 @@ span.string{
 td > table td{
     font-weight: normal !important;
 }
+form.search{
+    margin-bottom: 10px;
+}

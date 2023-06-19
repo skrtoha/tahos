@@ -2,11 +2,12 @@
 /* @var $db \core\Database */
 
 use core\Config;
+use core\Provider;
 
 $act = $_GET['act'];
 switch ($act) {
     case 'clearAllPrices':
-        \core\Provider::clearStoresItems();
+        Provider::clearStoresItems();
         break;
 	case 'delete':
 		if ($db->delete('providers', "`id`=".$_GET['id'])){
@@ -204,6 +205,7 @@ function show_form($act){
 <?}
 function items(){
 	global $status, $db, $page_title;
+    $isSelf = isset($_GET['self']) && $_GET['self'];
 	$id = $_GET['id'];
 	require_once('templates/pagination.php');
 	$title_store = $db->getFieldOnID('provider_stores', $id, 'cipher');
@@ -224,6 +226,12 @@ function items(){
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}
 	$where = "si.store_id = $id AND ";
+
+    if ($isSelf){
+        $selfStores = $db->query('provider_stores', ['id', 'title'], "`self` = 1");
+        $id = $selfStores[0]['id'];
+    }
+
 	if (isset($_GET['article'])){
         switch($_GET['type_search']){
             case 'article':
@@ -341,6 +349,13 @@ function items(){
         <input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
         <?if($_GET['id'] == Config::MAIN_STORE_ID){?>
             <a href="/admin/?view=prices&act=updatePrices">Обновить цены</a>
+        <?}?>
+        <?if ($isSelf){?>
+            <select name="self_id">
+                <?foreach($selfStores as $row){?>
+                    <option value="<?=$row['id']?>"><?=$row['title']?></option>
+                <?}?>
+            </select>
         <?}?>
 	</div>
 	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>">

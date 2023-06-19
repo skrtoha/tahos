@@ -78,6 +78,7 @@ class Marketplaces{
             e.preventDefault()
             let formData = new FormData(e.target)
             formData.set('act', 'applyCategory')
+            formData.set('isAvito', '1')
             fetch(Marketplaces.itemAjaxUrl, {
                 method: 'post',
                 body: formData

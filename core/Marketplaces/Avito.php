@@ -9,6 +9,21 @@ class Avito extends Marketplaces{
         return self::getDBInstance()->query($query)->fetch_all(MYSQLI_ASSOC);
     }
 
+    public static function isCategoryAvito($category_id){
+        $categoryInfo = self::getDBInstance()->select_one(
+            'categories',
+            ['id', 'parent_id'],
+            "`id` = {$_POST['category_id']}"
+        );
+        return in_array($categoryInfo['parent_id'], self::getParentCategories());
+    }
+
+    public static function getParentCategories($asString = false){
+        $array = [200, 197, 132, 136, 138];
+        if ($asString) return implode(',', $array);
+        return $array;
+    }
+
     private static function getQueryCommonList(): string
     {
     $query = "
@@ -53,7 +68,7 @@ class Avito extends Marketplaces{
                     si.store_id IN (23) AND
                     si.price > 0 AND
                     ad.description is not null AND
-                    cat.parent_id in (200, 197, 132, 136, 138)
+                    cat.parent_id in (".self::getParentCategories(true).")
             GROUP BY
                 si.item_id
             ORDER BY b.title

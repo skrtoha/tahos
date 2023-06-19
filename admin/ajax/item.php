@@ -2,6 +2,7 @@
 
 use core\Config;
 use core\Item;
+use core\Marketplaces\Avito;
 use core\Marketplaces\Marketplaces;
 use core\Marketplaces\Ozon;
 use core\Provider;
@@ -94,6 +95,16 @@ switch($_POST['act']){
 		]);
 		break;
 	case 'applyCategory':
+        if (isset($_POST['isAvito']) && $_POST['isAvito']){
+            $db->query("
+                DELETE ci FROM
+                   #categories_items ci
+                LEFT JOIN #categories c ON c.id = ci.category_id
+                WHERE 
+                    c.parent_id IN (".Avito::getParentCategories(true).") AND
+                    ci.item_id = {$_POST['item_id']}
+            ");
+        }
 		$db->insert('categories_items', ['item_id' => $_POST['item_id'], 'category_id' => $_POST['category_id']]);
 
 		if (isset($_POST['marketplace_description'])){

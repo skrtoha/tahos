@@ -225,12 +225,12 @@ function items(){
 		}
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}
-	$where = "si.store_id = $id AND ";
-
     if ($isSelf){
-        $selfStores = $db->query('provider_stores', ['id', 'title'], "`self` = 1");
+        $selfStores = $db->select('provider_stores', ['id', 'title'], "`self` = 1");
         $id = $selfStores[0]['id'];
     }
+
+	$where = "si.store_id = $id AND ";
 
 	if (isset($_GET['article'])){
         switch($_GET['type_search']){
@@ -320,6 +320,15 @@ function items(){
         <?}?>
     </div>
 	<div class="actions" style="">
+        <?if ($isSelf){?>
+            <div class="self">
+                <select name="self_id">
+                    <?foreach($selfStores as $row){?>
+                        <option value="<?=$row['id']?>"><?=$row['title']?></option>
+                    <?}?>
+                </select>
+            </div>
+        <?}?>
         <form>
             <input type="hidden" name="view" value="prices">
             <input type="hidden" name="act" value="items">
@@ -349,13 +358,6 @@ function items(){
         <input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
         <?if($_GET['id'] == Config::MAIN_STORE_ID){?>
             <a href="/admin/?view=prices&act=updatePrices">Обновить цены</a>
-        <?}?>
-        <?if ($isSelf){?>
-            <select name="self_id">
-                <?foreach($selfStores as $row){?>
-                    <option value="<?=$row['id']?>"><?=$row['title']?></option>
-                <?}?>
-            </select>
         <?}?>
 	</div>
 	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>">

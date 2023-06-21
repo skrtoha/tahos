@@ -3,6 +3,7 @@
 use Box\Spout\Common\Exception\IOException;
 use Box\Spout\Common\Exception\UnsupportedTypeException;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use core\Marketplaces\Ozon;
 use core\Provider;
 use core\Setting;
 use Katzgrau\KLogger\Logger;
@@ -161,7 +162,6 @@ switch ($params[0]){
         Setting::update('currency', 'dateUpdate', $dateTime->format('d.m.Y H:i:s'));
         break;
     case 'updatePrices':
-        $logger->alert('Обновление цен');
         $db->delete('prices', "item_id > 0");
         $res = $db->query("
 			SELECT
@@ -183,7 +183,7 @@ switch ($params[0]){
 		", '');
         if (!$res->num_rows) return true;
         foreach($res as $item) $db->insert('prices', $item);
-        break;
+        message('Обновление прошло успешно!');
     case 'clearStores':
         $db->query("
 			DELETE si FROM #store_items si
@@ -799,6 +799,10 @@ switch ($params[0]){
             $logger->alert("Полный лог: $price->nameFileLog");
         }
         
+        break;
+    case 'updatePricesOzon':
+        $logger->alert('Цены и остатки Озон');
+        Ozon::updatePrices($logger);
         break;
 }
 $logger->alert('----------КОНЕЦ-------------');

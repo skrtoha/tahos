@@ -2,6 +2,8 @@
 namespace core\Marketplaces;
 
 use core\Provider;
+use core\Setting;
+use Katzgrau\KLogger\Logger;
 
 class Ozon extends Marketplaces{
     const API_URL = 'https://api-seller.ozon.ru/';
@@ -242,5 +244,108 @@ class Ozon extends Marketplaces{
                 ]
             ]
         ]);
+    }
+
+    public static function updatePrices(Logger $logger = null){
+        $start = 0;
+        $offset = 100;
+        $nextIterator = true;
+        $selectItem = '';
+        $items = [];
+        if ($logger){
+            $selectItem = '
+                b.title as brend,
+                i.article,
+                i.title_full, 
+            ';
+            $leftJoinItem = "
+                LEFT JOIN
+                    #items i ON i.id = oz.offer_id
+                LEFT JOIN 
+                    #brends b ON b.id = i.brend_id
+            ";
+        }
+
+        while($nextIterator){
+            $ozonMarkup = Setting::get('marketplaces', 'markup');
+            $result = self::getDBInstance()->query("
+                SELECT 
+                    $selectItem
+                    oz.offer_id,
+                    si.price * c.rate + si.price * c.rate * ps.percent / 100 AS price,
+                    si.in_stock
+                FROM
+                    #item_ozon oz
+                $leftJoinItem
+                LEFT JOIN 
+                    #store_items si ON si.item_id = oz.offer_id AND si.store_id = ".Provider\Tahos::$store_id."
+                LEFT JOIN
+				    #provider_stores ps ON ps.id = si.store_id
+			    LEFT JOIN
+				    #currencies c ON c.id = ps.currency_id
+                LIMIT $start, $offset
+            ");
+
+            if ($result->num_rows < $offset) $nextIterator = false;
+            $start += $offset;
+            $prices = [];
+            $stocks = [];
+            foreach($result as $row){
+                if ($logger){
+                    $items[$row['offer_id']] = "{$row['brend']} {$row['article']} {$row['title_full']}";
+                }
+                $stocks[] = [
+                    'offer_id' => $row['offer_id'],
+                    'stock' => $row['in_stock']
+                ];
+                $old_price = ceil($row['price'] + $row['price'] * ($ozonMarkup / 100));
+                $price = ceil($row['price']);
+                $prices[] = [
+                    'offer_id' => $row['offer_id'],
+                    'old_price' => "$old_price",
+                    'price' => "$price"
+                ];
+            }
+
+            $resStocks = Ozon::getResponse('v1/product/import/stocks', [
+                'stocks' => $stocks
+            ]);
+            $resPrices = Ozon::getResponse('v1/product/import/prices', [
+                'prices' => $prices
+            ]);
+            if ($logger){
+                self::setLoger($resStocks, $items, $logger, 'stocks');
+                self::setLoger($resPrices, $items, $logger, 'prices');
+            }
+        }
+
+    }
+
+    private static function setLoger($array, array $items, Logger $logger, string $type){
+        $updated = 0;
+        foreach($array['result'] as $value){
+            if ($value['updated']){
+                $updated++;
+                continue;
+            }
+            $error = '';
+            foreach($value['errors'] as $e) $error .= $e['message'].'; ';
+            $logger->emergency($items[$value['offer_id']].': '.$error);
+        }
+        $message = 'Обновлено ';
+        if ($type == 'prices') $message .= " $updated цен.";
+        if ($type == 'stocks') $message .= " $updated остатков.";
+        $logger->alert($message);
+    }
+
+    public static function getFbsSku($offer_id){
+        $productInfo = self::getProductInfo($offer_id, false);
+        Ozon::setItemOzon([
+            [
+                'offer_id' => $offer_id,
+                'fbs_sku' => $productInfo['fbs_sku']
+            ]
+        ]);
+        return $productInfo['fbs_sku'];
     }
 }

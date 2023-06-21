@@ -166,14 +166,7 @@ switch($_POST['act']){
         $itemOzon = Ozon::getItemOzon(['offer_id' => $_POST['offer_id']]);
         $fbs_sku = $itemOzon['fbs_sku'];
         if (!$fbs_sku){
-            $productInfo = Ozon::getProductInfo($_POST['offer_id'], false);
-            Ozon::setItemOzon([
-                [
-                    'offer_id' => $_POST['offer_id'],
-                    'fbs_sku' => $productInfo['fbs_sku']
-                ]
-            ]);
-            $fbs_sku = $productInfo['fbs_sku'];
+            $fbs_sku = Ozon::getFbsSku($_POST['offer_id']);
         }
         $result = Ozon::getInStock($fbs_sku);
         echo json_encode([

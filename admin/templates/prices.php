@@ -322,6 +322,10 @@ function items(){
         $provider_id = $item['provider_id'];
         break;
     }
+    if ($isSelf && !$provider_id){
+        $result = $db->select_one('provider_stores', ['provider_id'], "`id` = $id");
+        $provider_id = $result['provider_id'];
+    }
 
     ?>
 	<div id="total" style="margin-top: 10px;">

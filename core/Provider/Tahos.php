@@ -1,5 +1,6 @@
 <?php
 namespace core\Provider;
+use core\Database;
 use core\Provider;
 use core\Config;
 
@@ -37,6 +38,11 @@ class Tahos extends Provider{
 	public static function getItemsToOrder($provider_id): array {
 		return [];
 	}
+
+    private static function getDbInstance(): Database
+    {
+        return $GLOBALS['db'];
+    }
 	public static function isInBasket($params){}
 	public static function removeFromBasket($ov){}
 	public static function addToBasket($params){}
@@ -77,4 +83,12 @@ class Tahos extends Provider{
 		$writer->save($file);
 		return $file;
 	}
+    public static function isSelfStore($store_id){
+        $result = self::getDbInstance()->select_one('provider_stores', ['provider_id'], "`id` = {$store_id}");
+        if ($result['provider_id'] == self::$provider_id) return true;
+        return false;
+    }
+    public static function getSelfStores(){
+        return self::getDbInstance()->select('provider_stores', ['id', 'title'], "`self` = 1");
+    }
 }

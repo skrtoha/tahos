@@ -1,4 +1,7 @@
 <?
+
+use core\Provider\Tahos;
+
 ini_set('error_reporting', E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -32,6 +35,11 @@ switch($_POST['act']){
 			'is_main' => $_POST['is_main'] ? 1 : 0,
 			'block' => $_POST['block'] ? 1 : 0
 		];
+
+        if ($array['provider_id'] == Tahos::$provider_id && $array['is_main'] == 1){
+            $array['self'] = 1;
+        }
+
 		if ($_POST['store_id']) $res = $db->update(
 			'provider_stores',
 			$array,

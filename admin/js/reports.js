@@ -150,6 +150,7 @@ $(function(){
                         dateFrom: $('div[data-name=' + obj.tab + '] input[name=dateFrom]').val(),
                         dateTo: $('div[data-name=' + obj.tab + '] input[name=dateTo]').val()
                     }
+                    let $tbody = $('[data-name=' + obj.tab + '] table tbody')
 					$.ajax({
 						type: 'post',
 						url: reports.ajaxUrl,
@@ -157,7 +158,6 @@ $(function(){
 						success: function(response){
 							switch(obj.tab){
                                 case 'goodsAvito':
-                                    let $tbody = $('[data-name=' + obj.tab + '] table tbody');
                                     $.each(JSON.parse(response), (i, item) => {
                                         $tbody.append(`
                                             <tr data-item-id="${item.item_id}">
@@ -170,7 +170,7 @@ $(function(){
                                     break;
 								case 'remainsMainStore':
 									let itemRemains = JSON.parse(response);
-									$('[data-name=' + obj.tab + '] table tbody').empty();
+									$tbody.empty();
 									$.each(itemRemains, function(i, item){
 										$('[data-name=' + obj.tab + '] table tbody').append(
 											'<tr>' +

@@ -1,4 +1,7 @@
 <?php
+
+use core\Provider\Tahos;
+
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 error_reporting(E_ERROR | E_PARSE);
@@ -107,9 +110,10 @@ switch($_GET['tableName']){
 		$res_store_items = $db->query($query);
 		if (!$res_store_items->num_rows) break;
 		foreach($res_store_items as $v){
+            $dataSelf = $v['provider_id'] == Tahos::$provider_id ? 1 : 0;
 			$output .= "
 				<li>
-					<a store_id=\"{$v['store_id']}\" item_id=\"{$v['item_id']}\" class=\"showStoreItemInfo\" href=\"#\">
+					<a store_id=\"{$v['store_id']}\" item_id=\"{$v['item_id']}\" data-self=\"$dataSelf\" class=\"showStoreItemInfo\" href=\"#\">
 						{$v['brend']} - {$v['article']} - {$v['title_full']}
 					</a>
 				</li>";

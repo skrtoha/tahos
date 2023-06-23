@@ -1,5 +1,8 @@
 <?php
 /** @var $result mysqli_result */
+
+use core\Provider\Tahos;
+
 require_once ("../../core/DataBase.php");
 
 $db = new core\Database();
@@ -46,7 +49,8 @@ switch ($_POST['column']) {
 				'required_remains', 
 				[
 					'item_id' => $_POST['item_id'], 
-					'requiredRemain' => $_POST['requiredRemain']
+					'requiredRemain' => $_POST['requiredRemain'],
+                    'self_store_id' => $_POST['store_id']
 				],
 				['duplicate' => [
 					'requiredRemain' => $_POST['requiredRemain']
@@ -54,7 +58,8 @@ switch ($_POST['column']) {
 			);
 		}
 
-        if ($_POST['is_main']){
+
+        if (Tahos::isSelfStore($_POST['store_id'])){
             $db->delete(
                 'main_store_item',
                 "`item_id` = {$_POST['item_id']} AND `store_id` = {$_POST['main_store_id']}"

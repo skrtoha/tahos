@@ -17,6 +17,7 @@ class StoreItem{
 				si.in_stock,
 				ps.cipher,
 				p.title AS provider,
+				ps.provider_id,
 				b.title AS brend,
 				i.id AS item_id,
 				i.article,

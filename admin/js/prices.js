@@ -1,13 +1,14 @@
 var itemInfo = {};
 let store = {};
-function showStoreInfo(store_id, item_id){
+function showStoreInfo(store_id, item_id, self_store = 0){
 	$.ajax({
 		type: 'post',
 		url: '/admin/ajax/item.php',
 		data: {
 			act: 'getStoreItem',
 			store_id: store_id,
-			item_id: item_id
+			item_id: item_id,
+            self_store: self_store
 		},
 		beforeSend: function(){
 			showGif();
@@ -35,7 +36,7 @@ function showStoreInfo(store_id, item_id){
 
 			showGif(false);
 			modal_show(add_item_to_store.getHtmlForm(storeInfo, store));
-            if (storeInfo.store_id == '23') addHtmlMainStore(storeInfo, store);
+            if ($('table.t_table').data('provider-id') == '14') addHtmlMainStore(storeInfo, store);
 		}
 	})
 	return false;
@@ -49,7 +50,8 @@ function set_intuitive_search(e, tableName){
 		value: val,
 		additionalConditions: {
 			store_id: $('table.t_table').attr('store_id'),
-            type_search: document.querySelector('input[name=type_search]:checked').value
+            type_search: document.querySelector('input[name=type_search]:checked').value,
+            provider_id: document.querySelector('input[name="provider_id"]').value
 		},
 		minLength: minLength,
 		tableName: tableName
@@ -193,10 +195,11 @@ $(function(){
 		set_intuitive_search(e, 'storeItemsForAdding');
 	})
 	$(document).on('click', 'a.showStoreItemInfo', function(){
-		let elem = $(this);
-		let store_id = elem.attr('store_id');
-		let item_id = elem.attr('item_id');
-		showStoreInfo(store_id, item_id);
+		let elem = $(this)
+		let store_id = elem.attr('store_id')
+		let item_id = elem.attr('item_id')
+        let self = elem.data('self')
+		showStoreInfo(store_id, item_id, self)
 	})
 	$(document).on('click', 'table.t_table tr', function(e){
 		let target = $(e.target);
@@ -214,9 +217,13 @@ $(function(){
 			deleteStoreItem(item_id, store_id);
 			return false;
 		}
+
+        let self_store = 0;
+        if ($('input[name="provider_id"]').val() == 14) self_store = 1
 		showStoreInfo(
 			$(this).closest('table').attr('store_id'),
-			$(this).closest('tr').find('input[column=packaging]').attr('item_id')
+			$(this).closest('tr').find('input[column=packaging]').attr('item_id'),
+            self_store
 		);
 	})
 	$(document).on('click', 'a.addStoreItem', function(){
@@ -233,18 +240,19 @@ $(function(){
                 store_id: $('table.t_table').attr('store_id')
 			},
 			success: function(response){
+                const element = $('table.t_table')
 				showGif(false);
 				itemInfo = JSON.parse(response);
 				$.each(itemInfo, function(key, value){
 					storeInfo[key] = value;
 				}) 
-				storeInfo.store_id = $('table.t_table').attr('store_id');
+				storeInfo.store_id = element.attr('store_id');
 				storeInfo.item_id = item_id;
                 storeInfo.priceWithoutMarkup = '';
 				modal_show(add_item_to_store.getHtmlForm(storeInfo));
 
                 //добавление возможности выбора поставщика для основного склада
-                if (storeInfo.store_id === '23') addHtmlMainStore();
+                if (element.data('provider-id') == '14') addHtmlMainStore();
 			}
 		})
 	})
@@ -264,6 +272,7 @@ $(function(){
                 provider_id: $th.val()
             },
             success: function(response){
+                $('tr.provider_store').remove()
                 let str = `
                     <tr class="provider_store">
                         <td>Склад</td>
@@ -287,8 +296,16 @@ $(function(){
 	$(document).on('submit', 'form.add_item_to_store', function(){
 		if (add_item_to_store.isValidated == false) return false;
 
-        const prevTr = $(`a.deleteStoreItem[item_id=${itemInfo.id}]`).closest('tr').prev();
-        prevTr.next().remove();
+        let tbody = $('#contents table.t_table tbody')
+
+        let prevTr = $(`a.deleteStoreItem[item_id=${itemInfo.id}]`).closest('tr').prev();
+        if (prevTr.length){
+            prevTr.next().remove()
+        }
+        else{
+            prevTr = tbody.find('tr:last-child')
+        }
+
 
 		let array = $(this).serializeArray();
 		let formData = {};
@@ -310,7 +327,7 @@ $(function(){
 				<td><input type="text" class="store_item" value="${formData.in_stock}" column="in_stock" item_id="${itemInfo.id}"></td>
 				<td><input type="text" class="store_item" value="${formData.price}" column="price" item_id="${itemInfo.id}"></td>
 			`;
-		if (formData.store_id == '23'){
+		if ($('input[name="provider_id"]').val() == 14){
             let now = new Date();
             let updated = now.toLocaleDateString();
 			str += `
@@ -330,7 +347,7 @@ $(function(){
                     </a>
                 </td>
 		    </tr>`;
-		$('table.t_table tbody tr.empty').remove();
+		$('table.t_table tbody').find('tr.empty').remove()
 		prevTr.after(str);
 	})
 	$(document).on('click', 'a.deleteStoreItem', function(){
@@ -373,4 +390,7 @@ $(function(){
 			}
 		})
 	})
+    $('select[name="self_id"]').on('change', e => {
+        document.location.href = `/admin/?view=prices&act=items&self=1&id=${e.target.value}`
+    })
 })

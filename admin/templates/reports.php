@@ -2,7 +2,7 @@
 /** @global Database $db */
 
 use core\Database;
-use core\Item;
+use core\Item;use core\Provider\Tahos;
 
 $page_title = 'Отчеты';
 $status = '<a href="/">Главная</a> > Отчеты';
@@ -237,6 +237,11 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			</table>
 		</div>
 		<div class="ionTabs__item" data-name="remainsMainStore">
+            <select>
+                <?foreach(Tahos::getSelfStores() as $row){?>
+                    <option value="<?=$row['id']?>"><?=$row['title']?></option>
+                <?}?>
+            </select>
 			<table class="t_table" cellspacing="1">
 				<thead>
 					<tr class="head">

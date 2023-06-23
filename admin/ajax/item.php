@@ -135,7 +135,7 @@ switch($_POST['act']){
 		";
 		$res_store_items = $db->query($query, '');
         $store_items = $res_store_items->fetch_assoc();
-        if ($_POST['store_id'] == Config::MAIN_STORE_ID){
+        if ($_POST['self_store']){
             $result = $db->query("
                 select
                     ps.id as store_id,
@@ -149,7 +149,7 @@ switch($_POST['act']){
                 left join
                     #provider_stores ps on ps.id = msi.store_id
                 left join 
-                    #required_remains ri on ri.item_id = msi.item_id
+                    #required_remains ri on ri.item_id = msi.item_id AND ri.self_store_id = {$_POST['store_id']}
                 where
                     msi.item_id = {$_POST['item_id']}
             ", '');

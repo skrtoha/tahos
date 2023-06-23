@@ -2,11 +2,12 @@
 /* @var $db \core\Database */
 
 use core\Config;
+use core\Provider;
 
 $act = $_GET['act'];
 switch ($act) {
     case 'clearAllPrices':
-        \core\Provider::clearStoresItems();
+        Provider::clearStoresItems();
         break;
 	case 'delete':
 		if ($db->delete('providers', "`id`=".$_GET['id'])){
@@ -204,6 +205,7 @@ function show_form($act){
 <?}
 function items(){
 	global $status, $db, $page_title;
+    $isSelf = isset($_GET['self']) && $_GET['self'];
 	$id = $_GET['id'];
 	require_once('templates/pagination.php');
 	$title_store = $db->getFieldOnID('provider_stores', $id, 'cipher');
@@ -223,7 +225,16 @@ function items(){
 		}
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}
+    if ($isSelf){
+        $selfStores = Provider\Tahos::getSelfStores();
+        if (!isset($_GET['id'])){
+            $id = $selfStores[0]['id'];
+        }
+        else $id = $_GET['id'];
+    }
+
 	$where = "si.store_id = $id AND ";
+
 	if (isset($_GET['article'])){
         switch($_GET['type_search']){
             case 'article':
@@ -251,14 +262,15 @@ function items(){
 			IF (i.title_full<>'', i.title_full, i.title) AS title_full,  
 		    CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item,
             msi.min_price,
+            ps.provider_id,
             msi.updated
 		FROM
 			#store_items si
 		LEFT JOIN #items i ON si.item_id=i.id
 		LEFT JOIN #brends b ON b.id=i.brend_id
-		LEFT JOIN #required_remains rr ON rr.item_id = si.item_id
+		LEFT JOIN #required_remains rr ON rr.item_id = si.item_id AND self_store_id = {$id}
 		LEFT JOIN #main_store_item msi ON msi.item_id = si.item_id    
-		LEFT JOIN #provider_stores ps ON ps.id = msi.store_id 
+		LEFT JOIN #provider_stores ps ON ps.id = si.store_id 
 		LEFT JOIN #providers p ON p.id = ps.provider_id
 		WHERE 
 			$where
@@ -297,21 +309,41 @@ function items(){
 		'in_stock' => 'В наличии',
 		'price' => 'Цена'
 	];
-	if ($id == Config::MAIN_STORE_ID){
-		$menu['summ'] = 'Сумма';
-		$menu['requiredRemain'] = 'Мин. наличие';
+	$res_items = $db->query($query, '');
+    if ($isSelf){
+        $menu['summ'] = 'Сумма';
+        $menu['requiredRemain'] = 'Мин. наличие';
         $menu['main_store_item'] = 'Поставщик';
         $menu['min_price'] = 'Закупка';
         $menu['updated'] = 'Обновлен';
-	}
-	$res_items = $db->query($query, '');?>
+    }
+    $provider_id = 0;
+    foreach($res_items as $item){
+        $provider_id = $item['provider_id'];
+        break;
+    }
+
+    ?>
 	<div id="total" style="margin-top: 10px;">
         Всего: <?=$all?>
         <?if ($_GET['id'] == Config::MAIN_STORE_ID){?>
             на сумму <b><?=$commonSumm?></b> р.
         <?}?>
     </div>
+    <input type="hidden" name="provider_id" value="<?=$provider_id?>">
 	<div class="actions" style="">
+        <?if ($isSelf){
+            ?>
+            <div class="self">
+                <select name="self_id">
+                    <?foreach($selfStores as $row){
+                        $selected = $row['id'] == $id ? 'selected' : '';
+                        ?>
+                        <option <?=$selected?> value="<?=$row['id']?>"><?=$row['title']?></option>
+                    <?}?>
+                </select>
+            </div>
+        <?}?>
         <form>
             <input type="hidden" name="view" value="prices">
             <input type="hidden" name="act" value="items">
@@ -319,7 +351,7 @@ function items(){
             <div class="type_search">
                 <div>
                     <label>
-                        <?$checked = !isset($_GET['type_search']) || $_GET['type_search'] == 'article' ? 'checked' : '';?>
+                        <?$checked = !$_GET['type_search'] || $_GET['type_search'] == 'article' ? 'checked' : '';?>
                         <input <?=$checked?> type="radio" name="type_search" value="article">
                         <span>артикулу</span>
                     </label>
@@ -342,55 +374,63 @@ function items(){
         <?if($_GET['id'] == Config::MAIN_STORE_ID){?>
             <a href="/admin/?view=prices&act=updatePrices">Обновить цены</a>
         <?}?>
+        <div class="clear"></div>
 	</div>
-	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>">
-		<tr class="head sort">
-			<?foreach($menu as $alias => $title){
-				$href = "$linkHref&sort=$alias";
-				if (isset($_GET['sort']) && $_GET['sort'] == $alias && !$_GET['direction']){
-					$href .= "&direction=desc";
-				}?>
-				<td>
-					<a class="<?=isset($_GET['direction']) ? $_GET['direction'] : ''?>" href="<?=$href?>"><?=$title?></a>
-					<?if (isset($_GET['sort']) && $_GET['sort'] == $alias){?>
-						<span class="icon-arrow-down2"></span>
-					<?}?>
-				</td>
-			<?}?>
-			<td>
-		</tr>
-		<?if ($res_items->num_rows){
-			while($pi = $res_items->fetch_assoc()){?>
-				<tr>
-					<td><?=$pi['brend']?></td>
-					<td><a class="item" href="?view=items&id=<?=$pi['item_id']?>&act=item"><?=$pi['article']?></a></td>
-					<td><?=$pi['title_full']?></td>
-					<td><input type="text" class="store_item" value="<?=$pi['packaging']?>" column="packaging" item_id="<?=$pi['item_id']?>"></td>
-					<td><input type="text" class="store_item" value="<?=$pi['in_stock']?>" column="in_stock" item_id="<?=$pi['item_id']?>"></td>
-					<td><input type="text" class="store_item" value="<?=$pi['price']?>" column="price" item_id="<?=$pi['item_id']?>"></td>
-					<?if ($id == Config::MAIN_STORE_ID){?>
-						<td><?=$pi['price'] * $pi['in_stock']?></td>
-						<td>
-							<input type="text" class="store_item" value="<?=$pi['requiredRemain']?>" column="requiredRemain" item_id="<?=$pi['item_id']?>">
-                        </td>
-                        <td><?=$pi['main_store_item']?></td>
-                        <td><input type="text" class="store_item" value="<?=$pi['min_price']?>" column="min_price" item_id="<?=$pi['item_id']?>"></td>
-                        <td column="updated" item_id="<?=$pi['item_id']?>">
-                            <?if ($pi['updated']){?>
-                                <?=DateTime::createFromFormat('Y-m-d H:i:s', $pi['updated'])->format('d.m.Y')?>
-                            <?}?>
-                        </td>
-					<?}?>
-					<td><a title="Удалить" item_id="<?=$pi['item_id']?>" class="deleteStoreItem" href="#"><span class="icon-cancel-circle1"></span></a></td>
-				</tr>
-			<?}
-		}
-		else{?>
-			<tr class="empty"><td colspan="7">Товаров не найдено</td></tr>
-		<?}?>
+	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>" data-provider-id="<?=$provider_id?>">
+        <thead>
+        <tr class="head sort">
+            <?foreach($menu as $alias => $title){
+                $href = "$linkHref&sort=$alias";
+                if (isset($_GET['sort']) && $_GET['sort'] == $alias && !$_GET['direction']){
+                    $href .= "&direction=desc";
+                }?>
+                <td>
+                    <a class="<?= $_GET['direction'] ?? '' ?>" href="<?=$href?>"><?=$title?></a>
+                    <?if (isset($_GET['sort']) && $_GET['sort'] == $alias){?>
+                        <span class="icon-arrow-down2"></span>
+                    <?}?>
+                </td>
+            <?}?>
+            <td>
+        </tr>
+        </thead>
+		<tbody>
+            <?if ($res_items->num_rows){
+                foreach($res_items as $pi){?>
+                    <tr>
+                        <td><?=$pi['brend']?></td>
+                        <td><a class="item" href="?view=items&id=<?=$pi['item_id']?>&act=item"><?=$pi['article']?></a></td>
+                        <td><?=$pi['title_full']?></td>
+                        <td><input type="text" class="store_item" value="<?=$pi['packaging']?>" column="packaging" item_id="<?=$pi['item_id']?>"></td>
+                        <td><input type="text" class="store_item" value="<?=$pi['in_stock']?>" column="in_stock" item_id="<?=$pi['item_id']?>"></td>
+                        <td><input type="text" class="store_item" value="<?=$pi['price']?>" column="price" item_id="<?=$pi['item_id']?>"></td>
+                        <?if ($isSelf){?>
+                            <td><?=$pi['price'] * $pi['in_stock']?></td>
+                            <td>
+                                <input type="text" class="store_item" value="<?=$pi['requiredRemain']?>" column="requiredRemain" item_id="<?=$pi['item_id']?>">
+                            </td>
+                            <td><?=$pi['main_store_item']?></td>
+                            <td><input type="text" class="store_item" value="<?=$pi['min_price']?>" column="min_price" item_id="<?=$pi['item_id']?>"></td>
+                            <td column="updated" item_id="<?=$pi['item_id']?>">
+                                <?if ($pi['updated']){?>
+                                    <?=DateTime::createFromFormat('Y-m-d H:i:s', $pi['updated'])->format('d.m.Y')?>
+                                <?}?>
+                            </td>
+                        <?}?>
+                        <td><a title="Удалить" item_id="<?=$pi['item_id']?>" class="deleteStoreItem" href="#"><span class="icon-cancel-circle1"></span></a></td>
+                    </tr>
+                <?}
+            }
+            else{?>
+                <tr class="empty"><td colspan="7">Товаров не найдено</td></tr>
+            <?}?>
+        </tbody>
 	</table>
 	<a style="display: block;margin-top: 10px" href="<?=$_SERVER['HTTP_REFERER']?>">Назад</a>
-	<?pagination($chank, $page, ceil($all / $perPage), $href = "?view=prices&act=items&id=$id&article={$_GET['article']}&sort={$_GET['sort']}&direction={$_GET['direction']}&type_search={$_GET['type_search']}&page=");
+	<?$href = "?view=prices&act=items&id=$id&article={$_GET['article']}&sort={$_GET['sort']}&direction={$_GET['direction']}&type_search={$_GET['type_search']}";
+    if (isset($_GET['self'])) $href .= "&self={$_GET['self']}";
+    $href .= "&page=";
+    pagination($chank, $page, ceil($all / $perPage), $href);
 }
 function search_add(){
 	global $status, $db, $page_title;

@@ -75,7 +75,7 @@ use admin\functions\LeftMenu;
 			<div class="block">
 				<div class="title">Главное меню</div>
 					<ul>
-						<li><a href="/admin/?view=prices&act=items&id=23">Основной склад</a></li>
+						<li><a href="/admin/?view=prices&act=items&self=1">Склады компании</a></li>
 						<li><a href="/admin/?view=cron&act=updatePrices">Обновление цен</a></li>
 						<?foreach(admin\functions\LeftMenu::$leftMenu as $key => $value){
 							if (

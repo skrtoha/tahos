@@ -380,7 +380,7 @@ function items(){
         <?}?>
         <div class="clear"></div>
 	</div>
-	<table class="t_table" cellspacing="1" store_id="<?=$_GET['id']?>" data-provider-id="<?=$provider_id?>">
+	<table class="t_table" cellspacing="1" store_id="<?=$id?>" data-provider-id="<?=$provider_id?>">
         <thead>
         <tr class="head sort">
             <?foreach($menu as $alias => $title){

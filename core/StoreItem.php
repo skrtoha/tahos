@@ -39,16 +39,16 @@ class StoreItem{
 	public static function getStoreItemsByStoreID(array $store_ids, $notNulPrice = false): \mysqli_result
 	{
         $where = "si.store_id IN (" . implode(',', $store_ids) . ")";
-        if ($notNulPrice) $where .= " AND si.stock_id > 0";
+        if ($notNulPrice) $where .= " AND si.in_stock > 0";
 		return $GLOBALS['db']->query("
 			SELECT
 				si.item_id,
-				b.title AS brend,
-				i.article,
-				i.title_full,
-				si.in_stock,
-				MIN(CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100)) as price,
-				si.packaging
+                b.title AS brend,
+                i.article,
+                i.title_full,
+                SUM(si.in_stock) AS in_stock,
+                MIN(CEIL(si.price * c.rate + si.price * c.rate * ps.percent / 100)) AS price,
+                MAX(si.packaging) AS packaging
 			FROM
 				#store_items si
 			LEFT JOIN

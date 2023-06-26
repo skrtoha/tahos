@@ -270,7 +270,7 @@ function items(){
 		LEFT JOIN #brends b ON b.id=i.brend_id
 		LEFT JOIN #required_remains rr ON rr.item_id = si.item_id AND self_store_id = {$id}
 		LEFT JOIN #main_store_item msi ON msi.item_id = si.item_id    
-		LEFT JOIN #provider_stores ps ON ps.id = si.store_id 
+		LEFT JOIN #provider_stores ps ON ps.id = msi.store_id 
 		LEFT JOIN #providers p ON p.id = ps.provider_id
 		WHERE 
 			$where

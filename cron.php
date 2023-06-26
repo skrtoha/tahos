@@ -11,6 +11,7 @@ use core\StoreItem;
 use Katzgrau\KLogger\Logger;
 use Psr\Log\LogLevel;
 use core\Mailer;
+use core\Provider\Tahos;
 
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 1);
@@ -678,12 +679,13 @@ switch ($params[0]){
             $logger->info('Не найдено пользователей для рассылки');
             break;
         }
-        
-        $res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id], true);
+
+        $selfStores = Tahos::getSelfStores();
+        $res_store_items = StoreItem::getStoreItemsByStoreID(array_column($selfStores, 'id'), true);
         foreach($res_users as $user){
             switch($user['subscribe_type']){
                 case 'xls':
-                    $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price', $user['discount']);
+                    $file = Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price', $user['discount']);
                     break;
                 case 'csv':
                     $file = core\Config::$tmpFolderPath . '/price.csv';
@@ -712,12 +714,13 @@ switch ($params[0]){
         $res_emails = $db->query("SELECT * FROM #subscribe_prices", '');
         if (!$res_emails->num_rows) break;
         foreach($res_emails as $row) $emails[] = $row['email'];
-        
+
+        $selfStores = Tahos::getSelfStores();
         $query = StoreItem::getQueryStoreItem();
-        $query .= " WHERE si.store_id = ".\core\Config::MAIN_STORE_ID;
+        $query .= " WHERE si.store_id IN (".implode(',', array_column($selfStores, 'id')).")";
         $query .= " AND si.in_stock > 0";
         $res_store_items = $db->query($query);
-        $file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price');
+        $file = Tahos::processExcelFileForSubscribePrices($res_store_items, 'user_price');
         
         $mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
         $res = $mailer->send([

@@ -3,9 +3,11 @@
 use Box\Spout\Common\Exception\IOException;
 use Box\Spout\Common\Exception\UnsupportedTypeException;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use core\Config;
 use core\Marketplaces\Ozon;
 use core\Provider;
 use core\Setting;
+use core\StoreItem;
 use Katzgrau\KLogger\Logger;
 use Psr\Log\LogLevel;
 use core\Mailer;
@@ -190,7 +192,7 @@ switch ($params[0]){
 			LEFT JOIN
 				#provider_stores ps ON ps.id = si.store_id
 			WHERE
-				ps.id != ".\core\Config::MAIN_STORE_ID."
+				ps.id != ". Config::MAIN_STORE_ID."
 		",'');
         $mysqli = $db->get_mysqli();
         $logger->info("Удалено {$mysqli->affected_rows} строк.");
@@ -711,7 +713,7 @@ switch ($params[0]){
         if (!$res_emails->num_rows) break;
         foreach($res_emails as $row) $emails[] = $row['email'];
         
-        $query = \core\StoreItem::getQueryStoreItem();
+        $query = StoreItem::getQueryStoreItem();
         $query .= " WHERE si.store_id = ".\core\Config::MAIN_STORE_ID;
         $query .= " AND si.in_stock > 0";
         $res_store_items = $db->query($query);

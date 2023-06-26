@@ -300,7 +300,7 @@ function items(){
 	$chank = getChank($all, $perPage, $linkLimit, $page);
 	$start = $chank[$page] ?? 0;
 	$query .= " LIMIT $start,$perPage";
-	$linkHref = "/admin/?view=prices&act=items&id={$_GET['id']}";
+	$linkHref = "/admin/?view=prices&act=items&id={$id}";
 	$menu = [
 		'brend' => 'Бренд',
 		'article' => 'Артикул',

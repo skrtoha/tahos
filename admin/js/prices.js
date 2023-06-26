@@ -203,6 +203,7 @@ $(function(){
 	})
 	$(document).on('click', 'table.t_table tr', function(e){
 		let target = $(e.target);
+        if (target.closest('tr').hasClass('head')) return
 		if (target.hasClass('store_item')){
 			return false;
 		}

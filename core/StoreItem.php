@@ -21,8 +21,7 @@ class StoreItem{
 				b.title AS brend,
 				i.id AS item_id,
 				i.article,
-				LEFT(i.title_full, 20) AS title_full,
-				rr.requiredRemain
+				LEFT(i.title_full, 20) AS title_full
 			FROM
 				#store_items si
 			LEFT JOIN
@@ -35,8 +34,6 @@ class StoreItem{
 				#items i ON i.id = si.item_id
 			LEFT JOIN
 				#brends b ON b.id = i.brend_id
-			LEFT JOIN
-				#required_remains rr ON rr.item_id = si.item_id
 		";
 	}
 	public static function getStoreItemsByStoreID(array $store_ids, $notNulPrice = false): \mysqli_result

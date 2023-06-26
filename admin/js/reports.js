@@ -3,6 +3,9 @@ $(function(){
 	window['reports'] = {
 		tab: null,
 		ajaxUrl: '/admin/?view=reports',
+        getTableBody: function(tab){
+            return  $('[data-name=' + tab + '] table tbody')
+        },
 		init: function(){
 			if (!window.location.hash){
 				get = getParams();
@@ -109,6 +112,20 @@ $(function(){
                 let item_id = $(e.target).closest('tr').data('item-id')
                 document.location.href = `/admin/?view=items&act=item&id=${item_id}`
             })
+            $('select[name="self_store_id"]').on('change', e => {
+                let data = reports.getDataRequiredRemains('remainsMainStore');
+                data.store_id = e.target.value;
+                $.ajax({
+                    type: 'post',
+                    url: reports.ajaxUrl,
+                    data: data,
+                    success: function(response){
+                        let $tbody = reports.getTableBody('remainsMainStore')
+                        $tbody.empty()
+                        reports.parseItemRemains(JSON.parse(response))
+                    }
+                })
+            })
 		},
         processAjaxQuery: function(tab){
 		    const form = $('div[data-name=' + tab + ']').find('form.filter-form');
@@ -138,6 +155,13 @@ $(function(){
 				closeOnWithoutClick: true
 			});
 		},
+        getDataRequiredRemains: function (tab){
+            return {
+                tab:tab,
+                dateFrom: $('div[data-name=' + tab + '] input[name=dateFrom]').val(),
+                dateTo: $('div[data-name=' + tab + '] input[name=dateTo]').val()
+            }
+        },
 		setTabs: function(){
 			$.ionTabs("#tabs_1", {
 				type: "hash",
@@ -145,12 +169,8 @@ $(function(){
 					reports.tab = obj.tab;
 					reports.setDateTimePicker(reports.tab);
 					if (obj.tab == 'searchHistory' || obj.tab == 'purchaseability') return reports.processAjaxQuery(obj.tab);
-					let data = {
-                        tab: obj.tab,
-                        dateFrom: $('div[data-name=' + obj.tab + '] input[name=dateFrom]').val(),
-                        dateTo: $('div[data-name=' + obj.tab + '] input[name=dateTo]').val()
-                    }
-                    let $tbody = $('[data-name=' + obj.tab + '] table tbody')
+					let data = reports.getDataRequiredRemains(obj.tab);
+                    let $tbody = reports.getTableBody(tab);
 					$.ajax({
 						type: 'post',
 						url: reports.ajaxUrl,
@@ -171,16 +191,7 @@ $(function(){
 								case 'remainsMainStore':
 									let itemRemains = JSON.parse(response);
 									$tbody.empty();
-									$.each(itemRemains, function(i, item){
-										$('[data-name=' + obj.tab + '] table tbody').append(
-											'<tr>' +
-												'<td>' + item.brend + '</td>' +
-												'<td><a target="_blank" href="?view=items&act=item&id=' + item.id + '">' + item.article + '</a></td>' +
-												'<td>' + item.title_full + '</td>' +
-												'<td>' + item.in_stock + '</td>' +
-											'</tr>'
-										);
-									})
+									reports.parseItemRemains(itemRemains)
 									break;
 								default:
 									$('div[data-name=' + obj.tab + ']').html(response);
@@ -191,6 +202,19 @@ $(function(){
 				}
 			});
 		},
+        parseItemRemains(itemRemains){
+            $.each(itemRemains, function(i, item){
+                let $tbody = reports.getTableBody('remainsMainStore')
+                $tbody.append(
+                    '<tr>' +
+                    '<td>' + item.brend + '</td>' +
+                    '<td><a target="_blank" href="?view=items&act=item&id=' + item.id + '">' + item.article + '</a></td>' +
+                    '<td>' + item.title_full + '</td>' +
+                    '<td>' + item.in_stock + '</td>' +
+                    '</tr>'
+                );
+            })
+        },
 		parsePurchaseability: function(items, tab){
 			if (!items) return false;
 			switch(tab){

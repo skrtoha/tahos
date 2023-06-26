@@ -142,7 +142,12 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			echo json_encode($output);
 			break;
 		case 'remainsMainStore':
-			$output = [];
+            $selfStores = Tahos::getSelfStores();
+
+            if (!isset($_POST['store_id'])) $store_id = $selfStores[0]['id'];
+            else $store_id = $_POST['store_id'];
+
+            $output = [];
 			$res = $db->query("
 				SELECT
 					i.id,
@@ -158,7 +163,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				LEFT JOIN
 					#items i ON i.id = si.item_id
 				LEFT JOIN
-					#required_remains rr ON rr.item_id = si.item_id
+					#required_remains rr ON rr.item_id = si.item_id and rr.self_store_id = $store_id
 				LEFT JOIN
 					#brends b ON b.id = i.brend_id
 				WHERE
@@ -237,7 +242,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			</table>
 		</div>
 		<div class="ionTabs__item" data-name="remainsMainStore">
-            <select>
+            <select name="self_store_id">
                 <?foreach(Tahos::getSelfStores() as $row){?>
                     <option value="<?=$row['id']?>"><?=$row['title']?></option>
                 <?}?>

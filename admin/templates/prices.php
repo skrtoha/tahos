@@ -251,27 +251,28 @@ function items(){
     }
     $where = substr($where, 0, -5);
 	$query = "
-		SELECT 
-			si.item_id,
-			si.price,
-			si.in_stock,
-			si.packaging,
-			b.title as brend, 
-			rr.requiredRemain,
-			IF(i.article_cat != '', i.article_cat, i.article) AS article, 
-			IF (i.title_full<>'', i.title_full, i.title) AS title_full,  
-		    CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item,
+		SELECT
+            si.item_id,
+            si.price,
+            si.in_stock,
+            si.packaging,
+            b.title as brend,
+            rr.requiredRemain,
+            IF(i.article_cat != '', i.article_cat, i.article) AS article,
+            IF (i.title_full<>'', i.title_full, i.title) AS title_full,
+            CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item,
             msi.min_price,
-            ps.provider_id,
+            ps2.provider_id,
             msi.updated
-		FROM
-			#store_items si
-		LEFT JOIN #items i ON si.item_id=i.id
-		LEFT JOIN #brends b ON b.id=i.brend_id
-		LEFT JOIN #required_remains rr ON rr.item_id = si.item_id AND self_store_id = {$id}
-		LEFT JOIN #main_store_item msi ON msi.item_id = si.item_id    
-		LEFT JOIN #provider_stores ps ON ps.id = msi.store_id 
-		LEFT JOIN #providers p ON p.id = ps.provider_id
+        FROM
+            #store_items si
+            LEFT JOIN #items i ON si.item_id=i.id
+            LEFT JOIN #brends b ON b.id=i.brend_id
+            LEFT JOIN #required_remains rr ON rr.item_id = si.item_id AND self_store_id = 23
+            LEFT JOIN #main_store_item msi ON msi.item_id = si.item_id
+            LEFT JOIN #provider_stores ps ON ps.id = msi.store_id
+            LEFT JOIN #provider_stores ps2 ON ps2.id = si.store_id
+            LEFT JOIN #providers p ON p.id = ps.provider_id
 		WHERE 
 			$where
 		ORDER BY

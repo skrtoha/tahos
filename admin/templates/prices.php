@@ -240,7 +240,7 @@ function items(){
         switch($_GET['type_search']){
             case 'article':
                 $article = \core\Item::articleClear($_GET['article']);
-                $where .= "(i.article='$article') AND ";
+                $where .= "(i.article LIKE '$article%') AND ";
                 break;
             case 'brend':
                 $where .= "b.title LIKE '{$_GET['article']}%' AND ";
@@ -353,7 +353,11 @@ function items(){
         <form>
             <input type="hidden" name="view" value="prices">
             <input type="hidden" name="act" value="items">
-            <input type="hidden" name="id" value="<?=$_GET['id']?>">
+            <input type="hidden" name="id" value="<?=$id?>">
+            <?if ($isSelf){?>
+                <input type="hidden" name="self" value="1">
+            <?}?>
+
             <div class="type_search">
                 <div>
                     <label>

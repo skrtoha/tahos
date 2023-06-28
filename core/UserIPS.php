@@ -108,7 +108,7 @@ class UserIPS{
                 #users u ON u.id = ui.user_id
             WHERE
                 ui.ip = '$ip'
-        ")->fetch_assoc();
+        ", '')->fetch_assoc();
 		return $result;
 	}
 

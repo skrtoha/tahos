@@ -39,6 +39,7 @@ switch ($act) {
 		}
 		break;
     case 'updatePrices':
+        $selfStores = Provider\Tahos::getSelfStores();
         $query = "
             SELECT
                 si2.store_id AS main_store_item,
@@ -54,11 +55,11 @@ switch ($act) {
             LEFT JOIN
 			    #store_items si2 ON si2.store_id = msi.store_id AND si2.item_id = si.item_id     
             WHERE
-                si.store_id = ".Config::MAIN_STORE_ID." AND si.price != si2.price";
+                si.store_id IN (".implode(',', array_column($selfStores, 'id')).") AND si.price != si2.price";
         $result = $db->query($query, '');
         foreach($result as $row){
             if ($row['main_store_item_price'] < $row['min_price']) continue;
-            $where = "`store_id` = ".Config::MAIN_STORE_ID." AND item_id = {$row['item_id']}";
+            $where = "`store_id` = ".$row['store_id']." AND item_id = {$row['item_id']}";
             $db->update(
                 'store_items',
                 ['price' => $row['main_store_item_price']],
@@ -70,7 +71,7 @@ switch ($act) {
                 "`item_id` = {$row['item_id']}"
             );
         }
-        header("Location: /admin/?view=prices&act=items&id=".Config::MAIN_STORE_ID);
+        header("Location: /admin/?view=prices&act=items&self=1");
         die;
 	default:
 		view();
@@ -376,7 +377,7 @@ function items(){
             <input type="submit" value="Искать">
         </form>
         <input style="width: 264px;" type="text" name="storeItemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
-        <?if($_GET['id'] == Config::MAIN_STORE_ID){?>
+        <?if($provider_id == Provider\Tahos::$provider_id){?>
             <a href="/admin/?view=prices&act=updatePrices">Обновить цены</a>
         <?}?>
         <div class="clear"></div>

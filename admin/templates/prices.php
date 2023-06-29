@@ -332,7 +332,7 @@ function items(){
     ?>
 	<div id="total" style="margin-top: 10px;">
         Всего: <?=$all?>
-        <?if ($_GET['id'] == Config::MAIN_STORE_ID){?>
+        <?if ($provider_id == Provider\Tahos::$provider_id){?>
             на сумму <b><?=$commonSumm?></b> р.
         <?}?>
     </div>

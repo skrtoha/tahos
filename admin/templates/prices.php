@@ -391,6 +391,7 @@ function items(){
         <tr class="head sort">
             <?foreach($menu as $alias => $title){
                 $href = "$linkHref&sort=$alias";
+                if ($isSelf) $href .= "&self=1";
                 if (isset($_GET['sort']) && $_GET['sort'] == $alias && !$_GET['direction']){
                     $href .= "&direction=desc";
                 }?>

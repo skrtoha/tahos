@@ -33,7 +33,8 @@ switch($_POST['act']){
 			'daysForReturn' => $_POST['daysForReturn'],
 			'noReturn' => $_POST['noReturn'] ? 1 : 0,
 			'is_main' => $_POST['is_main'] ? 1 : 0,
-			'block' => $_POST['block'] ? 1 : 0
+			'block' => $_POST['block'] ? 1 : 0,
+			'checked' => $_POST['checked'] ? 1 : 0
 		];
 
         if ($array['provider_id'] == Tahos::$provider_id && $array['is_main'] == 1){

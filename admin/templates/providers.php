@@ -487,7 +487,7 @@ function stores(){
 		<?if ($res_stores->num_rows){
 			while($row = $res_stores->fetch_assoc()){
                 $class = $row['is_main'] ? 'bold' : ''; ?>
-				<tr id="someTr" class="store <?=$class?>" store_id="<?=$row['id']?>">
+				<tr class="store <?=$class?>" store_id="<?=$row['id']?>">
 					<td><?=$row['title']?></td>
 					<td><?=$row['price_updated']?></td>
 					<td><?=$row['cipher']?></td>

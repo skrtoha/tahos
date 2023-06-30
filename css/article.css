@@ -376,7 +376,10 @@ span.subprice {
     color: #00aafb;
     font-weight: 700;
 }
-
+.icon-shield:before {
+    content: "\e9b4";
+    color: #65a565;
+}
 .ionTabs__head {
     position: relative;
     display: block;

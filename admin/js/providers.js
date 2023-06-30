@@ -27,6 +27,7 @@ function set_store(store_id){
 			store.noReturn = +store.noReturn ? 'checked' : '';
 			store.is_main = +store.is_main ? 'checked' : '';
 			store.block = +store.block ? 'checked' : '';
+			store.checked = +store.checked ? 'checked' : '';
 		}
 	})
 }
@@ -61,7 +62,7 @@ function get_str_form(){
 		'<a href="?view=prices&act=items&id=' + store.id + '">Прайс склада</a>' +
 		'<a target="" href="?view=providers&act=priceEmail&store_id=' + store.id + '">Прайс с Email</a>' +
 		'<a target="_blank" href="?view=providers&act=calendar&store_id=' + store.id + '">График поставок</a>';
-	}; 
+	}
 	str +=
 		'<form name="store_change">' +
 			'<input type="hidden" name="store_id" value="' + store.id + '">' +
@@ -114,6 +115,10 @@ function get_str_form(){
                     '<td>Заблокировать</td>' +
                     '<td><input type="checkbox" name="block" ' + store.block + ' value="1"></td>' +
                 '</tr>' +
+				'<tr>' +
+					'<td>Проверен</td>' +
+					'<td><input type="checkbox" name="checked" ' + store.checked + ' value="1"></td>' +
+				'</tr>' +
 			 	'<tr>' + form_bottom + '</tr>' +
 	 		'</table>' +
 		'</form>';

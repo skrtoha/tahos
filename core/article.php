@@ -53,9 +53,12 @@ use core\User;
 					<td>
 						<?if (!empty($si['prevails'])){?>
 							<ul class="prevail">
-								<?foreach($si['prevails'] as $value){?>
+								<?foreach($si['prevails'] as $v){?>
 									<li>
-										<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
+										<a href="" store_id="<?=$v['store_id']?>"><?=$v['cipher']?></a>
+                                        <?if ($v['checked']){?>
+                                            <span title="Проверенный поставщик" class="icon-shield"></span>
+                                        <?}?>
 									</li>
 								<?}?>
 							</ul>
@@ -64,10 +67,16 @@ use core\User;
 							<ul>
 								<li <?=$si_price['noReturn']?>>
 									<a href="" store_id="<?=$si_price['store_id']?>"><?=$si_price['cipher']?></a>
+                                    <?if ($si_price['checked']){?>
+                                        <span title="Проверенный поставщик" class="icon-shield"></span>
+                                    <?}?>
 								</li>
 								<?if (!empty($si_delivery)){?>
 									<li <?=$si_delivery['noReturn']?>>
 										<a href="" store_id="<?=$si_delivery['store_id']?>"><?=$si_delivery['cipher']?></a>
+                                        <?if ($si_delivery['checked']){?>
+                                            <span title="Проверенный поставщик" class="icon-shield"></span>
+                                        <?}?>
 									</li>
 								<?}?>
 							</ul>
@@ -77,10 +86,10 @@ use core\User;
 					<td>
 						<?if (!empty($si['prevails'])){?>
 							<ul class="prevail">
-								<?foreach($si['prevails'] as $value){?>
+								<?foreach($si['prevails'] as $v){?>
 									<li>
-										<?=$value['in_stock']?>
-										<?=$value['packaging_text']?>
+										<?=$v['in_stock']?>
+										<?=$v['packaging_text']?>
 									</li>
 								<?}?>
 							</ul>
@@ -245,17 +254,23 @@ use core\User;
 						<td>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
-									<?foreach($si['prevails'] as $value){?>
+									<?foreach($si['prevails'] as $v){?>
 										<li>
-											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
+											<a href="" store_id="<?=$v['store_id']?>"><?=$v['cipher']?></a>
+                                            <?if ($v['checked']){?>
+                                                <span title="Проверенный поставщик" class="icon-shield"></span>
+                                            <?}?>
 										</li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
-								<?foreach($si['list'] as $key => $value){?>
-									<li <?=$value['noReturn']?>>
-										<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
+								<?foreach($si['list'] as $key => $v){?>
+									<li <?=$v['noReturn']?>>
+										<a href="" store_id="<?=$v['store_id']?>"><?=$v['cipher']?></a>
+                                        <?if ($v['checked']){?>
+                                            <span title="Проверенный поставщик" class="icon-shield"></span>
+                                        <?}?>
 									</li>
 								<?}?>
 							</ul>
@@ -264,19 +279,19 @@ use core\User;
 						<td>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
-									<?foreach($si['prevails'] as $value){?>
+									<?foreach($si['prevails'] as $v){?>
 										<li>
-											<?=$value['in_stock']?>
-											<?=$value['packaging_text']?>
+											<?=$v['in_stock']?>
+											<?=$v['packaging_text']?>
 										</li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
-								<?foreach($si['list'] as $key => $value){?>
+								<?foreach($si['list'] as $key => $v){?>
 									<li>
-										<?=$value['in_stock']?>
-										<?=$value['packaging_text']?>
+										<?=$v['in_stock']?>
+										<?=$v['packaging_text']?>
 									</li>
 								<?}?>
 							</ul>
@@ -285,14 +300,14 @@ use core\User;
 						<td>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
-									<?foreach($si['prevails'] as $value){?>
-										<li><?=$value['delivery_date']?></li>
+									<?foreach($si['prevails'] as $v){?>
+										<li><?=$v['delivery_date']?></li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
-								<?foreach($si['list'] as $key => $value){?>
-									<li><?=$value['delivery_date']?></li>
+								<?foreach($si['list'] as $key => $v){?>
+									<li><?=$v['delivery_date']?></li>
 								<?}?>
 							</ul>
 						</td>
@@ -300,17 +315,17 @@ use core\User;
 						<td class="price">
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
-									<?foreach($si['prevails'] as $value){?>
+									<?foreach($si['prevails'] as $v){?>
 										<li>
-											<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
+											<?=User::getHtmlUserPrice($v['price'], $user['designation'])?>
 										</li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
-								<?foreach($si['list'] as $key => $value){?>
+								<?foreach($si['list'] as $key => $v){?>
 									<li>
-										<?=User::getHtmlUserPrice($value['price'], $user['designation'])?>
+										<?=User::getHtmlUserPrice($v['price'], $user['designation'])?>
 									</li>
 								<?}?>
 							</ul>
@@ -319,20 +334,20 @@ use core\User;
 						<td class="quan <?=$hidden?>">
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
-									<?foreach($si['prevails'] as $value){?>
-											<li prevail="1" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
-												<?if ($value['in_basket']){?>
-													<input value="<?=$value['in_basket']?>">
-												<?}?>
-											</li>
+									<?foreach($si['prevails'] as $v){?>
+                                        <li prevail="1" packaging="<?=$v['packaging']?>" store_id="<?=$v['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+                                            <?if ($v['in_basket']){?>
+                                                <input value="<?=$v['in_basket']?>">
+                                            <?}?>
+                                        </li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
-								<?foreach($si['list'] as $key => $value){?>
-									<li packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+								<?foreach($si['list'] as $key => $v){?>
+									<li packaging="<?=$v['packaging']?>" store_id="<?=$v['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 										<?if ($value['in_basket']){?>
-											<input value="<?=$value['in_basket']?>">
+											<input value="<?=$v['in_basket']?>">
 										<?}?>
 									</li>
 								<?}?>
@@ -342,15 +357,15 @@ use core\User;
 						<td>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="to-cart-list prevail">
-									<?foreach($si['prevails'] as $value){?>
+									<?foreach($si['prevails'] as $v){?>
 										<li>
-											<i price="<?=$value['price']?>" 
-												store_id="<?=$value['store_id']?>" 
+											<i price="<?=$v['price']?>"
+												store_id="<?=$v['store_id']?>"
 												item_id="<?=$si['item_id']?>" 
-												packaging="<?=$value['packaging']?>" 
+												packaging="<?=$v['packaging']?>"
 												class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-												<?if ($value['in_basket']){?>
-													<i class="goods-counter"><?=$value['in_basket']?></i> 
+												<?if ($v['in_basket']){?>
+													<i class="goods-counter"><?=$v['in_basket']?></i>
 												<?}?>
 											</i> 
 										</li>
@@ -358,15 +373,15 @@ use core\User;
 								</ul>
 							<?}?>
 							<ul class="to-cart-list">
-								<?foreach($si['list'] as $key => $value){?>
+								<?foreach($si['list'] as $key => $v){?>
 									<li>
-										<i price="<?=$value['price']?>" 
-											store_id="<?=$value['store_id']?>" 
+										<i price="<?=$v['price']?>"
+											store_id="<?=$v['store_id']?>"
 											item_id="<?=$si['item_id']?>" 
-											packaging="<?=$value['packaging']?>" 
+											packaging="<?=$v['packaging']?>"
 											class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-											<?if ($value['in_basket']){?>
-												<i class="goods-counter"><?=$value['in_basket']?></i> 
+											<?if ($v['in_basket']){?>
+												<i class="goods-counter"><?=$v['in_basket']?></i>
 											<?}?>
 										</i> 
 										</li>
@@ -447,6 +462,9 @@ else{?>
 									<?foreach($si['prevails'] as $value){?>
 										<li>
 											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
+                                            <?if ($value['checked']){?>
+                                                <span title="Проверенный поставщик" class="icon-shield"></span>
+                                            <?}?>
 										</li>
 									<?}?>
 								</ul>
@@ -455,10 +473,16 @@ else{?>
 								<ul>
 									<li <?=$si_price['noReturn']?>>
 										<a href="" store_id="<?=$si_price['store_id']?>"><?=$si_price['cipher']?></a>
+                                        <?if ($si_price['checked']){?>
+                                            <span title="Проверенный поставщик" class="icon-shield"></span>
+                                        <?}?>
 									</li>
 									<?if (!empty($si_delivery)){?>
 										<li <?=$si_delivery['noReturn']?>>
 											<a href="" store_id="<?=$si_delivery['store_id']?>"><?=$si_delivery['cipher']?></a>
+                                            <?if ($si_delivery['checked']){?>
+                                                <span title="Проверенный поставщик" class="icon-shield"></span>
+                                            <?}?>
 										</li>
 									<?}?>
 								</ul>
@@ -612,6 +636,9 @@ else{?>
 									<?foreach($si['prevails'] as $value){?>
 										<li <?=$value['noReturn']?>>
 											<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
+                                            <?if ($value['checked']){?>
+                                                <span title="Проверенный поставщик" class="icon-shield"></span>
+                                            <?}?>
 										</li>
 									<?}?>
 								</ul>
@@ -620,6 +647,9 @@ else{?>
 								<?foreach($si['list'] as $key => $value){?>
 									<li <?=$value['noReturn']?>>
 										<a href="" store_id="<?=$value['store_id']?>"><?=$value['cipher']?></a>
+                                        <?if ($value['checked']){?>
+                                            <span title="Проверенный поставщик" class="icon-shield"></span>
+                                        <?}?>
 									</li>
 								<?}?>
 							</ul>

@@ -224,6 +224,7 @@ class Search{
             else $v['prevail'] = 0;
 
             $list['store_id'] = $v['store_id'];
+            $list['checked'] = $v['checked'];
             $list['in_stock'] = (int) $v['in_stock'] ? $v['in_stock'] : 'Под заказ';
             $list['cipher'] = $v['cipher'];
             $list['provider'] = $v['provider'];
@@ -326,6 +327,7 @@ class Search{
 			ps.provider_id,
 			p.title AS provider,
 			ps.id as store_id,
+			ps.checked,
 			IF (ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS workSchedule,
 			IF (
 				i.article_cat != '', 

@@ -1,8 +1,10 @@
-<?
+<?php
+/** @var string $view */
+/** @var \core\Database $db */
 
 use core\Breadcrumb;
 use core\Exceptions\NotFoundException;
-use core\Item;
+
 $href = $_GET['href'];
 $category = $db->select('categories', '*', "`parent_id`=0 AND `href`='$href'");
 
@@ -10,7 +12,7 @@ if (is_null($category)) throw new NotFoundException('Категория не н�
 
 $category = $category[0];
 $category_id = $category['id'];
-$subs = $db->select('categories', '*', "`parent_id`=$category_id", 'pos', true);
+$subs = $db->select('categories', '*', "`parent_id`=$category_id AND `hidden` = 0", 'pos', true);
 
 if (!$_GET['sub']){
     $title = $category['title'];

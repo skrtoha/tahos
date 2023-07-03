@@ -380,6 +380,9 @@ span.subprice {
     content: "\e9b4";
     color: #65a565;
 }
+#analogies span.icon-shield{
+    margin-left: 4px;
+}
 .ionTabs__head {
     position: relative;
     display: block;

@@ -179,18 +179,18 @@ function setNewValue(obj){
     setNewValueAjax(obj);
 }
 function store_items(store_items, user, search_type = null){
-    var isInBasket = window.isInBasket(store_items);
+    const isInBasket = window.isInBasket(store_items);
     /**
      * adds to class if no items exists in basket
      * @type {[string]}
      */
-    var hidden = isInBasket ? '' : 'hidden';
-    var c_si = Object.keys(store_items).length;
+    const hidden = isInBasket ? '' : 'hidden';
+    const c_si = Object.keys(store_items).length;
     if (!c_si) return '<div>Ничего не найдено</div>';
     // console.log(Object.keys(si.list).length);
     let priceTh;
     let deliveryTh;
-    if (search_type == 'analogies'){
+    if (search_type === 'analogies'){
         priceTh = '';
         deliveryTh = '';
     }
@@ -255,10 +255,10 @@ function store_items(store_items, user, search_type = null){
             '</p>' +
             '<p>' + si.title_full + '</p>';
         if (
-            search_type == 'analogies' &&
+            search_type === 'analogies' &&
             typeof user !== 'undefined' &&
             typeof user.id !== 'undefined' &&
-            user.allow_request_delete_item == '1' &&
+            user.allow_request_delete_item === '1' &&
             si.status == '0'
         ){
             var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
@@ -316,6 +316,10 @@ function store_items(store_items, user, search_type = null){
                     '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
                 mobile +=
                     '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
+                if (+si.prevails[p].checked){
+                    full += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                    mobile += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                }
                 full += '</li>';
                 mobile += '</li>';
             }
@@ -333,6 +337,10 @@ function store_items(store_items, user, search_type = null){
                 '<li ' + si_price.noReturn + '>';
             full += '<a href="" store_id="' + si_price.store_id + '">' + si_price.cipher + '</a>';
             mobile += '<a href="" store_id="' + si_price.store_id + '">' + si_price.cipher + '</a>';
+            if (+si_price.checked){
+                full += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                mobile += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+            }
             full += '</li>';
             mobile += '</li>';
             if (si_delivery){
@@ -340,6 +348,10 @@ function store_items(store_items, user, search_type = null){
                     '<li ' + si_delivery.noReturn + '>';
                 full += '<a href="" store_id="' + si_delivery.store_id + '">' + si_delivery.cipher + '</a>';
                 mobile += '<a href="" store_id="' + si_delivery.store_id + '">' + si_delivery.cipher + '</a>';
+                if (+si_delivery.checked){
+                    full += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                    mobile += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                }
                 full += '</li>';
                 mobile += '</li>';
             }
@@ -347,7 +359,7 @@ function store_items(store_items, user, search_type = null){
                 '</ul>';
             mobile +=
                 '</ul>';
-        };
+        }
         full +=
             '</td>';
         mobile +=
@@ -405,7 +417,7 @@ function store_items(store_items, user, search_type = null){
                     si_delivery.in_stock +
                     si_delivery.packaging_text +
                     '</li>';
-            };
+            }
             full +=
                 '</ul>';
             mobile +=
@@ -730,6 +742,9 @@ function store_items(store_items, user, search_type = null){
                     full +=
                         '<li ' + si.prevails[p].noReturn + '>';
                     full += '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
+                    if (+si.prevails[p].checked){
+                        full += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                    }
                     full += '</li>'
                 }
                 full +=
@@ -747,6 +762,9 @@ function store_items(store_items, user, search_type = null){
                     mobile +=
                         '<li ' + si.prevails[p].noReturn + '>';
                     mobile += '<a href="" store_id="' + si.prevails[p].store_id + '">' + si.prevails[p].cipher + '</a>';
+                    if (+si.prevails[p].checked){
+                        mobile += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                    }
                     mobile += '</li>';
                 }
                 mobile +=
@@ -761,6 +779,10 @@ function store_items(store_items, user, search_type = null){
                     '<li ' + si.list[k].noReturn + '>';
                 full += '<a href="" store_id="' + si.list[k].store_id + '">' + si.list[k].cipher + '</a>';
                 mobile += '<a href="" store_id="' + si.list[k].store_id + '">' + si.list[k].cipher + '</a>';
+                if (+si.list[k].checked){
+                    full += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                    mobile += `<span title="Проверенный поставщик" class="icon-shield"></span>`
+                }
             }
             full +=
                 '</ul>' +

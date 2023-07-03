@@ -63,7 +63,7 @@ function setTabType(tab){
             success: function(msg){
                 if (msg){
                     res = JSON.parse(msg);
-                    sortStoreItems('brend');
+                    sortStoreItems('delivery');
                     var si = store_items(res.store_items, res.user, search_type);
                     if (Object.keys(res.prices).length){
                         $('#offers-filter-form').removeClass('hidden');

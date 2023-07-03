@@ -809,5 +809,9 @@ switch ($params[0]){
         $logger->alert('Цены и остатки Озон');
         Ozon::updatePrices($logger);
         break;
+    case 'subscribeTahosPrice':
+        $logger->alert('Рассылка прайса Тахос');
+        echo Tahos::subscribePrice();
+        break;
 }
 $logger->alert('----------КОНЕЦ-------------');

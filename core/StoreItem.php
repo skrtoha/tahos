@@ -39,7 +39,7 @@ class StoreItem{
 	public static function getStoreItemsByStoreID(array $store_ids, $notNulPrice = false): \mysqli_result
 	{
         $where = "si.store_id IN (" . implode(',', $store_ids) . ")";
-        if ($notNulPrice) $where .= " AND si.in_stock > 0";
+        if ($notNulPrice) $where .= " AND si.in_stock > 0 AND si.price > 0";
 		return $GLOBALS['db']->query("
 			SELECT
 				si.item_id,

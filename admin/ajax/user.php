@@ -149,17 +149,7 @@ switch($_POST['act']){
 		);
 		break;
 	case 'subscribeTahosPrice':
-		$res_store_items = core\StoreItem::getStoreItemsByStoreID([core\Provider\Tahos::$store_id]);
-		$file = core\Provider\Tahos::processExcelFileForSubscribePrices($res_store_items, 'price_tahos');
-
-		$mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
-        $res = $mailer->send([
-			'emails' => [$_POST['email']],
-			'subject' => 'Прайс с tahos.ru',
-			'body' => 'Прайс с tahos.ru'
-		], [$file]);
-		if ($res !== true) die($res);
-		echo true;
+		echo Provider\Tahos::subscribePrice();
 		break;
 	case 'subscribeMainStoresPrice':
 		if ($_POST['isFormNew'] == 'true'){

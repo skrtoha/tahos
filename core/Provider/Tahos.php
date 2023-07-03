@@ -1,8 +1,10 @@
 <?php
 namespace core\Provider;
 use core\Database;
+use core\Mailer;
 use core\Provider;
 use core\Config;
+use core\StoreItem;
 
 class Tahos extends Provider{
 	public static $store_id = Config::MAIN_STORE_ID;
@@ -90,5 +92,19 @@ class Tahos extends Provider{
     }
     public static function getSelfStores(){
         return self::getDbInstance()->select('provider_stores', ['id', 'title'], "`self` = 1");
+    }
+
+    public static function subscribePrice(){
+        $res_store_items = StoreItem::getStoreItemsByStoreID([self::$store_id], true);
+        $file = self::processExcelFileForSubscribePrices($res_store_items, 'price_tahos');
+
+        $mailer = new Mailer(Mailer::TYPE_SUBSCRIBE);
+        $res = $mailer->send([
+            'emails' => [$_POST['email']],
+            'subject' => 'Прайс с tahos.ru',
+            'body' => 'Прайс с tahos.ru'
+        ], [$file]);
+        if ($res !== true) die($res);
+        return true;
     }
 }

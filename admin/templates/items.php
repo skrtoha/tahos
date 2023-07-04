@@ -1,9 +1,11 @@
 <?
+
+use core\Database;
 use core\Managers;
 use core\Item;
 use core\Marketplaces\Marketplaces;
 
-/** @global \core\Database $db */
+/** @global Database $db */
 
 if (isset($_FILES['photo'])){
 	$name = preg_replace('/[а-яА-Я]+/u', "", $_FILES['photo']['name']);
@@ -180,14 +182,21 @@ switch ($act) {
 	case 'delete':
 		if (Managers::isActionForbidden('Номенклатура', 'Удаление')){
 			Managers::handlerAccessNotAllowed();
-		} 
-		if ($db->delete('items', "`id`=".$_GET['id'])){
+		}
+        $dbInstance = Database::getInstance();
+        $dbInstance->startTransaction();
+        $dbInstance->delete('required_remains', "`item_id` = {$_GET['id']}");
+        $dbInstance->delete('item_options', "`item_id` = {$_GET['id']}");
+        $dbInstance->delete('items', "`id`=".$_GET['id']);
+        $result = $dbInstance->commit();
+		if ($result === true){
 			$db->query("
 				UPDATE #settings SET `countItems` = `countItems` - 1 WHERE `id`=1
 			");
 			message('Успешно удалено!');
 			header("Location: ?view=items");
 		}
+        else message($result, false);
 		break;
 	case 'deleteItemDiff':
 		debug($_GET);

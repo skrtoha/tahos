@@ -11,6 +11,7 @@ class Database {
 	public $connection_id;
 	public $found_rows;
 	private $last_id;
+
 	public function __construct(){
 		$this->config = new Config();
 		$this->db_prefix = $this->config->db_prefix;
@@ -47,6 +48,7 @@ class Database {
 	function query($query, $show_query = '', $replaceSymbols = true){
 		if ($replaceSymbols) $query = str_replace('#', $this->db_prefix, $query);
         $this->last_query = $query;
+
 		if ($show_query == 'get') return $query;
 		if ($show_query == 'print'){
 			echo "<pre>$query</pre>";
@@ -375,10 +377,6 @@ class Database {
 		}
 		else return false;
 	}
-	function deleteOnID($table_name, $id){
-		if ($this->delete($table_name, 'id='.$id)) return true;
-		else return false;
-	}
 	/**
 	 * [getField description]
 	 * @param  [type] $table_name [description]
@@ -436,6 +434,24 @@ class Database {
 		$result_set->close();
 		return $data[0]["MAX($field)"];
 	}
+    public static function getInstance(): Database
+    {
+        static $self;
+        if ($self) return $self;
+        return new static();
+    }
+    public function startTransaction(){
+        $this->mysqli->begin_transaction();
+    }
+    public function commit(){
+        $result = $this->mysqli->commit();
+        if (!$result){
+            $error = $this->error();
+            $this->mysqli->rollback();
+            return $error;
+        }
+        return true;
+    }
 }
 
 spl_autoload_register(function($class){

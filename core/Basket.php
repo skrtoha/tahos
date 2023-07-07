@@ -16,7 +16,7 @@ class Basket{
 			SELECT 
                 b.*,
                 i.article,
-                i.article_cat,
+                IF(i.article_cat IS NOT NULL, i.article_cat, i.article) AS article_cat, 
                 i.brend_id,
                 br.title AS brend,
                 IF(pb.title IS NOT NULL, pb.title, br.title) AS provider_brend,

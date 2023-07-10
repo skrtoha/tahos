@@ -91,7 +91,7 @@ class Tahos extends Provider{
         return false;
     }
     public static function getSelfStores(){
-        return self::getDbInstance()->select('provider_stores', ['id', 'title'], "`self` = 1");
+        return Database::getInstance()->select('provider_stores', ['id', 'title'], "`self` = 1");
     }
 
     public static function subscribePrice(){

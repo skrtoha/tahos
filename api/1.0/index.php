@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
+use core\Database;
 use core\Exceptions\NotFoundException;
 use core\Setting;
 
@@ -14,7 +15,7 @@ require_once($root.'/core/DataBase.php');
 require_once($root.'/core/functions.php');
 require_once($root.'/vendor/autoload.php');
 
-$db = new core\Database();
+$db = Database::getInstance();
 $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();

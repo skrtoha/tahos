@@ -443,6 +443,7 @@ class Database {
     public function startTransaction(){
         $this->mysqli->begin_transaction();
     }
+
     public function commit(){
         $result = $this->mysqli->commit();
         if (!$result){

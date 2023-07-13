@@ -155,7 +155,7 @@ function getHtmlAdditionStringMainStore(providerList, providerStoreList = {}, st
         '</tr>';
 
     let requiredRemain = 1;
-    if (Object.keys(storeInfo).length != 0){
+    if (Object.keys(storeInfo).length != 0 && storeInfo.main_store !== null){
         requiredRemain = storeInfo.main_store.requiredRemain;
     }
     str +=

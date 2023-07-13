@@ -86,12 +86,18 @@ class Synchronization{
         if ($data['brend']['id'] == 0){
             $result = $db->select_one(
                 'brends',
-                'id',
-                "`title` = '{$data['brend']['title']}' AND `parent_id` = 0"
+                'id,parent_id',
+                "`title` = '{$data['brend']['title']}'"
             );
             if (!empty($result)){
-                $data['brend_id'] = $result['id'];
-                $output['result']['created_brend_id'] = $result['id'];
+                if ($result['parent_id']){
+                    $output['result']['created_brend_id'] = $result['parent_id'];
+                    $data['brend_id'] = $result['parent_id'];
+                }
+                else{
+                    $output['result']['created_brend_id'] = $result['c'];
+                    $data['brend_id'] = $result['id'];
+                }
             }
             else{
                 $result = $db->insert('brends', [

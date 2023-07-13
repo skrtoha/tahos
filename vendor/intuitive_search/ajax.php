@@ -127,14 +127,27 @@ switch($_GET['tableName']){
         if (!$showAll) $query = str_replace('SELECT', 'SELECT SQL_CALC_FOUND_ROWS', $query);
 
         $isMarketplace = isset($_GET['additionalConditions']['marketplace']) && $_GET['additionalConditions']['marketplace'];
-		$query .= "
-			LEFT JOIN
-				#store_items si ON si.item_id = i.id AND si.store_id = {$_GET['additionalConditions']['store_id']}
-			WHERE
-				i.article LIKE '{$_GET['value']}%'
-		";
+        if ($isMarketplace){
+            $selfStores = Tahos::getSelfStores();
+            $strSelfStores = implode(',', array_column($selfStores, 'id'));
+            $query .= "
+                LEFT JOIN
+                    #store_items si ON si.item_id = i.id AND si.store_id IN ($strSelfStores)
+                WHERE
+                    i.article LIKE '{$_GET['value']}%'
+		    ";
+        }
+        else{
+            $query .= "
+                LEFT JOIN
+                    #store_items si ON si.item_id = i.id AND si.store_id = {$_GET['additionalConditions']['store_id']}
+                WHERE
+                    i.article LIKE '{$_GET['value']}%'
+            ";
+        }
+
         if (!$isMarketplace) $query .= " AND si.store_id IS NULL";
-        else $query .= " AND si.store_id = {$_GET['additionalConditions']['store_id']}";
+        else $query .= " GROUP BY si.item_id";
 
         if (!$showAll) $query .= " LIMIT 0, {$_GET['maxCountResults']}";
 		$res_items = $db->query($query);

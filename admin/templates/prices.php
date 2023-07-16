@@ -21,8 +21,10 @@ switch ($act) {
 	case 'search_add': search_add(); break;
 	case 'delete_item':
         $where = "`item_id`=".$_GET['item_id']." AND `store_id`=".$_GET['store_id'];
-		if ($db->delete('store_items', $where)){
-            $db->delete('main_store_item', "`item_id` = {$_GET['item_id']}");
+		if ($db->delete('store_items', $where) === true){
+            if (!Provider\Tahos::isSelfStore($_GET['store_id'])){
+                $db->delete('main_store_item', "`item_id` = {$_GET['item_id']}");
+            }
 			exit();
 		}
 		break;

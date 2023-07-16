@@ -140,4 +140,17 @@ class Synchronization{
 
         return $output;
     }
+    public static function httpQuery($method, $data){
+        static $settings;
+        if (!$settings){
+            $settings = Setting::get('site_settings', null, 'all');
+        }
+        $url = $settings['1c_url'];
+        $url .= "$method/?".http_build_query($data);
+        $result = Provider::getCurlUrlData($url, [], [
+            'synchronization_token' => $settings['synchronization_token'],
+            'Authorization' => $settings['1c_authorization']
+        ]);
+        return $result;
+    }
 }

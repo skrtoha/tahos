@@ -3,6 +3,7 @@
 use core\Mailer;
 use core\Provider;
 use core\Setting;
+use core\Synchronization;
 use core\UserAddress;
 use core\User;
 require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/DataBase.php");
@@ -198,10 +199,10 @@ switch($_POST['act']){
         $db->delete('user_addresses', "`id` = {$_POST['address_id']}");
         break;
     case 'getArrangements':
-        $settings = Setting::get('site_settings', null, 'all');
-        $url = $settings['1c_url'];
-        $url .= "get-user-arrangements/?TahosID={$_POST['TahosID']}&userType={$_POST['userType']}";
-        $result = Provider::getCurlUrlData($url, [], ['synchronization_token' => $settings['synchronization_token']]);
+		$result = Synchronization::httpQuery('get-user-arrangements', [
+			'TahosID' => $_POST['TahosID'],
+			'userType' => $_POST['userType']
+		]);
         echo $result;
         break;
     case 'checkDebts':
@@ -227,10 +228,6 @@ switch($_POST['act']){
                 type_operation in (1,2)
             ORDER BY created
         ");
-        foreach($res as $value){
-
-        }
-
         echo json_encode($output);
         break;
     case 'getFundDistribution':

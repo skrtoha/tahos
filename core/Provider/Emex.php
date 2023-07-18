@@ -127,7 +127,7 @@ class Emex extends Provider{
         return $this->getResponse(self::SERVICE_SEARCH, 'TestConnect', ['some string']);
     }
 
-    private function FindDetailAdv($params = []): array
+    private function FindDetailAdv($params = [])
     {
         $defaultParams = [
             'substLevel' => 'OriginalOnly',

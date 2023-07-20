@@ -116,6 +116,8 @@ class Synchronization{
         else $data['brend_id'] = $data['brend']['id'];
 
         unset($data['brend']);
+        unset($data['title']);
+        unset($data['title_full']);
 
         if ($data['id']) $result = Item::update($data, ['id' => $data['id']]);
         else{

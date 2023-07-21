@@ -3,7 +3,10 @@ namespace core;
 
 class Synchronization{
 	public static function getNoneSynchronizedOrders(){
-		return self::getOrders(['synchronized' => 0], '');
+		return self::getOrders([
+            'synchronized' => 0,
+            'created' => '2023-07-20 00:00:00'
+        ], '');
 	}
 	public static function getOrders($params, $flag){
 		$output = [];

@@ -409,6 +409,9 @@ class OrderValue{
                 case 'limit':
                     $limit = "LIMIT $value";
                     break;
+                case 'created':
+                    $where .= "o.created >= '$value' AND ";
+                    break;
             }
         }
         if ($where){

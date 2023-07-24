@@ -98,7 +98,7 @@ class Synchronization{
                     $data['brend_id'] = $result['parent_id'];
                 }
                 else{
-                    $output['result']['created_brend_id'] = $result['c'];
+                    $output['result']['created_brend_id'] = $result['id'];
                     $data['brend_id'] = $result['id'];
                 }
             }
@@ -119,10 +119,13 @@ class Synchronization{
         else $data['brend_id'] = $data['brend']['id'];
 
         unset($data['brend']);
-        unset($data['title']);
-        unset($data['title_full']);
 
-        if ($data['id']) $result = Item::update($data, ['id' => $data['id']]);
+
+        if ($data['id']){
+            unset($data['title']);
+            unset($data['title_full']);
+            $result = Item::update($data, ['id' => $data['id']]);
+        }
         else{
             $query = Item::getQueryItemInfo();
             $query .= " WHERE i.article = '{$data['article']}' AND i.brend_id = {$data['brend_id']}";

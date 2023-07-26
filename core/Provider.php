@@ -1,6 +1,7 @@
 <?php
 namespace core;
 use core\Provider\Rossko;
+use core\Provider\Tahos;
 
 abstract class Provider{
 	private static $ignoreProvidersForMarkups = [18, 14];
@@ -511,7 +512,7 @@ abstract class Provider{
 	}
 
 	public static function clearStoresItems(array $params = []){
-        $where = "ps.id != ".Config::MAIN_STORE_ID." AND ";
+        $where = '';
 	    if (isset($params['provider_id']) && $params['provider_id']){
             $where .= "ps.provider_id = {$params['provider_id']} AND ";
         }
@@ -520,7 +521,8 @@ abstract class Provider{
 			foreach($params as $key => $value){
 				switch($key){
                     case '!main_stores':
-                        $where .= "ps.is_main != 1 AND ";
+                        $selfStores = Tahos::getSelfStores();
+                        $where .= "ps.id NOT IN (".implode(',', array_column($selfStores, 'id')).") AND ";
                         break;
 				}
 			}

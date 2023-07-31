@@ -188,13 +188,14 @@ switch ($params[0]){
         foreach($res as $item) $db->insert('prices', $item);
         message('Обновление прошло успешно!');
     case 'clearStores':
+        $selfStores = array_column(Tahos::getSelfStores(), 'id');
         $db->query("
 			DELETE si FROM #store_items si
 			LEFT JOIN
 				#provider_stores ps ON ps.id = si.store_id
 			WHERE
-				ps.id != ". Config::MAIN_STORE_ID."
-		",'');
+				ps.id NOT IN (".implode(',', $selfStores).")
+		",'get');
         $mysqli = $db->get_mysqli();
         $logger->info("Удалено {$mysqli->affected_rows} строк.");
         $db->query("

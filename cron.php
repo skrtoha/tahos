@@ -195,7 +195,7 @@ switch ($params[0]){
 				#provider_stores ps ON ps.id = si.store_id
 			WHERE
 				ps.id NOT IN (".implode(',', $selfStores).")
-		",'get');
+		",'');
         $mysqli = $db->get_mysqli();
         $logger->info("Удалено {$mysqli->affected_rows} строк.");
         $db->query("

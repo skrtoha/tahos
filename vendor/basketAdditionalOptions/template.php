@@ -87,6 +87,7 @@ $addresses = $db->select('user_addresses', '*', "`user_id` = {$user['id']}");
                 $end = clone $dateTimeObject;
 
                 if ($minDelivery){
+                    if ($minDelivery = -1) $minDelivery = 0;
                     $begin = $dateTimeObject->add(new \DateInterval("P{$minDelivery}D"));
                 }
                 else $begin = $dateTimeObject;

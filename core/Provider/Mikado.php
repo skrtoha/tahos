@@ -282,7 +282,7 @@ class Mikado extends Provider{
 	}
 	private function parseCodeListRow($row){
 		$object = new \StdClass();
-		$object->BRAND = $row->ProducerBrand;
+		$object->BRAND = $row->Brand;
 		$object->PIN = $row->ProducerCode;
 		$object->NAME = $row->Name;
 		$object->ZakazCode = $row->ZakazCode;

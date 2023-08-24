@@ -600,10 +600,10 @@ switch ($params[0]){
                     continue;
                 }
                 $resDownload = (
-                file_put_contents(
-                    core\Config::$tmpFolderPath . "/{$storeInfo['cipher']}.zip",
-                    $file
-                )
+                    file_put_contents(
+                        core\Config::$tmpFolderPath . "/{$storeInfo['cipher']}.zip",
+                        $file
+                    )
                 );
     
                 $zipArchive = new ZipArchive();

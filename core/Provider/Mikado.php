@@ -281,8 +281,10 @@ class Mikado extends Provider{
 		} 
 	}
 	private function parseCodeListRow($row){
+        if (!is_string($row->ProducerBrand)) return false;
+
 		$object = new \StdClass();
-		$object->BRAND = $row->Brand;
+        $object->BRAND = $row->ProducerBrand;
 		$object->PIN = $row->ProducerCode;
 		$object->NAME = $row->Name;
 		$object->ZakazCode = $row->ZakazCode;
@@ -299,6 +301,7 @@ class Mikado extends Provider{
 			}
 			else $this->parseStockLine($row->OnStocks->StockLine, $item_id, $row);
 		}
+        return true;
 	}
 	private static function getStoreID($StockID){
 		$stocks = self::getStocks();

@@ -190,8 +190,12 @@ class Autoeuro extends Provider{
                 $db->insert('autoeuro_order_keys', [
                     'store_id' => $store_id,
                     'item_id' => $item_id,
-                    'offer_key' => $offer['offer_key']
-                ]);
+                    'offer_key' => $offer['offer_key'],
+                    'order_term' => $offer['delivery']
+                ],
+                ['duplicate' => [
+                    'order_term' => $offer['delivery']
+                ]]);
                 continue;
             }
             

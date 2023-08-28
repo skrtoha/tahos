@@ -163,7 +163,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				LEFT JOIN
 					#items i ON i.id = si.item_id
 				LEFT JOIN
-					#required_remains rr ON rr.item_id = si.item_id and rr.self_store_id = $store_id
+					#required_remains rr ON rr.item_id = si.item_id
 				LEFT JOIN
 					#brends b ON b.id = i.brend_id
 				WHERE

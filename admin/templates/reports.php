@@ -168,7 +168,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 					#brends b ON b.id = i.brend_id
 				WHERE
 					si.in_stock < rr.requiredRemain AND
-					si.store_id = " . core\Provider\Tahos::$store_id . "
+					si.store_id = $store_id
 				ORDER BY 
 					b.title
 			", '');

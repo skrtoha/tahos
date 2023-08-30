@@ -90,8 +90,6 @@ switch ($act){
                 ]]
             );
 
-            $array =
-
             Database::getInstance()->insert(
                 'main_store_item',
                 [

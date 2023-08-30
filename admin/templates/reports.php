@@ -149,7 +149,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 
             $output = [];
 			$res = $db->query("
-				SELECT
+				SELECT DISTINCT 
 					i.id,
 					i.brend_id,
 					b.title AS brend,

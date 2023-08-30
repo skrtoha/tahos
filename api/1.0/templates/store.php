@@ -18,20 +18,94 @@ switch ($act){
         if ($queryParams['store_id']){
             $db->delete('store_items', "`store_id` = {$queryParams['store_id']}");
         }
+        $queryByItemId = [];
         foreach($queryParams['items'] as $row){
+            $itemIDList[] = $row['item_id'];
+            $queryByItemId[$row['item_id']] = [
+                'price' => $row['price'],
+                'quan' => $row['quan']
+            ];
+        }
+
+        $selfStores = Tahos::getSelfStores();
+        $selfStoresIDs = array_column($selfStores, 'id');
+
+        $result = Database::getInstance()->query("
+            select
+                si.item_id,
+                min(si.price) as price
+            from
+                tahos_store_items si
+            where
+                si.item_id in (".implode(",", $itemIDList).")
+                AND si.store_id not in (".implode(",", $selfStoresIDs).")
+                and si.in_stock > 0
+            group by
+                si.item_id
+        ");
+
+        $where = "";
+        while($row = $result->fetch_assoc()){
+            $where .= "(si.item_id = {$row['item_id']} and si.price = {$row['price']}) or ";
+        }
+        $where = substr($where, 0, -4);
+        $result = Database::getInstance()->query("
+            select
+                min(si.item_id) as item_id,
+                min(si.store_id) as store_id,
+                min(si.price) as price
+            from
+                tahos_store_items si
+            where $where
+            group by si.item_id;
+        ");
+        $minPriceByItemId = [];
+        while($row = $result->fetch_assoc()){
+            $minPriceByItemId[$row['item_id']] = [
+                'store_id' => $row['store_id'],
+                'price' => $row['price']
+            ];
+        }
+
+        foreach($queryByItemId as $item_id => $row){
+            $price = 0;
+            if (
+                isset($minPriceByItemId[$item_id]) &&
+                $minPriceByItemId[$item_id]['price'] >= $queryByItemId[$item_id]['price']
+            ){
+                $price = $minPriceByItemId[$item_id]['price'];
+            }
+            else $price = $queryByItemId[$item_id]['price'];
+
             Database::getInstance()->insert(
                 'store_items',
                 [
                     'store_id' => $queryParams['store_id'],
-                    'item_id' => $row['item_id'],
-                    'price' => $row['price'],
+                    'item_id' => $item_id,
+                    'price' => $price,
                     'in_stock' => $row['quan']
                 ],
                 ['duplicate' => [
-                    'price' => $row['price'],
                     'in_stock' => $row['quan']
                 ]]
             );
+
+            $array =
+
+            Database::getInstance()->insert(
+                'main_store_item',
+                [
+                    'store_id' => $minPriceByItemId[$item_id]['store_id'] ?? null,
+                    'item_id' => $item_id,
+                    'min_price' => $queryByItemId[$item_id]['price']
+                ]
+                ,
+                ['duplicate' => [
+                    'min_price' => $queryByItemId[$item_id]['price'],
+                    'store_id' => $minPriceByItemId[$item_id]['store_id'] ?? null
+                ]]
+            );
+
         }
         break;
     default:

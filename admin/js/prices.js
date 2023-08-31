@@ -27,7 +27,11 @@ function showStoreInfo(store_id, item_id, self_store = 0){
             if (typeof storeInfo.main_store !== 'undefined' && storeInfo.main_store !== null){
                 store.store_id = storeInfo.main_store.store_id;
                 store.provider_id = storeInfo.main_store.provider_id;
-                store.provider = storeInfo.providerList[store.provider_id].title;
+
+                if (store.provider_id){
+                    store.provider = storeInfo.providerList[store.provider_id].title;
+                }
+
                 store.cipher = storeInfo.main_store.cipher;
                 store.store = storeInfo.main_store.cipher + '-' + storeInfo.main_store.title;
                 store.min_price = storeInfo.main_store.min_price;

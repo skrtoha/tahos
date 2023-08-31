@@ -20,7 +20,6 @@ $db = new core\Database();
 $connection = new core\Connection($db);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');
 $db->connection_id = $connection->connection_id;
-$settings = $db->select('settings', '*', '`id`=1'); $settings = $settings[0];
 $db->setProfiling();
 
 $detect = new \Mobile_Detect;

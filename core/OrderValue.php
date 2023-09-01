@@ -63,15 +63,13 @@ class OrderValue{
         return true;
     }
 
-	/**
-	 * changes status
-	 * @param  [integer] $status_id 1, 2, 3, 6, 10, 11
-	 * @param  [array] $params 
-	 *         order_id, store_id, item_id - required for all statuses
-	 *         status = 1 - issued
-	 *         status = 2|3|8|10|11  - price, quan, user_id
-	 * @return [boolean] true if changed successfully
-	 */
+    /**
+     * changes status
+     * @param $status_id
+     * @param $params
+     * @return void [boolean] true if changed successfully
+     * @throws Exception
+     */
 	public static function changeStatus($status_id, $params){
 		$values = ['status_id' => $status_id];
 		if (isset($params['synchronized']) && $params['synchronized']){

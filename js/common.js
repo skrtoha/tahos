@@ -298,40 +298,41 @@ $(function() {
 			.css('width', '100%')
 			.css('display', 'flex')
 			.css('justify-content', 'center')
-			.css('align-items', 'center');
+			.css('align-items', 'center')
+            .css('height', '90vh')
 		$("#full-image").show();
-		$.getScript('https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=64b4b12b-f136-4cc3-bfe2-3418e1c7b59a', function(){
-			ymaps.ready(function(){
+		$.getScript('https://api-maps.yandex.ru/2.1/?apikey=64b4b12b-f136-4cc3-bfe2-3418e1c7b59a&lang=ru_RU', function(){
+            ymaps.ready(function(){
 				$.ajax({
 					type: 'post',
 					url: '/ajax/common.php',
 					data: 'act=get_issue_by_id&issue_id=' + th.data('issue-id'),
 					success: function(response){
 						// console.log(response); return false;
-						var issue = JSON.parse(response);
-						var coords = issue.coords.split(',');
-						var coord_1 = parseFloat(coords[0]);
-						var coord_2 = parseFloat(coords[1]);
-						var myPlacemark = new ymaps.Placemark(
-							[coord_1, coord_2],
-							{
-								balloonContentHeader: issue.title,
-								balloonContentBody: issue.desc,
-								balloonContentFooter: issue.adres,
-							},
-							{
-								'balloonCloseButton': false
-							}
-						);
-						$('#map').empty();
-						var myMap = new ymaps.Map('map', {
-							center: [coord_1, coord_2],
-							zoom: 15
-							}
-						);
-						myMap.geoObjects.add(myPlacemark);
+                        const issue = JSON.parse(response);
+                        const coords = issue.coords.split(',');
+                        const coord_1 = parseFloat(coords[0]);
+                        const coord_2 = parseFloat(coords[1]);
+                        const myPlacemark = new ymaps.Placemark(
+                            [coord_1, coord_2],
+                            {
+                                balloonContentHeader: issue.title,
+                                balloonContentBody: issue.desc,
+                                balloonContentFooter: issue.adres,
+                            },
+                            {
+                                'balloonCloseButton': false
+                            }
+                        );
+                        $('#map').empty();
+                        const myMap = new ymaps.Map('map', {
+                                center: [coord_1, coord_2],
+                                zoom: 15
+                            }
+                        );
+                        myMap.geoObjects.add(myPlacemark);
 						myPlacemark.balloon.open();
-					} 
+					}
 				})
 			});
 		})

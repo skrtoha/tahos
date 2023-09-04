@@ -301,7 +301,7 @@ $(function() {
 			.css('align-items', 'center')
             .css('height', '90vh')
 		$("#full-image").show();
-		$.getScript('https://api-maps.yandex.ru/2.1/?apikey=64b4b12b-f136-4cc3-bfe2-3418e1c7b59a&lang=ru_RU', function(){
+		$.getScript('https://api-maps.yandex.ru/2.1/?apikey=9c8a8b41-54f2-48ab-993b-1b8384cda4eb&lang=ru_RU', function(){
             ymaps.ready(function(){
 				$.ajax({
 					type: 'post',

@@ -21,4 +21,4 @@ foreach ($array as $value) {
 		'balloon' => $balloon
 		);
 }
-echo json_encode($result)?>
+echo json_encode($result);

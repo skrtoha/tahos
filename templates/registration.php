@@ -251,9 +251,7 @@ Breadcrumb::out();
 		<button>Зарегистрироваться</button>
 	</form>
 </div>
-<div id="map" class="">
-	 <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?sid=z7VNSevfo6D6GHSqRPVSqExzHwOlBrQN&amp;width=100%25&amp;height=786&amp;lang=ru_RU&load=package.geoObjects&sourceType=constructor&amp;scroll=true"></script>
-</div>
+<div id="map2" class=""></div>
 <div class="clear"></div>
 <?
 $user_id = null;

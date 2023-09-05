@@ -13,6 +13,17 @@ switch ($act){
     case 'replenishBill':
         $queryParams['comment'] = mb_substr($queryParams['comment'], 0, -8);
 
+        $count = Database::getInstance()->getCount(
+            'funds',
+            "
+                `user_id` = {$queryParams['user_id']} AND 
+                `sum` = {$queryParams['sum']} AND
+                `comment` = '{$queryParams['comment']}'
+            "
+        );
+
+        if ($count) break;
+
         User::replenishBill([
             'user_id' => $queryParams['user_id'],
             'sum' => $queryParams['sum'],

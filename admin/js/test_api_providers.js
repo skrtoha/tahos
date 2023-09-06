@@ -7,16 +7,18 @@
 				let val = $(this).val();
 				let minLength = 1;
 				val = val.replace(/[^\wа-яА-Я]+/gi, '');
-				intuitive_search.getResults({
-					event: e,
-					value: val,
-					minLength: minLength,
-					additionalConditions: {
-						act: $(this).attr('name'),
-						item_id: $('input[name=item_id]').val()
-					},
-					tableName: 'items',
-				});
+                delay(() => {
+                    intuitive_search.getResults({
+                        event: e,
+                        value: val,
+                        minLength: minLength,
+                        additionalConditions: {
+                            act: $(this).attr('name'),
+                            item_id: $('input[name=item_id]').val()
+                        },
+                        tableName: 'items',
+                    });
+                }, 1000)
 			});
 			$('#getCoincidences').on('submit', function(e){
 				e.preventDefault();

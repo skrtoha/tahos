@@ -143,12 +143,14 @@
 				e.preventDefault();
 				let val = $(this).val();
 				let minLength = 1;
-				intuitive_search.getResults({
-					event: e,
-					value: val,
-					minLength: minLength,
-					tableName: 'brends',
-				});
+                delay(() => {
+                    intuitive_search.getResults({
+                        event: e,
+                        value: val,
+                        minLength: minLength,
+                        tableName: 'brends',
+                    });
+                }, 1000)
 			});
 			$(document).on('click', 'a.resultBrend', function(){
 				let th = $(this);

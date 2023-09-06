@@ -49,17 +49,19 @@ function set_intuitive_search(e, tableName){
 	let val = $(e.target).val();
 	let minLength = 1;
 	val = val.replace(/[^\wа-яА-Я]+/gi, '');
-	intuitive_search.getResults({
-		event: e,
-		value: val,
-		additionalConditions: {
-			store_id: $('table.t_table').attr('store_id'),
-            type_search: document.querySelector('input[name=type_search]:checked').value,
-            provider_id: document.querySelector('input[name="provider_id"]').value
-		},
-		minLength: minLength,
-		tableName: tableName
-	});
+    delay(() => {
+        intuitive_search.getResults({
+            event: e,
+            value: val,
+            additionalConditions: {
+                store_id: $('table.t_table').attr('store_id'),
+                type_search: document.querySelector('input[name=type_search]:checked').value,
+                provider_id: document.querySelector('input[name="provider_id"]').value
+            },
+            minLength: minLength,
+            tableName: tableName
+        });
+    }, 1000)
 }
 function deleteStoreItem(item_id, store_id){
 	$.ajax({

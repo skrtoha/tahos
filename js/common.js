@@ -1,11 +1,18 @@
 let ajaxIsProcessing = false;
 var cookieOptions = {path: '/'};
 var cp_api = false;
-let countCharactersForSearch = 3;
+let countCharactersForSearch = 2;
 var h_win = $(window).height();
 let bigImages = [];
 let countPressBackspace = 0;
 const popup = document.querySelector('#popup')
+const delay = (function () {
+    let timer = 0;
+    return function (callback, ms) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();
 function showPopupAddGarage(data){
     let src = `
         <div class="wrapper">
@@ -529,8 +536,6 @@ $(function() {
 		$('.hints').show();
 	})
         .on('keyup input', function(event){
-            if (ajaxIsProcessing) return;
-
             if (event.keyCode == 38 || event.keyCode == 40){
                 return selectItemByKey(event);
             }
@@ -579,23 +584,24 @@ $(function() {
             }
 
             $('.hints table.coincidences').html(htmlArticleBarcole);
-            $.ajax({
-                type: 'post',
-                url: '/ajax/common.php',
-                data: {
-                    act: 'searchArticles',
-                    value: inputValue,
-                    maxCountResults: 10
-                },
-                beforeSend: function(){
-                    ajaxIsProcessing = true;
-                },
-                success: function(response){
-                    ajaxIsProcessing = false;
-                    $('table.coincidences tr.item').remove();
-                    $('table.coincidences').append(response);
-                }
-            })
+
+            delay(() => {
+                $.ajax({
+                    type: 'post',
+                    url: '/ajax/common.php',
+                    data: {
+                        act: 'searchArticles',
+                        value: inputValue,
+                        maxCountResults: 10
+                    },
+                    beforeSend: function(){},
+                    success: function(response){
+                        ajaxIsProcessing = false;
+                        $('table.coincidences tr.item').remove();
+                        $('table.coincidences').append(response);
+                    }
+                })
+            }, 1000)
         })
 	$(document).on('click', '.hints table tr', function(e){
 		let tr = $(this);

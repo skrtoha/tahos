@@ -96,16 +96,18 @@ $(function(){
 		let val = $(this).val();
 		let minLength = 1;
 		val = val.replace(/[^\wа-яА-Я]+/gi, '');
-		intuitive_search.getResults({
-			event: e,
-			value: val,
-			minLength: minLength,
-			additionalConditions: {
-				act: $(this).attr('name'),
-				item_id: $('input[name=item_id]').val()
-			},
-			tableName: 'items',
-		});
+        delay(() => {
+            intuitive_search.getResults({
+                event: e,
+                value: val,
+                minLength: minLength,
+                additionalConditions: {
+                    act: $(this).attr('name'),
+                    item_id: $('input[name=item_id]').val()
+                },
+                tableName: 'items',
+            });
+        }, 1000)
 	});
 	$('.hide').on('click', function(e){
 		e.preventDefault();
@@ -117,7 +119,7 @@ $(function(){
 		var th = $(this);
 		var category_id = th.parent().next().attr('category_id');
 		var item_id = th.closest('#category_items').attr('item_id');
-		var initials = new Array();
+		var initials = [];
 		$('.category[category_id=' + category_id + '] td').each(function(){
 			var th = $(this);
 			if (th.attr('filter_id')) initials[th.attr('filter_id')] = th.html();

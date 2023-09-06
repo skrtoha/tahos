@@ -144,15 +144,17 @@ $(function(){
         let val = $(this).val();
         let minLength = 1;
         val = val.replace(/[^\wа-яА-Я]+/gi, '');
-        intuitive_search.getResults({
-            event: e,
-            value: val,
-            minLength: minLength,
-            tableName: 'users',
-            additionalConditions: {
-                provider_id: getParams().id
-            }
-        });
+        delay(() => {
+            intuitive_search.getResults({
+                event: e,
+                value: val,
+                minLength: minLength,
+                tableName: 'users',
+                additionalConditions: {
+                    provider_id: getParams().id
+                }
+            });
+        }, 1000)
     });
 	$(document).on('click', '[type=checkbox][name*=isWorkDay]', function(){
 		let th = $(this);
@@ -297,12 +299,14 @@ $(function(){
         e.preventDefault();
         let val = e.target.value;
         let minLength = 1;
-        intuitive_search.getResults({
-            event: e,
-            value: val,
-            minLength: minLength,
-            additionalConditions: {},
-            tableName: 'brends',
+        delay(() => {
+            intuitive_search.getResults({
+                event: e,
+                value: val,
+                minLength: minLength,
+                additionalConditions: {},
+                tableName: 'brends',
+            })
         })
     })
 

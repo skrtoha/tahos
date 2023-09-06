@@ -1,5 +1,13 @@
-var cookieOptions = {path: '/'};
-var item_id = $('input[name=id]').val();
+const cookieOptions = {path: '/'};
+const item_id = $('input[name=id]').val();
+const delay = (function () {
+    let timer = 0;
+    return function (callback, ms) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();
+
 function getParams(url = ''){
 	let str = url ? url : window.location.search;
 	if (!str) return false;

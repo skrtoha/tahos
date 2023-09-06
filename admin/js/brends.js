@@ -94,15 +94,17 @@
 				let val = $(this).val();
 				let minLength = 1;
 				val = val.replace(/[^\wа-яА-Я]+/gi, '');
-				intuitive_search.getResults({
-					event: e,
-					value: val,
-					minLength: minLength,
-					additionalConditions: {
-						brend_id: $('input[name=id]').val(),
-					},
-					tableName: 'brendItems',
-				});
+                delay(() => {
+                    intuitive_search.getResults({
+                        event: e,
+                        value: val,
+                        minLength: minLength,
+                        additionalConditions: {
+                            brend_id: $('input[name=id]').val(),
+                        },
+                        tableName: 'brendItems',
+                    });
+                }, 1000)
 			});
 			$('div.value.subbrends').on('click', '.subbrend_delete', function(){
 				var elem = $(this).parent();

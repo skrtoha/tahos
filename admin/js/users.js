@@ -161,15 +161,17 @@ class User{
             let val = $(this).val();
             let minLength = 1;
             val = val.replace(/[^\wа-яА-Я]+/gi, '');
-            intuitive_search.getResults({
-                event: e,
-                value: val,
-                minLength: minLength,
-                additionalConditions: {
-                    act: 'items'
-                },
-                tableName: 'items',
-            });
+            delay(() => {
+                intuitive_search.getResults({
+                    event: e,
+                    value: val,
+                    minLength: minLength,
+                    additionalConditions: {
+                        act: 'items'
+                    },
+                    tableName: 'items',
+                });
+            }, 1000)
         });
         $('div.set-addresses > button').on('click', function(e) {
             e.preventDefault();

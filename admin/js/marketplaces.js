@@ -540,16 +540,18 @@ class Marketplaces{
         let val = e.target.value;
         let minLength = 1;
         val = val.replace(/[^\wа-яА-Я]+/gi, '');
-        intuitive_search.getResults({
-            event: e,
-            value: val,
-            additionalConditions: {
-                store_id: 23,
-                marketplace: 1
-            },
-            minLength: minLength,
-            tableName: tableName
-        });
+        delay(() => {
+            intuitive_search.getResults({
+                event: e,
+                value: val,
+                additionalConditions: {
+                    store_id: 23,
+                    marketplace: 1
+                },
+                minLength: minLength,
+                tableName: tableName
+            });
+        }, 1000)
     }
 
     static getTypeHtml(types){

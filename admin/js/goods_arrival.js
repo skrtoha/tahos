@@ -6,13 +6,15 @@
 				e.preventDefault();
 				let val = $(this).val();
 				let minLength = 1;
-				intuitive_search.getResults({
-					event: e,
-					value: val,
-					minLength: minLength,
-					additionalConditions: {},
-					tableName: 'provider_stores',
-				});
+                delay(() => {
+                    intuitive_search.getResults({
+                        event: e,
+                        value: val,
+                        minLength: minLength,
+                        additionalConditions: {},
+                        tableName: 'provider_stores',
+                    });
+                }, 1000)
 			});
 			$(document).on('click', '[store_id].provider_store', function(e){
 				e.preventDefault();
@@ -31,15 +33,17 @@
 				let val = $(this).val();
 				let minLength = 1;
 				val = val.replace(/[^\wа-яА-Я]+/gi, '');
-				intuitive_search.getResults({
-					event: e,
-					value: val,
-					minLength: minLength,
-					additionalConditions: {
-						act: 'items'
-					},
-					tableName: 'items',
-				});
+                delay(() => {
+                    intuitive_search.getResults({
+                        event: e,
+                        value: val,
+                        minLength: minLength,
+                        additionalConditions: {
+                            act: 'items'
+                        },
+                        tableName: 'items',
+                    });
+                }, 1000)
 			});
 			$(document).on('click', '.store_id .icon-cross1', function(){
 				let th = $(this);

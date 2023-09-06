@@ -113,10 +113,10 @@ function funds(){
 					<td label="Сумма" class="price_format"><?=$fund['sum']?></td>
                     <td>
                         <?if ($fund['bill_type'] == \core\User::BILL_CASH){?>
-                            наличный
+                            Наличный
                         <?}?>
                         <?if ($fund['bill_type'] == \core\User::BILL_CASHLESS){?>
-                            безналичный
+                            Безналичный
                         <?}?>
                     </td>
 					<td label="Остаток" class="price_format"><?=$fund['remainder']?></td>

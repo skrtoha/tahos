@@ -51,6 +51,7 @@ switch($_POST['act']){
 		$query = core\Item::getQueryItemInfo();
 		$article = core\Item::articleClear($_POST['value']);
         $query = str_replace('SELECT', 'SELECT DISTINCT', $query);
+        $query = str_replace('b.title AS brend', 'b.title AS brend, si.price', $query);
 		$query .= "
 		    LEFT JOIN
 		        #store_items si ON si.item_id = i.id

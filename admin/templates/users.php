@@ -840,10 +840,10 @@ function funds(){
 					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
                     <td label="Счет">
                         <?if ($fund['bill_type'] == User::BILL_CASH){?>
-                            наличный
+                            Наличный
                         <?}
                         else{?>
-                            безналичный
+                            Безналичный
                         <?}?>
                     </td>
 					<td label="Сумма" class="price_format"><?=$fund['sum']?></td>

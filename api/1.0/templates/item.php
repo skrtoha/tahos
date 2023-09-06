@@ -13,6 +13,15 @@ switch ($act){
     case 'create':
         $result = json_encode(Synchronization::createItem($queryParams));
         break;
+    case 'updateTitle':
+        $result = \core\Item::update(
+            [
+                'title_full' => $queryParams['title'],
+                'title' => $queryParams['title']
+            ],
+            ['id' => $queryParams['item_id']]
+        );
+        break;
     case 'get':
         $result = [];
         $query = \core\Item::getQueryItemInfo();

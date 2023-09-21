@@ -92,17 +92,18 @@ switch ($act){
                 ]]
             );
 
+            $store_id = $minPriceByItemId[$item_id]['store_id'] ?? $queryParams['store_id'];
             Database::getInstance()->insert(
                 'main_store_item',
                 [
-                    'store_id' => $minPriceByItemId[$item_id]['store_id'] ?? null,
+                    'store_id' => $store_id,
                     'item_id' => $item_id,
                     'min_price' => $queryByItemId[$item_id]['price']
                 ]
                 ,
                 ['duplicate' => [
                     'min_price' => $queryByItemId[$item_id]['price'],
-                    'store_id' => $minPriceByItemId[$item_id]['store_id'] ?? null
+                    'store_id' => $store_id
                 ]]
             );
 

@@ -58,7 +58,7 @@ switch ($act){
                 tahos_store_items si
             left join
                 #provider_stores ps on ps.id = si.store_id
-            where ($where) AND ps.is_main = 1
+            where ($where)
             group by si.item_id;
         ");
         $minPriceByItemId = [];

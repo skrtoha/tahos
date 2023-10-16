@@ -225,6 +225,7 @@ function items(){
 			case 'summ': $orderBy = 'si.price * si.in_stock'; break;
             case 'updated': $orderBy = 'msi.updated'; break;
             case 'min_price': $orderBy = 'msi.min_price'; break;
+            case 'main_store_item': $orderBy = 'main_store_item'; break;
 		}
 		if (isset($_GET['direction']) && $_GET['direction']) $orderBy .= " {$_GET['direction']}";
 	}

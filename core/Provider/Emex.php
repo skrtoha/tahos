@@ -397,7 +397,15 @@ class Emex extends Provider{
             'Com' => '',
             'Notc' => $ov['typeOrganization'] == 'entity' ? 1 : 0
         ];
-        self::getInfstance()->getResponse(self::SERVICE_BASKET, 'InsertToBasket3', $array);
+        $result = self::getInfstance()->getResponse(self::SERVICE_BASKET, 'InsertToBasket3', $array);
+
+        if (isset($result->ErrorMessageCode) && $result->ErrorMessageCode){
+            Log::insert([
+                'text' => $result->Comment,
+                'additional' => "osi: {$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"
+            ]);
+            return;
+        }
         OrderValue::changeStatus(7, $ov);
     }
 

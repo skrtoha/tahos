@@ -1,14 +1,14 @@
 <?php
 namespace core;
 class Log{
-	/**
-	 * inserts a record to Log
-	 * @param  array $params 
-	 *         	text - required,
-	 *         	url, query, trace - optional
-	 * @param  bool|null $flag   [description]
-	 * @return mixed true - if successfully inserted, string - error
-	 */
+    /**
+     * inserts a record to Log
+     * @param array $params
+     *            text - required,
+     *            url, query, trace - optional
+     * @param array|null $flag [description]
+     * @return mixed true - if successfully inserted, string - error
+     */
 	public static function insert(array $params, array $flag = null): bool
 	{
 		if (!isset($params['url'])) $params['url'] = $_SERVER['REQUEST_URI'];

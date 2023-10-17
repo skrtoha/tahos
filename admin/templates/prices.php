@@ -223,7 +223,7 @@ function items(){
 			case 'price': $orderBy = 'si.price'; break;
 			case 'requiredRemain': $orderBy = 'rr.requiredRemain'; break;
 			case 'summ': $orderBy = 'si.price * si.in_stock'; break;
-            case 'updated': $orderBy = 'msi.updated'; break;
+            case 'updated': $orderBy = 'updated'; break;
             case 'min_price': $orderBy = 'msi.min_price'; break;
             case 'main_store_item': $orderBy = 'main_store_item'; break;
 		}

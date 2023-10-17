@@ -267,12 +267,12 @@ function items(){
             CONCAT(p.title, '-', ps.cipher, '-', ps.title) AS main_store_item,
             msi.min_price,
             ps2.provider_id,
-            msi.updated
+            if(msi.updated is null, msi.created, msi.updated) as updated
         FROM
             #store_items si
             LEFT JOIN #items i ON si.item_id=i.id
             LEFT JOIN #brends b ON b.id=i.brend_id
-            LEFT JOIN #required_remains rr ON rr.item_id = si.item_id AND self_store_id = 23
+            LEFT JOIN #required_remains rr ON rr.item_id = si.item_id AND self_store_id = $id
             LEFT JOIN #main_store_item msi ON msi.item_id = si.item_id
             LEFT JOIN #provider_stores ps ON ps.id = msi.store_id
             LEFT JOIN #provider_stores ps2 ON ps2.id = si.store_id

@@ -106,6 +106,14 @@ switch ($act){
                     'store_id' => $store_id
                 ]]
             );
+            Database::getInstance()->insert(
+                'required_remains',
+                [
+                    'item_id' => $item_id,
+                    'self_store_id' => $queryParams['store_id'],
+                    'requiredRemain' => 1
+                ]
+            );
 
         }
         break;

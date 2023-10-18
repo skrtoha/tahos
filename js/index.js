@@ -1,7 +1,5 @@
 let count_click = 0;
 $(function(){
-    $.mask.definitions['~'] = '[+-]';
-    $("input[name=phone]").mask("+7 (999) 999-99-99");
 	/* actions slider */
 	$(".actions_slider").owlCarousel({
 		items: 1,
@@ -21,10 +19,6 @@ $(function(){
 				ul.find('li:nth-child(' + i + ')').addClass('hidden');
 				i--;
 			}
-			/*console.log(ul.height);
-			for(let i = 9; i <= li_count; i++){
-				ul.find('li:nth-child(' + i + ')').addClass('hidden');
-			}*/
 			ul.append('<li><a class="more" href="#">еще..<a></li>');
 		}
 	})

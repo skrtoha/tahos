@@ -231,7 +231,6 @@ use core\Setting;
 						<input type="hidden" name="form_autorization" value="1">
 						<p>Логин</p>
 						<input type="text" name="login" placeholder="Введите телефон или почту">
-                        <input type="text" name="phone">
 						<p>Пароль</p>
 						<input type="password" name="password">
 						<div class="forgot_password">
@@ -466,7 +465,7 @@ use core\Setting;
 	<!-- Optimized loading JS Start -->
 	<script>var scr = {"scripts":[
 		{"src" : "/js/jquery.cookie.js", "async" : false},
-		{"src" : "/js/jquery.priceformat.min.js", "async" : false},
+		// {"src" : "/js/jquery.priceformat.min.js", "async" : false},
 		{"src" : "/js/common.js", "async" : false},
 		{"src" : "/js/jquery.preload.min.js", "async" : false},
 		{"src" : "/js/jquery.form.js", "async" : false},

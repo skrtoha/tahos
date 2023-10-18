@@ -280,14 +280,6 @@ $(function() {
         }
     }
 
-    const maskPhone = "+7 (999) 999-99-99";
-    $.mask.definitions['~']='[9]';
-    $('.login input[name=phone]').mask(maskPhone, {
-        autoclear: false,
-        completed: () => {
-            document.querySelector('.login input[type=password]').focus()
-        }
-    });
 	cp_init();
 	price_format();
 	$('input[name=remember]').styler();
@@ -743,32 +735,34 @@ $(function() {
         })
     })
 
-    $('.login input[name=login], .login input[name=phone]').on('keyup', (event) => {
-        const t = event.target;
-        switch (t.name){
-            case 'login':
-                countPressBackspace = 0;
-                const started89 = /^8\(?9/.test(t.value);
-                if (/^\+7/.test(t.value) || started89){
-                    t.style.display = 'none';
-                    t.value = '';
-                    const phone = document.querySelector('.login input[name=phone]');
-                    if (started89) phone.value = '+7 9';
-                    phone.style.display = 'block';
-                    phone.focus();
+    let countPressBackspace = 0;
+    const maskPhone = "+7 (999) 999-99-99";
+    $('.login input[name=login]').on('keyup', (event) => {
+
+        const t = event.target
+
+        if (event.key == 'Backspace' && t.value == '+7 (___) ___-__-__') {
+            countPressBackspace++;
+            if (countPressBackspace <= 1) return
+            $(t).unmask()
+            t.value = ''
+            countPressBackspace = 0
+            return;
+        }
+
+        const started89 = /^8\(?9/.test(t.value);
+        if (/^\+7/.test(t.value) || started89){
+            if (t.value.length >= 4) return
+
+            t.value = '+7 9';
+            $(t).mask(maskPhone, {
+                autoclear: false,
+                completed: () => {
+                    document.querySelector('.login input[type=password]').focus()
                 }
-                break;
-            case 'phone':
-                if (event.key == 'Backspace' && t.value == '+7 (___) ___-__-__'){
-                    countPressBackspace++;
-                    if (countPressBackspace <= 1) break;
-                    t.style.display = 'none';
-                    const login = document.querySelector('.login input[name=login]');
-                    login.style.display = 'block';
-                    login.value = '';
-                    login.focus();
-                }
-                break;
+            })
+            t.setSelectionRange(5, 5)
+            countPressBackspace = 0
         }
     })
 

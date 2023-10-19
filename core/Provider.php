@@ -7,7 +7,12 @@ abstract class Provider{
 	private static $ignoreProvidersForMarkups = [18, 14];
 	private static $counterDaysDelivery;
 
+    public const ACTIVE_ONLY_PRIVATE = 'only_private';
+    public const ACTIVE_ONLY_ENTITY = 'only_entity';
+    public const ACTIVE_BOTH = 'both';
+
 	public static $todayIssue;
+    public static $statusAPI = [];
 
 	protected abstract static function getItemsToOrder(int $provider_id);
 
@@ -58,9 +63,14 @@ abstract class Provider{
 
         if (!$params[$provider_id]->entity->isActive && $params[$provider_id]->private->isActive){
             $params[$provider_id]->entity = $params[$provider_id]->private;
+            self::$statusAPI[$provider_id] = self::ACTIVE_ONLY_PRIVATE;
         }
-        if (!$params[$provider_id]->private->isActive && $params[$provider_id]->entity->isActive){
+        elseif (!$params[$provider_id]->private->isActive && $params[$provider_id]->entity->isActive){
             $params[$provider_id]->private = $params[$provider_id]->entity;
+            self::$statusAPI[$provider_id] = self::ACTIVE_ONLY_ENTITY;
+        }
+        else{
+            self::$statusAPI[$provider_id] = self::ACTIVE_BOTH;
         }
 
         //это фрагмент закоментирован в связи фрагментом выше

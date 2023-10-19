@@ -184,7 +184,7 @@ class Berg extends Provider{
 
                 $order = [];
                 $order['force'] = 0;
-                $order['order']['payment_type'] = $type_organization == 'private' ? 1 : 2;
+                $order['order']['payment_type'] = self::getPayment($type_organization);
                 $order['order']['dispatch_type'] = 3;
                 $order['order']['dispatch_time'] = 2;
                 $order['order']['shipment_address_id'] = self::getParams($type_organization)->address_id;
@@ -250,6 +250,15 @@ class Berg extends Provider{
 	    }
 	    
         return $ordered;
+    }
+
+    private static function getPayment($type_organization){
+        if(parent::$statusAPI == parent::ACTIVE_BOTH){
+            return $type_organization == 'private' ? 1 : 2;
+        }
+        if (parent::ACTIVE_ONLY_ENTITY) return 2;
+        if (parent::ACTIVE_ONLY_PRIVATE) return 1;
+        return false;
     }
     
     public static function getDateDispatch($period){

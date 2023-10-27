@@ -338,7 +338,7 @@ class Autoeuro extends Provider{
             switch ($pb['pay_type']){
                 case 'Наличный':
                 case 'Онлайн':
-                $providerBasketPayType['Наличный'][] = $pb;
+                    $providerBasketPayType['Наличный'][] = $pb;
                     break;
                 case 'Безналичный':
                     $providerBasketPayType['Безналичный'][] = $pb;
@@ -356,6 +356,14 @@ class Autoeuro extends Provider{
                     $class = new static($pb['item_id']);
                     $class->setArticle($pb['brend'], $pb['article']);
                     $aeok = self::getOrderKeys($pb['store_id'], $pb['item_id']);
+                }
+
+                if(!$aeok){
+                    Log::insert([
+                        'text' => 'Ошибка получения offer_key, возможно отключено API поиска.',
+                        'additional' => "osi: {$pb['order_id']}-{$pb['store_id']}-{$pb['item_id']}"
+                    ]);
+                    continue;
                 }
 
                 $stock_items[] = [

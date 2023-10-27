@@ -260,6 +260,14 @@ class FavoriteParts extends Provider{
 
                 $PaymentType = in_array($orderInfo['pay_type'], ['Наличный', 'Онлайн']) ? 1 : 2;
 
+                if (parent::$statusAPI[self::getParams()->provider_id] == parent::ACTIVE_ONLY_ENTITY){
+                    $PaymentType = 2;
+                }
+                if (parent::$statusAPI[self::getParams()->provider_id] == parent::ACTIVE_ONLY_PRIVATE){
+                    $PaymentType = 1;
+                }
+
+
                 $array = [
                     'WarehouseShipping' => self::getWarehouseShipping($basket),
                     'ShippingDate' => $date,

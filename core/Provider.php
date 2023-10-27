@@ -324,7 +324,7 @@ abstract class Provider{
 		try{
 			$res = file_get_contents($url, false, $context);
 			$GLOBALS['response_header'] = $http_response_header;
-			if ($res == false) return self::getCurlUrlData($url, $data, $header);
+			if (!$res) return self::getCurlUrlData($url, $data, $header);
 		} catch(\Exception $e){}
 		return $res;
 	}

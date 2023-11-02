@@ -545,4 +545,16 @@ class User{
         if ($count) return false;
         return true;
     }
+
+    public static function checkAuthKey($auth_key){
+        /** @var mysqli_result $res_user */
+        $res_user = User::get(['auth_key' => $auth_key]);
+        if (!$res_user->num_rows){
+            die('Неверный токен');
+        }
+        foreach($res_user as $value){
+            $user = $value;
+        }
+        return $user['id'];
+    }
 }

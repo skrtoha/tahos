@@ -467,16 +467,37 @@ $(function(){
 			success: function(response){
 				let ov = JSON.parse(response);
 				ov.comment = ov.comment ? ov.comment : '';
+        let storesString = `<tr>
+                                    <td>Склад:</td>
+                                    <td>
+                                        <select name="store_id">
+                                `;
+        for(let item of ov.stores){
+          const selected = item.store_id == ov.store_id ? 'selected' : '';
+          storesString += `<option
+                              data-price="${item.price}" 
+                              data-without-markup="${item.withoutMarkup}"
+                              ${selected} 
+                              value="${item.store_id}"
+                            >
+                            ${item.cipher} - ${item.price} руб.
+                            </option>`
+        }
+        storesString += `</select>
+                          <td>
+                          </tr>`;
 
 				modal_show(
 					'<form class="editOrderValue">' +
 						'<input type="hidden" name="status_id" value="editOrderValue">' +
 						'<input type="hidden" name="osi" value="' + th.attr('osi') + '">' +
+            `<input type="hidden" name="withoutMarkup" value="${ov.withoutMarkup}">` +
 						'<table>' +
 							'<tr>' +
 								'<td>Цена:</td>' +
 								'<td><input ' + inputDisable + ' type="text" name="price" value="' + ov.price + '"></td>' +
 							'</tr>' +
+              storesString +
 							'<tr>' +
 								'<td>Количество:</td>' +
 								'<td><input ' + inputDisable + ' type="text" name="quan" value="' + ov.quan + '"></td>' +
@@ -498,18 +519,21 @@ $(function(){
 						type: 'post',
 						url: '/admin/ajax/orders.php',
 						data: form.serialize(),
+            beforeSend: () => {
+              showGif()
+            },
 						success: function(response){
-							ov = JSON.parse(response);
-							let tr = th.closest('tr').next();
-							tr.find('[label=Кол-во]').html('Заказ - ' + ov.quan + ' шт.');
-							tr.find('[label=Цена]').html(ov.price);
-							tr.find('[label=Сумма]').html(ov.price * ov.quan);
-							tr.find('[label=Комментарий]').html(ov.comment);
-							$('#modal-container').removeClass('active');
+              document.location.reload()
 						}
 					})
 				})
 			}
 		})
 	})
+  $(document).on('change', 'form.editOrderValue select[name=store_id]', e => {
+    const $th = $(e.target)
+    const option = $th.find('option:selected')
+    $th.closest('form').find('input[name=price]').val(option.data('price'))
+    $th.closest('form').find('input[name=withoutMarkup]').val(option.data('without-markup'))
+  })
 })

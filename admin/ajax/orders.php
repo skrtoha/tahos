@@ -2,7 +2,9 @@
 ini_set('error_reporting', E_PARSE | E_ERROR);
 
 use core\Basket;
+use core\Database;
 use core\OrderValue;
+use core\StoreItem;
 
 require_once('../../core/DataBase.php');
 
@@ -156,20 +158,35 @@ switch($_POST['status_id']){
 		break;
 	case 'getOrderValue':
 		$array = explode('-', $_POST['osi']);
-		$res = OrderValue::get([
+		$output = OrderValue::get([
 			'order_id' => $array[0],
 			'store_id' => $array[1],
 			'item_id' => $array[2]
-		]);
-		echo json_encode($res->fetch_assoc());
+		])->fetch_assoc();
+        $output['stores'] = [];
+        $query = StoreItem::getQueryStoreItem();
+        $query .= " where si.item_id = {$array[2]} AND si.in_stock >= {$output['quan']} ORDER BY si.price";
+        $result = Database::getInstance()->query($query);
+        foreach($result as $row){
+            $output['stores'][] = [
+                'cipher' => $row['cipher'],
+                'store_id' => $row['store_id'],
+                'price' => $row['price'],
+                'withoutMarkup' => $row['priceWithoutMarkup']
+            ];
+        }
+		echo json_encode($output);
 		break;
 	case 'editOrderValue':
-		$array = explode('-', $_POST['osi']);
+        $data = $_POST;
+        $array = explode('-', $data['osi']);
 		OrderValue::update(
 			[
-				'price' => $_POST['price'], 
-				'quan' => $_POST['quan'],
-				'comment' => $_POST['comment']
+				'price' => $data['price'],
+				'quan' => $data['quan'],
+				'comment' => $data['comment'],
+                'store_id' => $data['store_id'],
+                'withoutMarkup' => $data['withoutMarkup']
 			],
 			[
 				'order_id' => $array[0],
@@ -177,7 +194,7 @@ switch($_POST['status_id']){
 				'item_id' => $array[2]
 			]
 		);
-		echo json_encode($_POST);
+		echo json_encode($data);
 		break;
     case 'getItemsToOrder':
         $commonItemsToOrders = core\Provider::getCommonItemsToOrders();

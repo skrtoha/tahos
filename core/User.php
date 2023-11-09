@@ -203,7 +203,7 @@ class User{
         unset($fields['addressee']);
         unset($fields['default_address']);
         unset($fields['address_id']);
-		return $GLOBALS['db']->update('users', $fields, "`id`=$user_id");
+		return Database::getInstance()->update('users', $fields, "`id`=$user_id");
 	}
 
 	public static function getHtmlUserPrice($price, $designation){

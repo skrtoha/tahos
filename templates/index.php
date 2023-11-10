@@ -4,10 +4,21 @@
 /** @var array $categories */
 
 use core\User;
+use core\YandexCaptcha;
 
 $title="Торговая площадка Тахос";
 
 if (!empty($_POST)){
+    $yandexCaptcha = new YandexCaptcha();
+    try{
+        $yandexCaptcha->check($_POST["smart-token"]);
+    }
+    catch (\Exception $exception){
+        message('Докажите, что вы не робот!');
+        header("Location: {$_SERVER['HTTP_REFERER']}");
+        die();
+    }
+
     $currentDateTime = new DateTime();
     $previousDateTime = $currentDateTime->sub(DateInterval::createFromDateString('1 hour'));
     $result = $db->getCount(
@@ -127,7 +138,10 @@ $res_vehicles = $db->query("
 
                         </label>
                     </div>
-                    <input type="submit" value="Отправить">
+                    <div class="selection">
+                        <? YandexCaptcha::show();?>
+                    </div>
+                    <input type="submit" value="Отправить" disabled>
                 </div>
             </form>
         </div>

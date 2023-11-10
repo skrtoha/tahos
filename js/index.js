@@ -28,15 +28,21 @@ $(function(){
 		more.closest('ul').find('li').removeClass('hidden');
 		more.remove();
 	})
-    $('div.selection.spare_parts_request > div.left > form').on('submit', (e) => {
-        e.preventDefault();
-        document.location.href = "/original-catalogs/legkovie-avtomobili#/carInfo?q=" + $('input[name=q]').val();
-    })
-    $('div.selection.spare_parts_request > div.right > form')
-        .on('submit', (e) => {
-            if (count_click < 2) e.preventDefault();
-        })
-        .on('click', (e) => {
-            count_click++;
-        })
+  $('div.selection.spare_parts_request > div.left > form').on('submit', (e) => {
+    e.preventDefault();
+    document.location.href = "/original-catalogs/legkovie-avtomobili#/carInfo?q=" + $('input[name=q]').val();
+  })
+
+  document.querySelector('#spare_parts_request').addEventListener('submit', e => {
+    const captchaInput = document.querySelector('input[name="smart-token"]')
+    if (!captchaInput.value){
+      e.preventDefault()
+      return
+    }
+  })
+
+  document.addEventListener('captchaSuccessed', e => {
+    $('#spare_parts_request input[type=submit]').prop('disabled', false)
+  })
+
 });

@@ -100,6 +100,10 @@
     color: #bbbbbb;
 }
 
+#spare_parts_request input[type=submit]:disabled{
+    background: #9aa5b5;
+}
+
 #spare_parts_request input[type=submit]{
     float: none;
     margin-top: 25px;

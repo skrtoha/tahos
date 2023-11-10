@@ -385,6 +385,12 @@ ul[name=issue] li.selected {
 .registration .fast_login a:hover {
     opacity: .8
 }
+#registration button:disabled{
+    background: gainsboro;
+}
+#registration button{
+    margin-top: 10px;
+}
 
 #map2 {
     -webkit-box-sizing: border-box;

@@ -37,7 +37,6 @@ $(function(){
     const captchaInput = document.querySelector('input[name="smart-token"]')
     if (!captchaInput.value){
       e.preventDefault()
-      return
     }
   })
 

@@ -104,4 +104,7 @@ $(function(){
             $('div.set-addresses').hide();
         }
     });
+  document.addEventListener('captchaSuccessed', e => {
+    $('#registration > button').prop('disabled', false)
+  })
 });

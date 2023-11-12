@@ -266,6 +266,7 @@ use core\YandexCaptcha;
                                         <input required type="email" name="email">
                                     </div>
                                 </div>
+                                <? YandexCaptcha::show('restore_password')?>
                                 <input type="submit" value="Отправить" disabled>
                             </form>
                         </div>

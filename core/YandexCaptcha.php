@@ -11,25 +11,18 @@ class YandexCaptcha{
      */
     public function check($token): bool
     {
-        $ch = curl_init();
         $args = http_build_query([
             "secret" => self::SERVER_KEY,
             "token" => $token,
             "ip" => $_SERVER['REMOTE_ADDR'],
         ]);
-        curl_setopt($ch, CURLOPT_URL, "https://smartcaptcha.yandexcloud.net/validate?$args");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+        $response = Provider::getCurlUrlData("https://smartcaptcha.yandexcloud.net/validate?$args");
+        $result = json_decode($response);
 
-        $server_output = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($httpcode !== 200) {
-            throw new \Exception("Allow access due to an error: code=$httpcode; message=$server_output\n");
+        if ($result->status == 'failed'){
+            throw new \Exception("Allow access due to an error: message={$result->message}\n");
         }
-        $resp = json_decode($server_output);
-        return $resp->status === "ok";
+        return $result->status === "ok";
     }
 
     public static function show(){

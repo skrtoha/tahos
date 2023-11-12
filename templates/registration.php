@@ -27,7 +27,7 @@ if ($_POST['form_submit']){
         $yandexCaptcha->check($_POST['smart-token']);
     }
     catch (\Exception $exception){
-        message('Подвердите, что вы не робот');
+        message('Подвердите, что вы не робот', false);
         $b_registration = false;
     }
 

@@ -734,10 +734,65 @@ $(function() {
             }
         })
     })
+    document.addEventListener('captchaSuccessed_restore_password', e => {
+        $('#restore_password input[type=submit]').prop('disabled', false)
+    })
+
+    let countEnters = 0
+    $('#authorization').on('submit', e => {
+        e.preventDefault()
+        const $th = $(e.target)
+        const $button = $th.find('button')
+        const formData = {}
+        for(let i of $th.serializeArray()){
+            formData[i.name] = i.value
+        }
+        formData.act = 'authorize'
+
+        $.ajax({
+            url: '/ajax/common.php',
+            type: 'post',
+            data: formData,
+            success: response => {
+                if (response == 'error'){
+                    show_message('Неверный логин или пароль!', 'error')
+                    countEnters++
+
+                    if (countEnters == 5){
+                        $button.prop('disabled', true)
+                        let script = document.createElement('script');
+                        script.src = "https://captcha-api.yandex.ru/captcha.js?render=onload&onload=yaChecker"
+                        document.head.append(script)
+
+                        script.onload = () => {
+                            const widgetId = window.smartCaptcha.render('yandex-policy', {
+                                sitekey: window.captcha_sitekey,
+                                invisible: false
+                            })
+                            $('#yandex-policy').css('height', '102px')
+
+                            window.smartCaptcha.subscribe(widgetId, 'success', () => {
+                                countEnters = 0
+                                $('#yandex-policy').css('height', 'auto')
+                                window.smartCaptcha.destroy(widgetId)
+                                $button.prop('disabled', false)
+                            })
+                        }
+                    }
+                }
+                else{
+                    show_message()
+                    $.cookie('message', 'Вы успешно авторизовались!', cookieOptions);
+                    $.cookie('message_type', 'ok', cookieOptions);
+                    document.location.reload()
+                }
+            }
+        })
+    })
 
     let countPressBackspace = 0;
     const maskPhone = "+7 (999) 999-99-99";
-    $('.login input[name=login]').on('keyup', (event) => {
+    $('#restore_password input[name=login]').on('keyup', (event) => {
 
         const t = event.target
 

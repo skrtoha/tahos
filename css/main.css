@@ -1219,10 +1219,24 @@ form input, header {
     background: white;
     padding: 20px;
 }
+#restore_password .yandex-captcha.smart-captcha{
+    height: 102px !important;
+    margin-top: 10px;
+}
 #restore_password .wrapper .right {
     margin-top: 10px;
 }
+#yandex-policy {
+    width: 325px;
+    margin-bottom: 10px;
+}
 
+#restore_password input[type="submit"]:disabled{
+    background: gainsboro;
+}
+#authorization button:disabled{
+    background: #dceaff;
+}
 #restore_password input[type="submit"] {
     margin-top: 15px;
     float: none;

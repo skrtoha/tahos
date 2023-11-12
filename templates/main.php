@@ -8,6 +8,7 @@
 /** @var $user array */
 
 use core\Setting;
+use core\YandexCaptcha;
 
 ?>
 <!DOCTYPE html>
@@ -227,7 +228,7 @@ use core\Setting;
 				</div>
 				<div class="login">
 					<h3>Авторизация</h3>
-					<form action="/authorization" method="post">
+					<form id="authorization" action="/authorization" method="post">
 						<input type="hidden" name="form_autorization" value="1">
 						<p>Логин</p>
 						<input type="text" name="login" placeholder="Введите телефон или почту">
@@ -240,6 +241,7 @@ use core\Setting;
 							<input id="w_not_remember_checkbox" type="checkbox" name="remember">
 							<label for="w_not_remember_checkbox">Запомнить</label>
 						</div>
+                        <div id="yandex-policy"></div>
 						<button>Войти</button>
 						<div class="registration_link">
 							<a href="/registration">Зарегистрироваться</a>
@@ -261,10 +263,10 @@ use core\Setting;
                                 <div class="wrapper">
                                     <div class="left">Введите ваш email:</div>
                                     <div class="right">
-                                        <input type="email" name="email">
+                                        <input required type="email" name="email">
                                     </div>
                                 </div>
-                                <input type="submit" value="Отправить">
+                                <input type="submit" value="Отправить" disabled>
                             </form>
                         </div>
                     </div>
@@ -462,6 +464,36 @@ use core\Setting;
 	</footer>
 	<div class="h_overlay"></div>
 	<div class="overlay"></div>
+
+
+    <?if (YandexCaptcha::$useCaptcha){?>
+        <script
+                src="https://smartcaptcha.yandexcloud.net/captcha.js?render=onload&onload=onloadFunction"
+                defer
+        ></script>
+        <script>
+            window.captcha_sitekey = "<?=YandexCaptcha::SITE_KEY?>"
+            function onloadFunction() {
+                if (window.smartCaptcha) {
+                    const elements = document.querySelectorAll(".yandex-captcha")
+
+                    if (elements){
+                        for(let elem of elements){
+                            const widgetId = window.smartCaptcha.render(elem, {
+                                sitekey: "<?=YandexCaptcha::SITE_KEY?>",
+                                hl: "ru",
+                            })
+                            window.smartCaptcha.subscribe(widgetId, "success", () => {
+                                const event = new Event(`captchaSuccessed_${elem.dataset.key}`, {bubbles: true})
+                                elem.dispatchEvent(event)
+                            })
+                        }
+                    }
+
+                }
+            }
+        </script>
+    <?}?>
 	<!-- Optimized loading JS Start -->
 	<script>var scr = {"scripts":[
 		{"src" : "/js/jquery.cookie.js", "async" : false},

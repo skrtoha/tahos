@@ -1,6 +1,9 @@
 <?
 session_start();
+
+use core\Authorize;
 use core\Mailer;
+use core\YandexCaptcha;
 
 require_once ("../core/DataBase.php");
 require_once('../core/functions.php');
@@ -86,6 +89,14 @@ switch($_POST['act']){
         $db->insert('search_vin', $arrayInsert);
         break;
     case 'restore_password':
+        try{
+            $yandexCaptcha = new YandexCaptcha();
+            $yandexCaptcha->check($_POST['smart-token']);
+        }
+        catch (\Exception $exception){
+            message('Произошла ошибка проверки каптча', false);
+            die();
+        }
         $result = \core\User::get(['email' => $_POST['email']]);
         if (!$result->num_rows) break;
         $user = $result->fetch_assoc();
@@ -138,6 +149,26 @@ switch($_POST['act']){
         $userInfo = $result->fetch_assoc();
         if ($_POST['code'] == $userInfo['confirm_sms_code']){
             \core\User::update($_SESSION['user'], ['phone_confirmed' => 1]);
+            echo 'ok';
+        }
+        break;
+    case 'authorize':
+        $login = $_POST['login'];
+        if (!$login && $_POST['phone']) $login = $_POST['phone'];
+        $password = md5($_POST['password']);
+        if (!preg_match("/.+@.+/", $login)) $login = str_replace(array(' ', ')', '(', '-'), '', $login);
+        $user = $db->select_one('users', "id,email", "(`email`='$login' OR `phone`='$login') AND `password`='$password'");
+        if (empty($user)) echo('error');
+        else{
+            $_SESSION['user'] = $user['id'];
+            if (isset($_POST['remember']) && $_POST['remember'] == 'on'){
+                $jwt = Authorize::getJWT([
+                    'user_id' => $user['id'],
+                    'login' => $user['email']
+                ]);
+                setcookie('jwt', $jwt, time()+60*60*24*30);
+            }
+            $db->update('user_ips', ['user_id' => $user['id']], "ip = '{$_SERVER['REMOTE_ADDR']}'");
             echo 'ok';
         }
         break;

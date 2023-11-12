@@ -237,7 +237,7 @@ Breadcrumb::out();
 			<label for="accept_checkbox">С <a target="_blank" href="/page/agreement">пользовательским соглашением</a> ознакомлен и согласен</label>
 		</div>
         <div class="input_phone">
-            <? YandexCaptcha::show();?>
+            <? YandexCaptcha::show('registration');?>
         </div>
 		<button disabled>Зарегистрироваться</button>
 	</form>

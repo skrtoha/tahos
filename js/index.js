@@ -40,7 +40,7 @@ $(function(){
     }
   })
 
-  document.addEventListener('captchaSuccessed', e => {
+  document.addEventListener('captchaSuccessed_spare_parts_request', e => {
     $('#spare_parts_request input[type=submit]').prop('disabled', false)
   })
 

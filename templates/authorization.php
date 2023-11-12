@@ -27,26 +27,3 @@ if ($_POST['token']){
 	header("Location: /");
 	exit();
 }
-$login = $_POST['login'];
-if (!$login && $_POST['phone']) $login = $_POST['phone'];
-$password = md5($_POST['password']);
-if (!preg_match("/.+@.+/", $login)) $login = str_replace(array(' ', ')', '(', '-'), '', $login);
-$user = $db->select_one('users', "id,email", "(`email`='$login' OR `phone`='$login') AND `password`='$password'");
-if (empty($user)) message('Неверный логин или пароль!', false);
-else{
-    $_SESSION['user'] = $user['id'];
-    if (isset($_POST['remember']) && $_POST['remember'] == 'on'){
-        $jwt = Authorize::getJWT([
-            'user_id' => $user['id'],
-            'login' => $user['email']
-        ]);
-        setcookie('jwt', $jwt, time()+60*60*24*30);
-    }
-    $db->update('user_ips', ['user_id' => $user['id']], "ip = '{$_SERVER['REMOTE_ADDR']}'");
-    message('Вы успешно авторизовались!');
-}
-if (strpos($_SERVER['HTTP_REFERER'], 'exceeded_connections') > 0){
-    header('Location: /');
-}
-else header("Location: ".$_SERVER['HTTP_REFERER']);
-die();

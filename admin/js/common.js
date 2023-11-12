@@ -12,12 +12,12 @@ function getParams(url = ''){
 	let str = url ? url : window.location.search;
 	if (!str) return false;
 	const urlParams = new URLSearchParams(str);
-	let output = new Object();
+	let output = {};
 	for(const[name, value] of urlParams){
 		output[name] = value;
 	}
 	return output;
-};
+}
 function showGif(hide = true){
 	let display = hide ? 'flex' : 'none';
 	$('#popup').css('display', display);

@@ -493,6 +493,7 @@ class User{
         $db = $GLOBALS['db'];
 
         $params['ip'] = $_SERVER['REMOTE_ADDR'];
+        unset($params['smart-token']);
 
         $result = $db->insert('spare_parts_request', $params);
 

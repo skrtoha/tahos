@@ -9,14 +9,16 @@ use core\YandexCaptcha;
 $title="Торговая площадка Тахос";
 
 if (!empty($_POST)){
-    $yandexCaptcha = new YandexCaptcha();
-    try{
-        $yandexCaptcha->check($_POST["smart-token"]);
-    }
-    catch (\Exception $exception){
-        message('Докажите, что вы не робот!');
-        header("Location: {$_SERVER['HTTP_REFERER']}");
-        die();
+    if (!User::isAuthorized()){
+        $yandexCaptcha = new YandexCaptcha();
+        try{
+            $yandexCaptcha->check($_POST["smart-token"]);
+        }
+        catch (\Exception $exception){
+            message('Докажите, что вы не робот!');
+            header("Location: {$_SERVER['HTTP_REFERER']}");
+            die();
+        }
     }
 
     $currentDateTime = new DateTime();
@@ -135,13 +137,14 @@ $res_vehicles = $db->query("
                         <label class="description">
                             <span>требуемые запчасти</span>
                             <textarea required name="description"></textarea>
-
                         </label>
                     </div>
-                    <div class="selection">
-                        <? YandexCaptcha::show();?>
-                    </div>
-                    <input type="submit" value="Отправить" disabled>
+                    <?if (!User::isAuthorized()){?>
+                        <div class="selection">
+                            <? YandexCaptcha::show();?>
+                        </div>
+                    <?}?>
+                    <input type="submit" value="Отправить" <?=!User::isAuthorized() ? 'disabled' : ''?>>
                 </div>
             </form>
         </div>

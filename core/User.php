@@ -558,4 +558,8 @@ class User{
         }
         return $user['id'];
     }
+
+    public static function isAuthorized(){
+        return isset($_SESSION['user']) && $_SESSION['user'];
+    }
 }

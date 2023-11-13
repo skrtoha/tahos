@@ -792,7 +792,7 @@ $(function() {
 
     let countPressBackspace = 0;
     const maskPhone = "+7 (999) 999-99-99";
-    $('#restore_password input[name=login]').on('keyup', (event) => {
+    $('.login input[name=login]').on('keyup', (event) => {
 
         const t = event.target
 

@@ -26,12 +26,12 @@ class FavoriteParts extends Provider{
 		switch($cipher){
 			case 'FAVO':
 				return ['МЦС'];
-				break;
 			case 'FAMO':
 				return ['МС1', 'МС2', 'Дилер OE', 'МСК', 'ЦС OE'];
-				break;
+            case 'FAJA':
+                return ['ЯРС'];
 		}
-		return false;
+		return [];
 	}
 	public static function getPrice(array $params){
 		$url = 'http://api.favorit-parts.ru/hs/hsprice/?key='.self::getParams()->key.'&number='.$params['article'].'&brand='.$params['brend'].'&analogues=';

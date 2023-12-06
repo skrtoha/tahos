@@ -114,7 +114,7 @@ class Returns{
 	}
 
 	public static function processReturn($params, $return){
-		$GLOBALS['db']->update(
+		Database::getInstance()->update(
 			'returns',
 			[
 				'return_price' => $params['return_price'],
@@ -137,7 +137,7 @@ class Returns{
 				'quan' => $params['quan'],
 				'user_id' => $return['user_id'],
                 'bill_type' => $return['bill_type']
-			]);
+			], true);
             User::checkDebt(
                 $return['user_id'],
                 $params['return_price'] * $params['quan'],
@@ -145,5 +145,6 @@ class Returns{
                 Fund::$last_id
             );
 		}
+        return true;
 	}
 }

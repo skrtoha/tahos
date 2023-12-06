@@ -70,7 +70,11 @@ class OrderValue{
      * @return void [boolean] true if changed successfully
      * @throws Exception
      */
-	public static function changeStatus($status_id, $params){
+	public static function changeStatus($status_id, $params, $noCommit = false){
+        if (!$noCommit){
+            Database::getInstance()->startTransaction();
+        }
+
 		$values = ['status_id' => $status_id];
 		if (isset($params['synchronized']) && $params['synchronized']){
             $values['synchronized'] = 1;
@@ -144,9 +148,7 @@ class OrderValue{
 			case 11:
 				$values['ordered'] = "`ordered` + {$params['quan']}";
 				self::update($values, $params);
-                if (!$params['is_payed']){
-                    User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'plus', $params['pay_type']);
-                }
+                User::updateReservedFunds($params['user_id'], $params['quan'] * $params['price'], 'plus', $params['pay_type']);
 				self::changeInStockStoreItem($params['quan'], $params);
 				break;
 			//отменен клиентом
@@ -162,7 +164,7 @@ class OrderValue{
 
 				//если отменено поставщиком
 				if ($status_id == 8){
-					$GLOBALS['db']->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
+					Database::getInstance()->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
                     /** @var \mysqli_result $res_user */
                     $res_user = User::get(['id' => $ov['user_id']]);
                     foreach($res_user as $value) $userInfo = $value;
@@ -180,7 +182,7 @@ class OrderValue{
                     }
 				}
                 if ($status_id == 12){
-                    $GLOBALS['db']->query("
+                    Database::getInstance()->query("
                         UPDATE
                             #store_items
                         SET
@@ -202,12 +204,16 @@ class OrderValue{
 				self::update($values, $params);
 				break;
 			case 6:
-				$GLOBALS['db']->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
+				Database::getInstance()->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
 				self::update($values, $params);
 				break;
 			default:
 				self::update($values, $params);
 		}
+
+        if (!$noCommit){
+            Database::getInstance()->commit();
+        }
 	}
 
 	/**
@@ -247,7 +253,7 @@ class OrderValue{
      * updates order values
      * @param  [array] $values for update
      * @param  [type] $params for condition (order_id, store_id, item_id)
-     * @return \mysqli_result
+     * @return bool
      * @throws Exception
      */
 	public static function update($values, $params){
@@ -266,7 +272,7 @@ class OrderValue{
                 'body' => "Поставщик отказал в поставке товара {$orderValue['brend']} {$orderValue['article']} {$orderValue['title_full']}"
             ]);
         }
-	    return $GLOBALS['db']->update('orders_values', $values, Provider::getWhere([
+	    return Database::getInstance()->update('orders_values', $values, Provider::getWhere([
 			'order_id' => $params['order_id'],
 			'store_id' => $params['store_id'],
 			'item_id' => $params['item_id']
@@ -287,7 +293,7 @@ class OrderValue{
         $db = $GLOBALS['db'];
 
 		$sign = $act == 'minus' ? '-' : '+';
-		return $db->update(
+		return Database::getInstance()->update(
 			'store_items',
 			['in_stock' => "`in_stock` $sign $quan"],
 			"`store_id`= {$condition['store_id']} AND `item_id` = {$condition['item_id']}"

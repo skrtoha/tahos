@@ -1,4 +1,5 @@
 <?
+use core\Database;
 use core\User;
 class Issues{
 	public $user_id;
@@ -9,12 +10,13 @@ class Issues{
     //todo метод модернизирован только при использовании из админки, также нужна модифмкация для 1С
 	function setIncome($incomeList, $isRequestFrom1C = false): array
     {
+        Database::getInstance()->startTransaction();
         $output = [
             User::BILL_CASH => 0,
             User::BILL_CASHLESS => 0
         ];
 		foreach($incomeList as $bill_type => $income){
-            $insert_order_issue = $this->db->insert(
+            $insert_order_issue = Database::getInstance()->insert(
                 'order_issues',
                 [
                     'user_id' => $this->user_id,
@@ -22,13 +24,13 @@ class Issues{
                 ]
             );
             if ($insert_order_issue !== true) die("Ошибка: {$this->db->last_query} | $insert_order_issue");
-            $issue_id = $this->db->last_id();
+            $issue_id = Database::getInstance()->last_id();
 
             $titles = [];
             $totalSumm = 0;
             foreach($income as $key => $issued){
                 $a = explode(':', $key);
-                $insert_order_issue_values = $this->db->insert(
+                $insert_order_issue_values = Database::getInstance()->insert(
                     'order_issue_values',
                     [
                         'issue_id' => $issue_id,
@@ -63,7 +65,7 @@ class Issues{
                 ];
                 if ($isRequestFrom1C) $array['synchronized'] = 1;
 
-                core\OrderValue::changeStatus(1, $array);
+                core\OrderValue::changeStatus(1, $array, true);
             }
 
             core\OrderValue::setFunds([
@@ -81,6 +83,7 @@ class Issues{
             User::updateReservedFunds($this->user_id, $totalSumm, 'minus', $pay_type);
 
             if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
+                Database::getInstance()->commit();
                 echo $issue_id;
                 exit();
             }
@@ -94,6 +97,7 @@ class Issues{
             $output[$bill_type] = $issue_id;
 
         }
+        Database::getInstance()->commit();
         return $output;
 
 	}

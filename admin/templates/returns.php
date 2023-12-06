@@ -1,6 +1,7 @@
 <?php
-/** @global \core\Database $db */
+/** @global Database $db */
 
+use core\Database;
 use core\Returns;
 use core\Managers;
 switch ($_GET['act']){
@@ -15,7 +16,8 @@ switch ($_GET['act']){
 			'store_id' => $array[1],
 			'item_id' => $array[2]
 		];
-		$db->update('returns', ['is_new' => 0], core\Provider::getWhere($osi));
+        Database::getInstance()->startTransaction();
+		Database::getInstance()->update('returns', ['is_new' => 0], core\Provider::getWhere($osi));
 		$res_return = Returns::get($osi);
 		$return = $res_return->fetch_assoc();
 		if (!empty($_POST)){
@@ -27,7 +29,10 @@ switch ($_GET['act']){
 				message('Количество указано неккоректно!', false);
 			}
 			if ($is_validated){
-				Returns::processReturn($_POST, $return);
+				$result = Returns::processReturn($_POST, $return);
+                if ($result === true){
+                    Database::getInstance()->commit();
+                }
 			}
 			message('Успешно сохранено!');
 			if (isset($_GET['is_stay'])) header("Location: ?view=returns&act=form&osi={$_GET['osi']}");
@@ -166,7 +171,8 @@ function form($return, $statuses){
 				<div class="field">
 					<div class="title">Статус</div>
 					<div class="value">
-						<select name="status_id">
+                        <?$disabled = $return['status_id'] == 3 ? 'disabled' : ''?>
+						<select <?=$disabled?> name="status_id">
 							<?foreach($statuses as $s){?>
 								<option <?=$s['id'] == $return['status_id'] ? 'selected' : ''?> value="<?=$s['id']?>"><?=$s['title']?></option>
 							<?}?>

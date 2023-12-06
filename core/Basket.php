@@ -12,7 +12,7 @@ class Basket{
 		    AND si.price IS NOT NULL
 		    AND ps.cipher IS NOT NULL
         ";
-        $output[$user_id] = $GLOBALS['db']->query("
+        $output[$user_id] = Database::getInstance()->query("
 			SELECT 
                 b.*,
                 i.article,
@@ -113,8 +113,8 @@ class Basket{
     }
 
     public static function sendToOrder(array $user){
-        /** @var Database $db */
-        $db = $GLOBALS['db'];
+        $db = Database::getInstance();
+        $db->startTransaction();
 
         if (strpos($_SERVER['REQUEST_URI'], 'view=users') === false){
             $additional_options = json_decode($_COOKIE['additional_options'], true);
@@ -227,6 +227,8 @@ class Basket{
             'subject' => 'Новый заказ на tahos.ru',
             'body' => $body
         ]);
+
+        $db->commit();
 
         if ($user['isAutomaticOrder'] && User::noOverdue($user['id'])){
             header("Location: /admin/?view=orders&id=$order_id&act=allInWork&automaticOrder=1");

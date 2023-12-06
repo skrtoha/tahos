@@ -232,12 +232,15 @@ abstract class Provider{
 		return $dateTimeOut->format('d.m');
 	}
 	public static function addToProviderBasket($ov){
-		self::getInstanceDataBase()->insert('provider_basket', [
+        $db = Database::getInstance();
+        $db->startTransaction();
+		Database::getInstance()->insert('provider_basket', [
 			'order_id' => $ov['order_id'],
 			'store_id' => $ov['store_id'],
 			'item_id' => $ov['item_id'],
 		]);
-		OrderValue::changeStatus(7, $ov);
+		OrderValue::changeStatus(7, $ov, true);
+        $db->commit();
 		return true;
 	}
 	public static function getIsEnabledApiSearch($provider_id){

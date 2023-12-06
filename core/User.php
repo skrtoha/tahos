@@ -30,9 +30,9 @@ class User{
 		$remain = $creditedAmount;
 		foreach($res as $fund){
 			$remain = $remain - $fund['overdue'];
-			if ($remain > 0) $GLOBALS['db']->update('funds', ['overdue' => 0], "`id` = {$fund['id']}");
+			if ($remain > 0) Database::getInstance()->update('funds', ['overdue' => 0], "`id` = {$fund['id']}");
 			else{
-				$GLOBALS['db']->update('funds', ['overdue' => abs($remain)], "`id` = {$fund['id']}");
+				Database::getInstance()->update('funds', ['overdue' => abs($remain)], "`id` = {$fund['id']}");
 				break;
 			}
 		}
@@ -153,11 +153,15 @@ class User{
 	/**
 	 * updates reserved funds for user
 	 * @param  [integer] $user_id user_id
-	 * @param  [inter] $price value for increase|reduse reserved_funds
-	 * @return mysqli_result
-	 */
+	 * @param  [inter] $price value for increase|reduce reserved_funds
+	 * @return bool
+     */
 	public static function updateReservedFunds($user_id, $price, $act, $pay_type){
-		$sign = $act == 'plus' ? '+' : '-';
+		if (!$pay_type){
+            die('Не указан способ оплаты');
+        }
+
+        $sign = $act == 'plus' ? '+' : '-';
 
         $columnPayType = '';
         if ($pay_type == 'Наличный' || $pay_type == 'Онлайн') $columnPayType = 'reserved_cash';
@@ -176,8 +180,6 @@ class User{
 	 * @return [boolean] true is updated successfully, false - if no user bonus program
 	 */
 	public static function setBonusProgram($user_id, $titles, $sum){
-		$db = $GLOBALS['db'];
-
         /** @var mysqli_result $res_user */
 		$res_user = self::get(['user_id' => $user_id]);
         $user = $res_user->fetch_assoc();
@@ -419,14 +421,11 @@ class User{
      * @return void
      */
     public static function checkDebt($user_id, $amount, $bill_type, $replenishment_id){
-        /** @global $db Database  */
-        global $db;
-
         $query = self::getQueryDebt(
             "f.paid < f.sum AND f.user_id = $user_id AND f.issue_id IS NOT NULL AND `bill_type` = $bill_type",
             'f.created'
         );
-        $result = $db->query($query);
+        $result = Database::getInstance()->query($query);
 
         if (!$result->num_rows) return;
 
@@ -434,12 +433,12 @@ class User{
         foreach($result as $row){
             $difference = $row['sum'] - $row['paid'];
             if ($remain < $difference){
-                $db->update(
+                Database::getInstance()->update(
                     'funds',
                     ['paid' => $row['paid'] + $remain],
                     "id = {$row['id']}"
                 );
-                $db->insert('fund_distribution', [
+                Database::getInstance()->insert('fund_distribution', [
                     'debit_id' => $row['id'],
                     'replenishment_id' => $replenishment_id,
                     'sum' => $remain
@@ -447,12 +446,12 @@ class User{
                 break;
             }
             $remain = $remain - $difference;
-            $db->update(
+            Database::getInstance()->update(
                 'funds',
                 ['paid' => $row['paid'] + $difference],
                 "id = {$row['id']}"
             );
-            $db->insert('fund_distribution', [
+            Database::getInstance()->insert('fund_distribution', [
                 'debit_id' => $row['id'],
                 'replenishment_id' => $replenishment_id,
                 'sum' => $difference
@@ -462,8 +461,7 @@ class User{
 
     //todo метод требует доработки, если запрос пришел из 1С то проверять по дате, пользователю, сумме и типу счета
     public static function replenishBill($params){
-        /** @var Database $db */
-        $db = $GLOBALS['db'];
+        Database::getInstance()->startTransaction();
 
         /*$count = $db->getCount('funds', "`comment` = '{$params['comment']}' and sum = {$params['sum']}");
         if ($count) return;*/
@@ -483,9 +481,10 @@ class User{
         }
 
         Fund::insert(1, $params);
-        $db->update('users', $arrayUser, '`id`='.$params['user_id']);
+        Database::getInstance()->update('users', $arrayUser, '`id`='.$params['user_id']);
         User::checkOverdue($params['user_id'], $params['sum']);
         User::checkDebt($params['user_id'], $_POST['sum'], $params['bill_type'], Fund::$last_id);
+        Database::getInstance()->commit();
     }
 
     public static function setSparePartsRequest($params){

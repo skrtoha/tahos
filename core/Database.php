@@ -11,6 +11,7 @@ class Database {
 	public $connection_id;
 	public $found_rows;
 	private $last_id;
+    private $transactionStarted = false;
 
 	public function __construct(){
 		$this->config = new Config();
@@ -438,19 +439,28 @@ class Database {
     {
         static $self;
         if ($self) return $self;
-        return new static();
+
+        $self = new static();
+        return $self;
     }
     public function startTransaction(){
         $this->mysqli->begin_transaction();
+        $this->mysqli->autocommit(false);
+        $this->transactionStarted = true;
     }
 
     public function commit(){
+        if (!$this->transactionStarted){
+            return false;
+        }
         $result = $this->mysqli->commit();
         if (!$result){
             $error = $this->error();
             $this->mysqli->rollback();
             return $error;
         }
+        $this->transactionStarted = false;
+        $this->mysqli->autocommit(true);
         return true;
     }
 }

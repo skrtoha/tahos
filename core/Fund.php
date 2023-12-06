@@ -16,9 +16,6 @@ class Fund{
      */
 	public static function insert($type_operation, $fields): bool
     {
-        /** @var Database $db */
-        $db = $GLOBALS['db'];
-
 		$insert = [
 			'type_operation' => $type_operation,
 			'sum' => $fields['sum'],
@@ -32,10 +29,10 @@ class Fund{
 		];
 		if ($type_operation == 1) $insert['is_new'] = 1;
 
-        $result = $db->insert('funds', $insert);
+        $result = Database::getInstance()->insert('funds', $insert);
         if ($result !== true) throw new \Exception('Ошибка вставки funds');
 
-        self::$last_id = $db->last_id();
+        self::$last_id = Database::getInstance()->last_id();
 
 		return true;
 	}

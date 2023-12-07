@@ -1,9 +1,10 @@
 <?php
 namespace core\Messengers;
 
+use core\Database;
 use core\Provider;
 
-class Telegram extends Base{
+class Telegram{
     private const BOT_API_KEY = '6848824136:AAHD6BMrkWyruMuF6WtAJXyEg3heEJfFd_0';
     private const BOT_USER_NAME = 'skrtoha_bot';
 
@@ -42,6 +43,20 @@ class Telegram extends Base{
         else {
             file_put_contents($log_file_name, '');
             file_put_contents($log_file_name, $now." ".print_r($string, true)."\r\n", FILE_APPEND);
+        }
+    }
+
+    public static function sendMessage(){
+
+    }
+
+    public function parseMessage($message){
+        switch($message['text']){
+            case '/start':
+                $telegram_id = $message['from']['id'];
+                $result = Database::getInstance()->getCount('user_telegram', "`telegram_id`= {$telegram_id}");
+
+                break;
         }
     }
 }

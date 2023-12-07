@@ -10,4 +10,7 @@ require_once('core/DataBase.php');
 $telegram = new Telegram();
 $data = file_get_contents('php://input');
 $data = json_decode($data, true);
-$telegram->writeLogFile($data);
+
+$telegram->writeLogFile($data, true);
+
+

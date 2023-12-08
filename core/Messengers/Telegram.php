@@ -3,6 +3,7 @@ namespace core\Messengers;
 
 use core\Database;
 use core\Provider;
+use core\User;
 
 class Telegram{
     private const BOT_API_KEY = '6848824136:AAHD6BMrkWyruMuF6WtAJXyEg3heEJfFd_0';
@@ -46,16 +47,98 @@ class Telegram{
         }
     }
 
-    public static function sendMessage(){
+    public function sendMessage($params){
+        $result = $this->query('sendMessage', $params);
+        return $result;
+    }
 
+    private function bindContact($phone, $user_telegram_id){
+        $output = [];
+
+        if (!preg_match('/^\+/', $phone)){
+            $phone = '+'.$phone;
+        }
+        self::writeLogFile($phone);
+
+        $result = User::get(['phone' => $phone]);
+        foreach($result as $value) $user = $value;
+
+        if (empty($user)){
+            $output['result'] = '';
+            $output['error'] = 'Пользователь с таким номером телефона не найден. Измените номер телефона и введите /start';
+            return $output;
+        }
+
+        Database::getInstance()->insert(
+            'user_telegram',
+            [
+                'user_id' => $user['id'],
+                'telegram_id' => $user_telegram_id
+            ],
+            [['duplicate' => [
+                'telegram_id' => $user_telegram_id
+            ]]]
+        );
+        $output['result'] = 'Пользователь успешно привязан';
+        $output['error'] = '';
+        return $output;
+    }
+
+    private function deleteMessage($chat_id, $message_id){
+        return $this->query('deleteMessage', [
+            'chat_id' => $chat_id,
+            'message_id' => $message_id
+        ]);
     }
 
     public function parseMessage($message){
+        if (isset($message['contact']) && !isset($message['text'])){
+           $resBindContact = $this->bindContact($message['contact']['phone_number'], $message['contact']['user_id']);
+           if (!$resBindContact['error']){
+               $query = [
+                   'chat_id' => $message['chat']['id'],
+                   'parse_mode' => 'html',
+                   'text' => $resBindContact['result']
+               ];
+               $this->sendMessage($query);
+           }
+           else{
+               $query = [
+                   'chat_id' => $message['chat']['id'],
+                   'parse_mode' => 'html',
+                   'text' => $resBindContact['error']
+               ];
+               $this->sendMessage($query);
+           }
+           $this->deleteMessage($message['chat']['id'], $message['message_id']);
+           return;
+        }
         switch($message['text']){
-            case '/start':
+            default:
                 $telegram_id = $message['from']['id'];
-                $result = Database::getInstance()->getCount('user_telegram', "`telegram_id`= {$telegram_id}");
+                $query = [
+                    'chat_id' => $telegram_id,
+                    'parse_mode' => 'html'
+                ];
 
+                $query['text'] = "Добро пожаловать в бот Тахос!\n";
+                $result = Database::getInstance()->getCount('user_telegram', "`telegram_id`= {$telegram_id}");
+                if (!$result){
+                    $query['text'] .= "Вы еще не связали телеграм-бот со своим аккаунтом на Тахос. Нажмите кнопку \"Связать\".";
+                    $query['reply_markup'] = json_encode([
+                        'one_time_keyboard' => true,
+                        'resize_keyboard' => true,
+                        'keyboard' => [
+                            [
+                                [
+                                    'text' => 'Связать',
+                                    'request_contact' => true
+                                ]
+                            ]
+                        ]
+                    ]);
+                }
+                $this->sendMessage($query);
                 break;
         }
     }

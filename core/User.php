@@ -1,6 +1,7 @@
 <?php
 namespace core;
 
+use core\Messengers\Telegram;
 use mysqli_result;
 
 class User{
@@ -53,7 +54,6 @@ class User{
         $paramsString = json_encode($params);
         if (isset(self::$userGet[$paramsString])) return self::$userGet[$paramsString];
 
-		$db = $GLOBALS['db'];
 		$where = '';
         $having = '';
         $limit = '';
@@ -146,7 +146,7 @@ class User{
 			$order
 			$limit
 		";
-        self::$userGet[$paramsString] = $db->query($q_user, '');
+        self::$userGet[$paramsString] = Database::getInstance()->query($q_user, '');
 		return self::$userGet[$paramsString];
 	}
 

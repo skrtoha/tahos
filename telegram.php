@@ -6,11 +6,15 @@ ini_set('display_startup_errors', 0);
 use core\Messengers\Telegram;
 
 require_once('core/DataBase.php');
+try{
+    $telegram = new Telegram();
+    $data = file_get_contents('php://input');
+    $data = json_decode($data, true);
 
-$telegram = new Telegram();
-$data = file_get_contents('php://input');
-$data = json_decode($data, true);
-
-$telegram->writeLogFile($data, true);
-
+    $telegram->parseMessage($data['message']);
+    Telegram::writeLogFile($data['message']);
+}
+catch (Throwable $exception){
+    Telegram::writeLogFile($exception->getTraceAsString());
+}
 

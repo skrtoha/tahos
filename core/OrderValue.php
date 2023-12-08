@@ -1,6 +1,7 @@
 <?php
 namespace core;
 
+use core\Messengers\Telegram;
 use core\Provider\Autoeuro;
 use core\Provider\Berg;
 use core\Provider\Emex;
@@ -75,6 +76,7 @@ class OrderValue{
             Database::getInstance()->startTransaction();
         }
 
+        $postActions = [];
 		$values = ['status_id' => $status_id];
 		if (isset($params['synchronized']) && $params['synchronized']){
             $values['synchronized'] = 1;
@@ -129,14 +131,12 @@ class OrderValue{
 				break;
 			//пришло
 			case 3:
-                $orderInfo = self::getOrderInfo($params['order_id'], false, '');
-                $arrived = explode(',', $orderInfo['arrived']);
-                $isAllArrived = true;
-                foreach($arrived as $value){
-                    if ($value == 0) $isAllArrived = false;
-                }
 				$values['arrived'] = $params['quan'];
 				self::update($values, $params);
+                $postActions[] = [
+                    'name' => 'sendStatusArrived',
+                    'params' => $params
+                ];
 				break;
 			//отменен
 			case 10:
@@ -212,7 +212,10 @@ class OrderValue{
 		}
 
         if (!$noCommit){
-            Database::getInstance()->commit();
+            $result = Database::getInstance()->commit();
+            if($result){
+                self::executePostActions($postActions);
+            }
         }
 	}
 
@@ -665,5 +668,15 @@ class OrderValue{
         $output = [];
         foreach($orders as $o) $output[$o['id']] = $o;
         return $output;
+    }
+
+    private static function executePostActions($actions){
+        foreach($actions as $act){
+            switch($act['name']){
+                case 'sendStatusArrived':
+                    Telegram::sendMessageArrived($act['params']['order_id'], $act['params']['item_id']);
+                    break;
+            }
+        }
     }
 }

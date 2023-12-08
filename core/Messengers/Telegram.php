@@ -2,6 +2,7 @@
 namespace core\Messengers;
 
 use core\Database;
+use core\OrderValue;
 use core\Provider;
 use core\User;
 
@@ -48,6 +49,9 @@ class Telegram{
     }
 
     public function sendMessage($params){
+        if (!isset($params['parse_mode'])){
+            $params['parse_mode'] = 'html';
+        }
         $result = $this->query('sendMessage', $params);
         return $result;
     }
@@ -58,7 +62,6 @@ class Telegram{
         if (!preg_match('/^\+/', $phone)){
             $phone = '+'.$phone;
         }
-        self::writeLogFile($phone);
 
         $result = User::get(['phone' => $phone]);
         foreach($result as $value) $user = $value;
@@ -97,7 +100,6 @@ class Telegram{
            if (!$resBindContact['error']){
                $query = [
                    'chat_id' => $message['chat']['id'],
-                   'parse_mode' => 'html',
                    'text' => $resBindContact['result']
                ];
                $this->sendMessage($query);
@@ -105,7 +107,6 @@ class Telegram{
            else{
                $query = [
                    'chat_id' => $message['chat']['id'],
-                   'parse_mode' => 'html',
                    'text' => $resBindContact['error']
                ];
                $this->sendMessage($query);
@@ -141,5 +142,35 @@ class Telegram{
                 $this->sendMessage($query);
                 break;
         }
+    }
+
+    public static function sendMessageArrived($order_id, $item_id){
+        $orderInfo = OrderValue::getOrderInfo($order_id);
+        if ($orderInfo['delivery'] != 'Самовывоз'){
+            return;
+        }
+
+        $userTelegram = Database::getInstance()->select_one('user_telegram', '*', "`user_id` = {$orderInfo['user_id']}");
+        if (!$userTelegram || !$userTelegram['telegram_id']){
+            return;
+        }
+        $resUser = User::get(['id' => $orderInfo['user_id']]);
+        foreach($resUser as $value) $user = $value;
+
+        $issueInfo = Database::getInstance()->select_one('issues', "*", "`id` = {$user['issue_id']}");
+
+        $orderValue = OrderValue::get([
+            'order_id' => $order_id,
+            'item_id' => $item_id
+        ])->fetch_assoc();
+
+        if (empty($orderValue)){
+            return;
+        }
+        $query = [
+            'chat_id' => $userTelegram['telegram_id'],
+            'text' => "Товар {$orderValue['brend']} {$orderValue['article']}{$orderValue['title_full']} прибыл на пункт выдачи по адресу: {$issueInfo['adres']}"
+        ];
+        self::getInstance()->sendMessage($query);
     }
 }

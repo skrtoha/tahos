@@ -144,13 +144,18 @@ class Telegram{
         }
     }
 
+    private function getTelegramId($user_id){
+        $userTelegram = Database::getInstance()->select_one('user_telegram', '*', "`user_id` = {$user_id}");
+        return $userTelegram;
+    }
+
     public static function sendMessageArrived($order_id, $item_id){
         $orderInfo = OrderValue::getOrderInfo($order_id);
         if ($orderInfo['delivery'] != 'Самовывоз'){
             return;
         }
 
-        $userTelegram = Database::getInstance()->select_one('user_telegram', '*', "`user_id` = {$orderInfo['user_id']}");
+        $userTelegram = self::getInstance()->getTelegramId($orderInfo['user_id']);
         if (!$userTelegram || !$userTelegram['telegram_id']){
             return;
         }
@@ -172,5 +177,27 @@ class Telegram{
             'text' => "Товар {$orderValue['brend']} {$orderValue['article']} {$orderValue['title_full']} прибыл на пункт выдачи по адресу: {$issueInfo['adres']}"
         ];
         self::getInstance()->sendMessage($query);
+    }
+
+    public static function sendMessageAwaitInStore($user_id, $item){
+        $userTelegram = self::getInstance()->getTelegramId($user_id);
+        if (!$userTelegram || !$userTelegram['telegram_id']){
+            return;
+        }
+        self::getInstance()->sendMessage([
+            'chat_id' => $userTelegram['telegram_id'],
+            'text' => "Ваша заявка на возврат $item согласована. Товар ожидается на складе."
+        ]);
+    }
+
+    public static function sendMessageReturnPerformed($user_id, $item, $amount){
+        $userTelegram = self::getInstance()->getTelegramId($user_id);
+        if (!$userTelegram || !$userTelegram['telegram_id']){
+            return;
+        }
+        self::getInstance()->sendMessage([
+            'chat_id' => $userTelegram['telegram_id'],
+            'text' => "Ваша заявка на возврат $item зачтена в сумме $amount руб."
+        ]);
     }
 }

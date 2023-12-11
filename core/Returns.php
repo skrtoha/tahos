@@ -1,5 +1,7 @@
 <?php
 namespace core;
+use core\Messengers\Telegram;
+
 class Returns{
 	public static function get($params = []): \mysqli_result
 	{
@@ -145,6 +147,16 @@ class Returns{
                 Fund::$last_id
             );
 		}
+        $item = "{$return['brend']} {$return['article']} {$return['title_full']}";
+        switch($params['status_id']){
+            case 2:
+                Telegram::sendMessageAwaitInStore($return['user_id'], $item);
+                break;
+            case 3:
+                Telegram::sendMessageReturnPerformed($return['user_id'], $item, $return['price']);
+                break;
+
+        }
         return true;
 	}
 }

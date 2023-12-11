@@ -169,7 +169,7 @@ class Telegram{
         }
         $query = [
             'chat_id' => $userTelegram['telegram_id'],
-            'text' => "Товар {$orderValue['brend']} {$orderValue['article']}{$orderValue['title_full']} прибыл на пункт выдачи по адресу: {$issueInfo['adres']}"
+            'text' => "Товар {$orderValue['brend']} {$orderValue['article']} {$orderValue['title_full']} прибыл на пункт выдачи по адресу: {$issueInfo['adres']}"
         ];
         self::getInstance()->sendMessage($query);
     }

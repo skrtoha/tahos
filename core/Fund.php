@@ -30,7 +30,7 @@ class Fund{
 		if ($type_operation == 1) $insert['is_new'] = 1;
 
         $result = Database::getInstance()->insert('funds', $insert);
-        if ($result !== true) throw new \Exception('Ошибка вставки funds');
+        if ($result !== true) throw new \Exception("Ошибка вставки funds: $result");
 
         self::$last_id = Database::getInstance()->last_id();
 

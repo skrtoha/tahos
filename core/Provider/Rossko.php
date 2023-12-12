@@ -352,7 +352,6 @@ class Rossko extends Provider{
 		);
 		try{
 			$result = $soap->GetCheckout($param);
-			debug($result);
 		} catch(\SoapFault $e){
 			return $e;
 		}
@@ -389,13 +388,15 @@ class Rossko extends Provider{
 				parent::getComparableString($Item->brand) == parent::getComparableString($value['brand'])
 			){
 				$osi = explode('-', $value['comment']);
+                $orderInfo = OrderValue::getOrderInfo($osi[0]);
 				OrderValue::changeStatus(11, [
 					'order_id' => $osi[0],
 					'store_id' => $osi[1],
 					'item_id' => $osi[2],
 					'price' => $value['price'],
 					'quan' => $value['count'],
-					'user_id' => $value['user_id']
+					'user_id' => $value['user_id'],
+                    'pay_type' => $orderInfo['pay_type']
 				]);
 				parent::updateProviderBasket(
 					[

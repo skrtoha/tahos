@@ -143,67 +143,92 @@ $(function(){
     });
 	$(document).on('submit', '#askForQuanAndPrice', function(e){
 		e.preventDefault();
-		var array = $(this).serializeArray();
-		var store_id = array[0].value;
-		var item_id = array[1].value;
-		var form = $('tr[store_id=' + store_id + '][item_id=' + item_id + '] td.change_status form');
-		var data = {
-			status_id: 2,
-			new_returned: array[2].value,
-			returned: form.find('input[name=returned]').val(),
-			ordered: form.find('input[name=ordered]').val(),
-			store_id: store_id,
-			item_id: item_id,
-			price: array[3].value,
-			bill: form.find('input[name=bill]').val(),
-			order_id: form.find('input[name=order_id]').val(),
-			user_id: form.find('input[name=user_id]').val(),
-		}
-		$.ajax({
+        const $th = $(this)
+        const array = $th.serializeArray();
+        const formData = {}
+        for(let a of array){
+            formData[a.name] = a.value
+        }
+        const form = $('tr[store_id=' + formData.store_id + '][item_id=' + formData.item_id + '] td.change_status form');
+        formData.order_id = form.find('input[name=order_id]').val()
+        const items = []
+        items.push(formData)
+
+        $.ajax({
 			type: 'post',
-			url: ajax_url,
-			data: data,
+			url: '/admin/ajax/return.php',
+			data: {
+                act: 'createReturn',
+                items: items
+            },
+            beforeSend: () => {
+                showGif()
+            },
 			success: function(response){
-				// console.log(response); return false;
-				if (is_reload) document.location.reload();
+                showGif(false)
+                show_message('Заявка успешно создана')
+                $('#modal-container').removeClass('active')
 			}
 		})
 	})
 	$('select.change_status')
         .on('change', function(){
-            var th = $(this);
-            var status_id = + th.val();
-            if (status_id != 2) return false;
+            const th = $(this);
+            const status_id = +th.val();
+            if (status_id != 13) return false;
             if (!confirm('Подтверждаете действие?')) return false;
-            var form = th.closest('form');
-            var issued = form.find('input[name=issued]').val();
-            var returned = form.find('input[name=returned]').val();
-            var tr = form.closest('tr');
-            modal_show(
-                '<form id="askForQuanAndPrice">' +
-                    '<input type="hidden" name="store_id" value="' + tr.attr('store_id') + '">' +
-                    '<input type="hidden" name="item_id" value="' + tr.attr('item_id') + '">' +
-                    '<table>' +
-                        '<tr>' +
-                            '<td>Количество:</td>' +
-                            '<td><input type="text" name="quan" value="' + (issued - returned) + '"></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td>Цена:</td>' +
-                            '<td><input type="text" name="price" value="' + form.find('input[name=price]').val() + '"></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td colspan="2"><input type="submit" value="Отправить"></td>' +
-                        '</tr>' +
-                    '</table>' +
-                '</form>'
-            );
+            const form = th.closest('form');
+            const issued = form.find('input[name=issued]').val();
+            const returned = form.find('input[name=returned]').val();
+            const tr = form.closest('tr');
+
+            $.ajax({
+                type: 'get',
+                url: '/admin/ajax/return.php',
+                data: {
+                    act: 'get_reasons'
+                },
+                success: response => {
+                    let strReason = '';
+                    const reasons = JSON.parse(response)
+                    for(let r of reasons){
+                        strReason += `<option value="${r.id}">${r.title}</option>`
+                    }
+                    modal_show(`
+                        <form id="askForQuanAndPrice">
+                            <input type="hidden" name="store_id" value="${tr.attr('store_id')}">
+                            <input type="hidden" name="item_id" value="${tr.attr('item_id')}">
+                            <table>
+                                <tr>
+                                    <td>Количество:</td>
+                                    <td><input type="text" name="quan" value="${issued - returned}"></td>
+                                </tr>
+                                 <tr>
+                                    <td>Причина:</td>
+                                    <td>
+                                        <select name="reason_id">
+                                            ${strReason}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Цена:</td>
+                                    <td><input readonly type="text" name="price" value="${form.find('input[name=price]').val()}"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><input type="submit" value="Отправить"></td>
+                                </tr>
+                            </table>
+                        </form>
+                    `)
+                }
+            })
         })
         .on('change', function(){
             var th = $(this);
             var status_id = + th.val();
             //добавлено, т.к. обработка идет в другом месте
-            if (status_id == 2) return false;
+            if (status_id == 13) return false;
             if (status_id == 6 || status_id == 8){
                 if (!confirm('Вы подтверждаете действие?')) return false;
             }

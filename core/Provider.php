@@ -96,7 +96,7 @@ abstract class Provider{
 	public static function getEmailPrices(){
 		static $emailPrices;
 		if ($emailPrices) return $emailPrices;
-		$res = $GLOBALS['db']->query("SELECT store_id FROM #email_prices", '');
+		$res = Database::getInstance()->query("SELECT store_id FROM #email_prices", '');
 		if (!$res->num_rows) return false;
 		foreach($res as $value) $emailPrices[] = $value['store_id'];
 		return $emailPrices;

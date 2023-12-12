@@ -61,17 +61,17 @@ function get_summ($order){
 function get_order_statuses($status){
 	global $db;
 	switch ($status) {
-		case 1: $in = array(2); break;
+        case 4:
+        case 1: $in = array(13); break;
 		// case 2: $in = array(9); break;
-		case 2: $in = array(); break;
-		case 3: $in = array(); break;
-		case 4: $in = array(2); break;
-		case 5: $in = array(7); break;
-		case 6: $in = array(); break;
-		case 11: $in = array(12, 8, 3); break;
+        case 8:
+        case 3:
+        case 6:
+        case 2: $in = array(); break;
+        case 5: $in = array(7); break;
+        case 11: $in = array(12, 8, 3); break;
 		case 7: $in = array(11, 6, 12); break;
-		case 8: $in = array(); break;
-		case 10: $in = array(4, 3); break;
+        case 10: $in = array(4, 3); break;
 	}
 	return $db->select('orders_statuses', '*', '`id` IN ('.implode(',', $in).')');
 }

@@ -105,7 +105,7 @@ class Returns{
 		foreach($items as $value){
 			if (in_array($value['store_id'], $emailPrices)) $status_id = 2;
 			else $status_id = 1;
-			$GLOBALS['db']->query("
+			Database::getInstance()->query("
 				INSERT INTO #returns (`order_id`,`store_id`,`item_id`,`reason_id`,`quan`,`status_id`) 
 				VALUES ({$value['order_id']}, {$value['store_id']}, {$value['item_id']}, {$value['reason_id']}, {$value['quan']}, $status_id) 
 				ON DUPLICATE KEY UPDATE `status_id` = $status_id,`created` = CURRENT_TIMESTAMP, `updated` = NULL

@@ -3,7 +3,7 @@ session_start();
 use core\Basket;
 
 
-require_once ("../core/DataBase.php");
+require_once ("../core/Database.php");
 require_once ("../core/functions.php");
 
 $db = new core\Database();

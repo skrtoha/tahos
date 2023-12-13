@@ -1,5 +1,5 @@
 <?php
-require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/Database.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/functions.php");
 
 $db = new core\Database();

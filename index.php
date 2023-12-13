@@ -11,7 +11,7 @@ ini_set('error_reporting', E_PARSE);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 
-require_once('core/DataBase.php');
+require_once('core/Database.php');
 require_once('core/functions.php');
 require_once('vendor/autoload.php');
 

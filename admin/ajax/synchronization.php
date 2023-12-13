@@ -3,7 +3,7 @@
 
 
 
-require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/Database.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/order_issues.function.php");

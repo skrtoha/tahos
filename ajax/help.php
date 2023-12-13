@@ -1,5 +1,5 @@
 <?php 
-require_once ("../core/DataBase.php");
+require_once ("../core/Database.php");
 
 $db = new core\Database();
 $connection = new core\Connection($db);

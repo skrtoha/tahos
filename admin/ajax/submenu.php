@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/Database.php");
 $title = trim($_GET['title']);
 ?>
 <span id="userInfo">Пользователь: <b><?=$_SESSION['manager']['login']?></b></span>

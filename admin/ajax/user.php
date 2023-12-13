@@ -6,7 +6,7 @@ use core\Setting;
 use core\Synchronization;
 use core\UserAddress;
 use core\User;
-require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/DataBase.php");
+require_once ($_SERVER['DOCUMENT_ROOT'] . "/core/Database.php");
 
 session_start();
 

@@ -1,6 +1,6 @@
 <?
 session_start();
-require_once('../core/DataBase.php');
+require_once('../core/Database.php');
 require_once('../core/functions.php');
 require_once('../admin/functions/order_issues.function.php');
 

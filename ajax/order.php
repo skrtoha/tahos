@@ -3,7 +3,7 @@ ini_set('error_reporting', E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-require_once ("../core/DataBase.php");
+require_once ("../core/Database.php");
 session_start();
 
 

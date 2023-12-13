@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 use core\Log;
 use core\Managers;
 
-require_once('../core/DataBase.php');
+require_once('../core/Database.php');
 require_once('templates/functions.php');
 session_start();
 $view = $_GET['view'];

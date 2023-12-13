@@ -11,7 +11,7 @@ ini_set('display_startup_errors', 1);
 
 $root = $_SERVER['DOCUMENT_ROOT'];
 
-require_once($root.'/core/DataBase.php');
+require_once($root.'/core/Database.php');
 require_once($root.'/core/functions.php');
 require_once($root.'/vendor/autoload.php');
 

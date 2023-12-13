@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 0);
 
 use core\Messengers\Telegram;
 
-require_once('core/DataBase.php');
+require_once('core/Database.php');
 try{
     $telegram = new Telegram();
     $data = file_get_contents('php://input');

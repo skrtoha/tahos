@@ -1,5 +1,5 @@
 <?
-require_once('../core/DataBase.php');
+require_once('../core/Database.php');
 session_start();
 
 $db = new core\Database();

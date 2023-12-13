@@ -5,7 +5,7 @@ use core\Authorize;
 use core\Mailer;
 use core\YandexCaptcha;
 
-require_once ("../core/DataBase.php");
+require_once ("../core/Database.php");
 require_once('../core/functions.php');
 
 /** @var $result mysqli_result */

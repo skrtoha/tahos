@@ -2,7 +2,7 @@
 /** @var $res_user mysqli_result */
 
 session_start();
-require_once ("../core/DataBase.php");
+require_once ("../core/Database.php");
 require_once ("../core/functions.php");
 error_reporting(E_ERROR);
 

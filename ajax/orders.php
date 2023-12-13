@@ -1,5 +1,5 @@
 <?
-require_once('../core/DataBase.php');
+require_once('../core/Database.php');
 require_once('../core/functions.php');
 session_start();
 $user_id = $_SESSION['user'];

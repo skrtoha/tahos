@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 session_start();
-require_once('../core/DataBase.php');
+require_once('../core/Database.php');
 require_once('../core/functions.php');
 
 $db = new core\Database();

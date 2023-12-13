@@ -30,7 +30,7 @@ class Telegram{
 
     public function setWebhook(){
         $result = $this->query('setWebhook', [
-            "url" => 'https://tahos.ru/telegram.php'
+            "url" => 'https://tahos.skrtoha.ru/telegram.php'
         ]);
         return $result;
     }

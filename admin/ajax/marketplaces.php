@@ -4,7 +4,7 @@ use core\Item;
 use core\Marketplaces\Ozon;
 use core\Setting;
 
-require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/DataBase.php");
+require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/Database.php");
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/admin/templates/functions.php");
 
 $db = new core\Database();

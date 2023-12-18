@@ -2,16 +2,22 @@
 namespace core\Messengers;
 
 use core\Database;
+use core\Exceptions\Telegram\NotAllowedIP;
 use core\OrderValue;
 use core\Provider;
 use core\User;
 
 class Telegram{
     private const BOT_API_KEY = '6848824136:AAHD6BMrkWyruMuF6WtAJXyEg3heEJfFd_0';
-    private const BOT_USER_NAME = 'skrtoha_bot';
+    private const ALLOWED_IP = '91.108.6.53';
 
-    public function __construct(){
-
+    /**
+     * @throws NotAllowedIP
+     */
+    public function __construct($ip = null){
+        if ($ip && $ip != self::ALLOWED_IP){
+            throw new NotAllowedIP('Запрещенный ip сервера');
+        }
     }
 
     public static function getInstance(): Telegram
@@ -94,6 +100,44 @@ class Telegram{
         ]);
     }
 
+    private function showAccountInfo($message){
+        $telegram_id = $message['from']['id'];
+        $isBound = $this->checkBoundUser($telegram_id, false);
+        if (!$isBound){
+            return;
+        }
+
+        $userTelegram = self::getInstance()->getUserId($telegram_id);
+
+        $userResult = User::get(['user_id' => $userTelegram['user_id']]);
+        foreach($userResult as $value) $user = $value;
+
+        $query = [
+            'chat_id' => $telegram_id,
+        ];
+        $designation = 'руб.';
+        $text = "";
+        if (in_array($user['bill_mode'], [User::BILL_MODE_CASH, User::BILL_MODE_CASH_AND_CASHLESS])){
+            $text .= "<b>Наличный</b>\n";
+            $text .= "Кредитный лимит: {$user['credit_limit_cash']} $designation\n";
+            $text .= "Средств на счету: {$user['bill_cash']} $designation\n\n";
+        }
+
+
+        if (in_array($user['bill_mode'], [User::BILL_MODE_CASHLESS, User::BILL_MODE_CASH_AND_CASHLESS])){
+            $text .= "<b>Безналичный</b> \n";
+            $text .= "Кредитный лимит: {$user['credit_limit_cashless']} $designation\n";
+            $text .= "Средств на счету: {$user['bill_cashless']} $designation\n\n";
+        }
+
+        $text .= "<b>Зарезервировано:</b> ".($user['reserved_cash'] + $user['reserved_cashless'])."\n";
+        $text .= "<b>Итого:</b> {$user['bill_available']} $designation\n";
+        $text .= "<b>Отсрочка платежа:</b> {$user['defermentOfPayment']} д.\n";
+
+        $query['text'] = $text;
+        $this->sendMessage($query);
+    }
+
     public function parseMessage($message){
         if (isset($message['contact']) && !isset($message['text'])){
            $resBindContact = $this->bindContact($message['contact']['phone_number'], $message['contact']['user_id']);
@@ -115,37 +159,62 @@ class Telegram{
            return;
         }
         switch($message['text']){
+            case '/account':
+                $this->showAccountInfo($message);
+                break;
             default:
                 $telegram_id = $message['from']['id'];
-                $query = [
-                    'chat_id' => $telegram_id,
-                    'parse_mode' => 'html'
-                ];
-
-                $query['text'] = "Добро пожаловать в бот Тахос!\n";
-                $result = Database::getInstance()->getCount('user_telegram', "`telegram_id`= {$telegram_id}");
-                if (!$result){
-                    $query['text'] .= "Вы еще не связали телеграм-бот со своим аккаунтом на Тахос. Нажмите кнопку \"Связать\".";
-                    $query['reply_markup'] = json_encode([
-                        'one_time_keyboard' => true,
-                        'resize_keyboard' => true,
-                        'keyboard' => [
-                            [
-                                [
-                                    'text' => 'Связать',
-                                    'request_contact' => true
-                                ]
-                            ]
-                        ]
-                    ]);
-                }
-                $this->sendMessage($query);
+                self::getInstance()->checkBoundUser($telegram_id);
                 break;
         }
     }
 
+    private function checkBoundUser($telegram_id, $sayHello = true): bool
+    {
+        $output = true;
+        $query = [
+            'chat_id' => $telegram_id,
+            'parse_mode' => 'html',
+            'text' => ''
+        ];
+
+        if ($sayHello){
+            $query['text'] = "Добро пожаловать в бот Тахос!\n";
+        }
+
+        $result = self::getInstance()->getUserId($telegram_id);
+        if (!$result){
+            $output = false;
+            $query['text'] .= "Вы еще не связали телеграм-бот со своим аккаунтом на Тахос. Нажмите кнопку \"Связать\" внизу.";
+            $query['reply_markup'] = json_encode([
+                'one_time_keyboard' => true,
+                'resize_keyboard' => true,
+                'keyboard' => [
+                    [
+                        [
+                            'text' => 'Связать',
+                            'request_contact' => true
+                        ]
+                    ]
+                ]
+            ]);
+        }
+        $this->sendMessage($query);
+        return $output;
+    }
+
     private function getTelegramId($user_id){
         $userTelegram = Database::getInstance()->select_one('user_telegram', '*', "`user_id` = {$user_id}");
+        return $userTelegram;
+    }
+
+    private function getUserId($telegram_id){
+        static $output;
+        if (isset($output[$telegram_id])){
+            return $output[$telegram_id];
+        }
+        $userTelegram = Database::getInstance()->select_one('user_telegram', '*', "`telegram_id` = {$telegram_id}");
+        $output[$telegram_id] = $userTelegram;
         return $userTelegram;
     }
 

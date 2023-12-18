@@ -41,12 +41,12 @@ switch ($act) {
 		$res_order_values = OrderValue::get(['order_id' => $_GET['id']], '');
         $redirectString = "Location: /admin/?view=orders&id={$_GET['id']}&act=change";
 		while($ov = $res_order_values->fetch_assoc()){
-            if (!$ov['bill_type']){
+            if (!$ov['pay_type']){
                 message('Не указан способ оплаты!', false);
                 header($redirectString);
                 break;
             }
-			$automaticOrder = isset($_GET['automaticOrder']) ? true : false;
+			$automaticOrder = isset($_GET['automaticOrder']);
 			OrderValue::setStatusInWork($ov, $automaticOrder);
 		}
 		if (isset($_GET['automaticOrder'])){

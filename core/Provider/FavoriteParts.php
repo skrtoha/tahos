@@ -321,9 +321,12 @@ class FavoriteParts extends Provider{
         $where .= "(`order_id` = {$array[0]} AND `store_id` = {$array[1]} AND `item_id` = {$array[2]})";
 		$orders_values = $GLOBALS['db']->query("
 			SELECT
-				ov.*
+				ov.*,
+				o.pay_type
 			FROM 
 				#orders_values ov
+            LEFT JOIN
+			    #orders o ON o.id = ov.order_id	    
 			LEFT JOIN
 				#provider_stores ps ON ps.id = ov.store_id
 			WHERE

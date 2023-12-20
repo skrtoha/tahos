@@ -231,7 +231,8 @@ class Berg extends Provider{
                     'store_id' => $row['store_id'],
                     'item_id' => $row['item_id'],
                     'price' => $result->order->items[0]->price,
-                    'quan' => $result->order->items[0]->quantity
+                    'quan' => $result->order->items[0]->quantity,
+                    'pay_type' => $row['pay_type']
                 ]);
 
 

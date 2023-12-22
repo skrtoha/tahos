@@ -327,8 +327,7 @@ header {
     left: 0;
     z-index: 999
 }
-header #debt {
-    background: #f45f5f;
+header .top-message {
     width: calc(100% + 40px);
     position: relative;
     left: -20px;
@@ -336,6 +335,24 @@ header #debt {
     text-align: center;
     color: white;
     font-size: 13px;
+}
+header .top-message.debt{
+    background: #f45f5f;
+}
+.icon-cross1:before {
+    content: "\ea0f";
+}
+.top-message.telegram {
+    background: #d99c9c;
+    position: relative;
+}
+.top-message.telegram .icon-cross1{
+    position: absolute;
+    right: 20px;
+    cursor: pointer;
+}
+.top-message.telegram a{
+    color: white;
 }
 
 header .catalog_btn {

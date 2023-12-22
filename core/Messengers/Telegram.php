@@ -1,6 +1,7 @@
 <?php
 namespace core\Messengers;
 
+use core\Config;
 use core\Database;
 use core\Exceptions\Telegram\NotAllowedIP;
 use core\OrderValue;
@@ -8,14 +9,11 @@ use core\Provider;
 use core\User;
 
 class Telegram{
-    private const BOT_API_KEY = '6848824136:AAHD6BMrkWyruMuF6WtAJXyEg3heEJfFd_0';
-    private const ALLOWED_IP = '91.108.6.53';
-
     /**
      * @throws NotAllowedIP
      */
     public function __construct($ip = null){
-        if ($ip && $ip != self::ALLOWED_IP){
+        if ($ip && !in_array($ip, Config::$telegram['allowed_ip'])){
             throw new NotAllowedIP('Запрещенный ip сервера');
         }
     }
@@ -30,13 +28,13 @@ class Telegram{
     }
 
     public function query($method, $params){
-        $result = Provider::getCurlUrlData("https://api.telegram.org/bot".self::BOT_API_KEY."/$method?" . http_build_query($params));
+        $result = Provider::getCurlUrlData("https://api.telegram.org/bot".Config::$telegram['api_key']."/$method?" . http_build_query($params));
         return json_decode($result, true);
     }
 
     public function setWebhook(){
         $result = $this->query('setWebhook', [
-            "url" => 'https://tahos.skrtoha.ru/telegram.php'
+            "url" => Config::$telegram['hook']
         ]);
         return $result;
     }

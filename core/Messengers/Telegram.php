@@ -13,9 +13,9 @@ class Telegram{
      * @throws NotAllowedIP
      */
     public function __construct($ip = null){
-        if ($ip && !in_array($ip, Config::$telegram['allowed_ip'])){
+        /*if ($ip && !in_array($ip, Config::$telegram['allowed_ip'])){
             throw new NotAllowedIP('Запрещенный ip сервера');
-        }
+        }*/
     }
 
     public static function getInstance(): Telegram

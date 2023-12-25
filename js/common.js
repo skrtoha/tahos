@@ -271,6 +271,9 @@ function selectItemByKey(event){
 	} 
 }
 $(function() {
+    if (localStorage.getItem('hide_telegram_notice') == '1'){
+        $('.top-message.telegram').hide()
+    }
     const debt = document.querySelector('#debt');
     if (debt){
         const rectDebt = debt.getBoundingClientRect();
@@ -819,6 +822,10 @@ $(function() {
             t.setSelectionRange(5, 5)
             countPressBackspace = 0
         }
+    })
+    $('.top-message.telegram .icon-cross1').on('click', e => {
+        localStorage.setItem('hide_telegram_notice', '1')
+        e.target.closest('div').remove()
     })
 
 });

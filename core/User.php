@@ -561,4 +561,12 @@ class User{
     public static function isAuthorized(){
         return isset($_SESSION['user']) && $_SESSION['user'];
     }
+
+    public static function isRegistedTelegram($user_id){
+        static $output = [];
+        if (isset($output[$user_id])) return $output[$user_id];
+        $count = Database::getInstance()->getCount('user_telegram', "`user_id` = $user_id");
+        $output[$user_id] = $count > 0;
+        return $output[$user_id];
+    }
 }

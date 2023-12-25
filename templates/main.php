@@ -7,8 +7,10 @@
 /** @global $db \core\Database */
 /** @var $user array */
 
+use core\Config;
 use core\Setting;
 use core\YandexCaptcha;
+use core\User;
 
 ?>
 <!DOCTYPE html>
@@ -71,7 +73,13 @@ use core\YandexCaptcha;
 	</div>
 	<header>
         <?if (!empty($debt)){?>
-            <div id="debt"><?=$debt['message']?></div>
+            <div class="top-message debt"><?=$debt['message']?></div>
+        <?}?>
+        <?if (!User::isRegistedTelegram($_SESSION['user'])){?>
+            <div class="top-message telegram">
+                <a target="_blank" href="<?= Config::$telegram['url']?>">Подпишитесь на наш Телеграм бот</a>
+                <span class="icon-cross1"></span>
+            </div>
         <?}?>
 		<div class="wrapper">
 			<a href="/" class="logo"></a>

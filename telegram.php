@@ -13,8 +13,8 @@ try{
     $data = file_get_contents('php://input');
     $data = json_decode($data, true);
 
-    $telegram->parseMessage($data['message']);
     Telegram::writeLogFile($data['message']);
+    $telegram->parseMessage($data['message']);
 }
 catch (Throwable $exception){
     Telegram::writeLogFile(

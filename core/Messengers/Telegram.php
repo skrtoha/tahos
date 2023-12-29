@@ -267,4 +267,15 @@ class Telegram{
             'text' => "Ваша заявка на возврат $item зачтена в сумме $amount руб."
         ]);
     }
+
+    public static function sendMessageProviderRefuse($user_id, $message){
+        $userTelegram = self::getInstance()->getTelegramId($user_id);
+        if (!$userTelegram || !$userTelegram['telegram_id']){
+            return;
+        }
+        self::getInstance()->sendMessage([
+            'chat_id' => $userTelegram['telegram_id'],
+            'text' => $message
+        ]);
+    }
 }

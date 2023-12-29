@@ -155,7 +155,11 @@ class OrderValue{
 			case 12:
 			//отменен поставщиком
 			case 8:
-				$ov = $GLOBALS['db']->select_one('orders_values', '*', Provider::getWhere($params));
+                $ov = OrderValue::get([
+                    'order_id' => $params['order_id'],
+                    'store_id' => $params['store_id'],
+                    'item_id' => $params['item_id']
+                ])->fetch_assoc();
 				
 				//если предыдущий статус был заказано
 				if ($ov['status_id'] == 11){
@@ -181,7 +185,7 @@ class OrderValue{
                             $message
                         );
 
-                        Telegram::sendMesssageProviderRefuse($userInfo['id'], $message);
+                        Telegram::sendMessageProviderRefuse($userInfo['id'], $message);
                     }
 				}
                 if ($status_id == 12){

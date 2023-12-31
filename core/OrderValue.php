@@ -179,7 +179,8 @@ class OrderValue{
                         $query .= " WHERE i.id = {$ov['item_id']}";
                         $itemInfo = $GLOBALS['db']->query($query)->fetch_assoc();
                         $itemInfo['title_full'] = substr($itemInfo['title_full'], 0, 50);
-                        $message = "Позиция {$itemInfo['brend']}-{$itemInfo['article']} отменена поставщиком. Заказ {$_SERVER['HTTP_ORIGIN']}/order/{$ov['order_id']}";
+                        $url = str_replace('www.', '', $_SERVER['HTTP_ORIGIN']);
+                        $message = "Позиция {$itemInfo['brend']}-{$itemInfo['article']} отменена поставщиком. Заказ {$url}/order/{$ov['order_id']}";
 
                         $telegram = new Telegram();
                         $userTelegram = $telegram->getTelegramId($userInfo['id']);

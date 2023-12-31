@@ -201,9 +201,14 @@ class Telegram{
         return $output;
     }
 
-    private function getTelegramId($user_id){
-        $userTelegram = Database::getInstance()->select_one('user_telegram', '*', "`user_id` = {$user_id}");
-        return $userTelegram;
+    public function getTelegramId($user_id){
+        static $output;
+        if (isset($output[$user_id])){
+            return $output[$user_id];
+        }
+        $result = Database::getInstance()->select_one('user_telegram', '*', "`user_id` = {$user_id}");
+        $output[$user_id] = $result;
+        return $result;
     }
 
     private function getUserId($telegram_id){

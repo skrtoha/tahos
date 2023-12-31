@@ -140,9 +140,10 @@ class Returns{
 				'user_id' => $return['user_id'],
                 'bill_type' => $return['bill_type']
 			], true);
+            $amount = $params['return_price'] * $params['quan'];
             User::checkDebt(
                 $return['user_id'],
-                $params['return_price'] * $params['quan'],
+                $amount,
                 $return['bill_type'],
                 Fund::$last_id
             );
@@ -153,7 +154,7 @@ class Returns{
                 Telegram::sendMessageAwaitInStore($return['user_id'], $item);
                 break;
             case 3:
-                Telegram::sendMessageReturnPerformed($return['user_id'], $item, $return['price']);
+                Telegram::sendMessageReturnPerformed($return['user_id'], $item, $amount);
                 break;
 
         }

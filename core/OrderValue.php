@@ -180,12 +180,18 @@ class OrderValue{
                         $itemInfo = $GLOBALS['db']->query($query)->fetch_assoc();
                         $itemInfo['title_full'] = substr($itemInfo['title_full'], 0, 50);
                         $message = "Позиция {$itemInfo['brend']}-{$itemInfo['article']} отменена поставщиком. Заказ {$_SERVER['HTTP_ORIGIN']}/order/{$ov['order_id']}";
-                        $smsAero->sendSms(
-                            $userInfo['phone'],
-                            $message
-                        );
 
-                        Telegram::sendMessageProviderRefuse($userInfo['id'], $message);
+                        $telegram = new Telegram();
+                        $userTelegram = $telegram->getTelegramId($userInfo['id']);
+                        if ($userTelegram){
+                            Telegram::sendMessageProviderRefuse($userInfo['id'], $message);
+                        }
+                        else{
+                            $smsAero->sendSms(
+                                $userInfo['phone'],
+                                $message
+                            );
+                        }
                     }
 				}
                 if ($status_id == 12){

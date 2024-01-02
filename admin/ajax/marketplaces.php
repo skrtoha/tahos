@@ -2,6 +2,7 @@
 
 use core\Item;
 use core\Marketplaces\Ozon;
+use core\Provider\Tahos;
 use core\Setting;
 
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/Database.php");
@@ -190,4 +191,23 @@ switch($_POST['act']){
         }
         echo json_encode($output);
         break;
+    case 'ozonGetSelfStores':
+        $currentMainStore = Setting::get('marketplaces', 'main_store');
+        $selfStores = Tahos::getSelfStores();
+        $output = [];
+        foreach($selfStores as & $store){
+            if ($store['id'] == $currentMainStore){
+                $store['active'] = 1;
+            }
+            else{
+                $store['active'] = 0;
+            }
+        }
+        echo json_encode($selfStores);
+        break;
+    case 'ozonSetMainStore':
+        Setting::update('marketplaces', 'main_store', $_POST['value']);
+        echo json_encode([]);
+        break;
+
 }

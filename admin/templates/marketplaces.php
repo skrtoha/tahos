@@ -58,6 +58,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
         <div class="ionTabs__item" data-name="ozon">
             <div class="actions">
                 <input style="width: 264px;" type="text" name="itemsForAdding" value="" class="intuitive_search" placeholder="Поиск для добавления">
+                <input type="button" value="Изменить склад" name="changeStore">
             </div>
             <span class="total">
 				Всего: <span></span>

@@ -242,6 +242,46 @@ class Marketplaces{
                 else nodeTr.style.display = 'table-row'
             })
         })
+        $(document).on('click', 'input[name=changeStore]', e => {
+            showGif()
+            const formData = new FormData
+            formData.set('act', 'ozonGetSelfStores')
+            fetch(Marketplaces.marketplaceUrl, {
+                method: 'post',
+                body: formData
+            }).then(response => response.json()).then(response => {
+                showGif(false)
+                let str = ''
+                for (let store of response) {
+                    const checked = !!store.active ? 'checked' : ''
+                    str += `
+                        <label>
+                            <input ${checked} type="radio" name="change_store" value="${store.id}">
+                            ${store.title}
+                        </label>
+                    `
+                }
+                modal_show(`
+                    <form id="change_main_store" action="#">
+                        ${str}
+                    </form>                    
+                `)
+            })
+
+        })
+        $(document).on('change', 'input[name="change_store"]', e => {
+            const formData = new FormData
+            formData.set('act', 'ozonSetMainStore')
+            formData.set('value', e.target.value)
+            showGif()
+            fetch(Marketplaces.marketplaceUrl, {
+                method: 'post',
+                body: formData
+            }).then(response => response.json()).then(response => {
+                showGif(false)
+                show_message('Успешно изменено')
+            })
+        })
     }
 
 

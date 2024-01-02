@@ -174,3 +174,9 @@ td > table td{
 form.search{
     margin-bottom: 10px;
 }
+#change_main_store label {
+    margin-top: auto;
+    display: block;
+    text-align: left;
+    padding: 5px 0;
+}

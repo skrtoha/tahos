@@ -266,8 +266,8 @@ class Ozon extends Marketplaces{
             ";
         }
 
+        $ozonMarkup = Setting::get('marketplaces', 'markup');
         while($nextIterator){
-            $ozonMarkup = Setting::get('marketplaces', 'markup');
             $result = self::getDBInstance()->query("
                 SELECT 
                     $selectItem
@@ -278,7 +278,7 @@ class Ozon extends Marketplaces{
                     #item_ozon oz
                 $leftJoinItem
                 LEFT JOIN 
-                    #store_items si ON si.item_id = oz.offer_id AND si.store_id = ".Provider\Tahos::$store_id."
+                    #store_items si ON si.item_id = oz.offer_id AND si.store_id = ".Setting::get('marketplaces', 'main_store')."
                 LEFT JOIN
 				    #provider_stores ps ON ps.id = si.store_id
 			    LEFT JOIN
@@ -286,7 +286,9 @@ class Ozon extends Marketplaces{
                 LIMIT $start, $offset
             ");
 
-            if ($result->num_rows < $offset) $nextIterator = false;
+            if ($result->num_rows < $offset) {
+                $nextIterator = false;
+            }
             $start += $offset;
             $prices = [];
             $stocks = [];

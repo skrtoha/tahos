@@ -799,7 +799,7 @@ class Marketplaces{
                 showGif(false)
             })
         })
-        $(document).on('change', 'select[name="tahos_category_id"]', e => {
+        $(document).on('change', '#modal_ozon select[name="tahos_category_id"]', e => {
             const formData = new FormData
             formData.set('act', 'ozonGetOneMatchCategory')
             formData.set('tahos_category_id', e.target.value)

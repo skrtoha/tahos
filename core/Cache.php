@@ -8,7 +8,7 @@ class Cache{
     /** @var \Memcached|\Memcache */
     private $classCache;
 
-    private function __construct($ip = null){
+    private function __construct(){
         $this->classCache = new Config::$cacheClass;
         $this->classCache->addServer('localhost', 11211);
     }

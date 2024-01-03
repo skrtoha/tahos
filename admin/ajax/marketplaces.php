@@ -1,5 +1,6 @@
 <?php
 
+use core\Database;
 use core\Item;
 use core\Marketplaces\Ozon;
 use core\Provider\Tahos;
@@ -33,16 +34,7 @@ switch($_POST['act']){
         }
         break;
     case 'getCategoryOzon':
-        //todo изменить при релизе
-        $tree = Ozon::getTreeCategories();
-//        $tree = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/tmp/ozon_tree.json'), true);
-
-        $category_id = $_POST['category_id'] ?? null;
-        $tpl = Ozon::getTplCategory($tree['result'][0]['children'], $category_id);
-        echo "<select name='category_id'>
-                <option selected value='0'>выберите...</option>
-                $tpl
-            </select>";
+        echo Ozon::getOzonTplTreeCategories($_POST['category_id']);
         break;
     case 'ozon_get_type':
         $result = Ozon::getType($_POST['category_id']);
@@ -208,6 +200,54 @@ switch($_POST['act']){
     case 'ozonSetMainStore':
         Setting::update('marketplaces', 'main_store', $_POST['value']);
         echo json_encode([]);
+        break;
+    case 'ozonGetTahosCategory':
+        $tahos_category_id = false;
+        if (isset($_POST['category_id'])){
+            $result = Database::getInstance()->select_one(
+                'ozon_match_category',
+                '*',
+                "`ozon_category_id` = {$_POST['category_id']}"
+            );
+            if (isset($result['tahos_category_id'])){
+                $tahos_category_id = $result['tahos_category_id'];
+            }
+        }
+        echo Ozon::getTahosTplCategories($tahos_category_id);
+        break;
+    case 'ozonSetMatchCategory':
+        $output = [
+            'result' => [],
+            'error' => ''
+        ];
+        $result = Ozon::setMatchCategory($_POST);
+        if ($result !== true){
+            $output['error'] = $result;
+        }
+        else {
+            $output['result'] = $_POST;
+        }
+        echo json_encode($output);
+        break;
+    case 'ozonGetMatchedCategories':
+        $result = Ozon::getMatchedCategories();
+        echo json_encode($result);
+        break;
+    case 'ozonDeleteMatchCategory':
+        echo json_encode([
+            'success' => Ozon::deleteMatchCategory($_POST)
+        ]);
+        break;
+    case 'ozonGetOneMatchCategory':
+        $where = '';
+        if (isset($_POST['category_id'])){
+            $where = "`ozon_category_id` = {$_POST['category_id']}";
+        }
+        if (isset($_POST['tahos_category_id'])){
+            $where = "`tahos_category_id` = {$_POST['tahos_category_id']}";
+        }
+        $result = Database::getInstance()->select_one('ozon_match_category', '*', $where);
+        echo json_encode($result);
         break;
 
 }

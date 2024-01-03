@@ -41,4 +41,35 @@ class Category{
         }
         return $categories;
     }
+
+    private static function makeTree($cats, $root = 0){
+        $output = [];
+        foreach($cats as $c => $cat){
+            if ($cat['parent_id'] == $root && $c != $cat['parent_id']){
+                unset($cats[$c]);
+                $output[] = [
+                    'category_id' => $cat['id'],
+                    'title' => $cat['title'],
+                    'children' => self::makeTree($cats, $c)
+                ];
+            }
+        }
+        return $output;
+    }
+
+    public static function getTreeCategories(){
+        $cats = [];
+        $result = Database::getInstance()->query("
+            SELECT 
+                * 
+            FROM #categories 
+            WHERE
+                href NOT LIKE 'avito%'
+        ");
+        foreach($result as $row){
+            $cats[$row['id']] = $row;
+        }
+        $output = self::makeTree($cats, $root = 0);
+        return $output;
+    }
 }

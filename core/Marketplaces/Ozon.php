@@ -1,6 +1,9 @@
 <?php
 namespace core\Marketplaces;
 
+use core\Cache;
+use core\Category;
+use core\Database;
 use core\Provider;
 use core\Setting;
 use Katzgrau\KLogger\Logger;
@@ -43,7 +46,8 @@ class Ozon extends Marketplaces{
         return $menu;
     }
 
-    private static function showCat($data, $str, $category_id){
+    private static function showCat($data, $str, $category_id): string
+    {
         $string = '';
         foreach($data as $item){
             $string .= self::tplMenu($item, $str, $category_id);
@@ -51,11 +55,13 @@ class Ozon extends Marketplaces{
         return $string;
     }
 
-    public static function getTplCategory($tree, $category_id = null){
+    public static function getTplCategory($tree, $category_id = null): string
+    {
         return self::showCat($tree, '', $category_id);
     }
 
-    public static function getType($category_id, $selected = []){
+    public static function getType($category_id, $selected = []): array
+    {
         $output = [];
         if (!$category_id) return $output;
         $types = self::getResponse('v2/category/attribute/values', [
@@ -145,7 +151,8 @@ class Ozon extends Marketplaces{
         return $result;
     }
 
-    public static function getProductList(){
+    public static function getProductList(): array
+    {
         $itemOzonResult = self::getDBInstance()->query("
             SELECT 
                 io.*,
@@ -316,14 +323,14 @@ class Ozon extends Marketplaces{
                 'prices' => $prices
             ]);
             if ($logger){
-                self::setLoger($resStocks, $items, $logger, 'stocks');
-                self::setLoger($resPrices, $items, $logger, 'prices');
+                self::setLogger($resStocks, $items, $logger, 'stocks');
+                self::setLogger($resPrices, $items, $logger, 'prices');
             }
         }
 
     }
 
-    private static function setLoger($array, array $items, Logger $logger, string $type){
+    private static function setLogger($array, array $items, Logger $logger, string $type){
         $updated = 0;
         foreach($array['result'] as $value){
             if ($value['updated']){
@@ -349,5 +356,72 @@ class Ozon extends Marketplaces{
             ]
         ]);
         return $productInfo['fbs_sku'];
+    }
+
+    public static function getOzonTplTreeCategories($category_id): string
+    {
+        $tree = Cache::get('ozon_tree_categories');
+        if (!$tree){
+            $tree = Ozon::getTreeCategories();
+            Cache::set('ozon_tree_categories', $tree);
+        }
+
+        $tpl = Ozon::getTplCategory($tree['result'][0]['children'], $category_id);
+        $output = "
+            <select name='category_id'>
+                <option selected value='0'>выберите...</option>
+                $tpl
+            </select>";
+        return $output;
+    }
+
+    public static function getTahosTplCategories($category_id = 0){
+        $tree = Cache::get('tahos_tree_categories');
+        if (!$tree){
+            $tree = Category::getTreeCategories();
+            Cache::set('tahos_tree_categories', $tree);
+        }
+
+        $tpl = self::getTplCategory($tree, $category_id);
+        return "
+            <select name='tahos_category_id'>
+                <option selected value='0'>выберите...</option>
+                $tpl
+            </select>";
+    }
+
+    public static function setMatchCategory($params){
+        return Database::getInstance()->insert('ozon_match_category', [
+            'tahos_category_id' => $params['tahos_category_id'],
+            'ozon_category_id' => $params['category_id'],
+            'ozon_category_title' => $params['title_category_id']
+        ]);
+    }
+
+    public static function getMatchedCategories(): array
+    {
+        $result = Database::getInstance()->query("
+            SELECT
+                omc.tahos_category_id,
+                omc.ozon_category_id AS category_id,
+                omc.ozon_category_title AS title_category_id,
+                c.title AS title_tahos_category_id
+            FROM
+                #ozon_match_category omc
+            LEFT JOIN
+                #categories c ON c.id = omc.tahos_category_id
+        ")->fetch_all(MYSQLI_ASSOC);
+        return $result;
+    }
+
+    public static function deleteMatchCategory($params): bool
+    {
+        return Database::getInstance()->delete(
+            'ozon_match_category',
+            "
+                `tahos_category_id` = {$params['tahos_category_id']}
+                AND `ozon_category_id` = {$params['category_id']}
+            "
+        );
     }
 }

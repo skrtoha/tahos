@@ -180,3 +180,25 @@ form.search{
     text-align: left;
     padding: 5px 0;
 }
+span.icon-checkmark1 {
+    font-size: 18px;
+    color: green;
+}
+.icon-checkmark1:before {
+    content: "\ea10";
+}
+.modal{
+    overflow: visible;
+}
+#ozon-match-category tr{
+    padding: 3px 0;
+}
+#ozon-match-category td:nth-child(1),
+#ozon-match-category td:nth-child(2)
+{
+    min-width: 300px;
+}
+.modal td, .modal td:first-child {
+    text-align: left;
+    padding: 3px 10px 3px 0;
+}

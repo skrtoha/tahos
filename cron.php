@@ -395,16 +395,16 @@ switch ($params[0]){
         ini_set('memory_limit', '2048M');
         $logger->alert("Прайс Росско");
         $fileNames = [
-            '77769_91489D6DA76B9D7A99061B9F7B18F3CE.csv' => 24,
-            '77769_D27310FF6AA0D63D3D6B4B25EACB6C46.csv' => 25,
+            '77769_B85E2744A3E264E952F043A389AD7197.csv' => 4285574,
             '77769_C84E737C7E7B4C578310B631DC831E24.csv' => 258159,
-            '77769_16A706C191DC6CCEF4A1B2A54EAB089D.csv' => 686582
+            '77769_16A706C191DC6CCEF4A1B2A54EAB089D.csv' => 686582,
+            '77769_91489D6DA76B9D7A99061B9F7B18F3CE.csv' => 24
         ];
         $ciphers = [
-            24 => 'ROSV',
-            25 => 'ROSM',
+            4285574 => 'ROSP',
             258159 => 'ROJA',
-            686582 => 'ROCH'
+            686582 => 'ROCH',
+            24 => 'ROSV'
         ];
         $rossko = new core\Provider\Rossko($db);
         $imap = new core\Imap();

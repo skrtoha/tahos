@@ -106,7 +106,7 @@ class Ozon extends Marketplaces{
             $duplicate = $item;
             unset($duplicate['offer_id']);
             self::getDBInstance()->insert(
-                'item_ozon',
+                'ozon_item',
                 $item,
                 ['duplicate' => $duplicate]
             );
@@ -138,7 +138,7 @@ class Ozon extends Marketplaces{
             $where .= "`$field` = {$value} AND ";
         }
         $where = str_replace($where, 0, -5);
-        return parent::getDBInstance()->select_one('item_ozon', '*', $where);
+        return parent::getDBInstance()->select_one('ozon_item', '*', $where);
     }
 
     public static function updateAttributes($offer_id, $attributes){
@@ -161,7 +161,7 @@ class Ozon extends Marketplaces{
                 i.brend_id,
                 i.title_full,
                 i.article
-            FROM #item_ozon io
+            FROM #ozon_item io
             LEFT JOIN #items i ON i.id = io.offer_id
             LEFT JOIN #brends b ON b.id = i.brend_id
             ORDER BY b.title
@@ -230,7 +230,7 @@ class Ozon extends Marketplaces{
     }
 
     public static function getProductIdByOfferId($offer_id){
-        $result = self::getDBInstance()->select_one('item_ozon', '*', "`offer_id` = $offer_id");
+        $result = self::getDBInstance()->select_one('ozon_item', '*', "`offer_id` = $offer_id");
         if ($result) return $result['product_id'];
         return false;
     }
@@ -282,7 +282,7 @@ class Ozon extends Marketplaces{
                     si.price * c.rate + si.price * c.rate * ps.percent / 100 AS price,
                     si.in_stock
                 FROM
-                    #item_ozon oz
+                    #ozon_item oz
                 $leftJoinItem
                 LEFT JOIN 
                     #store_items si ON si.item_id = oz.offer_id AND si.store_id = ".Setting::get('marketplaces', 'main_store')."

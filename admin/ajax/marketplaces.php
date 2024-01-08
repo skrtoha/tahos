@@ -29,7 +29,7 @@ switch($_POST['act']){
                     Ozon::archiveProduct($product_id);
                     Ozon::deleteProduct($_POST['item_id']);
                 }
-                $db->delete('item_ozon', "`offer_id` = {$_POST['item_id']}");
+                $db->delete('ozon_item', "`offer_id` = {$_POST['item_id']}");
                 break;
         }
         break;

@@ -112,15 +112,26 @@ switch ($act) {
 function view(){
 	global $db, $page_title, $status;
 	$id = $_GET['id'];
-	$subcategories = $db->select('categories', '*', "`parent_id`=$id", 'pos', true);
+    $result = Database::getInstance()->query("
+        SELECT
+            c.*,
+            IF(isnull(omc.tahos_category_id), 0, 1) AS ozon_category
+        FROM 
+            #categories c
+        LEFT JOIN
+            #ozon_match_category omc ON omc.tahos_category_id = c.id
+        WHERE
+            c.parent_id = $id
+    ");
 	$page_title = $db->getFieldOnID('categories', $id, 'title');
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=categories'>Категории товаров</a> > $page_title";?>
-	<div id="total" style="margin: 0">Всего: <?=count($subcategories)?></div>
+	<div id="total" style="margin: 0">Всего: <?=$result->num_rows?></div>
 	<div class="actions"><a id="add_subcategory" category_id="<?=$id?>" href="">Добавить</a></div>
 	<table class="t_table" cellspacing="1">
         <thead>
             <tr class="head">
                 <td>Заголовок</td>
+                <td>Озон</td>
                 <td>Позиция</td>
                 <td>Ссылка</td>
                 <td>Отображать<br>на главной</td>
@@ -130,11 +141,16 @@ function view(){
             </tr>
         </thead>
 		<tbody>
-            <?if (count($subcategories)){
-                foreach ($subcategories as $category) {?>
+            <?if ($result->num_rows){
+                foreach ($result as $category) {?>
                     <tr class="subcategory" data-id="<?=$category['id']?>">
                         <td label="Наименование:" title="Нажмите, чтобы изменить" class="category" data-id="<?=$category['id']?>">
                             <?=$category['title']?>
+                        </td>
+                        <td class="ozon">
+                            <?if ($category['ozon_category']){?>
+                                <span title="Сопоставлено с озон" class="icon-checkbox-checked"></span>
+                            <?}?>
                         </td>
                         <td label="Позиция:" class="pos" data-id="<?=$category['id']?>"><?=$category['pos']?></td>
                         <td label="Ссылка:" title="Нажмите, чтобы изменить" class="href" >

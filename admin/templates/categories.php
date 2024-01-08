@@ -1,9 +1,12 @@
 <?php
+/** @var Database $db */
+
+use core\Database;
 use core\Managers;
 
 if (isset($_FILES['photo'])){
 	copy($_FILES['photo']['tmp_name'], core\Config::$tmpFolderPath . '/'.$_FILES['photo']['name']);?>
-		<img id="uploadedPhoto" src="<?=core\Config::$tmpFolderUrl?>/<?=$_FILES['photo']['name']?>">
+		<img id="uploadedPhoto" src="<?=core\Config::$tmpFolderUrl?>/<?=$_FILES['photo']['name']?>" alt="">
 		<button id="savePhoto">Сохранить</button>
 	<?
 	exit();

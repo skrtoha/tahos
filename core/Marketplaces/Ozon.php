@@ -390,16 +390,40 @@ class Ozon extends Marketplaces{
             </select>";
     }
 
-    public static function setMatchCategory($params){
-        return Database::getInstance()->insert('ozon_match_category', [
-            'tahos_category_id' => $params['tahos_category_id'],
-            'ozon_category_id' => $params['category_id'],
-            'ozon_category_title' => $params['title_category_id']
-        ]);
+    public static function setMatchCategory($params, $checkUnique = false){
+        if ($checkUnique){
+            $result = self::getMatchedCategories("omc.tahos_category_id = {$params['tahos_category_id']}");
+            if (!empty($result)){
+                return self::updateMatchCategory($params['tahos_category_id'], [
+                    'ozon_category_id' => $params['category_id'],
+                    'ozon_category_title' => $params['title_category_id']
+                ]);
+            }
+        }
+        return Database::getInstance()->insert(
+            'ozon_match_category',
+            [
+                'tahos_category_id' => $params['tahos_category_id'],
+                'ozon_category_id' => $params['category_id'],
+                'ozon_category_title' => $params['title_category_id']
+            ]
+        );
     }
 
-    public static function getMatchedCategories(): array
+    public static function updateMatchCategory($tahos_category_id, $params): bool
     {
+        return Database::getInstance()->update(
+            'ozon_match_category',
+            $params,
+            "`tahos_category_id` = $tahos_category_id"
+        );
+    }
+
+    public static function getMatchedCategories($where = ''): array
+    {
+        if ($where){
+            $where = "WHERE $where";
+        }
         $result = Database::getInstance()->query("
             SELECT
                 omc.tahos_category_id,
@@ -410,18 +434,25 @@ class Ozon extends Marketplaces{
                 #ozon_match_category omc
             LEFT JOIN
                 #categories c ON c.id = omc.tahos_category_id
+            $where
         ")->fetch_all(MYSQLI_ASSOC);
         return $result;
     }
 
     public static function deleteMatchCategory($params): bool
     {
-        return Database::getInstance()->delete(
-            'ozon_match_category',
-            "
-                `tahos_category_id` = {$params['tahos_category_id']}
-                AND `ozon_category_id` = {$params['category_id']}
-            "
-        );
+        $where = '';
+        foreach($params as $key => $value){
+            switch ($key){
+                case 'tahos_category_id':
+                case 'ozon_category_id':
+                    $where .= "`$key` = '$value' AND ";
+            }
+        }
+        if (!$where){
+            return false;
+        }
+        $where = substr($where, 0, -5);
+        return Database::getInstance()->delete('ozon_match_category', $where);
     }
 }

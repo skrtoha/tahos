@@ -220,7 +220,8 @@ switch($_POST['act']){
             'result' => [],
             'error' => ''
         ];
-        $result = Ozon::setMatchCategory($_POST);
+        $checkUnique = isset($_POST['check_unique']) && $_POST['check_unique'];
+        $result = Ozon::setMatchCategory($_POST, $checkUnique);
         if ($result !== true){
             $output['error'] = $result;
         }

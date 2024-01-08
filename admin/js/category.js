@@ -187,16 +187,28 @@ class Category{
 
             const selectElement = e.target.closest('form').querySelector('select[name="category_id"]')
             const category_id = selectElement.value
+
+            if (!parseInt(category_id)){
+                Category.removeMatchCategory(e.target)
+                return
+            }
+
             const ozon_category_title = selectElement.querySelector(`option[value="${category_id}"]`).innerText
             const formData = new FormData(e.target)
             formData.set('act', 'ozonSetMatchCategory')
             formData.set('title_category_id', ozon_category_title)
+            formData.set('check_unique', '1')
             fetch(Marketplaces.marketplaceUrl, {
                 method: 'post',
                 body: formData
-            }).then(response => response.json()).then(() => {
-                show_message('Успешно сохранено')
+            }).then(response => response.json()).then(response => {
                 showGif(false)
+                if (response.error){
+                    show_message(response.error, 'error')
+                    return
+                }
+
+                show_message('Успешно сохранено')
                 document.getElementById('modal-container').classList.remove('active')
                 const spanElement = document
                     .querySelector(`table td[data-id="${formData.get('tahos_category_id')}"]`)
@@ -209,6 +221,30 @@ class Category{
 
 
             })
+        })
+    }
+    static removeMatchCategory(form){
+        showGif()
+
+        const formData = new FormData
+        const tahos_category_id = form.querySelector('input[name="tahos_category_id"]').value
+        formData.set('act', 'ozonDeleteMatchCategory')
+        formData.set('tahos_category_id', tahos_category_id)
+
+        fetch(Marketplaces.marketplaceUrl, {
+            method: 'post',
+            body: formData
+        }).then(response => response.json()).then(() => {
+            const spanElement = document
+                .querySelector(`table td.category[data-id="${tahos_category_id}"]`)
+                .closest('tr')
+                .querySelector('td.ozon > span')
+
+            spanElement.classList.remove('icon-checkbox-checked')
+            spanElement.classList.add('icon-checkbox-unchecked')
+            show_message('Успешно удалено!')
+            showGif(false)
+            document.querySelector('#modal-container').classList.remove('active')
         })
     }
     static eventChangeHidden(obj){

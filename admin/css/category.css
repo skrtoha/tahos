@@ -1,9 +1,20 @@
 div.intuitiveSearch_wrap{
     margin-bottom: 10px;
 }
+.icon-checkbox-checked{
+    color: green;
+}
+.icon-checkbox-unchecked:before {
+    content: "\ea53";
+}
 .icon-checkbox-checked:before {
     content: "\ea52";
 }
 td.ozon{
     text-align: center;
+}
+.modal{
+    overflow: visible;
+    text-align: left;
+    min-width: 350px;
 }

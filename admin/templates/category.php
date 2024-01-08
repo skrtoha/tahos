@@ -115,7 +115,7 @@ function view(){
     $result = Database::getInstance()->query("
         SELECT
             c.*,
-            IF(isnull(omc.tahos_category_id), 0, 1) AS ozon_category
+            omc.ozon_category_id AS ozon_category
         FROM 
             #categories c
         LEFT JOIN
@@ -125,7 +125,11 @@ function view(){
     ");
 	$page_title = $db->getFieldOnID('categories', $id, 'title');
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=categories'>Категории товаров</a> > $page_title";?>
-	<div id="total" style="margin: 0">Всего: <?=$result->num_rows?></div>
+    <script>
+        const notCallInit = false
+    </script>
+    <script src="/admin/js/marketplaces.js"></script>
+    <div id="total" style="margin: 0">Всего: <?=$result->num_rows?></div>
 	<div class="actions"><a id="add_subcategory" category_id="<?=$id?>" href="">Добавить</a></div>
 	<table class="t_table" cellspacing="1">
         <thead>
@@ -149,7 +153,10 @@ function view(){
                         </td>
                         <td class="ozon">
                             <?if ($category['ozon_category']){?>
-                                <span title="Сопоставлено с озон" class="icon-checkbox-checked"></span>
+                                <span data-category-id="<?=$category['ozon_category']?>" class="icon-checkbox-checked"></span>
+                            <?}
+                            else{?>
+                                <span class="icon-checkbox-unchecked"></span>
                             <?}?>
                         </td>
                         <td label="Позиция:" class="pos" data-id="<?=$category['id']?>"><?=$category['pos']?></td>

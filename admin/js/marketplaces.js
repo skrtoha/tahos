@@ -901,5 +901,7 @@ class Marketplaces{
 }
 
 $(function(){
-    Marketplaces.init();
+    if (typeof notCallInit !== 'undefined' && notCallInit){
+        Marketplaces.init();
+    }
 })

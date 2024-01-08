@@ -126,7 +126,7 @@ function view(){
 	$page_title = $db->getFieldOnID('categories', $id, 'title');
 	$status = "<a href='/admin'>Главная</a> > <a href='?view=categories'>Категории товаров</a> > $page_title";?>
     <script>
-        const notCallInit = false
+        let notCallInit
     </script>
     <script src="/admin/js/marketplaces.js"></script>
     <div id="total" style="margin: 0">Всего: <?=$result->num_rows?></div>

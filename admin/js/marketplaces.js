@@ -507,6 +507,7 @@ class Marketplaces{
             if(e.target.classList.contains('icon-loop2')) return
             if(e.target.classList.contains('icon-info1')) return
             if(e.target.classList.contains('icon-upload')) return
+            if(e.target.classList.contains('icon-bin')) return
             let tab = e.target.closest('div[data-name]').dataset.name
             let item_id = e.target.closest('tr').dataset.itemId
             switch(tab){
@@ -522,24 +523,7 @@ class Marketplaces{
             }
         })
         $(document).on('click', 'span.avito-delete', e => {
-            if (!confirm('Действительно удалить?')) return
-            const tr = e.target.closest('tr')
-
-            showGif()
-            const tab = e.target.closest('div[data-name]').dataset.name
-            let formData = new FormData()
-            formData.set('act', 'delete_item')
-            formData.set('tab', tab)
-            formData.set('category_id', tr.dataset.categoryId)
-            formData.set('item_id', tr.dataset.itemId)
-
-            fetch(Marketplaces.marketplaceUrl, {
-                method: 'post',
-                body: formData
-            }).then(response => response.text()).then(response => {
-                tr.remove()
-                showGif(false)
-            })
+            Marketplaces.deleteElement(e)
         })
     }
 
@@ -877,6 +861,9 @@ class Marketplaces{
                 $element.trigger('chosen:updated')
             })
         })
+        $(document).on('click', 'span.ozon-delete-element', e => {
+            Marketplaces.deleteElement(e)
+        })
     }
 
     static set_intuitive_search(e, tableName){
@@ -938,6 +925,30 @@ class Marketplaces{
                 });
             }
         });
+    }
+
+    static deleteElement(event){
+        if (!confirm('Действительно удалить?')) return
+
+        const tr = event.target.closest('tr')
+
+        showGif()
+        const tab = event.target.closest('div[data-name]').dataset.name
+        let formData = new FormData()
+        formData.set('act', 'delete_item')
+        formData.set('tab', tab)
+        formData.set('category_id', tr.dataset.categoryId)
+        formData.set('item_id', tr.dataset.itemId)
+
+        fetch(Marketplaces.marketplaceUrl, {
+            method: 'post',
+            body: formData
+        }).then(response => response.text()).then(response => {
+            tr.remove()
+            showGif(false)
+            show_message('Успешно удалено!')
+        })
+
     }
 }
 

@@ -274,8 +274,14 @@ function item($act){
 				</a>
 				<a style="float: right" href="?view=items&id=<?=$item['id']?>&act=delete" class="delete_item" item_id="<?=$item['id']?>">Удалить</a>
 			<?}?>
+            <a href="#" id="add_to_ozon">Настроить Озон</a>
 		</div>
 	<?}?>
+    <script>
+        const notCallInit = true
+        const initOnlyOzon = true
+    </script>
+    <script src="/admin/js/marketplaces.js"></script>
 	<div class="t_form">
 		<div class="bg">
 			<form class="defaultSubmit" method="post" enctype="multipart/form-data">
@@ -348,8 +354,8 @@ function item($act){
                 <div class="field">
                     <div class="title">Дополнительно</div>
                     <div class="value">
-                        <a href="#" class="hide">Показать</a>
-                        <div style="margin-top: 10px;display: none">
+                        <a href="#" class="hide">Скрыть</a>
+                        <div style="margin-top: 10px;display: block">
                             <table>
                                 <tr>
                                     <td>Глубина, мм</td>

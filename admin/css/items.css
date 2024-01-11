@@ -195,3 +195,29 @@ table.category{
 div#categories {
     margin-top: 10px;
 }
+#modal_ozon table tr td{
+    text-align: left;
+    padding: 5px 5px 5px 0
+}
+#modal_ozon table tr td:nth-child(1){
+    font-weight: 800;
+}
+#modal_ozon textarea
+{
+    padding: 10px;
+}
+#modal_ozon label.type_good {
+    display: inline-block;
+    border: 1px #d3ccc7 solid;
+    padding: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+#modal_ozon input[name="title"] {
+    width: 100%;
+    display: block;
+}
+#modal_ozon textarea[name=marketplace_description] {
+    width: 100%;
+}

@@ -213,6 +213,9 @@ switch($_POST['act']){
                 $tahos_category_id = $result['tahos_category_id'];
             }
         }
+        elseif (isset($_POST['tahos_category_id'])){
+            $tahos_category_id = $_POST['tahos_category_id'];
+        }
         echo Ozon::getTahosTplCategories($tahos_category_id);
         break;
     case 'ozonSetMatchCategory':

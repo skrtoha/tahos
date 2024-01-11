@@ -1,4 +1,5 @@
 <?
+/** @var string $content */
 /** @var string $view */
 /** @var string $page_title */
 
@@ -23,7 +24,7 @@ use admin\functions\LeftMenu;
         <link rel="stylesheet" type="text/css" href="/vendor/addressee/style.css">
         <link rel="stylesheet" type="text/css" href="/vendor/addressee/jquery.fias.min.css">
     <?}?>
-	<?if (in_array($_GET['view'], ['connections', 'index', 'brends', 'marketplaces', 'category'])){?>
+	<?if (in_array($_GET['view'], ['connections', 'index', 'brends', 'marketplaces', 'category', 'items'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/chosen/chosen.css">
 	<?}?>
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
@@ -148,7 +149,7 @@ use admin\functions\LeftMenu;
                 <?if (in_array($view, ['prices'])){?>
 			{"src" : "/admin/js/add_item_to_store.js", "async" : false},
                 <?}?>
-                <?if (in_array($view, ['connections', 'index', 'brends', 'marketplaces', 'category'])){?>
+                <?if (in_array($view, ['connections', 'index', 'brends', 'marketplaces', 'category', 'items'])){?>
 			{"src" : "/vendor/chosen/chosen.jquery.min.js", "async" : false},
                 <?}?>
                 <?

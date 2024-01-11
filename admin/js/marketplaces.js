@@ -160,7 +160,7 @@ class Marketplaces{
             getTabElement: (type) => {
                 return document.querySelector(`div[data-name="${type}"]`)
             },
-            showModal: (item_id, ozonProductInfo = 0) => {
+            showModal: (item_id, ozonProductInfo = 0, params = {}) => {
                 showGif();
 
                 let formData = new FormData();
@@ -185,12 +185,19 @@ class Marketplaces{
                         body: formData
                     }).then(response => response.text()).then(categoryTree => {
                         formData.set('act', 'ozonGetTahosCategory')
+
+                        if (typeof params.tahos_category_id !== 'undefined'){
+                            formData.set('tahos_category_id', params.tahos_category_id)
+                        }
+
                         fetch(Marketplaces.marketplaceUrl, {
                             method: 'post',
                             body: formData
                         }).then(response => response.text()).then(tahosCategoryTree => {
                             let htmlType = '';
-                            if (formData.get('category_id')) htmlType = Marketplaces.methods.ozon.getTypeHtml(itemInfo.types);
+                            if (formData.get('category_id')){
+                                htmlType = Marketplaces.methods.ozon.getTypeHtml(itemInfo.types);
+                            }
 
                             let vat = {
                                 null: 'checked',
@@ -302,8 +309,36 @@ class Marketplaces{
                             `)
                             showGif(false)
                             Marketplaces.goodType = document.querySelector('#modal_ozon td.type_good')
-                            Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
-                            Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
+
+                            if (typeof params.tahos_category_id !== 'undefined'){
+                                showGif()
+                                const formData2 = new FormData()
+                                formData2.set('act', 'ozonGetOneMatchCategory')
+                                formData2.set('tahos_category_id', params.tahos_category_id)
+                                fetch(Marketplaces.marketplaceUrl, {
+                                    method: 'post',
+                                    body: formData2
+                                }).then(response => response.json()).then(response => {
+
+                                    if (typeof response.ozon_category_id === 'undefined'){
+                                        showGif(false)
+                                        return
+                                    }
+
+                                    $('select[name="category_id"]').find(`option[value="${response.ozon_category_id}"]`).prop('selected', true)
+
+                                    Marketplaces.methods.ozon.setTplType(response.ozon_category_id).then(() => {
+                                        $('select[name="category_id"], select[name="tahos_category_id"]').prop('disabled', true)
+                                        Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
+                                        Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
+                                        showGif(false)
+                                    })
+                                })
+                            }
+                            else{
+                                Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
+                                Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
+                            }
                         })
 
                     })
@@ -353,6 +388,18 @@ class Marketplaces{
                     </td>
                     <td><span title="Удалить" class="icon-bin ozon-delete-match-category"></span></td>
                 `
+            },
+            setTplType: (category_id) => {
+                let formData = new FormData()
+
+                formData.set('act', 'ozon_get_type')
+                formData.set('category_id', category_id)
+                return fetch(Marketplaces.marketplaceUrl, {
+                    method: 'post',
+                    body: formData
+                }).then(response => response.json()).then(response => {
+                    Marketplaces.goodType.innerHTML = Marketplaces.methods.ozon.getTypeHtml(response)
+                })
             }
         }
     }
@@ -498,18 +545,13 @@ class Marketplaces{
 
     static initOzon(){
         $(document).on('change', '#modal_ozon select[name="category_id"]', e => {
-            let formData = new FormData()
+            showGif()
 
-            formData.set('act', 'ozon_get_type')
-            formData.set('category_id', e.target.value)
-            showGif();
-            fetch(Marketplaces.marketplaceUrl, {
-                method: 'post',
-                body: formData
-            }).then(response => response.json()).then(response => {
-                Marketplaces.goodType.innerHTML = Marketplaces.methods.ozon.getTypeHtml(response)
-
+            Marketplaces.methods.ozon.setTplType(e.target.value).then(() => {
+                const formData = new FormData
+                formData.set('category_id', e.target.value)
                 formData.set('act', 'ozonGetOneMatchCategory')
+
                 fetch(Marketplaces.marketplaceUrl, {
                     method: 'post',
                     body: formData
@@ -527,7 +569,6 @@ class Marketplaces{
                     }
                     $element.trigger('chosen:updated')
                 })
-
             })
         })
         $(document).on('submit', '#modal_ozon', e => {
@@ -903,5 +944,8 @@ class Marketplaces{
 $(function(){
     if (typeof notCallInit === 'undefined'){
         Marketplaces.init()
+    }
+    if (typeof initOnlyOzon !== 'undefined'){
+        Marketplaces.initOzon()
     }
 })

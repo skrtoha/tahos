@@ -455,39 +455,56 @@ $(function(){
 	$(document).on('change', '#itemDiff select[name=status]', function(){
 		$(this).closest('form').submit();
 	})
-    $(document).on('submit', 'form.status', function(e){
-        e.preventDefault();
-        const $form = $(this).closest('form');
-        $.ajax({
-            url: document.location.href,
-            data: $form.serialize(),
-            success: function(){
-                $form.closest('tr').attr('class', 'analogyStatus_' + $form.find('select[name=status]').val());
-                show_message('Успешно сохранено');
-            }
-        });
-    })
-    document.querySelector('#add_category').addEventListener('click', (event) => {
-        showGif();
-        event.preventDefault();
-        let formData = new FormData();
-        formData.set('act', 'getMainCategory');
-        fetch('/admin/ajax/item.php', {
-            method: 'post',
-            body: formData
-        }).then(response => response.text()).then(response => {
-            let div = document.createElement('div');
-            div.classList.add('category');
-            div.innerHTML = response;
-            document.querySelector('#categories').prepend(div);
-            eventChangeMainCategory(div);
-            showGif(false);
-        })
-    })
+  $(document).on('submit', 'form.status', function(e){
+      e.preventDefault();
+      const $form = $(this).closest('form');
+      $.ajax({
+          url: document.location.href,
+          data: $form.serialize(),
+          success: function(){
+              $form.closest('tr').attr('class', 'analogyStatus_' + $form.find('select[name=status]').val());
+              show_message('Успешно сохранено');
+          }
+      });
+  })
+  document.querySelector('#add_category').addEventListener('click', (event) => {
+      showGif();
+      event.preventDefault();
+      let formData = new FormData();
+      formData.set('act', 'getMainCategory');
+      fetch('/admin/ajax/item.php', {
+          method: 'post',
+          body: formData
+      }).then(response => response.text()).then(response => {
+          let div = document.createElement('div');
+          div.classList.add('category');
+          div.innerHTML = response;
+          document.querySelector('#categories').prepend(div);
+          eventChangeMainCategory(div);
+          showGif(false);
+      })
+  })
 
-    const category = document.querySelectorAll('#categories div.category');
-    if (category) category.forEach((element, key) => {
-        eventRemoveCategory(element);
-    })
+  const category = document.querySelectorAll('#categories div.category');
+  if (category) category.forEach((element, key) => {
+      eventRemoveCategory(element);
+  })
+
+  $('#add_to_ozon').on('click', e => {
+      e.preventDefault()
+      const item_id = document.querySelector('a.delete_item').getAttribute('item_id')
+      let tahos_category_id = document.querySelector('select[name="category_id[]"]')
+
+      if (!tahos_category_id){
+          show_message('Укажите категорию!', 'error')
+          return
+      }
+
+      Marketplaces.methods.ozon.showModal(item_id, 1, {
+          tahos_category_id: tahos_category_id.value
+      })
+      Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
+      Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
+  })
 
 })

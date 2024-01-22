@@ -167,12 +167,19 @@ switch($_POST['act']){
 		$params = [];
 		if (isset($_POST['marketplace_description'])) $params[] = 'marketplace_description';
 		if (isset($_POST['additional_options'])) $params[] = 'additional_options';
+		if (isset($_POST['category_tahos'])) $params[] = 'category_tahos';
+		if (isset($_POST['ozon_item'])) $params[] = 'ozon_item';
 
 		$itemInfo = core\Item::getByID($_POST['item_id'], $params);
 
 		if (isset($_POST['ozon_product_info']) && $_POST['ozon_product_info']){
 			$ozonProductInfo = Ozon::getProductInfo($_POST['item_id']);
-			$itemInfo = array_merge($itemInfo, $ozonProductInfo);
+            $ozonItem = Ozon::getItemOzon(['offer_id' => $_POST['item_id']]);
+			$itemInfo = array_merge(
+                $itemInfo,
+                $ozonProductInfo,
+                ['store_id' => $ozonItem['store_id']]
+            );
 		}
 
         if (isset($_POST['ozon_markup']) && $_POST['ozon_markup']){

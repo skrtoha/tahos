@@ -433,6 +433,12 @@ class Item{
 		if (in_array('withCategories', $params)){
 			$query .= ",GROUP_CONCAT(c.title SEPARATOR '; ') AS categories";
 		}
+        if (in_array('category_tahos', $params)){
+            $query .= ",ci.category_id as tahos_category_id";
+        }
+        if (in_array('ozon_item', $params)){
+            $query .= ", IF(ISNULL(oi.marketplace_markup), 25, oi.marketplace_markup) as marketplace_markup";
+        }
 		$query .= "
 			FROM
 				#items i
@@ -467,6 +473,18 @@ class Item{
             $query .= "
                  LEFT JOIN
                     #item_vin iv ON iv.item_id = i.id
+            ";
+        }
+        if (in_array('category_tahos', $params)){
+            $query .= "
+                 LEFT JOIN
+                    #categories_items ci ON ci.item_id = i.id
+            ";
+        }
+        if (in_array('ozon_item', $params)){
+            $query .= "
+                 LEFT JOIN
+                    #ozon_item oi ON oi.offer_id = i.id
             ";
         }
 		return $query;

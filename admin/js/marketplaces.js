@@ -150,12 +150,12 @@ class Marketplaces{
             getStringByArray: (array, field = null) => {
                 let output = '';
                 array.forEach((item, i) => {
-                let val
-                if (field) val = item[field]
-                else val = item
-                output += `<span class="string">${val}</span>`
-            })
-            return output
+                    let val
+                    if (field) val = item[field]
+                    else val = item
+                    output += `<span class="string">${val}</span>`
+                })
+                return output
             },
             getTabElement: (type) => {
                 return document.querySelector(`div[data-name="${type}"]`)
@@ -170,6 +170,8 @@ class Marketplaces{
                 formData.set('additional_options', 1)
                 formData.set('ozon_product_info', ozonProductInfo)
                 formData.set('ozon_markup', 1)
+                formData.set('category_tahos', 1)
+                formData.set('ozon_item', 1)
                 fetch(Marketplaces.itemAjaxUrl, {
                     method: 'post',
                     body: formData
@@ -179,6 +181,9 @@ class Marketplaces{
                     if (typeof itemInfo.category_id !== 'undefined') {
                         formData.set('category_id', itemInfo.category_id)
                     }
+                    if (typeof itemInfo.tahos_category_id !== 'undefined'){
+                        formData.set('tahos_category_id', itemInfo.tahos_category_id)
+                    }
 
                     fetch(Marketplaces.marketplaceUrl, {
                         method: 'post',
@@ -186,171 +191,206 @@ class Marketplaces{
                     }).then(response => response.text()).then(categoryTree => {
                         formData.set('act', 'ozonGetTahosCategory')
 
-                        if (typeof params.tahos_category_id !== 'undefined'){
-                            formData.set('tahos_category_id', params.tahos_category_id)
+                        if (typeof itemInfo.tahos_category_id !== 'undefined'){
+                            formData.set('tahos_category_id', itemInfo.tahos_category_id)
                         }
 
                         fetch(Marketplaces.marketplaceUrl, {
                             method: 'post',
                             body: formData
                         }).then(response => response.text()).then(tahosCategoryTree => {
-                            let htmlType = '';
-                            if (formData.get('category_id')){
-                                htmlType = Marketplaces.methods.ozon.getTypeHtml(itemInfo.types);
+                            formData.set('act', 'getMainStores')
+                            if (typeof Marketplaces.itemInfo.store_id !== 'undefined'){
+                                formData.set('store_id', Marketplaces.itemInfo.store_id)
                             }
 
-                            let vat = {
-                                null: 'checked',
-                                ten: '',
-                                twenty: ''
-                            }
-                            if (typeof itemInfo.vat !== 'undefined') {
-                                vat.null = '';
-                                switch (parseFloat(itemInfo.vat)) {
-                                    case 0:
-                                        vat.null = 'checked';
-                                        break
-                                    case 0.1:
-                                        vat.ten = 'checked';
-                                        break
-                                    case 0.2:
-                                        vat.twenty = 'checked';
-                                        break
+                            fetch(Marketplaces.marketplaceUrl, {
+                                method: 'post',
+                                body: formData
+                            }).then(response => response.text()).then(mainStores => {
+                                let htmlType = '';
+                                if (formData.get('category_id')){
+                                    htmlType = Marketplaces.methods.ozon.getTypeHtml(itemInfo.types);
                                 }
-                            }
-                            modal_show(`
-                                <form id="modal_ozon">
-                                    <input type="hidden" name="offer_id" value="${item_id}">
-                                    <input type="hidden" name="barcode" value="${itemInfo.barcode ? itemInfo.barcode : ''}">
-                                    <textarea style="visibility: hidden; height: 0" type="hidden" name="marketplace_description">
-                                        ${itemInfo.marketplace_description}
-                                    </textarea>
-                                    <table>
-                                        <tr>
-                                            <td>Бренд</td>
-                                            <td><input type="text" name="brend" readonly value="${itemInfo.brend}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Артикул</td>
-                                            <td>
-                                                <input type="hidden" name="article" value="${itemInfo.article}">
-                                                <a target="_blank" href="/admin/?view=items&act=item&id=${itemInfo.offer_id}">${itemInfo.article}</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Название</td>
-                                            <td><input type="text" readonly name="name" value="${itemInfo.title_full}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Цена до скидки, руб</td>
-                                            <td><input type="text" name="old_price" value="${Math.floor(itemInfo.old_price)}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Наценка, %</td>
-                                            <td><input type="text" name="ozon_markup" value="${itemInfo.ozon_markup}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Цена, руб</td>
-                                            <td><input type="text" name="price" data-clear-price="${itemInfo.price}" value="${Math.floor(+itemInfo.price + itemInfo.price * (itemInfo.ozon_markup / 100))}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Категория<br>Тахос</td>
-                                            <td>${tahosCategoryTree}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Категория<br>Озон</td>
-                                            <td>${categoryTree}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Тип</td>
-                                            <td class="type_good">${htmlType}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Размер НДС</td>
-                                            <td>
-                                                <label class="type_good">
-                                                    <input ${vat.null} type="radio" name="vat" value="0">
-                                                    0%
-                                                </label>   
-                                                <label class="type_good">
-                                                    <input ${vat.ten} type="radio" name="vat" value="0.1">
-                                                    10%
-                                                </label> 
-                                                <label class="type_good">
-                                                    <input ${vat.twenty} type="radio" name="vat" value="0.2">
-                                                    20%
-                                                </label>                                  
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Размеры, мм</td>
-                                            <td>
-                                                <label class="type_good">
-                                                    Ширина
-                                                    <input type="text" name="width" value="${itemInfo.width}">
-                                                </label>
-                                                <label class="type_good">
-                                                    Высота
-                                                    <input type="text" name="height" value="${itemInfo.height}">
-                                                </label>
-                                                <label class="type_good">
-                                                    Глубина
-                                                    <input type="text" name="depth" value="${itemInfo.depth}">
-                                                </label>
-                                            </td>                            
-                                        </tr>
-                                        <tr>
-                                            <td>Вес, г</td>                            
-                                            <td><input type="text" name="weight" value="${itemInfo.weight}"></td>                            
-                                        </tr>
-                                    </table>
-                                    <input type="submit" value="Сохранить">
-                                </form>                    
-                            `)
-                            showGif(false)
-                            Marketplaces.goodType = document.querySelector('#modal_ozon td.type_good')
 
-                            if (typeof params.tahos_category_id !== 'undefined'){
-                                showGif()
-                                const formData2 = new FormData()
-                                formData2.set('act', 'ozonGetOneMatchCategory')
-                                formData2.set('tahos_category_id', params.tahos_category_id)
-                                fetch(Marketplaces.marketplaceUrl, {
-                                    method: 'post',
-                                    body: formData2
-                                }).then(response => response.json()).then(response => {
-
-                                    if (typeof response.ozon_category_id === 'undefined'){
-                                        showGif(false)
-                                        return
+                                let vat = {
+                                    null: '',
+                                    ten: '',
+                                    twenty: 'checked'
+                                }
+                                if (typeof itemInfo.vat !== 'undefined') {
+                                    vat.null = '';
+                                    switch (parseFloat(itemInfo.vat)) {
+                                        case 0:
+                                            vat.null = 'checked';
+                                            break
+                                        case 0.1:
+                                            vat.ten = 'checked';
+                                            break
+                                        case 0.2:
+                                            vat.twenty = 'checked';
+                                            break
                                     }
+                                }
+                                modal_show(`
+                                    <form id="modal_ozon">
+                                        <input type="hidden" name="offer_id" value="${item_id}">
+                                        <textarea style="visibility: hidden; height: 0" type="hidden" name="marketplace_description">
+                                            ${itemInfo.marketplace_description}
+                                        </textarea>
+                                        <table>
+                                            <tr>
+                                                <td>Название</td>
+                                                <td><input type="text" readonly name="name" value="${itemInfo.title_full}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Бренд</td>
+                                                <td><input type="text" name="brend" readonly value="${itemInfo.brend}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Артикул</td>
+                                                <td>
+                                                    <input type="hidden" name="article" value="${itemInfo.article}">
+                                                    <a target="_blank" href="/admin/?view=items&act=item&id=${itemInfo.offer_id}">${itemInfo.article}</a>
+                                                    <label class="bold" style="display: inline-block; margin-left: 10px">
+                                                        Штрихкод
+                                                        <input type="text" name="barcode" value="${itemInfo.barcode ? itemInfo.barcode : ''}">
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Склад<br>продажи</td>
+                                                <td>${mainStores}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Наценка для<br>скидки, %</td>
+                                                <td>
+                                                    <input type="text" name="ozon_markup" value="${itemInfo.ozon_markup}">
+                                                    <label class="bold">
+                                                        Цена до скидки, руб
+                                                        <input type="text" name="old_price" value="${Math.floor(itemInfo.old_price)}">
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Цена, руб</td>
+                                                <td>
+                                                    <input type="text" name="price" value="${itemInfo.price ? itemInfo.price : 0}">
+                                                    <label class="bold">
+                                                        <span>Наценка Озон, %</span>
+                                                        <input type="text" name="marketplace_markup" value="${itemInfo.marketplace_markup}">
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Категория<br>Тахос</td>
+                                                <td>${tahosCategoryTree}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Категория<br>Озон</td>
+                                                <td>${categoryTree}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Тип <span class="icon-enlarge2"></span></td>
+                                                <td class="type_good">${htmlType}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Размер НДС</td>
+                                                <td>
+                                                    <label class="type_good">
+                                                        <input ${vat.null} type="radio" name="vat" value="0">
+                                                        0%
+                                                    </label>   
+                                                    <label class="type_good">
+                                                        <input ${vat.ten} type="radio" name="vat" value="0.1">
+                                                        10%
+                                                    </label> 
+                                                    <label class="type_good">
+                                                        <input ${vat.twenty} type="radio" name="vat" value="0.2">
+                                                        20%
+                                                    </label>                                  
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Размеры, мм</td>
+                                                <td>
+                                                    <label class="type_good">
+                                                        Ширина
+                                                        <input type="text" name="width" value="${itemInfo.width}">
+                                                    </label>
+                                                    <label class="type_good">
+                                                        Высота
+                                                        <input type="text" name="height" value="${itemInfo.height}">
+                                                    </label>
+                                                    <label class="type_good">
+                                                        Глубина
+                                                        <input type="text" name="depth" value="${itemInfo.depth}">
+                                                    </label>
+                                                </td>                            
+                                            </tr>
+                                            <tr>
+                                                <td>Вес, г</td>                            
+                                                <td><input type="text" name="weight" value="${itemInfo.weight}"></td>                            
+                                            </tr>
+                                        </table>
+                                        <input type="submit" value="Сохранить">
+                                    </form>                    
+                                `)
+                                showGif(false)
+                                Marketplaces.goodType = document.querySelector('#modal_ozon td.type_good')
 
-                                    $('select[name="category_id"]').find(`option[value="${response.ozon_category_id}"]`).prop('selected', true)
+                                if (typeof params.tahos_category_id !== 'undefined'){
+                                    showGif()
+                                    const formData2 = new FormData()
+                                    formData2.set('act', 'ozonGetOneMatchCategory')
+                                    formData2.set('tahos_category_id', params.tahos_category_id)
+                                    fetch(Marketplaces.marketplaceUrl, {
+                                        method: 'post',
+                                        body: formData2
+                                    }).then(response => response.json()).then(response => {
 
-                                    Marketplaces.methods.ozon.setTplType(response.ozon_category_id).then(() => {
-                                        $('select[name="category_id"], select[name="tahos_category_id"]').prop('disabled', true)
-                                        Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
-                                        Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
-                                        showGif(false)
+                                        if (typeof response.ozon_category_id === 'undefined'){
+                                            showGif(false)
+                                            return
+                                        }
+
+                                        $('select[name="category_id"]').find(`option[value="${response.ozon_category_id}"]`).prop('selected', true)
+
+                                        Marketplaces.methods.ozon.setTplType(response.ozon_category_id).then(() => {
+                                            $('select[name="category_id"], select[name="tahos_category_id"]').prop('disabled', true)
+                                            Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
+                                            Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
+                                            Marketplaces.methods.ozon.setChosen('select[name="store_id"]')
+                                            showGif(false)
+                                        })
                                     })
-                                })
-                            }
-                            else{
-                                Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
-                                Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
-                            }
+                                }
+                                else{
+                                    Marketplaces.methods.ozon.setChosen('select[name="category_id"]')
+                                    Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
+                                    Marketplaces.methods.ozon.setChosen('select[name="store_id"]')
+                                }
+                            }).then(() => {
+                              const categoryIdElement = document.querySelector('select[name="category_id"]')
+                              if (categoryIdElement && categoryIdElement.value && Marketplaces.goodType.innerHTML == ''){
+                                  showGif()
+                                  Marketplaces.methods.ozon.setTplType(categoryIdElement.value).then(() => {
+                                      showGif(false)
+                                      Marketplaces.methods.ozon.toggleShowTypeGood()
+                                  })
+                              }
+                          })
                         })
-
                     })
                 })
             },
             setChosen: (selector) => {
                 $(selector).chosen({
-                   disable_search_threshold: 5,
-                   no_results_text: "не найден",
-                   allow_single_deselect: true,
-                   width: "100%"
-               });
+                    disable_search_threshold: 5,
+                    no_results_text: "не найден",
+                    allow_single_deselect: true,
+                    width: "100%"
+                });
             },
             getTypeHtml: (types) => {
                 let htmlString = '';
@@ -366,7 +406,7 @@ class Marketplaces{
             },
             getElementRow: (item) => {
                 return `
-                        <tr data-item-id="${item.offer_id}">
+                        <tr data-item-id="${item.id}">
                             <td>${item.brend}</td>
                             <td>${item.article}</td>
                             <td>${item.title_full}</td>
@@ -400,6 +440,33 @@ class Marketplaces{
                 }).then(response => response.json()).then(response => {
                     Marketplaces.goodType.innerHTML = Marketplaces.methods.ozon.getTypeHtml(response)
                 })
+            },
+            toggleShowTypeGood: () => {
+                const $typeGood = $('td.type_good')
+                const $typeGoodValue = $typeGood.prev().find('span')
+                $typeGood.toggleClass('active')
+                if ($typeGood.hasClass('active')){
+                    $typeGoodValue
+                        .removeClass('icon-enlarge2')
+                        .addClass('icon-shrink2')
+                }
+                else{
+                    $typeGoodValue
+                        .removeClass('icon-shrink2')
+                        .addClass('icon-enlarge2')
+                }
+            },
+            setPrices: () => {
+                const priceElement = document.querySelector('input[name="price"]')
+                const storeId = document.querySelector('select[name="store_id"]').value
+                const priceStore = + document.querySelector(`select[name="store_id"] option[value="${storeId}"]`).dataset.price
+                const firstMarkup = priceStore + priceStore * 20 / 100
+                const marketplaceMarkup = + document.querySelector('input[name="marketplace_markup"]').value
+                priceElement.value = Math.floor(firstMarkup + firstMarkup * marketplaceMarkup / 100)
+
+                const ozonMarkup = + document.querySelector('input[name="ozon_markup"]').value
+                const oldPriceElement = document.querySelector('input[name="old_price"]')
+                oldPriceElement.value =  Math.floor(+ priceElement.value + priceElement.value * ozonMarkup / 100)
             }
         }
     }
@@ -558,6 +625,12 @@ class Marketplaces{
         $(document).on('submit', '#modal_ozon', e => {
             e.preventDefault()
             let formData = new FormData(e.target)
+
+            if (!+formData.get('store_id')){
+                show_message('Укажите склад!', 'error')
+                return
+            }
+
             formData.set('act', 'ozon_product_import')
             showGif();
             fetch(Marketplaces.marketplaceUrl, {
@@ -576,17 +649,10 @@ class Marketplaces{
 
                 const toRemove = document.querySelector([`tr[data-item-id="${Marketplaces.itemInfo.offer_id}"]`]);
                 if (toRemove) toRemove.remove()
-
-                $(Marketplaces.methods.ozon.getTabElement('ozon')).find('tbody').append(
-                    Marketplaces.methods.ozon.getElementRow(Marketplaces.itemInfo)
-                )
             })
         })
         $(document).on('keyup', 'input[name="ozon_markup"]', e => {
-            let elementPrice = document.querySelector('input[name="price"]')
-            let currentPrice = + elementPrice.dataset.clearPrice;
-            let markup = + e.target.value;
-            elementPrice.value = Math.floor(currentPrice + currentPrice * (markup / 100))
+            Marketplaces.methods.ozon.setPrices()
         })
         $(document).on('click', 'span.icon-info1', e => {
             showGif()
@@ -863,6 +929,15 @@ class Marketplaces{
         })
         $(document).on('click', 'span.ozon-delete-element', e => {
             Marketplaces.deleteElement(e)
+        })
+        $(document).on('change', '#modal_ozon select[name="store_id"]', e => {
+            Marketplaces.methods.ozon.setPrices()
+        })
+        $(document).on('click', '#modal_ozon .icon-enlarge2, #modal_ozon .icon-shrink2', () => {
+            Marketplaces.methods.ozon.toggleShowTypeGood()
+        })
+        $(document).on('keyup', '#modal_ozon input[name="marketplace_markup"]', e => {
+            Marketplaces.methods.ozon.setPrices()
         })
     }
 

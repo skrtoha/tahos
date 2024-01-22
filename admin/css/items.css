@@ -206,6 +206,9 @@ div#categories {
 {
     padding: 10px;
 }
+#modal_ozon input[type="text"]{
+    width: 100%;
+}
 #modal_ozon label.type_good {
     display: inline-block;
     border: 1px #d3ccc7 solid;
@@ -220,4 +223,7 @@ div#categories {
 }
 #modal_ozon textarea[name=marketplace_description] {
     width: 100%;
+}
+div.modal {
+    max-width: 1000px;
 }

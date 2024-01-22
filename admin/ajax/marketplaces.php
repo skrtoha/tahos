@@ -34,7 +34,16 @@ switch($_POST['act']){
         }
         break;
     case 'getCategoryOzon':
-        echo Ozon::getOzonTplTreeCategories($_POST['category_id']);
+        $category_id = false;
+        if (isset($_POST['tahos_category_id']) && !isset($_POST['category_id'])){
+            $result = Database::getInstance()->select_one('ozon_match_category', '*', "`tahos_category_id` = {$_POST['tahos_category_id']}");
+            $category_id = $result['ozon_category_id'];
+        }
+        elseif(isset($_POST['category_id'])){
+            $category_id = $_POST['category_id'];
+        }
+
+        echo Ozon::getOzonTplTreeCategories($category_id);
         break;
     case 'ozon_get_type':
         $result = Ozon::getType($_POST['category_id']);
@@ -118,18 +127,17 @@ switch($_POST['act']){
 
         $items[] = $item;
 
-        $product_id = Ozon::getProductIdByOfferId($item['offer_id']);
+        /*$product_id = Ozon::getProductIdByOfferId($item['offer_id']);
         if ($product_id){
             Ozon::archiveProduct($product_id);
             Ozon::deleteProduct($item['offer_id']);
-        }
+        }*/
 
         $resultImport = Ozon::getResponse('v2/product/import', ['items' => $items]);
 
         Ozon::checkResult($resultImport);
 
         $task_id = $resultImport['result']['task_id'];
-        $ozonItemArray[$item['offer_id']]['task_id'] = $task_id;
 
         $checkStatus = Ozon::importInfo($task_id);
 
@@ -147,6 +155,8 @@ switch($_POST['act']){
             }
         }
 
+        $ozonItemArray[$item['offer_id']]['store_id'] = $_POST['store_id'];
+        $ozonItemArray[$item['offer_id']]['marketplace_markup'] = $_POST['marketplace_markup'];
         Ozon::setItemOzon($ozonItemArray);
 
         echo json_encode($output);
@@ -252,6 +262,29 @@ switch($_POST['act']){
         }
         $result = Database::getInstance()->select_one('ozon_match_category', '*', $where);
         echo json_encode($result);
+        break;
+    case 'getMainStores':
+        $output = '<select name="store_id">';
+        $output .= "<option value='0' data-price='0'>...выберите</option>";
+        $query = Ozon::getQueryStoreItems();
+        $result = Database::getInstance()->query("
+            $query
+            where si.item_id = {$_POST['item_id']}
+            order by si.price
+        ");
+        foreach($result as $row){
+            $string = "{$row['title']} - {$row['cipher']} ({$row['store_price']} руб. {$row['in_stock']}";
+            if ($row['measure']){
+                $string .= " {$row['measure']})";
+            }
+            else{
+                $string .= " шт.)";
+            }
+            $selected = isset($_POST['store_id']) && $_POST['store_id'] == $row['id'] ? 'selected': '';
+            $output .= "<option {$selected} data-price='{$row['store_price']}' value='{$row['id']}'>{$string}</option>";
+        }
+        $output .= '</select>';
+        echo $output;
         break;
 
 }

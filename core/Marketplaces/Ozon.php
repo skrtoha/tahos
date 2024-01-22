@@ -137,7 +137,7 @@ class Ozon extends Marketplaces{
         foreach($params as $field => $value){
             $where .= "`$field` = {$value} AND ";
         }
-        $where = str_replace($where, 0, -5);
+        $where = substr($where, 0, -5);
         return parent::getDBInstance()->select_one('ozon_item', '*', $where);
     }
 
@@ -151,23 +151,60 @@ class Ozon extends Marketplaces{
         return $result;
     }
 
+    public static function getQueryStoreItems(){
+        return "
+            select
+                si.price as store_price,
+                ps.id,
+                p.title,
+                ps.cipher,
+                si.in_stock,
+                m.title as measure
+            from
+                #store_items si
+            left join
+                #ozon_item oz on oz.offer_id = si.item_id
+            left join
+                #provider_stores ps on si.store_id = ps.id
+            left join
+                #providers p on p.id = ps.provider_id
+            left join
+                #item_options io on io.item_id = si.item_id
+            left join
+                #measures m on m.id = io.measure_id
+        ";
+    }
+
+    public static function getOzonProductList(){
+        $result = self::getResponse('v2/product/list', [
+            "last_id" => "",
+            "limit" => 100
+        ]);
+        return $result['result']['items'];
+    }
+
     public static function getProductList(): array
     {
-        $itemOzonResult = self::getDBInstance()->query("
+        $result = self::getOzonProductList();
+        $itemIdList = array_map(function ($element){
+            return "'{$element['offer_id']}'";
+        }, $result);
+
+        $itemResult = self::getDBInstance()->query("
             SELECT 
-                io.*,
                 i.id,
                 b.title AS brend,
                 i.brend_id,
                 i.title_full,
                 i.article
-            FROM #ozon_item io
-            LEFT JOIN #items i ON i.id = io.offer_id
+            FROM #items i
             LEFT JOIN #brends b ON b.id = i.brend_id
+            WHERE i.id IN (".implode(',', $itemIdList).")
             ORDER BY b.title
+            
         ");
-        self::$countProduct = $itemOzonResult->num_rows;
-        return $itemOzonResult->fetch_all(MYSQLI_ASSOC);
+        self::$countProduct = $itemResult->num_rows;
+        return $itemResult->fetch_all(MYSQLI_ASSOC);
     }
 
     public static function importInfo($task_id){
@@ -259,37 +296,25 @@ class Ozon extends Marketplaces{
         $nextIterator = true;
         $selectItem = '';
         $items = [];
-        if ($logger){
-            $selectItem = '
-                b.title as brend,
-                i.article,
-                i.title_full, 
-            ';
-            $leftJoinItem = "
-                LEFT JOIN
-                    #items i ON i.id = oz.offer_id
-                LEFT JOIN 
-                    #brends b ON b.id = i.brend_id
-            ";
-        }
 
         $ozonMarkup = Setting::get('marketplaces', 'markup');
         while($nextIterator){
             $result = self::getDBInstance()->query("
-                SELECT 
-                    $selectItem
-                    oz.offer_id,
-                    si.price * c.rate + si.price * c.rate * ps.percent / 100 AS price,
-                    si.in_stock
-                FROM
-                    #ozon_item oz
-                $leftJoinItem
-                LEFT JOIN 
-                    #store_items si ON si.item_id = oz.offer_id AND si.store_id = ".Setting::get('marketplaces', 'main_store')."
-                LEFT JOIN
-				    #provider_stores ps ON ps.id = si.store_id
-			    LEFT JOIN
-				    #currencies c ON c.id = ps.currency_id
+                select
+                    oi.offer_id,
+                    i.article,
+                    si.price as store_price,
+                    si.in_stock,
+                    @firstMarkup := si.price + (si.price * 20 / 100) as first_markup,
+                    @withMarkupMarketplace := round(@firstMarkup + (@firstMarkup * 25 / 100)) as price,
+                from
+                    #ozon_item oi
+                left join
+                    #store_items si on si.item_id = oi.offer_id and si.store_id = oi.store_id
+                left join 
+                    #items i on i.id = oi.offer_id
+                left join 
+                    #brends b on b.id = i.brend_id
                 LIMIT $start, $offset
             ");
 

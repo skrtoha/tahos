@@ -134,6 +134,21 @@ tr[data-item-id][data-category-id] td:last-child{
     margin-bottom: 5px;
     margin-top: 0;
 }
+#modal_ozon td.type_good{
+    display: none;
+}
+#modal_ozon td.type_good.active{
+    display: block;
+}
+#modal_ozon label.bold{
+    font-weight: 800;
+    font-size: 13px;
+}
+#modal_ozon tr td:first-child {
+    min-width: 110px;
+    font-size: 13px;
+    line-height: 13px;
+}
 #modal_ozon input[name="title"] {
     width: 100%;
     display: block;
@@ -165,6 +180,15 @@ div.modal{
     font-size: 16px;
     cursor: pointer;
 }
+.icon-enlarge2:before {
+    content: "\e98b";
+}
+.icon-enlarge2, .icon-shrink2{
+    margin-left: 10px;
+}
+.icon-shrink2:before {
+    content: "\e98c";
+}
 span.string{
     display: block;
 }
@@ -188,7 +212,7 @@ span.icon-checkmark1 {
     content: "\ea10";
 }
 .modal{
-    overflow: visible;
+    overflow: auto;
 }
 #ozon-match-category tr{
     padding: 3px 0;

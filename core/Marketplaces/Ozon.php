@@ -294,7 +294,6 @@ class Ozon extends Marketplaces{
         $start = 0;
         $offset = 100;
         $nextIterator = true;
-        $selectItem = '';
         $items = [];
 
         $ozonMarkup = Setting::get('marketplaces', 'markup');
@@ -306,7 +305,7 @@ class Ozon extends Marketplaces{
                     si.price as store_price,
                     si.in_stock,
                     @firstMarkup := si.price + (si.price * 20 / 100) as first_markup,
-                    @withMarkupMarketplace := round(@firstMarkup + (@firstMarkup * 25 / 100)) as price,
+                    @withMarkupMarketplace := round(@firstMarkup + (@firstMarkup * oi.marketplace_markup / 100)) as price
                 from
                     #ozon_item oi
                 left join

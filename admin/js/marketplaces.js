@@ -263,22 +263,30 @@ class Marketplaces{
                                                 <td>${mainStores}</td>
                                             </tr>
                                             <tr>
-                                                <td>Наценка для<br>скидки, %</td>
+                                                <td>Наценка, %</td>
                                                 <td>
-                                                    <input type="text" name="ozon_markup" value="${itemInfo.ozon_markup}">
+                                                    <input type="number" name="ozon_markup_common" value="${itemInfo.ozon_markup_common}">
+                                                    <label class="bold thin">
+                                                        <span>Наценка Озон, %</span>
+                                                        <input type="number" name="markup_marketplace" value="${itemInfo.markup_marketplace}">
+                                                    </label>
                                                     <label class="bold">
-                                                        Цена до скидки, руб
-                                                        <input type="text" name="old_price" value="${Math.floor(itemInfo.old_price)}">
+                                                        Наценка для скидки, %
+                                                        <input type="number" name="ozon_markup_old_price" value="${Math.floor(itemInfo.ozon_markup_old_price)}">
                                                     </label>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Цена, руб</td>
                                                 <td>
-                                                    <input type="text" name="price" value="${itemInfo.price ? itemInfo.price : 0}">
+                                                    <input type="number" name="price_common" value="">
+                                                    <label class="bold thin">
+                                                        Цена Озон, руб
+                                                        <input type="number" name="price" value="${itemInfo.price ? itemInfo.price : 0}">
+                                                    </label>
                                                     <label class="bold">
-                                                        <span>Наценка Озон, %</span>
-                                                        <input type="text" name="marketplace_markup" value="${itemInfo.marketplace_markup}">
+                                                        Наценка для скидки, руб
+                                                        <input type="number" name="old_price" value="${Math.floor(itemInfo.old_price)}">
                                                     </label>
                                                 </td>
                                             </tr>
@@ -370,6 +378,8 @@ class Marketplaces{
                                     Marketplaces.methods.ozon.setChosen('select[name="tahos_category_id"]')
                                     Marketplaces.methods.ozon.setChosen('select[name="store_id"]')
                                 }
+
+                                Marketplaces.methods.ozon.setPrices()
                             }).then(() => {
                               const categoryIdElement = document.querySelector('select[name="category_id"]')
                               if (categoryIdElement && categoryIdElement.value && Marketplaces.goodType.innerHTML == ''){
@@ -460,13 +470,16 @@ class Marketplaces{
                 const priceElement = document.querySelector('input[name="price"]')
                 const storeId = document.querySelector('select[name="store_id"]').value
                 const priceStore = + document.querySelector(`select[name="store_id"] option[value="${storeId}"]`).dataset.price
-                const firstMarkup = priceStore + priceStore * 20 / 100
-                const marketplaceMarkup = + document.querySelector('input[name="marketplace_markup"]').value
+                const markupCommon = + document.querySelector('input[name="ozon_markup_common"]').value
+                const priceCommonElement = document.querySelector('input[name="price_common"]')
+                const firstMarkup = priceStore + priceStore * markupCommon / 100
+                priceCommonElement.value = firstMarkup
+                const marketplaceMarkup = + document.querySelector('input[name="markup_marketplace"]').value
                 priceElement.value = Math.floor(firstMarkup + firstMarkup * marketplaceMarkup / 100)
 
-                const ozonMarkup = + document.querySelector('input[name="ozon_markup"]').value
+                const oldPriceMarkup = + document.querySelector('input[name="ozon_markup_old_price"]').value
                 const oldPriceElement = document.querySelector('input[name="old_price"]')
-                oldPriceElement.value =  Math.floor(+ priceElement.value + priceElement.value * ozonMarkup / 100)
+                oldPriceElement.value =  Math.floor(+ priceElement.value + priceElement.value * oldPriceMarkup / 100)
             }
         }
     }
@@ -651,7 +664,7 @@ class Marketplaces{
                 if (toRemove) toRemove.remove()
             })
         })
-        $(document).on('keyup', 'input[name="ozon_markup"]', e => {
+        $(document).on('keyup', 'input[name="ozon_markup_old_price"]', e => {
             Marketplaces.methods.ozon.setPrices()
         })
         $(document).on('click', 'span.icon-info1', e => {
@@ -936,7 +949,13 @@ class Marketplaces{
         $(document).on('click', '#modal_ozon .icon-enlarge2, #modal_ozon .icon-shrink2', () => {
             Marketplaces.methods.ozon.toggleShowTypeGood()
         })
-        $(document).on('keyup', '#modal_ozon input[name="marketplace_markup"]', e => {
+        $(document).on('change', '#modal_ozon input[name="ozon_markup_common"]', e => {
+            Marketplaces.methods.ozon.setPrices()
+        })
+        $(document).on('change', '#modal_ozon input[name="markup_marketplace"]', e => {
+            Marketplaces.methods.ozon.setPrices()
+        })
+        $(document).on('change', '#modal_ozon input[name="ozon_markup_old_price"]', e => {
             Marketplaces.methods.ozon.setPrices()
         })
     }

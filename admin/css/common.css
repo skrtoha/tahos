@@ -705,7 +705,7 @@ form input:hover {
     cursor: pointer;
 }
 
-input[type=email], input[type=text], button, input[type=submit], input[type=button], input[type=password] {
+input[type=email], input[type=text], button, input[type=submit], input[type=button], input[type=password], input[type=number] {
     box-sizing: border-box;
     display: inline-block;
     padding: 0 10px;

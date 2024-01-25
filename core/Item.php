@@ -437,7 +437,7 @@ class Item{
             $query .= ",ci.category_id as tahos_category_id";
         }
         if (in_array('ozon_item', $params)){
-            $query .= ", IF(ISNULL(oi.marketplace_markup), 25, oi.marketplace_markup) as marketplace_markup";
+            $query .= ", IF(ISNULL(oi.markup_marketplace), 25, oi.markup_marketplace) as markup_marketplace";
         }
 		$query .= "
 			FROM

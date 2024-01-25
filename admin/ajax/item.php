@@ -183,7 +183,8 @@ switch($_POST['act']){
 		}
 
         if (isset($_POST['ozon_markup']) && $_POST['ozon_markup']){
-            $itemInfo['ozon_markup'] = Setting::get('marketplaces', 'markup');
+            $itemInfo['ozon_markup_old_price'] = Setting::get('marketplaces', 'ozon_markup_old_price');
+            $itemInfo['ozon_markup_common'] = Setting::get('marketplaces', 'ozon_markup_common');
         }
 
 		if (!isset($itemInfo['offer_id'])) $itemInfo['offer_id'] = $itemInfo['id'];

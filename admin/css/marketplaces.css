@@ -143,6 +143,12 @@ tr[data-item-id][data-category-id] td:last-child{
 #modal_ozon label.bold{
     font-weight: 800;
     font-size: 13px;
+    display: inline-block;
+    width: 290px;
+    text-align: right;
+}
+#modal_ozon label.bold.thin{
+    width: 245px;
 }
 #modal_ozon tr td:first-child {
     min-width: 110px;
@@ -155,6 +161,10 @@ tr[data-item-id][data-category-id] td:last-child{
 }
 #modal_ozon textarea[name=marketplace_description] {
     width: 100%;
+}
+#modal_ozon input[name*="markup"],
+#modal_ozon input[name*="price"]{
+    width: 100px;
 }
 input[readonly]{
     width: 100%;
@@ -225,4 +235,7 @@ span.icon-checkmark1 {
 .modal td, .modal td:first-child {
     text-align: left;
     padding: 3px 10px 3px 0;
+}
+.modal {
+    padding-top: 0;
 }

@@ -113,7 +113,8 @@ switch($_POST['act']){
         Item::setAdditionalOptions($fields, $item['offer_id']);
         unset($fields);
 
-        Setting::update('marketplaces', 'markup', $_POST['ozon_markup']);
+        Setting::update('marketplaces', 'ozon_markup_old_price', $_POST['ozon_markup_old_price']);
+        Setting::update('marketplaces', 'ozon_markup_common', $_POST['ozon_markup_old_price']);
 
         $ozonItemArray = [];
         $ozonItemArray[$item['offer_id']]['offer_id'] = $item['offer_id'];
@@ -156,7 +157,7 @@ switch($_POST['act']){
         }
 
         $ozonItemArray[$item['offer_id']]['store_id'] = $_POST['store_id'];
-        $ozonItemArray[$item['offer_id']]['marketplace_markup'] = $_POST['marketplace_markup'];
+        $ozonItemArray[$item['offer_id']]['markup_marketplace'] = $_POST['markup_marketplace'];
         Ozon::setItemOzon($ozonItemArray);
 
         echo json_encode($output);

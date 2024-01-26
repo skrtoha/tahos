@@ -195,6 +195,15 @@ table.category{
 div#categories {
     margin-top: 10px;
 }
+.icon-enlarge2:before {
+    content: "\e98b";
+}
+.icon-enlarge2, .icon-shrink2{
+    margin-left: 10px;
+}
+.icon-shrink2:before {
+    content: "\e98c";
+}
 #modal_ozon table tr td{
     text-align: left;
     padding: 5px 5px 5px 0
@@ -206,7 +215,7 @@ div#categories {
 {
     padding: 10px;
 }
-#modal_ozon input[type="text"]{
+#modal_ozon input[type="text"]:not([name="barcode"]) {
     width: 100%;
 }
 #modal_ozon label.type_good {
@@ -223,6 +232,35 @@ div#categories {
 }
 #modal_ozon textarea[name=marketplace_description] {
     width: 100%;
+}
+#modal_ozon tr td:first-child {
+    min-width: 110px;
+    font-size: 13px;
+    line-height: 13px;
+}
+#modal_ozon input[readonly] {
+    width: 100%;
+    border: none;
+    padding-left: 0;
+}
+#modal_ozon label.bold {
+    font-weight: 800;
+    font-size: 13px;
+    display: inline-block;
+    width: 290px;
+    text-align: right;
+}
+#modal_ozon label.bold.thin {
+    width: 245px;
+}
+#modal_ozon input[name*="markup"], #modal_ozon input[name*="price"] {
+    width: 100px;
+}
+#modal_ozon td.type_good {
+    display: none;
+}
+#modal_ozon td.type_good.active {
+    display: block;
 }
 div.modal {
     max-width: 1000px;

@@ -438,6 +438,7 @@ class Item{
         }
         if (in_array('ozon_item', $params)){
             $query .= ", IF(ISNULL(oi.markup_marketplace), 25, oi.markup_marketplace) as markup_marketplace";
+            $query .= ", IF(ISNULL(oi.item_title), i.title, oi.item_title) as name";
         }
 		$query .= "
 			FROM

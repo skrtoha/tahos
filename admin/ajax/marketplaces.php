@@ -46,7 +46,13 @@ switch($_POST['act']){
         echo Ozon::getOzonTplTreeCategories($category_id);
         break;
     case 'ozon_get_type':
-        $result = Ozon::getType($_POST['category_id']);
+        if (isset($_POST['item_id'])){
+            $ozonProductInfo = Ozon::getProductInfo($_POST['item_id']);
+            $result = $ozonProductInfo['types'];
+        }
+        else{
+            $result = Ozon::getType($_POST['category_id']);
+        }
         echo json_encode($result);
         break;
     case 'ozon_product_import':
@@ -158,6 +164,7 @@ switch($_POST['act']){
 
         $ozonItemArray[$item['offer_id']]['store_id'] = $_POST['store_id'];
         $ozonItemArray[$item['offer_id']]['markup_marketplace'] = $_POST['markup_marketplace'];
+        $ozonItemArray[$item['offer_id']]['item_title'] = $_POST['name'];
         Ozon::setItemOzon($ozonItemArray);
 
         echo json_encode($output);

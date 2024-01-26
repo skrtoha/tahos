@@ -241,7 +241,7 @@ class Marketplaces{
                                         <table>
                                             <tr>
                                                 <td>Название</td>
-                                                <td><input type="text" readonly name="name" value="${itemInfo.title_full}"></td>
+                                                <td><input style="width: 100%" type="text" name="name" value="${itemInfo.name}"></td>
                                             </tr>
                                             <tr>
                                                 <td>Бренд</td>
@@ -444,6 +444,11 @@ class Marketplaces{
 
                 formData.set('act', 'ozon_get_type')
                 formData.set('category_id', category_id)
+
+                if (typeof Marketplaces.itemInfo.offer_id !== 'undefined'){
+                    formData.set('item_id', Marketplaces.itemInfo.offer_id)
+                }
+
                 return fetch(Marketplaces.marketplaceUrl, {
                     method: 'post',
                     body: formData

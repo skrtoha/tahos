@@ -95,7 +95,7 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 				LEFT JOIN
 					#brends b ON b.id = i.brend_id
 				LEFT JOIN
-					#store_items si ON si.item_id = ov.item_id AND si.store_id = ".\core\Config::MAIN_STORE_ID."
+					#store_items si ON si.item_id = ov.item_id AND si.store_id = {$_POST['store_id']}
 				WHERE
 					o.created BETWEEN '$from' AND '$to'
 				GROUP BY
@@ -200,8 +200,14 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'){
 			$dateTo = new DateTime();
 			$dateFrom = new DateTime();
 			$dateFrom->sub(new DateInterval('P90D'));
+            $selfStores = Tahos::getSelfStores();
 			?>
             <form action="/admin/?view=reports" class="filter-form">
+                <select name="store_id">
+                    <?foreach($selfStores as $row){?>
+                        <option value="<?=$row['id']?>"><?=$row['title']?></option>
+                    <?}?>
+                </select>
                 <input class="datetimepicker" name="dateFrom" type="text" value="<?=$dateFrom->format('d.m.Y H:i')?>">
                 <input class="datetimepicker" name="dateTo" type="text" value="<?=$dateTo->format('d.m.Y H:i')?>">
                 <input type="submit" value="Искать">

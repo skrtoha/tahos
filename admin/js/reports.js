@@ -126,8 +126,12 @@ $(function(){
                     }
                 })
             })
+            $('div[data-name="purchaseability"] select[name="store_id"]').on('change', () => {
+                reports.processAjaxQuery('purchaseability')
+            })
 		},
         processAjaxQuery: function(tab){
+            showGif()
 		    const form = $('div[data-name=' + tab + ']').find('form.filter-form');
 		    let data = {};
 		    data.tab = tab;
@@ -135,6 +139,9 @@ $(function(){
                 if (!item.value) return 1;
                 data[item.name] = item.value;
             })
+            if (tab == 'purchasebility'){
+                data.store_id = $('div[data-name="purchaseability"] select[name="store_id"]').val()
+            }
             $.ajax({
                 type: 'post',
                 url: reports.ajaxUrl,
@@ -144,6 +151,7 @@ $(function(){
                     if (!response) return false;
                     var items = JSON.parse(response);
                     reports.parsePurchaseability(items, tab);
+                    showGif(false)
                 }
             });
         },

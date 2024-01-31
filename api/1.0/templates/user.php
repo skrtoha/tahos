@@ -11,7 +11,9 @@ use core\User;
 
 switch ($act){
     case 'replenishBill':
-        $queryParams['comment'] = mb_substr($queryParams['comment'], 0, -8);
+        if($queryParams['bill_type'] == User::BILL_CASHLESS){
+            $queryParams['comment'] = mb_substr($queryParams['comment'], 0, -8);
+        }
 
         $count = Database::getInstance()->getCount(
             'funds',
@@ -28,7 +30,7 @@ switch ($act){
             'user_id' => $queryParams['user_id'],
             'sum' => $queryParams['sum'],
             'comment' => $queryParams['comment'],
-            'bill_type' => User::BILL_CASHLESS
+            'bill_type' => $queryParams['bill_type']
         ]);
     break;
     case 'setArrangement':

@@ -11,8 +11,14 @@ use core\User;
 
 switch ($act){
     case 'replenishBill':
-        if($queryParams['bill_type'] == User::BILL_CASHLESS){
-            $queryParams['comment'] = mb_substr($queryParams['comment'], 0, -8);
+        if ($queryParams['act'] == 'minus'){
+            User::returnMoney(
+                $queryParams['user_id'],
+                $queryParams['sum'],
+                $queryParams['comment'],
+                $queryParams['bill_type']
+            );
+            break;
         }
 
         $count = Database::getInstance()->getCount(

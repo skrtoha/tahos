@@ -170,22 +170,7 @@ switch($_POST['act']){
 		echo (true);
 		break;
 	case 'return_money':
-        $user = [];
-		$res_user = User::get(['user_id' => $_POST['user_id']]);
-        foreach ($res_user as $value) $user = $value;
-
-        $remainder = $user['bill_cash'] - $_POST['amount'];
-		core\Fund::insert(2, [
-			'sum' => $_POST['amount'],
-			'remainder' => $remainder,
-			'user_id' => $_POST['user_id'],
-			'comment' => 'Возврат средств',
-            'bill_type' => User::BILL_CASH
-		]);
-		User::update(
-			$_POST['user_id'],
-			['bill_cash' => $remainder]
-		);
+        User::returnMoney($_POST['user_id'], $_POST['amount']);
 		break;
     case 'changeAddress':
         /*$id = UserAddress::edit([

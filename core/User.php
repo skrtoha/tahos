@@ -569,4 +569,31 @@ class User{
         $output[$user_id] = $count > 0;
         return $output[$user_id];
     }
+
+    public static function returnMoney($user_id, $amount, $comment = 'Возврат средств', $bill_type = User::BILL_CASH){
+        $user = [];
+        $res_user = User::get(['user_id' => $user_id]);
+        foreach ($res_user as $value) $user = $value;
+
+        $remainder = $user['bill_cash'] - $amount;
+        Database::getInstance()->startTransaction();
+        try{
+            Fund::insert(2, [
+                'sum' => $amount,
+                'remainder' => $remainder,
+                'user_id' => $user_id,
+                'comment' => $comment,
+                'bill_type' => $bill_type
+            ]);
+        }
+        catch (\Throwable $ex){
+            return;
+        }
+        User::update(
+            $user_id,
+            ['bill_cash' => $remainder]
+        );
+        Database::getInstance()->commit();
+
+    }
 }

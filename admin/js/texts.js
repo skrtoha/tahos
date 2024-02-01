@@ -6,24 +6,25 @@ $(function(){
         success: function(){
         }
     })
-	$.ionTabs("#tabs_1",{
+	  $.ionTabs("#tabs_1",{
 		type: "hash",
 		onChange: function(obj){
+      console.log('changed')
 			let str = '/admin/?view=texts&tab=' + obj.tab;
             const params = getParams();
             if (typeof params['act'] !== 'undefined') str += '&act=' + params['act'];
             if (typeof params['id'] !== 'undefined') str += '&id=' + params['id'];
             if (typeof params['parent_id'] !== 'undefined') str += '&parent_id=' + params['parent_id'];
 			str += '#tabs|texts:' + obj.tab;
-            $.ajax({
-                type: 'get',
-                url: str,
-                success: function (response){
-                    $(`div[data-name="${obj.tab}"]`).html(response);
-                    window.history.pushState(null, null, str);
-                }
-            })
-
+      $.ajax({
+          type: 'get',
+          url: str,
+          success: function (response){
+              $(`div[data-name="${obj.tab}"]`).html(response);
+              window.history.pushState(null, null, str);
+              tinymce.init(tinymceInitParams)
+          }
+      })
 		}
 	})
     $(document).on('dblclick', '.ionTabs__tab', function(e){

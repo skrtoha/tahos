@@ -16,11 +16,12 @@ switch ($_GET['act']){
 			'store_id' => $array[1],
 			'item_id' => $array[2]
 		];
-        Database::getInstance()->startTransaction();
 		Database::getInstance()->update('returns', ['is_new' => 0], core\Provider::getWhere($osi));
 		$res_return = Returns::get($osi);
 		$return = $res_return->fetch_assoc();
 		if (!empty($_POST)){
+            Database::getInstance()->startTransaction();
+
 			if (Managers::isActionForbidden('Возвраты', 'Изменение')){
 				Managers::handlerAccessNotAllowed();
 			} 

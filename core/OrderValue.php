@@ -34,13 +34,13 @@ class OrderValue{
 
 		//вычисление задолженности
 		$overdue = 0;
-		if ($bill < $params['totalSumm']){
+		if ($bill <= $params['totalSumm']){
 			if ($bill > 0) $overdue = $params['totalSumm'] - $bill;
 			else $overdue = $params['totalSumm'];
 		}
 
         $paid = 0;
-        if ($bill - $params['totalSumm'] > 0) $paid = $params['totalSumm'];
+        if ($bill - $params['totalSumm'] >= 0) $paid = $params['totalSumm'];
         elseif ($bill > 0 && $remainder < 0) $paid = $bill;
 
 		Fund::insert(2, [
@@ -113,7 +113,7 @@ class OrderValue{
                     $billColumn = 'bill_cashless';
                 }
 
-                if (!$bill) die('Ошибка получения остатка счета или данных запроса');
+                if ($bill === false) die('Ошибка получения остатка счета или данных запроса');
 
                 $remainder = $bill + $params['quan'] * $params['price'];
 				Fund::insert(1, [

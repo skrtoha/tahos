@@ -70,7 +70,15 @@ class User{
 			];
 			foreach($params as $key => $value){
 				switch($key){
-					case 'user_id': $where .= "u.id = {$value} AND "; break;
+					case 'user_id':
+                        if (is_array($value)){
+                            $where .= "u.id IN (".implode($value).") AND ";
+                        }
+                        else{
+                            $where .= "u.id = {$value} AND ";
+                        }
+
+                        break;
 					case 'withWithdraw': $where .= "
                         CASE
                             WHEN u.bill_mode = 1 THEN u.bill_cash < 0

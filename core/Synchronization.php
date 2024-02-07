@@ -53,6 +53,28 @@ class Synchronization{
                 'return_data' => $ov['return_data']
 			];
 		}
+
+        $userListResult = User::get(['user_id' => array_column($output, 'user_id')]);
+        $userList = [];
+        foreach($userListResult as $user){
+            $userList[$user['id']] = [
+                'phone' => $user['phone'],
+                'email' => $user['email']
+            ];
+        }
+        if (!empty($userList)){
+            foreach($output as & $order){
+                if (isset($userList[$order['user_id']])){
+                    $order['email'] = $userList[$order['user_id']]['email'];
+                    $order['phone'] = $userList[$order['user_id']]['phone'];
+                }
+                else{
+                    $order['email'] = '';
+                    $order['phone'] = '';
+                }
+            }
+        }
+
 		return $output;
 	}
 	public static function setOrdersSynchronized($osi){

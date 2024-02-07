@@ -54,7 +54,9 @@ class Synchronization{
 			];
 		}
 
-        $userListResult = User::get(['user_id' => array_column($output, 'user_id')]);
+        $userIdList = array_column($output, 'user_id');
+        $userIdList = array_unique($userIdList);
+        $userListResult = User::get(['user_id' => $userIdList]);
         $userList = [];
         foreach($userListResult as $user){
             $userList[$user['id']] = [

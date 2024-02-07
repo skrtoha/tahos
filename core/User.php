@@ -72,7 +72,7 @@ class User{
 				switch($key){
 					case 'user_id':
                         if (is_array($value)){
-                            $where .= "u.id IN (".implode($value).") AND ";
+                            $where .= "u.id IN (".implode(',', $value).") AND ";
                         }
                         else{
                             $where .= "u.id = {$value} AND ";

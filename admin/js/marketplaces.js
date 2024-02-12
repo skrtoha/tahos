@@ -956,7 +956,7 @@ class Marketplaces{
                         }).then(response => response.json()).then(response => {
                             let tplDangerOilClass = '<select name="danger_class_id">'
                             for(const row of response.values){
-                                tplDangerOilClass += `<option value="${row.id}">${row.value}</option>`
+                                tplDangerOilClass += `<option value="${row.value}">${row.value}</option>`
                             }
                             tplDangerOilClass += '</select>'
                             Marketplaces.goodType.closest('tr').insertAdjacentHTML('afterend', `

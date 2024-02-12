@@ -98,6 +98,15 @@ switch($_POST['act']){
         ];
         $attributes[] = $attributeDescription;
 
+        if (isset($_POST['danger_class_id'])){
+            $attributeDangerClass = [];
+            $attributeDangerClass['id'] = Ozon::$oilDangerClass['attribute_id'];
+            $attributeDangerClass['values'][] = [
+                'value' => $_POST['danger_class_id']
+            ];
+            $attributes[] = $attributeDangerClass;
+        }
+
         $item['attributes'] = $attributes;
 
         $item['category_id'] = $_POST['category_id'];
@@ -293,6 +302,9 @@ switch($_POST['act']){
         }
         $output .= '</select>';
         echo $output;
+        break;
+    case 'get_oil_danger_class':
+        echo json_encode(Ozon::$oilDangerClass);
         break;
 
 }

@@ -20,6 +20,52 @@ class Ozon extends Marketplaces{
     const STATUS_IMPORTED = 'imported';
     const STATUS_PENDING = 'pending';
 
+    public static $oilDangerClass = [
+        "attribute_id" => 9782,
+        "values" => [
+            [
+                "id" => 970593901,
+                "value" => "Класс 1. Взрывчатые материалы"
+            ],
+            [
+                "id" => 970593902,
+                "value" => "Класс 2. Газы"
+            ],
+            [
+                "id" => 970593903,
+                "value" => "Класс 3. Легковоспламеняющиеся жидкости"
+            ],
+            [
+                "id" => 970593904,
+                "value" => "Класс 4. Легковоспламеняющиеся вещества"
+            ],
+            [
+                "id" => 970593905,
+                "value" => "Класс 5. Окисляющие вещества"
+            ],
+            [
+                "id" => 970593906,
+                "value" => "Класс 6. Ядовитые и инфекционные вещества"
+            ],
+            [
+                "id" => 970593907,
+                "value" => "Класс 7. Радиоактивные вещества"
+            ],
+            [
+                "id" => 970593908,
+                "value" => "Класс 8. Едкие и коррозионные вещества"
+            ],
+            [
+                "id" => 970593909,
+                "value" => "Класс 9. Прочие опасные вещества"
+            ],
+            [
+                "id" => 970661099,
+                "value" => "Не опасен"
+            ]
+        ]
+    ];
+
     public static $countProduct = 0;
 
     public static function getTreeCategories($category_id = self::CATEGORY_AUTO_GOODS){

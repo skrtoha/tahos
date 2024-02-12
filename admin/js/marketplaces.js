@@ -912,6 +912,12 @@ class Marketplaces{
             const formData = new FormData
             formData.set('act', 'ozonGetOneMatchCategory')
             formData.set('tahos_category_id', e.target.value)
+
+            const dangerClass = document.querySelector('tr.danger-class')
+            if (dangerClass){
+                dangerClass.remove()
+            }
+
             fetch(Marketplaces.marketplaceUrl, {
                 method: 'post',
                 body: formData
@@ -940,8 +946,29 @@ class Marketplaces{
                 }).then(response => response.json()).then(response => {
                     Marketplaces.goodType.innerHTML = Marketplaces.methods.ozon.getTypeHtml(response)
                     showGif(false)
+                }).then(() => {
+                    if (+formData.get('category_id') == 33717370){
+                        const formData = new FormData
+                        formData.set('act', 'get_oil_danger_class')
+                        fetch(Marketplaces.marketplaceUrl, {
+                            method: 'post',
+                            body: formData
+                        }).then(response => response.json()).then(response => {
+                            let tplDangerOilClass = '<select name="danger_class_id">'
+                            for(const row of response.values){
+                                tplDangerOilClass += `<option value="${row.id}">${row.value}</option>`
+                            }
+                            tplDangerOilClass += '</select>'
+                            Marketplaces.goodType.closest('tr').insertAdjacentHTML('afterend', `
+                                <tr class="danger-class">
+                                    <td>Класс<br>опасности</td>
+                                    <td>${tplDangerOilClass}</td>
+                                </tr>
+                            `)
+                            Marketplaces.methods.ozon.setChosen('select[name="danger_class_id"]')
+                        })
+                    }
                 })
-
                 $element.trigger('chosen:updated')
             })
         })

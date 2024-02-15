@@ -298,6 +298,24 @@ $(function(){
     })
 	$('div.basket > a.button').on('click', function(e){
         e.preventDefault();
+
+        let emptyOrder = true
+        const checkboxes = document.querySelectorAll('td.checkbox input[type="checkbox"]')
+        if(!checkboxes){
+            show_message('Нечего нету для заказа!', 'error')
+        }
+        for(const ch of checkboxes){
+            if (ch.checked){
+                emptyOrder = false
+            }
+        }
+
+        if (emptyOrder){
+            show_message('Нечего заказывать!', 'error')
+            return
+        }
+
+
         eventClickToOrder(e);
 	})
 	$('input[name=toOrder]').on('change', function(){

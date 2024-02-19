@@ -320,18 +320,9 @@ class Rossko extends Provider{
 		}
         
         $delivery = [];
-        if ($orderInfo['delivery'] == 'Доставка'){
-            $delivery['delivery_id'] = '000000002';
-            if ($orderInfo['address_provider_id']) $delivery['address_id'] = $orderInfo['address_provider_id'];
-            else $delivery['address_id'] = 56653;
-        }
-        else $delivery = [
-            'delivery_id' => '000000001',
-            'city' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->city,
-            'street' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->street,
-            'house' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->house,
-            'office' => $checkoutDetails->CheckoutDetailsResult->DeliveryAddress->address->office
-        ];
+        $delivery['delivery_id'] = '000000002';
+        if ($orderInfo['address_provider_id']) $delivery['address_id'] = $orderInfo['address_provider_id'];
+        else $delivery['address_id'] = 56653;
 
 		$param = array(
 			'KEY1' => self::getParams('private')->KEY1,

@@ -398,14 +398,16 @@ switch ($params[0]){
             '77769_B85E2744A3E264E952F043A389AD7197.csv' => 4285574,
             '77769_C84E737C7E7B4C578310B631DC831E24.csv' => 258159,
             '77769_16A706C191DC6CCEF4A1B2A54EAB089D.csv' => 686582,
-            '77769_91489D6DA76B9D7A99061B9F7B18F3CE.csv' => 24
+            '77769_91489D6DA76B9D7A99061B9F7B18F3CE.csv' => 24,
+            '77769_F572FDAF9EE26AF5DEAA7C0C3341BB30.csv' => 4464681
         ];
 
         $ciphers = [
             4285574 => 'ROSP',
             258159 => 'ROJA',
             686582 => 'ROCH',
-            24 => 'ROSV'
+            24 => 'ROSV',
+            4464681 => 'ROSM'
         ];
         $rossko = new core\Provider\Rossko($db);
         $imap = new core\Imap();

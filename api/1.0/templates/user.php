@@ -11,21 +11,28 @@ use core\User;
 
 switch ($act){
     case 'replenishBill':
-        $userArrangement = Database::getInstance()->select_one(
-            'user_1c_arrangements',
-            '*',
-            "`user_id` = {$queryParams['user_id']} AND `uid` = '{$queryParams['arrangement']}'"
-        );
-        if (!$userArrangement){
-            break;
+        if (isset($queryParams['bill_type'])){
+            $bill_type = $queryParams['bill_type'];
         }
+        else{
+            $userArrangement = Database::getInstance()->select_one(
+                'user_1c_arrangements',
+                '*',
+                "`user_id` = {$queryParams['user_id']} AND `uid` = '{$queryParams['arrangement']}'"
+            );
+            if (!$userArrangement){
+                break;
+            }
+            $bill_type = $userArrangement['bill_type'];
+        }
+
 
         if ($queryParams['act'] == 'minus'){
             User::returnMoney(
                 $queryParams['user_id'],
                 $queryParams['sum'],
                 $queryParams['comment'],
-                $userArrangement['bill_type']
+                $bill_type
             );
             break;
         }
@@ -45,7 +52,7 @@ switch ($act){
             'user_id' => $queryParams['user_id'],
             'sum' => $queryParams['sum'],
             'comment' => $queryParams['comment'],
-            'bill_type' => $userArrangement['bill_type']
+            'bill_type' => $bill_type
         ]);
     break;
     case 'setArrangement':

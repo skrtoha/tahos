@@ -41,7 +41,7 @@ switch ($act){
                 $changedOrders[] = $osi;
             }
         }
-        echo json_encode($changedOrders);
+        $result = $changedOrders;
         break;
     case 'setStatusIssued':
         $orderValues = [];

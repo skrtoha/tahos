@@ -75,11 +75,11 @@ if ($count_seconds > 0 && $blockData['is_blocked']){
 	$view = 'blocked';
 }
 
-core\UserIPS::registerIP([
+/*core\UserIPS::registerIP([
 	'user_id' => $_SESSION['user'] ?: null,
 	'ip' => $_SERVER['REMOTE_ADDR'],
 	'view' => $view
-]);
+]);*/
 
 if ($_SESSION['user']){
     $basket = Basket::get($_SESSION['user']);

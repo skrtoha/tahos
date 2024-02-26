@@ -2,12 +2,15 @@
 
 namespace core\Payment;
 
+use core\Database;
+use core\Exceptions\Paykeeper\PaymentAlreadyExistsException;
 use core\User;
 
 class Paykeeper{
     private static $user = "admin";
     private static $password = "89eb4d68eb32";
     private static $server = 'http://tahos.server.paykeeper.ru';
+    private static $secret_seed = "2m}aFojrEqwjnEJW";
 
     public static function getLinkReplenishBill($user_id, $amount){
         $resultUser = User::get(['user_id' => $user_id]);
@@ -64,4 +67,51 @@ class Paykeeper{
 
         return self::$server."/bill/$invoice_id/";
     }
+
+    public static function setPayment($params){
+        $mdString = $params['id']
+            .number_format($params['sum'], 2, ".", "")
+            .$params['clientid']
+            .$params['orderid']
+            .self::$secret_seed;
+        if ($params['key'] != md5($mdString)){
+            return false;
+        }
+
+        try{
+            self::checkPerformedPayment($params['id']);
+        }
+        catch(\Throwable $e){
+            return false;
+        }
+        User::replenishBill([
+            'user_id' => $params['clientid'],
+            'sum' => $params['sum'],
+            'comment' => "Поступление оплаты от клиента: Платежное поручение №{$params['id']} от {$params['obtain_datetime']}",
+            'bill_type' => User::BILL_CASH
+        ]);
+
+        self::addPerformedPayment($params['id'], $params['clientid']);
+
+        return true;
+    }
+
+    /**
+     * @throws PaymentAlreadyExistsException
+     */
+    private static function checkPerformedPayment($paymentId){
+        $result = Database::getInstance()->getCount('user_paykeeper', "`paykeeper_id` = $paymentId");
+        if ($result){
+            throw new PaymentAlreadyExistsException('Данный платеж уже проведен!');
+        }
+    }
+
+    private static function addPerformedPayment($paykeeper_id, $user_id){
+        return Database::getInstance()->insert('user_paykeeper', [
+            'paykeeper_id' => $paykeeper_id,
+            'user_id' => $user_id
+        ]);
+    }
+
+
 }

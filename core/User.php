@@ -19,13 +19,13 @@ class User{
 			"f.user_id = $user_id AND f.overdue > 0",
 			'date_payment > CURRENT_DATE'
 		);
-		$res_funds = $GLOBALS['db']->query($query, '');
+		$res_funds = Database::getInstance()->query($query, '');
 		if ($res_funds->num_rows) return false;
 		return true;
 	}
 	public static function checkOverdue($user_id, $creditedAmount){
 		$query = Fund::getQueryListFunds("f.user_id = $user_id AND f.overdue > 0", '', 'f.created');
-		$res = $GLOBALS['db']->query($query, '');
+		$res = Database::getInstance()->query($query, '');
 		if (!$res->num_rows) return;
 		
 		$remain = $creditedAmount;
@@ -234,7 +234,7 @@ class User{
 	 */
 	public static function saveUserSearch($array)
 	{
-		return $GLOBALS['db']->query("
+		return Database::getInstance()->query("
 			INSERT INTO #search_items (`user_id`, `item_id`) VALUES
 			({$array['user_id']}, '{$array['item_id']}') 
 			ON DUPLICATE KEY UPDATE 
@@ -258,8 +258,7 @@ class User{
     
     public static function updateSettings($settings, $user){
         $update = $settings['data'];
-        $db = $GLOBALS['db'];
-        
+
         if (!$update['is_subscribe']) $update['is_subscribe'] = 0;
         if (!$update['get_news']) $update['get_news'] = 0;
         if (!$update['show_all_analogies']) $update['show_all_analogies'] = 0;
@@ -285,7 +284,7 @@ class User{
             $settings['address_id'] ?? []
         );
         
-        return $db->update('users', $update, "`id` = {$user['id']}");
+        return Database::getInstance()->update('users', $update, "`id` = {$user['id']}");
     }
     
     public static function setAddress($user_id, $addressee, $default_address, $address_id = []){
@@ -496,13 +495,11 @@ class User{
     }
 
     public static function setSparePartsRequest($params){
-        /** @var \core\Database $db */
-        $db = $GLOBALS['db'];
 
         $params['ip'] = $_SERVER['REMOTE_ADDR'];
         unset($params['smart-token']);
 
-        $result = $db->insert('spare_parts_request', $params);
+        $result = Database::getInstance()->insert('spare_parts_request', $params);
 
         if ($result !== true) return false;
 
@@ -524,10 +521,7 @@ class User{
     }
 
     public static function setUserArrangement1C($params){
-        /** @var Database $db */
-        $db = $GLOBALS['db'];
-
-        $db->insert(
+        Database::getInstance()->insert(
             'user_1c_arrangements',
             $params,
             ['duplicate' => [

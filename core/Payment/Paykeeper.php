@@ -20,10 +20,9 @@ class Paykeeper{
 
         $payment_data = [
             "pay_amount" => $amount,
-            "clientid" => $user_id,
-            "orderid" => "",
+            "clientid" => "{$userInfo['full_name']}",
             "client_email" => $userInfo['email'],
-            "service_name" => "Пополнение счета",
+            "service_name" => "Пополнение счета для {$userInfo['full_name']}",
             "client_phone" => $userInfo['phone'],
         ];
         $base64 = base64_encode(self::$user.":".self::$password);
@@ -83,14 +82,36 @@ class Paykeeper{
         catch(\Throwable $e){
             return false;
         }
+
+        if ($params['client_email']){
+            $where = ['email' => $params['client_email']];
+        }
+        elseif ($params['client_phone']){
+            $where = ['phone' => $params['client_phone']];
+        }
+        else{
+            $where = ['full_name' => $params['clientid']];
+        }
+        if (empty($where)){
+            return false;
+        }
+        $result = User::get($where);
+        if (!$result){
+            return false;
+        }
+        foreach($result as $value){
+            $userInfo = $value;
+        }
+
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $params['obtain_datetime']);
         User::replenishBill([
-            'user_id' => $params['clientid'],
+            'user_id' => $userInfo['id'],
             'sum' => $params['sum'],
-            'comment' => "Поступление оплаты от клиента: Платежное поручение №{$params['id']} от {$params['obtain_datetime']}",
+            'comment' => "Поступление оплаты от клиента: Платежное поручение №{$params['id']} от ".$dateTime->format('d.m.Y H:i:s'),
             'bill_type' => User::BILL_CASH
         ]);
 
-        self::addPerformedPayment($params['id'], $params['clientid']);
+        self::addPerformedPayment($params['id'], $userInfo['id']);
 
         return true;
     }

@@ -88,6 +88,7 @@ class User{
                         break;
                     case 'full_name': $having .= "full_name LIKE '%{$value}%' AND "; break;
                     case 'limit': $limit = "LIMIT $value"; break;
+
                     case 'order':
                     case 'dir':
                         $order = "ORDER BY {$params['order']} $dir";

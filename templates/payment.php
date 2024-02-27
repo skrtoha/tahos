@@ -1,4 +1,5 @@
 <? use core\Breadcrumb;
+use core\Database;
 
 $title = "Баланс";
 if ($_POST['bonus_current']){
@@ -122,7 +123,11 @@ Breadcrumb::out();
 			</div>
 			<h4>Оплатить наличными в офисе</h4>
 			<p>Адреса:</p>
-			<p><a href="#">г. Вологда, ул. Зеленый город, д.4</a></p>
+            <?$issues = Database::getInstance()->select('issues', '*', "`accept_cash` = 1");?>
+            <?foreach($issues as $i){?>
+                <p><a href="#"><?=$i['adres']?></a></p>
+            <?}?>
+
 		</div>
 		<?if ($user['bonus_program']){?>
 			<div class="pay-block" id="bonus">

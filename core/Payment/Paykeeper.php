@@ -12,19 +12,24 @@ class Paykeeper{
     private static $server = 'http://tahos.server.paykeeper.ru';
     private static $secret_seed = "2m}aFojrEqwjnEJW";
 
-    public static function getLinkReplenishBill($user_id, $amount){
-        $resultUser = User::get(['user_id' => $user_id]);
-        foreach($resultUser as $value){
-            $userInfo = $value;
-        }
-
+    public static function getLinkReplenishBill($amount, $user_id, $orderId = null){
         $payment_data = [
-            "pay_amount" => $amount,
-            "clientid" => "{$userInfo['full_name']}",
-            "client_email" => $userInfo['email'],
-            "service_name" => "Пополнение счета для {$userInfo['full_name']}",
-            "client_phone" => $userInfo['phone'],
+            "pay_amount" => $amount
         ];
+        if ($orderId){
+            $payment_data['orderid'] = $orderId;
+            $payment_data['service_name'] = "Оплата заказа №$orderId";
+        }
+        else{
+            $resultUser = User::get(['user_id' => $user_id]);
+            foreach($resultUser as $value){
+                $userInfo = $value;
+            }
+            $payment_data['clientid'] = $userInfo['full_name'];
+            $payment_data['service_name'] = "Пополнение счета для {$userInfo['full_name']}";
+            $payment_data['client_email'] = $userInfo['email'];
+            $payment_data['client_phone'] = $userInfo['phone'];
+        }
         $base64 = base64_encode(self::$user.":".self::$password);
         $headers = [];
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';

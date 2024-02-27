@@ -12,7 +12,7 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 switch($_POST['act']){
     case 'get_link':
-        echo Paykeeper::getLinkReplenishBill($_SESSION['user'], $_POST['amount']);
+        echo Paykeeper::getLinkReplenishBill($_POST['amount'], $_SESSION['user']);
         break;
 }
 

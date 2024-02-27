@@ -4,6 +4,7 @@ namespace core\Payment;
 
 use core\Database;
 use core\Exceptions\Paykeeper\PaymentAlreadyExistsException;
+use core\OrderValue;
 use core\User;
 
 class Paykeeper{
@@ -68,6 +69,17 @@ class Paykeeper{
             return false;
         }
 
+        if ($orderId){
+            Database::getInstance()->insert('order_paykeeper_invoice', [
+                'order_id' => $orderId,
+                'invoice_id' => $invoice_id
+            ]);
+        }
+
+        return self::getLinkPay($invoice_id);
+    }
+
+    public static function getLinkPay($invoice_id){
         return self::$server."/bill/$invoice_id/";
     }
 
@@ -88,6 +100,31 @@ class Paykeeper{
             return false;
         }
 
+        if (isset($params['orderid']) && $params['orderid']){
+            return self::setPaymentOrder($params);
+        }
+
+        return self::setPaymentAccount($params);
+    }
+
+    private static function setPaymentOrder($params){
+        $orderInfo = OrderValue::getOrderInfo($params['orderid'], false);
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $params['obtain_datetime']);
+        User::replenishBill([
+            'user_id' => $orderInfo['user_id'],
+            'sum' => $params['sum'],
+            'comment' => "Оплата заказа №{$params['orderid']}: Платежное поручение №{$params['id']} от ".$dateTime->format('d.m.Y H:i:s'),
+            'bill_type' => User::BILL_CASH
+        ]);
+        Database::getInstance()->update(
+            'order_paykeeper_invoice',
+            ['payed' => 1],
+            "`order_id` = {$params['orderid']}"
+        );
+        return true;
+    }
+
+    private static function setPaymentAccount($params) {
         if ($params['client_email']){
             $where = ['email' => $params['client_email']];
         }

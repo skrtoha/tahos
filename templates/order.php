@@ -1,10 +1,12 @@
 <?
-/** @var $db \core\Database */
+/** @var $db Database */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/orders.function.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/admin/functions/sendings.function.php');
 
+use core\Database;
 use core\OrderValue;
+use core\Payment\Paykeeper;
 
 if (isset($_GET['act']) && $_GET['act'] == 'edit') $title = 'Редактирование заказа';
 else $title = "Просмотр заказа";
@@ -22,6 +24,16 @@ $status_classes = [
 <h1><?=$title?></h1>
 <div class="clearfix"></div>
 <div class="orders">
+    <?if ($orderInfo['pay_type'] == 'Онлайн'){
+        $paykeeperInvoice = Database::getInstance()->select_one('order_paykeeper_invoice', '*', "`order_id` = {$orderInfo['id']}");
+        if (!$paykeeperInvoice['payed']){?>
+            <p style="color: #bd2130">
+                Заказ не оплачен!
+                <a href="<?= Paykeeper::getLinkPay($paykeeperInvoice['invoice_id'])?>">Оплатить</a>
+            </p>
+        <?}?>
+    <?}?>
+
     <?if ($orderInfo['date_issue'] && $orderInfo['delivery']){?>
         <h3>Информация</h3>
         <form id="orderInfo" style="margin-bottom: 20px">

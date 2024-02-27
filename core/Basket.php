@@ -238,7 +238,7 @@ class Basket{
         }
 
         if ($additional_options['pay_type'] == 'Онлайн'){
-            $link = Paykeeper::getLinkReplenishBill($sum, $user['id']);
+            $link = Paykeeper::getLinkReplenishBill($sum, null, $order_id);
             header("Location: $link");
             die();
         }

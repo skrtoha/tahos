@@ -177,7 +177,7 @@ class OrderValue{
                         $smsAero = new SmsAero();
                         $query = Item::getQueryItemInfo();
                         $query .= " WHERE i.id = {$ov['item_id']}";
-                        $itemInfo = $GLOBALS['db']->query($query)->fetch_assoc();
+                        $itemInfo = Database::getInstance()->query($query)->fetch_assoc();
                         $itemInfo['title_full'] = substr($itemInfo['title_full'], 0, 50);
                         $url = str_replace('www.', '', $_SERVER['HTTP_ORIGIN']);
                         $message = "Позиция {$itemInfo['brend']}-{$itemInfo['article']} отменена поставщиком. Заказ {$url}/order/{$ov['order_id']}";
@@ -249,7 +249,7 @@ class OrderValue{
 	 * @return [array] brend_id, article, title_full, brend
 	 */
 	public static function getItem($item_id){
-		$item = $GLOBALS['db']->query("
+		$item = Database::getInstance()->query("
 			SELECT
 				i.brend_id,
 				i.article,
@@ -307,7 +307,7 @@ class OrderValue{
 	 */
 	private static function changeInStockStoreItem($quan, $condition, string $act = 'minus'){
         /** @var Database $db */
-        $db = $GLOBALS['db'];
+        $db = Database::getInstance();
 
 		$sign = $act == 'minus' ? '-' : '+';
 		return Database::getInstance()->update(
@@ -346,7 +346,7 @@ class OrderValue{
 				i.article = '$article' AND b.title LIKE '%{$params['brend']}%'
 				$where
 		";
-		$res = $GLOBALS['db']->query($query, '');
+		$res = Database::getInstance()->query($query, '');
 		return $res->fetch_assoc();
 	}
 
@@ -385,7 +385,7 @@ class OrderValue{
 
     public static function getCount($params){
         /** @var Database $db */
-        $db = $GLOBALS['db'];
+        $db = Database::getInstance();
 
         $query = "
             SELECT 
@@ -457,7 +457,7 @@ class OrderValue{
         }
 
         /** @var Database $db */
-        $db = $GLOBALS['db'];
+        $db = Database::getInstance();
 		return $db->query("
 			SELECT
 				ps.cipher,
@@ -533,7 +533,7 @@ class OrderValue{
 	}
 	public static function getStatuses(): \mysqli_result
 	{
-		return $GLOBALS['db']->query("SELECT * FROM #orders_statuses ORDER BY title");
+		return Database::getInstance()->query("SELECT * FROM #orders_statuses ORDER BY title");
 	}
 
 	public static function setStatusInWork($ov, $automaticOrder){
@@ -674,8 +674,8 @@ class OrderValue{
             $leftJoin
             WHERE o.id IN (".implode(',', $order_id).")
         ";
-        if ($flag) return $GLOBALS['db']->query($query, $flag);
-        $orders = $GLOBALS['db']->select_unique($query, $flag);
+        if ($flag) return Database::getInstance()->query($query, $flag);
+        $orders = Database::getInstance()->select_unique($query, $flag);
 
         if (count($orders) == 1) return $orders[0];
 

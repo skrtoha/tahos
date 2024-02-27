@@ -55,15 +55,11 @@ Breadcrumb::out();
 		<div class="pay-methods">
 			<div class="method selected" data-target="paykeeper">
 				<div class="img"><img src="/img/pay-methods/logo3v.png" alt="mirpay"></div>
-				<p>Карта Мир</p>
+				<p>Картой онлайн</p>
 			</div>
 			<div class="method" data-target="yandex-money">
 				<div class="img"><img src="/img/pay-methods/io.svg" alt="Yoomoney"></div>
 				<p>Yoomoney</p>
-			</div>
-			<div class="method" data-target="mobile">
-				<div class="img"><img src="/img/pay-methods/mobile-phone.png" alt="Оплата через мобильный"></div>
-				<p>Мобильный <br>телефон</p>
 			</div>
 			<div class="method" data-target="cash">
 				<div class="img"><img src="/img/pay-methods/cash.png" alt="Оплата наличными"></div>
@@ -84,7 +80,7 @@ Breadcrumb::out();
 				<div class="pay-logo">
 					<img src="/img/pay-methods/logo3v.png" alt="Карта Мир">
 				</div>
-				<h4>Пополнить счет картой on-line</h4>
+				<h4>Пополнить счет картой онлайн</h4>
 				<div class="amount-wrap">
 					<label for="amount">Сумма пополнения: </label>
 					<input type="number" data-type="number" name="amount" id="amount" placeholder="0,00" required pattern="[0-9]+">
@@ -120,43 +116,13 @@ Breadcrumb::out();
 				<button type="submit">Оплатить</button>
 			</form>
 		</div>
-		<div class="pay-block" id="mobile">
-			<form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml">
-				<input type="hidden" name="receiver" value="410013982328385">
-				<input type="hidden" name="formcomment" value="Пополнение счета пользователя">
-				<input type="hidden" name="short-dest" value="">
-				<input type="hidden" name="label" value="account:<?=$_SESSION['user']?>">
-				<input type="hidden" name="quickpay-form" value="donate">
-				<input type="hidden" name="targets" value="Пополнение счета пользователя">
-				<input type="hidden" name="comment" value="Пополнение счета для <?=$_SESSION['user']?>">
-				<input type="hidden" name="need-fio" value="false">
-				<input type="hidden" name="need-email" value="false">
-				<input type="hidden" name="need-phone" value="false">
-				<input type="hidden" name="need-address" value="false">
-				<input type="hidden" name="paymentType" value="MC">
-				<input type="hidden" name="successURL" value="http://tahos.ru/account">
-				<div class="pay-logo">
-					<img src="/img/pay-methods/mobile-phone.png" alt="Оплатить через мобильный">
-				</div>
-				<h4>Оплатить через мобильный телефон</h4>
-
-				<div class="amount-wrap">
-					<label for="amount">Сумма пополнения: </label>
-					<input type="number" data-type="number" name="sum" id="amount" placeholder="0,00" required pattern="[0-9]+">
-					<span>Руб.</span>
-				</div>
-				<p>При оплате через мобильного оператора, платеж автоматически не зачисляется. Сообщите об оплате администратору</p>
-				<button type="submit">Оплатить</button>
-			</form>
-		</div>
 		<div class="pay-block" id="cash">
 			<div class="pay-logo">
 				<img src="/img/pay-methods/cash.png" alt="Оплатить наличными">
 			</div>
 			<h4>Оплатить наличными в офисе</h4>
 			<p>Адреса:</p>
-			<p><a href="#">Вологда, Окружное шоссе 9Б</a></p>
-			<p><a href="#">Вологда, Окружное шоссе 9Б</a></p>
+			<p><a href="#">г. Вологда, ул. Зеленый город, д.4</a></p>
 		</div>
 		<?if ($user['bonus_program']){?>
 			<div class="pay-block" id="bonus">

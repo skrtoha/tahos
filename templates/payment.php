@@ -54,11 +54,11 @@ Breadcrumb::out();
 	<div class="pay-methods-wrap">
 		<div class="pay-methods">
 			<div class="method selected" data-target="paykeeper">
-				<div class="img"><img src="/img/pay-methods/mirpay.jpg" alt="mirpay"></div>
+				<div class="img"><img src="/img/pay-methods/logo3v.png" alt="mirpay"></div>
 				<p>Карта Мир</p>
 			</div>
 			<div class="method" data-target="yandex-money">
-				<div class="img"><img src="/img/pay-methods/yoomoney.jpg" alt="Yoomoney"></div>
+				<div class="img"><img src="/img/pay-methods/io.svg" alt="Yoomoney"></div>
 				<p>Yoomoney</p>
 			</div>
 			<div class="method" data-target="mobile">
@@ -82,7 +82,7 @@ Breadcrumb::out();
 		<div class="pay-block show" id="paykeeper">
 			<form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml">
 				<div class="pay-logo">
-					<img src="/img/pay-methods/mirpay.jpg" alt="Карта Мир">
+					<img src="/img/pay-methods/logo3v.png" alt="Карта Мир">
 				</div>
 				<h4>Пополнить счет картой on-line</h4>
 				<div class="amount-wrap">
@@ -109,7 +109,7 @@ Breadcrumb::out();
 				<input type="hidden" name="successURL" value="http://tahos.ru/account">
 				<input type="hidden" name="paymentType" value="PC">
 				<div class="pay-logo">
-					<img src="/img/pay-methods/yoomoney.jpg" alt="Яндекс деньги">
+					<img src="/img/pay-methods/io.svg" alt="Яндекс деньги">
 				</div>
 				<h4>Оплатить через Yoomoney</h4>
 				<div class="amount-wrap">
@@ -136,7 +136,7 @@ Breadcrumb::out();
 				<input type="hidden" name="paymentType" value="MC">
 				<input type="hidden" name="successURL" value="http://tahos.ru/account">
 				<div class="pay-logo">
-					<img src="img/pay-methods/mobile-phone.png" alt="Оплатить через мобильный">
+					<img src="/img/pay-methods/mobile-phone.png" alt="Оплатить через мобильный">
 				</div>
 				<h4>Оплатить через мобильный телефон</h4>
 

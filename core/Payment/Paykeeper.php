@@ -18,17 +18,16 @@ class Paykeeper{
             $userInfo = $value;
         }
 
-
         $payment_data = [
             "pay_amount" => $amount,
             "clientid" => $user_id,
-            "orderid" => "Пополнение счета №$user_id",
+            "orderid" => "Пополнение счета для {$userInfo['full_name']}",
             "client_email" => $userInfo['email'],
             "service_name" => "Пополнение счета",
-            "client_phone" => $userInfo['phone']
+            "client_phone" => $userInfo['phone'],
         ];
         $base64 = base64_encode(self::$user.":".self::$password);
-        $headers = Array();
+        $headers = [];
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
         $headers[] = 'Authorization: Basic ' . $base64;
         $uri = "/info/settings/token/";

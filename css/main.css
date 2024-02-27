@@ -1632,13 +1632,13 @@ footer .partnership h4 {
 }
 
 footer .partnership ul {
-    margin-bottom: 10px;
+    margin: 0 0 28px
 }
 
 footer .payment_systems {
-    width: 128px;
-    height: 201px;
-    background: url(../img/pay-methods/paykeeper.png) center no-repeat;
+    width: 192px;
+    height: 123px;
+    background: url(../img/icons/footer__partnership__payment_systems.png) center no-repeat
 }
 
 footer .contacts {

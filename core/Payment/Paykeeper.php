@@ -21,7 +21,7 @@ class Paykeeper{
         $payment_data = [
             "pay_amount" => $amount,
             "clientid" => $user_id,
-            "orderid" => "Пополнение счета для {$userInfo['full_name']}",
+            "orderid" => "",
             "client_email" => $userInfo['email'],
             "service_name" => "Пополнение счета",
             "client_phone" => $userInfo['phone'],

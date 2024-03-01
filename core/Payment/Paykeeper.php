@@ -121,6 +121,7 @@ class Paykeeper{
             ['payed' => 1],
             "`order_id` = {$params['orderid']}"
         );
+        self::addPerformedPayment($params['id'], $orderInfo['user_id']);
         return true;
     }
 

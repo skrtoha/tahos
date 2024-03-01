@@ -101,10 +101,15 @@ class Paykeeper{
         }
 
         if (isset($params['orderid']) && $params['orderid']){
-            return self::setPaymentOrder($params);
+            $result = self::setPaymentOrder($params);
+        }
+        else{
+            $result = self::setPaymentAccount($params);
         }
 
-        return self::setPaymentAccount($params);
+        $hash = md5($params['id'].self::$secret_seed);
+        echo "OK $hash";
+        return $result;
     }
 
     private static function setPaymentOrder($params){
@@ -176,5 +181,29 @@ class Paykeeper{
         ]);
     }
 
+    public static function getPaymentSystems(){
+        $auth_header =  array (
+            'Authorization: Basic '.base64_encode(self::$user.':'.self::$password)
+        );
 
+        $request_headers = array_merge($auth_header, array("Content-type: application/x-www-form-urlencoded"));
+
+        $context = stream_context_create(array (
+                'http' => array (
+                    'method' => 'GET',
+                    'header' => $request_headers
+                )
+            )
+        );
+
+        $result = json_decode(file_get_contents(self::$server."/info/systems/list/", FALSE, $context), TRUE);
+
+        foreach($result as $data) {
+            foreach($data as $key => $value) {
+                echo $key . " : " . $value;
+                echo "\n";
+            }
+            echo "\n\n";
+        }
+    }
 }

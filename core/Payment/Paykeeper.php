@@ -97,6 +97,7 @@ class Paykeeper{
             self::checkPerformedPayment($params['id']);
         }
         catch(\Throwable $e){
+            self::setResponse($params['id']);
             return false;
         }
 
@@ -107,9 +108,14 @@ class Paykeeper{
             $result = self::setPaymentAccount($params);
         }
 
-        $hash = md5($params['id'].self::$secret_seed);
-        echo "OK $hash";
+        self::setResponse($params['id']);
+
         return $result;
+    }
+
+    private static function setResponse($id){
+        $hash = md5($id.self::$secret_seed);
+        echo "OK $hash";
     }
 
     private static function setPaymentOrder($params){

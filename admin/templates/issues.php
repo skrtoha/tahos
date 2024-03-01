@@ -1,4 +1,6 @@
 <?php
+
+use core\Database;
 use core\Managers;
 $act = $_GET['act'];
 switch ($act) {
@@ -12,7 +14,7 @@ switch ($act) {
 		if (Managers::isActionForbidden('Точки выдачи', 'Добавление')){
 			Managers::handlerAccessNotAllowed();
 		}
-		if ($db->insert('issues', $_POST)){
+		if (Database::getInstance()->insert('issues', $_POST)){
 			message('Точка выдачи успешно сохранена!');
 			header('Location: ?view=issues');
 		}
@@ -21,7 +23,7 @@ switch ($act) {
 		if (Managers::isActionForbidden('Точки выдачи', 'Удаление')){
 			Managers::handlerAccessNotAllowed();
 		}
-		$res = $db->delete('issues', "`id`=".$_GET['id']);
+		$res = Database::getInstance()->delete('issues', "`id`=".$_GET['id']);
 		if ($res === true){
 			message('Точка выдачи успешно удалена!');
 			header('Location: ?view=issues');
@@ -32,14 +34,18 @@ switch ($act) {
 		if (Managers::isActionForbidden('Точки выдачи', 'Изменение')){
 			Managers::handlerAccessNotAllowed();
 		}
-		$db->update('issues', ['is_main' => 0], '1');
-		// debug($_POST); exit();
-		if ($_POST['is_main']) $_POST['is_main'] = 1;
-		else $_POST['is_main'] = 0;
-		$res = $db->update('issues', $_POST, "`id`=".$_GET['id']);
+        $post = $_POST;
+        if (!isset($post['is_main'])){
+            $post['is_main'] = 0;
+        }
+        if (!isset($post['accept_cash'])){
+            $post['accept_cash'] = 0;
+        }
+		$res = Database::getInstance()->update('issues', $post, "`id`=".$_GET['id']);
 		if ($res === true){
 			message('Пункт выдачи успешно изменен!');
 			header('Location: ?view=issues');
+            die();
 		}
 		else echo $res;
 		break;
@@ -119,6 +125,10 @@ function show_form($act){
 					<div class="title">Основной</div>
 					<div class="value"><input <?=$issue['is_main'] ? 'checked' : ''?> type="checkbox" name="is_main" value="1"></div>
 				</div>
+                <div class="field">
+                    <div class="title">Прием наличной<br>оплаты</div>
+                    <div class="value"><input <?=$issue['accept_cash'] ? 'checked' : ''?> type="checkbox" name="accept_cash" value="1"></div>
+                </div>
 				<div class="field">
 					<div class="title">Соцсети</div>
 					<div class="value" id="admin_social">

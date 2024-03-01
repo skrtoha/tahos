@@ -47,5 +47,3 @@ if (isset($_GET['brend_id'])){
 	};
 	echo json_encode($imagesList);
 }
-
-?>

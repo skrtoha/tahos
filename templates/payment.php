@@ -1,4 +1,5 @@
 <? use core\Breadcrumb;
+use core\Database;
 
 $title = "Баланс";
 if ($_POST['bonus_current']){
@@ -53,21 +54,16 @@ Breadcrumb::out();
 	</div>
 	<div class="pay-methods-wrap">
 		<div class="pay-methods">
-			<div class="method selected" data-target="visa-master">
-				<div class="img"><img src="img/pay-methods/visa-master.png" alt="visa, mastercard"></div>
-				<p>VISA</p>
-				<p>MasterCard</p>
+			<div class="method selected" data-target="paykeeper">
+				<div class="img"><img src="/img/pay-methods/logo3v.png" alt="mirpay"></div>
+				<p>Картой онлайн</p>
 			</div>
 			<div class="method" data-target="yandex-money">
-				<div class="img"><img src="img/pay-methods/yandex.png" alt="Yandex деньги"></div>
-				<p>Яндекс.Деньги</p>
-			</div>
-			<div class="method" data-target="mobile">
-				<div class="img"><img src="img/pay-methods/mobile-phone.png" alt="Оплата через мобильный"></div>
-				<p>Мобильный <br>телефон</p>
+				<div class="img"><img src="/img/pay-methods/io.svg" alt="Yoomoney"></div>
+				<p>Yoomoney</p>
 			</div>
 			<div class="method" data-target="cash">
-				<div class="img"><img src="img/pay-methods/cash.png" alt="Оплата наличными"></div>
+				<div class="img"><img src="/img/pay-methods/cash.png" alt="Оплата наличными"></div>
 				<p>Наличные</p>
 			</div>
 			<?if ($user['bonus_program']){?>
@@ -80,28 +76,15 @@ Breadcrumb::out();
 	</div>
 	<div class="clearfix"></div>
 	<div class="pay-block-wrap">
-		<div class="pay-block show" id="visa-master">
+		<div class="pay-block show" id="paykeeper">
 			<form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml">
-				<input type="hidden" name="receiver" value="410013982328385">
-				<input type="hidden" name="formcomment" value="<?=$fio?>">
-				<input type="hidden" name="short-dest" value="">
-				<input type="hidden" name="label" value="account:<?=$_SESSION['user']?>">
-				<input type="hidden" name="quickpay-form" value="donate">
-				<input type="hidden" name="targets" value="Пополнение счета пользователя">
-				<input type="hidden" name="comment" value="Пополнение счета для <?=$_SESSION['user']?>">
-				<input type="hidden" name="need-fio" value="false">
-				<input type="hidden" name="need-email" value="false">
-				<input type="hidden" name="need-phone" value="false">
-				<input type="hidden" name="need-address" value="false">
-				<input type="hidden" name="paymentType" value="AC">
-				<input type="hidden" name="successURL" value="http://tahos.ru/account">
 				<div class="pay-logo">
-					<img src="img/pay-methods/visa-master.png" alt="Visa или MasterCard">
+					<img src="/img/pay-methods/logo3v.png" alt="Карта Мир">
 				</div>
-				<h4>Пополнить счет картой on-line</h4>
+				<h4>Пополнить счет картой онлайн</h4>
 				<div class="amount-wrap">
 					<label for="amount">Сумма пополнения: </label>
-					<input type="number" data-type="number" name="sum" id="amount" placeholder="0,00" required pattern="[0-9]+">
+					<input type="number" data-type="number" name="amount" id="amount" placeholder="0,00" required pattern="[0-9]+">
 					<span>Руб.</span>
 				</div>
 				<button type="submit">Оплатить</button>
@@ -123,9 +106,9 @@ Breadcrumb::out();
 				<input type="hidden" name="successURL" value="http://tahos.ru/account">
 				<input type="hidden" name="paymentType" value="PC">
 				<div class="pay-logo">
-					<img src="img/pay-methods/yandex.png" alt="Яндекс деньги">
+					<img src="/img/pay-methods/io.svg" alt="Яндекс деньги">
 				</div>
-				<h4>Оплатить через Яндекс.Деньги</h4>
+				<h4>Оплатить через Yoomoney</h4>
 				<div class="amount-wrap">
 					<label for="amount">Сумма пополнения: </label>
 					<input type="number" data-type="number" name="sum" id="amount" placeholder="0,00" required pattern="[0-9]+">
@@ -134,43 +117,17 @@ Breadcrumb::out();
 				<button type="submit">Оплатить</button>
 			</form>
 		</div>
-		<div class="pay-block" id="mobile">
-			<form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml">
-				<input type="hidden" name="receiver" value="410013982328385">
-				<input type="hidden" name="formcomment" value="Пополнение счета пользователя">
-				<input type="hidden" name="short-dest" value="">
-				<input type="hidden" name="label" value="account:<?=$_SESSION['user']?>">
-				<input type="hidden" name="quickpay-form" value="donate">
-				<input type="hidden" name="targets" value="Пополнение счета пользователя">
-				<input type="hidden" name="comment" value="Пополнение счета для <?=$_SESSION['user']?>">
-				<input type="hidden" name="need-fio" value="false">
-				<input type="hidden" name="need-email" value="false">
-				<input type="hidden" name="need-phone" value="false">
-				<input type="hidden" name="need-address" value="false">
-				<input type="hidden" name="paymentType" value="MC">
-				<input type="hidden" name="successURL" value="http://tahos.ru/account">
-				<div class="pay-logo">
-					<img src="img/pay-methods/mobile-phone.png" alt="Оплатить через мобильный">
-				</div>
-				<h4>Оплатить через мобильный телефон</h4>
-
-				<div class="amount-wrap">
-					<label for="amount">Сумма пополнения: </label>
-					<input type="number" data-type="number" name="sum" id="amount" placeholder="0,00" required pattern="[0-9]+">
-					<span>Руб.</span>
-				</div>
-				<p>При оплате через мобильного оператора, платеж автоматически не зачисляется. Сообщите об оплате администратору</p>
-				<button type="submit">Оплатить</button>
-			</form>
-		</div>
 		<div class="pay-block" id="cash">
 			<div class="pay-logo">
-				<img src="img/pay-methods/cash.png" alt="Оплатить наличными">
+				<img src="/img/pay-methods/cash.png" alt="Оплатить наличными">
 			</div>
 			<h4>Оплатить наличными в офисе</h4>
 			<p>Адреса:</p>
-			<p><a href="#">Вологда, Окружное шоссе 9Б</a></p>
-			<p><a href="#">Вологда, Окружное шоссе 9Б</a></p>
+            <?$issues = Database::getInstance()->select('issues', '*', "`accept_cash` = 1");?>
+            <?foreach($issues as $i){?>
+                <p><a href="#"><?=$i['adres']?></a></p>
+            <?}?>
+
 		</div>
 		<?if ($user['bonus_program']){?>
 			<div class="pay-block" id="bonus">

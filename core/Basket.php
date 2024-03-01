@@ -1,6 +1,6 @@
 <?php
 namespace core;
-use function Matrix\add;
+use core\Payment\Paykeeper;
 
 class Basket{
 	public static function get($user_id, $isToOrder = false, $flag = ''){
@@ -151,6 +151,7 @@ class Basket{
         $body = "<h1>Заказанные товары:</h1><table style='width: 100%;border-collapse: collapse;''>";
 
         $order_id = false;
+        $sum = 0;
         foreach ($res_basket as $value){
             if (!$value['isToOrder']) continue;
 
@@ -209,6 +210,7 @@ class Basket{
             if ($res !== true) die("$res | $db->last_query");
 
             $db->delete('basket', "`user_id`={$user['id']} AND store_id = {$value['store_id']} AND `item_id` = {$value['item_id']}");
+            $sum += $value['price'] * $value['quan'];
         }
         $body .= "</table>";
 
@@ -235,8 +237,9 @@ class Basket{
             exit();
         }
 
-        if (in_array($additional_options['pay_type'], ['Онлайн'])){
-            header("Location: /online_payment/$order_id");
+        if ($additional_options['pay_type'] == 'Онлайн'){
+            $link = Paykeeper::getLinkReplenishBill($sum, null, $order_id);
+            header("Location: $link");
             die();
         }
         return $order_id;

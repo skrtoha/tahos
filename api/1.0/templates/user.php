@@ -26,6 +26,20 @@ switch ($act){
             $bill_type = $userArrangement['bill_type'];
         }
 
+        if(isset($queryParams['order_id']) && $queryParams['order_id']){
+            $where = "`comment` LIKE 'Оплата заказа №{$queryParams['order_id']}: %'";
+        }
+        else{
+            $where = "
+                `user_id` = {$queryParams['user_id']} AND 
+                `sum` = {$queryParams['sum']} AND
+                `comment` = '{$queryParams['comment']}'
+            ";
+        }
+
+        $count = Database::getInstance()->getCount('funds', $where);
+
+        if ($count) break;
 
         if ($queryParams['act'] == 'minus'){
             User::returnMoney(

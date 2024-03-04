@@ -69,11 +69,14 @@ switch ($act){
         $issues->setIncome($income, true);
         break;
     case 'cancelItemsFromOrder':
-        $osiArray = explode(',', $queryParams);
-        foreach($osiArray as $osiString){
+        foreach($queryParams as $osiString){
             $osi = Synchronization::getArrayOSIFromString($osiString);
             $ov_result = core\OrderValue::get($osi);
             $ov = $ov_result->fetch_assoc();
+            if ($ov['status_id'] == 6) {
+                continue;
+            }
+            $ov['synchronized'] = 1;
             core\OrderValue::changeStatus(6, $ov);
         }
         break;

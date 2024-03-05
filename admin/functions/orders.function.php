@@ -61,11 +61,12 @@ function get_summ($order){
 function get_order_statuses($status){
 	global $db;
 	switch ($status) {
+        case 3:
+            $in = [12];
+            break;
         case 4:
         case 1: $in = array(13); break;
-		// case 2: $in = array(9); break;
         case 8:
-        case 3:
         case 6:
         case 2: $in = array(); break;
         case 5: $in = array(7); break;

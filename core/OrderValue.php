@@ -162,7 +162,7 @@ class OrderValue{
                 ])->fetch_assoc();
 				
 				//если предыдущий статус был заказано
-				if ($ov['status_id'] == 11){
+				if (in_array($ov['status_id'], [11, 3])){
 					User::updateReservedFunds($params['user_id'], $params['price'], 'minus', $params['pay_type']);
 				}
 

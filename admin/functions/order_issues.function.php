@@ -7,7 +7,7 @@ class Issues{
 		if ($user_id) $this->user_id = $user_id;
 		$this->db = $db;
 	}
-    //todo метод модернизирован только при использовании из админки, также нужна модифмкация для 1С
+
 	function setIncome($incomeList, $isRequestFrom1C = false): array
     {
         Database::getInstance()->startTransaction();
@@ -87,12 +87,6 @@ class Issues{
                 echo $issue_id;
                 exit();
             }
-
-            /*//если запрос пришел с 1С тогда проводить товар там не нужно
-            if (!$isRequestFrom1C){
-                $nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
-                core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);
-            }*/
 
             $output[$bill_type] = $issue_id;
 

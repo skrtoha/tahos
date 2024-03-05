@@ -4,6 +4,7 @@ namespace core\Payment;
 
 use core\Database;
 use core\Exceptions\Paykeeper\PaymentAlreadyExistsException;
+use core\Fund;
 use core\OrderValue;
 use core\User;
 
@@ -83,6 +84,62 @@ class Paykeeper{
         return self::$server."/bill/$invoice_id/";
     }
 
+    public static function getRefundsInfo($payment_id){
+        $base64 = base64_encode(self::$user.":".self::$password);
+        $headers = [];
+        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+        $headers[] = 'Authorization: Basic ' . $base64;
+        $uri = "/info/refunds/bypaymentid/?id=$payment_id";
+        $curl = curl_init();
+        curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($curl,CURLOPT_URL,self::$server.$uri);
+        curl_setopt($curl,CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($curl,CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl,CURLOPT_HEADER, false);
+
+        $response = curl_exec($curl);
+        return json_decode($response, true);
+    }
+
+    private static function dischargeBill($amount, $params){
+        $user = [];
+        if (isset($params['orderid']) && $params['orderid']) {
+           $orderInfo = OrderValue::getOrderInfo($params['orderid']);
+           $res_user = User::get(['user_id' => $orderInfo['user_id']]);
+           $comment = "Отмена оплаты по заказу №{$params['orderid']}: Возврат оплаты в сумме $amount руб.";
+        }
+        if (isset($params['clientid']) && $params['clientid']) {
+           $res_user = User::get(['full_name' => $params['clientid']]);
+           $comment = "Отмена пополнения счета: Возврат оплаты в сумме $amount руб.";
+        }
+        foreach($res_user as $value){
+            $user = $value;
+        }
+        if (empty($user)){
+            return false;
+        }
+
+        $update = [];
+
+        $remainder = $user['bill_cash'] - $amount;
+        $update['bill_cash'] = "`bill_cash` - $amount";
+
+        Database::getInstance()->startTransaction();
+        $res_insert = Fund::insert(2, [
+           'sum' => $amount,
+           'remainder' => $remainder,
+           'user_id' => $user['id'],
+           'paid' => 0,
+           'comment' => $comment,
+           'bill_type' => User::BILL_CASH
+        ]);
+        if ($res_insert === true){
+            User::update($user['id'], $update);
+            Database::getInstance()->commit();
+        }
+        return true;
+    }
+
     public static function setPayment($params){
         $mdString = $params['id']
             .number_format($params['sum'], 2, ".", "")
@@ -91,6 +148,13 @@ class Paykeeper{
             .self::$secret_seed;
         if ($params['key'] != md5($mdString)){
             return false;
+        }
+
+        if (isset($params['type']) && $params['type'] == 'cancel'){
+            self::setResponse($params['id']);
+            $refunds = self::getRefundsInfo($params['id']);
+            $refundInfo = array_pop($refunds);
+            return self::dischargeBill($refundInfo['amount'], $params);
         }
 
         try{
@@ -118,7 +182,8 @@ class Paykeeper{
         echo "OK $hash";
     }
 
-    private static function setPaymentOrder($params){
+    private static function setPaymentOrder($params): bool
+    {
         $orderInfo = OrderValue::getOrderInfo($params['orderid'], false);
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $params['obtain_datetime']);
         User::replenishBill([
@@ -136,7 +201,8 @@ class Paykeeper{
         return true;
     }
 
-    private static function setPaymentAccount($params) {
+    private static function setPaymentAccount($params): bool
+    {
         if ($params['client_email']){
             $where = ['email' => $params['client_email']];
         }

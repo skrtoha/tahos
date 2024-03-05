@@ -244,6 +244,14 @@ div[store_id][item_id] {
     border-color: #0082BF;
 }
 
+a.pay-order{
+    float: none;
+    display: block;
+    width: fit-content;
+    margin-bottom: 20px;
+    background: green;
+}
+
 @media screen and (max-width: 550px){
     #main {
         padding: 0 5px;

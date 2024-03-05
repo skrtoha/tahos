@@ -27,9 +27,8 @@ $status_classes = [
     <?if ($orderInfo['pay_type'] == 'Онлайн'){
         $paykeeperInvoice = Database::getInstance()->select_one('order_paykeeper_invoice', '*', "`order_id` = {$orderInfo['id']}");
         if (!$paykeeperInvoice['payed']){?>
-            <p style="color: #bd2130">
-                Заказ не оплачен!
-                <a href="<?= Paykeeper::getLinkPay($paykeeperInvoice['invoice_id'])?>">Оплатить</a>
+            <p>
+                <a class="button pay-order" href="<?= Paykeeper::getLinkPay($paykeeperInvoice['invoice_id'])?>">Оплатить заказ</a>
             </p>
         <?}?>
     <?}?>

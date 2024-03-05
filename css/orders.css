@@ -593,6 +593,13 @@ span.ordered_return.status_return_1 {
     font-size: 13px;
 }
 
+a.pay-order{
+    background: green;
+}
+a.pay-order:hover{
+    background: #4e9f4e;
+}
+
 @media only screen and (max-width: 750px) {
     div[data-name=returns] td.icon {
         position: absolute;

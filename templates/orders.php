@@ -3,6 +3,7 @@
 /** @global \core\Database $db */
 
 use core\Breadcrumb;
+use core\Payment\Paykeeper;
 
 require_once('admin/functions/orders.function.php');
 require_once('admin/functions/sendings.function.php');
@@ -539,6 +540,7 @@ Breadcrumb::out();
 					<th>Дата заказа</th>
 					<th>Статус</th>
 					<th>Сумма</th>
+                    <th></th>
 				</tr>
 				<?if (empty($orders)){?>
 					<tr>
@@ -561,7 +563,12 @@ Breadcrumb::out();
 								'returned' => preg_replace('/,$/', '', $order['returned'])
 							])?>
 							<i class="fa fa-rub" aria-hidden="true"></i>
-						</td>						
+						</td>
+                        <td>
+                            <?if ($order['invoice']){?>
+                                <a class="button pay-order" href="<?= Paykeeper::getLinkPay($order['invoice'])?>">Оплатить</a>
+                            <?}?>
+                        </td>
 					</tr>
 					<?}
 				}?>

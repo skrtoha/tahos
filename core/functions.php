@@ -238,10 +238,14 @@ function get_order_group($params, $flag = ''){
 			getOrderStatus(GROUP_CONCAT(ov.status_id)) AS status,
 			o.user_id,
 			o.is_draft,
-			o.is_new
+			o.is_new,
+            min(
+                if (topi.payed = 1, '', topi.invoice_id)
+            ) as invoice
 		FROM
 			#orders o
-		LEFT JOIN #orders_values ov ON ov.order_id=o.id
+		LEFT JOIN #orders_values ov ON ov.order_id = o.id
+		LEFT JOIN tahos_order_paykeeper_invoice topi on o.id = topi.order_id
 		WHERE
 			o.user_id={$_SESSION['user']} AND
 			o.is_draft = 0

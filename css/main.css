@@ -353,6 +353,7 @@ header .top-message.debt{
 }
 .top-message.telegram a{
     color: white;
+    text-decoration: underline;
 }
 
 header .catalog_btn {

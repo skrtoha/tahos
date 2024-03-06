@@ -969,6 +969,10 @@ tr.shown.button-row.empty td{
     padding: 18px 0;
 }
 
+.mobile-layout .articul{
+    z-index: auto;
+}
+
 @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
     /**
              * Remove all paddings around the image on small screen
@@ -1283,5 +1287,8 @@ tr.shown.button-row.empty td{
     #main {
         padding: 0 10px;
         margin-top: 10px;
+    }
+    #user_markup::before{
+        right: 0;
     }
 }

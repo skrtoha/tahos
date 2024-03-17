@@ -185,4 +185,24 @@ class Synchronization{
         ]);
         return $result;
     }
+    public static function set1CDocument(string $title, array $data){
+        $json = json_encode($data);
+        Database::getInstance()->insert(
+            '1c_documents',
+            [
+                'title' => $title,
+                'data' => $json
+            ],
+            ['duplicate' => [
+                'data' => $json
+            ]]
+        );
+    }
+    public static function get1CDocument($title){
+        $result = Database::getInstance()->select_one('1c_documents', "*", "`title` = '$title'");
+        if (!$result){
+            return [];
+        }
+        return json_decode($result['data'], true);
+    }
 }

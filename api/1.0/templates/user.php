@@ -7,6 +7,7 @@
 
 use core\Database;
 use core\Exceptions\NotFoundException;
+use core\Synchronization;
 use core\User;
 
 switch ($act){
@@ -26,20 +27,26 @@ switch ($act){
             $bill_type = $userArrangement['bill_type'];
         }
 
-        if(isset($queryParams['order_id']) && $queryParams['order_id']){
-            $where = "`comment` LIKE 'Оплата заказа №{$queryParams['order_id']}: %'";
-        }
-        else{
-            $where = "
-                `user_id` = {$queryParams['user_id']} AND 
-                `sum` = {$queryParams['sum']} AND
-                `comment` = '{$queryParams['comment']}'
-            ";
+        $document = Synchronization::get1CDocument($queryParams['document_title']);
+        if (!empty($document) && $queryParams['act'] == 'plus'){
+            if ($document['sum'] == $queryParams['sum']){
+                break;
+            }
+            $queryParams['previous_sum'] = $document['sum'];
+            $queryParams['bill_type'] = $bill_type;
+            $queryParams['fund_id'] = $document['fund_id'];
+            User::changeReplenishBill($queryParams);
+            break;
         }
 
-        $count = Database::getInstance()->getCount('funds', $where);
-
-        if ($count) break;
+        if ($queryParams['act'] == 'unset'){
+            $countFundDistribution = $db->getCount('fund_distribution', "`replenishment_id` = {$document['fund_id']}");
+            if ($countFundDistribution){
+                throw new Exception('Имеются оплаченные выдачи. Отмена проведения невозможна!');
+            }
+            User::unsetReplenishBill($queryParams);
+            break;
+        }
 
         if ($queryParams['act'] == 'minus'){
             User::returnMoney(
@@ -51,22 +58,12 @@ switch ($act){
             break;
         }
 
-        $count = Database::getInstance()->getCount(
-            'funds',
-            "
-                `user_id` = {$queryParams['user_id']} AND 
-                `sum` = {$queryParams['sum']} AND
-                `comment` = '{$queryParams['comment']}'
-            "
-        );
-
-        if ($count) break;
-
         User::replenishBill([
             'user_id' => $queryParams['user_id'],
             'sum' => $queryParams['sum'],
             'comment' => $queryParams['comment'],
-            'bill_type' => $bill_type
+            'bill_type' => $bill_type,
+            'document_title' => $queryParams['document_title']
         ]);
     break;
     case 'setArrangement':

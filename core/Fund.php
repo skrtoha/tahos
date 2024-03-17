@@ -38,12 +38,13 @@ class Fund{
 	}
 
     /**
-     * @param $where
-     * @param $having
-     * @param $order
+     * @param string $where
+     * @param string $having
+     * @param string $order
      * @return string
      */
-	public static function getQueryListFunds($where = '', $having = '', $order = ''){
+	public static function getQueryListFunds(string $where = '', string $having = '', string $order = ''): string
+    {
 		if ($where) $where = "WHERE $where";
 		if (!$order) $order = "f.id DESC";
 		if ($having) $having = "HAVING $having";
@@ -69,4 +70,18 @@ class Fund{
 			ORDER BY $order
 		";
 	}
+
+    public static function setFundDistribution($debit_id, $replenishment_id, $sum){
+        Database::getInstance()->insert(
+            'fund_distribution',
+            [
+                'debit_id' => $debit_id,
+                'replenishment_id' => $replenishment_id,
+                'sum' => $sum
+            ],
+            ['duplicate' => [
+                'sum' => $sum
+            ]]
+        );
+    }
 }

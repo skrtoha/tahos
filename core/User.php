@@ -446,24 +446,17 @@ class User{
                     ['paid' => $row['paid'] + $remain],
                     "id = {$row['id']}"
                 );
-                Database::getInstance()->insert('fund_distribution', [
-                    'debit_id' => $row['id'],
-                    'replenishment_id' => $replenishment_id,
-                    'sum' => $remain
-                ]);
+                Fund::setFundDistribution($row['id'], $replenishment_id, $remain);
                 break;
             }
             $remain = $remain - $difference;
+            $sum = $row['paid'] + $difference;
             Database::getInstance()->update(
                 'funds',
-                ['paid' => $row['paid'] + $difference],
+                ['paid' => $sum],
                 "id = {$row['id']}"
             );
-            Database::getInstance()->insert('fund_distribution', [
-                'debit_id' => $row['id'],
-                'replenishment_id' => $replenishment_id,
-                'sum' => $difference
-            ]);
+            Fund::setFundDistribution($row['id'], $replenishment_id, $sum);
         }
     }
 
@@ -473,7 +466,7 @@ class User{
         $res_user = User::get(['user_id' => $params['user_id']]);
         foreach ($res_user as $value) $user = $value;
 
-        if (empty($user)) return;
+        if (empty($user)) return false;
 
         if($params['bill_type'] == User::BILL_CASH){
             $params['remainder'] = $user['bill_cash'] + $params['sum'];
@@ -487,8 +480,18 @@ class User{
         Fund::insert(1, $params);
         Database::getInstance()->update('users', $arrayUser, '`id`='.$params['user_id']);
         User::checkOverdue($params['user_id'], $params['sum']);
-        User::checkDebt($params['user_id'], $_POST['sum'], $params['bill_type'], Fund::$last_id);
+        User::checkDebt($params['user_id'], $params['sum'], $params['bill_type'], Fund::$last_id);
+
+        if (isset($params['document_title'])){
+            $data = [
+                'fund_id' => Fund::$last_id,
+                'sum' => $params['sum']
+            ];
+            Synchronization::set1CDocument($params['document_title'], $data);
+        }
+
         Database::getInstance()->commit();
+        return true;
     }
 
     public static function setSparePartsRequest($params){
@@ -594,5 +597,184 @@ class User{
         );
         Database::getInstance()->commit();
 
+    }
+
+    public static function changeReplenishBill($params){
+        if ($params['previous_sum'] > $params['sum']){
+            $result = self::changeReplenishBillDecrease($params);
+        }
+        if ($params['previous_sum'] < $params['sum']){
+            $result = self::changeReplenishBillIncrease($params);
+        }
+        if ($result){
+            $data = [
+                'fund_id' => $params['fund_id'],
+                'sum' => $params['sum']
+            ];
+            Synchronization::set1CDocument($params['document_title'], $data);
+        }
+        return false;
+    }
+
+    private static function changeReplenishBillDecrease($params): bool
+    {
+        $result = User::get(['user_id' => $params['user_id']]);
+        $user = [];
+        foreach($result as $value){
+            $user = $value;
+        }
+        $remain = $params['previous_sum'] - $params['sum'];
+        if ($params['bill_type'] == User::BILL_CASH){
+            $bill = $user['bill_cash'];
+            $field = 'bill_cash';
+        }
+        else{
+            $bill = $user['bill_cashless'];
+            $field = 'bill_cashless';
+        }
+
+        $db = Database::getInstance();
+        $db->startTransaction();
+
+        $remainder = $bill - $remain;
+        User::update($params['user_id'], [
+            $field => $remainder
+        ]);
+        if ($remainder >= 0){
+            $db->update(
+                'funds',
+                ['sum' => $params['sum'], 'remainder' => $remainder],
+                "`id` = {$params['fund_id']}"
+            );
+            $db->commit();
+            return true;
+        }
+
+        $remain = abs($remainder);
+
+        $query = self::getQueryDebt(
+            "f.paid > 0 AND f.user_id = {$params['user_id']} AND f.issue_id IS NOT NULL AND `bill_type` = {$params['bill_type']}",
+            'f.created DESC'
+        );
+        $result = $db->query($query);
+
+        if (!$result->num_rows){
+            return true;
+        };
+
+        self::parseUnsetFund($result, $remain, $params['fund_id']);
+
+        $db->update(
+            'funds',
+            ['sum' => $params['sum'], 'remainder' => $remainder],
+            "`id` = {$params['fund_id']}"
+        );
+        $db->commit();
+        return true;
+    }
+
+    private static function parseUnsetFund(mysqli_result $result, $remain, $fund_id){
+        $db = Database::getInstance();
+        foreach($result as $row){
+            if ($remain == 0){
+                break;
+            }
+            $whereFunds = "`id` = {$row['id']}";
+            $whereDistribution = "`debit_id` = {$row['id']} AND `replenishment_id` = $fund_id";
+            if ($row['paid'] <= $remain){
+                $db->update('funds', ['paid' => 0], $whereFunds);
+                $remain -= $row['paid'];
+                $db->delete('fund_distribution', $whereDistribution);
+                continue;
+            }
+
+            $sum = $row['paid'] - $remain;
+            $db->update('funds', ['paid' => $sum], $whereFunds);
+            $db->update('fund_distribution', ['sum' => $sum], $whereDistribution);
+            $remain = 0;
+        }
+    }
+
+    private static function changeReplenishBillIncrease($params): bool
+    {
+        Database::getInstance()->startTransaction();
+
+        $sum = $params['sum'] - $params['previous_sum'];
+        $res_user = User::get(['user_id' => $params['user_id']]);
+        foreach ($res_user as $value){
+            $user = $value;
+        }
+
+        if (empty($user)){
+            return false;
+        }
+
+        $remainder = $user['bill_cash'] + $sum;
+        if($params['bill_type'] == User::BILL_CASH){
+            $arrayUser = ['bill_cash' => $remainder];
+        }
+        else{
+            $arrayUser = ['bill_cashless' => $remainder];
+        }
+
+        User::update($params['user_id'], $arrayUser);
+        User::checkOverdue($params['user_id'], $sum);
+        User::checkDebt($params['user_id'], $sum, $params['bill_type'], $params['fund_id']);
+
+        Database::getInstance()->update(
+            'funds',
+            ['sum' => $params['sum'], 'remainder' => $remainder],
+            "`id` = {$params['fund_id']}"
+        );
+
+        Database::getInstance()->commit();
+
+        return true;
+    }
+
+    public static function unsetReplenishBill($params){
+        $db = Database::getInstance();
+        $db->startTransaction();
+
+        $result = User::get(['user_id' => $params['user_id']]);
+        $user = [];
+        foreach($result as $value){
+            $user = $value;
+        }
+        if ($params['bill_type'] == User::BILL_CASH){
+            $bill = $user['bill_cash'];
+            $field = 'bill_cash';
+        }
+        else{
+            $bill = $user['bill_cashless'];
+            $field = 'bill_cashless';
+        }
+        $remainder = $bill - $params['sum'];
+
+        User::update($params['user_id'], [
+            $field => $remainder
+        ]);
+
+        if ($remainder >= 0){
+            return true;
+        }
+
+        $query = self::getQueryDebt(
+            "f.paid > 0 AND f.user_id = {$params['user_id']} AND f.issue_id IS NOT NULL AND `bill_type` = {$params['bill_type']}",
+            'f.created DESC'
+        );
+        $result = $db->query($query);
+
+        if (!$result->num_rows){
+            return true;
+        };
+
+        $remain = abs($remainder);
+        self::parseUnsetFund($result, $remain, $params['fund_id']);
+
+        $db->delete('funds', "`id` = {$params['fund_id']}");
+        $db->delete('1c_documents', "`title` = '{$params['document_title']}'");
+
+        $db->commit();
     }
 }

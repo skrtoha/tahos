@@ -1,4 +1,8 @@
-<?php  
+<?php
+
+use core\OrderValue;
+use core\Synchronization;
+
 ini_set('error_reporting', E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -77,6 +81,17 @@ switch ($_POST['act']){
         $values['date_issue'] = $dateTimeObject->format('Y-m-d');
         $values['entire_order'] = $values['entire_order'] ?? 0;
         $db->update('orders', $values, "`id` = {$_POST['order_id']}");
+        break;
+    case 'set_1c_return':
+        $data = $_POST['items'][0];
+        $orderInfo = OrderValue::get(['order_id' => $data['order_id']])->fetch_assoc();
+        $params = [
+            'user_id' => $orderInfo['user_id'],
+            'item_id' => $data['item_id'],
+            'quan' => $data['quan'],
+            'arrangement_uid' => $orderInfo['arrangement_uid']
+        ];
+        Synchronization::createReturn($params);
         break;
 }
 if ($res) echo true;

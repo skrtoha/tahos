@@ -307,9 +307,19 @@ $(function(){
 				items: data
 			},
 			success: function(response){
-				$.cookie('message', 'Возврат успешно оформлен', cookieOptions);
-				$.cookie('message_type', 'ok', cookieOptions);
-				document.location.reload();
+                $.ajax({
+                    url: '/ajax/order.php',
+                    type: 'post',
+                    data: {
+                        act: 'set_1c_return',
+                        items: data
+                    },
+                    success: response => {
+                    }
+                })
+                $.cookie('message', 'Возврат успешно оформлен', cookieOptions);
+                $.cookie('message_type', 'ok', cookieOptions);
+                document.location.reload();
 			}
 		})
 		return false;

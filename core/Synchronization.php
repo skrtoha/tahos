@@ -205,4 +205,8 @@ class Synchronization{
         }
         return json_decode($result['data'], true);
     }
+    public static function createReturn($params){
+        $result = self::httpQuery('create-return', $params);
+        return $result;
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 namespace core\Provider;
+use core\Exceptions\Autopiter\ErrorArticleId;
 use core\Provider;
 use core\Log;
 use core\OrderValue;
@@ -145,13 +146,17 @@ class Autopiter extends Provider{
 		$brends[$brend] = $output;
 		return $output;
 	}
-	private static function getArticleIdByBrendAndArticle($brend, $article){
+
+    /**
+     * @throws ErrorArticleId
+     */
+    private static function getArticleIdByBrendAndArticle($brend, $article){
 		$client = self::getClient();
 		try{
 			$result = $client->FindCatalog(["Number" => $article]);
 		}
 		catch(\SoapFault $e){
-			return false;
+			throw new ErrorArticleId($e->getMessage());
 		}
 		$items = $result->FindCatalogResult->SearchCatalogModel;
 		$brend = self::getBrend($brend);

@@ -777,4 +777,12 @@ class User{
 
         $db->commit();
     }
+
+    public static function getUserArrangement1C($user_id, $arrangement){
+        return Database::getInstance()->select_one(
+            'user_1c_arrangements',
+            '*',
+            "`user_id` = {$user_id} AND `uid` = '$arrangement'"
+        );
+    }
 }

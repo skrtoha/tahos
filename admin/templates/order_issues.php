@@ -5,8 +5,12 @@ use core\User;
 require_once("{$_SERVER['DOCUMENT_ROOT']}/admin/functions/orders.function.php");
 $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
 $issues = new Issues($db, $user_id);
-if (isset($_GET['ajax'])) $issues->getAjax();
-if ($_GET['act'] == 'print') $issues->print($_GET['issue_id']);
+if (isset($_GET['ajax'])) {
+    $issues->getAjax($_GET);
+}
+if ($_GET['act'] == 'print') {
+    $issues->print($_GET['issue_id']);
+}
 $status = "<a href='/admin'>Главная</a> > ";
 if ($_GET['user_id'] && !$_GET['issued']){
 	if (!empty($_POST['income'])){

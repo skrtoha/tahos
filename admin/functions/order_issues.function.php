@@ -3,6 +3,7 @@ use core\Database;
 use core\User;
 class Issues{
 	public $user_id;
+    public Database $db;
 	function __construct($db, $user_id = null){
 		if ($user_id) $this->user_id = $user_id;
 		$this->db = $db;
@@ -63,7 +64,9 @@ class Issues{
                     'item_id' => $a[1],
                     'issued' => $issued
                 ];
-                if ($isRequestFrom1C) $array['synchronized'] = 1;
+                if ($isRequestFrom1C) {
+                    $array['synchronized'] = 1;
+                }
 
                 core\OrderValue::changeStatus(1, $array, true);
             }
@@ -95,10 +98,37 @@ class Issues{
         return $output;
 
 	}
-	protected function getOrderIssues(){
-		if ($_GET['user_id']) $where = "WHERE oi.user_id={$_GET['user_id']}";
+
+    public function getByOSI($osi){
+        $where = '';
+        if (!is_array($osi)){
+            $osi = [$osi];
+        }
+        if (empty($osi)){
+            return [];
+        }
+        foreach($osi as $row){
+            $o = explode('-', $row);
+            $where .= "(oiv.order_id={$o[0]} AND oiv.store_id={$o[1]} AND oiv.item_id={$o[2]}) OR ";
+        }
+        $where = substr($where, 0, -4);
+        return $this->db->query("
+            SELECT
+                min(oiv.order_id) as order_id,
+                min(oiv.store_id) as store_id,
+                min(oiv.item_id) as item_id,
+                sum(oiv.issued) as issued
+            FROM
+                #order_issue_values oiv
+            WHERE $where
+            GROUP BY oiv.order_id, oiv.store_id, oiv.item_id
+        ", '');
+    }
+
+	protected function getOrderIssues($params){
+		if ($params['user_id']) $where = "WHERE oi.user_id={$params['user_id']}";
 		else $where = null;
-		$start = ($_GET['pageNumber'] - 1) * $_GET['pageSize'];
+		$start = ($params['pageNumber'] - 1) * $params['pageSize'];
 		$res = $this->db->select_unique("
 			SELECT
 				oiv.issue_id,
@@ -115,12 +145,12 @@ class Issues{
 			GROUP BY oiv.issue_id
 			ORDER BY	
 				oi.created DESC
-			LIMIT $start, {$_GET['pageSize']}
+			LIMIT $start, {$params['pageSize']}
 		", '');
 		return $res;
 	}
-	protected function commonList(){
-		echo json_encode($this->getOrderIssues());
+	protected function commonList($params){
+		echo json_encode($this->getOrderIssues($params));
 	}
     public static function getQueryIssueValues($fields){
         $where = '';
@@ -160,12 +190,12 @@ class Issues{
         $query .= " LIMIT $start, {$_GET['pageSize']}";
 		return $this->db->select_unique($query, '');
 	}
-	function getAjax(){
+	function getAjax($params){
 		// debug($_GET);
-		switch($_GET['ajax']){
-			case 'common_list': $this->commonList(); break;
+		switch($params['ajax']){
+			case 'common_list': $this->commonList($params); break;
 			case 'user_issue_values':
-				$issue_values = $this->getIssueValues($_GET['user_id']);
+				$issue_values = $this->getIssueValues($params['user_id']);
 				echo json_encode($issue_values);
 				break;
 		}

@@ -16,11 +16,7 @@ switch ($act){
             $bill_type = $queryParams['bill_type'];
         }
         else{
-            $userArrangement = Database::getInstance()->select_one(
-                'user_1c_arrangements',
-                '*',
-                "`user_id` = {$queryParams['user_id']} AND `uid` = '{$queryParams['arrangement']}'"
-            );
+            $userArrangement = User::getUserArrangement1C($queryParams['user_id'], $queryParams['arrangement']);
             if (!$userArrangement){
                 break;
             }

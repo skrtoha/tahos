@@ -44,28 +44,40 @@ switch ($act){
         $result = $changedOrders;
         break;
     case 'setStatusIssued':
-        $orderValues = [];
-        $orderValuesResult = \core\OrderValue::get(['osi' => array_keys($queryParams)]);
-        $isAllItemsIssued = [];
-        foreach($orderValuesResult as $ov){
-            $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
-            if ($ov['issued'] >= $queryParams[$osi]) $isAllItemsIssued[$osi] = true;
-            else $isAllItemsIssued = false;
-
-            $user_id = $ov['user_id'];
+        $arrangement = User::getUserArrangement1C($queryParams['user_id'], $queryParams['arrangement']);
+        if (!$arrangement){
             break;
         }
 
+        $osi = array_keys($queryParams['items']);
+
+        require_once ($_SERVER['DOCUMENT_ROOT'].'/admin/functions/order_issues.function.php');
+        $issuesObject = new Issues(Database::getInstance());
+        $issued = $issuesObject->getByOSI($osi);
+
+        $isAllItemsIssued = [];
+        foreach($issued as $ov){
+            $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+            if ($ov['issued'] >= $queryParams['items'][$osi]){
+                $isAllItemsIssued[$osi] = true;
+            }
+            else {
+                $isAllItemsIssued[$osi] = false;
+            }
+        }
+
         $income = [];
-        foreach($queryParams as $key => $value){
+        foreach($queryParams['items'] as $key => $value){
             $array = explode('-', $key);
-            if ($isAllItemsIssued[$key]) continue;
-            $income["{$array[0]}:{$array[2]}:{$array[1]}"] = $value;
+            if ($isAllItemsIssued[$key]){
+                continue;
+            }
+            $income[$arrangement['bill_type']]["{$array[0]}:{$array[2]}:{$array[1]}"] = $value;
         }
 
         if (empty($income)) break;
 
-        $issues = new \Issues($db, $user_id);
+        $issues = new \Issues($db, $queryParams['user_id']);
         $issues->setIncome($income, true);
         break;
     case 'cancelItemsFromOrder':

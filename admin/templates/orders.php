@@ -71,7 +71,7 @@ switch ($act) {
 		$all = $db->getCount('orders_values', "`status_id` = {$_GET['status_id']}");
 		$page = $_GET['page'] ? $_GET['page'] : 1;
 		$chank = getChank($all, $perPage, $linkLimit, $page);
-		$start = $chank[$page] ? $chank[$page] : 0;
+		$start = $chank[$page] ?: 0;
 		$res_order_values = OrderValue::get([
 			'status_id' => $_GET['status_id'],
 			'limit' => "$start, $perPage"
@@ -86,12 +86,20 @@ function view(){
 	global $status, $db, $page_title, $settings;
 	require_once('templates/pagination.php');
 	if ($_GET['search'] || $_GET['status']){
-		if (is_numeric($_GET['search'])) $where = "WHERE o.id={$_GET['search']}";
-		else{
+		$having = '';
+        if (is_numeric($_GET['search'])){
+            $where = "WHERE o.id={$_GET['search']}";
+        }
+		elseif($_GET['search']){
 			$where = '';
-			$having = "HAVING fio LIKE '%{$_GET['search']}%'";
+			$having = "fio LIKE '%{$_GET['search']}%' AND ";
 		} 
-		if ($_GET['status']) $having .= " AND status='{$_GET['status']}'";
+		if ($_GET['status']){
+            $having .= "status='{$_GET['status']}' AND ";
+        }
+        if ($having){
+            $having = "HAVING ".substr($having, 0, -4);
+        }
 		$page_title = 'Поиск по номену или ФИО';
 		$status = "<a href='/admin'>Главная</a> > <a href='?view=orders'>Заказы</a> > $page_title";
 	}
@@ -99,24 +107,11 @@ function view(){
 		$page_title = "Заказы";
 		$status = "<a href='/admin'>Главная</a> > $page_title";
 	}
-	$res_all = $db->query("
-		SELECT
-			o.id
-		FROM
-			#orders o
-		LEFT JOIN #orders_values ov ON ov.order_id=o.id
-		$where
-		GROUP BY o.id
-		$having
-	", '');
-	$all = $res_all->num_rows;
 	$perPage = 30;
 	$linkLimit = 10;
-	$page = $_GET['page'] ? $_GET['page'] : 1;
-	$chank = getChank($all, $perPage, $linkLimit, $page);
-	$start = $chank[$page] ? $chank[$page] : 0;
-	$orders = $db->query("
-		SELECT
+	$page = $_GET['page'] ?: 1;
+    $query = "
+		SELECT SQL_CALC_FOUND_ROWS
 			o.id,
 			DATE_FORMAT(o.created, '%d.%m.%Y %H:%i') AS date,
 			GROUP_CONCAT(ov.price) AS prices,
@@ -143,9 +138,16 @@ function view(){
 		$where
 		GROUP BY ov.order_id
 		$having
-		ORDER BY o.is_new DESC, o.created DESC
+	";
+    $db->query($query, '');
+    $all = $db->found_rows();
+	$chank = getChank($all, $perPage, $linkLimit, $page);
+	$start = $chank[$page] ?: 0;
+    $query .= "
+        ORDER BY o.is_new DESC, o.created DESC
 		LIMIT $start,$perPage
-	", '');
+    ";
+	$orders = $db->query($query, '');
 	?>
 	<div id="total" style="margin-top: 10px;">Всего: <?=$all?></div>
 	<div class="actions">

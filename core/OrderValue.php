@@ -455,6 +455,9 @@ class OrderValue{
 		if (!empty($params)) {
             $where = self::getWhere($params);
         }
+        if ($params['limit']){
+            $limit = "LIMIT {$params['limit']}";
+        }
 
         /** @var Database $db */
         $db = Database::getInstance();

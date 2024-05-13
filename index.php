@@ -17,6 +17,25 @@ require_once('vendor/autoload.php');
 
 $db = new core\Database();
 
+$result = $db->query("
+    select
+        id,
+        comment
+    from
+        tahos.tahos_funds f
+    where created >= '2023-07-24' and comment like '%от%'
+        and document_date is null
+");
+foreach($result as $row){
+    $str = preg_replace('/.* от/', '', $row['comment']);
+    $str = trim($str);
+    $dateTime = DateTime::createFromFormat('d.m.Y H:i:s', $str);
+    if (!$dateTime){
+        continue;
+    }
+    $db->update('funds', ["document_date" => $dateTime->format('Y-m-d H:i:s')], "id = {$row['id']}");
+}
+
 $connection = new core\Connection($db);
 if ($connection->denyAccess) die('Доступ к данной странице с Вашего ip запрещен');
 $db->connection_id = $connection->connection_id;

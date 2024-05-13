@@ -477,6 +477,11 @@ class User{
             $arrayUser = ['bill_cashless' => $params['remainder']];
         }
 
+        if (isset($params['document_date'])){
+            $dateTime = (\DateTime::createFromFormat('d.m.Y H:i:s', $params['document_date']));
+            $params['document_date'] = $dateTime->format('Y-m-d H:i:s');
+        }
+
         Fund::insert(1, $params);
         Database::getInstance()->update('users', $arrayUser, '`id`='.$params['user_id']);
         User::checkOverdue($params['user_id'], $params['sum']);
@@ -572,12 +577,24 @@ class User{
         return $output[$user_id];
     }
 
-    public static function returnMoney($user_id, $amount, $comment = 'Возврат средств', $bill_type = User::BILL_CASH){
+    public static function returnMoney($user_id, $amount, $comment = 'Возврат средств', $bill_type = User::BILL_CASH, $document_date = null){
         $user = [];
         $res_user = User::get(['user_id' => $user_id]);
         foreach ($res_user as $value) $user = $value;
 
-        $remainder = $user['bill_cash'] - $amount;
+        $remainder = 0;
+        if ($bill_type == User::BILL_CASH) {
+            $remainder = $user['bill_cash'] + $amount;
+        }
+        if ($bill_type == User::BILL_CASHLESS) {
+            $remainder = $user['bill_cashless'] + $amount;
+        }
+
+        if ($document_date){
+            $dateTime = (\DateTime::createFromFormat('d.m.Y H:i:s', $document_date));
+            $document_date = $dateTime->format('Y-m-d H:i:s');
+        }
+
         Database::getInstance()->startTransaction();
         try{
             Fund::insert(2, [
@@ -585,18 +602,19 @@ class User{
                 'remainder' => $remainder,
                 'user_id' => $user_id,
                 'comment' => $comment,
+                'document_date' => $document_date,
                 'bill_type' => $bill_type
             ]);
         }
         catch (\Throwable $ex){
             return;
         }
-        User::update(
-            $user_id,
-            ['bill_cash' => $remainder]
-        );
-        Database::getInstance()->commit();
+        User::checkDebt($user_id, $amount, $bill_type, Fund::$last_id);
 
+        $field = $bill_type == User::BILL_CASH ? 'bill_cash' : 'bill_cashless';
+        User::update($user_id, [$field => $remainder]);
+
+        Database::getInstance()->commit();
     }
 
     public static function changeReplenishBill($params){

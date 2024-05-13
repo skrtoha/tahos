@@ -25,7 +25,8 @@ class Fund{
             'issue_id' => $fields['issue_id'] ?? null,
 			'overdue' => $fields['overdue'] ?? 0,
 			'comment' => $fields['comment'],
-            'bill_type' => $fields['bill_type']
+            'document_date' => $fields['document_date'] ?? null,
+            'bill_type' => $fields['bill_type'],
 		];
 		if ($type_operation == 1) $insert['is_new'] = 1;
 

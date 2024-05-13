@@ -23,8 +23,32 @@ switch ($act){
             $bill_type = $userArrangement['bill_type'];
         }
 
+        if (!$bill_type){
+            break;
+        }
+
+        if ($queryParams['document_date']) {
+            $dateTime = DateTime::createFromFormat('d.m.Y H:i:s', $queryParams['document_date']);
+            $from = $dateTime->format('Y-m-d').' 00:00:00';
+            $to = $dateTime->format('Y-m-d').' 23:59:59';
+            $result = Database::getInstance()->query("
+            SELECT
+                *
+                FROM #funds
+            WHERE
+                `user_id` = {$queryParams['user_id']} 
+                AND `sum` = {$queryParams['sum']}
+                AND `bill_type` = $bill_type
+                AND `document_date` BETWEEN '$from' and '$to'
+        ");
+            if ($result->num_rows) {
+                break;
+            }
+        }
+
         $document = Synchronization::get1CDocument($queryParams['document_title']);
-        if (!empty($document) && $queryParams['act'] == 'plus'){
+
+        if ($queryParams['act'] == 'plus' && !empty($document)){
             if ($document['sum'] == $queryParams['sum']){
                 break;
             }
@@ -32,6 +56,10 @@ switch ($act){
             $queryParams['bill_type'] = $bill_type;
             $queryParams['fund_id'] = $document['fund_id'];
             User::changeReplenishBill($queryParams);
+            break;
+        }
+
+        if (!empty($document)){
             break;
         }
 
@@ -49,8 +77,10 @@ switch ($act){
                 $queryParams['user_id'],
                 $queryParams['sum'],
                 $queryParams['comment'],
-                $bill_type
+                $bill_type,
+                $queryParams['document_date']
             );
+            Synchronization::set1CDocument($queryParams['document_title'], $queryParams);
             break;
         }
 
@@ -59,7 +89,8 @@ switch ($act){
             'sum' => $queryParams['sum'],
             'comment' => $queryParams['comment'],
             'bill_type' => $bill_type,
-            'document_title' => $queryParams['document_title']
+            'document_title' => $queryParams['document_title'],
+            'document_date' => $queryParams['document_date'] ?? ''
         ]);
     break;
     case 'setArrangement':

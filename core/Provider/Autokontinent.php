@@ -17,7 +17,7 @@ class Autokontinent extends Provider{
 
 	private static $mainStores = [
 		'Череповец' => 7,
-		'Петербург' => 1,
+		'СПб Юг' => 1,
         'Вологда' => 9
 	];
 

@@ -116,6 +116,9 @@ switch($_GET['act']){
     case 'orderEmex':
         $ordered = Provider\Emex::sendOrder();
         break;
+    case 'orderAbsel':
+        $ordered = Provider\Absel::sendOrder();
+        break;
 	case 'getItemsVoshod':
 		$abcp = new core\Provider\Abcp(NULL, $db);
 		$countTransaction = 50;

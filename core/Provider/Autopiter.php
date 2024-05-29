@@ -108,7 +108,8 @@ class Autopiter extends Provider{
             }
         }
 	}
-	public static function getItemsToOrder($provider_id){
+	public static function getItemsToOrder($provider_id): array
+    {
 		$output = [];
 		$basket = self::getBasket('entity');
         self::setOutputItemsToOrder($output, $basket);

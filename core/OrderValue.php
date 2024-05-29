@@ -2,6 +2,7 @@
 namespace core;
 
 use core\Messengers\Telegram;
+use core\Provider\Absel;
 use core\Provider\Autoeuro;
 use core\Provider\Berg;
 use core\Provider\Emex;
@@ -410,6 +411,9 @@ class OrderValue{
             switch($key){
                 case 'osi':
                     $where .= "(";
+                    if (!is_array($value)) {
+                        $value = [$value];
+                    }
                     foreach($value as $v){
                         $array = explode('-', $v);
                         $where .= "(ov.order_id = {$array[0]} AND ov.store_id = {$array[1]} AND ov.item_id = {$array[2]}) OR ";
@@ -594,6 +598,9 @@ class OrderValue{
 				Provider\Autokontinent::addToBasket($ov);
 				if ($automaticOrder) self::$countOrdered = Provider\Autokontinent::sendOrder();
 				break;
+            case 40: //ТД Столица
+                self::$countOrdered = Absel::addToBasket($ov);
+                break;
 			case Provider\Autopiter::getParams()->provider_id:
 				Provider\Autopiter::addToBasket($ov); 
 				if ($automaticOrder) self::$countOrdered = Provider\Autopiter::sendOrder();

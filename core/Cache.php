@@ -39,4 +39,9 @@ class Cache{
         return $self->classCache->delete($key);
     }
 
+    public static function getResult() {
+        $self = self::getInstance();
+        return $self->classCache->getResultCode();
+    }
+
 }

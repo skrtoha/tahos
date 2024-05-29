@@ -19,8 +19,9 @@
       "ext-dom": "*",
 	  "ext-simplexml": "*",
 	  "ext-libxml": "*",
-      "ext-memcache": "*"
-	},
+      "ext-memcache": "*",
+      "ext-memcached": "*"
+    },
     "autoload": {
         "psr-4": {
             "core\\": "core"

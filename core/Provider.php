@@ -509,6 +509,11 @@ abstract class Provider{
 	}
 	protected static function getProviderBrend($provider_id, $brend): string
 	{
+        static $output;
+        $key = "$provider_id-$brend";
+        if (isset($output[$key])){
+            return $output[$provider_id];
+        }
 		$res = self::getInstanceDataBase()->query("
 			SELECT
 				pb.title
@@ -521,6 +526,7 @@ abstract class Provider{
 		", '');
 		if (!$res->num_rows) return $brend;
 		$array = $res->fetch_assoc();
+        $output[$key] = $array['title'];
 		return $array['title'];
 	}
 

@@ -3,6 +3,7 @@
 
 use core\Breadcrumb;
 use core\Exceptions\NotFoundException;
+use core\Provider\Absel;
 use core\Provider\Autoeuro;
 use core\Provider\Emex;
 
@@ -41,6 +42,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
         Emex::setArticle($abcp->item['brend_id'], $abcp->item['article'], $_GET['item_id']);
     }
     catch (\Throwable $e){}
+
+    Absel::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
     exit();
 }

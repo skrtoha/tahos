@@ -301,7 +301,7 @@ class Abcp extends Provider{
 				'store_id' => $store_id,
 				'item_id' => $item_id,
 				'price' => ceil($item['price']),
-				'packaging' => $item['packing'] ? $item['packing'] : 1,
+				'packaging' => $item['packing'] ?: 1,
 				'in_stock' => $item['availability']
 			],
 			[

@@ -3,6 +3,7 @@
 namespace core;
 
 use core\Provider\Abcp;
+use core\Provider\Absel;
 use core\Provider\Armtek;
 use core\Provider\Autokontinent;
 use core\Provider\Autopiter;
@@ -67,6 +68,8 @@ class Search{
         self::setCoincidences(Autopiter::getCoincidences($search));
 
         self::setCoincidences(Berg::getCoincidences($search));
+
+        self::setCoincidences(Absel::getSearch($search));
 
         return self::$coincidences;
     }

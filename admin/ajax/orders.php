@@ -90,36 +90,6 @@ switch($_POST['status_id']){
 				`id`={$post['user_id']}
 		", '');
 		break;
-    //todo удалить действие, реализовано в другом месте
-	/*case 'issued_new':
-		$db->query("
-			UPDATE 
-				#orders_values 
-			SET 
-				`issued` = `issued` + {$_POST['issued_new']}
-			WHERE $where
-		", '');
-		$db->insert(
-			'funds',
-			[
-				'type_operation' => 2,
-				'sum' => $_POST['price'] * $_POST['issued_new'],
-				'remainder' => $_POST['bill'] - $_POST['price'] * $_POST['issued_new'],
-				'user_id' => $_POST['user_id'],
-				'comment' => 'Списание средств на оплату "'.$title.'"'
-			],
-			['print_query' => false]
-		);
-		$db->query("
-			UPDATE
-				#users
-			SET
-				`reserved_funds`=`reserved_funds` - {$_POST['price']} * {$_POST['issued_new']},
-				`bill`=`bill` - {$_POST['price']} * {$_POST['issued_new']}
-			WHERE
-				`id`={$_POST['user_id']}
-		", '');
-		break;*/
 	case 'return_to_basket':
 		foreach($post['data'] as $row){
             $order_id = $row['order_id'];
@@ -211,16 +181,3 @@ switch($_POST['status_id']){
 	default:
 		core\OrderValue::changeStatus($_POST['status_id'], $_POST);
 }
-
-/*switch($_POST['status_id']){
-	case 2://возврат
-	case 3://пришло
-	case 6://нет в наличии
-	case 8://отменен
-	case 11://заказано
-		$nonSynchronizedOrders = core\Synchronization::getNoneSynchronizedOrders();
-		core\Synchronization::sendRequest('orders/write_orders', $nonSynchronizedOrders);	
-		break;
-}*/
-
-?>

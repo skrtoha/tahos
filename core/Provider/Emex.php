@@ -50,10 +50,14 @@ class Emex extends Provider{
         return self::$_self = new self();
     }
 
-    public static function getItemsToOrder(int $provider_id){
+    public static function getItemsToOrder(int $provider_id, $field = 'Reference', $basketContent = null){
         $output = [];
-        $basketContent = self::getInfstance()->getBasket();
-        $osiList = array_column($basketContent, 'Reference');
+
+        if (!$basketContent) {
+            $basketContent = self::getInfstance()->getBasket();
+        }
+
+        $osiList = array_column($basketContent, $field);
         $orderInfoList = OrderValue::get(['osi' => $osiList], '');
 
         foreach($orderInfoList as $ov){

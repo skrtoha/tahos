@@ -973,7 +973,7 @@ tr.shown.button-row.empty td{
     z-index: auto;
 }
 
-header .top-message.no-authorization p {
+header .top-message.telegram p {
     padding: 0;
 }
 

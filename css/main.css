@@ -343,7 +343,7 @@ header .top-message.debt{
     content: "\ea0f";
 }
 .top-message.telegram {
-    background: #d99c9c;
+    background: red;
     position: relative;
 }
 .top-message.telegram .icon-cross1{

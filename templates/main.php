@@ -81,6 +81,11 @@ use core\User;
                 <span class="icon-cross1"></span>
             </div>
         <?}?>
+        <?if (!$_SESSION['user'] && $view == 'article'){?>
+            <div class="top-message telegram">
+                <p>После авторизации будут доступны дополнительные предложения и цены.</p>
+            </div>
+        <?}?>
 		<div class="wrapper">
 			<a href="/" class="logo"></a>
 			<div class="catalog_btn">

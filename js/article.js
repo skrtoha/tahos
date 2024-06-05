@@ -43,7 +43,14 @@ function setTabType(tab){
     if (search_type === 'articles' && hidable_form){
         $filterForm.addClass('hidden');
     }
-    if (search_type === 'substitutes' || search_type === 'analogies' || search_type === 'complects'){
+    if (
+        document.querySelector('input[name="user_id"]').value
+        && (
+            search_type === 'substitutes'
+            || search_type === 'analogies'
+            || search_type === 'complects'
+        )
+    ){
         var item_id = $('#item_id').val();
         var data = "item_id=" + item_id + "&search_type=" + search_type;
         $.ajax({
@@ -107,8 +114,8 @@ function set_tabs(){
 }
 /**
  * checks is there any item in basket
- * @param  {[object]}  store_items_list [description]
  * @return {Boolean}
+ * @param store_items_list
  */
 function isInBasket(store_items_list){
     for(var key in store_items_list){
@@ -134,9 +141,9 @@ function setNewValueCurrentItem(obj){
 }
 /**
  * sets in value inBasket amount of item
- * @param {[type]} store_id [description]
- * @param {[type]} item_id  [description]
- * @param {[type]} amount   [addable value]
+ * @param store_id
+ * @param item_id
+ * @param amount
  * @param isReplace
  */
 function setAmountInBasket(store_id, item_id, amount, isReplace = false){
@@ -1185,13 +1192,15 @@ function applyUserMarkup(){
     }
     $('#user_markup').hide();
 }
-function checkThroughAPI(item_id){
+function checkThroughAPI(){
+    if (!document.querySelector('input[name="user_id"]').value) {
+        return;
+    }
     $.ajax({
         type: 'get',
         url: document.location.href,
         success: function(){
-            let href = document.location.href + '/noUseAPI';
-            document.location.href = href;
+            document.location.href = document.location.href + '/noUseAPI';
         }
     })
 }
@@ -1199,7 +1208,7 @@ $(function(){
     if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;
     set_tabs();
     applyUserMarkup();
-    if ($('input[name=noUseAPI]').val() == '0'){
+    if ($('input[name="noUseAPI"]').val() == '0'){
         checkThroughAPI();
     }
     $(document).on('click', '.cart-popup-table .delete-btn', function(){

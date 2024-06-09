@@ -130,7 +130,7 @@ class Autokontinent extends Provider{
 	}
 	private static function getItemsByPartID($part_id){
 		$response = Provider::getCurlUrlData(
-			self::getParams()->url . 'search/price.json?part_id=' . $part_id, 
+			self::getParams()->url . 'search/price.json?show_cross=false&show_odds=false&part_id=' . $part_id,
 			self::getAuthData()
 		);
 		return json_decode($response);
@@ -155,7 +155,7 @@ class Autokontinent extends Provider{
 				'brend_id' => $brend_id,
 				'article' => Item::articleClear($part->part_code),
 				'article_cat' => $part->part_code,
-				'title' => $part->part_name ? $part->part_name : $part->part_comment,
+				'title' => $part->part_name ?: $part->part_comment,
 				'title_full' => $part->part_comment,
 				'source' => self::getParams()->title
 			]);

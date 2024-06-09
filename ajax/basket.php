@@ -23,15 +23,21 @@ switch ($_POST['act']){
 	case 'plus':
 	case 'minus':
 		$act = $_POST['act'] == 'minus' ? '-' : '+';
+
+        $where = "`store_id`= $store_id AND `item_id` = $item_id AND `user_id`= $user_id";
+        $basket = $db->select_one('basket', '*', $where);
+
+        if ($basket['quan'] - $_POST['packaging'] <= 0 && $_POST['act'] == 'minus'){
+            $db->delete('basket', $where);
+            break;
+        }
+
 		$res = $db->query("
 			UPDATE
 				#basket
 			SET 
 				`quan` = `quan` $act {$_POST['packaging']}
-			WHERE
-				`store_id`= $store_id AND
-				`item_id` = $item_id AND
-				`user_id`= $user_id
+			WHERE $where
 		");
 		break;
 	case 'clear':

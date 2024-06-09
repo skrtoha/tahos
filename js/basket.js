@@ -41,18 +41,21 @@ $(function(){
         else setDateIssueDelivery($('input[name=min_date]').val())
     })
 	$(".count-block .minus, .count-block .plus").click(function() {
-		var e = $(this);
-		var available = + e.closest('.good').find('input[name=available]').val();
-		if (available !== 'undefined'){
+        let e = $(this);
+        const available = +e.closest('.good').find('input[name=available]').val();
+        if (available !== 'undefined'){
 			if (available == -1) return show_message('Данной позиции нет в наличии!', 'error');
 		}
 		// if (!e.closest('.good').find('input[name=toOrder]').prop('checked')) return false;
-		var act = e.attr('class');
-		e = $(this).parent();
-		var store_id = e.attr('store_id');
-		var item_id = e.attr('item_id');
-		var packaging = + e.attr('packaging');
-		if (act == 'minus' && + e.find('input').val() - packaging < 0) return false;
+        const act = e.attr('class');
+        e = $(this).parent();
+        const store_id = e.attr('store_id');
+        const item_id = e.attr('item_id');
+        const packaging = +e.attr('packaging');
+        if (act == 'minus' && + e.find('input').val() - packaging <= 0) {
+            e.closest('tr').remove()
+        }
+
 		if (act == 'plus' && + e.find('input').val() + packaging > available) {
 			e.closest('div').nextAll('span.available').addClass('active');
 			return show_message('Превышено доступное количество!', 'error');

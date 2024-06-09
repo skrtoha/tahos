@@ -323,8 +323,11 @@ class Absel extends Provider {
 
         OrderValue::changeStatus(11, $ov);
 
+        self::removeFromBasket($ov);
+
         return $ov['quan'];
     }
+
 
     public static function removeFromBasket($ov): void
     {

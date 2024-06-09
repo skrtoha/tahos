@@ -328,7 +328,6 @@ class Absel extends Provider {
         return $ov['quan'];
     }
 
-
     public static function removeFromBasket($ov): void
     {
         $orderInfo = OrderValue::get(['osi' => Autoeuro::getStringBasketComment($ov)])->fetch_assoc();

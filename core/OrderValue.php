@@ -463,7 +463,6 @@ class OrderValue{
             $limit = "LIMIT {$params['limit']}";
         }
 
-        /** @var Database $db */
         $db = Database::getInstance();
 		return $db->query("
 			SELECT

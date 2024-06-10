@@ -119,9 +119,9 @@ class Absel extends Provider {
         ]);
         $result = json_decode(parent::getUrlData($url));
 
+        $osiList = array_column($basket->products, 'description');
+        $orderInfoList = OrderValue::get(['osi' => $osiList], '');
         if ($result->status != 'OK') {
-            $osiList = array_column($basket->products, 'description');
-            $orderInfoList = OrderValue::get(['osi' => $osiList], '');
             foreach($orderInfoList as $orderInfo){
                 Log::insert([
                     'text' => $result->status,
@@ -131,10 +131,11 @@ class Absel extends Provider {
             return 0;
         }
 
+        foreach($orderInfoList as $ov){
+            self::removeFromBasket($ov);
+        }
+
         return count($basket->products);
-
-
-
     }
 
     private function getStoreId($warehouse_name, $delivery_duration): int
@@ -322,8 +323,6 @@ class Absel extends Provider {
         }
 
         OrderValue::changeStatus(11, $ov);
-
-        self::removeFromBasket($ov);
 
         return $ov['quan'];
     }

@@ -136,8 +136,15 @@ function isInBasket(store_items_list){
  * @param {[type]} obj object with parameters (value, store_id, item_id)
  */
 function setNewValueCurrentItem(obj){
+    const $item = $('i.to-stock-btn[store_id=' + obj.store_id + '][item_id=' + obj.item_id + ']');
+    if (obj.quan == 0) {
+        $('.quan li[store_id=' + obj.store_id + '][item_id=' + obj.item_id + ']').html('');
+        $item.html('');
+        return;
+    }
+
     $('li[store_id=' + obj.store_id + '][item_id=' + obj.item_id + '] input').val(obj.quan);
-    $('i.to-stock-btn[store_id=' + obj.store_id + '][item_id=' + obj.item_id + ']').html('<i class="goods-counter">' + obj.quan + '</i>');
+    $item.html('<i class="goods-counter">' + obj.quan + '</i>');
 }
 /**
  * sets in value inBasket amount of item
@@ -156,13 +163,17 @@ function setAmountInBasket(store_id, item_id, amount, isReplace = false){
  * [setNewValueCartIcon sets common amount in basket icon]
  */
 function setNewValueCartIcon(){
-    var summ = 0;
+    const $cart = $('.cart')
+    let summ = 0;
     $('.cart span').remove();
-    for(var k in inBasket){
+    for(const k in inBasket){
         inBasket[k] = parseInt(inBasket[k]);
         summ += inBasket[k];
     }
-    return $('.cart').append('<span>' + summ + '</span>');
+    if (summ == 0) {
+        return $cart.find('span').remove();
+    }
+    return $cart.append('<span>' + summ + '</span>');
 }
 function setNewValueAjax(obj){
     $.ajax({
@@ -170,12 +181,16 @@ function setNewValueAjax(obj){
         url: "/ajax/to_basket.php",
         data: obj,
         success: function(msg){
-            get_basket(JSON.parse(msg));
-            show_popup_basket();
-            setTimeout(function(){
-                if (!$('.cart-popup').is(':hover')) $('.overlay').click();
-            }, 2500);
-            applyUserMarkup();
+            const result = JSON.parse(msg);
+            get_basket(result);
+
+            if (result.length) {
+                show_popup_basket();
+                setTimeout(function(){
+                    if (!$('.cart-popup').is(':hover')) $('.overlay').click();
+                }, 2500);
+                applyUserMarkup();
+            }
         }
     });
 }
@@ -1362,11 +1377,10 @@ $(function(){
     });
     $(document).on('click', '.to-stock-btn', function(){
         $('.mfp-wrap').click();
-        var e = $(this);
-        var store_id = +e.attr('store_id');
-        var price = +e.attr('price');
-        var packaging = +e.attr('packaging');
-        var item_id = e.attr('item_id');
+        const e = $(this);
+        const store_id = +e.attr('store_id');
+        const packaging = +e.attr('packaging');
+        const item_id = e.attr('item_id');
 
         if ($('.login_btn span').html() === 'Войти'){
             $('.login_btn').click();
@@ -1385,11 +1399,24 @@ $(function(){
         });
     });
     $(document).on('blur', '.quan li[store_id][item_id] input', function(){
-        var isValidated = true;
-        var th = $(this);
-        var val = + th.val();
-        var packaging = + th.closest('li').attr('packaging');
-        var message = 'Количество должно быть кратно ' + packaging + '!';
+        let isValidated = true;
+        const th = $(this);
+        const val = +th.val();
+        const packaging = +th.closest('li').attr('packaging');
+        const message = 'Количество должно быть кратно ' + packaging + '!';
+        const store_id = + th.closest('li').attr('store_id');
+        const item_id = + th.closest('li').attr('item_id');
+
+        if (val == 0) {
+            setAmountInBasket(store_id, item_id, val, true);
+            setNewValue({
+                store_id: store_id,
+                item_id: item_id,
+                price: 0,
+            });
+            return;
+        }
+
         if(val % packaging){
             isValidated = false;
             show_message(message, 'error');
@@ -1400,14 +1427,7 @@ $(function(){
         }
         if (!isValidated) return th.focus();
 
-        var store_id = + th.closest('li').attr('store_id');
-        var item_id = + th.closest('li').attr('item_id');
-        setAmountInBasket(
-            + store_id,
-            + item_id,
-            + val,
-            true
-        );
+        setAmountInBasket(store_id, item_id, val, true);
         setNewValue({
             store_id: store_id,
             item_id: item_id,

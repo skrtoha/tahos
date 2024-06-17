@@ -13,13 +13,18 @@ $db->setProfiling();
 
 $user_id = $_POST['user_id'] ?? $_SESSION['user'];
 
-$res = Basket::addToBasket([
-    'user_id' => $user_id,
-    'store_id' => $_POST['store_id'],
-    'item_id' => $_POST['item_id'],
-    'quan' => $_POST['quan'],
-    'price' => $_POST['price'],
-]);
+if ($_POST['quan'] == 0) {
+    $db->delete('basket', "`user_id` = $user_id AND `store_id` = {$_POST['store_id']} AND `item_id` = {$_POST['item_id']}");
+}
+else {
+    Basket::addToBasket([
+        'user_id' => $user_id,
+        'store_id' => $_POST['store_id'],
+        'item_id' => $_POST['item_id'],
+        'quan' => $_POST['quan'],
+        'price' => $_POST['price'],
+    ]);
+}
 
 echo (json_encode(get_basket()));
 ?>

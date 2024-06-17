@@ -133,6 +133,7 @@ class Absel extends Provider {
 
         foreach($orderInfoList as $ov){
             self::removeFromBasket($ov);
+            OrderValue::changeStatus(11, $ov);
         }
 
         return count($basket->products);
@@ -322,7 +323,7 @@ class Absel extends Provider {
             return 0;
         }
 
-        OrderValue::changeStatus(11, $ov);
+        OrderValue::changeStatus(7, $ov);
 
         return $ov['quan'];
     }

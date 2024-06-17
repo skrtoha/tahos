@@ -117,7 +117,7 @@ function get_basket(){
 			LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
 			WHERE b.user_id={$_SESSION['user']}
 	", false);
-	if (empty($basket)) return false;
+	if (empty($basket)) return [];
 	foreach($basket as $key => $value){
 		$b = & $basket[$key];
 		unset($b['user_id'], $b['comment']);

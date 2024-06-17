@@ -109,20 +109,12 @@ function getParams(url = ''){
 	return output;
 }
 function show_popup_basket(){
-	event.preventDefault();
-	var cart = $(".cart-popup");
-	var left = ($('header').outerWidth(true) - $('.wrapper').outerWidth(true)) / 2 +
-						$('.logo').outerWidth(true) + 
-						$('.catalog_btn').outerWidth(true) + 
-						$('.search_btn_2').outerWidth(true) + 
-						$('.cart').outerWidth(true) + 45 -
-						cart.outerWidth(true);
-	cart.toggle();
+    const cart = $(".cart-popup");
+    cart.toggle();
 	if (cp_api){
 		cp_api.reinitialise();
 		cp_api.scrollToBottom();
 	} 
-	// if ($(document).width() <= 1024) cart.offset({ left: left});
 	$(".cart .arrow_up").show();
 	$(".h_overlay, .overlay").show();
 }
@@ -145,17 +137,22 @@ function price_format(){
 	// });
 }
 function get_basket(basket){
-	var total_quan = 0;
-	var total_price = 0;
-	var c_tr = $('.cart-popup-table tr').length;
-	var str = '' +
-			'<tr>' +
-				'<th>Наименование</th>' +
-				'<th>Кол-во</th>' +
-				'<th>Сумма</th>' +
-				'<th><img id="basket_clear" src="/img/icons/icon_trash.png" alt="Удалить"></th>' +
-			'</tr>';
-	for (var k in basket){
+    let total_quan = 0;
+    let total_price = 0;
+    const c_tr = $('.cart-popup-table tr').length;
+
+    if (basket.length == 0) {
+        return;
+    }
+
+    let str = '' +
+        '<tr>' +
+        '<th>Наименование</th>' +
+        '<th>Кол-во</th>' +
+        '<th>Сумма</th>' +
+        '<th><img id="basket_clear" src="/img/icons/icon_trash.png" alt="Удалить"></th>' +
+        '</tr>';
+    for (var k in basket){
 		var b = basket[k];
 		total_quan += +b.quan;
 		total_price += (b.quan * b.price);

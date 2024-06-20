@@ -156,7 +156,7 @@ use core\User;
 						<?if (!empty($si['prevails'])){?>
 							<ul class="prevail">
 								<?foreach($si['prevails'] as $value){?>
-									<li packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+									<li data-in-stock="<?=$value['in_stock']?>" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 										<?if ($value['in_basket']){?>
 											<input value="<?=$value['in_basket']?>">
 										<?}?>
@@ -166,13 +166,13 @@ use core\User;
 						<?}?>
 						<?if (!empty($si_price)){?>
 							<ul>
-								<li packaging="<?=$si_price['packaging']?>" store_id="<?=$si_price['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+								<li data-in-stock="<?=$si_price['in_stock']?>"  packaging="<?=$si_price['packaging']?>" store_id="<?=$si_price['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 									<?if ($si_price['in_basket']){?>
 										<input value="<?=$si_price['in_basket']?>">
 									<?}?>
 								</li>
 								<?if (!empty($si_delivery)){?>
-										<li packaging="<?=$si_delivery['packaging']?>" store_id="<?=$si_delivery['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+										<li data-in-stock="<?=$si_delivery['in_stock']?>"  packaging="<?=$si_delivery['packaging']?>" store_id="<?=$si_delivery['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 											<?if ($si_delivery['in_basket']){?>
 												<input value="<?=$si_delivery['in_basket']?>">
 											<?}?>
@@ -187,13 +187,14 @@ use core\User;
 							<ul class="prevail to-cart-list">
 								<?foreach($si['prevails'] as $value){?>
 									<li>
-										<i price="<?=$value['price']?>" 
-											store_id="<?=$value['store_id']?>" 
-											item_id="<?=$si['item_id']?>" 
-											packaging="<?=$value['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-											<?if ($value['in_basket']){?>
-												<i class="goods-counter"><?=$value['in_basket']?></i> 
-											<?}?>
+										<i price="<?=$value['price']?>"
+                                            data-in-stock="<?=$value['in_stock']?>"
+                                            store_id="<?=$value['store_id']?>"
+                                            item_id="<?=$si['item_id']?>"
+                                            packaging="<?=$value['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
+                                            <?if ($value['in_basket']){?>
+                                                <i class="goods-counter"><?=$value['in_basket']?></i>
+                                            <?}?>
 										</i> 
 									</li>
 								<?}?>
@@ -202,7 +203,8 @@ use core\User;
 						<?if (!empty($si_price)){?>
 							<ul class="to-cart-list">
 								<li>
-									<i price="<?=$si_price['price']?>" 
+									<i price="<?=$si_price['price']?>"
+                                        data-in-stock="<?=$si_price['in_stock']?>"
 										store_id="<?=$si_price['store_id']?>" 
 										item_id="<?=$si['item_id']?>" 
 										packaging="<?=$si_price['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
@@ -213,7 +215,8 @@ use core\User;
 								</li>
 								<?if (!empty($si_delivery)){?>
 									<li>
-										<i price="<?=$si_delivery['price']?>" 
+										<i price="<?=$si_delivery['price']?>"
+                                            data-in-stock="<?=$si_delivery['in_stock']?>"
 											store_id="<?=$si_delivery['store_id']?>" 
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$si_delivery['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
@@ -335,7 +338,7 @@ use core\User;
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $v){?>
-                                        <li prevail="1" packaging="<?=$v['packaging']?>" store_id="<?=$v['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+                                        <li data-in-stock="<?=$v['in_stock']?>" prevail="1" packaging="<?=$v['packaging']?>" store_id="<?=$v['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
                                             <?if ($v['in_basket']){?>
                                                 <input value="<?=$v['in_basket']?>">
                                             <?}?>
@@ -345,8 +348,8 @@ use core\User;
 							<?}?>
 							<ul>
 								<?foreach($si['list'] as $key => $v){?>
-									<li packaging="<?=$v['packaging']?>" store_id="<?=$v['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
-										<?if ($value['in_basket']){?>
+									<li data-in-stock="<?=$v['in_stock']?>" packaging="<?=$v['packaging']?>" store_id="<?=$v['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+										<?if ($v['in_basket']){?>
 											<input value="<?=$v['in_basket']?>">
 										<?}?>
 									</li>
@@ -360,6 +363,7 @@ use core\User;
 									<?foreach($si['prevails'] as $v){?>
 										<li>
 											<i price="<?=$v['price']?>"
+                                                data-in-stock="<?=$v['in_stock']?>"
 												store_id="<?=$v['store_id']?>"
 												item_id="<?=$si['item_id']?>" 
 												packaging="<?=$v['packaging']?>"
@@ -376,6 +380,7 @@ use core\User;
 								<?foreach($si['list'] as $key => $v){?>
 									<li>
 										<i price="<?=$v['price']?>"
+                                            data-in-stock="<?=$v['in_stock']?>"
 											store_id="<?=$v['store_id']?>"
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$v['packaging']?>"
@@ -559,7 +564,7 @@ else{?>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
-										<li prevail="1" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+										<li data-in-stock="<?=$value['in_stock']?>" prevail="1" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 											<?if ($value['in_basket']){?>
 												<input value="<?=$value['in_basket']?>">
 											<?}?>
@@ -569,13 +574,13 @@ else{?>
 							<?}?>
 							<?if (!empty($si_price)){?>
 								<ul>
-									<li packaging="<?=$si_price['packaging']?>" store_id="<?=$si_price['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+									<li data-in-stock="<?=$si_price['in_stock']?>" packaging="<?=$si_price['packaging']?>" store_id="<?=$si_price['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 										<?if ($si_price['in_basket']){?>
 											<input value="<?=$si_price['in_basket']?>">
 										<?}?>
 									</li>
 									<?if (!empty($si_delivery)){?>
-										<li packaging="<?=$si_delivery['packaging']?>" store_id="<?=$si_delivery['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
+										<li data-in-stock="<?=$si_delivery['in_stock']?>" packaging="<?=$si_delivery['packaging']?>" store_id="<?=$si_delivery['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 											<?if ($si_delivery['in_basket']){?>
 												<input value="<?=$si_delivery['in_basket']?>">
 											<?}?>
@@ -589,7 +594,8 @@ else{?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<i price="<?=$value['price']?>" 
+											<i price="<?=$value['price']?>"
+                                                data-in-stock="<?=$value['in_stock']?>"
 												store_id="<?=$value['store_id']?>" 
 												item_id="<?=$si['item_id']?>" 
 												packaging="<?=$value['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
@@ -604,7 +610,8 @@ else{?>
 							<?if (!empty($si_price)){?>
 								<ul class="to-cart-list">
 								<li>
-									<i price="<?=$si_price['price']?>" 
+									<i price="<?=$si_price['price']?>"
+                                        data-in-stock="<?=$si_price['in_stock']?>"
 										store_id="<?=$si_price['store_id']?>" 
 										item_id="<?=$si['item_id']?>" 
 										packaging="<?=$si_price['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
@@ -615,7 +622,8 @@ else{?>
 								</li>
 								<?if (!empty($si_delivery)){?>
 									<li>
-										<i price="<?=$si_delivery['price']?>" 
+										<i price="<?=$si_delivery['price']?>"
+                                            data-in-stock="<?=$si_delivery['in_stock']?>"
 											store_id="<?=$si_delivery['store_id']?>" 
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$si_delivery['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
@@ -723,7 +731,7 @@ else{?>
 							<?}?>
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
-									<li packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>"class="count-block">
+									<li data-in-stock="<?=$value['in_stock']?>" packaging="<?=$value['packaging']?>" store_id="<?=$value['store_id']?>" item_id="<?=$si['item_id']?>" class="count-block">
 										<?if ($value['in_basket']){?>
 											<input value="<?=$value['in_basket']?>">
 										<?}?>
@@ -736,9 +744,10 @@ else{?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
 										<li>
-											<i price="<?=$value['price']?>" 
-												store_id="<?=$value['store_id']?>" 
-												item_id="<?=$si['item_id']?>" 
+											<i price="<?=$value['price']?>"
+                                                data-in-stock="<?=$value['in_stock']?>"
+												store_id="<?=$value['store_id']?>"
+												item_id="<?=$si['item_id']?>"
 												packaging="<?=$value['packaging']?>" 
 												class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
 												<?if ($value['in_basket']){?>
@@ -752,7 +761,8 @@ else{?>
 							<ul class="to-cart-list">
 								<?foreach($si['list'] as $key => $value){?>
 									<li>
-										<i price="<?=$value['price']?>" 
+										<i price="<?=$value['price']?>"
+                                            data-in-stock="<?=$value['in_stock']?>"
 											store_id="<?=$value['store_id']?>" 
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$value['packaging']?>" 

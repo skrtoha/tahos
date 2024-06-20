@@ -6,6 +6,16 @@ var hidable_form = true;
 var res;
 let tabSelector = '#Tab__search-result-tabs__';
 
+function AmountExhausted() {
+    this.name = 'amountExhausted';
+    this.message = 'Превышено количество!';
+}
+AmountExhausted.prototype.setValue = function (item_id, store_id, inStock) {
+    const selector = `[store_id="${store_id}"][item_id="${item_id}"]`
+    document.querySelector(`li${selector} input`).value = inStock;
+    document.querySelector(`i${selector} .goods-counter`).innerText = inStock;
+}
+
 function removeWithoutProviders(){
     if ($('#in_stock_only').is(':checked')){
         $elements = $('td');
@@ -151,13 +161,26 @@ function setNewValueCurrentItem(obj){
  * @param store_id
  * @param item_id
  * @param amount
+ * @param inStock
  * @param isReplace
  */
-function setAmountInBasket(store_id, item_id, amount, isReplace = false){
-    if (typeof inBasket[store_id + ':' + item_id] == 'undefined') return inBasket[store_id + ':' + item_id] = amount;
-    if (isReplace) return inBasket[store_id + ':' + item_id] = parseInt(amount);
-    inBasket[store_id + ':' + item_id] = parseInt(inBasket[store_id + ':' + item_id]);
-    return inBasket[store_id + ':' + item_id] += amount;
+function setAmountInBasket(store_id, item_id, amount, inStock, isReplace = false){
+    const key = store_id + ':' + item_id;
+    if (typeof inBasket[key] == 'undefined'){
+        return inBasket[key] = amount;
+    }
+
+    if (amount > inStock) {
+        throw new AmountExhausted();
+    }
+
+    if (isReplace) {
+        return inBasket[key] = parseInt(amount);
+    }
+
+    inBasket[key] = parseInt(inBasket[key]);
+
+    return inBasket[key] += amount;
 }
 /**
  * [setNewValueCartIcon sets common amount in basket icon]
@@ -1236,7 +1259,7 @@ $(function(){
         e.preventDefault();
         $('#user_markup').show();
     })
-    $('#user_markup input[name=withUserMarkup]').on('change', function(){
+    $('#user_markup input[name="withUserMarkup"]').on('change', function(){
         let th = $(this);
         if (th.is(':checked')){
             th.closest('form').find('input:not([name=withUserMarkup])').prop('disabled', false).trigger('refresh');
@@ -1381,6 +1404,7 @@ $(function(){
         const store_id = +e.attr('store_id');
         const packaging = +e.attr('packaging');
         const item_id = e.attr('item_id');
+        const inStock = e.data('in-stock');
 
         if ($('.login_btn span').html() === 'Войти'){
             $('.login_btn').click();
@@ -1389,9 +1413,20 @@ $(function(){
         }
         $('button[type=full]').closest('td').attr('colspan', 8);
         $('.quan.hidden').removeClass('hidden');
-        $('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']').html('<input value="' + packaging + '">');
+        const $li = $('.quan li[store_id=' + store_id + '][item_id=' + item_id + ']');
+        $li.html('<input value="' + packaging + '">');
 
-        setAmountInBasket(store_id, item_id, packaging);
+        try {
+            setAmountInBasket(store_id, item_id, packaging, inStock);
+        }
+        catch (e) {
+            if (e.name == 'amountExhausted') {
+                show_message(e.message, 'error');
+                e.setValue(item_id, store_id, inStock);
+                return;
+            }
+        }
+
         setNewValue({
             store_id: store_id,
             item_id: item_id,
@@ -1406,9 +1441,10 @@ $(function(){
         const message = 'Количество должно быть кратно ' + packaging + '!';
         const store_id = + th.closest('li').attr('store_id');
         const item_id = + th.closest('li').attr('item_id');
+        const inStock = th.closest('li').data('in-stock')
 
         if (val == 0) {
-            setAmountInBasket(store_id, item_id, val, true);
+            setAmountInBasket(store_id, item_id, val, inStock, true);
             setNewValue({
                 store_id: store_id,
                 item_id: item_id,
@@ -1427,7 +1463,16 @@ $(function(){
         }
         if (!isValidated) return th.focus();
 
-        setAmountInBasket(store_id, item_id, val, true);
+        try {
+            setAmountInBasket(store_id, item_id, val, inStock, true);
+        }
+        catch (e) {
+            if (e.name == 'amountExhausted') {
+                e.setValue(item_id, store_id, inStock);
+                show_message(e.message, 'error');
+                return;
+            }
+        }
         setNewValue({
             store_id: store_id,
             item_id: item_id,

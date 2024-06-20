@@ -58,7 +58,7 @@ if ($_POST['form_submit']){
 		$b_registration = false;
 	}
 	$email = $_POST['email'];
-	$preg_email = "/^[a-z-\._0-9]+@[\w]+\.[\w]+$/";
+	$preg_email = "/^[A-Za-z-._0-9]+@[\w]+\.[\w]+$/";
 	if (!preg_match($preg_email, $email)){
 		message('Неверный формат e-mail!', false);
 		$b_registration = false;

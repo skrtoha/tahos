@@ -6,6 +6,7 @@ use core\Database;
 use core\Exceptions\Paykeeper\PaymentAlreadyExistsException;
 use core\Fund;
 use core\OrderValue;
+use core\Synchronization;
 use core\User;
 
 class Paykeeper{
@@ -13,6 +14,8 @@ class Paykeeper{
     private static $password = "89eb4d68eb32";
     private static $server = 'http://tahos.server.paykeeper.ru';
     private static $secret_seed = "2m}aFojrEqwjnEJW";
+
+    public static $orderInfo = [];
 
     public static function getLinkReplenishBill($amount, $user_id, $orderId = null){
         $payment_data = [
@@ -80,7 +83,8 @@ class Paykeeper{
         return self::getLinkPay($invoice_id);
     }
 
-    public static function getLinkPay($invoice_id){
+    public static function getLinkPay($invoice_id): string
+    {
         return self::$server."/bill/$invoice_id/";
     }
 
@@ -101,7 +105,8 @@ class Paykeeper{
         return json_decode($response, true);
     }
 
-    private static function dischargeBill($amount, $params){
+    private static function dischargeBill($amount, $params): bool
+    {
         $user = [];
         if (isset($params['orderid']) && $params['orderid']) {
            $orderInfo = OrderValue::getOrderInfo($params['orderid']);
@@ -140,7 +145,8 @@ class Paykeeper{
         return true;
     }
 
-    public static function setPayment($params){
+    public static function setPayment($params): bool
+    {
         $mdString = $params['id']
             .number_format($params['sum'], 2, ".", "")
             .$params['clientid']
@@ -167,6 +173,15 @@ class Paykeeper{
 
         if (isset($params['orderid']) && $params['orderid']){
             $result = self::setPaymentOrder($params);
+            if ($result) {
+                Synchronization::createPayment1C([
+                    'order_id' => $params['orderid'],
+                    'user_id' => self::$orderInfo['user_id'],
+                    'paykeeper_id' => $params['id'],
+                    'sum' => $params['sum'],
+                    'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
+                ]);
+            }
         }
         else{
             $result = self::setPaymentAccount($params);
@@ -184,10 +199,10 @@ class Paykeeper{
 
     private static function setPaymentOrder($params): bool
     {
-        $orderInfo = OrderValue::getOrderInfo($params['orderid'], false);
+        self::$orderInfo = OrderValue::getOrderInfo($params['orderid'], false);
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $params['obtain_datetime']);
         User::replenishBill([
-            'user_id' => $orderInfo['user_id'],
+            'user_id' => self::$orderInfo['user_id'],
             'sum' => $params['sum'],
             'comment' => "Оплата заказа №{$params['orderid']}: Платежное поручение №{$params['id']} от ".$dateTime->format('d.m.Y H:i:s'),
             'bill_type' => User::BILL_CASH
@@ -197,7 +212,7 @@ class Paykeeper{
             ['payed' => 1],
             "`order_id` = {$params['orderid']}"
         );
-        self::addPerformedPayment($params['id'], $orderInfo['user_id']);
+        self::addPerformedPayment($params['id'], self::$orderInfo['user_id']);
         return true;
     }
 

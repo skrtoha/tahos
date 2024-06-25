@@ -2,6 +2,10 @@
 namespace core;
 
 class Synchronization{
+    public static array $paymentPaykeeper1C = [
+        94 => 'СПБ',
+        12 => 'ИТ-1'
+    ];
 	public static function getNoneSynchronizedOrders(){
 		return self::getOrders([
             'synchronized' => 0,
@@ -172,17 +176,24 @@ class Synchronization{
 
         return $output;
     }
-    public static function httpQuery($method, $data){
+    public static function httpQuery($method, $data, $type = 'get'){
         static $settings;
         if (!$settings){
             $settings = Setting::get('site_settings', null, 'all');
         }
         $url = $settings['1c_url'];
-        $url .= "$method/?".http_build_query($data);
-        $result = Provider::getCurlUrlData($url, [], [
+        $headers = [
             'synchronization_token' => $settings['synchronization_token'],
             'Authorization' => $settings['1c_authorization']
-        ]);
+        ];
+        if ($type == 'get') {
+            $url .= "$method/?".http_build_query($data);
+            $result = Provider::getCurlUrlData($url, [], $headers);
+        }
+        elseif ($type == 'post') {
+            $result = Provider::getCurlUrlData($url, json_encode($data), $headers);
+        }
+
         return $result;
     }
     public static function set1CDocument(string $title, array $data){
@@ -208,5 +219,9 @@ class Synchronization{
     public static function createReturn($params){
         $result = self::httpQuery('create-return', $params);
         return $result;
+    }
+
+    public static function createPayment1C($params) {
+        return self::httpQuery('create-payment', $params, 'post');
     }
 }

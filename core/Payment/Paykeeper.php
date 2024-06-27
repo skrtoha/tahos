@@ -248,6 +248,13 @@ class Paykeeper{
 
         self::addPerformedPayment($params['id'], $userInfo['id']);
 
+        Synchronization::createPayment1C([
+            'user_id' => $userInfo['id'],
+            'paykeeper_id' => $params['id'],
+            'sum' => $params['sum'],
+            'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
+        ]);
+
         return true;
     }
 

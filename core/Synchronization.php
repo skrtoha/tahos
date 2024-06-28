@@ -1,9 +1,11 @@
 <?php
 namespace core;
 
+use core\Messengers\Telegram;
+
 class Synchronization{
     public static array $paymentPaykeeper1C = [
-        94 => 'СПБ',
+        94 => 'СБП',
         12 => 'ИТ-1'
     ];
 	public static function getNoneSynchronizedOrders(){
@@ -222,6 +224,33 @@ class Synchronization{
     }
 
     public static function createPayment1C($params) {
-        return self::httpQuery('create-payment', $params, 'post');
+        Telegram::writeLogFile($params);
+        $settings = Setting::get('site_settings', null, 'all');
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "{$settings['1c_url']}create-payment",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($params, JSON_UNESCAPED_UNICODE),
+            CURLOPT_HTTPHEADER => array(
+                "synchronization_token: {$settings['synchronization_token']}",
+                'Content-Type: application/json',
+                "Authorization: {$settings['1c_authorization']}"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        Telegram::writeLogFile(curl_error($curl));
+        Telegram::writeLogFile($response);
+
+        curl_close($curl);
+        return $response;
     }
 }

@@ -5,6 +5,7 @@ namespace core\Payment;
 use core\Database;
 use core\Exceptions\Paykeeper\PaymentAlreadyExistsException;
 use core\Fund;
+use core\Messengers\Telegram;
 use core\OrderValue;
 use core\Synchronization;
 use core\User;
@@ -248,12 +249,17 @@ class Paykeeper{
 
         self::addPerformedPayment($params['id'], $userInfo['id']);
 
-        Synchronization::createPayment1C([
-            'user_id' => $userInfo['id'],
-            'paykeeper_id' => $params['id'],
-            'sum' => $params['sum'],
-            'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
-        ]);
+        try {
+            Synchronization::createPayment1C([
+                'user_id' => $userInfo['id'],
+                'paykeeper_id' => $params['id'],
+                'sum' => $params['sum'],
+                'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
+            ]);
+        }
+        catch (\Throwable $exception) {
+            Telegram::writeLogFile($exception);
+        }
 
         return true;
     }

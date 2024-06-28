@@ -7,14 +7,14 @@ class Setting{
 		if ($param2){
 			$view = $param1;
 			$name = $param2;
-			$resArray = $GLOBALS['db']->select_one(self::$tableName, ['name', 'value'], "`view` = '$view' AND `name` = '$name'");
+			$resArray = Database::getInstance()->select_one(self::$tableName, ['name', 'value'], "`view` = '$view' AND `name` = '$name'");
 			return $resArray['value'];
 		}
 		else{
 			$view = $type == null ? $_GET['view'] : $param1;
 			$name = $param1;
 			if (!$defaultSettingsOfView){
-				$resArray = $GLOBALS['db']->select(self::$tableName, ['name', 'value'], "`view` = '$view'");
+				$resArray = Database::getInstance()->select(self::$tableName, ['name', 'value'], "`view` = '$view'");
 				foreach($resArray as $value) $defaultSettingsOfView[$value['name']] = $value['value'];
 			}
             if ($type == 'all') return $defaultSettingsOfView;
@@ -32,11 +32,11 @@ class Setting{
 			$name = $param1;
 			$value = $param2;
 		}
-		return $GLOBALS['db']->query("
+		return Database::getInstance()->query("
 			INSERT INTO #". self::$tableName. " (`view`, `name`, `value`) VALUES (
 				'$view', '$name', '$value'
 			) ON DUPLICATE KEY UPDATE `value` = '$value'
 		", '');
-		// return $GLOBALS['db']->update_query(self::$tableName, ['value' => $value], "`view` = '$view' AND `name` = '$name'");
+		// return Database::getInstance()->update_query(self::$tableName, ['value' => $value], "`view` = '$view' AND `name` = '$name'");
 	}
 }

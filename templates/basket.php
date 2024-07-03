@@ -62,18 +62,20 @@ Breadcrumb::out();
 			foreach ($res_basket as $key => $val) {
 				$checkbox = '';
 				if (core\Config::$isUseApiProviders){
-					$val['pp'] = core\Provider::getPrice([
-						'provider_id' => $val['provider_id'],
-						'store_id' => $val['store_id'],
-						'providerStore' => $val['providerStore'],
-						'item_id' => $val['item_id'],
-						'price' => $val['price'],
-						'article' => $val['article'],
-                        'brend_id' => $val['brend_id'],
-						'brend' => $val['provider_brend'],
-						'in_stock' => $val['in_stock'],
-						'user_id' => $_SESSION['user'],
-					]);
+                    if ($val['isToOrder']) {
+                        $val['pp'] = core\Provider::getPrice([
+                            'provider_id' => $val['provider_id'],
+                            'store_id' => $val['store_id'],
+                            'providerStore' => $val['providerStore'],
+                            'item_id' => $val['item_id'],
+                            'price' => $val['price'],
+                            'article' => $val['article'],
+                            'brend_id' => $val['brend_id'],
+                            'brend' => $val['provider_brend'],
+                            'in_stock' => $val['in_stock'],
+                            'user_id' => $_SESSION['user'],
+                        ]);
+                    }
 				}
 				if ($val['pp']){
 					if (

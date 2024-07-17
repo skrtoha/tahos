@@ -1,19 +1,22 @@
 <?php
-
 namespace core;
-
-use core\Messengers\Telegram;
 
 class Cache{
     /** @var \Memcached|\Memcache */
     private $classCache;
 
+    /**
+     * @throws \Exception
+     */
     private function __construct(){
+        if (!class_exists(Config::$cacheClass)) {
+            throw new \Exception('Класс '.Config::$cacheClass.' не найден');
+        }
         $this->classCache = new Config::$cacheClass;
         $this->classCache->addServer('localhost', 11211);
     }
 
-    private static function getInstance(): Cache
+    private static function getInstance()
     {
         static $self;
         if ($self) return $self;
@@ -22,14 +25,32 @@ class Cache{
         return $self;
     }
 
-    public static function set($key, $value): bool
+    public static function set($key, $value, $expiration = 0): bool
     {
-        $self = self::getInstance();
-        return $self->classCache->set($key, $value);
+        try {
+            $self = self::getInstance();
+        }
+        catch (\Exception $e) {
+            return false;
+        }
+
+        if (Config::$cacheClass == 'Memcached') {
+            return $self->classCache->set($key, $value, $expiration);
+        }
+        if (Config::$cacheClass == 'Memcache') {
+            return $self->classCache->set($key, $value, 0, $expiration);
+        }
+        return false;
     }
 
     public static function get($key){
-        $self = self::getInstance();
+        try {
+            $self = self::getInstance();
+        }
+        catch (\Exception $e) {
+            return false;
+        }
+
         return $self->classCache->get($key);
     }
 

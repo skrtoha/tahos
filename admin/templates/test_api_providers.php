@@ -1,6 +1,10 @@
 <?php
-use core\Managers;
+/** @var Database $db */
+
+use core\Database;
 use core\Item;
+use core\Provider\Autoeuro;
+use core\Provider\Autopiter;
 use core\Timer;
 
 if (isset($_GET['item_id'])){
@@ -17,7 +21,6 @@ if (isset($_GET['act'])){
 			echo json_encode($output);
 			break;
 		case 'getResultApi':
-			// debug($_GET);
 			Timer::start();
 			switch($_GET['providerApiTitle']){
 				case 'Abcp':
@@ -40,12 +43,24 @@ if (isset($_GET['act'])){
 					core\Provider\ForumAuto::setArticle($_GET['item_id'], $item['brend'], $item['article']);
 					break;
 				case 'Autoeuro':
-                    $autoeuro = new \core\Provider\Autoeuro($_GET['item_id']);
+                    $autoeuro = new Autoeuro($_GET['item_id']);
 					$autoeuro->setArticle($item['brend'], $item['article']);
 					break;
 				case 'Autokontinent':
-					core\Provider\Autokontinent::setArticle($item['brend'], $item['article'], $_GET['item_id']);
+					core\Provider\Autokontinent::setArticle($item['brend'], $item['article']);
 					break;
+                case 'Berg':
+                    core\Provider\Berg::setArticle($item['brend'], $item['article'], $_GET['item_id']);
+                    break;
+                case 'Emex':
+                    core\Provider\Emex::setArticle($item['brend_id'], $item['article'], $_GET['item_id']);
+                    break;
+                case 'Absel':
+                    core\Provider\Absel::setArticle($item['brend'], $item['article'], $_GET['item_id']);
+                    break;
+                case 'Autopiter':
+                    Autopiter::setArticle($item['brend'], $item['article']);
+                    break;
 			}
 			echo Timer::end();
 			break;
@@ -57,7 +72,7 @@ $page_title = 'Тестирование API поставщиков';
 $status = "<a href='/'>Главная </a> > Администрирование > $page_title";
 
 
-$res_providers = $db->query("
+$res_providers = Database::getInstance()->query("
 	SELECT
 		p.id,
 		p.title,

@@ -12,6 +12,7 @@ use core\Provider\FavoriteParts;
 use core\Provider\ForumAuto;
 use core\Provider\Mikado;
 use core\Provider\Rossko;
+use core\Provider\ShateM;
 use core\Provider\Tahos;
 
 class Search{
@@ -70,6 +71,8 @@ class Search{
         self::setCoincidences(Berg::getCoincidences($search));
 
         self::setCoincidences(Absel::getSearch($search));
+
+        self::setCoincidences(ShateM::getSearch($search));
 
         return self::$coincidences;
     }

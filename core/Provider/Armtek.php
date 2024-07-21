@@ -345,6 +345,8 @@ class Armtek extends Provider{
 		}
 		$params['ITEMS'] = $itemsForSending;
 		$params['format'] = 'json';
+
+        //тестовый заказ createTestOrder
 		$request_params = [
 			'url' => 'order/createOrder',
 			'params' => $params
@@ -359,9 +361,13 @@ class Armtek extends Provider{
 	
 	private static function getUserInfo(){
         $params = self::$params;
-	    $response = self::getClientArmtek('private')->post([
-	        'VKORG' => $params['VKORG']
-        ]);
+        $request_params = [
+            'url' => 'user/getUserInfo',
+            'params' => [
+                'VKORG' => $params['VKORG']
+            ]
+        ];
+	    $response = self::getClientArmtek('private')->post($request_params);
         return $response->json();
     }
 	private static function parseOrderResponse($input){

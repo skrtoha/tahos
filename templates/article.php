@@ -6,6 +6,7 @@ use core\Exceptions\NotFoundException;
 use core\Provider\Absel;
 use core\Provider\Autoeuro;
 use core\Provider\Emex;
+use core\Provider\ShateM;
 
 $abcp = new core\Provider\Abcp($_GET['item_id'], $db);
 
@@ -44,6 +45,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
     catch (\Throwable $e){}
 
     Absel::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
+
+    ShateM::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
     exit();
 }

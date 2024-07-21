@@ -1,6 +1,7 @@
 <?php
 namespace core\Provider;
 
+use core\Exceptions\ForumAuto\ErrorStoreID;
 use core\Provider;
 use core\Brend;
 use core\Item;
@@ -108,7 +109,11 @@ class ForumAuto extends Provider{
 		parent::getInstanceDataBase()->insert('analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
 		parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
 	}
-	private static function getStoreID($item){
+
+    /**
+     * @throws ErrorStoreID
+     */
+    private static function getStoreID($item){
 		// debug($item);
 		static $stores = [];
 		if (empty($stores)){
@@ -139,10 +144,6 @@ class ForumAuto extends Provider{
 	public static function setArticle($mainItemID, $brend, $article){
 		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
-		
-		$item_id = NULL;
-
-		// Provider::clearStoresItemsByProviderID(self::getParams()->provider_id, ['item_id' => $mainItemID]);
 
 		$response = self::getItemsByBrendAndArticle($brend, $article);
 

@@ -1,6 +1,8 @@
 <?php
 namespace core\Provider;
 
+use core\Cache;
+use core\Exceptions\ForumAuto\ErrorBrendID;
 use core\Provider;
 use core\Brend;
 use core\Item;
@@ -45,30 +47,41 @@ class ForumAuto extends Provider{
 		foreach($itemsList as $item) $output[$item->brand] = $item->name;
 		return $output;
 	}
-	public static function getBrendID($brand_name){
-		static $brends;
-		$brend_id = NULL;
-		if (isset($brends[$brand_name]) && $brends[$brand_name]) return $brends[$brand_name];
+
+    /**
+     * @throws ErrorBrendID
+     */
+    public static function getBrendID($brand_name){
+        $cacheId = "Forum-Auto-brend-$brand_name";
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
+
 		$res_brend = Brend::get([
 			'title' => $brand_name, 
 			'provider_id' => self::getParams()->provider_id
 		], [], '');
 		if (!$res_brend->num_rows){
-			$brends[$brand_name] = NULL;
+			Cache::set($cacheId, Null);
 			throw new EForumAuto\ErrorBrendID("Бренд $brand_name отсутствует в базе");
 		} 
 		$brend = $res_brend->fetch_assoc();
-		if ($brend['parent_id']) $brend_id = $brend['parent_id'];
-		else $brend_id = $brend['id'];
-		$brends[$brand_name] = $brend_id;
+		if ($brend['parent_id']) {
+            $brend_id = $brend['parent_id'];
+        }
+		else {
+            $brend_id = $brend['id'];
+        }
+        Cache::set($cacheId, $brend_id);
 		return $brend_id;
 	}
 	private static function getItemID(object $part){
-		static $items;
-		$item_id = NULL;
-
-		$key = "{$part->brand}:{$part->art}";
-		if (isset($items[$key]) && $items[$key]) return $items[$key];
+		$cacheId = "Forum-Auto-{$part->brand}:{$part->art}";
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
 
 		try{
 			$brend_id = self::getBrendID($part->brand);
@@ -85,7 +98,7 @@ class ForumAuto extends Provider{
 				'title' => $part->name,
 				'title_full' => $part->name,
 				'source' => self::getParams()->title
-			]/*, ['print' => true]*/);
+			]);
 			if ($res === true){
 				$item_id = parent::getInstanceDataBase()->last_id();
 				parent::getInstanceDataBase()->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
@@ -95,35 +108,33 @@ class ForumAuto extends Provider{
 				$item_id = $item['id'];
 			}
 			if (!$item_id) throw new EForumAuto\ErrorItemID("Ошибка получения item_id");
+            Cache::set($cacheId, $item_id);
 		}
 		catch(EForumAuto\ErrorItemID $e){
 			$e->process($brend_id, $part);
 		}
-		$items[$key] = $item_id;
 		return $item_id;
 	}
-	private static function addAnalogy($mainItemID, $item_id){
-		static $processedAnalogies = [];
-		if (isset($processedAnalogies["$mainItemID:$item_id"])) return;
-		parent::getInstanceDataBase()->insert('analogies', ['item_id' => $mainItemID, 'item_diff' => $item_id]);
-		parent::getInstanceDataBase()->insert('analogies', ['item_id' => $item_id, 'item_diff' => $mainItemID]);
-	}
-	private static function getStoreID($item){
-		// debug($item);
-		static $stores = [];
-		if (empty($stores)){
-			$storesList = parent::getInstanceDataBase()->select('provider_stores', 'id,cipher', '`provider_id` = ' . self::getParams()->provider_id);
-			foreach($storesList as $store) $stores[$store['cipher']] = $store['id'];
-		} 
-		$key = self::getParams()->storePrefix . $item->d_deliv;
-		if(!isset($stores[$key])) throw new EForumAuto\ErrorStoreID('Ошибка получения strore_id');
-		return $stores[$key];
+
+	private static function getStoreID($whse){
+        $cacheId = "Forum-Auto-$whse";
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
+        $store = parent::getInstanceDataBase()->select_one(
+            'provider_stores',
+            'id,cipher',
+            "`provider_id` = ".self::getParams()->provider_id." AND `title` = '$whse'"
+        );
+        Cache::set($cacheId, $store['id']);
+        return $store['id'];
 	}
 	private static function getItemsByBrendAndArticle($brend, $article, $typeOrganization = 'private'){
 		try{
 			$queryString = self::getStringQuery(
                 'listGoods',
-                ['art' => $article, 'br' => $brend, 'cross' => 1],
+                ['art' => $article, 'br' => $brend, 'cross' => 0],
                 $typeOrganization
             );
 			$json = Provider::getUrlData($queryString);
@@ -137,50 +148,37 @@ class ForumAuto extends Provider{
 		return $response;
 	}
 	public static function setArticle($mainItemID, $brend, $article){
-		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
-		if (!parent::isActive(self::getParams()->provider_id)) return false;
-		
-		$item_id = NULL;
-
-		// Provider::clearStoresItemsByProviderID(self::getParams()->provider_id, ['item_id' => $mainItemID]);
+		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) {
+            return false;
+        }
+		if (!parent::isActive(self::getParams()->provider_id)) {
+            return false;
+        }
 
 		$response = self::getItemsByBrendAndArticle($brend, $article);
 
-		//первоначальная обработка для отбора цены
-		$itemsOrderedByPrice = [];
-		foreach($response as $item) $itemsOrderedByPrice[$item->d_deliv][$item->art][] = $item;
-
-		foreach($itemsOrderedByPrice as $delivery => $itemsList){
-			foreach($itemsList as $item){
-				try {
-					$store_id = self::getStoreID($item[0]);
-				} catch (EForumAuto\ErrorStoreID $e) {
-					$e->process();
-					return false;
-				}
-				$item_id = self::getItemID($item[0]);
-				if ($mainItemID != $item_id) self::addAnalogy($mainItemID, $item_id);
-				parent::getInstanceDataBase()->insert('store_items', [
-					'store_id' => $store_id,
-					'item_id' => $item_id,
-					'price' => $item[0]->price,
-					'in_stock' => $item[0]->num,
-					'packaging' => 1
-				], [
-					'duplicate' => [
-						'price' => $item[0]->price,
-						'in_stock' => $item[0]->num
-				]/*, 'print' => true*/]);
-			}
-		}
+		foreach($response as $item){
+            $store_id = self::getStoreID($item->whse);
+            $item_id = self::getItemID($item);
+            parent::getInstanceDataBase()->insert('store_items', [
+                'store_id' => $store_id,
+                'item_id' => $item_id,
+                'price' => $item->price,
+                'in_stock' => $item->num,
+                'packaging' => $item->kr
+            ], [
+                'duplicate' => [
+                    'price' => $item->price,
+                    'in_stock' => $item->num
+            ]]);
+        }
+        return true;
 	}
 	public static function getPrice($params){
 		try{
 			$itemsList = self::getItemsByBrendAndArticle($params['brend'], $params['article']);
-			$cipher = parent::getInstanceDataBase()->getField('provider_stores', 'cipher', 'id', $params['store_id']);
-			$delivery = str_replace(self::getParams()->storePrefix, '', $cipher);
 			foreach($itemsList as $item){
-				if ($item->d_deliv != $delivery) continue;
+				if ($item->whse != $params['providerStore']) continue;
 				if (Provider::getComparableString($item->brand) != Provider::getComparableString($params['brend'])) continue;
 				if (Provider::getComparableString($item->art) != Provider::getComparableString($params['article'])) continue;
 				return [
@@ -204,13 +202,13 @@ class ForumAuto extends Provider{
 	public static function sendOrder(){
 		$providerBasket = parent::getProviderBasket(self::getParams()->provider_id, '');
 		if (!$providerBasket->num_rows) return false;
+        $ordered = 0;
 		foreach($providerBasket as $pb){
 			$itemsList = self::getItemsByBrendAndArticle($pb['brend'], $pb['article'], $pb['typeOrganization']);
-			$delivery = str_replace(self::getParams($pb['typeOrganization'])->storePrefix, '', $pb['cipher']);
 			$requiredItem = NULL;
 			try{
 				foreach($itemsList as $item){
-					if ($item->d_deliv != $delivery) continue;
+					if ($item->whse != $pb['store']) continue;
 					if (Provider::getComparableString($item->brand) != Provider::getComparableString($pb['brend'])) continue;
 					if (Provider::getComparableString($item->art) != Provider::getComparableString($pb['article'])) continue;
 					$requiredItem = $item;
@@ -222,7 +220,6 @@ class ForumAuto extends Provider{
 				$e->process($pb);
 				continue;
 			}
-			var_dump($requiredItem);
 			$queryString = self::getStringQuery('addGoodsToOrder', [
 				'tid' => $requiredItem->gid,
 				'num' => $pb['quan'],
@@ -246,6 +243,8 @@ class ForumAuto extends Provider{
 				],
 				['response' => 'OK']
 			);
+            $ordered += $pb['quan'];
 		}
+        return $ordered;
 	}
 }

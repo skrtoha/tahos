@@ -454,7 +454,6 @@ abstract class Provider{
 			$price['price'] = self::getPriceWithMarkups($price['price'], $params['store_id'], $params['user_id']);
 		}
         $price['price'] = floor($price['price']);
-		// debug($price, get_class($provider) . " {$params['article']}");
 		return $price;
 	}
 	private static function getInstanceProvider($provider_id){

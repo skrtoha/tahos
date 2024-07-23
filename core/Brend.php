@@ -11,7 +11,8 @@ class Brend{
 	 * @param string for debugging (result, print)
 	 * @return mixed false in no results, else mysqli object
 	 */
-	public static function get($conditions = array(), $additionalFields = array(), $flag = ''){
+	public static function get($conditions = array(), $additionalFields = array(), $flag = ''): \mysqli_result
+    {
 		if ($additionalFields) self::$additionalFields = $additionalFields;
 		if (isset($conditions['provider_id'])) self::$additionalFields[] = 'provider_id';
 		$fields = array_merge(self::$defaultFields, self::$additionalFields);

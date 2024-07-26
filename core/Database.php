@@ -476,6 +476,6 @@ spl_autoload_register(function($class){
 	foreach($notLoading as $value){
 		if (preg_match("/$value/", $class)) return false;
 	}
-	include $_SERVER['DOCUMENT_ROOT'].'/'.$class.'.php';
+	return include $_SERVER['DOCUMENT_ROOT'].'/'.$class.'.php';
 });
 ?>

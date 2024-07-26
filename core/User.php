@@ -50,7 +50,8 @@ class User{
      * @return array [type] if no $user_id and $_SESSION['user'] returns default values, if no user_id then by $_SESSION['user']
      * @return mysqli_result
      */
-	public static function get(array $params = []){
+	public static function get(array $params = []): mysqli_result
+    {
         $paramsString = json_encode($params);
         if (isset(self::$userGet[$paramsString])) return self::$userGet[$paramsString];
 

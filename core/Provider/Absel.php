@@ -19,7 +19,6 @@ class Absel extends Provider {
 
     public function getParams($typeOrganization = 'entity'){
         $cacheId = 'Absel-api-params';
-        Cache::delete($cacheId);
         $result = Cache::get($cacheId);
         if ($result) {
             return $result;
@@ -59,29 +58,6 @@ class Absel extends Provider {
         $result = json_decode(parent::getUrlData($url));
         Cache::set($cacheId, $result);
         return $result;
-    }
-
-    public static function getSearch($search) {
-        $params = self::getInstance()->getParams();
-        if (!parent::getIsEnabledApiSearch($params->provider_id)) return false;
-        if (!parent::isActive($params->provider_id)) return false;
-
-        $url = self::getInstance()->getUrl('search', [
-            'article' => $search,
-            'agreement_id' => $params->agreement_id
-        ]);
-        $result = json_decode(parent::getUrlData($url));
-
-        if ($result->status != 'OK') {
-            return [];
-        }
-
-        $coincidences = array();
-        foreach ($result->data as $item) {
-            $coincidences[$item->brand] = $item->product_name;
-        }
-
-        return $coincidences;
     }
 
     public static function getInstance(): Absel

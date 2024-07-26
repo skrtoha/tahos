@@ -578,6 +578,7 @@ class OrderValue{
             case 16:
             case 26:
             case 27:
+            case 30:
                 Provider::addToProviderBasket($ov);
                 if ($automaticOrder) self::$countOrdered = Berg::sendOrder();
                 break;

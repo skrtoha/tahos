@@ -3,6 +3,7 @@ namespace core\Provider;
 
 use core\Cache;
 use core\Database;
+use core\Log;
 use core\OrderValue;
 use core\Provider;
 use core\User;
@@ -59,6 +60,7 @@ class ShateM extends Provider
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_SSL_VERIFYPEER => false
         ));
 
         switch ($type) {
@@ -94,6 +96,10 @@ class ShateM extends Provider
         ]);
 
         $response = curl_exec($curl);
+        if (!$response) {
+            return [];
+        }
+
         return json_decode($response, true);
     }
 
@@ -397,6 +403,16 @@ class ShateM extends Provider
             }
 
             $response = self::getInstance()->sendRequest('orders/bypriceitems', json_encode($queryParams));
+
+            if ($response['id']) {
+                OrderValue::changeStatus(11, $pb);
+            }
+            else {
+                Log::insert([
+                    'text' => 'Ошибка отправки заказа: '.json_encode($response),
+                    'additional' => "osi: ".Autoeuro::getStringBasketComment($pb)
+                ]);
+            }
         }
     }
 }

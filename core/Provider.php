@@ -578,7 +578,8 @@ abstract class Provider{
 				case 6://'Авторусь':
 				case 15://'Rossko':
 				case 17://'Forum-Avto':
-                case 18://'Autoeuro':
+                case 18://'Autoeuro':*/
+                case 30://'ShateM':
                     $output = Provider\Abcp::getItemsToOrder($p['id']);
                     break;
 				default:

@@ -3,6 +3,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use core\Mailer;
 use core\Provider\Mikado;
 use core\Provider;
+use core\Provider\ShateM;
 
 set_time_limit(0);
 core\Timer::start();
@@ -118,6 +119,9 @@ switch($_GET['act']){
         break;
     case 'orderAbsel':
         $ordered = Provider\Absel::sendOrder();
+        break;
+    case 'orderShateM':
+        $ordered = ShateM::sendOrder();
         break;
 	case 'getItemsVoshod':
 		$abcp = new core\Provider\Abcp(NULL, $db);

@@ -205,8 +205,6 @@ class Abcp extends Provider{
 	public function render($provider_id){
 		if(!parent::getIsEnabledApiSearch($provider_id)) return false;
 		if (!parent::isActive($provider_id)) return false;
-		//пока не понятно для чего эта строка
-		// if (!empty($providerStores) && !in_array($provider_id, $providerStores)) continue;
 
 		$items = $this->getItems($provider_id);
 		if (!$items) return false;
@@ -235,7 +233,10 @@ class Abcp extends Provider{
 		}
 	}
 	public function getBrandId($provider_id, $brand){
-		// $brend = $this->db->select_one('brends', 'id,parent_id', "`title`='$brand'");
+        if (!$brand) {
+            return false;
+        }
+
 		$brendsList = Brend::get([
 			'title' => $brand,
 			'provider_id' => $provider_id

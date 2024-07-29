@@ -36,7 +36,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && core\Config::$isUseApiProviders)
     core\Provider\ForumAuto::setArticle($_GET['item_id'], $abcp->item['brand'], $abcp->item['article']);
 
 	core\Provider\Autopiter::setArticle($abcp->item['brand'], $abcp->item['article']);
-	
+
 	core\Provider\Berg::setArticle($abcp->item['brand'], $abcp->item['article'], $_GET['item_id']);
 
     try {

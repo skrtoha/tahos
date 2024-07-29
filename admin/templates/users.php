@@ -293,7 +293,7 @@ function getWhere($type, $filters){
     $output = '';
     switch($type){
         case 'vin': $output .= "sv.user_id = {$filters['id']} AND "; break;
-        case 'items': $output .= "si.user_id = {$filters['id']} AND "; break;
+        case 'items': $output .= "si.user_id = {$filters['id']} AND si.item_id <> 0 AND "; break;
     }
     foreach($filters as $key => $value){
         switch($key){

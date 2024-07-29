@@ -46,6 +46,29 @@ class Absel extends Provider {
         return $params->url."-$method?".http_build_query($data);
     }
 
+    public static function getSearch($search) {
+        $params = self::getInstance()->getParams();
+        if (!parent::getIsEnabledApiSearch($params->provider_id)) return false;
+        if (!parent::isActive($params->provider_id)) return false;
+
+        $url = self::getInstance()->getUrl('search', [
+            'article' => $search,
+            'agreement_id' => $params->agreement_id
+        ]);
+        $result = json_decode(parent::getUrlData($url));
+
+        if ($result->status != 'OK') {
+            return [];
+        }
+
+        $coincidences = array();
+        foreach ($result->data as $item) {
+            $coincidences[$item->brand] = $item->product_name;
+        }
+
+        return $coincidences;
+    }
+
     private function getUserContext() {
         $cacheId = 'Absel-api-user-context';
         $result = Cache::get($cacheId);

@@ -323,16 +323,19 @@ class User{
             callback: function(data, pagination){
                 let str = User.head_common_list;
                 let search;
-                for(var key in data){
-                    var d = data[key];
+                for(const key in data){
+                    const d = data[key];
                     if (d.item_id){
                         let href = `/admin/?view=items&act=item&id=${d.item_id}`;
                         search = '<a target="_blank" href="'+ href + '">' + d.search + '</a>';
                     }
-                    else {
+                    else if(d.search != null) {
                         let vin = d.search.slice(0, 17);
                         let href = '/original-catalogs/legkovie-avtomobili#/carInfo?q=' + vin;
-                        search = '<a target="_blank" href="'+ href + '">' + d.search + '</a>'
+                        search = '<a target="_blank" href="'+ href + '">' + d.search + '</a>';
+                    }
+                    else {
+                        search = '';
                     }
                     str +=
                         '<tr>' +

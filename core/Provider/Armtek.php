@@ -222,6 +222,12 @@ class Armtek extends Provider{
 	public function setArticle($brand, $article){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
 		if (!parent::isActive(self::$provider_id)) return false;
+
+        $cacheId = "Armtek-$brand-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return false;
+        }
+
 		$config = self::getConfig();
 		$params = self::$params;
 		$params['PIN'] = $article;
@@ -235,6 +241,8 @@ class Armtek extends Provider{
 		$response = self::getClientArmtek()->post($request_params);
 		$data = $response->json();
 		$this->render($data->RESP);
+        Provider::setCacheData($cacheId);
+        return true;
 	}
 	public function getSearch($search){
 		if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;

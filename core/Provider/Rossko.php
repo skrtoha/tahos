@@ -491,6 +491,11 @@ class Rossko extends Provider{
 	public function execute($search){
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
+
+        $cacheId = "Rossko-$search";
+        if (Provider::getCacheData($cacheId)) {
+            return false;
+        }
 		$result = $this->getResult($search);
 		if (!$result) return false;
 		if (!$result->SearchResult->success) return false;
@@ -498,6 +503,8 @@ class Rossko extends Provider{
 			foreach($result->SearchResult->PartsList->Part as $value) $this->renderPart($value);
 		}
 		else $this->renderPart($result->SearchResult->PartsList->Part);
+        Provider::setCacheData($cacheId);
+        return true;
 	}
 	public static function isInBasket($ov){
 		return Armtek::isInBasket($ov);

@@ -184,6 +184,11 @@ class Autopiter extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 
+        $cacheId = "Autopiter-$brend-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return false;
+        }
+
 		try{
 			$articleId = self::getArticleIdByBrendAndArticle($brend, $article);
 		}
@@ -203,6 +208,8 @@ class Autopiter extends Provider{
 			}
 		}
 		else self::parseSearchModel($PriceIdResult->GetPriceIdResult->PriceSearchModel);
+        Provider::setCacheData($cacheId);
+        return true;
 	}
 	private static function getStoreID($model){
 		$providerStore = Provider::getInstanceDataBase()->select_one('provider_stores', 'id', "`title` = '{$model->SellerId}' AND `provider_id` = " . self::getParams()->provider_id);

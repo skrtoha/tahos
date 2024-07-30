@@ -27,6 +27,11 @@ class Berg extends Provider{
 	public static function setArticle($brend, $article, $item_id){
         if (!parent::getIsEnabledApiSearch(self::$provider_id)) return false;
         if (!parent::isActive(self::$provider_id)) return false;
+
+        $cacheId = "Berg-$brend-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return true;
+        }
         
         $providerBrend = parent::getProviderBrend(self::$provider_id, $brend);
         
@@ -62,6 +67,7 @@ class Berg extends Provider{
                 ]);
             }
         }
+        Provider::setCacheData($cacheId);
         return true;
 	}
     

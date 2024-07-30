@@ -233,6 +233,11 @@ class Autokontinent extends Provider{
 	public static function setArticle(string $brand, string $article){
 		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
+
+        $cacheId = "Autokontinent-$brand-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return false;
+        }
 		
 		$part_id = self::getPartIdByBrandAndArticle($brand, $article);
 		if (!$part_id) return false;
@@ -258,6 +263,8 @@ class Autokontinent extends Provider{
 				'packaging' => $part->package
 			]);
 		}
+        Provider::setCacheData($cacheId);
+        return true;
 	}
 	public static function removeFromBasket($ov){
 		$basketList = self::getBasket();

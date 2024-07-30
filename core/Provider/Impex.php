@@ -87,12 +87,20 @@ class Impex extends Provider{
 	}
 	public static function getItemsToOrder(int $provider_id){}
 	public static function getData($params){
+        $cacheId = "Impex-{$params['brend']}-{$params['article']}";
+        if (Provider::getCacheData($cacheId)) {
+            return [];
+        }
+
 		$url = "https://www.impex-jp.com/api/parts/search.html?part_no={$params['article']}&key=" . self::getParams()->key;
 		if (isset($params['brend']) && $params['brend']){
 			$mark_id = self::$marks[strtoupper($params['brend'])];
 			$url .= "&mark_id=$mark_id";
-		} 
-		return json_decode(file_get_contents($url), true);
+		}
+        $result = json_decode(file_get_contents($url), true);
+        Provider::setCacheData($cacheId);
+
+		return $result;
 	}
 	public static function setSearch($params){
 		if (!Provider::getIsEnabledApiSearch(1)) return false;

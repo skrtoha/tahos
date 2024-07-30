@@ -245,6 +245,11 @@ class Emex extends Provider{
         if (!parent::getIsEnabledApiSearch(self::PROVIDER_ID)) return;
         if (!parent::isActive(self::PROVIDER_ID)) return;
 
+        $cacheId = "Emex-$brend_id-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return;
+        }
+
         $makeLogo = self::getInfstance()->getMakeLogo($brend_id);
         $result = self::getInfstance()->FindDetailAdv([
             'makeLogo' => $makeLogo,
@@ -260,6 +265,8 @@ class Emex extends Provider{
         foreach ($result as $row){
             self::getInfstance()->parseFindDetailAdv($row, $mainItemID);
         }
+
+        Provider::setCacheData($cacheId);
     }
 
     private function parseFindDetailAdv(object $detail, $mainItemID){

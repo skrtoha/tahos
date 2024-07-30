@@ -21,8 +21,8 @@ class Setting{
             return $defaultSettingsOfView[$name];
 		}
 	}
-	public static function update($param1, $param2, $param3 = ''){
-		if ($param3){
+	public static function update($param1, $param2, $param3 = null){
+		if (!is_null($param3)){
 			$view = $param1;
 			$name = $param2;
 			$value = $param3;

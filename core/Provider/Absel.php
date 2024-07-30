@@ -203,11 +203,8 @@ class Absel extends Provider {
         return $item_id;
     }
 
-    public static function setArticle($brend, $article, $mainItemId) {
+    private function getArticleInfo($brend, $article) {
         $params = self::getInstance()->getParams();
-        if (!parent::getIsEnabledApiSearch($params->provider_id)) return false;
-        if (!parent::isActive($params->provider_id)) return false;
-
         $providerBrend = parent::getProviderBrend($params->provider_id, $brend);
 
         $url = self::getInstance()->getUrl('search', [
@@ -216,7 +213,24 @@ class Absel extends Provider {
             'brand' => $providerBrend,
             'with_cross' => $params->with_cross
         ]);
-        $result = json_decode(parent::getUrlData($url));
+        return json_decode(parent::getUrlData($url));
+    }
+
+    public static function setArticle($brend, $article, $mainItemId) {
+        $params = self::getInstance()->getParams();
+        if (!parent::getIsEnabledApiSearch($params->provider_id)) {
+            return false;
+        }
+        if (!parent::isActive($params->provider_id)) {
+            return false;
+        }
+
+        $cacheId = "Absel-$brend-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return true;
+        }
+
+        $result = self::getInstance()->getArticleInfo($brend, $article);
 
         if ($result->status != 'OK') {
             return false;
@@ -250,6 +264,7 @@ class Absel extends Provider {
             );
 
         }
+        Provider::setCacheData($cacheId);
         return true;
     }
 

@@ -217,19 +217,30 @@ class Mikado extends Provider{
 		if (preg_match('/АНАЛОГИ ПРОЧИЕ \(БРЭНД НЕИЗВЕСТЕН\)/i', $brend)) return false;
 		return true;
 	}
+
+    private function getResponseArticle($article) {
+        $clientData = self::getClientData();
+        $xml = self::getUrlData(
+            'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
+            [
+                'Search_Code' => $article,
+                'ClientID' => $clientData['ClientID'],
+                'Password' => $clientData['Password'],
+                'FromStockOnly' => 'FromStockOnly'
+            ]
+        );
+        return $xml;
+    }
 	public function setArticle($brend, $article, $getZakazCode = false){
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
-		$clientData = self::getClientData();
-		$xml = self::getUrlData(
-			'http://www.mikado-parts.ru/ws1/service.asmx/Code_Search',
-			[
-				'Search_Code' => $article,
-				'ClientID' => $clientData['ClientID'],
-				'Password' => $clientData['Password'],
-				'FromStockOnly' => 'FromStockOnly'  			
-			]
-		);
+
+        $cacheId = "Mikado-$brend-$article-$getZakazCode";
+        if (Provider::getCacheData($cacheId)) {
+            return true;
+        }
+        $xml = $this->getResponseArticle($article);
+
 		if (!$xml) return false;
 		$result = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
 		$result = json_decode(json_encode($result));
@@ -250,6 +261,7 @@ class Mikado extends Provider{
 				$this->parseCodeListRow($r);
 			}
 		}
+        Provider::setCacheData($cacheId);
         return true;
 	}
 	private function compareBrends($b1, $b2){

@@ -15,3 +15,12 @@ select[name=is_blocked] {
 input[name=count_seconds] {
     width: auto !important;
 }
+.cache {
+    display: flex;
+}
+.cache input[type="text"] {
+    width: 50px !important;
+}
+.cache label {
+    margin-right: 10px;
+}

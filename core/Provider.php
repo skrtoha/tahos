@@ -622,4 +622,23 @@ abstract class Provider{
                 return User::BILL_CASH;
         }
     }
+
+    public static function getCacheData($cacheId) {
+        if (Cache::useCache()) {
+            $result = Cache::get($cacheId);
+            if ($result) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static function setCacheData($cacheId) {
+        if (Cache::useCache()) {
+            Cache::set($cacheId, 1, Cache::getDuration());
+        }
+    }
 }

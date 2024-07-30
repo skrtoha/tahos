@@ -203,11 +203,16 @@ class Abcp extends Provider{
 		return $coincidences;
 	}
 	public function render($provider_id){
-		if(!parent::getIsEnabledApiSearch($provider_id)) return false;
-		if (!parent::isActive($provider_id)) return false;
+		if(!parent::getIsEnabledApiSearch($provider_id)) return;
+		if (!parent::isActive($provider_id)) return;
 
-		$items = $this->getItems($provider_id);
-		if (!$items) return false;
+        $cacheId = "Abcp-$provider_id-{$this->item['article']}-{$this->item['brand']}";
+        if (Provider::getCacheData($cacheId)) {
+            return;
+        }
+
+        $items = $this->getItems($provider_id);
+		if (!$items) return;
 
 		$count = count($items);
 		$count = $count <= 5 ? $count : 5; 
@@ -223,7 +228,7 @@ class Abcp extends Provider{
 				'title_full' => $item['description'] ?: 'Деталь',
 				'weight' => $item['weight'] ?: null
 			]);
-			if (!$item_id) return false;
+			if (!$item_id) return;
 			if (self::getComparableString($this->item['article']) != self::getComparableString($item['numberFix'])){
 				$this->insertAnalogies($provider_id, $item_id, $item);
 			}
@@ -231,6 +236,7 @@ class Abcp extends Provider{
 			if (!$store_id) continue;
 			$this->insertStoreItems($store_id, $item_id, $item);
 		}
+        Provider::setCacheData($cacheId);
 	}
 	public function getBrandId($provider_id, $brand){
         if (!$brand) {

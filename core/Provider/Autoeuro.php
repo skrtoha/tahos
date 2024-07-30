@@ -1,5 +1,6 @@
 <?php
 namespace core\Provider;
+use core\Cache;
 use core\Database;
 use core\Provider;
 use core\Log;
@@ -116,6 +117,12 @@ class Autoeuro extends Provider{
 	public function setArticle($brend, $article){
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
+
+        $cacheId = "Autroeuro-$brend-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return false;
+        }
+
         $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
 		$response = self::getStockItems(mb_strtoupper($providerBrend), $article, 1);
 		if (!$response || $response == 'Пустой ключ покупателя'){
@@ -147,6 +154,8 @@ class Autoeuro extends Provider{
             $codes[$key]['offers'][] = $offer;
         }
         foreach($codes as $code) $this->parseCode($code);
+        Provider::setCacheData($cacheId);
+        return true;
 	}
     
     private static function getDelivery(object  $o){

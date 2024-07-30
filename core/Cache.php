@@ -54,6 +54,18 @@ class Cache{
         return $self->classCache->get($key);
     }
 
+    public static function flush(): void
+    {
+        try {
+            $self = self::getInstance();
+        }
+        catch (\Exception $e) {
+            return;
+        }
+
+        $self->classCache->flush();
+    }
+
     public static function delete($key): bool
     {
         $self = self::getInstance();
@@ -63,6 +75,26 @@ class Cache{
     public static function getResult() {
         $self = self::getInstance();
         return $self->classCache->getResultCode();
+    }
+
+    private function getSettings() {
+        static $output;
+        if ($output) {
+            return $output;
+        };
+        $settings = Setting::get('site_settings', null, 'all');
+        $output = $settings;
+        return $settings;
+    }
+
+    public static function useCache() {
+        $settings = self::getInstance()->getSettings();
+        return $settings['cache_use'];
+    }
+
+    public static function getDuration() {
+        $settings = self::getInstance()->getSettings();
+        return $settings['cache_duration'] * 3600;
     }
 
 }

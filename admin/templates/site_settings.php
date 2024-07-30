@@ -1,5 +1,6 @@
 <?php
-use core\Managers;
+use core\Cache;
+
 $page_title = 'Настройки сайта';
 if (!empty($_POST)){
     $data = $_POST;
@@ -10,7 +11,16 @@ if (!empty($_POST)){
     ]);
     $update['1c_url'] = $data['1c_url'];
     $update['synchronization_token'] = $data['synchronization_token'];
-    foreach($update as $key => $value) core\Setting::update('site_settings', $key, $value);
+    $update['cache_duration'] = $data['cache_duration'];
+    $update['cache_use'] = $data['cache_use'];
+
+    if (isset($data['cache_clear'])) {
+        Cache::flush();
+        message('Кэш успешно очищен');
+    }
+    foreach($update as $key => $value) {
+        core\Setting::update('site_settings', $key, $value);
+    }
 	header("Location: /admin/?view=site_settings");
 }
 $data = core\Setting::get('site_settings', null, 'all');
@@ -40,6 +50,26 @@ $act = $_GET['act'];?>
                 <div class="title">Веб адрес 1С</div>
                 <div class="value">
                     <input name="1c_url" value="<?=$data['1c_url']?>">
+                </div>
+            </div>
+            <div class="field">
+                <div class="title">Кэширование артикулов</div>
+                <div class="value cache">
+                    <label>
+                        Включено
+                        <select name="cache_use">
+                            <option <?=$data['cache_use'] == '0' ? 'selected' : ''?> value="0">нет</option>
+                            <option <?=$data['cache_use'] == '1' ? 'selected' : ''?> value="1">да</option>
+                        </select>
+                    </label>
+                    <label>
+                        Длительность, ч.
+                        <input type="text" name="cache_duration" value="<?=$data['cache_duration']?>">
+                    </label>
+                    <label>
+                        <input type="checkbox" name="cache_clear" value="1">
+                        Очистить
+                    </label>
                 </div>
             </div>
             <input type="submit" value="Сохранить">

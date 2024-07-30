@@ -155,6 +155,11 @@ class ForumAuto extends Provider{
             return false;
         }
 
+        $cacheId = "ForumAuto-$brend-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return true;
+        }
+
 		$response = self::getItemsByBrendAndArticle($brend, $article);
 
 		foreach($response as $item){
@@ -172,6 +177,7 @@ class ForumAuto extends Provider{
                     'in_stock' => $item->num
             ]]);
         }
+        Provider::setCacheData($cacheId);
         return true;
 	}
 	public static function getPrice($params){

@@ -111,6 +111,12 @@ class ShateM extends Provider
         if (!parent::isActive($params->provider_id)) {
             return false;
         }
+
+        $cacheId = "ShateM-$brend-$article";
+        if (Provider::getCacheData($cacheId)) {
+            return true;
+        }
+
         $self = self::getInstance();
         $articleId = $self->getArticleId($brend, $article);
         $queryParams = [
@@ -145,6 +151,9 @@ class ShateM extends Provider
         if ($params->with_cross) {
             self::getInstance()->processCrosses($crossItems, $mainItemId);
         }
+
+        Provider::setCacheData($cacheId);
+
         return true;
     }
 

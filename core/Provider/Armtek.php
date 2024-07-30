@@ -3,9 +3,6 @@ namespace core\Provider;
 use core\Provider;
 use core\OrderValue;
 use core\Log;
-use core\Item;
-use core\Setting;
-use ArmtekRestClient\Http\Exception\ArmtekException as ArmtekException;
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
 

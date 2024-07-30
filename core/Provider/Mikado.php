@@ -192,26 +192,6 @@ class Mikado extends Provider{
 		// debug($brendTitle); exit();
 		if (empty($brendTitle)) return false;
 		else return $brendTitle;
-		foreach($brendTitle as $key => $value){
-			$brend_id = $this->armtek->getBrendId($key, 'mikado');
-			if (!$brend_id) continue;
-			$article = preg_replace('/[\W_]+/', '', $text);
-			$res = $GLOBALS['db']->insert(
-				'items',
-				[
-					'brend_id' => $brend_id,
-					'article' => $article,
-					'article_cat' => $text,
-					'title_full' => $value,
-					'title' => $value, 
-				],
-				['print_query' => true]
-			);
-			if ($res === true){
-				$item_id = $GLOBALS['db']->last_id();
-				$GLOBALS['db']->insert('item_articles', ['item_id' => $item_id, 'item_diff' => $item_id]);
-			}
-		}
 	}
 	private function isRealBrend($brend){
 		if (preg_match('/АНАЛОГИ ПРОЧИЕ \(БРЭНД НЕИЗВЕСТЕН\)/i', $brend)) return false;
@@ -290,7 +270,8 @@ class Mikado extends Provider{
 		$b2 = self::getComparableString($b2);
 		if ($this->brends[$b1]['id'] == $this->brends[$b2]['parent_id'] || $this->brends[$b2]['id'] == $this->brends[$b1]['parent_id']){
 			return true;
-		} 
+		}
+        return false;
 	}
 	private function parseCodeListRow($row){
         if (!is_string($row->ProducerBrand)) return false;

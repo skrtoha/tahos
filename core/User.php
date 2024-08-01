@@ -585,10 +585,10 @@ class User{
 
         $remainder = 0;
         if ($bill_type == User::BILL_CASH) {
-            $remainder = $user['bill_cash'] + $amount;
+            $remainder = $user['bill_cash'] - $amount;
         }
         if ($bill_type == User::BILL_CASHLESS) {
-            $remainder = $user['bill_cashless'] + $amount;
+            $remainder = $user['bill_cashless'] - $amount;
         }
 
         if ($document_date){

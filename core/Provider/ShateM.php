@@ -119,6 +119,11 @@ class ShateM extends Provider
 
         $self = self::getInstance();
         $articleId = $self->getArticleId($brend, $article);
+
+        if (!$articleId) {
+            return false;
+        }
+
         $queryParams = [
             'deliveryAddressCode' => $self->getAddress(),
             'agreementCode' => $params->agreementCode,

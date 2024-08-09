@@ -5,6 +5,7 @@ use core\OrderValue;
 use core\Log;
 use ArmtekRestClient\Http\Config\Config as ArmtekRestClientConfig;
 use ArmtekRestClient\Http\ArmtekRestClient as ArmtekRestClient;
+use core\User;
 
 //добавлен в связи с тем, что не работало в тестах для Росско
 if ($_SERVER['DOCUMENT_ROOT']) $path = $_SERVER['DOCUMENT_ROOT'].'/';
@@ -329,7 +330,7 @@ class Armtek extends Provider{
 		if (empty($items)){
 			Log::insert([
 				'url' => $_SERVER['REQUEST_URI'],
-				'text' => "Армтек: не найдено товаров для отправки для $user_type"
+				'text' => "Армтек: не найдено товаров для отправки для $typeOrganization"
 			]);
 			return 0;
 		} 
@@ -345,7 +346,8 @@ class Armtek extends Provider{
 				'PIN' => $i['article'],
 				'BRAND' => $i['brend'],
 				'KWMENG' => $i['quan'],
-				'KEYZAK' => $i['store']
+				'KEYZAK' => $i['store'],
+                'bill_type' => $typeOrganization == 'entity' ? User::BILL_CASHLESS : User::BILL_CASH
 			];
 		}
 		$params['ITEMS'] = $itemsForSending;
@@ -357,10 +359,9 @@ class Armtek extends Provider{
 			'params' => $params
 		];
         $response = self::getClientArmtek($typeOrganization)->post($request_params);
-        $json_responce_data = $response->json();
         return [
 			'itemsForSending' => $itemsForSending,
-			'responseData' => $json_responce_data
+			'responseData' => $response->json()
 		];
 	}
 	
@@ -376,6 +377,7 @@ class Armtek extends Provider{
         return $response->json();
     }
 	private static function parseOrderResponse($input){
+        $output = 0;
 		$items = $input['itemsForSending'];
 		$response = $input['responseData'];
 		if (!empty($response->MESSAGES)){
@@ -398,38 +400,41 @@ class Armtek extends Provider{
 				]);
 			}
 			if (isset($value->RESULT) && !empty($value->RESULT)){
+                $i = & $items[$itemKey];
 				if ($value->RESULT[0]->ERROR){
 					Log::insert([
 						'text' => $value->RESULT[0]->ERROR,
-						'additional' => "osi: {$items[$itemKey['order_id']]}-{$items[$itemKey['store_id']]}-{$items[$itemKey['item_id']]}"
+						'additional' => "osi: {$i['order_id']}-{$i['store_id']}-{$i['item_id']}"
 					]);
 					continue;
 				}
 				if ($value->RESULT->REMAIN) Log::insert([
 					'text' => 'Армтек: нехватка остатка для заказа',
-					'additional' => "osi: {$items[$itemKey]['order_id']}-{$items[$itemKey]['store_id']}-{$items[$itemKey]['item_id']}"
+					'additional' => "osi: {$i['order_id']}-{$i['store_id']}-{$i['item_id']}"
 				]);
 				OrderValue::changeStatus(11, [
-					'order_id' => $items[$itemKey]['order_id'],
-					'store_id' => $items[$itemKey]['store_id'],
-					'item_id' => $items[$itemKey]['item_id'],
-					'price' => $items[$itemKey]['price'],
+					'order_id' => $i['order_id'],
+					'store_id' => $i['store_id'],
+					'item_id' => $i['item_id'],
+					'price' => $i['price'],
 					'quan' => $value->RESULT[0]->KWMENG,
-					'user_id' => $items[$itemKey]['user_id']
+					'user_id' => $i['user_id']
 				]);
 				parent::updateProviderBasket(
 					[
-						'order_id' => $items[$itemKey]['order_id'],
-						'store_id' => $items[$itemKey]['store_id'],
-						'item_id' => $items[$itemKey]['item_id'],
+						'order_id' => $i['order_id'],
+						'store_id' => $i['store_id'],
+						'item_id' => $i['item_id'],
 					],
 					[
 						'response' => 'OK',
 						'successful' => 1
 					]
 				);
+                $output += $value->RESULT[0]->KWMENG;
 			}
 		}
+        return $output;
 	}
 	/**
 	 * prepares data for sending and sends them to order
@@ -438,6 +443,7 @@ class Armtek extends Provider{
 	public static function sendOrder(){
 		$items = [];
 		$config = self::getConfig();
+        $ordered = 0;
 		$providerBasket = parent::getProviderBasket($config['provider_id'], '');
 		if (!$providerBasket->num_rows) return;
 		foreach($providerBasket as $pb){
@@ -445,10 +451,15 @@ class Armtek extends Provider{
 		}
 		
 		$resultEntity = self::executeSendOrder($items['entity'], 'entity');
-		if ($resultEntity) self::parseOrderResponse($resultEntity);
-        
+		if ($resultEntity) {
+            $ordered += self::parseOrderResponse($resultEntity);
+        }
+
         $resultPrivate = self::executeSendOrder($items['private'], 'private');
-        if ($resultPrivate) self::parseOrderResponse($resultPrivate);
+        if ($resultPrivate) {
+            $ordered += self::parseOrderResponse($resultPrivate);
+        }
+        return $ordered;
 	}
 	public static function isInBasket($ov){
 		return parent::getInstanceDataBase()->getCount('provider_basket', parent::getWhere($ov));

@@ -218,6 +218,44 @@ class User{
                 item.addEventListener('click', User.eventFundDistribution)
             })
         }
+
+        const refundMoneyList = document.querySelectorAll('.refund-money');
+        if (refundMoneyList !== null){
+            refundMoneyList.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    let amount = + prompt('Введите сумму:', e.target.dataset.amount);
+                    if (!amount) {
+                        return false;
+                    }
+                    if (!/\d+/.test(amount) || amount > e.target.dataset.amount) {
+                        return show_message('Сумма указано неверно!', 'error');
+                    }
+
+                    const formData = new FormData;
+                    formData.set('amount', amount);
+                    formData.set('id', e.target.dataset.id);
+                    formData.set('act', 'refund-money');
+                    if (amount < e.target.dataset.amount) {
+                        formData.set('partial', 'true');
+                    }
+                    else {
+                        formData.set('partial', 'false');
+                    }
+                    fetch('/admin/ajax/user.php', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => response.json()).then(response => {
+                        if (response.result == 'fail') {
+                            show_message(response.msg, 'error');
+                        }
+                        else {
+                            show_message('Успешно возвращено')
+                        }
+                    })
+                })
+            })
+        }
     }
     static eventFundDistribution = (e) => {
         let formData = new FormData;

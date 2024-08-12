@@ -142,3 +142,10 @@ tr.not-paid {
          margin-right: 10px;
     }
 }
+
+a.refund-money {
+    font-size: 12px;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+}

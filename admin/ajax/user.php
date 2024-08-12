@@ -1,8 +1,8 @@
 <?php
 
 use core\Mailer;
+use core\Payment\Paykeeper;
 use core\Provider;
-use core\Setting;
 use core\Synchronization;
 use core\UserAddress;
 use core\User;
@@ -232,6 +232,10 @@ switch($_POST['act']){
                 f1.issue_id = {$_POST['issue_id']}
         ")->fetch_all(MYSQLI_ASSOC);
         echo json_encode($result);
+        break;
+    case 'refund-money':
+        $response = Paykeeper::refundMoney($_POST['id'], $_POST['amount'], $_POST['partial']);
+        echo json_encode($response);
         break;
 }
 

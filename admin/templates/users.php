@@ -833,11 +833,23 @@ function funds(){
 			<td>Комментарий</td>
 		</tr>
 		<?if (count($funds)){
-			foreach($funds as $id => $fund){
+            $stringPayment = 'Поступление оплаты от клиента: Платежное поручение №';
+			foreach($funds as $fund){
                 $class = $fund['issue_id'] && $fund['paid'] < $fund['sum'] ? 'not-paid' : ''?>
 				<tr class="<?=$class?>" <?=$fund['issue_id'] ? "data-issue-id='{$fund['issue_id']}'" : ''?>>
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
-					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
+					<td label="Тип операции">
+                        <?=$operations_types[$fund['type_operation']]?>
+                        <?if (mb_strpos($fund['comment'], $stringPayment) !== false) {
+                            $string = str_replace($stringPayment, '', $fund['comment']);
+                            $paymentId = preg_replace('/ от.*/', '', $string);
+                            ?>
+                            <br>
+                            <a nohref data-id="<?=$paymentId?>" data-amount="<?=$fund['sum']?>" class="refund-money">
+                                Вернуть
+                            </a>
+                        <?}?>
+                    </td>
                     <td label="Счет">
                         <?if ($fund['bill_type'] == User::BILL_CASH){?>
                             Наличный

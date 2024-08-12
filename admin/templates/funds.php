@@ -68,7 +68,7 @@ function funds(){
 	$res_funds = $db->query($query, '');
 	?>
 	<div id="div_form" class="actions">
-		<form method="" action="?view=funds">
+		<form action="?view=funds">
 			<input type="hidden" name="view" value="funds">
 			<input style="width: 264px;" type="text" name="search" value="<?=$_GET['search']?>" placeholder="Поиск по пользователям">
 			<select style="height: 25px" name="type_operation">

@@ -2,6 +2,7 @@
 
 namespace core\Payment;
 
+use core\Cache;
 use core\Database;
 use core\Exceptions\Paykeeper\PaymentAlreadyExistsException;
 use core\Fund;
@@ -18,17 +19,60 @@ class Paykeeper{
 
     public static $orderInfo = [];
 
+    private static function getHeaders() {
+        $base64 = base64_encode(self::$user.":".self::$password);
+        return [
+            'Content-Type: application/x-www-form-urlencoded',
+            'Authorization: Basic ' . $base64
+        ];
+    }
+
+    private static function getToken() {
+        $cacheId = 'paykeeper_token';
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
+
+        $uri = "/info/settings/token/";
+        $curl = curl_init();
+        curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($curl,CURLOPT_URL,self::$server.$uri);
+        curl_setopt($curl,CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($curl,CURLOPT_HTTPHEADER, self::getHeaders());
+        curl_setopt($curl,CURLOPT_HEADER, false);
+
+        $response = curl_exec($curl);
+        $php_array = json_decode($response, true);
+        if ($php_array['token']) {
+            Cache::set($cacheId, $php_array['token'], 24 * 60 * 60);
+        }
+        return $php_array['token'] ?? false;
+    }
+
+    private static function sendPostRequest($uri, $request) {
+        $curl = curl_init();
+        $request = http_build_query(array_merge($request, ['token' => self::getToken()]));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_URL, self::$server . $uri);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($curl, CURLOPT_HTTPHEADER, self::getHeaders());
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $request);
+
+        return json_decode(curl_exec($curl),true);
+    }
+
     public static function getLinkReplenishBill($amount, $user_id, $orderId = null){
         $payment_data = [
             "pay_amount" => $amount
         ];
-        if ($orderId){
+        if ($orderId) {
             $payment_data['orderid'] = $orderId;
             $payment_data['service_name'] = "Оплата заказа №$orderId";
-        }
-        else{
+        } else {
             $resultUser = User::get(['user_id' => $user_id]);
-            foreach($resultUser as $value){
+            foreach ($resultUser as $value) {
                 $userInfo = $value;
             }
             $payment_data['clientid'] = $userInfo['full_name'];
@@ -36,37 +80,8 @@ class Paykeeper{
             $payment_data['client_email'] = $userInfo['email'];
             $payment_data['client_phone'] = $userInfo['phone'];
         }
-        $base64 = base64_encode(self::$user.":".self::$password);
-        $headers = [];
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-        $headers[] = 'Authorization: Basic ' . $base64;
-        $uri = "/info/settings/token/";
-        $curl = curl_init();
-        curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($curl,CURLOPT_URL,self::$server.$uri);
-        curl_setopt($curl,CURLOPT_CUSTOMREQUEST, 'GET');
-        curl_setopt($curl,CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl,CURLOPT_HEADER, false);
 
-        $response = curl_exec($curl);
-        $php_array = json_decode($response, true);
-        if (isset($php_array['token'])){
-            $token = $php_array['token'];
-        }
-        else{
-            return false;
-        }
-
-        $uri="/change/invoice/preview/";
-        $request = http_build_query(array_merge($payment_data, ['token'=>$token]));
-        curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($curl,CURLOPT_URL,self::$server.$uri);
-        curl_setopt($curl,CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl,CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl,CURLOPT_HEADER, false);
-        curl_setopt($curl,CURLOPT_POSTFIELDS, $request);
-
-        $response=json_decode(curl_exec($curl),true);
+        $response = self::sendPostRequest('/change/invoice/preview/', $payment_data);
         if (isset($response['invoice_id'])){
             $invoice_id = $response['invoice_id'];
         }
@@ -305,5 +320,13 @@ class Paykeeper{
             }
             echo "\n\n";
         }
+    }
+
+    public static function refundMoney($id, $amount, $partial) {
+        return self::sendPostRequest('/change/payment/reverse/', [
+            'amount' => $amount,
+            'id' => $id,
+            'partial' => $partial
+        ]);
     }
 }

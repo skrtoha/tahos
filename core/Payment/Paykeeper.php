@@ -157,6 +157,20 @@ class Paykeeper{
         if ($res_insert === true){
             User::update($user['id'], $update);
             Database::getInstance()->commit();
+
+            $array = [
+                'paykeeper_id' => $params['id'],
+                'sum' => $amount,
+                'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
+            ];
+            if (isset($params['orderid']) && $params['orderid']) {
+                $array['order_id'] = $params['order_id'];
+                $array['user_id'] = $user['id'];
+            }
+            if (isset($params['clientid']) && $params['clientid']) {
+                $array['user_id'] = $user['id'];
+            }
+            Synchronization::createPayment1C($array, 'cancel');
         }
         return true;
     }

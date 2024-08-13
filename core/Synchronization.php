@@ -223,12 +223,13 @@ class Synchronization{
         return $result;
     }
 
-    public static function createPayment1C($params) {
+    public static function createPayment1C($params, $type = '') {
         Telegram::writeLogFile($params);
         $settings = Setting::get('site_settings', null, 'all');
 
         $curl = curl_init();
 
+        $params['type'] = $type;
         curl_setopt_array($curl, array(
             CURLOPT_URL => "{$settings['1c_url']}create-payment",
             CURLOPT_RETURNTRANSFER => true,

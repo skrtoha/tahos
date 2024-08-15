@@ -833,20 +833,28 @@ function funds(){
 			<td>Комментарий</td>
 		</tr>
 		<?if (count($funds)){
-            $stringPayment = 'Поступление оплаты от клиента: Платежное поручение №';
+            $stringPaymentAccount = 'Поступление оплаты от клиента: Платежное поручение №';
+            $stringPaymentOrder = 'Оплата заказа №';
 			foreach($funds as $fund){
                 $class = $fund['issue_id'] && $fund['paid'] < $fund['sum'] ? 'not-paid' : ''?>
 				<tr class="<?=$class?>" <?=$fund['issue_id'] ? "data-issue-id='{$fund['issue_id']}'" : ''?>>
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 					<td label="Тип операции">
                         <?=$operations_types[$fund['type_operation']]?>
-                        <?if (mb_strpos($fund['comment'], $stringPayment) !== false) {
-                            $string = str_replace($stringPayment, '', $fund['comment']);
+                        <?if (mb_strpos($fund['comment'], $stringPaymentAccount) !== false) {
+                            $string = str_replace($stringPaymentAccount, '', $fund['comment']);
                             $paymentId = preg_replace('/ от.*/', '', $string);
                             ?>
-                            <br>
-                            <a nohref data-id="<?=$paymentId?>" data-amount="<?=$fund['sum']?>" class="refund-money">
-                                Вернуть
+                            <a title="Вернуть" nohref data-id="<?=$paymentId?>" data-amount="<?=$fund['sum']?>" class="refund-money">
+                                <span class="icon-arrow-up"></span>
+                            </a>
+                        <?}?>
+                        <?if (mb_strpos($fund['comment'], $stringPaymentOrder) !== false) {
+                            $string = preg_replace("/Оплата заказа.*поручение №/", '', $fund['comment']);
+                            $paymentId = preg_replace('/ от.*/', '', $string);
+                            ?>
+                            <a title="Вернуть" nohref data-id="<?=$paymentId?>" data-amount="<?=$fund['sum']?>" class="refund-money">
+                                <span class="icon-arrow-up"></span>
                             </a>
                         <?}?>
                     </td>

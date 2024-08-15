@@ -224,19 +224,20 @@ class User{
             refundMoneyList.forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
-                    let amount = + prompt('Введите сумму:', e.target.dataset.amount);
+                    const element = e.target.closest('a');
+                    let amount = + prompt('Введите сумму:', element.dataset.amount);
                     if (!amount) {
                         return false;
                     }
-                    if (!/\d+/.test(amount) || amount > e.target.dataset.amount) {
+                    if (!/\d+/.test(amount) || amount > element.dataset.amount) {
                         return show_message('Сумма указано неверно!', 'error');
                     }
 
                     const formData = new FormData;
                     formData.set('amount', amount);
-                    formData.set('id', e.target.dataset.id);
+                    formData.set('id', element.dataset.id);
                     formData.set('act', 'refund-money');
-                    if (amount < e.target.dataset.amount) {
+                    if (amount < element.dataset.amount) {
                         formData.set('partial', 'true');
                     }
                     else {

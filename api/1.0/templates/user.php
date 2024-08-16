@@ -7,6 +7,7 @@
 
 use core\Database;
 use core\Exceptions\NotFoundException;
+use core\Payment\Paykeeper;
 use core\Synchronization;
 use core\User;
 
@@ -81,6 +82,13 @@ switch ($act){
                 $queryParams['document_date']
             );
             Synchronization::set1CDocument($queryParams['document_title'], $queryParams);
+            if ($queryParams['paykeeper_id']) {
+                $response = Paykeeper::refundMoney(
+                    $queryParams['paykeeper_id'],
+                    $queryParams['sum'],
+                    $queryParams['partial']
+                );
+            }
             break;
         }
 

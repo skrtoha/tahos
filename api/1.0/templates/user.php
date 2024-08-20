@@ -28,20 +28,20 @@ switch ($act){
             break;
         }
 
-        if ($queryParams['document_date']) {
+        if ($queryParams['document_date'] && $queryParams['act'] != 'minus') {
             $dateTime = DateTime::createFromFormat('d.m.Y H:i:s', $queryParams['document_date']);
             $from = $dateTime->format('Y-m-d').' 00:00:00';
             $to = $dateTime->format('Y-m-d').' 23:59:59';
             $result = Database::getInstance()->query("
-            SELECT
-                *
-                FROM #funds
-            WHERE
-                `user_id` = {$queryParams['user_id']} 
-                AND `sum` = {$queryParams['sum']}
-                AND `bill_type` = $bill_type
-                AND `document_date` BETWEEN '$from' and '$to'
-        ");
+                SELECT
+                    *
+                    FROM #funds
+                WHERE
+                    `user_id` = {$queryParams['user_id']} 
+                    AND `sum` = {$queryParams['sum']}
+                    AND `bill_type` = $bill_type
+                    AND `document_date` BETWEEN '$from' and '$to'
+            ");
             if ($result->num_rows) {
                 break;
             }
@@ -74,6 +74,18 @@ switch ($act){
         }
 
         if ($queryParams['act'] == 'minus'){
+            if ($queryParams['paykeeper_id']) {
+                $result = Paykeeper::refundMoney(
+                    $queryParams['paykeeper_id'],
+                    $queryParams['sum'],
+                    (bool)$queryParams['partial']
+                );
+                if ($result['result'] != 'fail') {
+                    Synchronization::set1CDocument($queryParams['document_title'], $queryParams);
+                }
+                break;
+
+            }
             User::returnMoney(
                 $queryParams['user_id'],
                 $queryParams['sum'],
@@ -82,13 +94,6 @@ switch ($act){
                 $queryParams['document_date']
             );
             Synchronization::set1CDocument($queryParams['document_title'], $queryParams);
-            if ($queryParams['paykeeper_id']) {
-                $response = Paykeeper::refundMoney(
-                    $queryParams['paykeeper_id'],
-                    $queryParams['sum'],
-                    $queryParams['partial']
-                );
-            }
             break;
         }
 

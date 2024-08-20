@@ -151,3 +151,6 @@ a.refund-money {
 .icon-arrow-up:before {
     content: "\ea32";
 }
+td[label="Тип операции"] {
+    white-space: nowrap;
+}

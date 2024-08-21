@@ -75,6 +75,9 @@ switch($_POST['act']){
 					<td>{$item['title_full']}</td>
 				</tr>";
 		}
+        $output .= "<tr>
+            <td colspan='2'><a class='show_more' href='/search/article/$article'>показать больше</a></td>
+        </tr>";
 		echo $output;
 		break;
 	case 'rememberUserSearch':

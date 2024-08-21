@@ -166,9 +166,11 @@ class Abcp extends Provider{
 		$brends = Brend::get(['id' => $this->item['brend_id'], 'provider_id' => $provider_id], [], '');
 		$brend = $brends->fetch_assoc();
 		$p = self::getParam($provider_id);
-		$res = parent::getUrlData(
-			"{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$this->item['article']}&brand={$brend['title']}"
-		);
+        $url = "{$p['url']}/search/articles/?userlogin={$p['userlogin']}&userpsw=".md5($p['userpsw'])."&useOnlineStocks=1&number={$this->item['article']}&brand={$brend['title']}";
+        if (!$p['with_cross']) {
+            $url .= "&withOutAnalogs=1";
+        }
+		$res = parent::getUrlData($url);
 		return json_decode($res, true);
 	}
 	public function getSearch($search){
@@ -204,16 +206,11 @@ class Abcp extends Provider{
 		if(!parent::getIsEnabledApiSearch($provider_id)) return;
 		if (!parent::isActive($provider_id)) return;
 
-        $cacheId = "Abcp-$provider_id-{$this->item['article']}-{$this->item['brand']}";
-        if (Provider::getCacheData($cacheId)) {
-            return;
-        }
-
         $items = $this->getItems($provider_id);
 		if (!$items) return;
 
 		$count = count($items);
-		$count = $count <= 5 ? $count : 5; 
+		$count = min($count, 5);
 		for($i = 0; $i < $count; $i++){
 			$item = $items[$i];
 			$brend_id = $this->getBrandId($provider_id, $item['brand']);
@@ -234,7 +231,6 @@ class Abcp extends Provider{
 			if (!$store_id) continue;
 			$this->insertStoreItems($store_id, $item_id, $item);
 		}
-        Provider::setCacheData($cacheId);
 	}
 	public function getBrandId($provider_id, $brand){
         if (!$brand) {

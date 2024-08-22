@@ -53,7 +53,7 @@ switch($_POST['act']){
 		$output = '';
 		$query = core\Item::getQueryItemInfo();
 		$article = core\Item::articleClear($_POST['value']);
-        $query = str_replace('SELECT', 'SELECT DISTINCT', $query);
+        $query = str_replace('SELECT', 'SELECT DISTINCT SQL_CALC_FOUND_ROWS', $query);
 		$query .= "
 		    LEFT JOIN
 		        #store_items si ON si.item_id = i.id
@@ -75,9 +75,11 @@ switch($_POST['act']){
 					<td>{$item['title_full']}</td>
 				</tr>";
 		}
-        $output .= "<tr>
+        if ($db->found_rows() > $_POST['maxCountResults']){
+            $output .= "<tr>
             <td colspan='2'><a class='show_more' href='/search/article/$article'>показать больше</a></td>
         </tr>";
+        }
 		echo $output;
 		break;
 	case 'rememberUserSearch':

@@ -141,7 +141,7 @@ $(function(){
             clearInterval(intervalID);
             return false;
         }
-        let $partsCatalogsNodes = $('div._1WlWlHOl9uqtdaoVxShALG');
+        let $partsCatalogsNodes = $('#app');
         if (!$('#to_garage').size()) isProccessedGarage = false;
         if($partsCatalogsNodes.size() && !isProccessedGarage){
 			let $h1 = $partsCatalogsNodes.find('h1');

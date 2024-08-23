@@ -374,7 +374,6 @@ class Abcp extends Provider{
 			$items["{$value['order_id']}-{$value['store_id']}-{$value['item_id']}"] = $value;
 		}
 		$responseAddToBasket = self::addToBasket($items, $value);
-		debug($responseAddToBasket);
 		self::parseResponseAddToBasket($responseAddToBasket, $items);
 		self::sendBasketToOrder($provider_id, $value['typeOrganization']);
 	}
@@ -440,7 +439,7 @@ class Abcp extends Provider{
 		$res = json_decode($response, true);
 		return $res[1]['date'];
 	}
-	public static function sendBasketToOrder(int $provider_id, string $user_type): void
+	private static function sendBasketToOrder(int $provider_id, string $user_type): void
 	{
 		$param = self::getParam($provider_id, $user_type);
 		$shipmentDate = self::getShipmentDate($provider_id);
@@ -451,8 +450,8 @@ class Abcp extends Provider{
 				'userpsw' => md5($param['userpsw']),
 				'paymentMethod' => $param['paymentMethod'],
 				'shipmentAddress' => $param['shipmentAddress'],
-				'shipmentOffice' => isset($param['shipmentOffice']) ? $param['shipmentOffice'] : '',
-				'shipmentMethod' => isset($param['shipmentMethod']) ? $param['shipmentMethod'] : '',
+				'shipmentOffice' => $param['shipmentOffice'] ?? '',
+				'shipmentMethod' => $param['shipmentMethod'] ?? '',
 				'shipmentDate' => $shipmentDate
 			]
 		);

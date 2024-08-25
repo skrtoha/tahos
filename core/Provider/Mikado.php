@@ -206,7 +206,7 @@ class Mikado extends Provider{
                 'Search_Code' => $article,
                 'ClientID' => $clientData['ClientID'],
                 'Password' => $clientData['Password'],
-                'FromStockOnly' => 'FromStockOnly'
+                'FromStockOnly' => self::getParams()->with_cross ? 'FromStockAndByOrder' : 'FromStockOnly'
             ]
         );
         return $xml;

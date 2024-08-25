@@ -118,16 +118,18 @@ class Autoeuro extends Provider{
 		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 
-        $cacheId = "Autroeuro-$brend-$article";
+        $cacheId = "Autoeuro-$brend-$article";
         if (Provider::getCacheData($cacheId)) {
             return false;
         }
 
         $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
-		$response = self::getStockItems(mb_strtoupper($providerBrend), $article, 1);
+        $providerBrend = mb_strtoupper($providerBrend);
+        $params = self::getParams();
+		$response = self::getStockItems($providerBrend, $article, $params->with_crosses);
 		if (!$response || $response == 'Пустой ключ покупателя'){
 			$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
-			$response = self::getStockItems(strtoupper($providerBrend), $article);
+			$response = self::getStockItems($providerBrend, $article, $params->with_crosses);
 		}
 		if (!$response) return false;
 		$object = json_decode($response, false);

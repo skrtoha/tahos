@@ -2,6 +2,7 @@
 namespace core\Provider;
 
 use core\Cache;
+use core\Database;
 use core\Exceptions\ForumAuto\ErrorBrendID;
 use core\Provider;
 use core\Brend;
@@ -130,11 +131,11 @@ class ForumAuto extends Provider{
         Cache::set($cacheId, $store['id']);
         return $store['id'];
 	}
-	private static function getItemsByBrendAndArticle($brend, $article, $typeOrganization = 'private'){
+	private static function getItemsByBrendAndArticle($brend, $article, $typeOrganization = 'private', $cross = 0){
 		try{
 			$queryString = self::getStringQuery(
                 'listGoods',
-                ['art' => $article, 'br' => $brend, 'cross' => 0],
+                ['art' => $article, 'br' => $brend, 'cross' => $cross],
                 $typeOrganization
             );
 			$json = Provider::getUrlData($queryString);
@@ -161,25 +162,53 @@ class ForumAuto extends Provider{
         }
 
 		$response = self::getItemsByBrendAndArticle($brend, $article);
-
-		foreach($response as $item){
-            $store_id = self::getStoreID($item->whse);
-            $item_id = self::getItemID($item);
-            parent::getInstanceDataBase()->insert('store_items', [
-                'store_id' => $store_id,
-                'item_id' => $item_id,
-                'price' => $item->price,
-                'in_stock' => $item->num,
-                'packaging' => $item->kr
-            ], [
-                'duplicate' => [
-                    'price' => $item->price,
-                    'in_stock' => $item->num
-            ]]);
+        foreach($response as $item){
+            self::setItem($item);
         }
+
+        if (self::getParams()->with_cross) {
+            $response = self::getItemsByBrendAndArticle($brend, $article, 'private', 1);
+            foreach($response as $item){
+                self::setItem($item, $mainItemID);
+            }
+        }
+
         Provider::setCacheData($cacheId);
         return true;
 	}
+
+    private static function setItem($item, $mainItemID = null) {
+        $store_id = self::getStoreID($item->whse);
+
+        if (!$store_id) {
+            return;
+        }
+
+        $item_id = self::getItemID($item);
+
+        if ($mainItemID) {
+            Database::getInstance()->insert('item_analogies', [
+                'item_id' => $mainItemID,
+                'item_diff' => $item_id
+            ]);
+            Database::getInstance()->insert('item_analogies', [
+                'item_id' => $item_id,
+                'item_diff' => $mainItemID
+            ]);
+        }
+
+        parent::getInstanceDataBase()->insert('store_items', [
+            'store_id' => $store_id,
+            'item_id' => $item_id,
+            'price' => $item->price,
+            'in_stock' => $item->num,
+            'packaging' => $item->kr
+        ],
+            ['duplicate' => [
+                'price' => $item->price,
+                'in_stock' => $item->num
+            ]]);
+    }
 	public static function getPrice($params){
 		try{
 			$itemsList = self::getItemsByBrendAndArticle($params['brend'], $params['article']);

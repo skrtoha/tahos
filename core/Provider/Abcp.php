@@ -124,7 +124,8 @@ class Abcp extends Provider{
 				si.item_id = $item_id AND ps.provider_id = $provider_id
 		"; 
 	}
-	public static function getParam(int $provider_id, $typeOrganization = 'entity'){
+	public static function getParam(int $provider_id, $typeOrganization = 'entity'): array
+    {
 		$param = parent::getApiParams([
 			'provider_id' => $provider_id,
 			'typeOrganization' => $typeOrganization
@@ -224,7 +225,10 @@ class Abcp extends Provider{
 				'weight' => $item['weight'] ?: null
 			]);
 			if (!$item_id) return;
-			if (self::getComparableString($this->item['article']) != self::getComparableString($item['numberFix'])){
+			if (
+                self::getComparableString($this->item['article']) != self::getComparableString($item['numberFix'])
+                && self::getParam($provider_id)['with_cross']
+            ){
 				$this->insertAnalogies($provider_id, $item_id, $item);
 			}
 			$store_id = $this->insertProviderStore($provider_id, $item);

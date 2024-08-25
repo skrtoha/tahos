@@ -1,6 +1,7 @@
 <?php
 namespace core\Provider;
 
+use core\Exceptions\Autokontinent\ErrorPartID;
 use core\Provider;
 use core\Brend;
 use core\Item;
@@ -122,7 +123,11 @@ class Autokontinent extends Provider{
 		$brends[$brand_name] = $brend_id;
 		return $brend_id;
 	}
-	private static function getPartIdByBrendAndArrayOfItems($brand, $items){
+
+    /**
+     * @throws ErrorPartID
+     */
+    private static function getPartIdByBrendAndArrayOfItems($brand, $items){
 		foreach($items as $item){
 			if (Provider::getComparableString($item->brand_name) == Provider::getComparableString($brand)) return $item->part_id;
 		}

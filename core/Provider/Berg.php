@@ -36,6 +36,7 @@ class Berg extends Provider{
         $providerBrend = parent::getProviderBrend(self::$provider_id, $brend);
         
         $url = self::getUrlString('/ordering/get_stock')."&items[0][resource_article]=$article&items[0][brand_name]=$providerBrend";
+        $url .= "&analogs=".self::getParams()->with_cross;
         $result = parent::getCurlUrlData($url);
         $data = json_decode($result);
         

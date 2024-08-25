@@ -189,7 +189,7 @@ class Rossko extends Provider{
 	}
 	private function renderPart($value){
 		$item_id = $this->addItem($value);
-		if (isset($value->crosses)){
+		if (isset($value->crosses) && self::getParams()->with_cross){
 			$this->db->query(Abcp::getQueryDeleteByProviderId($item_id, $this->provider_id), ''); 
 			if (is_array($value->crosses->Part)){
 				foreach($value->crosses->Part as $v){

@@ -126,7 +126,7 @@ class Autoeuro extends Provider{
         $providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
         $providerBrend = mb_strtoupper($providerBrend);
         $params = self::getParams();
-		$response = self::getStockItems($providerBrend, $article, $params->with_crosses);
+		$response = self::getStockItems($providerBrend, $article, $params->with_cross);
 		if (!$response || $response == 'Пустой ключ покупателя'){
 			$providerBrend = parent::getProviderBrend(self::getParams()->provider_id, $brend);
 			$response = self::getStockItems($providerBrend, $article, $params->with_crosses);

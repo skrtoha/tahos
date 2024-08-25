@@ -73,12 +73,6 @@ abstract class Provider{
             self::$statusAPI[$provider_id] = self::ACTIVE_BOTH;
         }
 
-        //это фрагмент закоментирован в связи фрагментом выше
-		//если private отключен то ставим в него entity
-		/*if (isset($params[$provider_id]) && !$params[$provider_id]->$typeOrganization->isActive){
-			$params[$provider_id]->private = $params[$provider_id]->entity;
-		}*/
-
 		return $params[$provider_id]->$typeOrganization;
 	}
 	public static function get(){
@@ -508,10 +502,10 @@ abstract class Provider{
 	}
 	protected static function getProviderBrend($provider_id, $brend): string
 	{
-        static $output;
-        $key = "$provider_id-$brend";
-        if (isset($output[$key])){
-            return $output[$provider_id];
+        $cacheId = "$provider_id-$brend";
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
         }
 		$res = self::getInstanceDataBase()->query("
 			SELECT
@@ -525,7 +519,7 @@ abstract class Provider{
 		", '');
 		if (!$res->num_rows) return $brend;
 		$array = $res->fetch_assoc();
-        $output[$key] = $array['title'];
+        Cache::set($cacheId, $array['title']);
 		return $array['title'];
 	}
 

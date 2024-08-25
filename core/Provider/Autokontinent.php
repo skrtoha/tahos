@@ -28,7 +28,6 @@ class Autokontinent extends Provider{
 			'typeOrganization' => $typeOrganization
 		]);
 		$params->title = "Автоконтинент";
-		$params->url = 'http://api.autokontinent.ru/v1/';
 		return $params;
 	}
 
@@ -128,16 +127,24 @@ class Autokontinent extends Provider{
      * @throws ErrorPartID
      */
     private static function getPartIdByBrendAndArrayOfItems($brand, $items){
+        $providerBrand = parent::getProviderBrend(self::getParams()->provider_id, $brand);
 		foreach($items as $item){
-			if (Provider::getComparableString($item->brand_name) == Provider::getComparableString($brand)) return $item->part_id;
+			if (Provider::getComparableString($item->brand_name) == Provider::getComparableString($providerBrand)) {
+                return $item->part_id;
+            }
 		}
 		throw new EAuto\ErrorPartID('Не найден part_id');
 	}
 	private static function getItemsByPartID($part_id){
-		$response = Provider::getCurlUrlData(
-			self::getParams()->url . 'search/price.json?show_cross=false&show_odds=false&part_id=' . $part_id,
-			self::getAuthData()
-		);
+        $url = self::getParams()->url . 'search/price.json?show_odds=false&part_id='.$part_id;
+        $params = self::getParams();
+        if ($params->with_cross) {
+            $url .= '&with_cross=true';
+        }
+        else {
+            $url .= '&with_cross=false';
+        }
+		$response = Provider::getCurlUrlData($url, self::getAuthData());
 		return json_decode($response);
 	}
 	private static function getItemID(object $part){
@@ -252,8 +259,14 @@ class Autokontinent extends Provider{
 		foreach($partsList as $part){
 			if (!$part->price) continue;
 			$item_id = self::getItemID($part);
-			if (!$item_id) continue;
-			if ($part->part_id == $part_id) $mainItemID = $item_id;
+
+            if (!$item_id) {
+                continue;
+            }
+
+			if ($part->part_id == $part_id) {
+                $mainItemID = $item_id;
+            }
 			if ($mainItemID != $item_id){
 				self::addAnalogy($mainItemID, $item_id);
 			}

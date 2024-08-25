@@ -252,7 +252,6 @@ class Emex extends Provider{
 
         $makeLogo = self::getInfstance()->getMakeLogo($brend_id);
 
-
         $apiParams = parent::getApiParams([
             'provider_id' => self::PROVIDER_ID,
             'typeOrganization' => self::getInfstance()->type_organization
@@ -262,7 +261,7 @@ class Emex extends Provider{
             'makeLogo' => $makeLogo,
             'detailNum' => $article,
             'substLevel' => $apiParams->with_cross ? 'All' : 'OriginalOnly',
-            'substFilter' => 'FilterOriginalAndAnalogs',
+            'substFilter' => 'None',
             'minQuantity' => 1,
             'maxOneDetailOffersCount' => 5
         ]);

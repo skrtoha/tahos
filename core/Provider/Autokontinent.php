@@ -114,7 +114,7 @@ class Autokontinent extends Provider{
 		], [], '');
 		if (!$res_brend->num_rows){
 			$brends[$brand_name] = NULL;
-			throw new EAuto\ErrorBrendID("Бренд $brend отсутствует в базе");
+			throw new EAuto\ErrorBrendID("Бренд $brand_name отсутствует в базе");
 		} 
 		$brend = $res_brend->fetch_assoc();
 		if ($brend['parent_id']) $brend_id = $brend['parent_id'];
@@ -127,9 +127,8 @@ class Autokontinent extends Provider{
      * @throws ErrorPartID
      */
     private static function getPartIdByBrendAndArrayOfItems($brand, $items){
-        $providerBrand = parent::getProviderBrend(self::getParams()->provider_id, $brand);
 		foreach($items as $item){
-			if (Provider::getComparableString($item->brand_name) == Provider::getComparableString($providerBrand)) {
+			if (Provider::getComparableString($item->brand_name) == Provider::getComparableString($brand)) {
                 return $item->part_id;
             }
 		}
@@ -139,11 +138,12 @@ class Autokontinent extends Provider{
         $url = self::getParams()->url . 'search/price.json?show_odds=false&part_id='.$part_id;
         $params = self::getParams();
         if ($params->with_cross) {
-            $url .= '&with_cross=true';
+            $url .= '&show_cross=true';
         }
         else {
-            $url .= '&with_cross=false';
+            $url .= '&show_cross=false';
         }
+
 		$response = Provider::getCurlUrlData($url, self::getAuthData());
 		return json_decode($response);
 	}
@@ -231,7 +231,7 @@ class Autokontinent extends Provider{
 		$items = self::getItemsByArticle($article);
 		if (!$items) return false;
         
-        $brand = Provider::getProviderBrend(self::getParams($params['typeOrganization'])->provider_id, $brand);
+        $brand = Provider::getProviderBrend(self::getParams()->provider_id, $brand);
 
 		try{
 			$part_id = self::getPartIdByBrendAndArrayOfItems($brand, $items);
@@ -243,7 +243,7 @@ class Autokontinent extends Provider{
 		return $part_id;
 	}
 	public static function setArticle(string $brand, string $article){
-		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) return false;
 		if (!parent::isActive(self::getParams()->provider_id)) return false;
 
         $cacheId = "Autokontinent-$brand-$article";
@@ -264,10 +264,12 @@ class Autokontinent extends Provider{
                 continue;
             }
 
+            $mainItemID = null;
 			if ($part->part_id == $part_id) {
                 $mainItemID = $item_id;
             }
-			if ($mainItemID != $item_id){
+
+			if ($mainItemID != $item_id && self::getParams()->with_cross){
 				self::addAnalogy($mainItemID, $item_id);
 			}
 			$store_id = self::getStoreID($part);

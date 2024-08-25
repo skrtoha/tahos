@@ -149,7 +149,7 @@ class ForumAuto extends Provider{
 		return $response;
 	}
 	public static function setArticle($mainItemID, $brend, $article){
-		if(!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) {
+		if (!parent::getIsEnabledApiSearch(self::getParams()->provider_id)) {
             return false;
         }
 		if (!parent::isActive(self::getParams()->provider_id)) {

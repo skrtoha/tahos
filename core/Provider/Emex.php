@@ -2,6 +2,7 @@
 namespace core\Provider;
 
 use core\Brend;
+use core\Cache;
 use core\Database;
 use core\Log;
 use core\Mailer;
@@ -178,11 +179,13 @@ class Emex extends Provider{
      * @throws Exception при ошибке отправки email
      */
     public function getMakeLogo($brend_id){
-        static $output = [];
+        $cacheId = "Emex-brend-$brend_id";
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
 
-        if (isset($output[$brend_id])) return $output[$brend_id];
-
-        $result = $this->db->select('emex_brends', '*', "`brend_id` = $brend_id");
+        $result = $this->db->select('emex_brends', '*', "`brend_id` = $brend_id and `ignored` = 0");
         if (!$result){
             $brendInfo = Brend::get(['id' => $brend_id])->fetch_assoc();
             $mailer = new Mailer(Mailer::TYPE_INFO);
@@ -193,12 +196,19 @@ class Emex extends Provider{
             ]);
             return false;
         }
-        $output[$brend_id] = $result[0]['logo'];
-        return $output[$brend_id];
+        Cache::set($cacheId, $result[0]['logo']);
+        return $result[0]['logo'];
     }
 
     public static function getMakesDict(){
-        return self::getInfstance()->getResponse(self::SERVICE_DICTIONARY, 'GetMakesDict');
+        $cacheId = "Emex-Makes-Dict";
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
+        $output = self::getInfstance()->getResponse(self::SERVICE_DICTIONARY, 'GetMakesDict');
+        Cache::set($cacheId, $output);
+        return $output;
     }
 
     /**

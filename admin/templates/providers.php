@@ -237,7 +237,8 @@ switch ($act) {
             select
                 eb.brend_id,
                 eb.logo,
-                tb.title
+                tb.title,
+                eb.ignored
             from
                 #emex_brends eb
             left join tahos_brends tb on eb.brend_id = tb.id
@@ -246,7 +247,8 @@ switch ($act) {
         foreach($emexBrends_db_result as $row){
             $params['emexBrends_db'][$row['logo']] = [
                 'brend_id' => $row['brend_id'],
-                'title' => $row['title']
+                'title' => $row['title'],
+                'ignored' => $row['ignored']
             ];
         }
 
@@ -1004,20 +1006,23 @@ function emex_brands($params){?>
                 <th>Наименование<br>Emex</th>
                 <th>Logo</th>
                 <th>Наш бренд</th>
+                <th>Игнорировать</th>
             </tr>
             </thead>
             <tbody>
                 <?$end = $params['start'] + $params['perPage'];
                 $count = count($params['makesDictResult']);
                 if ($params['perPage'] >= $count) $end = $count;
-                for($i = $params['start']; $i < $end; $i++){?>
+
+                for($i = $params['start']; $i < $end; $i++){
+                    $row = $params['emexBrends_db'][$params['makesDictResult'][$i]->MakeLogo];?>
                     <tr>
                         <td><?=$params['makesDictResult'][$i]->MakeName?></td>
                         <td class="logo"><?=$params['makesDictResult'][$i]->MakeLogo?></td>
                         <td>
-                            <?if (isset($params['emexBrends_db'][$params['makesDictResult'][$i]->MakeLogo])){?>
+                            <?if (isset($row)){?>
                                 <span class="our-brend">
-                                    <?=$params['emexBrends_db'][$params['makesDictResult'][$i]->MakeLogo]['title']?>
+                                    <?=$row['title']?>
                                 </span>
                             <?}?>
                             <div class="search-brend">
@@ -1026,6 +1031,18 @@ function emex_brands($params){?>
                                 <span title="Удалить" class="icon-bin"></span>
                             </div>
                             <span title="Изменить" class="icon-pencil"></span>
+                        </td>
+                        <td>
+                            <?if (isset($row)){?>
+                                <?$checked = $row['ignored'] ? 'checked' : ''?>
+                                <input
+                                    data-logo="<?=$params['makesDictResult'][$i]->MakeLogo?>"
+                                    data-brend-id="<?=$row['brend_id']?>"
+                                    type="checkbox"
+                                    <?=$checked?>
+                                    name="emex-brend-ignored"
+                                >
+                            <?}?>
                         </td>
                     </tr>
                 <?}?>

@@ -116,6 +116,13 @@ switch($_POST['act']){
     case 'removeEmexBrend':
         $db->query("DELETE FROM tahos_emex_brends where `logo` = '{$_POST['logo']}'");
         break;
+    case 'change-emex-brend-ignored':
+        \core\Database::getInstance()->update(
+            'emex_brends',
+            ['ignored' => $_POST['value']],
+            "`logo` = '{$_POST['logo']}' AND `brend_id` = {$_POST['brend_id']}"
+        );
+        break;
 }
 function getStoreInfo($storeInfo){?>
 	<div id="providerInfo">

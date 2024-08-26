@@ -357,4 +357,16 @@ $(function(){
         })
     })
 
+    $('input[name="emex-brend-ignored"]').on('change', e => {
+        const formData = new FormData();
+        formData.set('brend_id', e.target.dataset.brendId);
+        formData.set('logo', e.target.dataset.logo);
+        formData.set('act', 'change-emex-brend-ignored');
+        formData.set('value', e.target.checked ? 1 : 0);
+        fetch('/admin/ajax/providers.php', {
+            method: 'POST',
+            body: formData
+        });
+    })
+
 })

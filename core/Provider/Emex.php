@@ -261,7 +261,7 @@ class Emex extends Provider{
             'makeLogo' => $makeLogo,
             'detailNum' => $article,
             'substLevel' => $apiParams->with_cross ? 'All' : 'OriginalOnly',
-            'substFilter' => 'None',
+            'substFilter' => 'FilterOriginalAndAnalogs',
             'minQuantity' => 1,
             'maxOneDetailOffersCount' => 5
         ]);

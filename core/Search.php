@@ -160,6 +160,12 @@ class Search{
 
     public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles'): array
     {
+        $cacheId = md5($item_id.$search_type.json_encode($filters));
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
+
         $user = [];
         if ($user_id){
             $result = User::get(['user_id' => $user_id]);
@@ -279,14 +285,16 @@ class Search{
                 }
             }
         }
-
-        return [
+        $output = [
             'store_items' => $store_items,
             'prices' => $prices ?: array(),
             'deliveries' => $deliveries ?: array(),
             'hide_analogies' => '',
             'user' => $user
         ];
+        Cache::set($cacheId, $output);
+
+        return $output;
     }
 
     private static function getQueryArticleStoreItems($item_id, $user, $search_type, $filters = []){

@@ -227,7 +227,7 @@ b.brend_info{
     color: #006a9b
 }
 
-.search-result table .goods-counter {
+.search-result table .goods-counter{
     position: absolute;
     top: 0;
     right: 0;
@@ -240,6 +240,10 @@ b.brend_info{
     color: #fff;
     padding: 1px;
     font-size: 15px
+}
+
+.loading.goods-counter {
+    background: white !important;
 }
 
 .search-result table.small-view tr:nth-child(2n+1) td {
@@ -977,6 +981,9 @@ header .top-message.telegram p {
     padding: 0;
 }
 
+.loading.goods-counter {
+    
+}
 @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
     /**
              * Remove all paddings around the image on small screen

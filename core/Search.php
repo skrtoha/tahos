@@ -291,15 +291,6 @@ class Search{
 
     private static function getQueryArticleStoreItems($item_id, $user, $search_type, $filters = []){
         if ($user){
-            $join_basket = "
-                LEFT JOIN 
-                        #basket ba 
-                ON 
-                    si.store_id=ba.store_id AND 
-                    si.item_id=ba.item_id AND 
-                    ba.user_id={$user['id']}
-		    ";
-            $ba_quan = " ba.quan as in_basket, ";
             $userDiscount = "@price * {$user['discount']} / 100";
         }
         else $userDiscount = 0;
@@ -312,68 +303,66 @@ class Search{
         }
 
         $q_item = "
-		SELECT
-			diff.item_diff as item_id,
-			$selectAnalogies
-			si.in_stock,
-			IF(
-				si.packaging != 1,
-				CONCAT(
-					'&nbsp;(<span>уп.&nbsp;',
-					si.packaging,
-					'&nbsp;шт.</span>)'
-				),
-				''
-			) as packaging_text,
-			si.packaging,
-			b.title as brend,
-			i.brend_id as brend_id,
-			i.photo,
-			ps.cipher,
-			ps.provider_id,
-			p.title AS provider,
-			ps.id as store_id,
-			ps.checked,
-			IF (ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS workSchedule,
-			IF (
-				i.article_cat != '', 
-				i.article_cat, 
-				IF (
-					i.article !='',
-					i.article,
-					ib.barcode
-				)
-			) as article,
-			IF (i.title_full!='', i.title_full, i.title) as title_full,
-			@delivery := CASE
-				WHEN aok.order_term IS NOT NULL THEN aok.order_term
-				ELSE
-					IF (si.in_stock = 0, ps.under_order, ps.delivery) 
-			END AS delivery,
-			IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
-			IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
-			ps.noReturn,
-			ps.percent,
-			@price := si.price * c.rate + si.price * c.rate * ps.percent / 100,
-			CEIL(@price - $userDiscount) AS price,
-			$ba_quan
-			IF (
-				i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.photo != '',
-				1,
-				0
-			) as is_desc
-		FROM #item_$search_type diff
-		RIGHT JOIN #store_items si ON si.item_id=diff.item_diff
-		LEFT JOIN #provider_stores ps ON ps.id=si.store_id AND ps.block = 0
-		LEFT JOIN #providers p ON p.id = ps.provider_id
-		LEFT JOIN #currencies c ON c.id=ps.currency_id
-		LEFT JOIN #items i ON diff.item_diff=i.id
-		LEFT JOIN #brends b ON b.id=i.brend_id
-		LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
-		LEFT JOIN #autoeuro_order_keys aok ON aok.item_id = si.item_id AND aok.store_id = si.store_id
-		$join_basket
-		WHERE diff.item_id=$item_id $whereAnalogies
-	";
+            SELECT
+                diff.item_diff as item_id,
+                $selectAnalogies
+                si.in_stock,
+                IF(
+                    si.packaging != 1,
+                    CONCAT(
+                        '&nbsp;(<span>уп.&nbsp;',
+                        si.packaging,
+                        '&nbsp;шт.</span>)'
+                    ),
+                    ''
+                ) as packaging_text,
+                si.packaging,
+                b.title as brend,
+                i.brend_id as brend_id,
+                i.photo,
+                ps.cipher,
+                ps.provider_id,
+                p.title AS provider,
+                ps.id as store_id,
+                ps.checked,
+                IF (ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS workSchedule,
+                IF (
+                    i.article_cat != '', 
+                    i.article_cat, 
+                    IF (
+                        i.article !='',
+                        i.article,
+                        ib.barcode
+                    )
+                ) as article,
+                IF (i.title_full!='', i.title_full, i.title) as title_full,
+                @delivery := CASE
+                    WHEN aok.order_term IS NOT NULL THEN aok.order_term
+                    ELSE
+                        IF (si.in_stock = 0, ps.under_order, ps.delivery) 
+                END AS delivery,
+                IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
+                IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
+                ps.noReturn,
+                ps.percent,
+                @price := si.price * c.rate + si.price * c.rate * ps.percent / 100,
+                CEIL(@price - $userDiscount) AS price,
+                IF (
+                    i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.photo != '',
+                    1,
+                    0
+                ) as is_desc
+            FROM #item_$search_type diff
+            RIGHT JOIN #store_items si ON si.item_id=diff.item_diff
+            LEFT JOIN #provider_stores ps ON ps.id=si.store_id AND ps.block = 0
+            LEFT JOIN #providers p ON p.id = ps.provider_id
+            LEFT JOIN #currencies c ON c.id=ps.currency_id
+            LEFT JOIN #items i ON diff.item_diff=i.id
+            LEFT JOIN #brends b ON b.id=i.brend_id
+            LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
+            LEFT JOIN #autoeuro_order_keys aok ON aok.item_id = si.item_id AND aok.store_id = si.store_id
+            WHERE diff.item_id=$item_id $whereAnalogies
+        ";
         if ($hide_analogies) $q_item .= ' AND si.item_id IS NOT NULL';
         if (!empty($filters)){
             if ($filters['in_stock']) $q_item .= ' AND si.in_stock>0';

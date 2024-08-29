@@ -106,9 +106,32 @@ function setTabType(tab){
                 price_format();
                 applyUserMarkup();
                 popup.style.display = 'none';
+
+                applyBasketAmount();
             }
         });
     }
+}
+
+function applyBasketAmount() {
+    const formData = new FormData;
+    formData.set('act', 'get-basket-amount');
+    fetch('/ajax/common.php', {
+        method: 'POST',
+        body: formData
+    }).then(response => response.json()).then(response => {
+        document.querySelectorAll(`i.fa-cart-arrow-down`).forEach((element) => {
+            element.innerHTML = '';
+        })
+        response.forEach(row => {
+            const elements = document.querySelectorAll(`i.fa-cart-arrow-down[store_id="${row.store_id}"][item_id="${row.item_id}"]`);
+            if (elements.length){
+                elements.forEach(element => {
+                    element.innerHTML = `<i class="goods-counter">${row.quan}</i>`;
+                })
+            }
+        })
+    })
 }
 
 function set_tabs(){
@@ -653,19 +676,15 @@ function store_items(store_items, user, search_type = null){
                     '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.prevails[p].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                 mobile +=
                     '<li>' +
                     '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.prevails[p].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
-                if (si.prevails[p].in_basket){
-                    full +=
-                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
-                    mobile +=
-                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
-                }
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                 full +=
                     '</i>' +
                     '</li>';
@@ -685,20 +704,16 @@ function store_items(store_items, user, search_type = null){
                 '<i price="' + si_price.price + '" store_id="' + si_price.store_id + '" ' +
                 'item_id="' + si.item_id + '" ' +
                 'packaging="' + si_price.packaging + '"' +
-                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
             mobile +=
                 '<ul>' +
                 '<li>' +
                 '<i price="' + si_price.price + '" store_id="' + si_price.store_id + '" ' +
                 'item_id="' + si.item_id + '" ' +
                 'packaging="' + si_price.packaging + '"' +
-                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
-            if (si_price.in_basket){
-                full +=
-                    '<i class="goods-counter">' + si_price.in_basket + '</i> ';
-                mobile +=
-                    '<i class="goods-counter">' + si_price.in_basket + '</i> ';
-            }
+                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
             full +=
                 '</i>' +
                 '</li>';
@@ -711,19 +726,15 @@ function store_items(store_items, user, search_type = null){
                     '<i price="' + si_delivery.price + '" store_id="' + si_delivery.store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si_delivery.packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                 mobile +=
                     '<li>' +
                     '<i price="' + si_delivery.price + '" store_id="' + si_delivery.store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si_delivery.packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
-                if (si_delivery.in_basket){
-                    full +=
-                        '<i class="goods-counter">' + si_delivery.in_basket + '</i> ';
-                    mobile +=
-                        '<i class="goods-counter">' + si_delivery.in_basket + '</i> ';
-                }
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                 full +=
                     '</i>' +
                     '</li>';
@@ -735,7 +746,7 @@ function store_items(store_items, user, search_type = null){
                 '</ul>';
             mobile +=
                 '</ul>';
-        };
+        }
         full +=
             '</td>';
         mobile +=
@@ -1042,17 +1053,15 @@ function store_items(store_items, user, search_type = null){
                         '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                         'item_id="' + si.item_id + '" ' +
                         'packaging="' + si.prevails[p].packaging + '"' +
-                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
-                    if (si.prevails[p].in_basket) full +=
-                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
+                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                        '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                     mobile +=
                         '<li>' +
                         '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                         'item_id="' + si.item_id + '" ' +
                         'packaging="' + si.prevails[p].packaging + '"' +
-                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
-                    if (si.prevails[p].in_basket) mobile +=
-                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
+                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                        '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                     full +=
                         '</i> ' +
                         '</li>';
@@ -1075,17 +1084,15 @@ function store_items(store_items, user, search_type = null){
                     '<i price="' + si.list[k].price + '" store_id="' + si.list[k].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.list[k].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
-                if (si.list[k].in_basket) full +=
-                    '<i class="goods-counter">' + si.list[k].in_basket + '</i> ';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                 mobile +=
                     '<li>' +
                     '<i price="' + si.list[k].price + '" store_id="' + si.list[k].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.list[k].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
-                if (si.list[k].in_basket) mobile +=
-                    '<i class="goods-counter">' + si.list[k].in_basket + '</i> ';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
+                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
                 full +=
                     '</i> ' +
                     '</li>';

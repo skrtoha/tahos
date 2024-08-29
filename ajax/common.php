@@ -2,6 +2,7 @@
 session_start();
 
 use core\Authorize;
+use core\Database;
 use core\Mailer;
 use core\YandexCaptcha;
 
@@ -176,6 +177,14 @@ switch($_POST['act']){
             $db->update('user_ips', ['user_id' => $user['id']], "ip = '{$_SERVER['REMOTE_ADDR']}'");
             echo 'ok';
         }
+        break;
+    case 'get-basket-amount':
+        $result = Database::getInstance()->select(
+            'basket',
+            ['store_id', 'item_id', 'quan'],
+            "`user_id` = {$_SESSION['user']}"
+        );
+        echo json_encode($result);
         break;
 }
 ?>

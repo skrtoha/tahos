@@ -192,10 +192,10 @@ use core\User;
                                             store_id="<?=$value['store_id']?>"
                                             item_id="<?=$si['item_id']?>"
                                             packaging="<?=$value['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-                                            <?if ($value['in_basket']){?>
-                                                <i class="goods-counter"><?=$value['in_basket']?></i>
+                                            <?if ($_SESSION['user']){?>
+                                                <img class="loading goods-counter" src="/img/gif.gif" alt="">
                                             <?}?>
-										</i> 
+										</i>
 									</li>
 								<?}?>
 							</ul>
@@ -208,10 +208,10 @@ use core\User;
 										store_id="<?=$si_price['store_id']?>" 
 										item_id="<?=$si['item_id']?>" 
 										packaging="<?=$si_price['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-										<?if ($si_price['in_basket']){?>
-											<i class="goods-counter"><?=$si_price['in_basket']?></i> 
-										<?}?>
-									</i> 
+                                        <?if ($_SESSION['user']){?>
+                                            <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                        <?}?>
+									</i>
 								</li>
 								<?if (!empty($si_delivery)){?>
 									<li>
@@ -220,10 +220,10 @@ use core\User;
 											store_id="<?=$si_delivery['store_id']?>" 
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$si_delivery['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-											<?if ($si_delivery['in_basket']){?>
-												<i class="goods-counter"><?=$si_delivery['in_basket']?></i> 
-											<?}?>
-										</i> 
+                                            <?if ($_SESSION['user']){?>
+                                                <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                            <?}?>
+                                        </i>
 									</li>
 								<?}?>
 							</ul>
@@ -368,10 +368,10 @@ use core\User;
 												item_id="<?=$si['item_id']?>" 
 												packaging="<?=$v['packaging']?>"
 												class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-												<?if ($v['in_basket']){?>
-													<i class="goods-counter"><?=$v['in_basket']?></i>
-												<?}?>
-											</i> 
+                                                <?if ($_SESSION['user']){?>
+                                                    <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                                <?}?>
+                                            </i>
 										</li>
 									<?}?>
 								</ul>
@@ -385,10 +385,10 @@ use core\User;
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$v['packaging']?>"
 											class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-											<?if ($v['in_basket']){?>
-												<i class="goods-counter"><?=$v['in_basket']?></i>
-											<?}?>
-										</i> 
+                                            <?if ($_SESSION['user']){?>
+                                                <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                            <?}?>
+                                        </i>
 										</li>
 								<?}?>
 							</ul>
@@ -599,10 +599,10 @@ else{?>
 												store_id="<?=$value['store_id']?>" 
 												item_id="<?=$si['item_id']?>" 
 												packaging="<?=$value['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-												<?if ($value['in_basket']){?>
-													<i class="goods-counter"><?=$value['in_basket']?></i> 
-												<?}?>
-											</i> 
+                                                <?if ($_SESSION['user']){?>
+                                                    <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                                <?}?>
+                                            </i>
 										</li>
 									<?}?>
 								</ul>
@@ -615,10 +615,10 @@ else{?>
 										store_id="<?=$si_price['store_id']?>" 
 										item_id="<?=$si['item_id']?>" 
 										packaging="<?=$si_price['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-										<?if ($si_price['in_basket']){?>
-											<i class="goods-counter"><?=$si_price['in_basket']?></i> 
-										<?}?>
-									</i> 
+                                        <?if ($_SESSION['user']){?>
+                                            <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                        <?}?>
+                                    </i>
 								</li>
 								<?if (!empty($si_delivery)){?>
 									<li>
@@ -627,10 +627,10 @@ else{?>
 											store_id="<?=$si_delivery['store_id']?>" 
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$si_delivery['packaging']?>" class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-											<?if ($si_delivery['in_basket']){?>
-												<i class="goods-counter"><?=$si_delivery['in_basket']?></i> 
-											<?}?>
-										</i> 
+                                            <?if ($_SESSION['user']){?>
+                                                <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                            <?}?>
+                                        </i>
 									</li>
 								<?}?>
 							</ul>
@@ -750,10 +750,10 @@ else{?>
 												item_id="<?=$si['item_id']?>"
 												packaging="<?=$value['packaging']?>" 
 												class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-												<?if ($value['in_basket']){?>
-													<i class="goods-counter"><?=$value['in_basket']?></i> 
-												<?}?>
-											</i> 
+                                                <?if ($_SESSION['user']){?>
+                                                    <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                                <?}?>
+                                            </i>
 										</li>
 									<?}?>
 								</ul>
@@ -767,10 +767,10 @@ else{?>
 											item_id="<?=$si['item_id']?>" 
 											packaging="<?=$value['packaging']?>" 
 											class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">
-											<?if ($value['in_basket']){?>
-												<i class="goods-counter"><?=$value['in_basket']?></i> 
-											<?}?>
-										</i> 
+                                            <?if ($_SESSION['user']){?>
+                                                <img class="loading goods-counter" src="/img/gif.gif" alt="">
+                                            <?}?>
+                                        </i>
 										</li>
 								<?}?>
 							</ul>

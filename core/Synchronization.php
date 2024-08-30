@@ -66,7 +66,7 @@ class Synchronization{
         $userList = [];
         foreach($userListResult as $user){
             $userList[$user['id']] = [
-                'phone' => $user['phone'],
+                'phone' => self::formatPhone($user['phone']),
                 'email' => $user['email']
             ];
         }
@@ -85,6 +85,16 @@ class Synchronization{
 
 		return $output;
 	}
+
+    private static function formatPhone($phone): string
+    {
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        $code = substr($phone, 1, 3);
+        $number1 = substr($phone, 4, 3);
+        $number2 = substr($phone, 7, 2);
+        $number3 = substr($phone, 9, 2);
+        return "+7($code)$number1-$number2-$number3";
+    }
 	public static function setOrdersSynchronized($osi){
         foreach($osi as $row){
             $array = explode('-', $row);

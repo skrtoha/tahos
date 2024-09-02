@@ -618,7 +618,7 @@ abstract class Provider{
     }
 
     public static function getCacheData($cacheId) {
-        if (Cache::useCache()) {
+        if (Cache::useArticleCache()) {
             $result = Cache::get($cacheId);
             if ($result) {
                 return true;
@@ -631,7 +631,7 @@ abstract class Provider{
     }
 
     public static function setCacheData($cacheId) {
-        if (Cache::useCache()) {
+        if (Cache::useArticleCache()) {
             Cache::set($cacheId, 1, Cache::getDuration());
         }
     }

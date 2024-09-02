@@ -12,7 +12,7 @@ if (!empty($_POST)){
     $update['1c_url'] = $data['1c_url'];
     $update['synchronization_token'] = $data['synchronization_token'];
     $update['cache_duration'] = $data['cache_duration'];
-    $update['cache_use'] = $data['cache_use'];
+    $update['cache_article_use'] = $data['cache_article_use'];
 
     if (isset($data['cache_clear'])) {
         Cache::flush();
@@ -57,9 +57,9 @@ $act = $_GET['act'];?>
                 <div class="value cache">
                     <label>
                         Включено
-                        <select name="cache_use">
-                            <option <?=$data['cache_use'] == '0' ? 'selected' : ''?> value="0">нет</option>
-                            <option <?=$data['cache_use'] == '1' ? 'selected' : ''?> value="1">да</option>
+                        <select name="cache_article_use">
+                            <option <?=$data['cache_article_use'] == '0' ? 'selected' : ''?> value="0">нет</option>
+                            <option <?=$data['cache_article_use'] == '1' ? 'selected' : ''?> value="1">да</option>
                         </select>
                     </label>
                     <label>

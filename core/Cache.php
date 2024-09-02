@@ -87,9 +87,9 @@ class Cache{
         return $settings;
     }
 
-    public static function useCache() {
+    public static function useArticleCache() {
         $settings = self::getInstance()->getSettings();
-        return $settings['cache_use'];
+        return $settings['cache_article_use'];
     }
 
     public static function getDuration() {

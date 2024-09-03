@@ -81,7 +81,7 @@ class Cache{
         static $output;
         if ($output) {
             return $output;
-        };
+        }
         $settings = Setting::get('site_settings', null, 'all');
         $output = $settings;
         return $settings;

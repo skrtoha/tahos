@@ -161,9 +161,11 @@ class Search{
     public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles'): array
     {
         $cacheId = md5($item_id.$search_type.json_encode($filters));
-        $result = Cache::get($cacheId);
-        if ($result) {
-            return $result;
+        if (Cache::useArticleCache()) {
+            $result = Cache::get($cacheId);
+            if ($result) {
+                return $result;
+            }
         }
 
         $user = [];
@@ -292,7 +294,17 @@ class Search{
             'hide_analogies' => '',
             'user' => $user
         ];
-        Cache::set($cacheId, $output);
+        if (Cache::useArticleCache()) {
+            $cacheId = md5($item_id.$search_type.json_encode($filters));
+            $result = Cache::get($cacheId);
+            if ($result) {
+                return $result;
+            }
+        }
+
+        if (Cache::useArticleCache()) {
+            Cache::set($cacheId, $output);
+        }
 
         return $output;
     }

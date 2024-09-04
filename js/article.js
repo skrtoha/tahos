@@ -139,7 +139,7 @@ function set_tabs(){
         type: "none",
         onChange: function(obj){
             setTabType(obj.tab);
-            if (obj.tab === 'Tab_1'){
+            if (obj.tab === 'Tab_1' && !!parseInt(document.querySelector('input[name="noUseAPI"]').value)){
                 setTabType('Tab_3');
             }
         }

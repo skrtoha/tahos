@@ -158,10 +158,10 @@ class Search{
         return $items;
     }
 
-    public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles', $cache = false): array
+    public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles', $after_api = false): array
     {
-        $cacheId = md5($item_id.$search_type.json_encode($filters));
-        if (Cache::useArticleCache() && $cache) {
+        $cacheId = md5($item_id.$search_type.$after_api.json_encode($filters));
+        if (Cache::useArticleCache()) {
             $result = Cache::get($cacheId);
             if ($result) {
                 return $result;
@@ -295,7 +295,7 @@ class Search{
             'user' => $user
         ];
 
-        if (Cache::useArticleCache() && $cache) {
+        if (Cache::useArticleCache()) {
             Cache::set($cacheId, $output);
         }
 

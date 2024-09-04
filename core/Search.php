@@ -158,10 +158,10 @@ class Search{
         return $items;
     }
 
-    public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles'): array
+    public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles', $cache = false): array
     {
         $cacheId = md5($item_id.$search_type.json_encode($filters));
-        if (Cache::useArticleCache()) {
+        if (Cache::useArticleCache() && $cache) {
             $result = Cache::get($cacheId);
             if ($result) {
                 return $result;
@@ -294,15 +294,8 @@ class Search{
             'hide_analogies' => '',
             'user' => $user
         ];
-        if (Cache::useArticleCache()) {
-            $cacheId = md5($item_id.$search_type.json_encode($filters));
-            $result = Cache::get($cacheId);
-            if ($result) {
-                return $result;
-            }
-        }
 
-        if (Cache::useArticleCache()) {
+        if (Cache::useArticleCache() && $cache) {
             Cache::set($cacheId, $output);
         }
 

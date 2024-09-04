@@ -28,7 +28,8 @@ $array = core\Search::articleStoreItems(
     $_POST['item_id'],
     $_SESSION['user'] ?? null,
     $filters,
-    $_POST['search_type']
+    $_POST['search_type'],
+    true
 );
 
 $store_items = & $array['store_items'];

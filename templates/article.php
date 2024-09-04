@@ -58,7 +58,9 @@ $filters = [];
 $array = core\Search::articleStoreItems(
     $_GET['item_id'],
     $_SESSION['user'] ?? null,
-    $filters
+    $filters,
+    'articles',
+    isset($_GET['noUseAPI'])
 );
 $store_items = array();
 foreach($array['store_items'] as $key => $value){

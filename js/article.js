@@ -61,8 +61,9 @@ function setTabType(tab){
             || search_type === 'complects'
         )
     ){
-        var item_id = $('#item_id').val();
-        var data = "item_id=" + item_id + "&search_type=" + search_type;
+        let item_id = $('#item_id').val();
+        let data = "item_id=" + item_id + "&search_type=" + search_type;
+        data += '&noUseAPI=' + document.querySelector('input[name="noUseAPI"]').value;
         $.ajax({
             type: "POST",
             url: "/ajax/article_filter.php",
@@ -139,7 +140,7 @@ function set_tabs(){
         type: "none",
         onChange: function(obj){
             setTabType(obj.tab);
-            if (obj.tab === 'Tab_1' && !!parseInt(document.querySelector('input[name="noUseAPI"]').value)){
+            if (obj.tab === 'Tab_1'){
                 setTabType('Tab_3');
             }
         }
@@ -1290,6 +1291,7 @@ $(function(){
         data += "&price_to=" + $('#price-to').val();
         data += "&time_from=" + $('#time-from').val();
         data += "&time_to=" + $('#time-to').val();
+        data += '&noUseAPI=' + document.querySelector('input[name="noUseAPI"]').value;
 
         if ($('#in_stock_only').is(':checked')) data += '&in_stock=1';
 

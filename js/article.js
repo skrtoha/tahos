@@ -138,14 +138,22 @@ function applyInStock(){
         body: formData
     }).then(response => response.json()).then(response => {
         response.forEach(row => {
-            const element = document.querySelectorAll(`li.updating[data-store-id="${row.store_id}"][data-item-id="${row.item_id}"]`);
-            if (element) {
-                element.forEach(item => {
+            const elements = document.querySelectorAll(`li.updating[data-store-id="${row.store_id}"][data-item-id="${row.item_id}"]`);
+            if (elements) {
+                elements.forEach(item => {
                     item.classList.remove('updating');
                     item.innerHTML = row.in_stock;
                 })
             }
         })
+        //удаляем необработанные элементы
+        const elements = document.querySelectorAll(`li.updating[data-store-id][data-item-id]`);
+        if (elements) {
+            elements.forEach(item => {
+                item.classList.remove('updating');
+                item.innerHTML = '';
+            })
+        }
     })
 }
 

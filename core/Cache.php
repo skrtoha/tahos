@@ -88,7 +88,13 @@ class Cache{
     }
 
     public static function useArticleCache() {
-        $settings = self::getInstance()->getSettings();
+        try {
+            $settings = self::getInstance()->getSettings();
+        }
+        catch (\Exception $e) {
+            return 0;
+        }
+
         return $settings['cache_article_use'];
     }
 

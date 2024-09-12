@@ -246,6 +246,17 @@ b.brend_info{
     background: white !important;
 }
 
+li.updating[data-item-id][data-store-id]::before {
+    content: '';
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    background: url(/img/gif.gif);
+    background-size: contain;
+    position: relative;
+    top: 5px;
+}
+
 .search-result table.small-view tr:nth-child(2n+1) td {
     padding-top: 0
 }

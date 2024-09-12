@@ -186,5 +186,35 @@ switch($_POST['act']){
         );
         echo json_encode($result);
         break;
+    case 'get-in-stock':
+        $items = json_decode($_POST['items'], true);
+        $where = '';
+        foreach($items as $row){
+            $where .= "(item_id = {$row['item_id']} AND store_id = {$row['store_id']}) OR ";
+        }
+        $where = substr($where, 0, -4);
+        $result = Database::getInstance()->query("
+            select
+                si.store_id,
+                si.item_id,
+                concat(
+                    si.in_stock,
+                    ' ',
+                    IF(
+                        si.packaging != 1,
+                        CONCAT(
+                            ' (<span>уп. ',
+                            si.packaging,
+                            ' шт.</span>)'
+                        ),
+                        ''
+                    )
+                ) as in_stock
+            from
+                #store_items si
+            where $where
+        ")->fetch_all(MYSQLI_ASSOC);
+        echo json_encode($result);
+        break;
 }
 ?>

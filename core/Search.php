@@ -319,17 +319,6 @@ class Search{
             SELECT
                 diff.item_diff as item_id,
                 $selectAnalogies
-                si.in_stock,
-                IF(
-                    si.packaging != 1,
-                    CONCAT(
-                        '&nbsp;(<span>уп.&nbsp;',
-                        si.packaging,
-                        '&nbsp;шт.</span>)'
-                    ),
-                    ''
-                ) as packaging_text,
-                si.packaging,
                 b.title as brend,
                 i.brend_id as brend_id,
                 i.photo,
@@ -349,11 +338,7 @@ class Search{
                     )
                 ) as article,
                 IF (i.title_full!='', i.title_full, i.title) as title_full,
-                @delivery := CASE
-                    WHEN aok.order_term IS NOT NULL THEN aok.order_term
-                    ELSE
-                        IF (si.in_stock = 0, ps.under_order, ps.delivery) 
-                END AS delivery,
+                ps.delivery,
                 IF(ps.calendar IS NOT NULL, ps.calendar, p.calendar) AS  calendar,
                 IF(ps.workSchedule IS NOT NULL, ps.workSchedule, p.workSchedule) AS  workSchedule,
                 ps.noReturn,
@@ -390,12 +375,6 @@ class Search{
             }
         }
         else $q_item .= " HAVING price>0";
-
-        //строка закоментирована, т.к. затягивался поиск
-        /*if (!$hide_analogies){
-            if (empty($filters)) $q_item .= " OR price IS NULL";
-            else $q_item .= " OR si.price IS NULL";
-        } */
 
         $q_item .= ' ORDER BY b.title, price, delivery';
         return $q_item;

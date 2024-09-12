@@ -87,24 +87,27 @@ use core\User;
 						<?if (!empty($si['prevails'])){?>
 							<ul class="prevail">
 								<?foreach($si['prevails'] as $v){?>
-									<li>
-										<?=$v['in_stock']?>
-										<?=$v['packaging_text']?>
+									<li
+                                        class="updating"
+                                        data-item-id="<?=$si['item_id']?>"
+                                        data-store-id="<?=$si_delivery['store_id']?>">
 									</li>
 								<?}?>
 							</ul>
 						<?}?>
 						<?if (!empty($si_price)){?>
 							<ul>
-								<li>
-									<?=$si_price['in_stock']?>
-									<?=$si_price['packaging_text']?>
-								</li>
+								<li
+                                    class="updating"
+                                    data-item-id="<?=$si['item_id']?>"
+                                    data-store-id="<?=$si_price['store_id']?>"
+                                ></li>
 								<?if (!empty($si_delivery)){?>
-									<li>
-										<?=$si_delivery['in_stock']?>
-										<?=$si_delivery['packaging_text']?>
-									</li>
+									<li
+                                        class="updating"
+                                        data-item-id="<?=$si['item_id']?>"
+                                        data-store-id="<?=$si_delivery['store_id']?>"
+                                    ></li>
 								<?}?>
 							</ul>
 						<?}?>
@@ -283,18 +286,21 @@ use core\User;
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $v){?>
-										<li>
-											<?=$v['in_stock']?>
-											<?=$v['packaging_text']?>
+										<li
+                                            class="updating"
+                                            data-item-id="<?=$si['item_id']?>"
+                                            data-store-id="<?=$v['store_id']?>">
 										</li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
 								<?foreach($si['list'] as $key => $v){?>
-									<li>
-										<?=$v['in_stock']?>
-										<?=$v['packaging_text']?>
+									<li
+                                        class="updating"
+                                        data-item-id="<?=$si['item_id']?>"
+                                        data-store-id="<?=$v['store_id']?>"
+                                    >
 									</li>
 								<?}?>
 							</ul>
@@ -497,23 +503,29 @@ else{?>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
-										<li>
-											<?=$value['in_stock']?>
-											<?=$si_price['packaging_text']?>	
+										<li
+                                            class="updating"
+                                            data-item-id="<?=$si['item_id']?>"
+                                            data-store-id="<?=$si_price['store_id']?>"
+                                        >
 										</li>
 									<?}?>
 								</ul>
 							<?}?>
 							<?if (!empty($si_price)){?>
 								<ul>
-									<li>
-										<?=$si_price['in_stock']?>
-										<?=$si_price['packaging_text']?>
+									<li
+                                        class="updating"
+                                        data-item-id="<?=$si['item_id']?>"
+                                        data-store-id="<?=$si_delivery['store_id']?>"
+                                    >
 									</li>
 									<?if (!empty($si_delivery)){?>
-										<li>
-											<?=$si_delivery['in_stock']?>
-											<?=$si_delivery['packaging_text']?>
+										<li
+                                            class="updating"
+                                            data-item-id="<?=$si['item_id']?>"
+                                            data-store-id="<?=$si_delivery['store_id']?>"
+                                        >
 										</li>
 									<?}?>
 								</ul>
@@ -666,18 +678,22 @@ else{?>
 							<?if (!empty($si['prevails'])){?>
 								<ul class="prevail">
 									<?foreach($si['prevails'] as $value){?>
-										<li>
-											<?=$value['in_stock']?>
-											<?=$value['packaging_text']?>
+										<li
+                                            class="updating"
+                                            data-item-id="<?=$si['item_id']?>"
+                                            data-store-id="<?=$value['store_id']?>"
+                                        >
 										</li>
 									<?}?>
 								</ul>
 							<?}?>
 							<ul>
 								<?foreach($si['list'] as $key => $value){?>
-									<li>
-										<?=$value['in_stock']?>
-										<?=$value['packaging_text']?>
+									<li
+                                        class="updating"
+                                        data-item-id="<?=$si['item_id']?>"
+                                        data-store-id="<?=$value['store_id']?>"
+                                    >
 									</li>
 								<?}?>
 							</ul>

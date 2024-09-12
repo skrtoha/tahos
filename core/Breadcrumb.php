@@ -11,8 +11,8 @@ class Breadcrumb{
 
     public static function out()
     {
-        $res = '<div class="breadcrumb" itemscope="" itemtype="http://schema.org/BreadcrumbList" id="breadcrumbs">
-			<span itemscope="" itemprop="itemListElement" itemtype="http://schema.org/ListItem">
+        $res = '<div class="breadcrumb" itemscope="" name="breadcrumbs" itemtype="https://schema.org/BreadcrumbList" id="breadcrumbs">
+			<span itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem">
 				<a href="/" itemprop="item">
 					Главная
 					<meta itemprop="name" content="Главная">

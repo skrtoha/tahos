@@ -245,7 +245,7 @@ class Search{
             $list['packaging'] = $v['packaging'];
             $list['packaging_text'] = $v['packaging_text'];
 
-            if (!(int)$v['in_stock'] && $v['provider_id'] != 1) continue;
+//            if (!(int)$v['in_stock'] && $v['provider_id'] != 1) continue;
 
             $list['delivery'] = $v['delivery'];
             $list['price'] = $v['price'];

@@ -151,7 +151,7 @@ function applyInStock(){
         if (elements) {
             elements.forEach(item => {
                 item.classList.remove('updating');
-                item.innerHTML = '';
+                item.innerHTML = 'нет';
             })
         }
     })

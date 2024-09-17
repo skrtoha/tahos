@@ -13,6 +13,7 @@ switch ($act) {
 		if ($db->delete('providers', "`id`=".$_GET['id'])){
 			message('Поставщик успешно удален!');
 			header("Location: ?view=prices");
+            die();
 		}
 		break;
 	case 'items': items(); break;

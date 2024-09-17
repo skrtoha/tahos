@@ -21,6 +21,7 @@ if ($_GET['user_id'] && !$_GET['issued']){
 
 		message('Успешно сохранено');
 		header("Location: /admin/?view=order_issues&issue_id={$issue_id}");
+        die();
 	} 
 
     /** @var mysqli_result $res_user */

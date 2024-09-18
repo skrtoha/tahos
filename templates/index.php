@@ -140,9 +140,10 @@ $res_vehicles = $db->query("
                         </label>
                     </div>
                     <?if (!User::isAuthorized()){?>
-                        <div class="selection">
-                            <? YandexCaptcha::show('spare_parts_request');?>
-                        </div>
+                        <div id="spare-parts-request-captcha"></div>
+                        <script>
+                            window.captcha_sitekey = '<?=YandexCaptcha::SITE_KEY?>';
+                        </script>
                     <?}?>
                     <input type="submit" value="Отправить" <?=!User::isAuthorized() ? 'disabled' : ''?>>
                 </div>

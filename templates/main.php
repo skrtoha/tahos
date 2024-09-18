@@ -28,6 +28,7 @@ use core\User;
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
 	<link href="/css/main.css" rel="stylesheet" type="text/css" />
 	<link href="/css/<?=$view?>.css" rel="stylesheet" type="text/css" />
+    <link href="/vendor/plugins/formstyler/jquery.formstyler.css" rel="stylesheet" type="text/css" />
     <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
         <link href="/vendor/pickmeup/pickmeup.css" rel="stylesheet" type="text/css" />
     <?}?>
@@ -59,7 +60,14 @@ use core\User;
     <?}?>
 	<link rel="stylesheet" href="/css/fonts.min.css">
 	<meta name="theme-color" content="#0081BC">
-	<script src="/js/libs.min.js"></script>
+
+<!--	<script src="/js/libs.min.js"></script>-->
+	<script src="/vendor/plugins/jquery.min.js"></script>
+	<script src="/vendor/plugins/formstyler/jquery.formstyler.min.js"></script>
+	<script src="/vendor/plugins/owl.carousel.min.js"></script>
+	<script src="/vendor/plugins/jquery.jscrollpane.min.js"></script>
+
+
 	<meta name="msapplication-navbutton-color" content="#0081BC">
 	<meta name="apple-mobile-web-app-status-bar-style" content="#0081BC">
 </head>
@@ -479,35 +487,6 @@ use core\User;
 	<div class="h_overlay"></div>
 	<div class="overlay"></div>
 
-
-    <?if (YandexCaptcha::$useCaptcha){?>
-        <script
-                src="https://smartcaptcha.yandexcloud.net/captcha.js?render=onload&onload=onloadFunction"
-                defer
-        ></script>
-        <script>
-            window.captcha_sitekey = "<?=YandexCaptcha::SITE_KEY?>"
-            function onloadFunction() {
-                if (window.smartCaptcha) {
-                    const elements = document.querySelectorAll(".yandex-captcha")
-
-                    if (elements){
-                        for(let elem of elements){
-                            const widgetId = window.smartCaptcha.render(elem, {
-                                sitekey: "<?=YandexCaptcha::SITE_KEY?>",
-                                hl: "ru",
-                            })
-                            window.smartCaptcha.subscribe(widgetId, "success", () => {
-                                const event = new Event(`captchaSuccessed_${elem.dataset.key}`, {bubbles: true})
-                                elem.dispatchEvent(event)
-                            })
-                        }
-                    }
-
-                }
-            }
-        </script>
-    <?}?>
 	<!-- Optimized loading JS Start -->
 	<script>var scr = {"scripts":[
 		{"src" : "/js/jquery.cookie.js", "async" : false},

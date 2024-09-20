@@ -144,16 +144,15 @@ class Telegram{
                    'chat_id' => $message['chat']['id'],
                    'text' => $resBindContact['result']
                ];
-               $this->sendMessage($query);
            }
            else{
                $query = [
                    'chat_id' => $message['chat']['id'],
                    'text' => $resBindContact['error']
                ];
-               $this->sendMessage($query);
            }
-           $this->deleteMessage($message['chat']['id'], $message['message_id']);
+            $this->sendMessage($query);
+            $this->deleteMessage($message['chat']['id'], $message['message_id']);
            return;
         }
         switch($message['text']){

@@ -90,7 +90,7 @@ use core\User;
 									<li
                                         class="updating"
                                         data-item-id="<?=$si['item_id']?>"
-                                        data-store-id="<?=$si_delivery['store_id']?>">
+                                        data-store-id="<?=$v['store_id']?>">
 									</li>
 								<?}?>
 							</ul>

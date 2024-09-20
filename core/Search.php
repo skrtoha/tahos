@@ -324,6 +324,7 @@ class Search{
                 i.photo,
                 ps.cipher,
                 ps.provider_id,
+                si.packaging,
                 p.title AS provider,
                 ps.id as store_id,
                 ps.checked,

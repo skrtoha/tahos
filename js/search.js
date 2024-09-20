@@ -113,7 +113,7 @@ $(function(){
 		rememberUserSearch(tr.attr('item_id'));
 		document.location.href = '/article/' + tr.attr('item_id') + '-' + tr.attr('article');
 	})
-	if ($('tr.notFound.removable').size()){
+	if ($('tr.notFound.removable').length){
 		$.ajax({
 			type: 'get',
 			url: document.location.href,
@@ -143,7 +143,7 @@ $(function(){
 				$('table.hit-list-table .notFound').remove();
 				$('table.hit-list-table').append(str);
                 $search = $('tr.searchFromOtherProviders');
-				if ($search.size() === 1) $search.click();
+				if ($search.length === 1) $search.click();
 			}
 		})
 	}

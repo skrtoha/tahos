@@ -66,6 +66,8 @@ use core\User;
 	<script src="/vendor/plugins/formstyler/jquery.formstyler.min.js"></script>
 	<script src="/vendor/plugins/owl.carousel.min.js"></script>
 	<script src="/vendor/plugins/jquery.jscrollpane.min.js"></script>
+    <script src="/vendor/plugins/ion.tabs.min.js"></script>
+    <script src="/vendor/plugins/jquery.magnific-popup.min.js"></script>
 
 
 	<meta name="msapplication-navbutton-color" content="#0081BC">

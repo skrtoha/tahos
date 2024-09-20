@@ -10,7 +10,7 @@ function eventClickToOrder(e){
     if ($(document).width() >= 880){
         $('table.basket-table input[name=toOrder]:checked').each(function () {
             const th = $(this).closest('tr');
-            if (!th.find('.noReturn').size()) return 1;
+            if (!th.find('.noReturn').length) return 1;
             noReturn.push({
                 brend: th.find('b.brend_info').html(),
                 article: th.find('a.articul').html(),

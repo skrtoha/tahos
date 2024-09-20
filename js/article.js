@@ -168,10 +168,20 @@ function applyBasketAmount() {
             element.innerHTML = '';
         })
         response.forEach(row => {
-            const elements = document.querySelectorAll(`i.fa-cart-arrow-down[store_id="${row.store_id}"][item_id="${row.item_id}"]`);
-            if (elements.length){
-                elements.forEach(element => {
+            const elementsBasket = document.querySelectorAll(`i.fa-cart-arrow-down[store_id="${row.store_id}"][item_id="${row.item_id}"]`);
+            if (elementsBasket.length){
+                elementsBasket.forEach(element => {
                     element.innerHTML = `<i class="goods-counter">${row.quan}</i>`;
+                })
+            }
+            const elementsAmount = document.querySelectorAll(`li[store_id="${row.store_id}"][item_id="${row.item_id}"]`);
+            if (elementsAmount.length){
+                elementsAmount.forEach(element => {
+                    element.innerHTML = `<input value="${row.quan}">`;
+
+                    element.closest('table').querySelectorAll('.quan.hidden').forEach((e) => {
+                        e.classList.remove('hidden');
+                    })
                 })
             }
         })
@@ -492,18 +502,18 @@ function store_items(store_items, user, search_type = null){
                 '<ul class="prevail">';
             mobile +=
                 '<ul class="prevail">';
-            for (var p in si.prevails){
+            for (const pv in si.prevails){
                 full +=
                     `<li
                         class="updating"
                         data-item-id="${id}"
-                        data-store-id="${si.prevails[p].store_id}">
+                        data-store-id="${si.prevails[pv].store_id}">
                     </li>`;
                 mobile +=
                     `<li
                         class="updating"
                         data-item-id="${si.item_id}"
-                        data-store-id="${si.prevails[p].store_id}">
+                        data-store-id="${si.prevails[pv].store_id}">
                     </li>`;
             }
             full +=
@@ -1414,6 +1424,8 @@ $(function(){
         ionTab.find('a.sortable.' + sortType).addClass('asc');
         removeWithoutProviders();
         applyUserMarkup();
+        applyBasketAmount();
+        applyInStock();
     })
     $("input[type=checkbox], input[type=radio]").styler();
     $(document).on('click', ".button-row button", function(event){

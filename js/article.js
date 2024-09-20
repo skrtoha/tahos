@@ -63,7 +63,7 @@ function setTabType(tab){
     ){
         let item_id = $('#item_id').val();
         let data = "item_id=" + item_id + "&search_type=" + search_type;
-        data += '&noUseAPI=' + document.querySelector('input[name="noUseAPI"]').value;
+        data += '&no-use-api=' + document.querySelector('input[name="no-use-api"]').value;
         $.ajax({
             type: "POST",
             url: "/ajax/article_filter.php",
@@ -79,10 +79,11 @@ function setTabType(tab){
                 );
             },
             success: function(msg){
+                let si;
                 if (msg){
                     res = JSON.parse(msg);
                     sortStoreItems('delivery');
-                    var si = store_items(res.store_items, res.user, search_type);
+                    si = store_items(res.store_items, res.user, search_type);
                     if (Object.keys(res.prices).length){
                         $('#offers-filter-form').removeClass('hidden');
                         $('#price-from').val(Math.min.apply(null, res.prices));
@@ -107,7 +108,7 @@ function setTabType(tab){
                 price_format();
                 applyUserMarkup();
                 popup.style.display = 'none';
-                if (!!parseInt(document.querySelector('input[name="noUseAPI"]').value)) {
+                if (!!parseInt(document.querySelector('input[name="no-use-api"]').value)) {
                     applyInStock();
                 }
 
@@ -1310,13 +1311,14 @@ function applyUserMarkup(){
 }
 function checkThroughAPI(){
     if (!document.querySelector('input[name="user_id"]').value) {
+        applyInStock();
         return;
     }
     $.ajax({
         type: 'get',
         url: document.location.href,
         success: function(){
-            document.location.href = document.location.href + '/noUseAPI';
+            document.location.href = document.location.href + '/no-use-api';
         }
     })
 }
@@ -1324,7 +1326,7 @@ $(function(){
     if (!$('#offers-filter-form').hasClass('hidden')) hidable_form = false;
     set_tabs();
     applyUserMarkup();
-    if ($('input[name="noUseAPI"]').val() == '0'){
+    if ($('input[name="no-use-api"]').val() == '0'){
         checkThroughAPI();
     }
     $(document).on('click', '.cart-popup-table .delete-btn', function(){
@@ -1361,7 +1363,7 @@ $(function(){
         data += "&price_to=" + $('#price-to').val();
         data += "&time_from=" + $('#time-from').val();
         data += "&time_to=" + $('#time-to').val();
-        data += '&noUseAPI=' + document.querySelector('input[name="noUseAPI"]').value;
+        data += '&no-use-api=' + document.querySelector('input[name="no-use-api"]').value;
 
         if ($('#in_stock_only').is(':checked')) data += '&in_stock=1';
 

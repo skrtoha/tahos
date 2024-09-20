@@ -22,9 +22,9 @@ class Connection{
 		if (preg_match('/.*ajax.*/', $_SERVER['REQUEST_URI'])) return false;
 	
 		if (preg_match('/^\/article\/\d+-\w+/', $_SERVER['REQUEST_URI'])){
-		    if (!strpos($_SERVER['REQUEST_URI'], 'noUseAPI')) return false;
+		    if (!strpos($_SERVER['REQUEST_URI'], 'no-use-api')) return false;
 		    
-		    $_SERVER['REQUEST_URI'] = str_replace('/noUseAPI', '', $_SERVER['REQUEST_URI']);
+		    $_SERVER['REQUEST_URI'] = str_replace('/no-use-api', '', $_SERVER['REQUEST_URI']);
 		    
 		    preg_match_all('/\d+-/', $_SERVER['REQUEST_URI'], $matches);
 		    $item_id = substr($matches[0][0], 0, -1);

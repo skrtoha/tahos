@@ -224,7 +224,7 @@
 								'</button>';
 			}
 			str +=	'' +
-				'<button href="/article/' + item.id + '-' + item.article + '/noUseAPI"  id="search-same"><span class="icon_search"></span>Другие предложения</button>' +
+				'<button href="/article/' + item.id + '-' + item.article + '/no-use-api"  id="search-same"><span class="icon_search"></span>Другие предложения</button>' +
 				'<div class="clearfix"></div>' +
 			'</div>';
 			return str;

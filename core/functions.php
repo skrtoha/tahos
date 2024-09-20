@@ -121,7 +121,7 @@ function get_basket(){
 	foreach($basket as $key => $value){
 		$b = & $basket[$key];
 		unset($b['user_id'], $b['comment']);
-		$b['href'] = "/article/{$value['item_id']}-{$value['article']}/noUseAPI";
+		$b['href'] = "/article/{$value['item_id']}-{$value['article']}/no-use-api";
 	} 
 	return $basket;
 }

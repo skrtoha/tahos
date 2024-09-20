@@ -426,7 +426,7 @@ use core\User;
 						<?=$si['title_full']?>
 					</td>
 					<td colspan="5" style="">
-						<?if (!isset($_GET['noUseAPI'])){?>
+						<?if (!isset($_GET['no-use-api']) && User::isAuthorized()){?>
 							<div class="emptyAvailabilityMainStores">
 								<img src="<?=core\Config::$imgUrl?>/preload.gif">
 								<p>Идет поиск по складам партнеров...</p>
@@ -803,7 +803,7 @@ else{?>
 				else{?>
 					<tr class="shown first-mobile empty">
 						<td colspan="5">
-							<?if (!isset($_GET['noUseAPI'])){?>
+							<?if (!isset($_GET['no-use-api'])){?>
 								<div class="emptyAvailabilityMainStores">
 									<img src="<?=core\Config::$imgUrl?>/preload.gif">
 									<p>Идет поиск по складам партнеров...</p>

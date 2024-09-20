@@ -322,7 +322,7 @@ use core\User;
                 <tr store_id="<?=$value['store_id']?>" item_id="<?=$value['item_id']?>">
                     <td>
                         <?=$value['brend']?>
-                        <a class="articul" href="/article/<?=$value['item_id']?>-<?=$value['article']?>/noUseAPI">
+                        <a class="articul" href="/article/<?=$value['item_id']?>-<?=$value['article']?>/no-use-api">
                             <?=$value['article_cat']?>
                         </a> <?=$value['title']?>
                     </td>

@@ -60,7 +60,7 @@ $array = core\Search::articleStoreItems(
     $_SESSION['user'] ?? null,
     $filters,
     'articles',
-    isset($_GET['noUseAPI'])
+    isset($_GET['no-use-api'])
 );
 $store_items = array();
 foreach($array['store_items'] as $key => $value){
@@ -71,7 +71,7 @@ foreach($array['store_items'] as $key => $value){
 }
 
 Breadcrumb::add(
-    "/{$_GET['view']}/{$store_items[0]['item_id']}-{$store_items[0]['store_item']['article']}/noUseAPI",
+    "/{$_GET['view']}/{$store_items[0]['item_id']}-{$store_items[0]['store_item']['article']}/no-use-api",
     $store_items[0]['store_item']['title_full']
 );
 // debug($store_items);
@@ -99,7 +99,7 @@ Breadcrumb::out();
 <input type="hidden" id="time_from" value="<?=$time_from?>">
 <input type="hidden" id="time_to" value="<?=$time_to?>">
 <input type="hidden" name="isCheckedFromAbcp" value="<?=$abcp->isCheckedFromAbcp?>">
-<input type="hidden" name="noUseAPI" value="<?=isset($_GET['noUseAPI']) ? 1 : 0?>">
+<input type="hidden" name="no-use-api" value="<?=isset($_GET['no-use-api']) ? 1 : 0?>">
 <div class="search-result">
 	<h1>Список предложений</h1>
 	<form class="<?=$hide_form ? 'hidden' : ''?>" id="offers-filter-form" method="post">

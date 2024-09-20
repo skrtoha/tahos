@@ -167,6 +167,9 @@ function applyBasketAmount() {
         document.querySelectorAll(`i.fa-cart-arrow-down`).forEach((element) => {
             element.innerHTML = '';
         })
+        if (!response) {
+            return;
+        }
         response.forEach(row => {
             const elementsBasket = document.querySelectorAll(`i.fa-cart-arrow-down[store_id="${row.store_id}"][item_id="${row.item_id}"]`);
             if (elementsBasket.length){

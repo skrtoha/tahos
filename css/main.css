@@ -2089,6 +2089,10 @@ footer .partnership{
     order: 5
 }
 
+#show-social {
+    margin-bottom: 10px;
+    display: block;
+}
 
 @media screen and (max-width: 1490px) {
     footer .contacts .item_box {

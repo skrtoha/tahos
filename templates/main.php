@@ -270,15 +270,7 @@ use core\User;
 							<a href="/registration">Зарегистрироваться</a>
 						</div>
 					</form>
-					<div class="social_buttons">
-						<script src="//ulogin.ru/js/ulogin.js"></script>
-						<div id="uLogin" data-ulogin="display=buttons;fields=first_name,last_name;redirect_uri=http%3A%2F%2Ftahos.ru/authorization;mobilebuttons=0">
-							<?$socials = $db->select('socials', '*');
-							foreach ($socials as $key => $value){?>
-								<span class="social <?=$value['title']?>" data-uloginbutton="<?=$value['title']?>"></span>
-							<?}?>
-						</div>
-					</div>
+                    <a nohref id="show-social">Авторизоваться другим способом</a>
                     <div id="restore_password" class="product-popup mfp-hide">
                         <h2>Востановить пароль</h2>
                         <div class="content">

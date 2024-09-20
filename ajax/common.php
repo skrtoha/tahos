@@ -216,5 +216,9 @@ switch($_POST['act']){
         ")->fetch_all(MYSQLI_ASSOC);
         echo json_encode($result);
         break;
+    case 'get-socials-buttons':
+        $result = $db->select('socials', '*', "`active` = 1");
+        echo json_encode($result);
+        break;
 }
 ?>

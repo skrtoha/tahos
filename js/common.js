@@ -824,29 +824,32 @@ $(function() {
         localStorage.setItem('hide_telegram_notice', '1')
         e.target.closest('div').remove()
     })
-    document.getElementById('show-social').addEventListener('click', e => {
-        popup.style.display = 'flex';
-        const formData = new FormData;
-        formData.set('act', 'get-socials-buttons');
-        fetch('/ajax/common.php', {
-            method: 'post',
-            body: formData
-        }).then(response => response.json()).then(response => {
-            const divElement = document.createElement('div');
-            divElement.id = 'uLogin';
-            divElement.dataset.ulogin = 'display=buttons;fields=first_name,last_name;redirect_uri=https://tahos.ru/authorization;mobilebuttons=0';
-            let divContent = '';
-            response.forEach(row => {
-                divContent += `<span class="social ${row.title}" data-uloginbutton="${row.title}"></span>`
+    const showSocial = document.getElementById('show-social');
+    if (showSocial) {
+        showSocial.addEventListener('click', e => {
+            popup.style.display = 'flex';
+            const formData = new FormData;
+            formData.set('act', 'get-socials-buttons');
+            fetch('/ajax/common.php', {
+                method: 'post',
+                body: formData
+            }).then(response => response.json()).then(response => {
+                const divElement = document.createElement('div');
+                divElement.id = 'uLogin';
+                divElement.dataset.ulogin = 'display=buttons;fields=first_name,last_name;redirect_uri=https://tahos.ru/authorization;mobilebuttons=0';
+                let divContent = '';
+                response.forEach(row => {
+                    divContent += `<span class="social ${row.title}" data-uloginbutton="${row.title}"></span>`
+                })
+                divElement.innerHTML = divContent;
+                document.getElementById('show-social').insertAdjacentElement('afterend', divElement);
+                const script = document.createElement('script');
+                script.src = '//ulogin.ru/js/ulogin.js';
+                document.head.append(script);
+                script.onload = () => {
+                    popup.style.display = 'none';
+                }
             })
-            divElement.innerHTML = divContent;
-            document.getElementById('show-social').insertAdjacentElement('afterend', divElement);
-            const script = document.createElement('script');
-            script.src = '//ulogin.ru/js/ulogin.js';
-            document.head.append(script);
-            script.onload = () => {
-                popup.style.display = 'none';
-            }
         })
-    })
+    }
 });

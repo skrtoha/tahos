@@ -29,6 +29,10 @@ use core\User;
 	<link href="/css/main.css" rel="stylesheet" type="text/css" />
 	<link href="/css/<?=$view?>.css" rel="stylesheet" type="text/css" />
     <link href="/vendor/plugins/formstyler/jquery.formstyler.css" rel="stylesheet" type="text/css" />
+
+    <link href="/vendor/plugins/owl.carousel/owl.carousel.min.css" rel="stylesheet" type="text/css" />
+    <link href="/vendor/plugins/owl.carousel/owl.theme.default.min.css" rel="stylesheet" type="text/css" />
+
     <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
         <link href="/vendor/pickmeup/pickmeup.css" rel="stylesheet" type="text/css" />
     <?}?>
@@ -64,7 +68,7 @@ use core\User;
 <!--	<script src="/js/libs.min.js"></script>-->
 	<script src="/vendor/plugins/jquery.min.js"></script>
 	<script src="/vendor/plugins/formstyler/jquery.formstyler.min.js"></script>
-	<script src="/vendor/plugins/owl.carousel.min.js"></script>
+	<script src="/vendor/plugins/owl.carousel/owl.carousel.min.js"></script>
 	<script src="/vendor/plugins/jquery.jscrollpane.min.js"></script>
     <script src="/vendor/plugins/ion.tabs.min.js"></script>
     <script src="/vendor/plugins/jquery.magnific-popup.min.js"></script>

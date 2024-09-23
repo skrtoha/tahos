@@ -127,4 +127,4 @@ if (isset($item['store_items']) && count($item['store_items'])){
 	}
 }
 unset($item['store_items']);
-echo json_encode($item);?>
+echo json_encode($item);

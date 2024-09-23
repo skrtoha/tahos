@@ -19,18 +19,15 @@
 			})
 			$(document).on('click', '.product-popup-link', function(e){
 				e.preventDefault();
-				var t = e.target;
-				if (t.className == 'brend_info') return false;
-				var item_id = $(this).attr('item_id');
+                const t = e.target;
+                if (t.className == 'brend_info') return false;
+                const item_id = $(this).attr('item_id');
                 popup.style.display = 'flex';
 				$.ajax({
 					type: "POST",
 					url: "/ajax/item_full.php",
 					data: 'id=' + item_id + '&category=1',
 					success: function(msg){
-						// console.log(msg);
-						// return;
-						// console.log(JSON.parse(msg));
 						$('#mgn_popup').html(item_full.getFullItem(JSON.parse(msg)));
                         popup.style.display = 'none';
 						$.magnificPopup.open({
@@ -56,11 +53,10 @@
 									});
 									$("#Button__product-popup-tabs__Tab_1_name").click();
 									$('#gallery').owlCarousel({
-										loop: true,
-										margin: 5,
-										nav: true,
-										dots: false,
-										items: 3
+                                        loop:true,
+                                        margin:10,
+                                        nav:true,
+                                        items: 3
 									});
 								}
 							}
@@ -104,7 +100,9 @@
             });
 		},
 		getFullItem: function (i){
-			var s = '';
+			let src_small;
+            let src_big;
+            var s = '';
 			var item = i.item;
 			var b = new Object();
 			var del = new Object();
@@ -157,21 +155,21 @@
 			'</div>' +
 			'<div class="clearfix"></div>' + 
 		 	'<div class="gallery-block" style="' + s + '">';
-			var is_photo = item.photo ? true : false;
+			var is_photo = !!item.photo;
 			var c_photos = Object.keys(i.photos).length;
 			if (is_photo){
                 bigImages = [];
-				var src_small = getImgUrl() + '/items/small/' + item.id + '/' + item.photo;
-				var src_big = getImgUrl() + '/items/big/' + item.id + '/' + item.photo;
+				src_small = getImgUrl() + '/items/small/' + item.id + '/' + item.photo;
+				src_big = getImgUrl() + '/items/big/' + item.id + '/' + item.photo;
 				str += '' +
 						'<div id="main-pic">' + 
 							'<img src="'+ src_small + '" data-zoom-image="' + src_big + '">' + 
 						'</div>';
 				if (c_photos > 1){
-					str += '<div id="gallery">';
+					str += '<div class="items-gallery owl-carousel" id="gallery">';
 					for (var k in i.photos){
-						var src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.photos[k];
-						var src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.photos[k];
+                        src_small = getImgUrl() + '/items/small/' + item.id + '/' + i.photos[k];
+                        src_big = getImgUrl() + '/items/big/' + item.id + '/' + i.photos[k];
                         bigImages.push(src_big);
 						str += '<img src="' + src_small + '" data-big-img="' + src_big + '">';
 					}

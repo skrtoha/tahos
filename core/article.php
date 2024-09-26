@@ -517,7 +517,7 @@ else{?>
 									<li
                                         class="updating"
                                         data-item-id="<?=$si['item_id']?>"
-                                        data-store-id="<?=$si_delivery['store_id']?>"
+                                        data-store-id="<?=$si_price['store_id']?>"
                                     >
 									</li>
 									<?if (!empty($si_delivery)){?>

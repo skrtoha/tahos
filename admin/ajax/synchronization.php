@@ -14,7 +14,7 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 $request = !empty($_POST) ? $_POST : $_GET;
 
-$synchronization_token = Setting::get('site_settings', 'synchronization_token');
+$synchronization_token = Setting::get('common', 'synchronization_token');
 if ($synchronization_token != $request['synchronization_token']) die("Неверный токен");
 
 switch($request['act']){

@@ -20,7 +20,7 @@ $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
-$synchronization_token = Setting::get('site_settings', 'synchronization_token');
+$synchronization_token = Setting::get('common', 'synchronization_token');
 if ($synchronization_token != getallheaders()['Token']) die("Неверный токен");
 
 $path = "$root/api/{$_GET['version']}/templates/{$_GET['view']}.php";

@@ -191,7 +191,7 @@ class Synchronization{
     public static function httpQuery($method, $data, $type = 'get'){
         static $settings;
         if (!$settings){
-            $settings = Setting::get('site_settings', null, 'all');
+            $settings = Setting::get('common', null, 'all');
         }
         $url = $settings['1c_url'];
         $headers = [
@@ -235,7 +235,7 @@ class Synchronization{
 
     public static function createPayment1C($params, $type = '') {
         Telegram::writeLogFile($params);
-        $settings = Setting::get('site_settings', null, 'all');
+        $settings = Setting::get('common', null, 'all');
 
         $curl = curl_init();
 

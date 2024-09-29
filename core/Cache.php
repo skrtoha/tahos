@@ -82,7 +82,7 @@ class Cache{
         if ($output) {
             return $output;
         }
-        $settings = Setting::get('site_settings', null, 'all');
+        $settings = Setting::get('common', null, 'all');
         $output = $settings;
         return $settings;
     }
@@ -101,6 +101,19 @@ class Cache{
     public static function getDuration() {
         $settings = self::getInstance()->getSettings();
         return $settings['cache_duration'] * 3600;
+    }
+
+    public static function getCacheToken() {
+        $cacheId = 'site_cache_token';
+        $result = self::get($cacheId);
+
+        if ($result) {
+            return $result;
+        }
+
+        $settings = self::getInstance()->getSettings();
+        self::set($cacheId, $settings['cache_token']);
+        return $settings['cache_token'];
     }
 
 }

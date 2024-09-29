@@ -7,11 +7,13 @@
 /** @global $db \core\Database */
 /** @var $user array */
 
+use core\Cache;
 use core\Config;
 use core\Setting;
 use core\YandexCaptcha;
 use core\User;
 
+$token = Cache::getCacheToken();
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -26,52 +28,52 @@ use core\User;
 	<link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-touch-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-touch-icon-114x114.png">
-	<link href="/css/main.css" rel="stylesheet" type="text/css" />
-	<link href="/css/<?=$view?>.css" rel="stylesheet" type="text/css" />
-    <link href="/vendor/plugins/formstyler/jquery.formstyler.css" rel="stylesheet" type="text/css" />
+	<link href="/css/main.css?<?=$token?>" rel="stylesheet" type="text/css" />
+	<link href="/css/<?=$view?>.css?<?=$token?>" rel="stylesheet" type="text/css" />
+    <link href="/vendor/plugins/formstyler/jquery.formstyler.css?<?=$token?>" rel="stylesheet" type="text/css" />
 
-    <link href="/vendor/plugins/owl.carousel/owl.carousel.min.css" rel="stylesheet" type="text/css" />
-    <link href="/vendor/plugins/owl.carousel/owl.theme.default.min.css" rel="stylesheet" type="text/css" />
+    <link href="/vendor/plugins/owl.carousel/owl.carousel.min.css?<?=$token?>" rel="stylesheet" type="text/css" />
+    <link href="/vendor/plugins/owl.carousel/owl.theme.default.min.css?<?=$token?>" rel="stylesheet" type="text/css" />
 
     <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
-        <link href="/vendor/pickmeup/pickmeup.css" rel="stylesheet" type="text/css" />
+        <link href="/vendor/pickmeup/pickmeup.css?<?=$token?>" rel="stylesheet" type="text/css" />
     <?}?>
     <?if (in_array($view, ['basket'])){?>
-        <link href="/vendor/basketAdditionalOptions/style.css" rel="stylesheet" type="text/css" />
+        <link href="/vendor/basketAdditionalOptions/style.css?<?=$token?>" rel="stylesheet" type="text/css" />
     <?}?>
     <?if (in_array($view, ['article', 'orders'])){?>
-        <link rel="stylesheet" type="text/css" href="/css/provider_info.css">
+        <link rel="stylesheet" type="text/css" href="/css/provider_info.css?<?=$token?>">
     <?}?>
     <?if (in_array($view, ['article', 'category', 'favorites'])){?>
-        <link rel="stylesheet" type="text/css" href="/css/item_full.css">
+        <link rel="stylesheet" type="text/css" href="/css/item_full.css?<?=$token?>">
     <?}?>
     <?if (in_array($view, ['category'])){?>
-		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css">
+		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css?<?=$token?>">
 	<?}?>
     <?if (in_array($view, ['settings', 'registration'])){?>
-        <link rel="stylesheet" href="/vendor/addressee/jquery.fias.min.css">
-        <link rel="stylesheet" href="/vendor/addressee/style.css">
+        <link rel="stylesheet" href="/vendor/addressee/jquery.fias.min.css?<?=$token?>">
+        <link rel="stylesheet" href="/vendor/addressee/style.css?<?=$token?>">
     <?}?>
     <?if (in_array($view, ['basket', 'index', 'article'])){?>
         <link rel="stylesheet" href="/admin/fonts/icomoon.eot">
-        <link rel="stylesheet" href="/vendor/addressee/style.css">
+        <link rel="stylesheet" href="/vendor/addressee/style.css?<?=$token?>">
     <?}?>
     <?if (in_array($view, ['article', 'category', 'favorites'])){?>
-        <link rel="stylesheet" type="text/css" href="/vendor/blueimp/css/blueimp-gallery.min.css">
+        <link rel="stylesheet" type="text/css" href="/vendor/blueimp/css/blueimp-gallery.min.css?<?=$token?>">
     <?}?>
     <?if (in_array($view, ['garage', 'account', 'favorites', 'orders'])){?>
-        <link rel="stylesheet" type="text/css" href="/css/ionTabs.css">
+        <link rel="stylesheet" type="text/css" href="/css/ionTabs.css?<?=$token?>">
     <?}?>
-	<link rel="stylesheet" href="/css/fonts.min.css">
+	<link rel="stylesheet" href="/css/fonts.min.css?<?=$token?>">
 	<meta name="theme-color" content="#0081BC">
 
-<!--	<script src="/js/libs.min.js"></script>-->
-	<script src="/vendor/plugins/jquery.min.js"></script>
-	<script src="/vendor/plugins/formstyler/jquery.formstyler.min.js"></script>
-	<script src="/vendor/plugins/owl.carousel/owl.carousel.min.js"></script>
-	<script src="/vendor/plugins/jquery.jscrollpane.min.js"></script>
-    <script src="/vendor/plugins/ion.tabs.min.js"></script>
-    <script src="/vendor/plugins/jquery.magnific-popup.min.js"></script>
+<!--	<script src="/js/libs.min.js?<?=$token?>"></script>-->
+	<script src="/vendor/plugins/jquery.min.js?<?=$token?>"></script>
+	<script src="/vendor/plugins/formstyler/jquery.formstyler.min.js?<?=$token?>"></script>
+	<script src="/vendor/plugins/owl.carousel/owl.carousel.min.js?<?=$token?>"></script>
+	<script src="/vendor/plugins/jquery.jscrollpane.min.js?<?=$token?>"></script>
+    <script src="/vendor/plugins/ion.tabs.min.js?<?=$token?>"></script>
+    <script src="/vendor/plugins/jquery.magnific-popup.min.js?<?=$token?>"></script>
 
 
 	<meta name="msapplication-navbutton-color" content="#0081BC">
@@ -487,28 +489,28 @@ use core\User;
 
 	<!-- Optimized loading JS Start -->
 	<script>var scr = {"scripts":[
-		{"src" : "/js/jquery.cookie.js", "async" : false},
-		// {"src" : "/js/jquery.priceformat.min.js", "async" : false},
-		{"src" : "/js/common.js", "async" : false},
-		{"src" : "/js/jquery.preload.min.js", "async" : false},
-		{"src" : "/js/jquery.form.js", "async" : false},
-		// {"src" : "/js/to_top.js", "async" : false},
+		{"src" : "/js/jquery.cookie.js?<?=$token?>", "async" : false},
+		// {"src" : "/js/jquery.priceformat.min.js?<?=$token?>", "async" : false},
+		{"src" : "/js/common.js?<?=$token?>", "async" : false},
+		{"src" : "/js/jquery.preload.min.js?<?=$token?>", "async" : false},
+		{"src" : "/js/jquery.form.js?<?=$token?>", "async" : false},
+		// {"src" : "/js/to_top.js?<?=$token?>", "async" : false},
 		<?if (in_array($view, ['category', 'article', 'favorites'])){?>
-			{"src" : "/js/item_full.js", "async" : false},
+			{"src" : "/js/item_full.js?<?=$token?>", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['category'])){?>
-			{"src" : "/vendor/paginationjs/pagination.min.js", "async" : false},
+			{"src" : "/vendor/paginationjs/pagination.min.js?<?=$token?>", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['article', 'orders', 'order'])){?>
-			{"src" : "/js/get_store_info.js", "async" : false},
+			{"src" : "/js/get_store_info.js?<?=$token?>", "async" : false},
 		<?}?>
         <?if (in_array($view, ['orders', 'basket', 'order', 'account'])){?>
-            {"src": "/vendor/pickmeup/pickmeup.min.js", "async" : false},
+            {"src": "/vendor/pickmeup/pickmeup.min.js?<?=$token?>", "async" : false},
         <?}?>
         <?if (in_array($view, ['article', 'category', 'favorites'])){?>
-            {"src": "/vendor/blueimp/js/jquery.blueimp-gallery.min.js"},
+            {"src": "/vendor/blueimp/js/jquery.blueimp-gallery.min.js?<?=$token?>"},
         <?}?>
-		{"src" : "/js/<?=$view?>.js", "async" : false}
+		{"src" : "/js/<?=$view?>.js?<?=$token?>", "async" : false}
 		]};!function(t,n,r){"use strict";var c=function(t){if("[object Array]"!==Object.prototype.toString.call(t))return!1;for(var r=0;r<t.length;r++){var c=n.createElement("script"),e=t[r];c.src=e.src,c.async=e.async,n.body.appendChild(c)}return!0};t.addEventListener?t.addEventListener("load",function(){c(r.scripts);},!1):t.attachEvent?t.attachEvent("onload",function(){c(r.scripts)}):t.onload=function(){c(r.scripts)}}(window,document,scr);
 	</script>
 	<!-- Optimized loading JS End -->

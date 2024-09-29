@@ -437,7 +437,7 @@ function show_form($act){
 		<?=\User::getHtmlActions($user)?>
 	<?}?>
 	<input type="hidden" name="user_id" value="<?=$_GET['id']?>">
-    <input type="hidden" name="1c_url" value="<?= Setting::get('site_settings', '1c_url')?>">
+    <input type="hidden" name="1c_url" value="<?= Setting::get('common', '1c_url')?>">
 	<div class="t_form">
 		<div class="bg">
 			<form method="post" enctype="multipart/form-data" id="user">

@@ -1,7 +1,17 @@
 <?php
 use core\Cache;
+use core\Setting;
 
 $page_title = 'Настройки сайта';
+
+if (isset($_GET['reset-cache-token'])) {
+    Setting::update('common', 'cache_token', time());
+    header('Location: /admin/?view=site_settings');
+    message('Успешно обновлено!');
+    Cache::flush();
+    die();
+}
+
 if (!empty($_POST)){
     $data = $_POST;
     $update['is_blocked'] = json_encode([
@@ -19,11 +29,11 @@ if (!empty($_POST)){
         message('Кэш успешно очищен');
     }
     foreach($update as $key => $value) {
-        core\Setting::update('site_settings', $key, $value);
+        core\Setting::update('common', $key, $value);
     }
 	header("Location: /admin/?view=site_settings");
 }
-$data = core\Setting::get('site_settings', null, 'all');
+$data = core\Setting::get('common', null, 'all');
 $data['is_blocked'] = json_decode($data['is_blocked'], true);
 $act = $_GET['act'];?>
 <div class="t_form">
@@ -70,6 +80,12 @@ $act = $_GET['act'];?>
                         <input type="checkbox" name="cache_clear" value="1">
                         Очистить
                     </label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="title">Токен кэша</div>
+                <div class="value">
+                    <a href="/admin/?view=site_settings&reset-cache-token">Обновить</a>
                 </div>
             </div>
             <input type="submit" value="Сохранить">

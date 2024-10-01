@@ -125,10 +125,10 @@ function applyInStock(){
     }
     const items = [];
     elements.forEach(element => {
-        items.push({
-            store_id: element.dataset.storeId,
-            item_id: element.dataset.itemId
-        });
+        const key = `${element.dataset.storeId}-${element.dataset.itemId}`;
+        if (!items.includes(key)) {
+            items.push(key);
+        }
     })
     const formData = new FormData();
 

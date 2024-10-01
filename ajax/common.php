@@ -190,10 +190,11 @@ switch($_POST['act']){
         $items = json_decode($_POST['items'], true);
         $where = '';
         foreach($items as $row){
-            if (!$row['item_id'] || !$row['store_id']) {
+            $array = explode('-', $row);
+            if (!$array[0] || !$array[1]) {
                 continue;
             }
-            $where .= "(item_id = {$row['item_id']} AND store_id = {$row['store_id']}) OR ";
+            $where .= "(item_id = {$array[1]} AND store_id = {$array[0]}) OR ";
         }
         $where = substr($where, 0, -4);
         $result = Database::getInstance()->query("
@@ -224,4 +225,3 @@ switch($_POST['act']){
         echo json_encode($result);
         break;
 }
-?>

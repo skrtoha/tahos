@@ -23,8 +23,9 @@ foreach ($res_basket as $key => $val) {
 }
 
 $addresses = $db->select('user_addresses', '*', "`user_id` = {$user['id']}");
+$token = \core\Cache::getCacheToken();
 ?>
-<script src="/vendor/basketAdditionalOptions/script.js"></script>
+<script src="/vendor/basketAdditionalOptions/script.js?<?=$token?>"></script>
 <div id="additional_options" class="product-popup mfp-hide">
     <h2>Дополнительные параметры заказа</h2>
     <div class="content">

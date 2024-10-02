@@ -50,7 +50,7 @@
 										contentType: false,
 										success(response) {
 											let images = JSON.parse(response);
-											let count = $('#photos li').size();
+											let count = $('#photos li').length;
 											$('#photos').append(
 												'<li big="' + images.big + '">' +
 													'<div>' +

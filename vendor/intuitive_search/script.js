@@ -9,12 +9,12 @@
 			let ul = $input.nextAll('.searchResult_list');
 			let activeLi = ul.find('li.active');
 			if (event.keyCode == 40){
-				if (activeLi.next().size() == 0) return false;
+				if (activeLi.next().length == 0) return false;
 				ul.find('li').removeClass('active');
 				activeLi.next().addClass('active');
 			} 
 			if (event.keyCode == 38){
-				if (activeLi.prev().size() == 0) return false;
+				if (activeLi.prev().length == 0) return false;
 				ul.find('li').removeClass('active');
 				activeLi.prev().addClass('active');
 			} 

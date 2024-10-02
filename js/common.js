@@ -257,12 +257,12 @@ function selectItemByKey(event){
 	if (event.keyCode == 40){
 		if (activeTr.length == 0) return activeTable.find('tr:first-child').addClass('active');
 
-		if (activeTr.next().size() == 0) return false;
+		if (activeTr.next().length == 0) return false;
 		$('.hints').find('tr').removeClass('active');
 		activeTr.next().addClass('active');
 	} 
 	if (event.keyCode == 38){
-		if (activeTr.prev().size() == 0) return false;
+		if (activeTr.prev().length == 0) return false;
 		$('.hints').find('tr').removeClass('active');
 		activeTr.prev().addClass('active');
 	} 
@@ -538,7 +538,7 @@ $(function() {
 
             if (inputValue.length <= countCharactersForSearch){
                 $('.hints .previous_search').show();
-                if (!$('.hints .previous_search tr.active').size()){
+                if (!$('.hints .previous_search tr.active').length){
                     $('.hints .previous_search tr:first-child').addClass('active');
                 }
                 $('.hints .coincidences').hide();

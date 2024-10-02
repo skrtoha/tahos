@@ -1,7 +1,7 @@
 (function($){
 	window['goods_arrival'] = {
 		init: function(){
-			if ($('#store .store_id').size()) $('#store .intuitiveSearch_wrap').css({display: 'none'});
+			if ($('#store .store_id').length) $('#store .intuitiveSearch_wrap').css({display: 'none'});
 			$('#store input.intuitive_search').on('keyup focus', function(e){
 				e.preventDefault();
 				let val = $(this).val();

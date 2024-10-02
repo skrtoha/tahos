@@ -153,7 +153,7 @@ $(function(){
 			data: params,
 			success: function(response){
 				th.remove();
-				if (!$('table tr[order_id][store_id][item_id]').size()) document.location.href = '/orders';
+				if (!$('table tr[order_id][store_id][item_id]').length) document.location.href = '/orders';
 				// console.log(response); return false;
 
 			}

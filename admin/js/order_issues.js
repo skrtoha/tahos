@@ -11,8 +11,8 @@
 		pageSize: 30,
 		init: function(){
 			var oi = this;
-			if ($('#common_list').size()) this.common_list();
-			if ($('#user_issue_values').size()) this.user_issue_values();
+			if ($('#common_list').length) this.common_list();
+			if ($('#user_issue_values').length) this.user_issue_values();
 			
 			$('#user_order_issues input[type=checkbox]').on('change', function(){
 				var th = $(this);

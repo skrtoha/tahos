@@ -12,7 +12,7 @@
 		pageSize: 30,
 		init: function(){
 			var oi = this;
-			if ($('#common_list').size()) this.common_list();
+			if ($('#common_list').length) this.common_list();
 			$(document).on('click', 'tr[sending_id]', function(){
 				document.location.href = '/admin/?view=sendings&id=' + $(this).attr('sending_id');
 			})

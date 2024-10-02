@@ -202,7 +202,7 @@ $(function(){
 		$(this).toggleClass("opened").nextAll('.status-form').toggle();
 	});
 	$(document).mouseup(function (e){
-		if (!$(e.target).closest('div.status').size()){
+		if (!$(e.target).closest('div.status').length){
 			$(".status-form").hide();
 			$(".order-filter-form .pseudo-select").removeClass("opened");
 		}

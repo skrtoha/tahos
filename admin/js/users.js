@@ -26,7 +26,7 @@ class User{
             }
         }
 
-        if ($('#history_search').size()) User.history_search();
+        if ($('#history_search').length) User.history_search();
 
         $('#actions form').on('submit', function(e){
             e.preventDefault();
@@ -126,7 +126,7 @@ class User{
             if (!confirm('Вы действительно хотите удалить?')) return false;
             let item_id = $(this).closest('tr').attr('item_id');
             $(e.target).closest('tr').remove();
-            if (!$(User.getSelector('tr.item')).size()) $(User.getSelector('tr.hiddable')).show();
+            if (!$(User.getSelector('tr.item')).length) $(User.getSelector('tr.hiddable')).show();
 
             delete User.items[item_id];
             User.setTotal();

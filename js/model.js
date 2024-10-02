@@ -30,7 +30,7 @@ function get_items(){
 			$('table.wide-view tr:nth-child(n+2)').remove();
 			$('table.wide-view').append(
 				'<tr class="gif">' + 
-					'<td colspan="' + $('.mosaic-view table.wide-view').find('th').size() + '"></td>' +
+					'<td colspan="' + $('.mosaic-view table.wide-view').find('th').length + '"></td>' +
 				'</tr>'
 			)
 				
@@ -41,7 +41,7 @@ function get_items(){
 			if (!res){
 				str = 
 					'<tr>' + 
-						'<td colspan="' + $('.mosaic-view table.wide-view').find('th').size() + '">Ничего не найдено</td>' +
+						'<td colspan="' + $('.mosaic-view table.wide-view').find('th').length + '">Ничего не найдено</td>' +
 					'</tr>';
 			}
 			else{

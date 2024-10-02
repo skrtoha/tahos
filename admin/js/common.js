@@ -58,7 +58,7 @@ function getImgUrl(){
 }
 $('#left_menu > div > ul > li > a').on('click', function(){
 	var th = $(this);
-	if (th.next('ul').size()){
+	if (th.next('ul').length){
 		th.next().toggleClass('active');
 		th.find('span').toggleClass('icon-circle-up').toggleClass('icon-circle-down');
 		var title = th.text();

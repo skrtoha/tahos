@@ -119,7 +119,7 @@
 						if (msg == 'ok'){
 							show_message('Подбренд успешно удален!');
 							elem.remove();
-							if (!$('.subbrend').size()) $('#add_subbrend').before('<span id="no_brends">Подбрендов не найдено</span>');
+							if (!$('.subbrend').length) $('#add_subbrend').before('<span id="no_brends">Подбрендов не найдено</span>');
 						}
 					}
 				})

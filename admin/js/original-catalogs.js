@@ -334,7 +334,7 @@ $(function(){
 					// console.log(msg);
 					show_message('Успешно удалено!');
 					elem.remove();
-					if ($('table.brends tr').size() == 1) $('table.brends').append(
+					if ($('table.brends tr').length == 1) $('table.brends').append(
 						'<tr class="removable">' +
 							'<td colspan="2">Брендов не найдено</td>' +
 						'</tr>'
@@ -491,7 +491,7 @@ $(function(){
 			success: function(msg){
 				if (!title){
 					elem.remove();
-					if (!$('.filter_values a').size()) $('.filter_values').html('Значений фильтров не задано');
+					if (!$('.filter_values a').length) $('.filter_values').html('Значений фильтров не задано');
 					show_message('Успешно удалено!');
 				} 
 				else{
@@ -822,9 +822,9 @@ $(function(){
 			success: function(res){
 				elem.remove();
 				var t = $('table.modifications');
-				if (t.find('tr').size() == 1) t.append(
+				if (t.find('tr').length == 1) t.append(
 					'<tr class="removable">' +
-						'<td colspan="' + t.find('tr.head td').size() + '">Модификаций не найдено</td>' +
+						'<td colspan="' + t.find('tr.head td').length + '">Модификаций не найдено</td>' +
 					'</tr>'
 				);
 				$('#total span').html(+$('#total span').html() - 1);

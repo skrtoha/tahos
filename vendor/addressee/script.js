@@ -125,7 +125,7 @@ $(function(){
 
         $('#set-address .right').append(getHtml(formData));
         const selector = '#set-address-wrapper .right div.address';
-        if ($(selector).size() == 1){
+        if ($(selector).length == 1){
             const obj = $(selector + ':first-child input[name=isDefault]');
             obj.prop('checked', true);
             setDefault(obj);

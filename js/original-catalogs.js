@@ -142,8 +142,8 @@ $(function(){
             return false;
         }
         let $partsCatalogsNodes = $('#app');
-        if (!$('#to_garage').size()) isProccessedGarage = false;
-        if($partsCatalogsNodes.size() && !isProccessedGarage){
+        if (!$('#to_garage').length) isProccessedGarage = false;
+        if($partsCatalogsNodes.length && !isProccessedGarage){
 			let $h1 = $partsCatalogsNodes.find('h1');
 			let title = $h1.html();
 			title = title.replace(/[^\w ]+/g, '');
@@ -203,14 +203,14 @@ $(function(){
             const getQuery = getParams();
             console.log(getQuery);
             const $inputFrameSearch = $('#id-vin-frame-search');
-            if ($inputFrameSearch.size()) {
+            if ($inputFrameSearch.length) {
                 let currentVIN = $inputFrameSearch.val();
                 setTimeout(() => {
                     $inputFrameSearch.click();
                     $inputFrameSearch.focus();
                     setTimeout(() => {
                         const $ul = $inputFrameSearch.parent().parent().next();
-                        if ($ul.size()){
+                        if ($ul.length){
                             isProccessedVin = true;
                             $.each($ul.find('li'), (i, item) => {
                                 if (item.querySelector('div').innerText == currentVIN){

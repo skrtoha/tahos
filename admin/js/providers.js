@@ -281,7 +281,7 @@ $(function(){
         $target.prevAll('.our-brend').hide();
         $target.prevAll('div.search-brend').show();
 
-        if (!$target.prevAll('.our-brend').size()){
+        if (!$target.prevAll('.our-brend').length){
             $target.closest('td').find('span.icon-bin').hide();
         }
 

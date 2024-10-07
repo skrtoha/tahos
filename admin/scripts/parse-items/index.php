@@ -3,71 +3,17 @@
 use core\Item;
 use core\Provider\Armtek;
 
+/** @var int $category_id */
+/** @var array $filterValues */
+
 set_time_limit(0);
 require_once($_SERVER['DOCUMENT_ROOT'].'/core/DataBase.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 
 $db = new core\Database();
 $errors = [];
-$category_id = 99;
 
-$filterValues = [
-    'akbDlina' => 268,
-    'akbKlemmy' => [
-        'выносные (Азия)' => 2325,
-        'тонкие вынос.(Азия)' => 2331,
-        'конусные' => 5779,
-        'резьбовые (Америка)' => 5780,
-        'универсальные (болт и конус)' => 5781,
-        'мото' => 5782,
-        'под болт' => 5783,
-        'прочее' => 5785,
-        'стандартные (Т1)' => 2326,
-        'тонкие (Т3)' => 2331,
-        'винтовые' => 5786,
-        'винтовые + стандартные (T1)' => 5787
-    ],
-    'akbModelAkkumulyatora' => 612,
-    'akbNominalnoyeNapryazheniye' => [
-        '12V' =>2322
-    ],
-    'akbStartstop' => [
-        true => 5790,
-        false => 5791
-    ],
-    'akbSukhozaryazhennaya' => [
-        true => 5792,
-        false => 5793
-    ],
-    'akbSeriya' => 613,
-    'akbPolyarnost' => 265,
-    'akbPuskovoytok' => 263,
-    'akbShirina' => 269,
-    'akbSposobKrepleniya' => [
-        'B01 нижнее крепление' => 2399,
-        'B13' => 2327,
-        'B00' => 2324,
-        'B03 нижнее крепление' => 2454,
-        'нижнее крепление' => 5774,
-        'универсальное крепление' => 5775,
-        'верхняя планка' => 5776
-    ],
-    'akbEtn' => 618,
-    'akbTipBatarei' => [
-        'AGM' => 2329,
-        'Ca/Ca (Кальциевые)' => 2323,
-        'EFB' => 5777,
-        'Sb/Ca (Гибридные)' => 2453,
-        'Sb/Sb (Малосурьмянистые)' => 5778,
-    ],
-    'akbVysota' => 270,
-    'akbYemkost' => 264,
-    'akbObsluzhivayemaya' => [
-        true => 5788,
-        false => 5789
-    ]
-];
-
+require_once ('../parse-items/json/tire/filterValues.php');
 function get_filter_value_id($filter_id, $value, $is_like = false){
     global $db, $errors, $category_id;
     static $filterValues;
@@ -104,19 +50,19 @@ function get_filter_value_id($filter_id, $value, $is_like = false){
     return $fv;
 }
 
-for($i = 1; $i <= 3; $i++){
-    $result = json_decode(file_get_contents("json/$i.json"), true);
-    foreach($result['entities'] as $entity){
-        $brend_id = Armtek::getBrendId($entity['brand']);
+for($i = 1; $i <= 24; $i++){
+    $result = json_decode(file_get_contents("json/tire/$i.json"), true);
+    foreach($result['data']['entities'] as $entity){
+        $brend_id = Armtek::getBrendId($entity['fields']['brand']);
         if (!$brend_id){
             $errors[] = "Бренд {$entity['brand']} не найден";
             continue;
         }
-        $article = Item::articleClear($entity['article']);
+        $article = Item::articleClear($entity['code']);
         $resItemInsert = Item::insert([
             'brend_id' => $brend_id,
             'article' => $article,
-            'article_cat' => $entity['article'],
+            'article_cat' => $entity['code'],
             'title_full' => $entity['title'],
             'title' => $entity['title']
         ]);

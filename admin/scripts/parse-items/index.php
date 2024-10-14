@@ -13,56 +13,26 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 $db = new core\Database();
 $errors = [];
 
-require_once ('../parse-items/json/tire/filterValues.php');
-function get_filter_value_id($filter_id, $value, $is_like = false){
-    global $db, $errors, $category_id;
-    static $filterValues;
-    $fv = & $filterValues[$filter_id][$value];
-    if (isset($fv)) return $fv;
+require_once ('../parse-items/json/accum/filterValues.php');
 
-    if ($is_like) $whereTitle = "tfv.title like '%$value%' and ";
-    else $whereTitle = "tfv.title = '$value' and ";
-
-    $query = "
-        select
-            tf.id,
-            tf.title,
-            tfv.title as filter_value,
-            tfv.id as filter_value_id
-        from
-            tahos_filters_values tfv
-                left join
-            tahos_filters tf on tfv.filter_id = tf.id
-                left join
-            tahos_categories tc on tf.category_id = tc.id
-        where 
-              tf.category_id = $category_id and 
-              $whereTitle
-              tfv.filter_id = $filter_id
-    ";
-    $result = $db->query($query);
-    if (!$result->num_rows){
-        $errors[] = "Не найдено $filter_id $value";
-        return false;
-    }
-    $result = $result->fetch_assoc();
-    $fv = $result['filter_value_id'];
-    return $fv;
-}
-
-for($i = 1; $i <= 24; $i++){
-    $result = json_decode(file_get_contents("json/tire/$i.json"), true);
+for($i = 1; $i <= 16; $i++){
+    $result = json_decode(file_get_contents("json/accum/$i.json"), true);
     foreach($result['data']['entities'] as $entity){
         $brend_id = Armtek::getBrendId($entity['fields']['brand']);
         if (!$brend_id){
             $errors[] = "Бренд {$entity['brand']} не найден";
             continue;
         }
-        $article = Item::articleClear($entity['code']);
+        $article = Item::articleClear($entity['fields']['part_number']);
+
+        if (!$article) {
+            continue;
+        }
+
         $resItemInsert = Item::insert([
             'brend_id' => $brend_id,
             'article' => $article,
-            'article_cat' => $entity['code'],
+            'article_cat' => $entity['fields']['part_number'],
             'title_full' => $entity['title'],
             'title' => $entity['title']
         ]);
@@ -78,122 +48,57 @@ for($i = 1; $i <= 24; $i++){
             continue;
         }
 
-        $db->insert('categories_items', [
+        $res1 = $db->insert('categories_items', [
             'item_id' => $item_id,
             'category_id' => $category_id
         ]);
 
-        //todo для грузовых
-        $resItemValuesInsert = $db->insert('items_values', [
-            'item_id' => $item_id,
-            'value_id' => 2458
-        ]);
-
-        if ($entity['brand']){
-            switch($entity['brand']){
-                case 'АКОМ': $filter_value_id = 1751; break;
-                default:
-                    $filter_value_id = get_filter_value_id(262, $entity['brand'], true);
-            }
-            if ($filter_value_id !== false){
-                $db->insert('items_values', [
-                    'item_id' => $item_id,
-                    'value_id' => $filter_value_id
-                ]);
-
-            }
-        }
+        /*if ($res1 !== true) {
+            continue;
+        }*/
 
         foreach($entity['fields'] as $title => $value){
-            if (!$value) continue;
+            if (!$value || !key_exists($title, $filterValues)) {
+                continue;
+            }
             if (is_numeric($value)){
                 if((string) $value == (string) (int) $value){
                     $value = (int) $value;
                 }
             }
-            $isFoundedTitle = false;
+
             $filter_value_id = false;
             switch($title){
-                case 'akbDlina':
-                case 'akbModelAkkumulyatora':
-                case 'akbSeriya':
-                case 'akbPolyarnost':
-                case 'akbPuskovoytok':
-                case 'akbShirina':
-                case 'akbEtn':
-                case 'akbVysota':
-                case 'akbYemkost':
-                    $filter_value_id = get_filter_value_id($filterValues[$title], $value);
-                    if (!$filter_value_id){
-                        $db->insert('filters_values', [
-                            'title' => $value,
-                            'filter_id' => $filterValues[$title]
-                        ]);
-                        $filter_value_id = $db->last_id();
+                default:
+                    if (is_array($filterValues[$title])) {
+                        $filter_value_id = $filterValues[$title][$value];
                     }
-                    $isFoundedTitle = true;
-                    break;
-                case 'akbKlemmy':
-                case 'akbNominalnoyeNapryazheniye':
-                case 'akbStartstop':
-                case 'akbSukhozaryazhennaya':
-                case 'akbSposobKrepleniya':
-                case 'akbTipBatarei':
-                case 'akbObsluzhivayemaya':
-                    $isFoundedTitle = true;
-                    $filter_value_id = $filterValues[$title][$value];
-                    break;
+                    else {
+                        $result = $db->select_one(
+                            'filters_values',
+                            'id',
+                            "`filter_id` = {$filterValues[$title]} and `title` = '{$value}'"
+                        );
+                        if ($result){
+                            $filter_value_id = $result['id'];
+                        }
+                        else {
+                            $db->insert('filters_values', [
+                                'filter_id' => $filterValues[$title],
+                                'title' => $value
+                            ]);
+                            $filter_value_id = $db->last_id();
+                        }
+                    }
             }
-            if (!$filter_value_id && $isFoundedTitle && $value){
-                $errors[] = "$item_id: ошибка получения value_id для $title $value";
+            if (!$filter_value_id){
                 continue;
             }
 
-            if ($filter_value_id){
-                $resItemValuesInsert = $db->insert('items_values', [
-                    'item_id' => $item_id,
-                    'value_id' => $filter_value_id
-                ]);
-            }
+            $resItemValuesInsert = $db->insert('items_values', [
+                'item_id' => $item_id,
+                'value_id' => $filter_value_id
+            ]);
         }
-        echo "Конец fields";
     }
-    echo "";
-}
-echo json_encode($errors);
-
-
-
-function getResultQuery($page = 0){
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://www.autorus.ru/api2/catalog/section',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => '{"code":"shiny-legkovyye","query":{"page": "'.$page.'", "limit": 50}}',
-        CURLOPT_HTTPHEADER => array(
-            'authorization: Bearer',
-            'sec-ch-ua: \\" Not A;Brand\\";v=\\"99\\", \\"Chromium\\";v=\\"98\\", \\"Google Chrome\\";v=\\"98\\"',
-            'sec-ch-ua-mobile: ?0',
-            'sec-ch-ua-platform: \\"Windows\\"',
-            'sec-fetch-dest: empty',
-            'sec-fetch-mode: cors',
-            'sec-fetch-site: same-site',
-            'accept-language: ru-UA,ru;q=0.9,en-GB;q=0.8,en;q=0.7,ru-RU;q=0.6,en-US;q=0.5',
-            'content-type: application/json',
-            'pragma: no-cache',
-            'Cookie: qrator_msid=1644854652.588.V4OKCOBQMhbPlwrJ-qji0p9llb68nl580jstdla06ndb3o9p8; sess_arus=s%3AiL2BRmdHn_a0Wpzvwj3SgAFOhfOrE7ZA.BW40A8iHrV8J%2Fd26VmmRS2ZIdHqfNS94D3jViDQkqhw'
-        ),
-    ));
-
-    $response = curl_exec($curl);
-
-    curl_close($curl);
-    return $response;
-
 }

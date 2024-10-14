@@ -37,8 +37,8 @@ if ($items_id->num_rows){
 		", '');
 		if ($store_items->num_rows){
 			$log->info("Из store_items для {$row['item_id']} выбрано {$store_items->num_rows} строк");
-			$price = 100000000000000000;
-			$delivery = 1000;
+			$price = PHP_INT_MAX;
+			$delivery = PHP_INT_MAX;
 			$item_id = $row['item_id'];
 			while($v = $store_items->fetch_assoc()){
 				if ($v['price'] < $price) $price = $v['price'];

@@ -391,6 +391,9 @@ ul[name=issue] li.selected {
 #registration button{
     margin-top: 10px;
 }
+.jq-selectbox__dropdown {
+    width: 100% !important;
+}
 
 #map2 {
     -webkit-box-sizing: border-box;

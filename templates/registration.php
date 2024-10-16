@@ -236,6 +236,32 @@ Breadcrumb::out();
 			<input type="checkbox" id="accept_checkbox" name="accept_checkbox">
 			<label for="accept_checkbox">С <a target="_blank" href="/page/agreement">пользовательским соглашением</a> ознакомлен и согласен</label>
 		</div>
+        <script
+                src="https://smartcaptcha.yandexcloud.net/captcha.js?render=onload&onload=onloadFunction"
+                defer
+        ></script>
+        <script>
+            window.captcha_sitekey = "<?=YandexCaptcha::SITE_KEY?>"
+            function onloadFunction() {
+                if (window.smartCaptcha) {
+                    const elements = document.querySelectorAll(".yandex-captcha")
+
+                    if (elements){
+                        for(let elem of elements){
+                            const widgetId = window.smartCaptcha.render(elem, {
+                                sitekey: "<?=YandexCaptcha::SITE_KEY?>",
+                                hl: "ru",
+                            })
+                            window.smartCaptcha.subscribe(widgetId, "success", () => {
+                                const event = new Event(`captchaSuccessed_${elem.dataset.key}`, {bubbles: true})
+                                elem.dispatchEvent(event)
+                            })
+                        }
+                    }
+
+                }
+            }
+        </script>
         <div class="input_phone">
             <? YandexCaptcha::show('registration');?>
         </div>

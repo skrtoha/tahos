@@ -49,6 +49,7 @@ $token = Cache::getCacheToken();
     <?}?>
     <?if (in_array($view, ['category'])){?>
 		<link rel="stylesheet" type="text/css" href="/vendor/paginationjs/pagination.css?<?=$token?>">
+		<link rel="stylesheet" type="text/css" href="/vendor/plugins/ion.rangeSlider/ion.rangeSlider.min.css?<?=$token?>">
 	<?}?>
     <?if (in_array($view, ['settings', 'registration'])){?>
         <link rel="stylesheet" href="/vendor/addressee/jquery.fias.min.css?<?=$token?>">
@@ -507,6 +508,7 @@ $token = Cache::getCacheToken();
         <?}?>
 		<?if (in_array($view, ['category'])){?>
 			{"src" : "/vendor/paginationjs/pagination.min.js?<?=$token?>", "async" : false},
+			{"src" : "/vendor/plugins/ion.rangeSlider/ion.rangeSlider.min.js?<?=$token?>", "async" : false},
 		<?}?>
 		<?if (in_array($view, ['article', 'orders', 'order'])){?>
 			{"src" : "/js/get_store_info.js?<?=$token?>", "async" : false},

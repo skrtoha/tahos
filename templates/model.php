@@ -1,7 +1,9 @@
 <?
-// debug($_GET);
 use core\Breadcrumb;
 use core\Exceptions\NotFoundException;
+
+/** @var \core\Database $db */
+/** @var array $user */
 
 if ($_GET['to_garage'] && $user['id'] && $_GET['modification_id']){
 	$res = $db->insert(
@@ -11,15 +13,12 @@ if ($_GET['to_garage'] && $user['id'] && $_GET['modification_id']){
 			'modification_id' => $_GET['modification_id']
 		]
 	);
-	// echo "$db->last_query $res";
 	if ($res === true){
 		message("Успешно добавлено!");
 		header("Location: /garage");
 	}
 	elseif (preg_match('/Duplicate/u', $res)){
 		message('Такая модификация уже присутствует!', false);
-		// $url = preg_replace('/\/to_garage\/\d+$/', '/to_garage', $_SERVER['REQUEST_URI']);
-		// header("Location: $url");
 	}
 	else message("Произошла ошибка!", false);
 }
@@ -375,19 +374,19 @@ Breadcrumb::out();
 					</tr>
 					<?if (!empty($modifications)) foreach($modifications as $key => $value){
 						if ($_GET['year'] && $value['filter_values']['Год'] != $_GET['year']) continue;?>
-							<tr class="clickable" modification_id="<?=$value['id']?>">
-								<td class="name-col">
-									<a href="<?=$uri?>/<?=$value['id']?>">
-										<?=$value['title']?>
-									</a>
-								</td>
-								<?if (!empty($value['filter_values'])){
-									foreach ($value['filter_values'] as $k => $v){?>
-										<td><?=$v?></td>
-									<?}	
-								}?>
-							</tr>
-						<?}?>
+                            <tr class="clickable" modification_id="<?=$value['id']?>">
+                                <td class="name-col">
+                                    <a href="<?=$uri?>/<?=$value['id']?>">
+                                        <?=$value['title']?>
+                                    </a>
+                                </td>
+                                <?if (!empty($value['filter_values'])){
+                                    foreach ($value['filter_values'] as $k => $v){?>
+                                        <td><?=$v?></td>
+                                    <?}
+                                }?>
+                            </tr>
+                        <?}?>
 				</tbody>
 			</table>
 		</div>

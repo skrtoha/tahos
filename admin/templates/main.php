@@ -33,7 +33,7 @@ use admin\functions\LeftMenu;
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link rel="stylesheet" href="/css/magnific-popup.css">
 	<?if (core\Config::$isUseTinymce){?>
-		<script src="/js/tinymce/tinymce.min.js"></script>
+		<script src="/js/tinymce/tinymce.min.js" type="application/javascript"></script>
 		<script type="text/javascript">
             const tinymceInitParams = {
               language: "ru",
@@ -111,7 +111,7 @@ use admin\functions\LeftMenu;
 							<li><a href="?view=authorization&act=regout">Выйти</a></li>
 						<?}?>
 					</ul>
-				</ul>
+				</div>
 			</div>
 		</div>
 	<?}?>

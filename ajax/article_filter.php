@@ -28,8 +28,7 @@ $array = core\Search::articleStoreItems(
     $_POST['item_id'],
     $_SESSION['user'] ?? null,
     $filters,
-    $_POST['search_type'],
-    (bool)$_POST['no-use-api']
+    $_POST['search_type']
 );
 
 $store_items = & $array['store_items'];

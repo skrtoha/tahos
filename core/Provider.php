@@ -259,10 +259,6 @@ abstract class Provider{
 	public static function updateProviderBasket(array $params, array $fields){
 		return self::getInstanceDataBase()->update('provider_basket', $fields, self::getWhere($params));
 	}
-	public static function isAdminArea(){
-		if (preg_match('/^\/admin/', $_SERVER['REQUEST_URI'])) return true;
-		else return false;
-	}
 	/**
 	 * gets list with is_disabled_api_order =1
 	 * @return array array with is_disabled_api_order
@@ -607,15 +603,6 @@ abstract class Provider{
 	public static function isJSON($string){
 		return is_string($string) && is_array(json_decode($string, true)) ? true : false;
 	}
-
-    public static function getTypeOrganizationFromPayType($typeOrganization){
-        switch($typeOrganization){
-            case 'entity':
-                return User::BILL_CASHLESS;
-            case 'private':
-                return User::BILL_CASH;
-        }
-    }
 
     public static function getCacheData($cacheId) {
         if (Cache::useArticleCache()) {

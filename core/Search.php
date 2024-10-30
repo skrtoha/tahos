@@ -158,16 +158,8 @@ class Search{
         return $items;
     }
 
-    public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles', $after_api = false): array
+    public static function articleStoreItems($item_id, $user_id = null, $filters = [], $search_type = 'articles'): array
     {
-        $cacheId = md5($item_id.$search_type.$after_api.json_encode($filters));
-        if (Cache::useArticleCache()) {
-            $result = Cache::get($cacheId);
-            if ($result) {
-                return $result;
-            }
-        }
-
         $user = [];
         if ($user_id){
             $result = User::get(['user_id' => $user_id]);
@@ -287,23 +279,27 @@ class Search{
                 }
             }
         }
-        $output = [
+
+        return [
             'store_items' => $store_items,
             'prices' => $prices ?: array(),
             'deliveries' => $deliveries ?: array(),
             'hide_analogies' => '',
             'user' => $user
         ];
-
-        if (Cache::useArticleCache()) {
-            Cache::set($cacheId, $output);
-        }
-
-        return $output;
     }
 
     private static function getQueryArticleStoreItems($item_id, $user, $search_type, $filters = []){
         if ($user){
+            $join_basket = "
+                LEFT JOIN 
+                        #basket ba 
+                ON 
+                    si.store_id=ba.store_id AND 
+                    si.item_id=ba.item_id AND 
+                    ba.user_id={$user['id']}
+		    ";
+            $ba_quan = " ba.quan as in_basket, ";
             $userDiscount = "@price * {$user['discount']} / 100";
         }
         else $userDiscount = 0;
@@ -319,6 +315,16 @@ class Search{
             SELECT
                 diff.item_diff as item_id,
                 $selectAnalogies
+                si.in_stock,
+                IF(
+                    si.packaging != 1,
+                    CONCAT(
+                        '&nbsp;(<span>уп.&nbsp;',
+                        si.packaging,
+                        '&nbsp;шт.</span>)'
+                    ),
+                    ''
+                ) as packaging_text,
                 b.title as brend,
                 i.brend_id as brend_id,
                 i.photo,
@@ -346,6 +352,7 @@ class Search{
                 ps.percent,
                 @price := si.price * c.rate + si.price * c.rate * ps.percent / 100,
                 CEIL(@price - $userDiscount) AS price,
+                $ba_quan
                 IF (
                     i.applicability !='' || i.characteristics !=''  || i.full_desc !='' || i.photo != '',
                     1,
@@ -360,6 +367,7 @@ class Search{
             LEFT JOIN #brends b ON b.id=i.brend_id
             LEFT JOIN #item_barcodes ib ON ib.item_id = i.id
             LEFT JOIN #autoeuro_order_keys aok ON aok.item_id = si.item_id AND aok.store_id = si.store_id
+            $join_basket
             WHERE diff.item_id=$item_id $whereAnalogies
         ";
         if ($hide_analogies) $q_item .= ' AND si.item_id IS NOT NULL';

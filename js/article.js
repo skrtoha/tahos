@@ -26,7 +26,7 @@ function removeWithoutProviders(){
         $.each($('#analogies div.mobile-layout div.goods-header'), function(i, item){
             let th = $(this);
             let table = th.next('table');
-            if (!table.find('tr td').length) th.remove();
+            if (!table.find('tr td').size()) th.remove();
         })
     }
 }
@@ -61,9 +61,8 @@ function setTabType(tab){
             || search_type === 'complects'
         )
     ){
-        let item_id = $('#item_id').val();
-        let data = "item_id=" + item_id + "&search_type=" + search_type;
-        data += '&no-use-api=' + document.querySelector('input[name="no-use-api"]').value;
+        const item_id = $('#item_id').val();
+        const data = "item_id=" + item_id + "&search_type=" + search_type;
         $.ajax({
             type: "POST",
             url: "/ajax/article_filter.php",
@@ -108,88 +107,9 @@ function setTabType(tab){
                 price_format();
                 applyUserMarkup();
                 popup.style.display = 'none';
-                if (!!parseInt(document.querySelector('input[name="no-use-api"]').value)) {
-                    applyInStock();
-                }
-
-                applyBasketAmount();
             }
         });
     }
-}
-
-function applyInStock(){
-    const elements = document.querySelectorAll('li.updating');
-    if (!elements) {
-        return;
-    }
-    const items = [];
-    elements.forEach(element => {
-        const key = `${element.dataset.storeId}-${element.dataset.itemId}`;
-        if (!items.includes(key)) {
-            items.push(key);
-        }
-    })
-    const formData = new FormData();
-
-    formData.set('act', 'get-in-stock');
-    formData.set('items', JSON.stringify(items));
-    fetch('/ajax/common.php', {
-        method: 'POST',
-        body: formData
-    }).then(response => response.json()).then(response => {
-        response.forEach(row => {
-            const elements = document.querySelectorAll(`li.updating[data-store-id="${row.store_id}"][data-item-id="${row.item_id}"]`);
-            if (elements) {
-                elements.forEach(item => {
-                    item.classList.remove('updating');
-                    item.innerHTML = row.in_stock;
-                })
-            }
-        })
-        //удаляем необработанные элементы
-        const elements = document.querySelectorAll(`li.updating[data-store-id][data-item-id]`);
-        if (elements) {
-            elements.forEach(item => {
-                item.classList.remove('updating');
-                item.innerHTML = 'нет';
-            })
-        }
-    })
-}
-
-function applyBasketAmount() {
-    const formData = new FormData;
-    formData.set('act', 'get-basket-amount');
-    fetch('/ajax/common.php', {
-        method: 'POST',
-        body: formData
-    }).then(response => response.json()).then(response => {
-        document.querySelectorAll(`i.fa-cart-arrow-down`).forEach((element) => {
-            element.innerHTML = '';
-        })
-        if (!response) {
-            return;
-        }
-        response.forEach(row => {
-            const elementsBasket = document.querySelectorAll(`i.fa-cart-arrow-down[store_id="${row.store_id}"][item_id="${row.item_id}"]`);
-            if (elementsBasket.length){
-                elementsBasket.forEach(element => {
-                    element.innerHTML = `<i class="goods-counter">${row.quan}</i>`;
-                })
-            }
-            const elementsAmount = document.querySelectorAll(`li[store_id="${row.store_id}"][item_id="${row.item_id}"]`);
-            if (elementsAmount.length){
-                elementsAmount.forEach(element => {
-                    element.innerHTML = `<input value="${row.quan}">`;
-
-                    element.closest('table').querySelectorAll('.quan.hidden').forEach((e) => {
-                        e.classList.remove('hidden');
-                    })
-                })
-            }
-        })
-    })
 }
 
 function set_tabs(){
@@ -305,9 +225,6 @@ function setNewValue(obj){
     setNewValueAjax(obj);
 }
 function store_items(store_items, user, search_type = null){
-    let stringClass;
-    let selector;
-    let si_delivery;
     const isInBasket = window.isInBasket(store_items);
     /**
      * adds to class if no items exists in basket
@@ -329,51 +246,50 @@ function store_items(store_items, user, search_type = null){
     }
     let full =
         '<tr class="shown">' +
-            '<th><a class="sortable brend" href="">Бренд</a></th>' +
-            '<th>Наименование</th>' +
-            '<th>Поставщик</th>' +
-            '<th><a class="sortable in_stock" href="">В наличии</a></th>' +
-            '<th><a class="sortable delivery" href="">Срок</a></th>' +
-            '<th><a class="sortable price" href="">Цена</a></th>' +
-            '<th class="quan ' + hidden + '">К заказу</th>' +
-            '<th><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></th>' +
+        '<th><a class="sortable brend" href="">Бренд</a></th>' +
+        '<th>Наименование</th>' +
+        '<th>Поставщик</th>' +
+        '<th><a class="sortable in_stock" href="">В наличии</a></th>' +
+        '<th><a class="sortable delivery" href="">Срок</a></th>' +
+        '<th><a class="sortable price" href="">Цена</a></th>' +
+        '<th class="quan ' + hidden + '">К заказу</th>' +
+        '<th><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></th>' +
         '</tr>';
     let mobile = '';
     let i;
     length = store_items.length;
     for (i = 0; i < length; i++){
-        const id = store_items[i].item_id;
-        const si = store_items[i].store_item;
+        var id = store_items[i].item_id;
+        var si = store_items[i].store_item;
         /**
          * counts amount of items in list
          */
-        let csi;
+        var csi;
+        // console.log('item_id=' + si.item_id, typeof si.list);
         if (typeof si.list !== null && typeof si.list !== 'undefined') csi = Object.keys(si.list).length;
         else csi = false;
         /**
          * shows is there any prevail in item list
          * @type {[string]}
          */
-        const count_prevails = typeof si.prevails !== 'undefined' ? Object.keys(si.prevails).length : false;
+        var count_prevails = typeof si.prevails !== 'undefined' ? Object.keys(si.prevails).length : false;
         /**
          * for displaying additional items if csi > 2
          * @type {[string]}
          */
-        const button_row = (csi <= 2) ? 'button-row' : '';
-        const empty = '';
-        const si_price = si.min_price;
-        if (csi > 1) {
-            si_delivery = si.min_delivery;
-        }
+        var button_row = (csi <= 2) ? 'button-row' : '';
+        var empty = '';
+        var si_price = si.min_price;
+        if (csi > 1) var si_delivery = si.min_delivery;
         else si_delivery = false;
         full +=
             '<tr class="' + button_row + ' ' + empty + ' shown first-full">' +
             '<td style="padding: 20px 0;text-align:left">' +
             '<b class="brend_info" brend_id="' + si.brend_id + '">' +
-                si.brend +
+            si.brend +
             '</b> ' +
             '<a href="/article/' + si.item_id + '-' + si.article + '" class="articul">' +
-                si.article +
+            si.article +
             '</a>' +
             '</td>' +
             '<td class="name-col" style="padding-top: 18px;text-align:left">';
@@ -391,16 +307,16 @@ function store_items(store_items, user, search_type = null){
             user.allow_request_delete_item === '1' &&
             si.status == '0'
         ){
-            selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
+            var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
             mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
             full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
-        }
+        };
         if (si.status == '1'){
             mobile += '<span title="Проверенный аналог" class="icon-checkmark1"></span>';
             full += '<span title="Проверенный аналог" class="icon-checkmark1"></span>';
         }
         if (+si.is_desc || si.photo){
-            stringClass = '';
+            var stringClass = '';
             if (si.is_desc) stringClass = 'fa-cog';
             if (si.photo) stringClass = 'fa-camera';
             full +=
@@ -506,19 +422,17 @@ function store_items(store_items, user, search_type = null){
                 '<ul class="prevail">';
             mobile +=
                 '<ul class="prevail">';
-            for (const pv in si.prevails){
+            for (var p in si.prevails){
                 full +=
-                    `<li
-                        class="updating"
-                        data-item-id="${id}"
-                        data-store-id="${si.prevails[pv].store_id}">
-                    </li>`;
+                    '<li>' +
+                    si.prevails[p].in_stock +
+                    si.prevails[p].packaging_text
+                '</li>';
                 mobile +=
-                    `<li
-                        class="updating"
-                        data-item-id="${si.item_id}"
-                        data-store-id="${si.prevails[pv].store_id}">
-                    </li>`;
+                    '<li>' +
+                    si.prevails[p].in_stock +
+                    si.prevails[p].packaging_text
+                '</li>';
             }
             full +=
                 '</ul>';
@@ -528,31 +442,27 @@ function store_items(store_items, user, search_type = null){
         if (csi){
             full +=
                 '<ul>' +
-                `<li
-                    class="updating"
-                    data-item-id="${id}"
-                    data-store-id="${si_price.store_id}">
-                </li>`;
+                '<li>' +
+                si_price.in_stock +
+                si_price.packaging_text +
+                '</li>';
             mobile +=
                 '<ul>' +
-                `<li
-                    class="updating"
-                    data-item-id="${id}"
-                    data-store-id="${si_price.store_id}">
-                </li>`;
+                '<li>' +
+                si_price.in_stock +
+                si_price.packaging_text +
+                '</li>';
             if (si_delivery){
                 full +=
-                    `<li
-                        class="updating"
-                        data-item-id="${id}"
-                        data-store-id="${si_delivery.store_id}">
-                    </li>`;
+                    '<li>' +
+                    si_delivery.in_stock +
+                    si_delivery.packaging_text +
+                    '</li>';
                 mobile +=
-                    `<li
-                        class="updating"
-                        data-item-id="${id}"
-                        data-store-id="${si_delivery.store_id}">
-                    </li>`;
+                    '<li>' +
+                    si_delivery.in_stock +
+                    si_delivery.packaging_text +
+                    '</li>';
             }
             full +=
                 '</ul>';
@@ -744,15 +654,19 @@ function store_items(store_items, user, search_type = null){
                     '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.prevails[p].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
                 mobile +=
                     '<li>' +
                     '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.prevails[p].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                if (si.prevails[p].in_basket){
+                    full +=
+                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
+                    mobile +=
+                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
+                }
                 full +=
                     '</i>' +
                     '</li>';
@@ -772,16 +686,20 @@ function store_items(store_items, user, search_type = null){
                 '<i price="' + si_price.price + '" store_id="' + si_price.store_id + '" ' +
                 'item_id="' + si.item_id + '" ' +
                 'packaging="' + si_price.packaging + '"' +
-                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
             mobile +=
                 '<ul>' +
                 '<li>' +
                 '<i price="' + si_price.price + '" store_id="' + si_price.store_id + '" ' +
                 'item_id="' + si.item_id + '" ' +
                 'packaging="' + si_price.packaging + '"' +
-                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+            if (si_price.in_basket){
+                full +=
+                    '<i class="goods-counter">' + si_price.in_basket + '</i> ';
+                mobile +=
+                    '<i class="goods-counter">' + si_price.in_basket + '</i> ';
+            }
             full +=
                 '</i>' +
                 '</li>';
@@ -794,15 +712,19 @@ function store_items(store_items, user, search_type = null){
                     '<i price="' + si_delivery.price + '" store_id="' + si_delivery.store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si_delivery.packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
                 mobile +=
                     '<li>' +
                     '<i price="' + si_delivery.price + '" store_id="' + si_delivery.store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si_delivery.packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                if (si_delivery.in_basket){
+                    full +=
+                        '<i class="goods-counter">' + si_delivery.in_basket + '</i> ';
+                    mobile +=
+                        '<i class="goods-counter">' + si_delivery.in_basket + '</i> ';
+                }
                 full +=
                     '</i>' +
                     '</li>';
@@ -814,7 +736,7 @@ function store_items(store_items, user, search_type = null){
                 '</ul>';
             mobile +=
                 '</ul>';
-        }
+        };
         full +=
             '</td>';
         mobile +=
@@ -837,15 +759,15 @@ function store_items(store_items, user, search_type = null){
                 '</td>' +
                 '<td class="name-col" style="padding-top: 18px;text-align:left">';
             if (search_type == 'analogies' && typeof user.id !== 'undefined' && user.allow_request_delete_item == '1' && si.status == '0'){
-                selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
+                var selector = 'item_id="' + $('#item_id').val() + '" item_diff="' + si.item_id + '" user_id="' + user.id + '"';
                 mobile += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>';
                 full += '<span ' + selector + ' title="Сообщить о неверном аналоге" class="icon-tab wrongAnalogy"></span>'
-            }
+            };
             if (si.checked == '1'){
                 full += '<span title="Проверенный аналог" class="icon-checkmark1"></span>';
             }
             if (+si.is_desc || si.photo){
-                stringClass = '';
+                var stringClass = '';
                 if (si.is_desc) stringClass = 'fa-cog';
                 if (si.photo) stringClass = 'fa-camera';
                 full +=
@@ -927,17 +849,15 @@ function store_items(store_items, user, search_type = null){
                     '<ul class="prevail">';
                 for (var p in si.prevails){
                     full +=
-                        `<li
-                            class="updating"
-                            data-item-id="${id}"
-                            data-store-id="${si.prevails[p].store_id}">
-                        </li>`;
+                        '<li>' +
+                        si.prevails[p].in_stock +
+                        si.prevails[p].packaging_text +
+                        '</li>';
                     mobile +=
-                        `<li
-                            class="updating"
-                            data-item-id="${id}"
-                            data-store-id="${si.prevails[p].store_id}">
-                        </li>`;
+                        '<li>' +
+                        si.prevails[p].in_stock +
+                        si.prevails[p].packaging_text +
+                        '</li>';
                 }
                 full +=
                     '</ul>';
@@ -950,17 +870,15 @@ function store_items(store_items, user, search_type = null){
                 '<ul>';
             for (var k in si.list){
                 full +=
-                    `<li
-                        class="updating"
-                        data-item-id="${id}"
-                        data-store-id="${si.list[k].store_id}">
-                    </li>`;
+                    '<li>' +
+                    si.list[k].in_stock +
+                    si.list[k].packaging_text +
+                    '</li>';
                 mobile +=
-                    `<li
-                        class="updating"
-                        data-item-id="${id}"
-                        data-store-id="${si.list[k].store_id}">
-                    </li>`;
+                    '<li>' +
+                    si.list[k].in_stock +
+                    si.list[k].packaging_text +
+                    '</li>';
             }
             full +=
                 '</ul>' +
@@ -1125,15 +1043,17 @@ function store_items(store_items, user, search_type = null){
                         '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                         'item_id="' + si.item_id + '" ' +
                         'packaging="' + si.prevails[p].packaging + '"' +
-                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                        '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                    if (si.prevails[p].in_basket) full +=
+                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
                     mobile +=
                         '<li>' +
                         '<i price="' + si.prevails[p].price + '" store_id="' + si.prevails[p].store_id + '" ' +
                         'item_id="' + si.item_id + '" ' +
                         'packaging="' + si.prevails[p].packaging + '"' +
-                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                        '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                        ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                    if (si.prevails[p].in_basket) mobile +=
+                        '<i class="goods-counter">' + si.prevails[p].in_basket + '</i> ';
                     full +=
                         '</i> ' +
                         '</li>';
@@ -1156,15 +1076,17 @@ function store_items(store_items, user, search_type = null){
                     '<i price="' + si.list[k].price + '" store_id="' + si.list[k].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.list[k].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                if (si.list[k].in_basket) full +=
+                    '<i class="goods-counter">' + si.list[k].in_basket + '</i> ';
                 mobile +=
                     '<li>' +
                     '<i price="' + si.list[k].price + '" store_id="' + si.list[k].store_id + '" ' +
                     'item_id="' + si.item_id + '" ' +
                     'packaging="' + si.list[k].packaging + '"' +
-                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">' +
-                    '<img class="loading goods-counter" src="/img/gif.gif" alt="">';
+                    ' class="fa fa-cart-arrow-down to-stock-btn" aria-hidden="true">';
+                if (si.list[k].in_basket) mobile +=
+                    '<i class="goods-counter">' + si.list[k].in_basket + '</i> ';
                 full +=
                     '</i> ' +
                     '</li>';
@@ -1311,7 +1233,6 @@ function applyUserMarkup(){
 }
 function checkThroughAPI(){
     if (!document.querySelector('input[name="user_id"]').value) {
-        applyInStock();
         return;
     }
     $.ajax({
@@ -1363,7 +1284,6 @@ $(function(){
         data += "&price_to=" + $('#price-to').val();
         data += "&time_from=" + $('#time-from').val();
         data += "&time_to=" + $('#time-to').val();
-        data += '&no-use-api=' + document.querySelector('input[name="no-use-api"]').value;
 
         if ($('#in_stock_only').is(':checked')) data += '&in_stock=1';
 
@@ -1429,8 +1349,6 @@ $(function(){
         ionTab.find('a.sortable.' + sortType).addClass('asc');
         removeWithoutProviders();
         applyUserMarkup();
-        applyBasketAmount();
-        applyInStock();
     })
     $("input[type=checkbox], input[type=radio]").styler();
     $(document).on('click', ".button-row button", function(event){

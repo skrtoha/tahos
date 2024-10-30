@@ -178,48 +178,6 @@ switch($_POST['act']){
             echo 'ok';
         }
         break;
-    case 'get-basket-amount':
-        $result = Database::getInstance()->select(
-            'basket',
-            ['store_id', 'item_id', 'quan'],
-            "`user_id` = {$_SESSION['user']}"
-        );
-        echo json_encode($result);
-        break;
-    case 'get-in-stock':
-        $items = json_decode($_POST['items'], true);
-        $where = '';
-        foreach($items as $row){
-            $array = explode('-', $row);
-            if (!$array[0] || !$array[1]) {
-                continue;
-            }
-            $where .= "(item_id = {$array[1]} AND store_id = {$array[0]}) OR ";
-        }
-        $where = substr($where, 0, -4);
-        $result = Database::getInstance()->query("
-            select
-                si.store_id,
-                si.item_id,
-                concat(
-                    si.in_stock,
-                    ' ',
-                    IF(
-                        si.packaging != 1,
-                        CONCAT(
-                            ' (<span>уп. ',
-                            si.packaging,
-                            ' шт.</span>)'
-                        ),
-                        ''
-                    )
-                ) as in_stock
-            from
-                #store_items si
-            where $where
-        ")->fetch_all(MYSQLI_ASSOC);
-        echo json_encode($result);
-        break;
     case 'get-socials-buttons':
         $result = $db->select('socials', '*', "`active` = 1");
         echo json_encode($result);

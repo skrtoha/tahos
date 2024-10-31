@@ -54,12 +54,9 @@ function setTabType(tab){
         $filterForm.addClass('hidden');
     }
     if (
-        document.querySelector('input[name="user_id"]').value
-        && (
-            search_type === 'substitutes'
-            || search_type === 'analogies'
-            || search_type === 'complects'
-        )
+        search_type === 'substitutes'
+        || search_type === 'analogies'
+        || search_type === 'complects'
     ){
         const item_id = $('#item_id').val();
         const data = "item_id=" + item_id + "&search_type=" + search_type;

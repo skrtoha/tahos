@@ -804,15 +804,13 @@ else{?>
     </div>
 <?}?>
 
-<?if ($_SESSION['user']) {?>
-    <div id="analogies">
-        <h3 class="title_analogies">Аналоги</h3>
-        <div class="itemInsertable" id="Tab__search-result-tabs__Tab_3">
-            <table class="articul-table"></table>
-            <div class="mobile-layout"></div>
-        </div>
+<div id="analogies">
+    <h3 class="title_analogies">Аналоги</h3>
+    <div class="itemInsertable" id="Tab__search-result-tabs__Tab_3">
+        <table class="articul-table"></table>
+        <div class="mobile-layout"></div>
     </div>
-<?}?>
+</div>
 
     <script type="text/javascript">
         var isInBasket = <?=$isInBasket ? 'true' : 'false'?>;

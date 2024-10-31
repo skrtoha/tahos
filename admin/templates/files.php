@@ -153,6 +153,7 @@ if ($_POST['items_analogies']){
 			'article_cat' => $value[2],
 			'title_full' => $value[3]
 		]);
+        //todo проверить на правильность работы
 		if ($resMain === true){
 			$insertedItems++;
 			$item_main_id = $db->last_id();

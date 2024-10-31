@@ -370,7 +370,6 @@ class Search{
             $join_basket
             WHERE diff.item_id=$item_id $whereAnalogies
         ";
-        if ($hide_analogies) $q_item .= ' AND si.item_id IS NOT NULL';
         if (!empty($filters)){
             if ($filters['in_stock']) $q_item .= ' AND si.in_stock>0';
             if (isset($filters['is_main'])) $q_item .= " AND ps.is_main = {$filters['is_main']}";

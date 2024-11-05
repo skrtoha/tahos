@@ -77,24 +77,30 @@ $(function(){
 				var newVal;
 				if (act == 'plus'){
 					newVal = +e.find('input').val() + packaging;
-					$('#basket_basket').html(+$('#basket_basket').unmask() + packaging * summand);
+                    const $basket = $('#basket_basket')
+					$basket.html(+$basket.text() + packaging * summand);
 					if (e.closest('.good').find('input[name=toOrder]').prop('checked')){
 						$('#totalToOrder').html(+$('#totalToOrder').html() + packaging * summand);
 					}
-					$('.cart span').html(+$('.cart span').html() + packaging);
+                    const $cartSpan = $('.cart span')
+					$cartSpan.html(+$cartSpan.html() + packaging);
 				} 
 				if (act == 'minus'){
 					newVal = +e.find('input').val() - packaging;
-					$('#basket_basket').html(+$('#basket_basket').unmask() - packaging * summand);
+                    const $basketBasket = $('#basket_basket')
+					$basketBasket.html(+$basketBasket.text() - packaging * summand);
 					if (e.closest('.good').find('input[name=toOrder]').prop('checked')){
-						$('#totalToOrder').html(+$('#totalToOrder').html() - packaging * summand);
+                        const $totalToOrder = $('#totalToOrder');
+						$totalToOrder.html(+$totalToOrder.html() - packaging * summand);
 					}
-					$('.cart span').html(+$('.cart span').html() - packaging);
+                    const $cartSpan = $('.cart span')
+					$cartSpan.html(+$cartSpan.html() - packaging);
 				} 
 				e.parent().nextAll('.subtotal').find('span').html(newVal * summand);
 				e.closest('.good').find('.subtotal .price_format').html(newVal * summand);
-				$('.cart-popup-table tr' + sel).find('td:nth-child(2)').html(newVal + ' шт.');
-				$('.cart-popup-table tr' + sel).find('td:nth-child(3) span').html(newVal * summand);
+				$('.cart-popup-table tr' + sel)
+                    .find('td:nth-child(2)').html(newVal + ' шт.')
+                    .find('td:nth-child(3) span').html(newVal * summand);
 				e.find('input').val(newVal);
 				price_format();
 				$('.cart-popup ' + sel + ' td:nth-child(2)').html(newVal + ' шт.');
@@ -128,7 +134,7 @@ $(function(){
 		var elem = $(this);
 		var no_sendable = elem.attr('no_sendable');
 		var loc = elem.attr('loc');
-		document.location.href = elem.attr('loc');
+        document.location.href = elem.attr('loc');
 	})
 	$(".cancel_comment").click(function(event) {
 		$(".comment-block, .overlay, .h_overlay").hide();
@@ -146,13 +152,13 @@ $(function(){
 		var e = $(this).closest('div').prev();
 		var comment = $(this).prevAll('.comment_textarea').val();
 		var data =
-					'item_id=' + e.closest('i').attr('item_id') + 
-					'&store_id=' + e.closest('i').attr('store_id') + 
+					'item_id=' + e.closest('i').attr('item_id') +
+					'&store_id=' + e.closest('i').attr('store_id') +
 					'&comment=' + comment;
 		if ($(this).prev('label').find('input').is(':checked')){
 			data += '&filds=all';
 			$('.comment_textarea').val(comment);
-		} 
+		}
 		$.ajax({
 			type: "POST",
 			url: "/ajax/basket_comment.php",
@@ -161,41 +167,61 @@ $(function(){
 				console.log(msg);
 				$('.overlay').click();
 				show_message('Комментарий успешно изменен', 'ok');
-			} 
+			}
 		});
 	})
-	$('.basket-table .delete-btn, .basket .good .delete-btn').on('click', function(){
-		var e = $(this);
-		if (e.attr('view_type') == 'mobile') var elem = e.next('.count-block');
-		else var elem = e.closest('tr').find('.count-block');
-		var store_id = elem.attr('store_id');
-		var item_id = elem.attr('item_id');
-		var quan = elem.find('input').val();
-		var packaging = elem.attr('packaging');
-		var summand = elem.attr('summand');
-		var data = 'store_id=' + store_id +
-				'&item_id=' + item_id +
-				'&act=delete';
-		// console.log(data);
+	$('.basket-table .delete-btn, .basket .good .delete-btn').on('click', event => {
+        const e = $(event.target);
+        const checked = event.target.closest('tr').querySelector('input[name="toOrder"]').checked;
+
+        let elem;
+        if (e.attr('view_type') == 'mobile') {
+            elem = e.next('.count-block');
+        }
+
+		else {
+            elem = e.closest('tr').find('.count-block');
+        }
+
+        const store_id = elem.attr('store_id');
+        const item_id = elem.attr('item_id');
+        const quan = elem.find('input').val();
+        const summand = elem.attr('summand');
+        const data = 'store_id=' + store_id +
+            '&item_id=' + item_id +
+            '&act=delete';
 		$.ajax({
 			type: 'POST',
 			url: '/ajax/basket.php',
 			data: data,
-			success: function(msg){
+			success: function(){
 				e.closest('tr').remove();
 				e.closest('.good').remove();
-				$('#basket_basket').html(+$('#basket_basket').unmask() - (summand * quan));
+
+                const $basketBasket = $('#basket_basket');
+				$basketBasket.html(+$basketBasket.text() - (summand * quan));
 				$('.cart-popup-table tr[store_id=' + store_id + '][item_id=' + item_id + ']').remove();
-				$('.cart span').html(+$('.cart span').html() - quan);
-				$('#total_basket').html(+$('#total_basket').unmask() - (summand * quan));
-				$('#total_quan').html(+$('#total_quan').html() - quan);
-				$('#totalToOrder').html(+$('#totalToOrder').html() - (summand * quan));
+
+                const $cartSpan = $('.cart span');
+				$cartSpan.html(+$cartSpan.html() - quan);
+
+                const $totalBasket = $('#total_basket');
+				$totalBasket.html(+$totalBasket - (summand * quan));
+
+                const $totalQuan = $('#total_quan');
+				$totalQuan.html(+$totalQuan.html() - quan);
+
+                if (checked) {
+                    const $totalToOrder = $('#totalToOrder');
+                    $totalToOrder.html(+$totalToOrder.html() - (summand * quan));
+                }
+
 				if ($('.cart-popup-table tr').length == 2){
 					$('.cart-popup-table').html('<tr><td colspan="4">Корзина пуста</td>').next().remove();
-					$('.cart span').remove();
+					$cartSpan.remove();
 					$('.basket-table tr:nth-child(n+2)').remove();
 					$('.basket-table').append(
-						'<tr>' + 
+						'<tr>' +
 							'<td colspan="10">Корзина пуста</td>' +
 						'</tr>'
 					);
@@ -229,22 +255,23 @@ $(function(){
 					$('.cart span').remove();
 					$('.to-stock-btn').html('');
 				}
-				else show_message('Произошла ошибка');
+				else {
+                    show_message('Произошла ошибка');
+                }
 			}
 		})
 	})
 	$('div.count-block input').on('blur', function(){
-		var count = $(this).val();
-		var available = $(this).closest('.good').find('input[name=available]').val();
-		var th = $(this).closest('div.count-block');
-		var packaging = th.attr('packaging');
-		var reg = /^\d+$/;
-		var currTotalSum = 0;
-		var totalCount = 0;
-		var store_id = th.attr('store_id');
-		var item_id = th.attr('item_id');
-		// console.log(count % packaging);
-		if (!reg.test(count) || count < 1){
+        const count = $(this).val();
+        const available = $(this).closest('.good').find('input[name=available]').val();
+        const th = $(this).closest('div.count-block');
+        const packaging = th.attr('packaging');
+        const reg = /^\d+$/;
+        let currTotalSum = 0;
+        let totalCount = 0;
+        const store_id = th.attr('store_id');
+        const item_id = th.attr('item_id');
+        if (!reg.test(count) || count < 1){
 			show_message("Введите целое число отличное от нуля!", 'error');
 			$(this).focus();
 			return false;
@@ -259,7 +286,7 @@ $(function(){
 			$(this).focus();
 			return false;
 		}
-		var subtotal = th.find('input').val() * th.attr('summand');
+		let subtotal = th.find('input').val() * th.attr('summand');
 		th.closest('tr').find('.subtotal .price_format').html(subtotal);
 		$('.cart-popup-table tr[store_id=' + store_id + '][item_id=' + item_id + '] td:nth-child(2)').html(count + ' шт.');
 		$('.cart-popup-table tr[store_id=' + store_id + '][item_id=' + item_id + '] span.price_format').html(subtotal);
@@ -276,8 +303,8 @@ $(function(){
 		$.ajax({
 			type: 'post',
 			url: '/ajax/basket.php',
-			data: 'act=computing&store_id=' + store_id + 
-						'&item_id=' + item_id + 
+			data: 'act=computing&store_id=' + store_id +
+						'&item_id=' + item_id +
 						'&packaging=' + packaging +
 						'&summand=' + th.attr('summand') +
 						'&value=' + th.find('input').val(),

@@ -95,7 +95,7 @@ switch($_GET['act']){
 		$status .= "$page_title";
 		managers(Managers::get());
 }
-function managers($res_managers){?>
+function managers(mysqli_result $res_managers){?>
 	<div id="total">Всего: <?=$res_managers->num_rows?></div>
 	<div class="actions">
 		<a href="/admin/?view=managers&act=add">Добавить</a>
@@ -106,13 +106,15 @@ function managers($res_managers){?>
 			<td>Имя</td>
 			<td>Фамилия</td>
 			<td>Группа</td>
+            <td></td>
 		</tr>
 		<?if ($res_managers->num_rows){
 			foreach($res_managers as $m){?>
-				<tr manager_id="<?=$m['id']?>">
+				<tr data-manager-id="<?=$m['id']?>">
 					<td><?=$m['first_name']?></td>
 					<td><?=$m['last_name']?></td>
 					<td><?=$m['group_title']?></td>
+                    <td><span title="Удалить" class="icon-cross1"></span></td>
 				</tr>
 			<?}
 		}?>

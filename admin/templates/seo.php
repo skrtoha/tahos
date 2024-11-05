@@ -107,7 +107,13 @@ function view(){
                                 $row['url']
                             )?>
                         </td>
-                        <td><?=$row['type_tag']?></td>
+                        <td>
+                            <?=str_replace(
+                                $_GET['search'],
+                                "<b>{$_GET['search']}</b>",
+                                $row['type_tag']
+                            )?>
+                        </td>
                     </tr>
                 <?}?>
             </tbody>

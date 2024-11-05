@@ -154,7 +154,7 @@ $res_vehicles = $db->query("
 
     <?$seo = Seo::get('/');
     if (isset($seo['common'])) {?>
-        <div class="selection">
+        <div class="selection hidden">
             <?=$seo['common']?>
         </div>
     <?}?>

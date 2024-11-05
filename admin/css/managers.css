@@ -14,3 +14,7 @@ div.permissions > ul > li{
     margin-right: 10px;
     margin-bottom: 10px;
 }
+span.icon-cross1 {
+    display: block;
+    text-align: center;
+}

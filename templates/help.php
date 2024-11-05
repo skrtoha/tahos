@@ -1,4 +1,6 @@
 <?
+/** @var \core\Database $db */
+
 $title = 'Помощь';
 $rubrics = [];
 $res_rubrics = $db->query("
@@ -26,7 +28,6 @@ if ($res_rubrics->num_rows){
 }
 ?>
 <div class="help-page">
-	<h1>Помощь</h1>
 	<div class="questions-block">
 		<?if (!empty($rubrics)){
 			foreach($rubrics as $rubric_id => $value){

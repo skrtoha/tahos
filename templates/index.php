@@ -3,6 +3,7 @@
 /** @var \core\Database $db */
 /** @var array $categories */
 
+use core\Seo;
 use core\User;
 use core\YandexCaptcha;
 
@@ -150,6 +151,13 @@ $res_vehicles = $db->query("
             </form>
         </div>
     </div>
+
+    <?$seo = Seo::get('/');
+    if (isset($seo['common'])) {?>
+        <div class="selection">
+            <?=$seo['common']?>
+        </div>
+    <?}?>
 </div>
 
 	

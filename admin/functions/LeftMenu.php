@@ -71,7 +71,8 @@ class LeftMenu{
         'Настройки почты',
 		'Настройки сайта',
 		'Настройки',
-		'Маркетплейсы'
+		'Маркетплейсы',
+        'Настройки SEO'
 	];
 
 	public static $pagesViews = [
@@ -104,7 +105,8 @@ class LeftMenu{
         'Настройки почты' => ['email_settings'],
 		'Рассылки прайсов' => ['subscribePrices'],
 		'Настройки сайта' => ['site_settings'],
-		'Маркетплейсы' => ['marketplaces']
+		'Маркетплейсы' => ['marketplaces'],
+        'Настройки SEO' => ['seo']
 	];
 
 	public static $defaultPermissions = [
@@ -125,7 +127,8 @@ class LeftMenu{
 			'Рассылки прайсов' => 'subscribePrices',
             'Настройки почты' => 'email_settings',
 			'Настройки сайта' => 'site_settings',
-			'Маркетплейсы' => 'marketplaces'
+			'Маркетплейсы' => 'marketplaces',
+            'Настройки SEO' => 'seo'
 		],
 		'Финансовые операции' => 'funds',
 		'Отчеты' => [

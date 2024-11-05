@@ -9,6 +9,7 @@
 
 use core\Cache;
 use core\Config;
+use core\Seo;
 use core\Setting;
 use core\YandexCaptcha;
 use core\User;
@@ -19,8 +20,21 @@ $token = Cache::getCacheToken();
 <html lang="ru">
 <head>
 	<meta charset="utf-8">
-	<title><?=$title?></title>
-	<meta name="description" content="">
+
+    <?$seo = Seo::get($_SERVER['REQUEST_URI']);
+    if (isset($seo['description'])) {?>
+        <meta name="description" content="<?=$seo['description']?>">
+    <?}?>
+    <? if(isset($seo['keywords'])){?>
+        <meta name="keywords" content="<?=$seo['keywords']?>">
+    <?}?>
+    <?if (isset($seo['title'])) {?>
+        <title><?=$seo['title']?></title>
+    <?}
+    else {?>
+        <title><?=$title?></title>
+    <?}?>
+
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<!-- Template Basic Images Start -->
@@ -68,14 +82,12 @@ $token = Cache::getCacheToken();
 	<link rel="stylesheet" href="/css/fonts.min.css?<?=$token?>">
 	<meta name="theme-color" content="#0081BC">
 
-<!--	<script src="/js/libs.min.js?<?=$token?>"></script>-->
 	<script src="/vendor/plugins/jquery.min.js?<?=$token?>"></script>
 	<script src="/vendor/plugins/formstyler/jquery.formstyler.min.js?<?=$token?>"></script>
 	<script src="/vendor/plugins/owl.carousel/owl.carousel.min.js?<?=$token?>"></script>
 	<script src="/vendor/plugins/jquery.jscrollpane.min.js?<?=$token?>"></script>
     <script src="/vendor/plugins/ion.tabs.min.js?<?=$token?>"></script>
     <script src="/vendor/plugins/jquery.magnific-popup.min.js?<?=$token?>"></script>
-
 
 	<meta name="msapplication-navbutton-color" content="#0081BC">
 	<meta name="apple-mobile-web-app-status-bar-style" content="#0081BC">

@@ -1,0 +1,17 @@
+.t_table {
+    border-collapse: collapse;
+}
+tr[data-url][data-type] {
+    cursor: pointer;
+}
+select[name="type_content"] {
+    margin-bottom: 10px;
+}
+.actions {
+    display: flex;
+    margin: 10px 0;
+}
+
+.actions > a {
+    margin-left: 10px;
+}

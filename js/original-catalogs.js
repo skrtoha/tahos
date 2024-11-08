@@ -145,6 +145,11 @@ $(function(){
         if (!$('#to_garage').length) isProccessedGarage = false;
         if($partsCatalogsNodes.length && !isProccessedGarage){
 			let $h1 = $partsCatalogsNodes.find('h1');
+
+            if (!$h1.length) {
+                return;
+            }
+
 			let title = $h1.html();
 			title = title.replace(/[^\w ]+/g, '');
 			title = title.replace(/^ +/g, '');

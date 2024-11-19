@@ -13,10 +13,10 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 $db = new core\Database();
 $errors = [];
 
-require_once ('json/accum/filterValues.php');
+require_once ('json/motor-oil/filterValues.php');
 
-for($i = 1; $i <= 8; $i++){
-    $result = json_decode(file_get_contents("json/accum/$i.json"), true);
+for($i = 1; $i <= 21; $i++){
+    $result = json_decode(file_get_contents("json/motor-oil/$i.json"), true);
     foreach($result['data']['entities'] as $entity){
         $brend_id = Armtek::getBrendId($entity['fields']['brand']);
         if (!$brend_id){
@@ -61,6 +61,7 @@ for($i = 1; $i <= 8; $i++){
         ]);
 
         if ($res1 !== true) {
+            $db->endTransaction();
             continue;
         }
 
@@ -106,8 +107,11 @@ for($i = 1; $i <= 8; $i++){
                 'item_id' => $item_id,
                 'value_id' => $filter_value_id
             ]);
-
-            $db->commit();
         }
+        $db->commit();
     }
 }
+echo "<pre>";
+print_r($errors);
+echo "</pre>";
+die();

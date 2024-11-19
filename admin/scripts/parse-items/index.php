@@ -13,9 +13,9 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 $db = new core\Database();
 $errors = [];
 
-require_once ('../parse-items/json/accum/filterValues.php');
+require_once ('json/accum/filterValues.php');
 
-for($i = 1; $i <= 16; $i++){
+for($i = 1; $i <= 8; $i++){
     $result = json_decode(file_get_contents("json/accum/$i.json"), true);
     foreach($result['data']['entities'] as $entity){
         $brend_id = Armtek::getBrendId($entity['fields']['brand']);
@@ -33,7 +33,9 @@ for($i = 1; $i <= 16; $i++){
             'brend_id' => $brend_id,
             'article' => $article,
             'article_cat' => $entity['fields']['part_number'],
-            'title_full' => $entity['title'],
+            'title_full' => str_replace([
+                ', Ограниченно годен'
+            ], '', $entity['title']),
             'title' => $entity['title']
         ]);
 
@@ -41,7 +43,9 @@ for($i = 1; $i <= 16; $i++){
             $res = $db->select_one('items', 'id', "`article` = '{$article}' and brend_id = $brend_id");
             $item_id = $res['id'];
         }
-        else $item_id = Item::$lastInsertedItemID;
+        else {
+            $item_id = Item::$lastInsertedItemID;
+        }
 
         if (!$item_id){
             $errors[] = "Ошибка получения item_id {$entity['brand']}[$brend_id] - {$entity['article']}";

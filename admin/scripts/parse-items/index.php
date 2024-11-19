@@ -23,11 +23,13 @@ for($i = 1; $i <= 8; $i++){
             $errors[] = "Бренд {$entity['brand']} не найден";
             continue;
         }
-        $article = Item::articleClear($entity['fields']['part_number']);
 
+        $article = Item::articleClear($entity['fields']['part_number']);
         if (!$article) {
             continue;
         }
+
+        $db->startTransaction();
 
         $resItemInsert = Item::insert([
             'brend_id' => $brend_id,
@@ -49,6 +51,7 @@ for($i = 1; $i <= 8; $i++){
 
         if (!$item_id){
             $errors[] = "Ошибка получения item_id {$entity['brand']}[$brend_id] - {$entity['article']}";
+            $db->endTransaction();
             continue;
         }
 
@@ -57,9 +60,9 @@ for($i = 1; $i <= 8; $i++){
             'category_id' => $category_id
         ]);
 
-        /*if ($res1 !== true) {
+        if ($res1 !== true) {
             continue;
-        }*/
+        }
 
         foreach($entity['fields'] as $title => $value){
             if (!$value || !key_exists($title, $filterValues)) {
@@ -103,6 +106,8 @@ for($i = 1; $i <= 8; $i++){
                 'item_id' => $item_id,
                 'value_id' => $filter_value_id
             ]);
+
+            $db->commit();
         }
     }
 }

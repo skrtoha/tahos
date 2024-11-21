@@ -15,8 +15,8 @@ $errors = [];
 
 require_once ('json/motor-oil/filterValues.php');
 
-for($i = 1; $i <= 21; $i++){
-    $result = json_decode(file_get_contents("json/motor-oil/$i.json"), true);
+for($i = 1; $i <= 12; $i++){
+    $result = json_decode(file_get_contents("json/transmission-oil/$i.json"), true);
     foreach($result['data']['entities'] as $entity){
         $brend_id = Armtek::getBrendId($entity['fields']['brand']);
         if (!$brend_id){
@@ -75,29 +75,32 @@ for($i = 1; $i <= 21; $i++){
                 }
             }
 
+            switch($title) {
+                case 'maslo_transmissionnoye_obyem';
+                    $value = $value / 1000;
+                    break;
+            }
+
             $filter_value_id = false;
-            switch($title){
-                default:
-                    if (is_array($filterValues[$title])) {
-                        $filter_value_id = $filterValues[$title][$value];
-                    }
-                    else {
-                        $result = $db->select_one(
-                            'filters_values',
-                            'id',
-                            "`filter_id` = {$filterValues[$title]} and `title` = '{$value}'"
-                        );
-                        if ($result){
-                            $filter_value_id = $result['id'];
-                        }
-                        else {
-                            $db->insert('filters_values', [
-                                'filter_id' => $filterValues[$title],
-                                'title' => $value
-                            ]);
-                            $filter_value_id = $db->last_id();
-                        }
-                    }
+            if (is_array($filterValues[$title])) {
+                $filter_value_id = $filterValues[$title][$value];
+            }
+            else {
+                $result = $db->select_one(
+                    'filters_values',
+                    'id',
+                    "`filter_id` = {$filterValues[$title]} and `title` = '{$value}'"
+                );
+                if ($result){
+                    $filter_value_id = $result['id'];
+                }
+                else {
+                    $db->insert('filters_values', [
+                        'filter_id' => $filterValues[$title],
+                        'title' => $value
+                    ]);
+                    $filter_value_id = $db->last_id();
+                }
             }
             if (!$filter_value_id){
                 continue;

@@ -31,14 +31,15 @@ for($i = 1; $i <= 12; $i++){
 
         $db->startTransaction();
 
+        $title = str_replace([
+            ', Ограниченно годен'
+        ], '', $entity['title']);
         $resItemInsert = Item::insert([
             'brend_id' => $brend_id,
             'article' => $article,
             'article_cat' => $entity['fields']['part_number'],
-            'title_full' => str_replace([
-                ', Ограниченно годен'
-            ], '', $entity['title']),
-            'title' => $entity['title']
+            'title_full' => $title,
+            'title' => $title
         ]);
 
         if ($resItemInsert !== true){

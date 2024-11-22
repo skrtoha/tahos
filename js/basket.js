@@ -172,13 +172,22 @@ $(function(){
 	})
 	$('.basket-table .delete-btn, .basket .good .delete-btn').on('click', event => {
         const e = $(event.target);
-        const checked = event.target.closest('tr').querySelector('input[name="toOrder"]').checked;
 
-        let elem;
-        if (e.attr('view_type') == 'mobile') {
-            elem = e.next('.count-block');
+        const trElement = event.target.closest('tr');
+        let checked;
+        let goodElement = null;
+        if (trElement) {
+            checked = trElement.querySelector('input[name="toOrder"]').checked;
+        }
+        else {
+            goodElement = event.target.closest('.good');
+            checked = goodElement.querySelector('input[name="toOrder"]').checked;
         }
 
+        let elem;
+        if (goodElement) {
+            elem = $(goodElement.querySelector('.count-block'));
+        }
 		else {
             elem = e.closest('tr').find('.count-block');
         }

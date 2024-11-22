@@ -53,6 +53,7 @@ switch($_POST['act']){
 		echo $res;
 		break;
 	case 'store_delete':
+        $db->delete('required_remains', "`self_store_id` = {$_POST['id']}");
 		$db->delete('provider_stores', "`id`={$_POST['id']}");
 		break;
 	case 'get_currencies':

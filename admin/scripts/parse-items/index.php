@@ -12,11 +12,13 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 
 $db = new core\Database();
 $errors = [];
+$type = 'transmission-oil';
 
-require_once ('json/motor-oil/filterValues.php');
+require_once ("json/$type/filterValues.php");
+$vyazkost = [];
 
 for($i = 1; $i <= 12; $i++){
-    $result = json_decode(file_get_contents("json/transmission-oil/$i.json"), true);
+    $result = json_decode(file_get_contents("json/$type/$i.json"), true);
     foreach($result['data']['entities'] as $entity){
         $brend_id = Armtek::getBrendId($entity['fields']['brand']);
         if (!$brend_id){
@@ -61,10 +63,10 @@ for($i = 1; $i <= 12; $i++){
             'category_id' => $category_id
         ]);
 
-        if ($res1 !== true) {
+/*        if ($res1 !== true) {
             $db->endTransaction();
             continue;
-        }
+        }*/
 
         foreach($entity['fields'] as $title => $value){
             if (!$value || !key_exists($title, $filterValues)) {
@@ -77,6 +79,9 @@ for($i = 1; $i <= 12; $i++){
             }
 
             switch($title) {
+                case 'maslo_trans_vyazkost_po_sae':
+                    $vyazkost[$item_id] = $value;
+                    break;
                 case 'maslo_transmissionnoye_obyem';
                     $value = $value / 1000;
                     break;
@@ -116,6 +121,11 @@ for($i = 1; $i <= 12; $i++){
     }
 }
 echo "<pre>";
+print_r($vyazkost);
+echo "</pre>";
+
+echo "<pre>";
 print_r($errors);
 echo "</pre>";
 die();
+

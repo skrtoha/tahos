@@ -1,6 +1,10 @@
 <?
-/* @var $user_id int */
-/* @var $db \core\Database */
+/* @var int $user_id */
+/* @var Database $db */
+/* @var string $form */
+
+use core\Database;
+
 ?>
 <div id="set-address" class="popup">
     <div id="set-address-wrapper" >
@@ -75,7 +79,7 @@
         if (userAddresses !== null){
             $.each(userAddresses, (i, item) => {
                 $('#set-address-wrapper .right').append(
-                    getHtml(item.data, item.id, +item.is_default, form)
+                    getHtml(item.data, item.id, +item.is_default)
                 );
             })
         }

@@ -7,6 +7,11 @@ $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
+if ($_POST['act'] && $_POST['act'] == 'delete_address') {
+    $db->delete('user_addresses', "`id` = {$_POST['id']}");
+    die();
+}
+
 $user_id = $_SESSION['user'];
 $user = $db->select('users', 'password,email', "`id`=$user_id"); $user = $user[0];
 $curr_password = $user['password'];
@@ -40,4 +45,3 @@ foreach ($_POST as $key => $value){
 	}
 }
 if ($db->update('users', $update, "`id`=$user_id")) echo 3;
-?>

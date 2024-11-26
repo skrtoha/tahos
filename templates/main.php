@@ -515,7 +515,7 @@ $token = Cache::getCacheToken();
 		<?if (in_array($view, ['category', 'article', 'favorites'])){?>
 			{"src" : "/js/item_full.js?<?=$token?>", "async" : false},
 		<?}?>
-        <?if (in_array($view, ['registration'])){?>
+        <?if (in_array($view, ['registration', 'settings'])){?>
             {"src" : "/vendor/plugins/jquery.maskedinput.min.js?<?=$token?>", "async" : false},
         <?}?>
 		<?if (in_array($view, ['category'])){?>

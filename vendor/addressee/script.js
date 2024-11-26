@@ -1,5 +1,6 @@
 let $address_id = $('input[name=address_id]');
-var $tooltip = $('#tooltip');
+const $tooltip = $('#tooltip');
+
 function setAddress(formData){
     let container = $('form.js-form-address');
 
@@ -45,7 +46,18 @@ const getHtml = (data, address_id = '', isDefault = 0) => {
 function deleteAddress(obj){
     if (!confirm('Вы уверены?')) return false;
     let th = $(obj).closest('div');
-    th.remove();
+
+    $.ajax('/ajax/settings.php', {
+        type: 'post',
+        data: {
+            act: 'delete_address',
+            id: th.attr('id')
+        },
+        success: () => {
+            show_message('Успешно удалено');
+            th.remove();
+        }
+    })
 }
 function setDefault(obj){
     const selector = 'input[name="default_address[]"]';

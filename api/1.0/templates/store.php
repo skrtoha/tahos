@@ -73,7 +73,7 @@ switch ($act){
             $price = 0;
             if (
                 isset($minPriceByItemId[$item_id]) &&
-                $minPriceByItemId[$item_id]['price'] >= $queryByItemId[$item_id]['price']
+                $minPriceByItemId[$item_id]['price'] >= $row['price']
             ){
                 $price = $minPriceByItemId[$item_id]['price'];
             }
@@ -98,11 +98,11 @@ switch ($act){
                 [
                     'store_id' => $store_id,
                     'item_id' => $item_id,
-                    'min_price' => $queryByItemId[$item_id]['price']
+                    'min_price' => $row['price']
                 ]
                 ,
                 ['duplicate' => [
-                    'min_price' => $queryByItemId[$item_id]['price'],
+                    'min_price' => $row['price'],
                     'store_id' => $store_id
                 ]]
             );

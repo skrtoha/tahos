@@ -8,7 +8,12 @@ $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
 if ($_POST['act'] && $_POST['act'] == 'delete_address') {
-    $db->delete('user_addresses', "`id` = {$_POST['id']}");
+    $db->startTransaction();
+    $res1 = $db->delete('provider_addresses', "`address_site_id` = {$_POST['id']}");
+    $res2 = $db->delete('user_addresses', "`id` = {$_POST['id']}");
+    if ($res1 && $res2) {
+        $db->commit();
+    }
     die();
 }
 

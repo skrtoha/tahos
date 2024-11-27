@@ -39,8 +39,8 @@ $(".view-switch").click(function(event) {
 		$(".list-view").show();
 	}
 });
-$(".item .img-wrap").matchHeight();
-$(".item").matchHeight();
+/*$(".item .img-wrap").matchHeight();
+$(".item").matchHeight();*/
 $('#vehicle').on('change', function(){
 	document.location.href = '/original-catalogs/' + $(this).val();
 })

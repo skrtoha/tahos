@@ -848,6 +848,9 @@ function funds(){
                             <a title="Вернуть" nohref data-id="<?=$paymentId?>" data-amount="<?=$fund['sum']?>" class="refund-money">
                                 <span class="icon-arrow-up"></span>
                             </a>
+                            <a nohref data-payment-id="<?=$paymentId?>" data-amount="<?=$fund['sum']?>" class="delete-transaction">
+                                <span class="icon-cross1"></span>
+                            </a>
                         <?}?>
                         <?if (mb_strpos($fund['comment'], $stringPaymentOrder) !== false) {
                             $string = preg_replace("/Оплата заказа.*поручение №/", '', $fund['comment']);

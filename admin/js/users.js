@@ -257,6 +257,30 @@ class User{
                 })
             })
         }
+
+        const deleteTransactionList = document.querySelectorAll('.delete-transaction');
+        if (deleteTransactionList) {
+            deleteTransactionList.forEach(item => {
+                item.addEventListener('click', event => {
+                    if (!confirm('Удалить трансакцию?')) {
+                        return;
+                    }
+                    const element = event.target.closest('a');
+
+                    const formData = new FormData;
+                    formData.set('act', 'delete-transaction');
+                    formData.set('amount', element.dataset.amount);
+                    formData.set('payment_id', element.dataset.paymentId);
+
+                    fetch('/admin/ajax/user.php', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => response.json()).then(response => {
+                        console.log(response);
+                    })
+                })
+            })
+        }
     }
     static eventFundDistribution = (e) => {
         let formData = new FormData;

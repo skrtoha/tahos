@@ -154,3 +154,9 @@ a.refund-money {
 td[label="Тип операции"] {
     white-space: nowrap;
 }
+
+a.delete-transaction {
+    position: relative;
+    top: 1px;
+    font-size: 12px;
+}

@@ -237,6 +237,14 @@ switch($_POST['act']){
         $response = Paykeeper::refundMoney($_POST['id'], $_POST['amount'], $_POST['partial']);
         echo json_encode($response);
         break;
+    case 'delete-transaction':
+        $db->startTransaction();
+        $res1 = $db->delete('fund_distribution', "`debit_id` = {$_POST['payment_id']} or `replenishment_id` = {$_POST['payment_id']}");
+        $res2 = $db->delete('funds', "`id` = {$_POST['payment_id']}");
+        if ($res1 === true && $res2 === true) {
+        
+        }
+        break;
 }
 
 ?>

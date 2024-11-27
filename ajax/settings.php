@@ -11,7 +11,7 @@ if ($_POST['act'] && $_POST['act'] == 'delete_address') {
     $db->startTransaction();
     $res1 = $db->delete('provider_addresses', "`address_site_id` = {$_POST['id']}");
     $res2 = $db->delete('user_addresses', "`id` = {$_POST['id']}");
-    if ($res1 && $res2) {
+    if ($res1 === true && $res2 === true) {
         $db->commit();
     }
     die();

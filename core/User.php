@@ -279,14 +279,22 @@ class User{
         }
         else unset($update['password']);
         
-        self::setAddress(
+        Database::getInstance()->startTransaction();
+        
+        $res1 = self::setAddress(
             $user['id'],
             $settings['addressee'] ?? [],
             $settings['default_address'] ?? [],
             $settings['address_id'] ?? []
         );
-        
-        return Database::getInstance()->update('users', $update, "`id` = {$user['id']}");
+        $res2 = Database::getInstance()->update('users', $update, "`id` = {$user['id']}");
+
+        if ($res1 && $res2) {
+            Database::getInstance()->commit();
+            return  true;
+        }
+
+        return false;
     }
     
     public static function setAddress($user_id, $addressee, $default_address, $address_id = []){
@@ -298,6 +306,7 @@ class User{
                 'is_default' => $default_address[$key]
             ]);
         }
+        return true;
     }
     
     public static function clearUserAddress($user_id, & $addressee, & $default_address, & $address_id){
@@ -306,8 +315,13 @@ class User{
         $userAddressesList = $db->select('user_addresses', '*', "`user_id` = $user_id");
         if (empty($userAddressesList)) return;
         foreach($userAddressesList as $address){
+            $db->delete('provider_addresses', "`address_site_id` = {$address['id']}");
             $result = $db->delete('user_addresses', "`id` = {$address['id']}");
-            if ($result === true) continue;
+
+            if ($result === true) {
+                continue;
+            }
+
             $key = array_search($address['id'], $address_id);
             unset($addressee[$key]);
             unset($default_address[$key]);

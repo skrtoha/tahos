@@ -28,7 +28,7 @@ switch ($act){
             break;
         }
 
-        if ($queryParams['document_date'] && $queryParams['act'] != 'minus') {
+        if ($queryParams['document_date'] && $queryParams['act'] != 'refund') {
             $dateTime = DateTime::createFromFormat('d.m.Y H:i:s', $queryParams['document_date']);
             $from = $dateTime->format('Y-m-d').' 00:00:00';
             $to = $dateTime->format('Y-m-d').' 23:59:59';
@@ -43,20 +43,23 @@ switch ($act){
                     AND `document_date` BETWEEN '$from' and '$to'
             ");
             if ($result->num_rows) {
+                if (isset($queryParams['type_operation']) && $queryParams['type_operation'] == 'cancel'){
+                    Synchronization::cancelOperation($queryParams, $result, $bill_type);
+                }
                 break;
             }
         }
 
         $document = Synchronization::get1CDocument($queryParams['document_title']);
 
-        if ($queryParams['act'] == 'plus' && !empty($document)){
+        if ($queryParams['act'] == 'payment' && !empty($document)){
             if ($document['sum'] == $queryParams['sum']){
                 break;
             }
             $queryParams['previous_sum'] = $document['sum'];
             $queryParams['bill_type'] = $bill_type;
             $queryParams['fund_id'] = $document['fund_id'];
-            User::changeReplenishBill($queryParams);
+            User::changePayment($queryParams);
             break;
         }
 
@@ -64,16 +67,7 @@ switch ($act){
             break;
         }
 
-        if ($queryParams['act'] == 'unset'){
-            $countFundDistribution = $db->getCount('fund_distribution', "`replenishment_id` = {$document['fund_id']}");
-            if ($countFundDistribution){
-                throw new Exception('Имеются оплаченные выдачи. Отмена проведения невозможна!');
-            }
-            User::unsetReplenishBill($queryParams);
-            break;
-        }
-
-        if ($queryParams['act'] == 'minus'){
+        if ($queryParams['act'] == 'refund'){
             if ($queryParams['paykeeper_id']) {
                 $result = Paykeeper::refundMoney(
                     $queryParams['paykeeper_id'],

@@ -56,7 +56,8 @@ class Synchronization{
 				'updated' => $ov['updated'] ?: $ov['created'],
 				'withoutMarkup' => $ov['withoutMarkup'],
                 'return_price' => $ov['return_price'],
-                'return_data' => $ov['return_data']
+                'return_data' => $ov['return_data'],
+                'pay_type' => $ov['pay_type']
 			];
 		}
 
@@ -263,5 +264,32 @@ class Synchronization{
 
         curl_close($curl);
         return $response;
+    }
+
+    public static function cancelOperation($queryParams, \mysqli_result $result, $bill_type) {
+        $fund = $result->fetch_assoc();
+
+        User::decreasePayment([
+            'user_id' => $queryParams['user_id'],
+            'sum' => 0,
+            'previous_sum' => $queryParams['sum'],
+            'bill_type' => $bill_type,
+            'fund_id' => $fund['id'],
+            'delete' => true
+        ]);
+
+        $db = Database::getInstance();
+        $db->startTransaction();
+
+        Database::getInstance()->delete(
+            'fund_distribution',
+            "`replenishment_id` = {$fund['id']} AND `sum` = {$fund['sum']}"
+        );
+        Database::getInstance()->delete('funds', "`id` = {$fund['id']}");
+        $documentTitle = preg_replace('/\d\d:\d\d:\d\d.*/i', '', $queryParams['document_title']);
+        Database::getInstance()->delete('1c_documents', "`title` LIKE '$documentTitle%'");
+
+        $db->commit();
+
     }
 }

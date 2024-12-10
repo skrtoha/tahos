@@ -37,7 +37,13 @@ switch ($act){
                 $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
                 $ov['quan'] = $queryParams[$osi];
                 $ov['synchronized'] = 1;
+
+                $db->startTransaction();
+                core\OrderValue::changeStatus(11, $ov);
                 core\OrderValue::changeStatus(3, $ov);
+                Synchronization::setOrdersSynchronized([$osi]);
+                $db->commit();
+
                 $changedOrders[] = $osi;
             }
         }

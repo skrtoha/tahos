@@ -44,6 +44,14 @@ class User{
 	 */
 	public static $bonus_size = 1;
 
+    public static function getById($user_id) {
+        $result = User::get(['user_id' => $user_id]);
+        foreach($result as $value){
+            return $value;
+        }
+        return [];
+    }
+
     /**
      * gets common information about user
      * @param array $params
@@ -455,7 +463,7 @@ class User{
         $remain = $amount;
         foreach($result as $row){
             $difference = $row['sum'] - $row['paid'];
-            if ($remain < $difference){
+            if ($remain <= $difference){
                 Database::getInstance()->update(
                     'funds',
                     ['paid' => $row['paid'] + $remain],
@@ -478,8 +486,7 @@ class User{
     public static function replenishBill($params){
         Database::getInstance()->startTransaction();
 
-        $res_user = User::get(['user_id' => $params['user_id']]);
-        foreach ($res_user as $value) $user = $value;
+        $user = User::getById($params['user_id']);
 
         if (empty($user)) return false;
 
@@ -632,12 +639,12 @@ class User{
         Database::getInstance()->commit();
     }
 
-    public static function changeReplenishBill($params){
+    public static function changePayment($params){
         if ($params['previous_sum'] > $params['sum']){
-            $result = self::changeReplenishBillDecrease($params);
+            $result = self::decreasePayment($params);
         }
         if ($params['previous_sum'] < $params['sum']){
-            $result = self::changeReplenishBillIncrease($params);
+            $result = self::increasePayment($params);
         }
         if ($result){
             $data = [
@@ -646,16 +653,12 @@ class User{
             ];
             Synchronization::set1CDocument($params['document_title'], $data);
         }
-        return false;
+        return true;
     }
 
-    private static function changeReplenishBillDecrease($params): bool
+    public static function decreasePayment($params): bool
     {
-        $result = User::get(['user_id' => $params['user_id']]);
-        $user = [];
-        foreach($result as $value){
-            $user = $value;
-        }
+        $user = User::getById($params['user_id']);
         $remain = $params['previous_sum'] - $params['sum'];
         if ($params['bill_type'] == User::BILL_CASH){
             $bill = $user['bill_cash'];
@@ -686,7 +689,7 @@ class User{
         $remain = abs($remainder);
 
         $query = self::getQueryDebt(
-            "f.paid > 0 AND f.user_id = {$params['user_id']} AND f.issue_id IS NOT NULL AND `bill_type` = {$params['bill_type']}",
+            "f.paid > 0 AND f.user_id = {$params['user_id']} AND `bill_type` = {$params['bill_type']}",
             'f.created DESC'
         );
         $result = $db->query($query);
@@ -728,7 +731,7 @@ class User{
         }
     }
 
-    private static function changeReplenishBillIncrease($params): bool
+    private static function increasePayment($params): bool
     {
         Database::getInstance()->startTransaction();
 

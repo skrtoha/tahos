@@ -62,11 +62,9 @@ class Issues{
                     'order_id' => $a[0],
                     'store_id' => $a[2],
                     'item_id' => $a[1],
-                    'issued' => $issued
+                    'issued' => $issued,
+                    'synchronized' => 1
                 ];
-                if ($isRequestFrom1C) {
-                    $array['synchronized'] = 1;
-                }
 
                 core\OrderValue::changeStatus(1, $array, true);
             }

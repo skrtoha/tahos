@@ -404,7 +404,7 @@ class OrderValue{
      * @param array $params
      * @return string
      */
-    private static function getWhere(array $params): string
+    public static function getWhere(array $params): string
     {
         $where = '';
         foreach($params as $key => $value){

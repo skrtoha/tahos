@@ -7,6 +7,7 @@
 
 use core\Database;
 use core\Exceptions\NotFoundException;
+use core\OrderValue;
 use core\StoreItem;
 use core\Synchronization;
 use core\User;
@@ -29,25 +30,29 @@ switch ($act){
         $result = $changedOrders;
         break;
     case 'setStatusArrived':
-        $changedOrders = [];
-        $orders = Synchronization::getOrders(['osi' => array_keys($queryParams)], '');
-
-        foreach($orders as $order){
-            foreach($order['values'] as $ov){
-                $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
-                $ov['quan'] = $queryParams[$osi];
-                $ov['synchronized'] = 1;
-
-                $db->startTransaction();
-                core\OrderValue::changeStatus(11, $ov);
-                core\OrderValue::changeStatus(3, $ov);
-                Synchronization::setOrdersSynchronized([$osi]);
-                $db->commit();
-
-                $changedOrders[] = $osi;
+        foreach($queryParams as $row) {
+            $ov = OrderValue::get(['osi' => $row['osi']])->fetch_assoc();
+            $db->startTransaction();
+            if (in_array($ov['status_id'], [5, 7])) {
+                User::updateReservedFunds(
+                    $ov['user_id'],
+                    $ov['price'] * $row['arrived'],
+                    'plus',
+                    $ov['pay_type']
+                );
             }
+            $db->update(
+                'orders_values',
+                [
+                    'ordered' => $row['arrived'],
+                    'arrived' => $row['arrived'],
+                    'status_id' => 3,
+                    'synchronized' => 1
+                ],
+                str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $row['osi']]))
+            );
+            $db->commit();
         }
-        $result = $changedOrders;
         break;
     case 'setStatusIssued':
         $arrangement = User::getUserArrangement1C($queryParams['user_id'], $queryParams['arrangement']);

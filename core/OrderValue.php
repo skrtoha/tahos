@@ -426,7 +426,10 @@ class OrderValue{
                 case 'store_id':
                 case 'status_id':
                 case 'synchronized':
-                    $where .= "ov.$key = '$value' AND ";
+                    if (!is_array($value)) {
+                        $value = [$value];
+                    }
+                    $where .= "ov.$key in (".implode(',', $value).") AND ";
                     break;
                 case 'user_id':
                     $where .= "o.user_id = $value AND ";
@@ -625,7 +628,7 @@ class OrderValue{
      * @param string $flag
      * @return mixed
      */
-    public static function getOrderInfo($order_id, $provider_id = true, $flag = ''){
+    public static function getOrderInfo($order_id, bool $provider_id = true, string $flag = ''){
         $selectAddressId = 'o.address_id';
         if ($provider_id){
             $leftJoin = "

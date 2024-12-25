@@ -30,27 +30,59 @@ switch ($act){
         $result = $changedOrders;
         break;
     case 'setStatusArrived':
-        foreach($queryParams as $row) {
-            $ov = OrderValue::get(['osi' => $row['osi']])->fetch_assoc();
+        $orderIdList = [];
+        array_map(function ($item) use (& $orderIdList) {
+            $osi = explode('-', $item['osi']);
+            $orderIdList[] = $osi[0];
+        }, $queryParams);
+        $orderList = OrderValue::get(['order_id' => $orderIdList])->fetch_all(MYSQLI_ASSOC);
+        $associatedOrderList = [];
+        array_map(function($ov) use (& $associatedOrderList){
+            $associatedOrderList["{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"] = $ov;
+        }, $orderList);
+
+        $associatedQueryParams = [];
+        array_map(function($item) use (& $associatedQueryParams) {
+            $associatedQueryParams[$item['osi']] = $item['arrived'];
+        }, $queryParams);
+
+        foreach($associatedOrderList as $osi => $ov) {
             $db->startTransaction();
-            if (in_array($ov['status_id'], [5, 7])) {
-                User::updateReservedFunds(
-                    $ov['user_id'],
-                    $ov['price'] * $row['arrived'],
-                    'plus',
-                    $ov['pay_type']
+
+            if (isset($associatedQueryParams[$osi])) {
+                if (in_array($ov['status_id'], [5, 7])) {
+                    User::updateReservedFunds(
+                        $ov['user_id'],
+                        $ov['price'] * $associatedQueryParams[$osi],
+                        'plus',
+                        $ov['pay_type']
+                    );
+                }
+                $db->update(
+                    'orders_values',
+                    [
+                        'ordered' => $associatedQueryParams[$osi],
+                        'arrived' => $associatedQueryParams[$osi],
+                        'status_id' => 3,
+                        'synchronized' => 1
+                    ],
+                    str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $osi]))
                 );
             }
-            $db->update(
-                'orders_values',
-                [
-                    'ordered' => $row['arrived'],
-                    'arrived' => $row['arrived'],
-                    'status_id' => 3,
-                    'synchronized' => 1
-                ],
-                str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $row['osi']]))
-            );
+            else {
+                if ($ov['status_id'] == 3) {
+                    $db->update(
+                        'orders_values',
+                        [
+                            'arrived' => 0,
+                            'status_id' => 11,
+                            'synchronized' => 1
+                        ],
+                        str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $osi]))
+                    );
+                }
+            }
+
             $db->commit();
         }
         break;

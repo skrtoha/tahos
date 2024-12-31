@@ -292,4 +292,112 @@ class Synchronization{
         $db->commit();
 
     }
+
+    public static function cancelItemsFromOrder($queryParams, $orderValueList): void
+    {
+        foreach($orderValueList as $ov){
+            $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+
+            if (!isset($queryParams[$osi])) {
+                continue;
+            }
+
+            $oOsi = & $queryParams[$osi];
+
+            if (in_array($ov['status_id'], [6, 8, 12])) {
+                continue;
+            }
+
+            $db = Database::getInstance();
+            $db->startTransaction();
+            if ($oOsi['quan'] == $ov['quan']) {
+                $status_id = OrderValue::getStatusIdByTitle($oOsi['reason']);
+            }
+            else {
+                $status_id = $ov['status_id'];
+            }
+
+            if ($ov['status_id'] == 11) {
+                User::updateReservedFunds(
+                    $ov['user_id'],
+                    $ov['price'] * $oOsi['quan'],
+                    'minus',
+                    $ov['pay_type']
+                );
+            }
+            $update = [
+                'status_id' => $status_id,
+                'declined' => $oOsi['quan'],
+                'synchronized' => 1
+            ];
+            if ($ov['ordered'] > 0) {
+                $update['ordered'] = $ov['quan'] - $oOsi['quan'];
+            }
+            OrderValue::update($update, $ov);
+            $db->commit();
+        }
+    }
+
+    public static function setStatusArrived($queryParams, $orderValueList): void
+    {
+        if (empty($queryParams)) {
+            return;
+        }
+
+        $db = Database::getInstance();
+        foreach($orderValueList as $ov) {
+            $osi = "{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}";
+            $db->startTransaction();
+
+            if (isset($queryParams[$osi])) {
+                if (in_array($ov['status_id'], [5, 7])) {
+                    User::updateReservedFunds(
+                        $ov['user_id'],
+                        $ov['price'] * $queryParams[$osi],
+                        'plus',
+                        $ov['pay_type']
+                    );
+                }
+                $db->update(
+                    'orders_values',
+                    [
+                        'ordered' => $queryParams[$osi],
+                        'arrived' => $queryParams[$osi],
+                        'status_id' => 3,
+                        'synchronized' => 1
+                    ],
+                    str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $osi]))
+                );
+            }
+            else {
+                if ($ov['status_id'] == 3) {
+                    $db->update(
+                        'orders_values',
+                        [
+                            'arrived' => 0,
+                            'status_id' => 11,
+                            'synchronized' => 1
+                        ],
+                        str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $osi]))
+                    );
+                }
+            }
+
+            $db->commit();
+        }
+    }
+
+    public static function changePriceOrder($queryParams): void
+    {
+        foreach($queryParams as $osi => $price) {
+            Database::getInstance()->update(
+                'orders_values',
+                [
+                    'price' => $price['price'],
+                    'synchronized' => 1
+                ],
+                str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $osi]))
+            );
+        }
+    }
 }

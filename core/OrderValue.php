@@ -170,9 +170,7 @@ class OrderValue{
 				//если отменено поставщиком
 				if ($status_id == 8){
 					Database::getInstance()->delete('store_items', "`store_id` = {$params['store_id']} AND `item_id` = {$params['item_id']}");
-                    /** @var \mysqli_result $res_user */
-                    $res_user = User::get(['id' => $ov['user_id']]);
-                    foreach($res_user as $value) $userInfo = $value;
+                    $userInfo = User::getById($ov['user_id']);
 
                     if ($userInfo['get_sms_provider_refuse'] && $userInfo['phone']){
                         $smsAero = new SmsAero();
@@ -542,8 +540,26 @@ class OrderValue{
 	}
 	public static function getStatuses(): \mysqli_result
 	{
-		return Database::getInstance()->query("SELECT * FROM #orders_statuses ORDER BY title");
+        $cacheId = 'order-statuses';
+        $result = Cache::get($cacheId);
+        if ($result) {
+            return $result;
+        }
+        $output = Database::getInstance()->query("SELECT * FROM #orders_statuses ORDER BY title");
+        Cache::set($cacheId, $output);
+		return $output;
 	}
+
+    public static function getStatusIdByTitle(string $title): int
+    {
+        $statuses = self::getStatuses();
+        foreach ($statuses as $status) {
+            if ($status['title'] == $title) {
+                return $status['id'];
+            }
+        }
+        return false;
+    }
 
 	public static function setStatusInWork($ov, $automaticOrder){
 		if (!in_array($ov['status_id'], [5])) return;

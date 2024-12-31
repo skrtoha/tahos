@@ -530,9 +530,8 @@ function show_form($act){
 						if (
 								($ov['ordered'] && $ov['ordered'] < $ov['quan']) || 
 								($ov['arrived'] < $ov['ordered'] && $ov['declined'])
-							){
-							$declined = !$ov['declined'] ? ($ov['quan'] - $ov['ordered']) : ($ov['quan'] - $ov['arrived']);?>
-							<br>Отказ - <?=$declined?> шт.
+							){?>
+							<br>Отказ - <?=$ov['declined']?> шт.
 						<?}?>
 					</td>
 					<td label="Сумма" class="price_format sum">

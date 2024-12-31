@@ -29,63 +29,6 @@ switch ($act){
         }
         $result = $changedOrders;
         break;
-    case 'setStatusArrived':
-        $orderIdList = [];
-        array_map(function ($item) use (& $orderIdList) {
-            $osi = explode('-', $item['osi']);
-            $orderIdList[] = $osi[0];
-        }, $queryParams);
-        $orderList = OrderValue::get(['order_id' => $orderIdList])->fetch_all(MYSQLI_ASSOC);
-        $associatedOrderList = [];
-        array_map(function($ov) use (& $associatedOrderList){
-            $associatedOrderList["{$ov['order_id']}-{$ov['store_id']}-{$ov['item_id']}"] = $ov;
-        }, $orderList);
-
-        $associatedQueryParams = [];
-        array_map(function($item) use (& $associatedQueryParams) {
-            $associatedQueryParams[$item['osi']] = $item['arrived'];
-        }, $queryParams);
-
-        foreach($associatedOrderList as $osi => $ov) {
-            $db->startTransaction();
-
-            if (isset($associatedQueryParams[$osi])) {
-                if (in_array($ov['status_id'], [5, 7])) {
-                    User::updateReservedFunds(
-                        $ov['user_id'],
-                        $ov['price'] * $associatedQueryParams[$osi],
-                        'plus',
-                        $ov['pay_type']
-                    );
-                }
-                $db->update(
-                    'orders_values',
-                    [
-                        'ordered' => $associatedQueryParams[$osi],
-                        'arrived' => $associatedQueryParams[$osi],
-                        'status_id' => 3,
-                        'synchronized' => 1
-                    ],
-                    str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $osi]))
-                );
-            }
-            else {
-                if ($ov['status_id'] == 3) {
-                    $db->update(
-                        'orders_values',
-                        [
-                            'arrived' => 0,
-                            'status_id' => 11,
-                            'synchronized' => 1
-                        ],
-                        str_replace(['WHERE', 'ov.'], '', OrderValue::getWhere(['osi' => $osi]))
-                    );
-                }
-            }
-
-            $db->commit();
-        }
-        break;
     case 'setStatusIssued':
         $arrangement = User::getUserArrangement1C($queryParams['user_id'], $queryParams['arrangement']);
         if (!$arrangement){
@@ -123,17 +66,13 @@ switch ($act){
         $issues = new \Issues($db, $queryParams['user_id']);
         $issues->setIncome($income, true);
         break;
-    case 'cancelItemsFromOrder':
-        foreach($queryParams as $osiString){
-            $osi = Synchronization::getArrayOSIFromString($osiString);
-            $ov_result = core\OrderValue::get($osi);
-            $ov = $ov_result->fetch_assoc();
-            if ($ov['status_id'] == 6) {
-                continue;
-            }
-            $ov['synchronized'] = 1;
-            core\OrderValue::changeStatus(6, $ov);
-        }
+    case 'changeOrder':
+        $orderValueList = OrderValue::get([
+            'osi' => array_keys($queryParams['commonList'])
+        ], '')->fetch_all(MYSQLI_ASSOC);
+        Synchronization::cancelItemsFromOrder($queryParams['cancelled'], $orderValueList);
+        Synchronization::setStatusArrived($queryParams['arrived'], $orderValueList);
+        Synchronization::changePriceOrder($queryParams['commonList']);
         break;
     case 'returnOrderValues':
         for ($i = 0; $i < count($queryParams); $i++) {

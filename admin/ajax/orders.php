@@ -145,6 +145,13 @@ switch($_POST['status_id']){
                 'withoutMarkup' => $row['priceWithoutMarkup']
             ];
         }
+        $statuses = OrderValue::getStatuses();
+        array_map(function($item) use (& $output) {
+            $output['order_statuses'][] = [
+                'id' => $item['id'],
+                'title' => $item['title'],
+            ];
+        }, $statuses);
 		echo json_encode($output);
 		break;
 	case 'editOrderValue':
@@ -156,7 +163,13 @@ switch($_POST['status_id']){
 				'quan' => $data['quan'],
 				'comment' => $data['comment'],
                 'store_id' => $data['store_id'],
-                'withoutMarkup' => $data['withoutMarkup']
+                'withoutMarkup' => $data['withoutMarkup'],
+                'ordered' => $data['ordered'],
+                'arrived' => $data['arrived'],
+                'issued' => $data['issued'],
+                'declined' => $data['declined'],
+                'returned' => $data['returned'],
+                'status_id' => $data['order_status_id']
 			],
 			[
 				'order_id' => $array[0],

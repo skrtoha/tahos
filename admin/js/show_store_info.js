@@ -54,9 +54,9 @@
 		},
 		get_str_form: function (){
 			let store = show_store_info.store;
-			var form_bottom;
-			var str = '';
-			str +=
+            let form_bottom;
+            let str = '';
+            str +=
 				'<form name="store_change">' +
 					'<input type="hidden" name="store_id" value="' + store.id + '">' +
 					'<table>' +
@@ -115,8 +115,8 @@
 		init: function(){
 			$('.storeInfo').on('click', 'a.store', function(e){
 				e.preventDefault();
-				var store_id = $(this).attr('store_id');
-				show_store_info.set_store(store_id);
+                const store_id = $(this).attr('store_id');
+                show_store_info.set_store(store_id);
 				modal_show(show_store_info.get_str_form());
 			})
 		}

@@ -454,29 +454,6 @@ $(function(){
 			}
 		})
 	})
-	/*$('button').on('click', function(){
-		var is_valid = true;
-		$('tr[store_id][item_id]').each(function(){
-			var th = $(this);
-			if (!reg_integer.test(th.find('input[name=price]').val()) || !reg_integer.test(th.find('input[name=quan]').val())){
-				is_valid = false; 
-				return false;
-			};
-		})
-		if (!is_valid) return show_message('Произошла ошибка!', 'error');
-		$.ajax({
-			type: 'post',
-			url: '/admin/ajax/orders.php',
-			data: {
-				'status_id': 'to_order',
-				'order_id': $('input[name=order_id]').val()
-			},
-			success: function(response){
-				document.location.href = '/admin/?view=orders&id=' + $('input[name=order_id]').val() + '&act=change';
-				// console.log(response); return false;
-			}
-		})
-	})*/
 	$('a.editOrderValue').on('click', function(e){
 		e.preventDefault();
         const th = $(this);
@@ -485,80 +462,115 @@ $(function(){
         $.ajax({
 			type: 'post',
 			url: '/admin/ajax/orders.php',
+            beforeSend: function () {
+                showGif();
+            },
 			data: {
 				status_id: 'getOrderValue',
 				osi: th.attr('osi')
 			},
 			success: function(response){
+                showGif(false);
+
 				let ov = JSON.parse(response);
 				ov.comment = ov.comment ? ov.comment : '';
-        let storesString = `<tr>
-                                    <td>Склад:</td>
-                                    <td>
-                                        <select name="store_id">
-                                `;
-        for(let item of ov.stores){
-          const selected = item.store_id == ov.store_id ? 'selected' : '';
-          storesString += `<option
-                              data-price="${item.price}" 
-                              data-without-markup="${item.withoutMarkup}"
-                              ${selected} 
-                              value="${item.store_id}"
-                            >
-                            ${item.cipher} - ${item.price} руб.
-                            </option>`
-        }
-        storesString += `</select>
-                          <td>
-                          </tr>`;
-
-				modal_show(
-					'<form class="editOrderValue">' +
-						'<input type="hidden" name="status_id" value="editOrderValue">' +
-						'<input type="hidden" name="osi" value="' + th.attr('osi') + '">' +
-            `<input type="hidden" name="withoutMarkup" value="${ov.withoutMarkup}">` +
-						'<table>' +
-							'<tr>' +
-								'<td>Цена:</td>' +
-								'<td><input ' + inputDisable + ' type="text" name="price" value="' + ov.price + '"></td>' +
-							'</tr>' +
-              storesString +
-							'<tr>' +
-								'<td>Количество:</td>' +
-								'<td><input ' + inputDisable + ' type="text" name="quan" value="' + ov.quan + '"></td>' +
-							'</tr>' +
-							'<tr>' +
-								'<td>Комментарий:</td>' +
-								'<td><input type="text" name="comment" value="' + ov.comment + '"></td>' +
-							'</tr>' +
-							'<tr>' +
-								'<td colspan="2"><input type="submit"  value="Сохранить"></td>' +
-							'</tr>' +
-						'</table>' +
-					'</form>'
-				);
-				$(document).on('submit', 'form.editOrderValue', function(e){
-					e.preventDefault();
-					let form = $(this);
-					$.ajax({
-						type: 'post',
-						url: '/admin/ajax/orders.php',
-						data: form.serialize(),
-            beforeSend: () => {
-              showGif()
-            },
-						success: function(response){
-              document.location.reload()
-						}
-					})
-				})
+                let storesString =
+                    `<tr>
+                        <td>Склад:</td>
+                        <td>
+                            <select name="store_id">
+                    `;
+                for(let item of ov.stores){
+                    const selected = item.store_id == ov.store_id ? 'selected' : '';
+                    storesString += `<option
+                                      data-price="${item.price}" 
+                                      data-without-markup="${item.withoutMarkup}"
+                                      ${selected} 
+                                      value="${item.store_id}"
+                                    >
+                                        ${item.cipher} - ${item.price} руб.
+                                    </option>`
+                }
+                storesString += `</select>
+                                  <td>
+                                  </tr>`;
+                let orderStatuses = `<select name="order_status_id">`;
+                ov.order_statuses.forEach(item => {
+                    const selected = item.id == ov.status_id ? 'selected': '';
+                    orderStatuses += `<option ${selected} value="${item.id}">${item.title}</option>`;
+                })
+                orderStatuses += `</select>`;
+                modal_show(
+                    '<form class="editOrderValue">' +
+                                '<input type="hidden" name="status_id" value="editOrderValue">' +
+                                '<input type="hidden" name="osi" value="' + th.attr('osi') + '">' +
+                                `<input type="hidden" name="withoutMarkup" value="${ov.withoutMarkup}">` +
+                                '<table>' +
+                                    '<tr>' +
+                                        '<td>Цена:</td>' +
+                                        '<td><input ' + inputDisable + ' type="text" name="price" value="' + ov.price + '"></td>' +
+                                    '</tr>' +
+                                    storesString +
+                                    `<tr>
+                                        <td>Статус:</td>
+                                        <td>${orderStatuses}</td>
+                                    </tr>` +
+                                    '<tr>' +
+                                        '<td>Количество:</td>' +
+                                        '<td><input ' + inputDisable + ' type="text" name="quan" value="' + ov.quan + '"></td>' +
+                                    '</tr>' +
+                                    `<tr>
+                                        <td>Заказано:</td>
+                                        <td><input type="text" ${inputDisable} name="ordered" value="${ov.ordered}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Пришло:</td>
+                                        <td><input type="text" ${inputDisable} name="arrived" value="${ov.arrived}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Выдано:</td>
+                                        <td><input type="text" ${inputDisable} name="issued" value="${ov.issued}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Отказано:</td>
+                                        <td><input type="text" ${inputDisable} name="declined" value="${ov.declined}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Возврат:</td>
+                                        <td><input type="text" ${inputDisable} name="returned" value="${ov.returned}"></td>
+                                    </tr>` +
+                                    '<tr>' +
+                                        '<td>Комментарий:</td>' +
+                                        '<td><input type="text" name="comment" value="' + ov.comment + '"></td>' +
+                                    '</tr>' +
+                                    '<tr>' +
+                                        '<td colspan="2"><input type="submit"  value="Сохранить"></td>' +
+                                    '</tr>' +
+                                '</table>' +
+                            '</form>'
+                );
+                $(document).on('submit', 'form.editOrderValue', function(e){
+                    e.preventDefault();
+                    let form = $(this);
+                    $.ajax({
+                        type: 'post',
+                        url: '/admin/ajax/orders.php',
+                        data: form.serialize(),
+                        beforeSend: () => {
+                          showGif()
+                        },
+                        success: function(response){
+                            document.location.reload();
+                        }
+                    })
+                })
 			}
 		})
 	})
-  $(document).on('change', 'form.editOrderValue select[name=store_id]', e => {
-    const $th = $(e.target)
-    const option = $th.find('option:selected')
-    $th.closest('form').find('input[name=price]').val(option.data('price'))
-    $th.closest('form').find('input[name=withoutMarkup]').val(option.data('without-markup'))
+    $(document).on('change', 'form.editOrderValue select[name=store_id]', e => {
+        const $th = $(e.target)
+        const option = $th.find('option:selected')
+        $th.closest('form').find('input[name=price]').val(option.data('price'))
+        $th.closest('form').find('input[name=withoutMarkup]').val(option.data('without-markup'))
   })
 })

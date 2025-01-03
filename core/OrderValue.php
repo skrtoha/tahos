@@ -538,14 +538,14 @@ class OrderValue{
 			$limit
 		", $flag);
 	}
-	public static function getStatuses(): \mysqli_result
+	public static function getStatuses(): array
 	{
         $cacheId = 'order-statuses';
         $result = Cache::get($cacheId);
         if ($result) {
             return $result;
         }
-        $output = Database::getInstance()->query("SELECT * FROM #orders_statuses ORDER BY title");
+        $output = Database::getInstance()->query("SELECT * FROM #orders_statuses ORDER BY title")->fetch_all(MYSQLI_ASSOC);
         Cache::set($cacheId, $output);
 		return $output;
 	}

@@ -4,3 +4,22 @@
 div.radio {
     display: inline-block;
 }
+
+#fund_modal tr td:nth-child(2){
+    padding-left: 10px;
+}
+
+#fund_modal ~ a.remove {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+}
+
+#fund_modal label {
+    display: block;
+    margin-top: 0;
+}
+
+a {
+    cursor: pointer;
+}

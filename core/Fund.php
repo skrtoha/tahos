@@ -85,4 +85,22 @@ class Fund{
             ]]
         );
     }
+
+    public static function getById(int $id): array
+    {
+        $query = self::getQueryListFunds("f.id = {$id}");
+        return Database::getInstance()->query($query)->fetch_assoc();
+    }
+
+    public static function removeById(int $id): bool
+    {
+        $db = Database::getInstance();
+        $db->startTransaction();
+        $db->delete('fund_distribution', "`debit_id` = {$id} OR `replenishment_id` = $id");
+        $db->delete('funds', "`id` = $id");
+        $db->delete('1c_documents', 'data->"$.fund_id" = '.$id);
+        $db->commit();
+
+        return true;
+    }
 }

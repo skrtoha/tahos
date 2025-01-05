@@ -107,7 +107,7 @@ function funds(){
 		</tr>
 		<?if ($res_funds->num_rows){
 			foreach($res_funds as $fund){?>
-				<tr class="<?=$fund['is_new'] ? 'is_new' : ''?>">
+				<tr data-fund-id="<?=$fund['id']?>" class="<?=$fund['is_new'] ? 'is_new' : ''?>">
 					<td label="Дата"><?=date('d.m.Y H:i', strtotime($fund['created']))?></td>
 					<td label="Тип операции"><?=$operations_types[$fund['type_operation']]?></td>
 					<td label="Сумма" class="price_format"><?=$fund['sum']?></td>

@@ -1,6 +1,7 @@
 <?
 use core\Database;
 use core\User;
+
 class Issues{
 	public $user_id;
     public Database $db;
@@ -9,7 +10,7 @@ class Issues{
 		$this->db = $db;
 	}
 
-	function setIncome($incomeList, $isRequestFrom1C = false): array
+	function setIncome($incomeList): array
     {
         Database::getInstance()->startTransaction();
         $output = [
@@ -24,7 +25,10 @@ class Issues{
                     'bill_type' => $bill_type
                 ]
             );
-            if ($insert_order_issue !== true) die("Ошибка: {$this->db->last_query} | $insert_order_issue");
+            if ($insert_order_issue !== true) {
+                die("Ошибка: {$this->db->last_query} | $insert_order_issue");
+            }
+
             $issue_id = Database::getInstance()->last_id();
 
             $titles = [];

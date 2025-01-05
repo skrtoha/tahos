@@ -64,7 +64,7 @@ switch ($act){
         if (empty($income)) break;
 
         $issues = new \Issues($db, $queryParams['user_id']);
-        $issues->setIncome($income, true);
+        $issues->setIncome($income);
         break;
     case 'changeOrder':
         $orderValueList = OrderValue::get([

@@ -7,6 +7,7 @@
 
 use core\Database;
 use core\Exceptions\NotFoundException;
+use core\Fund;
 use core\Payment\Paykeeper;
 use core\Synchronization;
 use core\User;
@@ -51,18 +52,20 @@ switch ($act){
         }
 
         $document = Synchronization::get1CDocument($queryParams['document_title']);
-
-        if ($queryParams['act'] == 'payment' && !empty($document)){
+        if (
+            ($queryParams['act'] == 'payment' || $queryParams['act'] == 'refund')
+            && !empty($document)
+        ){
             if ($document['sum'] == $queryParams['sum']){
                 break;
             }
+
             $queryParams['previous_sum'] = $document['sum'];
             $queryParams['bill_type'] = $bill_type;
             $queryParams['fund_id'] = $document['fund_id'];
             User::changePayment($queryParams);
             break;
         }
-
         if (!empty($document)){
             break;
         }
@@ -87,7 +90,10 @@ switch ($act){
                 $bill_type,
                 $queryParams['document_date']
             );
-            Synchronization::set1CDocument($queryParams['document_title'], $queryParams);
+            Synchronization::set1CDocument($queryParams['document_title'], [
+                'sum' => $queryParams['sum'],
+                'fund_id' => Fund::$last_id,
+            ]);
             break;
         }
 

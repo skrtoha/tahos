@@ -600,9 +600,7 @@ class User{
     }
 
     public static function returnMoney($user_id, $amount, $comment = 'Возврат средств', $bill_type = User::BILL_CASH, $document_date = null){
-        $user = [];
-        $res_user = User::get(['user_id' => $user_id]);
-        foreach ($res_user as $value) $user = $value;
+        $user = User::getById($user_id);
 
         $remainder = 0;
         if ($bill_type == User::BILL_CASH) {
@@ -640,12 +638,26 @@ class User{
     }
 
     public static function changePayment($params){
-        if ($params['previous_sum'] > $params['sum']){
-            $result = self::decreasePayment($params);
+        switch($params['act']) {
+            case 'payment':
+                if ($params['previous_sum'] > $params['sum']){
+                    $result = self::decreasePayment($params);
+                }
+                if ($params['previous_sum'] < $params['sum']){
+                    $result = self::increasePayment($params);
+                }
+                break;
+            case 'refund':
+                if ($params['previous_sum'] > $params['sum']){
+                    $result = self::increasePayment($params);
+
+                }
+                if ($params['previous_sum'] < $params['sum']){
+                    $result = self::decreasePayment($params);
+                }
+                break;
         }
-        if ($params['previous_sum'] < $params['sum']){
-            $result = self::increasePayment($params);
-        }
+
         if ($result){
             $data = [
                 'fund_id' => $params['fund_id'],
@@ -659,7 +671,7 @@ class User{
     public static function decreasePayment($params): bool
     {
         $user = User::getById($params['user_id']);
-        $remain = $params['previous_sum'] - $params['sum'];
+        $remain = abs($params['previous_sum'] - $params['sum']);
         if ($params['bill_type'] == User::BILL_CASH){
             $bill = $user['bill_cash'];
             $field = 'bill_cash';
@@ -735,11 +747,8 @@ class User{
     {
         Database::getInstance()->startTransaction();
 
-        $sum = $params['sum'] - $params['previous_sum'];
-        $res_user = User::get(['user_id' => $params['user_id']]);
-        foreach ($res_user as $value){
-            $user = $value;
-        }
+        $sum = abs($params['sum'] - $params['previous_sum']);
+        $user = User::getById($params['user_id']);
 
         if (empty($user)){
             return false;

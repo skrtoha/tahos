@@ -54,8 +54,8 @@ use admin\functions\LeftMenu;
                 { title: 'Test template 2', content: 'Test 2' }
               ],
               content_css: [
-                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-                '//www.tinymce.com/css/codepen.min.css'
+                // '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                // '//www.tinymce.com/css/codepen.min.css'
               ]
             }
 			tinymce.init(tinymceInitParams);

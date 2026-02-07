@@ -79,7 +79,7 @@ else $user = $res_user;
 
 if (isset($user['markupSettings'])) $user['markupSettings'] = json_decode($user['markupSettings'], true);
 
-$blockData = json_decode(Setting::get('blockSite', 'is_blocked'), true);
+$blockData = json_decode(Setting::get('common', 'is_blocked'), true);
 $time_espiration = $blockData['time'] + $blockData['count_seconds'];
 $count_seconds = $time_espiration - time();
 if ($count_seconds < 0 && $blockData['is_blocked']){

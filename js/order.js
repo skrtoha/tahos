@@ -143,10 +143,8 @@ $(function(){
 	})
 	$('span[act=delete]').on('click', function(){
 		if (!confirm('Вы действительно хотите удалить?')) return false;
-		console.log()
-		var th = $(this).closest('tr');
-		var params = getParams(th, 'delete');
-		// console.log($('table tr[order_id][store_id][item_id]').size()); return false;
+        const th = $(this).closest('tr');
+        const params = getParams(th, 'delete');
 		$.ajax({
 			type: "POST",
 			url: "/ajax/order.php",
@@ -154,8 +152,6 @@ $(function(){
 			success: function(response){
 				th.remove();
 				if (!$('table tr[order_id][store_id][item_id]').length) document.location.href = '/orders';
-				// console.log(response); return false;
-
 			}
 		})
 	})

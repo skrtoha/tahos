@@ -48,7 +48,10 @@ switch ($_POST['act']){
 		break;
 	case 'delete':
 		$db->delete('orders_values', "`order_id`={$_POST['order_id']} AND `item_id`={$_POST['item_id']} AND `store_id`={$_POST['store_id']}");
-		if (!$db->getCount('orders_values', "`order_id`={$_POST['order_id']}")) $db->delete('orders', "`id`={$_POST['order_id']}");
+		if (!$db->getCount('orders_values', "`order_id`={$_POST['order_id']}")) {
+            $db->delete('orders', "`id`={$_POST['order_id']}");
+            $db->delete('order_paykeeper_invoice', "`id`={$_POST['order_id']}");
+        }
 		// print_r($_POST);
 		break;
 	case 'to_return':

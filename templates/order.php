@@ -12,7 +12,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'edit') $title = 'Редактиро�
 else $title = "Просмотр заказа";
 $res_orders_values = OrderValue::get(['order_id' => $_GET['id']], '');
 $orderInfo = OrderValue::getOrderInfo($_GET['id'], '');
-$editOrderInfo = $orderInfo['is_suspended'] && isset($_GET['act']) && $_GET['act'] == 'edit' ? true : false;
+$editOrderInfo = $orderInfo['is_suspended'] && isset($_GET['act']) && $_GET['act'] == 'edit';
 $total = 0;
 $status_classes = [ 
 	'Отменен' => 'status-return',
@@ -82,6 +82,11 @@ $status_classes = [
                                     $begin = $dateTimeObject->add(new DateInterval("P{$orderInfo['min_delivery']}D"));
                                 }
                                 else $begin = $dateTimeObject;
+
+                                if ($orderInfo['max_delivery'] == -1) {
+                                    $orderInfo['max_delivery'] = 1;
+                                }
+
                                 $end = $end->add(new DateInterval("P{$orderInfo['max_delivery']}D"));
                                 ?>
                                 <input type="hidden" id="min_date" value="<?=$begin->format('d.m.Y')?>">
@@ -343,7 +348,7 @@ $status_classes = [
                 <?}
             }?>
         </table>
-		
+
 	<?}
 	else{?>
 		<table class="orders-table small-view">
@@ -364,7 +369,7 @@ $status_classes = [
                             <?=$order['title_full']?>
                             <br><br>
 							Поставщик: <strong <?=$order['noReturn']?>><?=$order['cipher']?></strong> <br>
-							Количество: 
+							Количество:
 								<?if (!$blocked){?>
 									<div style="display: inline-block" store_id="<?=$order['store_id']?>" item_id="<?=$order['item_id']?>" packaging="<?=$order['packaging']?>" class="count-block" summand="<?=$order['price']?>">
 										<span class="minus">-</span>
@@ -380,7 +385,7 @@ $status_classes = [
 									<?switch($order['status']){
 										case 'Заказано':
 											$summ = $order['ordered'] * $order['price'];?>
-											Заказано 
+											Заказано
 											<?if ($order['ordered'] < $order['quan']){?>
 												- <?=$order['ordered']?> шт.
 											<?}

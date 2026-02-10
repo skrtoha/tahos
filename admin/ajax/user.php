@@ -215,24 +215,6 @@ switch($_POST['act']){
         ");
         echo json_encode($output);
         break;
-    case 'getFundDistribution':
-        $result = $db->query("
-            SELECT
-                fd.replenishment_id,
-                fd.sum,
-                DATE_FORMAT(f2.created, '%d.%m.%Y %H:%i:%s') AS created,
-                f2.comment
-            FROM
-                #funds f1
-            LEFT JOIN
-                #fund_distribution fd ON fd.debit_id = f1.id
-            LEFT JOIN
-                #funds f2 ON fd.replenishment_id = f2.id
-            where
-                f1.issue_id = {$_POST['issue_id']}
-        ")->fetch_all(MYSQLI_ASSOC);
-        echo json_encode($result);
-        break;
     case 'refund-money':
         $response = Paykeeper::refundMoney($_POST['id'], $_POST['amount'], $_POST['partial']);
         echo json_encode($response);

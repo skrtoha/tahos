@@ -259,7 +259,6 @@ class User{
         }
     }
     static eventFundDistribution = (e) => {
-        let formData = new FormData;
         const trDataIssueId = e.target.closest(['tr[data-issue-id]']);
 
         const nextSibling = trDataIssueId.nextElementSibling;
@@ -268,44 +267,14 @@ class User{
             return;
         }
 
-        formData.set('act', 'getFundDistribution');
-        formData.set('issue_id', trDataIssueId.getAttribute('data-issue-id'));
-        showGif();
-        fetch('/admin/ajax/user.php', {
-            method: 'POST',
-            body: formData
-        }).then(response => response.json()).then(response => {
-            let tdBaseElement = document.createElement('tr');
-            tdBaseElement.classList.add('second');
-            tdBaseElement.innerHTML = `
-                            <td colspan="7">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Дата</th>
-                                            <th>Тип операции</th>
-                                            <th>Сумма</th>
-                                            <th>Комментарий</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>                            
+        let tdBaseElement = document.createElement('tr');
+        tdBaseElement.classList.add('second');
+        tdBaseElement.innerHTML = `
+                            <td colspan="7" style="text-align: center">
+                                <a href="/admin/?view=order_issues&issue_id=${trDataIssueId.getAttribute('data-issue-id')}" target="_blank">Выдача</a>                     
                             </td>
                         `;
-            let tbody = tdBaseElement.querySelector('tbody');
-            for (let row of response){
-                let trElement = document.createElement('tr');
-                trElement.innerHTML = `
-                                <td>${row.created}</td>
-                                <td>Пополнение счета</td>
-                                <td>${row.sum}</td>
-                                <td>${row.comment}</td>
-                            `;
-                tbody.append(trElement);
-            }
-            trDataIssueId.after(tdBaseElement);
-            showGif(false);
-        })
+        trDataIssueId.after(tdBaseElement);
     }
     static async getArrangementList(){
         showGif();

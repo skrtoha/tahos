@@ -19,7 +19,6 @@ if (!isset($_GET['tab'])){
 		'end' => $end,
 		'period' => 'custom',
 		'status_id' => [
-			'1' => 1,
 			'2' => 1,
 			'3' => 1,
 			'5' => 1,
@@ -109,7 +108,7 @@ Breadcrumb::out();
 					<div class="status-wrap clearfix">
 						<p class="label">Выдано</p>
 						<label class="switch">
-							<input type="checkbox" id="ussued"  <?=isset($params['status_id'][1]) ? 'checked' : ''?> name="status_id[]" value="1">
+							<input type="checkbox" id="ussued"  <?=isset($params['status_id'][1]) && $params['status_id'][1] ? 'checked' : ''?> name="status_id[]" value="1">
 							<div class="slider round <?=isset($params['status_id'][1]) ? 'checked' : ''?>"></div>
 						</label>
 					</div>

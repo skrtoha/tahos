@@ -208,6 +208,7 @@ class Paykeeper{
                     'order_id' => $params['orderid'],
                     'user_id' => self::$orderInfo['user_id'],
                     'paykeeper_id' => $params['id'],
+                    'key' => $params['key'],
                     'sum' => $params['sum'],
                     'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
                 ]);

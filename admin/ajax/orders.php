@@ -180,6 +180,9 @@ switch($_POST['status_id']){
 		echo json_encode($data);
 		break;
     case 'getItemsToOrder':
+        if (!\core\Config::$isUseApiProviders) {
+            break;
+        }
         $commonItemsToOrders = core\Provider::getCommonItemsToOrders();
 		$countItemsToOrder = core\Provider::getCountItemsToOrders($commonItemsToOrders);
 		if ($countItemsToOrder){

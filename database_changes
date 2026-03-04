@@ -1,0 +1,41 @@
+alter table tahos_return_reasons
+    add `order` int default 0 null;
+    UPDATE tahos.tahos_return_reasons t
+SET t.title   = 'Товар повреждён или некомплект',
+    t.`order` = 20
+WHERE t.id = 4;
+
+UPDATE tahos.tahos_return_reasons t
+SET t.title   = 'Ошибка кросс номера',
+    t.`order` = 30
+WHERE t.id = 3;
+
+UPDATE tahos.tahos_return_reasons t
+SET t.`order` = 40
+WHERE t.id = 1;
+
+UPDATE tahos.tahos_return_reasons t
+SET t.title   = 'Товар не пригодился',
+    t.`order` = 10
+WHERE t.id = 2;
+
+create table tahos_returns_media
+(
+    return_id int          not null,
+    name      varchar(255) not null,
+    constraint tahos_returns_media_pk
+        primary key (return_id, name)
+)
+    comment 'Файлы в возвратах';
+
+alter table tahos_returns_media
+    add type varchar(10) not null after return_id;
+
+alter table tahos_returns_media
+    drop primary key;
+
+alter table tahos_returns_media
+    add constraint tahos_returns_media_pk
+        primary key (return_id, type);
+
+

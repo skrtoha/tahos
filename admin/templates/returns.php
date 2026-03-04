@@ -40,7 +40,9 @@ switch ($_GET['act']){
 			else header("Location: ?view=returns");
 		}
 		$return = array_merge($return, $_POST);
-		form($return, Returns::getStatuses()); 
+        $media = Database::getInstance()->select('returns_media', '*', "`return_id` = {$return['return_id']}");
+
+		form($return, $media, Returns::getStatuses());
 		break;
 	default: 
 		if (isset($_GET['dateFrom'])){
@@ -115,7 +117,7 @@ function views(array $params){?>
 		<?}?>
 		</table>
 <?}
-function form($return, $statuses){
+function form($return, $media, $statuses){
 	//debug($return);?>
 	<div style="margin-top: 10px" class="t_form">
 		<div class="bg">
@@ -179,12 +181,32 @@ function form($return, $statuses){
 							<?}?>
 						</select>
 					</div>
-					<div class="field">
+				<div class="field">
 					<div class="title">Комментарий</div>
 					<div class="value">
 						<input type="text" name="comment" value="<?=$return['comment']?>">
 					</div>
 				</div>
+                <? if (!empty($media)) { ?>
+                    <div class="field">
+                        <div class="title">Комментарий</div>
+                        <div class="value">
+                            <?foreach($media as $file) { ?>
+                                <div class="image">
+                                    <span>
+                                        <?switch ($file['type']) {
+                                            case 'order': echo 'Заказ-наряд'; break;
+                                            case 'photo': echo 'Фото товара'; break;
+                                            case 'conclusion': echo 'Заключение СТО'; break;
+                                        }?>
+                                    </span>
+                                    <img src="<?=\core\Config::$imgUrl?>/returns/<?=$return['return_id']?>/<?=$file['name']?>" alt="">
+                                </div>
+                            <? } ?>
+
+                        </div>
+                    </div>
+                <? } ?>
 				<div class="value">
 					<input type="submit" class="button" value="Сохранить и выйти">
 					<input class="is_stay button" type="submit" value="Сохранить и остаться">

@@ -96,23 +96,24 @@ class Returns{
 	}
 	public static function getReasons(): array
 	{
-		return $GLOBALS['db']->select('return_reasons', '*');
+		return Database::getInstance()->select('return_reasons', '*', '', '`order`');
 	}
 	public static function getStatuses(): array
 	{
 		return $GLOBALS['db']->select('return_statuses', '*'); 
 	}
-	public static function createReturnRequest($items){
+	public static function createReturnRequest($params){
 		$emailPrices = Provider::getEmailPrices();
-		foreach($items as $value){
-			if (in_array($value['store_id'], $emailPrices)) $status_id = 2;
-			else $status_id = 1;
-			Database::getInstance()->query("
-				INSERT INTO #returns (`order_id`,`store_id`,`item_id`,`reason_id`,`quan`,`status_id`) 
-				VALUES ({$value['order_id']}, {$value['store_id']}, {$value['item_id']}, {$value['reason_id']}, {$value['quan']}, $status_id) 
-				ON DUPLICATE KEY UPDATE `status_id` = $status_id,`created` = CURRENT_TIMESTAMP, `updated` = NULL
-			", '');
-		}
+        if (in_array($params['store_id'], $emailPrices)) $status_id = 2;
+        else $status_id = 1;
+        
+        Database::getInstance()->query("
+            INSERT INTO #returns (`order_id`,`store_id`,`item_id`,`reason_id`,`quan`,`status_id`)
+            VALUES ({$params['order_id']}, {$params['store_id']}, {$params['item_id']}, {$params['reason_id']}, {$params['quan']}, $status_id)
+            ON DUPLICATE KEY UPDATE `status_id` = $status_id,`created` = CURRENT_TIMESTAMP, `updated` = NULL
+        ", '');
+        
+        return Database::getInstance()->insert_id();
 	}
 
 	public static function processReturn($params, $return){
@@ -160,4 +161,18 @@ class Returns{
         }
         return true;
 	}
+    
+    public static function setMedia($files, $return_id) {
+        $dir = Config::$imgPath."/returns/$return_id";
+        mkdir($dir);
+        foreach($files as $type => $file){
+            if (copy($file['tmp_name'], "{$dir}/{$file['name']}")) {
+                Database::getInstance()->insert('returns_media', [
+                    'return_id' => $return_id,
+                    'type' => $type,
+                    'name' => $file['name']
+                ]);
+            };
+        }
+    }
 }

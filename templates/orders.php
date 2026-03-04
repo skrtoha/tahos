@@ -619,17 +619,19 @@ Breadcrumb::out();
 </div>
 <div id="mgn_popup" class="product-popup mfp-hide">
 	<h1>Оформление возврата</h1>
-	<table class="basket-table mobile_view">
-		<thead>
-			<tr>
-				<th>Наименование</th>
-				<th>Причина</th>
-				<th>Количество</th>
-				<th>Сумма</th>
-			</tr>
-		</thead>
-		<tbody></tbody>
-	</table>
-	<a class="button" href="">Оформить</a>
+    <form action="#" enctype="application/x-www-form-urlencoded">
+        <table class="basket-table mobile_view">
+            <thead>
+            <tr>
+                <th>Наименование</th>
+                <th>Причина</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <input type="submit" class="button" value="Оформить">
+    </form>
 	<div style="clear: both"></div>
 </div>

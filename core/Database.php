@@ -129,6 +129,9 @@ class Database {
 	function last_id(){
 		return $this->last_id;
 	}
+    function insert_id(){
+        return $this->mysqli->insert_id;
+    }
 	function rows_matches(){
 		$row = explode('  ', $this->mysqli->info);
 		$r = explode(': ', $row[0]);

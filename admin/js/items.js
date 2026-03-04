@@ -286,7 +286,7 @@ $(function(){
 	})
 	$('#buttonLoadPhoto').on('click', function(e){
 		e.preventDefault();
-		$('#loadPhoto').click();
+		$('#loadPhoto').trigger('click');
 	})
 	$(document).on('click', '.loop', function(e){
 		e.preventDefault();

@@ -55,7 +55,10 @@ switch ($_POST['act']){
 		// print_r($_POST);
 		break;
 	case 'to_return':
-		core\Returns::createReturnRequest($_POST['items']);
+		$return_id = core\Returns::createReturnRequest($_POST);
+        if (!empty($_FILES)) {
+            core\Returns::setMedia($_FILES, $return_id);
+        }
 		break;
 	case 'get_returns':
 		$res_returns = core\Returns::get(['user_id' => $_SESSION['user']]);
@@ -86,7 +89,7 @@ switch ($_POST['act']){
         $db->update('orders', $values, "`id` = {$_POST['order_id']}");
         break;
     case 'set_1c_return':
-        $data = $_POST['items'][0];
+        $data = $_POST['params'];
         $orderInfo = OrderValue::get(['order_id' => $data['order_id']])->fetch_assoc();
         $params = [
             'user_id' => $orderInfo['user_id'],

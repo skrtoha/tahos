@@ -108,11 +108,11 @@ class Returns{
         else $status_id = 1;
         
         Database::getInstance()->query("
-            INSERT INTO #returns (`order_id`,`store_id`,`item_id`,`reason_id`,`quan`,`status_id`)
-            VALUES ({$params['order_id']}, {$params['store_id']}, {$params['item_id']}, {$params['reason_id']}, {$params['quan']}, $status_id)
+            INSERT INTO #returns (`order_id`,`store_id`,`item_id`,`reason_id`,`quan`,`status_id`, `comment`)
+            VALUES ({$params['order_id']}, {$params['store_id']}, {$params['item_id']}, {$params['reason_id']}, {$params['quan']}, $status_id, '{$params['comment']}')
             ON DUPLICATE KEY UPDATE `status_id` = $status_id,`created` = CURRENT_TIMESTAMP, `updated` = NULL
         ", '');
-        
+
         return Database::getInstance()->insert_id();
 	}
 

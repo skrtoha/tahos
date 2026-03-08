@@ -177,33 +177,34 @@ function show_form_returns(params){
 	$('select').styler();
 }
 
-function setReturnFilesVisibility($tbody, reason_id) {
-    const visibilityParams = {
-        1: {
-            'order': '',
-            'conclusion': '',
-            'photo': '',
-            'comment': 'hidden'
-        },
-        2: {
-            'order': 'hidden',
-            'conclusion': 'hidden',
-            'photo': 'hidden',
-            'comment': 'hidden'
-        },
-        3: {
-            'order': 'hidden',
-            'conclusion': 'hidden',
-            'photo': 'hidden',
-            'comment': ''
-        },
-        4: {
-            'order': 'hidden',
-            'conclusion': 'hidden',
-            'photo': '',
-            'comment': 'hidden'
-        }
+const visibilityParams = {
+    1: {
+        'order': '',
+        'conclusion': '',
+        'photo': '',
+        'comment': 'hidden'
+    },
+    2: {
+        'order': 'hidden',
+        'conclusion': 'hidden',
+        'photo': 'hidden',
+        'comment': 'hidden'
+    },
+    3: {
+        'order': 'hidden',
+        'conclusion': 'hidden',
+        'photo': 'hidden',
+        'comment': ''
+    },
+    4: {
+        'order': 'hidden',
+        'conclusion': 'hidden',
+        'photo': '',
+        'comment': 'hidden'
     }
+}
+
+function setReturnFilesVisibility($tbody, reason_id) {
     $.each($tbody.find('.return-file'), (index, value) => {
         value.classList.remove('hidden');
         const itemClass = visibilityParams[parseInt(reason_id)][value.dataset.type];
@@ -211,6 +212,32 @@ function setReturnFilesVisibility($tbody, reason_id) {
             value.classList.add(itemClass);
         }
     })
+}
+
+function checkForm(event) {
+    let result = true;
+    const requiredParams = event.target.querySelectorAll('input[type="file"], textarea');
+    const reason_id = + event.target.reason_id.value;
+
+    requiredParams.forEach(item => {
+        const keys = Object.keys(visibilityParams[reason_id]);
+        keys.forEach(key => {
+            switch (item.type) {
+                case 'file':
+                    if (item.name == key && visibilityParams[reason_id][key] == '' && item.files.length == 0) {
+                        result = false;
+                    }
+                    break;
+                case 'textarea':
+                    if (visibilityParams[reason_id].comment == '' && item.value.length <= 10) {
+                        result = false;
+                    }
+                    break;
+            }
+        })
+    })
+    return result;
+
 }
 $(function(){
     $(document).on('change', '.return-file input[type="file"]', e => {
@@ -389,6 +416,12 @@ $(function(){
 	});
 	$(document).on('submit', '#mgn_popup form', function(e){
         e.preventDefault();
+
+        if (!checkForm(e)) {
+            show_message('Ошибка заполнения реквизитов!', 'error');
+            return;
+        }
+
         const formData = new FormData(e.target);
         formData.set('act', 'to_return');
 		$.ajax({

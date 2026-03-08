@@ -161,6 +161,7 @@ class Paykeeper{
             $array = [
                 'paykeeper_id' => $params['id'],
                 'sum' => $amount,
+                'key' => $params['key'],
                 'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
             ];
             if (isset($params['orderid']) && $params['orderid']) {
@@ -283,6 +284,7 @@ class Paykeeper{
             Synchronization::createPayment1C([
                 'user_id' => $userInfo['id'],
                 'paykeeper_id' => $params['id'],
+                'key' => $params['key'],
                 'sum' => $params['sum'],
                 'payment_arrangement' => Synchronization::$paymentPaykeeper1C[$params['ps_id']]
             ]);

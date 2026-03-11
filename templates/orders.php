@@ -59,7 +59,6 @@ $status_classes = [
 	'Завершен' => 'status-delivery',
 	'В работе' => 'status-sended'
 ];
-$orders = get_order_group($params, '');
 Breadcrumb::add('/orders', 'Заказы');
 Breadcrumb::out();
 ?>

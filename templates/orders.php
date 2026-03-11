@@ -236,6 +236,9 @@ Breadcrumb::out();
 												<?}
 												break;
 											case 'Выдано':
+                                                if ($order['return_status_id']) {
+                                                    break;
+                                                }
 												$summ = !$order['issued'] ? $order['issued'] * $order['price'] : ($order['issued'] - $order['returned']) * $order['price']?>
 												Выдано
 												<?if (
@@ -330,7 +333,10 @@ Breadcrumb::out();
 										?>
 										</span>
 										<?if ($order['ordered_return'] && $order['status_id'] != '2'){?>
-											<span class="ordered_return status_return_<?=$order['return_status_id']?>">Возврат: <?=$order['ordered_return']?></span>
+											<span class="ordered_return status_return_<?=$order['return_status_id']?>">
+                                                <span class="status-col status-block status-return">Возврат</span>
+                                                <?=$order['ordered_return']?>
+                                            </span>
 										<?}?>
 									</td>
 									<td>

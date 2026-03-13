@@ -787,7 +787,12 @@ function itemDiff($type){
 			<td>Название</td>
 			<td>Штрих-код</td>
 			<?if ($type == 'analogies'){?>
-				<td>Статус</td>
+				<td class="status_all">
+                    Статус
+                    <label>
+                        <input type="checkbox" name="all" value="1">
+                    </label>
+                </td>
 			<?}?>
 			<td>Категории</td>
 			<td></td>
@@ -816,9 +821,8 @@ function itemDiff($type){
 									<option <?=$value['status'] == '1' ? 'selected' : ''?> value="1">проверен</option>
 									<option <?=$value['status'] == '2' ? 'selected' : ''?> value="2">скрыт</option>
 								</select>
+                                <input type="checkbox" name="group" value="1">
 							</form>
-							<!-- <?$checked = $value['checked'] ? 'checked' : ''?>
-							<input <?=$checked?> name="checked" type="checkbox" value="<?=$value['item_id']?>"> -->
 						</td>
 					<?}?>
 					<td label="Категории"><?=$value['categories']?></td>
@@ -826,11 +830,31 @@ function itemDiff($type){
 						<a class="deleteItemDiff" href="act=deleteItemDiff&type=<?=$type?>&item_id=<?=$_GET['id']?>&item_diff=<?=$value['item_id']?>">Удалить</a>
 					</td>
 				</tr>
-			<?}	
-		}
-		else{?>
+			<? } ?>
+
+            <?if ($type == 'analogies'){?>
+                <tr class="hidden group-hidden">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="3">
+                        <label>
+                            <select name="status">
+                                <option value="0">не выбрано</option>
+                                <option value="1">проверен</option>
+                                <option value="2">скрыт</option>
+                            </select>
+                        </label>
+                        <button>Применить</button>
+                    </td>
+                </tr>
+            <?}?>
+		<? }
+		else{ ?>
 			<tr class="empty"><td colspan="5">Товаров не найдено</td></tr>
-		<?}?>
+		<? } ?>
 	</table>
 <?}
 function items(){

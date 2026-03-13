@@ -265,3 +265,11 @@ div#categories {
 div.modal {
     max-width: 1000px;
 }
+#itemDiff form.status,
+#itemDiff tr.head td.status_all {
+    display: flex;
+    justify-content: space-between;
+}
+#itemDiff form.status input[type="checkbox"] {
+    margin-left: 5px;
+}

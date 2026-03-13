@@ -89,8 +89,28 @@ function eventChangeMainCategory(obj){
         })
     })
 }
+
 $(function(){
 	let get = getParams();
+
+    function showGroupHidden() {
+        let show = false;
+        const groupAll = document.querySelectorAll('input[name="group"]');
+        const groupHidden = document.querySelector('tr.group-hidden');
+        for (let e of groupAll) {
+            if (e.checked) {
+                show = true;
+                break;
+            }
+        }
+        if (show) {
+            groupHidden.classList.remove('hidden');
+        }
+        else {
+            groupHidden.classList.add('hidden');
+        }
+    }
+
 	$('input.intuitive_search').on('keyup focus', function(e){
 		e.preventDefault();
 		let val = $(this).val();
@@ -128,18 +148,18 @@ $(function(){
 		$.ajax({
 			method: 'post',
 			url: '/admin/ajax/item.php',
-			data: 
+			data:
 				'act=get_filters&item_id=' + item_id +
 				'&category_id=' + category_id,
 			success: function(res){
 				var filters = JSON.parse(res);
 				// console.log('filters', filters);
-				var str = 
-					'<form id="apply_filter">' + 
+				var str =
+					'<form id="apply_filter">' +
 						'<table>';
 				for (var key in filters){
 					var f = filters[key];
-					str += 
+					str +=
 						'<tr>' +
 							'<td>' + f.title + '</td>' +
 							'<td>' +
@@ -151,13 +171,13 @@ $(function(){
 							// console.log(initials[key], selected);
 							str +=
 									'<option ' + selected + ' value="' + f.filter_values[k].id +'">' + f.filter_values[k].title + '</option>';
-						} 
+						}
 					}
 					str +=
 								'</select>' +
 							'</td>' +
 						'</tr>';
-				} 
+				}
 				str +=
 						'</table>' +
 						'<input type="submit" item_id="' + item_id + '" category_id="' + category_id + '" value="Изменить">'
@@ -173,8 +193,8 @@ $(function(){
 		$.ajax({
 			method: 'post',
 			url: '/admin/ajax/item.php',
-			data: 
-				$('#apply_filter').serialize() + 
+			data:
+				$('#apply_filter').serialize() +
 				'&act=apply_filter' +
 				'&item_id=' + elem.attr('item_id') + '&category_id=' + category_id,
 			success: function(res){
@@ -191,7 +211,7 @@ $(function(){
 	})
 	$('#language_add').on('click', function(e){
 		e.preventDefault();
-		str = 
+		str =
 			'<label class="item_translate">' +
 				'<select name="language_id[]">';
 		for(var k in languages) str +=
@@ -231,7 +251,7 @@ $(function(){
 		$.ajax({
 			method: 'post',
 			url: '/admin/ajax/item.php',
-			data: 
+			data:
 				'&act=category_delete&item_id=' + th.closest('div').attr('item_id') +
 				'&category_id=' + category_id,
 			success: function(res){
@@ -342,7 +362,7 @@ $(function(){
 						$('#modal_content').empty();
 						t.removeClass('active');
 						$('#loadPhoto').closest('form').resetForm();
-					} 
+					}
 				})
 				$('#savePhoto').on('click', function(){
 					showGif();
@@ -420,7 +440,7 @@ $(function(){
 			},
 			success: function(response){
 				let items = JSON.parse(response);
-				addItemDiffHtml(th.attr('type'), items);			
+				addItemDiffHtml(th.attr('type'), items);
 				showGif(false);
 				th.closest('ul').find('li:first-child').addClass('active');
 				th.closest('li').remove();
@@ -453,37 +473,94 @@ $(function(){
 		})
 	})
 	$(document).on('change', '#itemDiff select[name=status]', function(){
-		$(this).closest('form').submit();
+		$(this).closest('form').trigger('submit');
 	})
-  $(document).on('submit', 'form.status', function(e){
-      e.preventDefault();
-      const $form = $(this).closest('form');
-      $.ajax({
+    $(document).on('submit', 'form.status', function(e){
+        e.preventDefault();
+        const $form = $(this).closest('form');
+        $.ajax({
           url: document.location.href,
           data: $form.serialize(),
           success: function(){
               $form.closest('tr').attr('class', 'analogyStatus_' + $form.find('select[name=status]').val());
               show_message('Успешно сохранено');
           }
-      });
-  })
-  document.querySelector('#add_category').addEventListener('click', (event) => {
-      showGif();
-      event.preventDefault();
-      let formData = new FormData();
-      formData.set('act', 'getMainCategory');
-      fetch('/admin/ajax/item.php', {
-          method: 'post',
-          body: formData
-      }).then(response => response.text()).then(response => {
-          let div = document.createElement('div');
-          div.classList.add('category');
-          div.innerHTML = response;
-          document.querySelector('#categories').prepend(div);
-          eventChangeMainCategory(div);
-          showGif(false);
-      })
-  })
+        });
+    })
+
+    const statusAll = document.querySelector('td.status_all input[type="checkbox"]');
+    if (statusAll) {
+        statusAll.addEventListener('change', e => {
+            const allGroup = e.target.closest('tbody').querySelectorAll('input[name="group"]');
+            if (allGroup) {
+                allGroup.forEach(item => {
+                    item.checked = e.target.checked;
+                })
+                showGroupHidden();
+            }
+        })
+    }
+
+    const groupAll = document.querySelectorAll('input[name="group"]');
+    if (groupAll) {
+        groupAll.forEach(item => {
+            item.addEventListener('change', e => {
+                showGroupHidden();
+            })
+        })
+    }
+
+    const groupHidden = document.querySelector('tr.group-hidden');
+    if (groupHidden) {
+        groupHidden.querySelector('button').addEventListener('click', e => {
+            const params = {};
+            params.elements = [];
+            params.act = 'group_change_status';
+            params.status_id = e.target.closest('td').querySelector('select').value;
+
+            const groupAll = document.querySelectorAll('input[name="group"]');
+            groupAll.forEach(item => {
+                if (item.checked) {
+                    const form = item.closest('form');
+                    params.elements.push({
+                        item_id: form.querySelector('input[name="item_id"]').value,
+                        item_diff: form.querySelector('input[name="item_diff"]').value
+                    })
+                }
+            })
+            fetch('/admin/ajax/item.php', {
+                method: 'POST',
+                body: JSON.stringify(params),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+            }).then(response => response.text()).then(result => {
+                document.location.reload();
+            })
+        })
+    }
+
+
+    const addCategory = document.querySelector('#add_category');
+    if (addCategory) {
+        addCategory.addEventListener('click', (event) => {
+            showGif();
+            event.preventDefault();
+            let formData = new FormData();
+            formData.set('act', 'getMainCategory');
+            fetch('/admin/ajax/item.php', {
+                method: 'post',
+                body: formData
+            }).then(response => response.text()).then(response => {
+                let div = document.createElement('div');
+                div.classList.add('category');
+                div.innerHTML = response;
+                document.querySelector('#categories').prepend(div);
+                eventChangeMainCategory(div);
+                showGif(false);
+            })
+        })
+    }
 
   const category = document.querySelectorAll('#categories div.category');
   if (category) category.forEach((element, key) => {

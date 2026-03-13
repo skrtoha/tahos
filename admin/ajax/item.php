@@ -17,7 +17,12 @@ $connection = new core\Connection($db);
 $db->connection_id = $connection->connection_id;
 $db->setProfiling();
 
-switch($_POST['act']){
+$post = $_POST;
+if (empty($post)) {
+    $post = json_decode(file_get_contents('php://input'), true);
+}
+
+switch($post['act']){
 	case 'get_filters':
 		$res_filters = $db->query("
 			SELECT
@@ -30,7 +35,7 @@ switch($_POST['act']){
 				#filters f
 			LEFT JOIN #filters_values fv ON fv.filter_id=f.id
 			WHERE
-				f.category_id={$_POST['category_id']}
+				f.category_id={$post['category_id']}
 			ORDER BY f.pos, value_title_2, fv.title
 		", '');
 		if ($res_filters->num_rows) while($r = $res_filters->fetch_assoc()){
@@ -53,21 +58,21 @@ switch($_POST['act']){
 		echo json_encode($filters);
 		break;
 	case 'apply_filter':
-		// print_r($_POST); exit();
+		// print_r($post); exit();
 		$db->delete(
 			'items_values', 
 			"
-				`item_id`={$_POST['item_id']} AND 
-				`category_id`={$_POST['category_id']}
+				`item_id`={$post['item_id']} AND
+				`category_id`={$post['category_id']}
 			"
 		);
-		foreach($_POST as $key => $value){
+		foreach($post as $key => $value){
 			if (!is_numeric($key) || !$value) continue;
 			$db->insert(
 				'items_values',
 				[
-					'item_id' => $_POST['item_id'],
-					'category_id' => $_POST['category_id'],
+					'item_id' => $post['item_id'],
+					'category_id' => $post['category_id'],
 					'value_id' => $value
 				]
 			);
@@ -76,18 +81,18 @@ switch($_POST['act']){
 	case 'category_delete':
 		$db->delete(
 			'categories_items',
-			"`item_id`={$_POST['item_id']} AND `category_id`={$_POST['category_id']}"
+			"`item_id`={$post['item_id']} AND `category_id`={$post['category_id']}"
 		);
 		break;
 	case 'savePhoto':
-		// debug($_POST);
+		// debug($post);
 		// debug($_FILES);
 		$name = time();
 		$pathBig = "/big_$name.jpg";
 		$pathSmall = "/small_$name.jpg";
 
 		copy($_FILES['croppedImage']['tmp_name'], core\Config::$tmpFolderPath . $pathSmall);
-		copy($_SERVER['DOCUMENT_ROOT'].$_POST['initial'], core\Config::$tmpFolderPath . $pathBig);
+		copy($_SERVER['DOCUMENT_ROOT'].$post['initial'], core\Config::$tmpFolderPath . $pathBig);
 
 		echo json_encode([
 			'small' => Config::$tmpFolderUrl . $pathSmall,
@@ -95,20 +100,20 @@ switch($_POST['act']){
 		]);
 		break;
 	case 'applyCategory':
-        if (isset($_POST['isAvito']) && $_POST['isAvito']){
+        if (isset($post['isAvito']) && $post['isAvito']){
             $db->query("
                 DELETE ci FROM
                    #categories_items ci
                 LEFT JOIN #categories c ON c.id = ci.category_id
                 WHERE 
                     c.parent_id IN (".Avito::getParentCategories(true).") AND
-                    ci.item_id = {$_POST['item_id']}
+                    ci.item_id = {$post['item_id']}
             ");
         }
-		$db->insert('categories_items', ['item_id' => $_POST['item_id'], 'category_id' => $_POST['category_id']]);
+		$db->insert('categories_items', ['item_id' => $post['item_id'], 'category_id' => $post['category_id']]);
 
-		if (isset($_POST['marketplace_description'])){
-			Marketplaces::setItemDescription($_POST['item_id'], $_POST['marketplace_description']);
+		if (isset($post['marketplace_description'])){
+			Marketplaces::setItemDescription($post['item_id'], $post['marketplace_description']);
 		}
 		break;
 	case 'getStoreItem':
@@ -131,11 +136,11 @@ switch($_POST['act']){
         ";
 		$query .= "
 			WHERE
-				si.store_id = {$_POST['store_id']} AND si.item_id = {$_POST['item_id']}
+				si.store_id = {$post['store_id']} AND si.item_id = {$post['item_id']}
 		";
 		$res_store_items = $db->query($query, '');
         $store_items = $res_store_items->fetch_assoc();
-        if ($_POST['self_store']){
+        if ($post['self_store']){
             $result = $db->query("
                 select
                     ps.id as store_id,
@@ -149,9 +154,9 @@ switch($_POST['act']){
                 left join
                     #provider_stores ps on ps.id = msi.store_id
                 left join 
-                    #required_remains ri on ri.item_id = msi.item_id AND ri.self_store_id = {$_POST['store_id']}
+                    #required_remains ri on ri.item_id = msi.item_id AND ri.self_store_id = {$post['store_id']}
                 where
-                    msi.item_id = {$_POST['item_id']}
+                    msi.item_id = {$post['item_id']}
             ", '');
             $store_items['main_store'] = $result->fetch_assoc();
             $store_items['providerList'] = Provider::get();
@@ -165,16 +170,16 @@ switch($_POST['act']){
 		break;
 	case 'getItemInfo':
 		$params = [];
-		if (isset($_POST['marketplace_description'])) $params[] = 'marketplace_description';
-		if (isset($_POST['additional_options'])) $params[] = 'additional_options';
-		if (isset($_POST['category_tahos'])) $params[] = 'category_tahos';
-		if (isset($_POST['ozon_item'])) $params[] = 'ozon_item';
+		if (isset($post['marketplace_description'])) $params[] = 'marketplace_description';
+		if (isset($post['additional_options'])) $params[] = 'additional_options';
+		if (isset($post['category_tahos'])) $params[] = 'category_tahos';
+		if (isset($post['ozon_item'])) $params[] = 'ozon_item';
 
-		$itemInfo = core\Item::getByID($_POST['item_id'], $params);
+		$itemInfo = core\Item::getByID($post['item_id'], $params);
 
-		if (isset($_POST['ozon_product_info']) && $_POST['ozon_product_info']){
-			$ozonProductInfo = Ozon::getProductInfo($_POST['item_id']);
-            $ozonItem = Ozon::getItemOzon(['offer_id' => $_POST['item_id']]);
+		if (isset($post['ozon_product_info']) && $post['ozon_product_info']){
+			$ozonProductInfo = Ozon::getProductInfo($post['item_id']);
+            $ozonItem = Ozon::getItemOzon(['offer_id' => $post['item_id']]);
 			$itemInfo = array_merge(
                 $itemInfo,
                 $ozonProductInfo,
@@ -182,7 +187,7 @@ switch($_POST['act']){
             );
 		}
 
-        if (isset($_POST['ozon_markup']) && $_POST['ozon_markup']){
+        if (isset($post['ozon_markup']) && $post['ozon_markup']){
             $itemInfo['ozon_markup_old_price'] = Setting::get('marketplaces', 'ozon_markup_old_price');
             $itemInfo['ozon_markup_common'] = Setting::get('marketplaces', 'ozon_markup_common');
         }
@@ -201,24 +206,24 @@ switch($_POST['act']){
         echo json_encode($itemInfo);
 		break;
 	case 'addItem':
-		//debug($_POST); //exit();
+		//debug($post); //exit();
 		$res = $db->query("
-			SELECT * FROM #item_analogies WHERE item_id={$_POST['item_id']}
+			SELECT * FROM #item_analogies WHERE item_id={$post['item_id']}
 		", '');
 
-		$db->insert('item_'.$_POST['type'], ['item_id' => $_POST['item_id'], 'item_diff' => $_POST['item_diff']]/*, ['print' => true]*/);
-		if (in_array($_POST['type'], ['articles', 'analogies', 'substitutes'])){
-			$db->insert('item_'.$_POST['type'], ['item_id' => $_POST['item_diff'], 'item_diff' => $_POST['item_id']]/*, ['print' => true]*/);
+		$db->insert('item_'.$post['type'], ['item_id' => $post['item_id'], 'item_diff' => $post['item_diff']]/*, ['print' => true]*/);
+		if (in_array($post['type'], ['articles', 'analogies', 'substitutes'])){
+			$db->insert('item_'.$post['type'], ['item_id' => $post['item_diff'], 'item_diff' => $post['item_id']]/*, ['print' => true]*/);
 		}
-		if ($_POST['addAllAnalogies']){
+		if ($post['addAllAnalogies']){
 			if ($res->num_rows){
 				while($row = $res->fetch_assoc()){
-					$db->insert('item_analogies', ['item_id' => $_POST['item_diff'], 'item_diff' => $row['item_diff']]/*, ['print' => true]*/);
-					$db->insert('item_analogies', ['item_id' => $row['item_diff'], 'item_diff' => $_POST['item_diff']]/*, ['print' => true]*/);
+					$db->insert('item_analogies', ['item_id' => $post['item_diff'], 'item_diff' => $row['item_diff']]/*, ['print' => true]*/);
+					$db->insert('item_analogies', ['item_id' => $row['item_diff'], 'item_diff' => $post['item_diff']]/*, ['print' => true]*/);
 				} 
 			}
 		}
-		$res_items = core\Item::getResItemDiff($_POST['type'], $_POST['item_id'], '');
+		$res_items = core\Item::getResItemDiff($post['type'], $post['item_id'], '');
 		$output = [];
 		if ($res_items->num_rows){
 			foreach($res_items as $item) $output[] = $item;
@@ -226,23 +231,23 @@ switch($_POST['act']){
 		echo json_encode($output);
 		break;
 	case 'deleteItemDiff':
-		//debug($_POST); exit();
-		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_id']} AND `item_diff` = {$_POST['item_diff']}");
-		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_diff']} AND `item_diff` = {$_POST['item_id']}");
-		if ($_POST['type'] == 'analogies'){
+		//debug($post); exit();
+		$db->delete('item_'.$post['type'], "`item_id` = {$post['item_id']} AND `item_diff` = {$post['item_diff']}");
+		$db->delete('item_'.$post['type'], "`item_id` = {$post['item_diff']} AND `item_diff` = {$post['item_id']}");
+		if ($post['type'] == 'analogies'){
 			$res = $db->query("
-				SELECT item_diff FROM #item_analogies WHERE `item_id`={$_POST['item_id']}
+				SELECT item_diff FROM #item_analogies WHERE `item_id`={$post['item_id']}
 			", '');
 			if ($res->num_rows){
 				while($row = $res->fetch_assoc()){
 					$db->delete('item_analogies', "
-						(`item_id`={$_POST['item_diff']} AND `item_diff`={$row['item_diff']}) OR
-						(`item_id`={$row['item_diff']} AND `item_diff`={$_POST['item_diff']})
+						(`item_id`={$post['item_diff']} AND `item_diff`={$row['item_diff']}) OR
+						(`item_id`={$row['item_diff']} AND `item_diff`={$post['item_diff']})
 					");
 				}
 			}
 		}
-		$res_items = core\Item::getResItemDiff($_POST['type'], $_POST['item_id'], '');
+		$res_items = core\Item::getResItemDiff($post['type'], $post['item_id'], '');
 		$output = [];
 		if ($res_items->num_rows){
 			foreach($res_items as $item) $output[] = $item;
@@ -250,11 +255,11 @@ switch($_POST['act']){
 		echo json_encode($output);
 		break;
 	case 'clearItemDiff':
-		$db->delete('item_'.$_POST['type'], "`item_id` = {$_POST['item_id']} OR `item_diff` = {$_POST['item_id']}");
+		$db->delete('item_'.$post['type'], "`item_id` = {$post['item_id']} OR `item_diff` = {$post['item_id']}");
 		break;
     case 'getSubCategory':
-		$multipleCategory = isset($_POST['marketplace_description']);
-        echo Item::getSubCategory($_POST['parent_id'], $_POST['category_id'], $multipleCategory);
+		$multipleCategory = isset($post['marketplace_description']);
+        echo Item::getSubCategory($post['parent_id'], $post['category_id'], $multipleCategory);
         break;
     case 'deleteCategory':
         $db->query("
@@ -264,19 +269,25 @@ switch($_POST['act']){
                 tahos_filters f
             left join tahos_categories c on c.id = f.category_id
             where
-                c.id = {$_POST['id']} or c.parent_id = {$_POST['id']}
+                c.id = {$post['id']} or c.parent_id = {$post['id']}
         ");
-        $db->delete('categories', "`id` = {$_POST['id']} or `parent_id` = {$_POST['id']}");
+        $db->delete('categories', "`id` = {$post['id']} or `parent_id` = {$post['id']}");
         break;
     case 'setHidden':
         $db->update(
             'categories',
-            ['hidden' => $_POST['hidden']],
-            "`id` = {$_POST['id']}"
+            ['hidden' => $post['hidden']],
+            "`id` = {$post['id']}"
         );
         break;
     case 'getMainCategory':
         echo Item::getMainCategory();
+        break;
+    case 'group_change_status':
+        foreach($post['elements'] as $element){
+            $db->update('item_analogies', ['status' => $post['status_id']], "`item_id` = {$element['item_id']} AND `item_diff` = {$element['item_diff']}");
+            $db->update('item_analogies', ['status' => $post['status_id']], "`item_id` = {$element['item_diff']} AND `item_diff` = {$element['item_id']}");
+        }
         break;
 }
 ?>

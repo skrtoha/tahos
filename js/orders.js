@@ -59,7 +59,7 @@ function getReturns(){
 		}
 	})
 }
-function show_form_returns(items){
+function show_form_returns(params){
 	if (typeof reasonsOfReturn == 'undefined'){
 		$.ajax({
 			url: '/ajax/order.php',
@@ -79,52 +79,95 @@ function show_form_returns(items){
 		mainClass: 'product-popup-wrap',
 		callbacks: {
 			open: function(){
-				$('#mgn_popup table.basket-table tbody').empty();
+                const $tbody = $('#mgn_popup table.basket-table tbody');
+				$tbody.empty();
 				let return_summ = 0;
-				for(var k in items){
-					let strReason = '';
-					let commission;
-					return_summ = items[k].return_price * items[k].quan;
-					for(let i in reasonsOfReturn){
-						strReason += '<option ' + (reasonsOfReturn[i].id == items[k].reason_id ? 'selected' : '') + ' value="' + reasonsOfReturn[i].id + '">' + reasonsOfReturn[i].title + '</option>';
-					}
-					if (return_summ != items[k].summ) commission = 
-						'<span class="summ">'
-							 + items[k].summ + 
-							' <i class="fa fa-rub" aria-hidden="true"></i>' +
-						'</span>' +
-						'<span class="label">с комиссией</span>' +
-						'<span class="summ_return">'
-							 + '<span>' + return_summ + '</span>' +
-							' <i class="fa fa-rub" aria-hidden="true"></i>' +
-						'</span>';
-					else commission = 
-						'<span class="summ_return">'
-							 + '<span>' + return_summ + '</span>' +
-							' <i class="fa fa-rub" aria-hidden="true"></i>' +
-						'</span>';
-					$('#mgn_popup table.basket-table tbody').append(
-						'<tr order_id="' + items[k].order_id + '" store_id="' + items[k].store_id + '" item_id="' + items[k].item_id + '">' +
-							'<td label="Наменование: ">' + items[k].title + '</td>' + 
-							'<td>' +
-								'<select name="reason_id">' +
-									strReason +
-								'</select>' +
-							'</td>' +
-							'<td label="Количество: " class="quan">' + 
-								'<input type="hidden" name="available" value="' + items[k].quan + '">' +
-								'<div summand="' + items[k].return_price + '" packaging="' + items[k].packaging + '" class="count-block">' +
-									'<span class="minus">-</span>' +
-									'<input value="' + items[k].quan + '">' +
-									'<span class="plus">+</span>' +
-								'</div>' +
-							'</td>' +
-							'<td label="Сумма: ">' + 
-								commission +
-							'</td>' +
-						'</tr>'
-					)
-				}
+                let strReason = '';
+                let commission;
+                return_summ = params.return_price * params.quan;
+                for(let i in reasonsOfReturn){
+                    strReason += '<option ' + (reasonsOfReturn[i].id === params.reason_id ? 'selected' : '') + ' value="' + reasonsOfReturn[i].id + '">' + reasonsOfReturn[i].title + '</option>';
+                }
+                if (return_summ !== params.summ) {
+                    commission =
+                        '<span class="summ">'
+                        + params.summ +
+                        ' <i class="fa fa-rub" aria-hidden="true"></i>' +
+                        '</span>' +
+                        '<span class="label">с комиссией</span>' +
+                        '<span class="summ_return">'
+                        + '<span>' + return_summ + '</span>' +
+                        ' <i class="fa fa-rub" aria-hidden="true"></i>' +
+                        '</span>';
+                }
+                else {
+                    commission =
+                        '<span class="summ_return">'
+                        + '<span>' + return_summ + '</span>' +
+                        ' <i class="fa fa-rub" aria-hidden="true"></i>' +
+                        '</span>';
+                }
+
+                $tbody.append(
+                    '<tr>' +
+                        '<td label="Наменование: ">' + params.title + '</td>' +
+                        '<td>' +
+                            `
+                                <input type="hidden" name="order_id" value="${params.order_id}">
+                                <input type="hidden" name="store_id" value="${params.store_id}">
+                                <input type="hidden" name="item_id" value="${params.item_id}">
+                            ` +
+                            '<select name="reason_id">' +
+                                strReason +
+                            '</select>' +
+                        '</td>' +
+                        '<td label="Количество: " class="quan">' +
+                            '<input type="hidden" name="available" value="' + params.quan + '">' +
+                            '<div summand="' + params.return_price + '" packaging="' + params.packaging + '" class="count-block">' +
+                                '<span class="minus">-</span>' +
+                                '<input name="quan" value="' + params.quan + '">' +
+                                '<span class="plus">+</span>' +
+                            '</div>' +
+                        '</td>' +
+                        '<td label="Сумма: ">' +
+                            commission +
+                        '</td>' +
+                    '</tr>' +
+                    `<tr data-type="order" class="return-file">
+                        <td>Заказ-наряд</td>
+                        <td colspan="3">
+                            <label>
+                                <span>Выбрать</span>
+                                <input class="button" type="file" name="order">
+                            </label>
+                        </td>                            
+                    </tr>` +
+                    `<tr data-type="conclusion" class="return-file">
+                        <td>Заключение СТО</td>
+                        <td colspan="3">
+                            <label>
+                                <span>Выбрать</span>
+                                <input class="button" type="file" name="conclusion">
+                            </label>
+                        </td>                            
+                    </tr>` +
+                    `<tr data-type="photo" class="return-file">
+                        <td>Фото товара</td>
+                        <td colspan="3">
+                            <label>
+                                <span>Выбрать</span>
+                                <input class="button" type="file" name="photo">
+                            </label>
+                        </td>                            
+                    </tr>` +
+                    `<tr data-type="comment" class="return-file">
+                        <td>Комментарий</td>
+                        <td colspan="3">
+                            <textarea name="comment" placeholder="Описание..."></textarea>
+                        </td>                            
+                    </tr>`
+                )
+                setReturnFilesVisibility($tbody, params.reason_id);
 			}
 		},
 		items: {
@@ -133,22 +176,110 @@ function show_form_returns(items){
 	});
 	$('select').styler();
 }
+
+const visibilityParams = {
+    1: {
+        'order': '',
+        'conclusion': '',
+        'photo': '',
+        'comment': 'hidden'
+    },
+    2: {
+        'order': 'hidden',
+        'conclusion': 'hidden',
+        'photo': 'hidden',
+        'comment': 'hidden'
+    },
+    3: {
+        'order': 'hidden',
+        'conclusion': 'hidden',
+        'photo': 'hidden',
+        'comment': ''
+    },
+    4: {
+        'order': 'hidden',
+        'conclusion': 'hidden',
+        'photo': '',
+        'comment': 'hidden'
+    }
+}
+
+function setReturnFilesVisibility($tbody, reason_id) {
+    $.each($tbody.find('.return-file'), (index, value) => {
+        value.classList.remove('hidden');
+        const itemClass = visibilityParams[parseInt(reason_id)][value.dataset.type];
+        if (itemClass.length) {
+            value.classList.add(itemClass);
+        }
+    })
+}
+
+function checkForm(event) {
+    let result = true;
+    const requiredParams = event.target.querySelectorAll('input[type="file"], textarea');
+    const reason_id = + event.target.reason_id.value;
+
+    requiredParams.forEach(item => {
+        const keys = Object.keys(visibilityParams[reason_id]);
+        keys.forEach(key => {
+            switch (item.type) {
+                case 'file':
+                    if (item.name == key && visibilityParams[reason_id][key] == '' && item.files.length == 0) {
+                        result = false;
+                    }
+                    break;
+                case 'textarea':
+                    if (visibilityParams[reason_id].comment == '' && item.value.length <= 10) {
+                        result = false;
+                    }
+                    break;
+            }
+        })
+    })
+    return result;
+
+}
 $(function(){
-	var get = window
-		.location
-		.search
-		.replace('?','')
-		.split('&')
-		.reduce(
-			function(p,e){
-				var a = e.split('=');
-				p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
-				return p;
-			},
-			{}
-		);
-	var itemsForReturn = [];
-	$(document).on('click', 'tr.first', function(){
+    $(document).on('change', '.return-file input[type="file"]', e => {
+        e.target.closest('label').classList.add('active');
+    })
+    const get = window
+        .location
+        .search
+        .replace('?', '')
+        .split('&')
+        .reduce(
+            function (p, e) {
+                var a = e.split('=');
+                p[decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
+                return p;
+            },
+            {}
+        );
+
+    $(document).on('change', '.return-file input[type="file"]', e => {
+        if (e.target.files[0].size > 5000000) {
+            e.target.value = '';
+            show_message('Размер файла не должен превышать 5Мб!', 'error');
+            return;
+        }
+
+        const fileTypes = [
+            'image/jpeg',
+            'image/png'
+        ];
+        if (fileTypes.indexOf(e.target.files[0].type) === -1) {
+            e.target.value = '';
+            show_message('Недопустимый формат файла!', 'error');
+            return;
+        }
+        e.target.closest('label').querySelector('span').innerText = e.target.files[0].name;
+    })
+
+    $(document).on('change', 'select[name="reason_id"]', e => {
+        setReturnFilesVisibility($(e.target.closest('tbody')), e.target.value);
+    })
+    $(document).on('click', 'tr.first', function(){
 		$(this).toggleClass('active');
 	})
 	pickmeup.defaults.locales['ru'] = {
@@ -250,32 +381,20 @@ $(function(){
 	})
 	$(document).on('click', 'a.return', function(e){
 		e.preventDefault();
-		var tr = $(this).closest('tr');
-		var order_id = + tr.attr('order_id');
-		var store_id = + tr.attr('store_id');
-		var item_id = + tr.attr('item_id');
-		var key = order_id + '-' + store_id + '-' + item_id;
-		if (typeof itemsForReturn[key] !== 'undefined') return show_form_returns(itemsForReturn);
-		itemsForReturn[key] = {
-			order_id: order_id, 
-			store_id: store_id, 
-			item_id: item_id,
-			title: tr.find('.name-col').html(),
-			summ: + tr.find('.price_format').text(),
-			return_price: + $(this).attr('return_price'),
-			days_from_purchase: + $(this).attr('days_from_purchase'),
-			packaging: + $(this).attr('packaging'),
-			reason_id: 1,
-			quan: + tr.find('.quan').text()
-		};
-		console.log(itemsForReturn);
-		show_form_returns(itemsForReturn);
-	})
-	$(document).on('change', 'select[name=reason_id]', function(){
-		var order_id = $(this).closest('tr').attr('order_id');
-		var store_id = $(this).closest('tr').attr('store_id');
-		var item_id = $(this).closest('tr').attr('item_id');
-		itemsForReturn[order_id + '-' + store_id + '-' + item_id].reason_id = $(this).val();
+        const tr = $(this).closest('tr');
+
+		show_form_returns({
+            order_id: tr.attr('order_id'),
+            store_id: tr.attr('store_id'),
+            item_id: tr.attr('item_id'),
+            title: tr.find('.name-col').html(),
+            summ: + tr.find('.price_format').text(),
+            return_price: + $(this).attr('return_price'),
+            days_from_purchase: + $(this).attr('days_from_purchase'),
+            packaging: + $(this).attr('packaging'),
+            reason_id: 2,
+            quan: + tr.find('.quan').text()
+        });
 	})
 	$(document).on('click', ".count-block .minus, .count-block .plus", function(event) {
 		var e = $(this);
@@ -295,31 +414,36 @@ $(function(){
 		e.closest('tr').find('span.summ_return > span').html(newVal * summand);
 		itemsForReturn[order_id + '-' + store_id + '-' + item_id].quan = newVal;
 	});
-	$('#mgn_popup a.button').on('click', function(){
-		let data = new Array();
-		for(var k in itemsForReturn) data.push(itemsForReturn[k]);
+	$(document).on('submit', '#mgn_popup form', function(e){
+        e.preventDefault();
+
+        if (!checkForm(e)) {
+            show_message('Ошибка заполнения реквизитов!', 'error');
+            return;
+        }
+
+        const formData = new FormData(e.target);
+        formData.set('act', 'to_return');
 		$.ajax({
 			url: '/ajax/order.php',
 			type: 'post',
-			processData: true,
-			data: {
-				act: 'to_return',
-				items: data
-			},
+			processData: false,
+            contentType: false,
+			data: formData,
 			success: function(response){
+                formData.set('act', 'set_1c_return');
                 $.ajax({
                     url: '/ajax/order.php',
                     type: 'post',
-                    data: {
-                        act: 'set_1c_return',
-                        items: data
-                    },
+                    processData: false,
+                    contentType: false,
+                    data: formData,
                     success: response => {
+                        $.cookie('message', 'Возврат успешно оформлен', cookieOptions);
+                        $.cookie('message_type', 'ok', cookieOptions);
+                        document.location.reload();
                     }
                 })
-                $.cookie('message', 'Возврат успешно оформлен', cookieOptions);
-                $.cookie('message_type', 'ok', cookieOptions);
-                document.location.reload();
 			}
 		})
 		return false;

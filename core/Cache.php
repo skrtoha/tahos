@@ -13,7 +13,7 @@ class Cache{
             throw new \Exception('Класс '.Config::$cacheClass.' не найден');
         }
         $this->classCache = new Config::$cacheClass;
-        $this->classCache->addServer('localhost', 11211);
+        $this->classCache->addServer(Config::$cacheHost, 11211);
     }
 
     private static function getInstance()

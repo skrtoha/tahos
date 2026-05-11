@@ -30,3 +30,12 @@ tr.return_class_3 {
 tr.return_class_4 {
     background: #e4d4d4;
 }
+.image {
+    display: flex;
+    flex-direction: column;
+    max-width: 50%;
+}
+.image img {
+    width: 100%;
+    height: auto;
+}

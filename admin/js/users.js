@@ -385,7 +385,7 @@ class User{
                         <input value="${valueWithoutMarkup}" type="hidden" name="withoutMarkup[${item_id}]">
                         <input ${priceDisabled} value="${valuePrice}" type="text" name="price[${item_id}]">
                     </td>` +
-                    `<td label="Количество"><input value="${valueQuan}" type="text" name="quan[${item_id}]"></td>` +
+                    `<td label="Количество"><input value="${valueQuan}" type="number" name="quan[${item_id}]"></td>` +
                     `<td label="Сумма"><span value="0" class="summ">${valueSumm}</span></td>` +
                     `<td label="Комментарий">
                         <textarea name="comment[${item_id}]">${comment}</textarea>

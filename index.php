@@ -62,7 +62,6 @@ if($_GET['act'] == 'unbind'){
 	header('Location: /settings');
 }
 
-
 if (!empty($_COOKIE['jwt']) && !$_SESSION['user']){
     $jwtInfo = Authorize::getJWTInfo($_COOKIE['jwt']);
     $_SESSION['user'] = $jwtInfo['user_id'];

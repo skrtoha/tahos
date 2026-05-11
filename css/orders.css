@@ -91,6 +91,35 @@ a.removeFromBasket {
 }
 #mgn_popup .count-block{
     position: static;
+    display: flex;
+}
+#mgn_popup form input[type="submit"] {
+    margin-top: 10px;
+}
+.return-file input[type="file"] {
+    height: 0;
+    width: 0;
+    padding: 0;
+    border: none;
+}
+.return-file td > label {
+    display: block;
+    width: fit-content;
+    line-height: 34px;
+    height: 34px;
+    border: none;
+    padding: 0 15px;
+    border-radius: 4px;
+    background: #0082bf;
+    font-size: 16px;
+    color: #fff;
+    cursor: pointer;
+}
+.return-file textarea {
+    width: 229px;
+}
+.return-file[data-type="comment"] td:nth-child(2) {
+    text-align: left;
 }
 .product-popup .count-block {
     margin-left: 10px;
@@ -590,7 +619,6 @@ a.return, a.removeFromOrder {
 }
 span.ordered_return.status_return_1 {
     display: block;
-    font-size: 13px;
 }
 
 a.pay-order{
@@ -627,6 +655,7 @@ a.pay-order:hover{
     }
     #mgn_popup .basket-table tr{
         border-bottom: none;
+        padding: 0;
     }
 }
 

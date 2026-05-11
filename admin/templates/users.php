@@ -967,7 +967,7 @@ function basket(){
 					<div class="value">
                         <input type="hidden" name="save_basket" value="0">
                         <input type="submit" class="save" disabled value="Сохранить">
-						<input type="submit" class="send" class="button" value="Отправить в заказ">
+						<input type="submit" class="send button" value="Отправить в заказ">
 					</div>
 				</form>
 			</div>

@@ -196,11 +196,16 @@ class Armtek extends Provider{
 			$store_id = $this->getStoreId($value);
 			if (!$store_id) continue;
 			$item_id = $this->getItemId($value);
-			if (!$value->ANALOG) $this->mainItemId = $item_id;
+   
+			/*if (!$value->ANALOG) $this->mainItemId = $item_id;
 			else{
 				$GLOBALS['db']->insert('item_analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
 				$GLOBALS['db']->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
-			}
+			}*/
+            if ($value->ANALOG) {
+                continue;
+            }
+            
 			$GLOBALS['db']->insert('store_items', [
 				'store_id' => $store_id,
 				'item_id' => $item_id,

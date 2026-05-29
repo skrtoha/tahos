@@ -224,7 +224,7 @@ class Armtek extends Provider{
 		$config = self::getConfig();
 		$params = self::$params;
 		$params['PIN'] = $article;
-		$params['BRAND'] = $brand;
+		$params['BRAND'] = Provider::getProviderBrend(self::$provider_id, $brand);
 
         if ($config['with_cross']) {
             $params['QUERY_TYPE'] = 2;

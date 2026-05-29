@@ -116,6 +116,7 @@ class Armtek extends Provider{
                 'noReturn' => 0,
             ],
             ['duplicate' => [
+                'last_insert_id' => 'id',
                 'delivery' => $delivery,
                 'delivery_max' => $delivery_max
             ]]
@@ -193,14 +194,14 @@ class Armtek extends Provider{
 	}
 	private function render($array){
 		foreach($array as $value){
-			$store_id = $this->getStoreId($value);
+            if ($value->ANALOG) {
+                continue;
+            }
+
+            $store_id = $this->getStoreId($value);
 			if (!$store_id) continue;
 			$item_id = $this->getItemId($value);
-			if (!$value->ANALOG) $this->mainItemId = $item_id;
-			else{
-				$GLOBALS['db']->insert('item_analogies', ['item_id' => $this->mainItemId, 'item_diff' => $item_id]);
-				$GLOBALS['db']->insert('item_analogies', ['item_id' => $item_id, 'item_diff' => $this->mainItemId]);
-			}
+
 			$GLOBALS['db']->insert('store_items', [
 				'store_id' => $store_id,
 				'item_id' => $item_id,

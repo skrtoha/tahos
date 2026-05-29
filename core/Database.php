@@ -318,6 +318,10 @@ class Database {
 			$query .= " ON DUPLICATE KEY UPDATE ";
             if (is_array($insert_params['duplicate'])){
                 foreach($insert_params['duplicate'] as $key => $value){
+                    if ($key == 'last_insert_id') {
+                        $query .= "{$value} = LAST_INSERT_ID($value),";
+                        continue;
+                    }
                     $query .= "`$key` = ";
                     if ($value == '') $query .= 'DEFAULT,';
                     elseif (!is_numeric($value)) $query .= "'".$this->mysqli->real_escape_string($value) ."',";

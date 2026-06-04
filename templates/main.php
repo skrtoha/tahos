@@ -108,9 +108,9 @@ $token = Cache::getCacheToken();
         <?if (!empty($debt)){?>
             <div class="top-message debt"><?=$debt['message']?></div>
         <?}?>
-        <?if ($_SESSION['user'] && !User::isRegistedTelegram($_SESSION['user'])){?>
+        <?if ($_SESSION['user'] && !User::isRegistedMax($_SESSION['user'])){?>
             <div class="top-message telegram">
-                <a target="_blank" href="<?= Config::$telegram['url']?>">Подпишитесь на наш Телеграм бот</a>
+                <a target="_blank" href="<?= Config::$max['url']?>">Подпишитесь на наш Max бот</a>
                 <span class="icon-cross1"></span>
             </div>
         <?}?>

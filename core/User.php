@@ -599,6 +599,14 @@ class User{
         return $output[$user_id];
     }
 
+    public static function isRegistedMax($user_id){
+        static $output = [];
+        if (isset($output[$user_id])) return $output[$user_id];
+        $count = Database::getInstance()->getCount('user_max', "`user_id` = $user_id");
+        $output[$user_id] = $count > 0;
+        return $output[$user_id];
+    }
+
     public static function returnMoney($user_id, $amount, $comment = 'Возврат средств', $bill_type = User::BILL_CASH, $document_date = null){
         $user = User::getById($user_id);
 

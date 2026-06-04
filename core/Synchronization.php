@@ -1,6 +1,7 @@
 <?php
 namespace core;
 
+use core\Messengers\Messengers;
 use core\Messengers\Telegram;
 
 class Synchronization{
@@ -235,7 +236,7 @@ class Synchronization{
     }
 
     public static function createPayment1C($params, $type = '') {
-        Telegram::writeLogFile($params);
+        Messengers::writeLogFile($params);
         $settings = Setting::get('common', null, 'all');
 
         $curl = curl_init();
@@ -259,8 +260,8 @@ class Synchronization{
         ));
 
         $response = curl_exec($curl);
-        Telegram::writeLogFile(curl_error($curl));
-        Telegram::writeLogFile($response);
+        Messengers::writeLogFile(curl_error($curl));
+        Messengers::writeLogFile($response);
 
         curl_close($curl);
         return $response;

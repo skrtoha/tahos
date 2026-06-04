@@ -1,6 +1,7 @@
 <?php
 namespace core;
 
+use core\Messengers\Max;
 use core\Messengers\Telegram;
 use core\Provider\Absel;
 use core\Provider\Autoeuro;
@@ -181,10 +182,14 @@ class OrderValue{
                         $url = str_replace('www.', '', $_SERVER['HTTP_ORIGIN']);
                         $message = "Позиция {$itemInfo['brend']}-{$itemInfo['article']} отменена поставщиком. Заказ {$url}/order/{$ov['order_id']}";
 
-                        $telegram = new Telegram();
+                        /*$telegram = new Telegram();
                         $userTelegram = $telegram->getTelegramId($userInfo['id']);
                         if ($userTelegram){
                             Telegram::sendMessageProviderRefuse($userInfo['id'], $message);
+                        }*/
+                        $userMax = Max::getInstance()->getMaxId($userInfo['id']);
+                        if ($userMax){
+                            Max::sendMessageProviderRefuse($userInfo['id'], $message);
                         }
                         else{
                             $smsAero->sendSms(
@@ -717,7 +722,8 @@ class OrderValue{
         foreach($actions as $act){
             switch($act['name']){
                 case 'sendStatusArrived':
-                    Telegram::sendMessageArrived($act['params']['order_id'], $act['params']['item_id']);
+//                    Telegram::sendMessageArrived($act['params']['order_id'], $act['params']['item_id']);
+                    Max::sendMessageArrived($act['params']['order_id'], $act['params']['item_id']);
                     break;
             }
         }

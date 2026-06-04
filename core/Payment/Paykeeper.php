@@ -6,6 +6,7 @@ use core\Cache;
 use core\Database;
 use core\Exceptions\Paykeeper\PaymentAlreadyExistsException;
 use core\Fund;
+use core\Messengers\Messengers;
 use core\Messengers\Telegram;
 use core\OrderValue;
 use core\Synchronization;
@@ -290,7 +291,7 @@ class Paykeeper{
             ]);
         }
         catch (\Throwable $exception) {
-            Telegram::writeLogFile($exception);
+            Messengers::writeLogFile($exception);
         }
 
         return true;

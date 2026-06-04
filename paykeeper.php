@@ -6,5 +6,5 @@ if (isset($_GET['fail']) && $_GET['fail'] == 'true'){
     die();
 }
 require_once ("{$_SERVER['DOCUMENT_ROOT']}/core/Database.php");
-\core\Messengers\Telegram::writeLogFile($_REQUEST);
+\core\Messengers\Messengers::writeLogFile($_REQUEST);
 \core\Payment\Paykeeper::setPayment($_REQUEST);

@@ -1,5 +1,6 @@
 <?php
 namespace core;
+use core\Messengers\Max;
 use core\Messengers\Telegram;
 
 class Returns{
@@ -152,10 +153,12 @@ class Returns{
         $item = "{$return['brend']} {$return['article']} {$return['title_full']}";
         switch($params['status_id']){
             case 2:
-                Telegram::sendMessageAwaitInStore($return['user_id'], $item);
+//                Telegram::sendMessageAwaitInStore($return['user_id'], $item);
+                Max::sendMessageAwaitInStore($return['user_id'], $item);
                 break;
             case 3:
-                Telegram::sendMessageReturnPerformed($return['user_id'], $item, $amount);
+//                Telegram::sendMessageReturnPerformed($return['user_id'], $item, $amount);
+                Max::sendMessageReturnPerformed($return['user_id'], $item, $amount);
                 break;
 
         }

@@ -1,6 +1,7 @@
 <?php
 namespace core;
 
+use core\Messengers\Max;
 use core\Messengers\Telegram;
 use mysqli_result;
 
@@ -518,6 +519,20 @@ class User{
         }
 
         Database::getInstance()->commit();
+
+        $userMax = Max::getInstance()->getMaxId($params['user_id']);
+        if ($userMax && $userMax['max_user_id']) {
+            $text = 'Ваш ';
+            if ($params['bill_type'] == User::BILL_CASH){
+                $text .= 'наличный';
+            }
+            else {
+                $text .= 'безналичный';
+            }
+            $text .= " счет был пополнен на {$params['sum']} руб. Остаток: {$params['remainder']} руб.";
+            Max::getInstance()->sendMessages($userMax['max_user_id'], ['text' => $text]);
+        }
+
         return true;
     }
 

@@ -7,7 +7,7 @@ use core\User;
 
 class Max extends Messengers {
     private static $token = 'f9LHodD0cOJRSB4VJPG3SACaTR3yHB-X-baA_4lh1cL_6QWvYe9sQKOlNs6rcMFMY671LEXB-7W08xbL19Dg';
-    private static $uri = 'https://platform-api.max.ru/';
+    private static $uri = 'https://platform-api2.max.ru/';
     public function __construct() {}
 
     public function parseMessage($message) {
